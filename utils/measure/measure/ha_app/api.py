@@ -38,6 +38,7 @@ from measure.ha_app.contribution import (
 )
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
+from measure.ha_app.library_catalog import LibraryCatalogError, MeasureDeviceCatalog
 from measure.ha_app.light_probe import (
     LightLoadProbe,
     LightLoadProbeError,
@@ -135,6 +136,10 @@ class EntityCatalogResponse(BaseModel):
     lights: list[EntityDescriptor]
     powers: list[EntityDescriptor]
     voltages: list[EntityDescriptor]
+
+
+class MeasureDeviceCatalogResponse(BaseModel):
+    devices: list[str]
 
 
 class SessionFile(BaseModel):
@@ -238,6 +243,7 @@ class AppContext:
         self.trusted_ingress_only = trusted_ingress_only
         self.developer_mode = developer_mode
         self.storage = SessionStorage(data_root)
+        self.measure_device_catalog = MeasureDeviceCatalog()
         self.power_meter_diagnostics = PowerMeterDiagnostics(self.build_power_meter)
         self.light_load_probe = LightLoadProbe(
             lambda: app_measurement_assembler(
@@ -400,7 +406,7 @@ def _register_error_handlers(app: FastAPI) -> None:
         status_code = _CONTRIBUTION_STATUS_CODES.get(error.code, 500)
         return JSONResponse(
             status_code=status_code,
-            content=ErrorResponse(code=error.code.value, message=str(error)).model_dump(),
+            content=ErrorResponse(code=error.code.value, message=str(error), field=error.field).model_dump(),
         )
 
     @app.exception_handler(Exception)
@@ -440,6 +446,15 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/measure-definitions")
     async def measure_definitions() -> list[MeasureDefinition]:
         return _measure_definitions()
+
+    @router.get("/library/measure-devices", responses={503: _ERROR})
+    async def measure_devices(request: Request, response: Response) -> MeasureDeviceCatalogResponse:
+        try:
+            devices = await run_in_threadpool(_context(request).measure_device_catalog.devices)
+        except LibraryCatalogError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+        response.headers["Cache-Control"] = "public, max-age=600"
+        return MeasureDeviceCatalogResponse(devices=list(devices))
 
     @router.get("/settings")
     async def get_settings(request: Request) -> AppSettingsResponse:

@@ -5,6 +5,7 @@ import type {
   EntityCatalog,
   EntityDescriptor,
   MeasureDefinition,
+  MeasureDeviceCatalog,
   MeasurementParameters,
   PlotCollection,
   PreflightResponse,
@@ -45,6 +46,9 @@ const voltages: EntityDescriptor[] = [{ entity_id: "sensor.plug_voltage", name: 
 const lights: EntityDescriptor[] = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"] }];
 
 const catalog: EntityCatalog = { lights, powers, voltages };
+const measureDevices: MeasureDeviceCatalog = {
+  devices: ["Aeotec ZWA023", "Kasa EP25", "Shelly Plug S", "Shelly Plus Plug S", "TP-Link Kasa KP115"],
+};
 
 const settings: AppSettings = {
   default_power_entity_id: "sensor.plug_power",
@@ -83,7 +87,7 @@ const lightDefinition: MeasureDefinition = {
   description: "Build a lookup-table power profile for a light.",
   icon: "💡",
   model_id_example: "LWA017",
-  product_name_example: "Philips Hue White Ambiance A60 E27",
+  product_name_example: "Hue White Ambiance A60 E27",
   parameters: [
     { name: "sleep_time", label: "Settle time (seconds)", step: "0.1", group: "Sampling" },
     { name: "bri_bri_steps", label: "Brightness mode step", group: "Profile resolution" },
@@ -225,6 +229,7 @@ const fixedRoutes = new Map<string, unknown>([
   ["contribution/auth", { connected: false }],
   ["contribution/status", { submitted: false }],
   ["measure-definitions", [averageDefinition, lightDefinition]],
+  ["library/measure-devices", measureDevices],
   ["dummy-load/calibration", null],
   ["preflight", preflight],
   ["sessions/session-running", startedSnapshot],

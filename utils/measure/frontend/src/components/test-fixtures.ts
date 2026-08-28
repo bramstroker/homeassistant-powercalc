@@ -82,7 +82,7 @@ export const lightDefinition: MeasureDefinition = {
   description: "Build a lookup-table power profile for a light.",
   icon: "💡",
   model_id_example: "LWA017",
-  product_name_example: "Philips Hue White Ambiance A60 E27",
+  product_name_example: "Hue White Ambiance A60 E27",
   parameters: [
     { name: "sleep_time", label: "Settle time (seconds)", hint: "Wait after changing the light before reading power.", step: "0.1", group: "Sampling" },
     { name: "sample_count", label: "Samples per point", hint: "More samples reduce noise but increase measurement time.", group: "Sampling" },

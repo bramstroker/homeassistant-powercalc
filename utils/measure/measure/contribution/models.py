@@ -128,6 +128,7 @@ class ContributionPreview(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     manufacturer_directory: str
+    manufacturer_library_url: str | None = None
     model_directory: str
     files: tuple[ContributionPreparedFile, ...]
     warnings: tuple[str, ...] = ()

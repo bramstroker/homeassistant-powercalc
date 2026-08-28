@@ -179,9 +179,58 @@ def test_preparer_uses_downloaded_library_index_for_aliases_and_collisions(tmp_p
     preview = preparer.prepare(artifacts, metadata(model_id="LCT999"))
 
     assert preview.manufacturer_directory == "signify"
+    assert preview.manufacturer_library_url == "https://library.powercalc.nl/manufacturers/signify"
     collision_metadata = metadata(model_id="LCT010")
     with pytest.raises(ProfilePreparationError, match="Refusing to overwrite"):
         preparer.prepare(artifacts, collision_metadata)
+
+
+@pytest.mark.parametrize(
+    "manufacturer, product_name",
+    [
+        ("Signify", "Signify Hue test lamp"),
+        ("Philips", "philips-hue test lamp"),
+        ("Philips", "Philips_Hue test lamp"),
+    ],
+)
+def test_preparer_rejects_product_names_prefixed_with_manufacturer_or_alias(
+    tmp_path: Path,
+    manufacturer: str,
+    product_name: str,
+) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_library(tmp_path)
+    write_profile_artifacts(artifacts)
+
+    with pytest.raises(ProfilePreparationError, match="must not start with the manufacturer") as error:
+        make_preparer(tmp_path).prepare(artifacts, metadata(manufacturer, product_name=product_name))
+
+    assert error.value.field == "product_name"
+
+
+def test_preparer_allows_manufacturer_words_outside_the_product_name_prefix(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_library(tmp_path)
+    write_profile_artifacts(artifacts)
+
+    preview = make_preparer(tmp_path).prepare(
+        artifacts,
+        metadata(product_name="Mijia Philips Desk Lamp 3"),
+    )
+
+    assert preview.manufacturer_directory == "signify"
+
+
+def test_new_manufacturer_has_no_library_url_and_still_cannot_prefix_product_name(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    preparer = make_preparer(tmp_path)
+
+    preview = preparer.prepare(artifacts, metadata("Acme", product_name="Smart Bulb A19"))
+    assert preview.manufacturer_library_url is None
+
+    with pytest.raises(ProfilePreparationError, match="must not start with the manufacturer"):
+        preparer.prepare(artifacts, metadata("Acme", product_name="Acme Smart Bulb A19"))
 
 
 def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts(tmp_path: Path) -> None:

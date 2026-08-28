@@ -49,6 +49,7 @@ function state(): MeasureAppState {
     files: [], plotCollection: { partial: false, plots: [], warnings: [] },
     logs: [], samples: [], lights: [], powers: [], voltages: [], definitions: [],
     dummyLoadCalibration: null, dummyLoadCalibrationError: "",
+    measureDevices: [], measureDevicesLoading: false, measureDevicesError: "",
     contributionBusy: false, contributionAuthBusy: false, contributionError: "", contributionAuthError: "",
     deviceEntities: {}, deviceEntityErrors: {}, testingPowerMeter: false,
     shellyDiscoveryDevices: [], discoveringShellys: false, shellyDiscoveryError: "",
@@ -59,6 +60,7 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
   return {
     getCapabilities: async () => capabilities,
     getMeasureDefinitions: async () => [],
+    getMeasureDevices: async () => ({ devices: [] }),
     getSettings: async () => settings,
     getContributionAuth: async () => ({ connected: false }),
     getContributionStatus: async () => ({ state: "idle" as const }),
@@ -372,6 +374,33 @@ describe("measure app controller", () => {
     vi.useRealTimers();
   });
 
+  it("preserves contribution field errors for inline feedback", async () => {
+    const appState = state();
+    const controller = new MeasureAppController(appState, () => api({
+      previewContribution: async () => {
+        throw new ApiError(
+          "Product name must not start with the manufacturer",
+          422,
+          "invalid_metadata",
+          "product_name",
+        );
+      },
+    }), () => connection(), () => undefined);
+    appState.snapshot = { state: "completed", session_id: "session-1" };
+
+    await controller.previewContribution({
+      manufacturer_name: "Signify",
+      manufacturer_directory: "signify",
+      model_id: "LCT010",
+      product_name: "Signify Hue lamp",
+      contributor: "octocat",
+      notes: "",
+    });
+
+    expect(appState.contributionError).toBe("Product name must not start with the manufacturer");
+    expect(appState.contributionErrorField).toBe("product_name");
+  });
+
   it("backs off automatic device polling and stops when the code expires", async () => {
     vi.useFakeTimers();
     const appState = state();
@@ -648,6 +677,37 @@ describe("measure app controller", () => {
     controller.openSettings();
 
     expect(appState.settingsSection).toBeUndefined();
+  });
+
+  it("loads canonical measurement-device names without blocking settings", async () => {
+    const appState = state();
+    appState.view = "setup";
+    const controller = new MeasureAppController(appState, () => api({
+      getMeasureDevices: async () => ({ devices: ["Shelly Plug S", "TP-Link Kasa KP115"] }),
+    }), () => connection(), () => undefined);
+
+    controller.openSettings();
+
+    expect(appState.view).toBe("settings");
+    expect(appState.measureDevicesLoading).toBe(true);
+    await vi.waitFor(() => expect(appState.measureDevicesLoading).toBe(false));
+    expect(appState.measureDevices).toEqual(["Shelly Plug S", "TP-Link Kasa KP115"]);
+    expect(appState.measureDevicesError).toBe("");
+  });
+
+  it("keeps settings usable when measurement-device suggestions fail", async () => {
+    const appState = state();
+    appState.view = "setup";
+    const controller = new MeasureAppController(appState, () => api({
+      getMeasureDevices: async () => { throw new Error("Library unavailable"); },
+    }), () => connection(), () => undefined);
+
+    controller.openSettings();
+
+    await vi.waitFor(() => expect(appState.measureDevicesLoading).toBe(false));
+    expect(appState.view).toBe("settings");
+    expect(appState.measureDevices).toEqual([]);
+    expect(appState.measureDevicesError).toBe("Library unavailable");
   });
 
   it("discovers Shellys when opening Shelly settings and exposes unavailable discovery", async () => {

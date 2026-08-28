@@ -45,6 +45,21 @@ test("configures a measurement and reaches the setup check", async ({ page }) =>
   await expect(page.getByRole("button", { name: "Start measurement" })).toBeEnabled();
 });
 
+test("searches and selects a Home Assistant light with the shared combobox", async ({ page }) => {
+  await page.getByRole("button", { name: "New measurement" }).click();
+  await page.getByRole("button", { name: /Light bulb/ }).click();
+
+  const light = page.getByRole("combobox", { name: "Light" });
+  await light.fill("desk");
+  await expect(page.getByRole("listbox", { name: "Light options" })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Desk lamp · light.desk" })).toBeVisible();
+  await light.press("ArrowDown");
+  await light.press("Enter");
+
+  await expect(light).toHaveValue("Desk lamp · light.desk");
+  await expect(page.getByRole("listbox", { name: "Light options" })).toBeHidden();
+});
+
 test("starts the measurement and shows live events on the running screen", async ({ page }) => {
   await startAverageSetup(page);
   await page.getByRole("button", { name: "Check setup" }).click();
@@ -75,6 +90,17 @@ test("opens settings from setup with the configured power meter", async ({ page 
   await page.getByRole("button", { name: "Change power meter" }).click();
 
   await expect(page.getByRole("heading", { name: "Measurement defaults" })).toBeVisible();
-  await expect(page.getByLabel("Measurement device name")).toHaveValue("Shelly Plug S");
+  await expect(page.getByRole("combobox", { name: "Measurement device name" })).toHaveValue("Shelly Plug S");
   await expect(page.getByLabel("Type")).toHaveValue("hass");
+  await expect(page.getByRole("combobox", { name: "Power sensor" })).toHaveValue("Plug power · sensor.plug_power");
+
+  const deviceName = page.getByRole("combobox", { name: "Measurement device name" });
+  await deviceName.fill("plus");
+  await expect(page.getByRole("listbox", { name: "Measurement device name options" })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Shelly Plus Plug S" })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Aeotec ZWA023" })).toBeHidden();
+  await deviceName.press("ArrowDown");
+  await deviceName.press("Enter");
+  await expect(deviceName).toHaveValue("Shelly Plus Plug S");
+  await expect(page.getByRole("listbox", { name: "Measurement device name options" })).toBeHidden();
 });

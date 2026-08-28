@@ -50,9 +50,10 @@ class ContributionApiErrorCode(StrEnum):
 
 
 class ContributionApiError(Exception):
-    def __init__(self, code: ContributionApiErrorCode, message: str) -> None:
+    def __init__(self, code: ContributionApiErrorCode, message: str, *, field: str | None = None) -> None:
         super().__init__(message)
         self.code = code
+        self.field = field
 
 
 class ContributionIdentity(BaseModel):
@@ -140,6 +141,7 @@ class ContributionPreviewResponse(BaseModel):
     base_sha: str | None = None
     manufacturer_name: str
     manufacturer_directory: str
+    manufacturer_library_url: str | None = None
     model_id: str
     product_name: str
     contributor: str

@@ -65,7 +65,7 @@ Profiles belong under:
 profile_library/<manufacturer>/<model>/
 ```
 
-Use the exact model identifier for the model directory, not the full marketing name. Add the full product name to `aliases` in `model.json` when it differs from the model identifier.
+Use the exact model identifier for the model directory, not the full marketing name. Set `name` in `model.json` to the marketed product name without repeating the manufacturer. For example, a Signify profile should use `Hue White Ambiance GU10`, not `Signify Hue White Ambiance GU10`. Reserve `aliases` for additional model identifiers that can discover the same hardware.
 
 For example:
 
@@ -92,8 +92,9 @@ Completed light, speaker, fan, and charging measurements that generated a valid 
 1. Open **Settings → GitHub** in Powercalc Measure.
 2. Connect your GitHub account with the device login, or supply a personal access token with public-repository access.
 3. Return to the completed measurement and select **Create pull request automatically**.
-4. Confirm the manufacturer and model details, then review the exact files, generated JSON, commit message, and pull-request text.
-5. Select **Create pull request** only after the preview is correct.
+4. Confirm the manufacturer and model details. For an existing manufacturer, follow the library link and compare the product naming and metadata with its other profiles.
+5. Review the exact files, generated JSON, commit message, and pull-request text.
+6. Select **Create pull request** only after the preview is correct.
 
 The app reuses your existing fork or creates one when needed. It then creates a focused branch and commit and opens a pull request against Powercalc. An existing profile with the same manufacturer and model is not replaced automatically; use the manual process when proposing an update.
 
@@ -135,7 +136,9 @@ Open the link printed by `git push`, create the pull request against Powercalc `
 Before submitting, confirm that:
 
 - the manufacturer and exact model identifier are correct;
+- the product name does not repeat the manufacturer;
 - the model directory uses the model ID rather than a generic family or marketing name;
+- `measure_device` uses an existing library value when the same meter is already listed;
 - `model.json` describes the measured product and calculation strategy correctly;
 - generated CSV files match the capabilities and modes of the device;
 - compressed `.csv.gz` files do not have uncompressed `.csv` duplicates;

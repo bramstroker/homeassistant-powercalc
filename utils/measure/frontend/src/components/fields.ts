@@ -1,5 +1,7 @@
 import { html, nothing } from "lit";
 import type { EntityDescriptor } from "../types";
+import type { ComboboxOption } from "./combobox";
+import "./combobox";
 
 /**
  * Form controls shared by the views that render inputs. They are plain functions rather than a
@@ -60,11 +62,22 @@ export interface EntitySelectOptions {
 
 export function entitySelect(name: string, label: string, entities: EntityDescriptor[], options: EntitySelectOptions = {}) {
   const { selected = "", required = false, onChange = null } = options;
+  const comboboxOptions: ComboboxOption[] = entities.map((entity) => ({
+    value: entity.entity_id,
+    label: `${entity.name} · ${entity.entity_id}`,
+  }));
+  if (!required) comboboxOptions.unshift({ value: "", label: "None" });
   return html`
-    <label><span>${label}</span><select name=${name} ?required=${required} @change=${onChange}>
-      <option value="">${required ? "Select an entity" : "None"}</option>
-      ${entities.map((entity) => entityOption(entity, entity.entity_id === selected))}
-    </select></label>
+    <measure-combobox
+      name=${name}
+      label=${label}
+      .value=${selected}
+      .options=${comboboxOptions}
+      placeholder=${`Search ${label.toLowerCase()} entities`}
+      ?required=${required}
+    >
+      <input slot="value" type="hidden" name=${name} .value=${selected} @change=${onChange} />
+    </measure-combobox>
   `;
 }
 

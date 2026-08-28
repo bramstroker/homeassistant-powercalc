@@ -1,4 +1,4 @@
-import { LitElement, css, html, nothing, svg } from "lit";
+import { LitElement, css, html, nothing, svg, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, EntityDescriptor, MeasureParameterName, PowerMeterDiagnostic, PowerMeterType, SettingsSection, ShellyDiscoveryDevice } from "../types";
@@ -6,6 +6,8 @@ import { DEFAULT_SHELLY_USERNAME, POWER_METER_LIST, meterFor, settingsFromForm }
 import { formRaw, formText, formTextOrNull } from "../form";
 import { emit } from "../events";
 import { sharedStyles } from "../styles";
+import type { ComboboxOption } from "./combobox";
+import "./combobox";
 import "./power-meter-diagnostic";
 
 interface SettingsSectionDescriptor {
@@ -49,6 +51,15 @@ export class SettingsView extends LitElement {
 
   @property({ attribute: false })
   capabilities?: Capabilities;
+
+  @property({ attribute: false })
+  measureDevices: string[] = [];
+
+  @property({ type: Boolean })
+  measureDevicesLoading = false;
+
+  @property({ type: String })
+  measureDevicesError = "";
 
   @state()
   meter?: PowerMeterType;
@@ -123,6 +134,12 @@ export class SettingsView extends LitElement {
 
   private readonly form = createRef<HTMLFormElement>();
 
+  @state()
+  private measureDeviceValue = "";
+
+  @state()
+  private hassPowerEntity = "";
+
   static readonly styles = [sharedStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
     form { display: grid; gap: 1rem; min-width: 0; max-width: 100%; margin-top: 1rem; }
@@ -181,7 +198,11 @@ export class SettingsView extends LitElement {
     }
   `];
 
-  willUpdate() {
+  willUpdate(changedProperties: PropertyValues<this>) {
+    if (changedProperties.has("settings")) {
+      this.measureDeviceValue = this.settings?.default_measure_device ?? "";
+      this.hassPowerEntity = this.settings?.default_power_entity_id ?? "";
+    }
     // Honour a requested section (e.g. opened from the GitHub contribution shortcut) once,
     // while still letting the user switch sections afterwards.
     if (!this.appliedInitialSection && this.initialSection) {
@@ -215,10 +236,24 @@ export class SettingsView extends LitElement {
               <h3 id="power-meter-title">Power meter</h3>
               <p class="muted">Choose where readings come from and set the default measurement hardware.</p>
               <div class="section-fields">
-                <label>
-                  <span>Measurement device name</span>
-                  <input name="default_measure_device" .value=${this.settings?.default_measure_device ?? ""} required autocomplete="off" placeholder="e.g. Shelly Plug S" />
-                </label>
+                <measure-combobox
+                  name="default_measure_device"
+                  label="Measurement device name"
+                  .value=${this.measureDeviceValue}
+                  .options=${this.measureDeviceOptions()}
+                  placeholder="e.g. Shelly Plug S"
+                  .hint=${this.measureDevicesLoading
+                    ? "Loading names used by existing Powercalc profiles…"
+                    : "Choose an existing name for consistent profile metadata, or type a name when your meter is not listed."}
+                  required
+                  allowCustom
+                  @combobox-change=${this.measureDeviceChanged}
+                >
+                  <input slot="value" type="hidden" name="default_measure_device" .value=${this.measureDeviceValue} />
+                </measure-combobox>
+                ${this.measureDevicesError
+                  ? html`<small class="field-hint error" role="status">Library suggestions are unavailable; manual entry still works.</small>`
+                  : nothing}
                 <label>
                   <span>Type</span>
                   <select name="power_meter" @change=${this.powerMeterChanged}>
@@ -282,6 +317,20 @@ export class SettingsView extends LitElement {
     `;
   }
 
+  private measureDeviceOptions(): ComboboxOption[] {
+    if (this.measureDevicesLoading || this.measureDevicesError) return [];
+    return this.measureDevices.map((device) => ({ value: device, label: device }));
+  }
+
+  private measureDeviceChanged(event: CustomEvent<{ value: string }>): void {
+    this.measureDeviceValue = event.detail.value;
+  }
+
+  private hassPowerEntityChanged(event: CustomEvent<{ value: string }>): void {
+    this.hassPowerEntity = event.detail.value;
+    this.powerMeterSettingsChanged();
+  }
+
   /**
    * The inputs each meter needs. Kept here rather than in the registry because they are bound to
    * this view's handlers and credential state; the record's type still names any meter left out.
@@ -297,16 +346,22 @@ export class SettingsView extends LitElement {
   }
 
   private renderHassFields() {
-    const selected = this.settings?.default_power_entity_id ?? "";
-    return html`<label>
-      <span>Power sensor</span>
-      <select name="default_power_entity_id" required @change=${this.powerMeterSettingsChanged}>
-        <option value="">Select a power sensor</option>
-        ${this.powers.map((entity) => html`
-          <option value=${entity.entity_id} ?selected=${entity.entity_id === selected}>${entity.name} · ${entity.entity_id}</option>
-        `)}
-      </select>
-    </label>`;
+    const options = this.powers.map((entity) => ({
+      value: entity.entity_id,
+      label: `${entity.name} · ${entity.entity_id}`,
+    }));
+    return html`
+      <measure-combobox
+        name="default_power_entity_id"
+        label="Power sensor"
+        .value=${this.hassPowerEntity}
+        .options=${options}
+        placeholder="Search power sensors"
+        required
+        @combobox-change=${this.hassPowerEntityChanged}
+      >
+        <input slot="value" type="hidden" name="default_power_entity_id" .value=${this.hassPowerEntity} />
+      </measure-combobox>`;
   }
 
   private renderTestRow() {

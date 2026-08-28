@@ -148,6 +148,18 @@ describe("MeasureApiClient", () => {
     );
   });
 
+  it("loads canonical measurement-device names below the ingress prefix", async () => {
+    const catalog = { devices: ["Shelly Plug S", "TP-Link Kasa KP115"] };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(catalog));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getMeasureDevices()).resolves.toEqual(catalog);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/library/measure-devices"),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
   it("discovers Shelly power meters below the ingress prefix", async () => {
     const discovery = { available: true, message: null, devices: [] };
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(discovery));

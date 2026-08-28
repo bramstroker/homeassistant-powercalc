@@ -58,6 +58,9 @@ export class AppShell extends LitElement implements MeasureAppState {
   dummyLoadCalibration: DummyLoadCalibration | null = null;
   dummyLoadCalibrationError = "";
   settings?: AppSettings;
+  measureDevices: string[] = [];
+  measureDevicesLoading = false;
+  measureDevicesError = "";
   contributionAuth?: ContributionAuthState;
   contributionDeviceFlow?: ContributionDeviceFlow;
   contributionDeviceStatus?: ContributionAuthDeviceStatus;
@@ -67,6 +70,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   contributionBusy = false;
   contributionAuthBusy = false;
   contributionError = "";
+  contributionErrorField?: string;
   contributionAuthError = "";
   definitions: MeasureDefinition[] = [];
   deviceEntities: Record<string, EntityDescriptor[]> = {};
@@ -189,6 +193,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     return html`
       <measure-settings-view
         .powers=${this.powers} .settings=${this.settings} .capabilities=${this.capabilities}
+        .measureDevices=${this.measureDevices} .measureDevicesLoading=${this.measureDevicesLoading} .measureDevicesError=${this.measureDevicesError}
         .busy=${this.busy} .testing=${this.testingPowerMeter} .testResult=${this.powerMeterTestResult} .errorMessage=${this.errorMessage}
         .shellyDiscoveryDevices=${this.shellyDiscoveryDevices} .discoveringShellys=${this.discoveringShellys}
         .shellyDiscoveryError=${this.shellyDiscoveryError} .shellyDiscoveryAvailable=${this.shellyDiscoveryAvailable}
@@ -251,6 +256,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         .contributionAuth=${this.contributionAuth} .contributionDraft=${this.contributionDraft}
         .contributionPreview=${this.contributionPreview} .contributionResult=${this.contributionResult}
         .contributionBusy=${this.contributionBusy} .contributionError=${this.contributionError}
+        .contributionErrorField=${this.contributionErrorField}
         @sessions=${this.showSessions} @new=${() => this.controller.newMeasurement()} @resume=${() => void this.controller.resume()}
         @open-settings=${this.openSettings}
         @contribution-preview=${(event: CustomEvent<ContributionPreviewRequest>) => void this.controller.previewContribution(event.detail)}

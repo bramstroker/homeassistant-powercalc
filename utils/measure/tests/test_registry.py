@@ -36,3 +36,7 @@ def test_light_definition_allows_multiple_entities_and_explains_the_physical_cou
 
     assert fields["light_entity_id"].multiple is True
     assert "physical lights" in fields["multiple_light_count"].hint
+
+
+def test_light_product_name_example_does_not_repeat_the_manufacturer() -> None:
+    assert MEASUREMENT_REGISTRY[MeasureType.LIGHT].product_name_example == "Hue White Ambiance A60 E27"

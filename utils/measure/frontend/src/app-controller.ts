@@ -58,6 +58,9 @@ export interface MeasureAppState {
   dummyLoadCalibration: DummyLoadCalibration | null;
   dummyLoadCalibrationError: string;
   settings?: AppSettings;
+  measureDevices: string[];
+  measureDevicesLoading: boolean;
+  measureDevicesError: string;
   contributionAuth?: ContributionAuthState;
   contributionDeviceFlow?: ContributionDeviceFlow;
   contributionDeviceStatus?: ContributionAuthDeviceStatus;
@@ -67,6 +70,7 @@ export interface MeasureAppState {
   contributionBusy: boolean;
   contributionAuthBusy: boolean;
   contributionError: string;
+  contributionErrorField?: string;
   contributionAuthError: string;
   definitions: MeasureDefinition[];
   deviceEntities: Record<string, EntityDescriptor[]>;
@@ -300,6 +304,7 @@ export class MeasureAppController {
     this.state.testingPowerMeter = false;
     this.state.view = "settings";
     this.changed();
+    void this.loadMeasureDevices();
     const meter = this.state.settings?.power_meter;
     if (meter && meterFor(meter).discoverable) void this.discoverShellys();
   }
@@ -308,6 +313,20 @@ export class MeasureAppController {
     this.clearError();
     this.state.view = this.settingsReturnView;
     this.changed();
+  }
+
+  private async loadMeasureDevices(): Promise<void> {
+    this.state.measureDevicesLoading = true;
+    this.state.measureDevicesError = "";
+    this.changed();
+    try {
+      this.state.measureDevices = (await this.api().getMeasureDevices()).devices;
+    } catch (error) {
+      this.state.measureDevicesError = message(error);
+    } finally {
+      this.state.measureDevicesLoading = false;
+      this.changed();
+    }
   }
 
   async testPowerMeter(settings: AppSettingsUpdate): Promise<void> {
@@ -669,6 +688,7 @@ export class MeasureAppController {
     this.state.contributionPreview = undefined;
     this.state.contributionResult = undefined;
     this.state.contributionError = "";
+    this.state.contributionErrorField = undefined;
     this.clearError();
   }
 
@@ -694,11 +714,13 @@ export class MeasureAppController {
   private async runContribution(work: () => Promise<void>): Promise<void> {
     this.state.contributionBusy = true;
     this.state.contributionError = "";
+    this.state.contributionErrorField = undefined;
     this.changed();
     try {
       await work();
     } catch (error) {
       this.state.contributionError = message(error);
+      this.state.contributionErrorField = error instanceof ApiError ? error.field ?? undefined : undefined;
     } finally {
       this.state.contributionBusy = false;
       this.changed();
@@ -749,6 +771,7 @@ export class MeasureAppController {
       this.state.contributionDraft = contribution.value;
       this.state.contributionPreview = undefined;
       this.state.contributionError = "";
+      this.state.contributionErrorField = undefined;
     } else {
       this.state.contributionDraft = undefined;
       this.state.contributionPreview = undefined;
@@ -775,6 +798,7 @@ export class MeasureAppController {
     if (status.state === "failed" && status.error && !this.state.contributionResult) {
       if (status.preview) this.state.contributionPreview = status.preview;
       this.state.contributionError = status.error;
+      this.state.contributionErrorField = undefined;
     }
   }
 }
