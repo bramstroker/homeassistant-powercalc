@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.23.2:docker"
   },
-  "name": "Wi-Fi Dimmable 5 W G95 CCT Filament LED Bulb",
+  "name": "Wi-Fi Dimmable CCT ES 5W LED G95 Filament Bulb",
   "standby_power": 0.7,
   "authors": [
     {

@@ -6,6 +6,9 @@
   "calculation_strategy": "fixed",
   "created_at": "2023-12-31T20:16:31Z",
   "device_type": "smart_switch",
+  "legacy_ids": [
+    "ASKVADER"
+  ],
   "measure_description": "Manually measured.",
   "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",
   "measure_method": "manual",

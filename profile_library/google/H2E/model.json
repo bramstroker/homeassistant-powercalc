@@ -1,6 +1,6 @@
 {
   "aliases": [
-    "Nest Wifi point"
+    "Nest Wifi Point"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
@@ -21,6 +21,9 @@
       "0 -> 4.54"
     ]
   },
+  "legacy_ids": [
+    "Nest Wifi Point (H2E)"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110M",
   "measure_method": "script",

@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.24:docker"
   },
-  "name": "RGB+CCT 9 W Zigbee Downlight",
+  "name": "RGB+CCT 9W Zigbee Downlight",
   "standby_power": 0.22,
   "authors": [
     {

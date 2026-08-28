@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2024-11-09T00:06:13Z",
   "device_type": "light",
+  "legacy_ids": [
+    "ORMANAS LED Strip"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Fibaro FGWP102",
   "measure_method": "script",
@@ -13,7 +16,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.15.2:docker"
   },
-  "name": "ORMANAS LED Strip",
+  "name": "ORMANAS LED lighting strip (4 m)",
   "standby_power": 0.1,
   "authors": [
     {

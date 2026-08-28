@@ -1,6 +1,7 @@
 {
   "aliases": [
-    "TRADFRI LED driver, 30 w (ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2"
+    "TRADFRI LED driver, 30 w",
+    "ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2"
   ],
   "calculation_strategy": "linear",
   "created_at": "2025-02-12T13:05:00Z",
@@ -9,7 +10,7 @@
   "measure_device": "Nous A8T",
   "measure_device_firmware": "EspHome",
   "measure_method": "manual",
-  "name": "TRADFRI LED driver, 30 w",
+  "name": "TRADFRI LED Driver (30W)",
   "standby_power": 0.31,
   "standby_power_on": 0.35,
   "authors": [

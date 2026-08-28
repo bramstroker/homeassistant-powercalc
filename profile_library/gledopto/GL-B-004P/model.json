@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.22:docker"
   },
-  "name": "Filament LED light bulb E27 G95 7W",
+  "name": "CCT 7W E27 G95 Zigbee Filament Bulb",
   "standby_power": 0.36,
   "authors": [
     {

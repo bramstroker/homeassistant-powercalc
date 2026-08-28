@@ -10,7 +10,7 @@
     "SLEEP_TIME": 1,
     "VERSION": "v1.21.2:docker"
   },
-  "name": "Govee ST19 Smart Edison Light Bulb E26",
+  "name": "ST19 Smart Edison Light Bulb E26 500lm",
   "standby_power": 0.5,
   "authors": [
     {
