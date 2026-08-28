@@ -403,10 +403,10 @@
           ],
           "id": "C2H4R9",
           "manufacturer": "amazon",
-          "updated_at": "2026-08-28T08:46:01",
+          "updated_at": "2026-08-28T11:45:39",
           "max_power": 1.87,
           "sub_profile_count": 0,
-          "hash": "afbd55a12c2f52258d8ff0b7120338df"
+          "hash": "a9b1b8b5d283c9029fa714b98be5a2f1"
         },
         {
           "aliases": [
@@ -2297,6 +2297,8 @@
       "models": [
         {
           "aliases": [
+            "1",
+            "1 HS2",
             "HEOS 1"
           ],
           "calculation_strategy": "linear",
@@ -2304,7 +2306,7 @@
           "device_type": "smart_speaker",
           "measure_device": "Shelly Plug S",
           "measure_method": "manual",
-          "name": "HEOS 1 HS2",
+          "name": "Wireless Speaker",
           "standby_power": 3.99,
           "authors": [
             {
@@ -2315,10 +2317,10 @@
           ],
           "id": "HEOS 1 HS2",
           "manufacturer": "denon",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T12:35:32",
           "max_power": 12.55,
           "sub_profile_count": 0,
-          "hash": "e3e58bfd3cd397858647535b7a911390"
+          "hash": "0dfde1767c87efcd93e2d5e9d2175e62"
         }
       ],
       "device_types": [
@@ -2327,17 +2329,20 @@
     },
     {
       "aliases": [
+        "Dreametech",
         "Dreametech\u2122"
       ],
       "name": "dreame",
-      "full_name": "Dreametech",
+      "full_name": "Dreame",
       "dir_name": "dreame",
       "models": [
         {
           "calculation_strategy": "composite",
+          "compatible_integrations": [
+            "dreame_vacuum"
+          ],
           "created_at": "2026-07-27T17:24:26Z",
           "device_type": "vacuum_robot",
-          "integration": "dreame_vacuum",
           "measure_device": "Shelly Plug S Gen3",
           "measure_method": "script",
           "measure_settings": {
@@ -2345,7 +2350,7 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.2.1:app"
           },
-          "name": "Robot Vacuum Cleaner",
+          "name": "D10 Plus Robot Vacuum Cleaner",
           "standby_power": 2.6,
           "voltage_range": {
             "min": 227.5,
@@ -2354,18 +2359,21 @@
           "aliases": [
             "dreame.vacuum.r2205"
           ],
+          "legacy_ids": [
+            "d10-plus"
+          ],
           "authors": [
             {
               "name": "Maxik933",
               "github": "Maxik933"
             }
           ],
-          "id": "d10-plus",
+          "id": "RLS3D",
           "manufacturer": "dreame",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T12:35:32",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "19880ced7b3daf0f813b024440737522"
+          "hash": "0df3654258705c8fcbec99f8efd1839f"
         },
         {
           "aliases": [
@@ -2383,6 +2391,9 @@
           ],
           "created_at": "2026-08-21T13:51:11Z",
           "device_type": "vacuum_robot",
+          "legacy_ids": [
+            "x50-ultra"
+          ],
           "measure_device": "Shelly Plus 1PM",
           "measure_method": "script",
           "measure_settings": {
@@ -2390,18 +2401,18 @@
             "SLEEP_TIME": 3.0,
             "VERSION": "v0.3.0:cli"
           },
-          "name": "X50 Ultra",
+          "name": "X50 Ultra Complete",
           "standby_power": 5.55,
           "voltage_range": {
             "min": 225.9,
             "max": 230.9
           },
-          "id": "x50-ultra",
+          "id": "RLX85CE-5",
           "manufacturer": "dreame",
-          "updated_at": "2026-08-23T10:21:59",
+          "updated_at": "2026-08-28T15:03:27",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "f145b3a3fb4f044c48d1c5e71c87710d"
+          "hash": "a9aa4b0611906869f35dc07c79570ebd"
         }
       ],
       "device_types": [
@@ -2420,7 +2431,7 @@
           "device_type": "fan",
           "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
           "measure_method": "manual",
-          "name": "Lynx S Smart desk fan",
+          "name": "TurboPoly Table Fan 511S",
           "standby_power": 0.87,
           "authors": [
             {
@@ -2430,10 +2441,10 @@
           ],
           "id": "DR-HAF001S",
           "manufacturer": "dreo",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T12:51:12",
           "max_power": 39.62,
           "sub_profile_count": 0,
-          "hash": "03e0631af56bafb42e79094459c11554"
+          "hash": "f9af9005abccf21813addf02e271f3dd"
         },
         {
           "calculation_strategy": "linear",
@@ -2515,7 +2526,7 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.3.0:app"
           },
-          "name": "Cruiser Pro S Smart Tower Fan",
+          "name": "Cruiser Pro T3S Smart Tower Fan",
           "standby_power": 1.57,
           "voltage_range": {
             "min": 234.4,
@@ -2529,10 +2540,10 @@
           ],
           "id": "DR-HTF008S",
           "manufacturer": "dreo",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T12:51:12",
           "max_power": 36.03,
           "sub_profile_count": 0,
-          "hash": "42fd75968a9e01f3ee040e491858c914"
+          "hash": "aaa6ccd92063771337aa3d74234dd7f8"
         }
       ],
       "device_types": [
@@ -2546,13 +2557,19 @@
       "dir_name": "dygsm",
       "models": [
         {
+          "aliases": [
+            "DY-RQ500A"
+          ],
           "calculation_strategy": "fixed",
           "created_at": "2024-12-27T12:00:00Z",
           "device_type": "network",
           "discovery_by": "device",
+          "legacy_ids": [
+            "DY-RQ500A"
+          ],
           "measure_device": "Shelly Plus Plug S",
           "measure_method": "script",
-          "name": "Gas sensor",
+          "name": "Gas Leak Detector",
           "authors": [
             {
               "name": "Andrzej Dopiera\u0142a",
@@ -2560,12 +2577,12 @@
               "github": "theundefined"
             }
           ],
-          "id": "DY-RQ500A",
+          "id": "RQ500A",
           "manufacturer": "dygsm",
-          "updated_at": "2026-08-21T12:12:06",
+          "updated_at": "2026-08-28T12:54:41",
           "max_power": 0.88,
           "sub_profile_count": 0,
-          "hash": "c37526f78142c98435754d3a0fd89404"
+          "hash": "25e076e1bff332877d9d9bfbf1c9b183"
         }
       ],
       "device_types": [
@@ -2620,13 +2637,19 @@
       "dir_name": "ecodim",
       "models": [
         {
-          "calculation_strategy": "fixed",
+          "aliases": [
+            "ECO-DIM.07 Zigbee Basic"
+          ],
+          "calculation_strategy": "linear",
           "created_at": "2025-06-09T00:00:00Z",
           "device_type": "smart_dimmer",
           "discovery_by": "device",
           "measure_device": "Brennenstuhl EM 231-A",
           "measure_method": "manual",
-          "name": "ZigBee LED Dimmer",
+          "legacy_ids": [
+            "ECO-DIM.07 Zigbee Basic"
+          ],
+          "name": "LED Dimmer Zigbee Basic (0-200W)",
           "only_self_usage": false,
           "standby_power": 0.3,
           "standby_power_on": 0.3,
@@ -2637,12 +2660,12 @@
               "github": "SustainableBlueDuck"
             }
           ],
-          "id": "ECO-DIM.07 Zigbee Basic",
+          "id": "ECO-DIM.07 Zigbee",
           "manufacturer": "ecodim",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-28T13:15:05",
           "max_power": 0.3,
           "sub_profile_count": 0,
-          "hash": "89f72b88744fea1ef923d8abb36d5e31"
+          "hash": "9f7badbd0b42cb2ce6af02ffafbe26a2"
         }
       ],
       "device_types": [
@@ -2671,7 +2694,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "connect.z Smart Home E27 LED filament light bulb, G125",
+          "name": "connect.z G125 E27 LED Filament Bulb (4W)",
           "standby_power": 0.33,
           "authors": [
             {
@@ -2681,7 +2704,7 @@
           ],
           "id": "110288",
           "manufacturer": "eglo",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T13:32:59",
           "max_power": 4.22,
           "sub_profile_count": 0,
           "color_modes": [
@@ -2691,9 +2714,12 @@
             "score": 99.2,
             "brightness": 99.2
           },
-          "hash": "d5cb74b096dc03afd380584769a09dad"
+          "hash": "0988ed5d0a9e3d37c060e316d478a921"
         },
         {
+          "aliases": [
+            "33955"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2026-03-25T15:08:09Z",
           "device_type": "light",
@@ -2704,7 +2730,10 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.20.9:docker"
           },
-          "name": "LED light with color temperature",
+          "legacy_ids": [
+            "33955"
+          ],
+          "name": "SALOBRENA-Z Ceiling Light (1200x300mm)",
           "standby_power": 0.05,
           "authors": [
             {
@@ -2712,9 +2741,9 @@
               "github": "rammstone83"
             }
           ],
-          "id": "33955",
+          "id": "900053",
           "manufacturer": "eglo",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-28T13:32:59",
           "max_power": 38.77,
           "sub_profile_count": 0,
           "color_modes": [
@@ -2724,44 +2753,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "c7192f0e340bcfe019694c5dc6b3e33e"
-        },
-        {
-          "aliases": [
-            "33957"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2025-11-02T16:45:52Z",
-          "device_type": "light",
-          "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.24:docker"
-          },
-          "name": "FUEVA-Z recessed light",
-          "standby_power": 0.13,
-          "authors": [
-            {
-              "name": "Tom Frenzel",
-              "email": "admin@tom-frenzel.de",
-              "github": "tomfrenzel"
-            }
-          ],
-          "id": "FUEVA-Z",
-          "manufacturer": "eglo",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 22.14,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 99.1,
-            "color_temp": 99.1
-          },
-          "hash": "bfc4c744a174884c87f5740e150d3594"
+          "hash": "aea0692c803024c648a978afb6aefdf3"
         },
         {
           "aliases": [
@@ -2777,7 +2769,10 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.20.9:docker"
           },
-          "name": "Totari-Z 380 ceiling light",
+          "legacy_ids": [
+            "Totari-Z 380"
+          ],
+          "name": "TOTARI-Z Ceiling Light (380mm)",
           "standby_power": 0.22,
           "authors": [
             {
@@ -2785,9 +2780,9 @@
               "github": "tommials"
             }
           ],
-          "id": "Totari-Z 380",
+          "id": "900084",
           "manufacturer": "eglo",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-28T13:32:59",
           "max_power": 19.54,
           "sub_profile_count": 0,
           "color_modes": [
@@ -2797,7 +2792,47 @@
             "score": 99.5,
             "color_temp": 99.5
           },
-          "hash": "70d331fa1286c0c625520fbb3b414eae"
+          "hash": "f01caf2e3aa37979e8227d95d0fef396"
+        },
+        {
+          "aliases": [
+            "33957"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-11-02T16:45:52Z",
+          "device_type": "light",
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.24:docker"
+          },
+          "legacy_ids": [
+            "FUEVA-Z"
+          ],
+          "name": "FUEVA-Z Surface-Mounted Light (285mm)",
+          "standby_power": 0.13,
+          "authors": [
+            {
+              "name": "Tom Frenzel",
+              "email": "admin@tom-frenzel.de",
+              "github": "tomfrenzel"
+            }
+          ],
+          "id": "98847",
+          "manufacturer": "eglo",
+          "updated_at": "2026-08-28T13:32:59",
+          "max_power": 22.14,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "65bea096a5838a8872d9f67145680cc6"
         }
       ],
       "device_types": [
@@ -2811,9 +2846,15 @@
       "dir_name": "elgato",
       "models": [
         {
+          "aliases": [
+            "Elgato Key Light"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2022-08-08T08:27:59Z",
           "device_type": "light",
+          "legacy_ids": [
+            "Elgato Key Light"
+          ],
           "measure_device": "Zooz Z-Wave Plus Power Switch ZEN15",
           "measure_method": "script",
           "measure_settings": {
@@ -2829,9 +2870,9 @@
               "github": "ajacques"
             }
           ],
-          "id": "Elgato Key Light",
+          "id": "20GAK9901",
           "manufacturer": "elgato",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T13:42:42",
           "max_power": 39.61,
           "sub_profile_count": 0,
           "color_modes": [
@@ -2841,45 +2882,18 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "e5d66a6025277380e90f2fb1511dd442"
+          "hash": "e1523c2e79df9f1f922c9f2b61afe397"
         },
         {
-          "calculation_strategy": "lut",
-          "created_at": "2022-08-02T15:23:27Z",
-          "device_type": "light",
-          "measure_device": "Shelly Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "Key Light Air",
-          "standby_power": 0.41,
-          "authors": [
-            {
-              "name": "BeardedTinker",
-              "github": "BeardedTinker"
-            }
+          "aliases": [
+            "Elgato Light Strip"
           ],
-          "id": "Elgato Key Light Air",
-          "manufacturer": "elgato",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 24.02,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 98.8,
-            "color_temp": 98.8
-          },
-          "hash": "eb05e6ff1f4006a9758fab9c09440f5a"
-        },
-        {
           "calculation_strategy": "lut",
           "created_at": "2025-03-17T20:00:14Z",
           "device_type": "light",
+          "legacy_ids": [
+            "Elgato Light Strip"
+          ],
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
@@ -2896,9 +2910,9 @@
               "github": "frenck"
             }
           ],
-          "id": "Elgato Light Strip",
+          "id": "20LAA9901",
           "manufacturer": "elgato",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T13:42:42",
           "max_power": 19.4,
           "sub_profile_count": 0,
           "color_modes": [
@@ -2909,47 +2923,57 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "a76daa30b4d6e39af89fd47bb7ab70a1"
+          "hash": "7388ea1960219f0830b56c38e4f52036"
         },
         {
+          "aliases": [
+            "Elgato Key Light Air"
+          ],
           "calculation_strategy": "lut",
-          "created_at": "2025-03-18T18:12:40Z",
+          "created_at": "2022-08-02T15:23:27Z",
           "device_type": "light",
-          "measure_device": "Shelly PM Mini Gen3",
+          "legacy_ids": [
+            "Elgato Key Light Air"
+          ],
+          "measure_device": "Shelly Plug S",
           "measure_method": "script",
           "measure_settings": {
             "SAMPLE_COUNT": 2,
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "Light Strip Pro",
-          "standby_power": 1.2,
+          "name": "Key Light Air",
+          "standby_power": 0.41,
           "authors": [
             {
-              "name": "Franck Nijhof",
-              "email": "git@frenck.dev",
-              "github": "frenck"
+              "name": "BeardedTinker",
+              "github": "BeardedTinker"
             }
           ],
-          "id": "Elgato Light Strip Pro",
+          "id": "20LAB9901",
           "manufacturer": "elgato",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 15.86,
+          "updated_at": "2026-08-28T13:42:42",
+          "max_power": 24.02,
           "sub_profile_count": 0,
           "color_modes": [
-            "color_temp",
-            "hs"
+            "color_temp"
           ],
           "lut_quality": {
-            "score": 97.9,
-            "color_temp": 97.9
+            "score": 98.8,
+            "color_temp": 98.8
           },
-          "hash": "ee0af63d57def481eaaaf832d9a1fcfb"
+          "hash": "51058a737ca4e42f5fb8776daba3d28a"
         },
         {
+          "aliases": [
+            "Elgato Ring Light"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2023-02-14T20:16:53Z",
           "device_type": "light",
+          "legacy_ids": [
+            "Elgato Ring Light"
+          ],
           "measure_device": "Shelly Plus 1PM",
           "measure_method": "script",
           "measure_settings": {
@@ -2966,9 +2990,9 @@
               "github": "marcgeurts"
             }
           ],
-          "id": "Elgato Ring Light",
+          "id": "20LAC9901",
           "manufacturer": "elgato",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T13:42:42",
           "max_power": 48.31,
           "sub_profile_count": 0,
           "color_modes": [
@@ -2978,7 +3002,48 @@
             "score": 89.1,
             "color_temp": 89.1
           },
-          "hash": "ec52aa994c54bdd5cab2a026a3f5d38b"
+          "hash": "b11f5de2fd50d5f71f718aee2c0e3134"
+        },
+        {
+          "aliases": [
+            "Elgato Light Strip Pro"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-03-18T18:12:40Z",
+          "device_type": "light",
+          "legacy_ids": [
+            "Elgato Light Strip Pro"
+          ],
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "name": "Light Strip Pro",
+          "standby_power": 1.2,
+          "authors": [
+            {
+              "name": "Franck Nijhof",
+              "email": "git@frenck.dev",
+              "github": "frenck"
+            }
+          ],
+          "id": "20LAG9901",
+          "manufacturer": "elgato",
+          "updated_at": "2026-08-28T13:42:42",
+          "max_power": 15.86,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
+          "hash": "fb174c9220a4b5b87f31f4b52c0dfaa0"
         }
       ],
       "device_types": [
@@ -3078,7 +3143,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.19:docker"
           },
-          "name": "Smart Color 20W",
+          "name": "Smart Color 30W",
           "standby_power": 0.75,
           "authors": [
             {
@@ -3089,7 +3154,7 @@
           ],
           "id": "48LSB30WIFI0",
           "manufacturer": "elgin",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T13:56:48",
           "max_power": 29.2,
           "sub_profile_count": 0,
           "color_modes": [
@@ -3100,7 +3165,7 @@
             "score": 98.1,
             "color_temp": 98.1
           },
-          "hash": "8b8ca1571d077ebd2f30d79e24cc7833"
+          "hash": "aa76107c5d72159034e28826902ee6c0"
         }
       ],
       "device_types": [
@@ -3114,6 +3179,9 @@
       "dir_name": "emos",
       "models": [
         {
+          "aliases": [
+            "c0mb70xdt4fqomid"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2024-12-22T15:07:26Z",
           "device_type": "light",
@@ -3124,7 +3192,7 @@
             "SLEEP_TIME": 1,
             "VERSION": "v1.16.6:docker"
           },
-          "name": "GOSMART A65 14W",
+          "name": "GoSmart A65 E27 RGB+CCT Bulb (14W, 1400 lm)",
           "standby_power": 0.5,
           "authors": [
             {
@@ -3135,7 +3203,7 @@
           ],
           "id": "ZQW516R",
           "manufacturer": "emos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:04:02",
           "max_power": 13.85,
           "sub_profile_count": 0,
           "color_modes": [
@@ -3146,7 +3214,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "e86e923dc9c31fdfe0fd44f21297428c"
+          "hash": "8b95c15e242fdd381dfe17546e05387d"
         },
         {
           "calculation_strategy": "lut",
@@ -3159,7 +3227,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.10.6:docker"
           },
-          "name": "GOSMART LED MR16 4,8W GU10",
+          "name": "GoSmart MR16 GU10 RGB+CCT Bulb (4.8W, 400 lm)",
           "standby_power": 0.24,
           "authors": [
             {
@@ -3169,7 +3237,7 @@
           ],
           "id": "ZQZ832R",
           "manufacturer": "emos",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:04:02",
           "max_power": 4.94,
           "sub_profile_count": 0,
           "color_modes": [
@@ -3179,7 +3247,7 @@
             "score": 97.9,
             "color_temp": 97.9
           },
-          "hash": "fb643b23094612259193d753c8d311be"
+          "hash": "a009d55e84223bef32c98993b034dc3c"
         }
       ],
       "device_types": [
@@ -3193,12 +3261,15 @@
       "dir_name": "epson",
       "models": [
         {
+          "aliases": [
+            "ET-3760 Series"
+          ],
           "calculation_strategy": "fixed",
           "created_at": "2024-09-23T13:40:20Z",
           "device_type": "printer",
           "measure_device": "Shelly Plus Plug",
           "measure_method": "manual",
-          "name": "ET-3760 Series",
+          "name": "EcoTank All-in-One Cartridge-Free Supertank Printer",
           "authors": [
             {
               "name": "Brian Egge",
@@ -3206,20 +3277,26 @@
               "github": "brianegge"
             }
           ],
-          "id": "ET-3760 Series",
+          "legacy_ids": [
+            "ET-3760 Series"
+          ],
+          "id": "ET-3760",
           "manufacturer": "epson",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:11:34",
           "max_power": 14.0,
           "sub_profile_count": 0,
-          "hash": "1f02abb032e06e887ccf27e8de7bfd4d"
+          "hash": "bbf1d12fe66d9f4b42348a8ae5e697fb"
         },
         {
+          "aliases": [
+            "L6270 Series"
+          ],
           "calculation_strategy": "fixed",
           "created_at": "2024-12-06T12:00:00Z",
           "device_type": "printer",
           "measure_device": "Shelly Plus Plug S",
           "measure_method": "manual",
-          "name": "L6270 Series",
+          "name": "EcoTank Multifunction Wi-Fi Ink Tank A4 Printer",
           "authors": [
             {
               "name": "Andrzej Dopiera\u0142a",
@@ -3227,12 +3304,15 @@
               "github": "theundefined"
             }
           ],
-          "id": "L6270 Series",
+          "legacy_ids": [
+            "L6270 Series"
+          ],
+          "id": "L6270",
           "manufacturer": "epson",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:11:34",
           "max_power": 12.0,
           "sub_profile_count": 0,
-          "hash": "f2a33d99686e80c5ac80dbeeb6e54ba9"
+          "hash": "b9bfcbe235c53fe703bb29458211ab36"
         }
       ],
       "device_types": [
@@ -3248,14 +3328,14 @@
         {
           "calculation_strategy": "fixed",
           "created_at": "2024-09-06T18:37:40Z",
-          "description": "HomematicIP DIN rail mount smart switch with power measurement integrated for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device.",
+          "description": "Homematic DIN rail-mounted smart switch with integrated power measurement. This profile only models the switch's self-consumption because the connected load is measured by the device.",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "VERSION": "v1.17.1:docker"
           },
-          "name": "HM-ES-PMSw1-DR",
+          "name": "Wireless Switch Actuator with Power Metering, DIN Rail Mount",
           "only_self_usage": true,
           "standby_power": 0.37,
           "standby_power_on": 0.73,
@@ -3267,22 +3347,22 @@
           ],
           "id": "HM-ES-PMSw1-DR",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 0.73,
           "sub_profile_count": 0,
-          "hash": "8a7236bfcea87aa737de20cb6a8c637a"
+          "hash": "11ed04d46c28a95fef7301423a46f6e4"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2025-02-04T18:37:40Z",
-          "description": "HomematicIP DIN rail mount smart switch. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage must be configured by the user since it is possible to connect anything to it.",
+          "description": "Homematic DIN rail-mounted smart switch. This profile only models the switch's self-consumption; configure the connected load separately.",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "VERSION": "v1.17.1:docker"
           },
-          "name": "HM-LC-Sw1-DR",
+          "name": "Wireless Switch Actuator, DIN Rail Mount",
           "standby_power": 0.32,
           "standby_power_on": 0.52,
           "authors": [
@@ -3293,22 +3373,22 @@
           ],
           "id": "HM-LC-Sw1-DR",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T12:12:06",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 0.52,
           "sub_profile_count": 0,
-          "hash": "4119f4555907e94331efa85a4daef764"
+          "hash": "9f77ffc93aa4dcc1e20f3311d706a606"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2025-04-30T22:41:40Z",
-          "description": "Homematic smart switch. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage must be configured by the user since it is possible to connect anything to it.",
+          "description": "Homematic flush-mounted smart switch actuator for brand switch systems. This profile only models the switch's self-consumption; configure the connected load separately.",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "VERSION": "v1.17.11:docker"
           },
-          "name": "HM-LC-Sw1PBU-FM",
+          "name": "Wireless Switch Actuator for Brand Switch Systems, Flush-Mount",
           "standby_power": 0.83,
           "standby_power_on": 1.42,
           "authors": [
@@ -3320,22 +3400,22 @@
           ],
           "id": "HM-LC-Sw1PBU-FM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T12:12:06",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 1.42,
           "sub_profile_count": 0,
-          "hash": "345880546604b539626523b08bdcedc3"
+          "hash": "b51a62627bb651b10bf2f49b3bea4a87"
         },
         {
           "calculation_strategy": "linear",
           "created_at": "2025-02-04T18:37:40Z",
-          "description": "HomematicIP smart trailing edge dimmer for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage must be configured by the user since it is possible to connect anything to it.",
+          "description": "Homematic IP trailing-edge dimming actuator for brand switch systems. This profile only models the dimmer's self-consumption; configure the connected load separately.",
           "device_type": "smart_dimmer",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "VERSION": "v1.17.1:docker"
           },
-          "name": "HmIP-BDT",
+          "name": "Dimming Actuator for Brand Switches",
           "standby_power": 0.36,
           "standby_power_on": 0.41,
           "authors": [
@@ -3346,22 +3426,22 @@
           ],
           "id": "HmIP-BDT",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T12:12:06",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 0.41,
           "sub_profile_count": 0,
-          "hash": "bb3da4f143b620a13f4cce90fd272600"
+          "hash": "f739c95989c64c6acaf4832d19b19a13"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2025-02-04T18:37:40Z",
-          "description": "HomematicIP smart switch with power measurement integrated for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device.",
+          "description": "Homematic IP switch actuator with integrated power measurement for brand switch systems. This profile only models the switch's self-consumption because the connected load is measured by the device.",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "VERSION": "v1.17.1:docker"
           },
-          "name": "HmIP-BSM",
+          "name": "Switching Actuator and Meter for Brand Switches",
           "only_self_usage": true,
           "standby_power": 0.2,
           "standby_power_on": 0.2,
@@ -3373,22 +3453,22 @@
           ],
           "id": "HmIP-BSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 0.2,
           "sub_profile_count": 0,
-          "hash": "0b403928880abf06082a90773ff9f280"
+          "hash": "33314dc3038cad977f468b87953def02"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2025-02-04T18:37:40Z",
-          "description": "HomematicIP DIN rail mount smart switch. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage must be configured by the user since it is possible to connect anything to it.",
+          "description": "Homematic IP single-channel DIN rail-mounted smart switch. This profile only models the switch's self-consumption; configure the connected load separately.",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "VERSION": "v1.17.1:docker"
           },
-          "name": "HmIP-DRSI1",
+          "name": "Switching Actuator for DIN Rail Mount, 1-Channel",
           "standby_power": 0.25,
           "standby_power_on": 0.3,
           "authors": [
@@ -3399,19 +3479,19 @@
           ],
           "id": "HmIP-DRSI1",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T12:12:06",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 0.3,
           "sub_profile_count": 0,
-          "hash": "cb784e0e61d44aac98990bf613578337"
+          "hash": "418e84f3e6314699ce4c2cddf456054d"
         },
         {
           "calculation_strategy": "linear",
           "created_at": "2024-09-06T18:37:40Z",
-          "description": "HomematicIP flush mounted smart trailing edge dimmer. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage must be configured by the user since it is possible to connect anything to it.",
+          "description": "Homematic IP flush-mounted trailing-edge dimming actuator. This profile only models the dimmer's self-consumption; configure the connected load separately.",
           "device_type": "smart_dimmer",
           "measure_device": "From manufacturer specifications",
           "measure_method": "manual",
-          "name": "HmIP-FDT",
+          "name": "Dimming Actuator, Flush-Mount",
           "standby_power": 0.4,
           "standby_power_on": 0.4,
           "authors": [
@@ -3422,22 +3502,22 @@
           ],
           "id": "HmIP-FDT",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T12:12:06",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 0.4,
           "sub_profile_count": 0,
-          "hash": "55902c8b4aec0deda0b196846d99ae31"
+          "hash": "e10105ed91807b51ed8e4cb0c7153a8e"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2025-02-04T18:37:40Z",
-          "description": "HomematicIP flush mounted shutter actuator. This model is only configured to calculate the power usage of the smart actuator itself because the shutter motor connected is individual and can have different power draw even windows-by-window.",
+          "description": "Homematic IP flush-mounted shutter actuator. This profile only models the actuator's self-consumption because the connected shutter motor can have a different power draw for each installation.",
           "device_type": "cover",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "VERSION": "v1.17.1:docker"
           },
-          "name": "HmIP-FROLL",
+          "name": "Shutter Actuator, Flush-Mount",
           "standby_power": 0.12,
           "standby_power_on": 0.2,
           "authors": [
@@ -3448,22 +3528,22 @@
           ],
           "id": "HmIP-FROLL",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T12:12:06",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 0.68,
           "sub_profile_count": 3,
-          "hash": "6a8e163da1928d1f8fae16ee49c59dda"
+          "hash": "cda08f6a1c8401b8517b042e60318d90"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2024-09-06T18:37:40Z",
-          "description": "HomematicIP flush mounted smart switch with power measurement integrated. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device.",
+          "description": "Homematic IP flush-mounted smart switch with integrated power measurement. This profile only models the switch's self-consumption because the connected load is measured by the device.",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "VERSION": "v1.17.1:docker"
           },
-          "name": "HmIP-FSM",
+          "name": "Switching Actuator and Meter, Flush-Mount",
           "only_self_usage": true,
           "standby_power": 0.2,
           "standby_power_on": 0.74,
@@ -3475,22 +3555,22 @@
           ],
           "id": "HmIP-FSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 0.74,
           "sub_profile_count": 0,
-          "hash": "2f15fde2ef32b67b4b9b09c81cc61ff1"
+          "hash": "8f161926d9960716e43fe3f43750ec28"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2025-02-04T18:37:40Z",
-          "description": "HomematicIP flush mounted smart switch with power measurement integrated. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device.",
+          "description": "Homematic IP flush-mounted 16A smart switch with integrated power measurement. This profile only models the switch's self-consumption because the connected load is measured by the device.",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "VERSION": "v1.17.1:docker"
           },
-          "name": "HmIP-FSM16",
+          "name": "Switching Actuator and Meter (16A), Flush-Mount",
           "only_self_usage": true,
           "standby_power": 0.2,
           "standby_power_on": 0.2,
@@ -3502,22 +3582,22 @@
           ],
           "id": "HmIP-FSM16",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 0.2,
           "sub_profile_count": 0,
-          "hash": "784b682b54922375be1b6e2ea29e51f3"
+          "hash": "4b97554867e8026070d76ca070538c7f"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2025-02-04T18:37:40Z",
-          "description": "HomematicIP wall socket smart switch with power measurement integrated. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device.",
+          "description": "Homematic IP pluggable smart switch with integrated power measurement. This profile only models the switch's self-consumption because the connected load is measured by the device.",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "measure_settings": {
             "VERSION": "v1.17.1:docker"
           },
-          "name": "HmIP-PSM",
+          "name": "Pluggable Switch and Meter",
           "only_self_usage": true,
           "standby_power": 0.21,
           "standby_power_on": 0.78,
@@ -3529,10 +3609,10 @@
           ],
           "id": "HmIP-PSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:18:51",
           "max_power": 0.78,
           "sub_profile_count": 0,
-          "hash": "c3bf2e5965b8e046d68aa97f12e739f9"
+          "hash": "7f19f09f66a9cb44065a1d42a9097837"
         }
       ],
       "device_types": [
@@ -3542,7 +3622,9 @@
       ]
     },
     {
-      "aliases": [],
+      "aliases": [
+        "Eufy Security"
+      ],
       "name": "eufy",
       "full_name": "Eufy",
       "dir_name": "eufy",
@@ -3552,7 +3634,7 @@
           "created_at": "2024-12-14T09:59:57Z",
           "device_type": "camera",
           "measure_device": "TP-Link Kasa KP125M",
-          "measure_method": "manual",
+          "measure_method": "script",
           "name": "Indoor Cam C120",
           "authors": [
             {
@@ -3562,10 +3644,10 @@
           ],
           "id": "T8400",
           "manufacturer": "eufy",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-28T14:24:09",
           "max_power": 2.75,
           "sub_profile_count": 2,
-          "hash": "5c43efd716dd1365ca0270422640bce6"
+          "hash": "c6e452d9b3d9e987a7e74682bbcc4021"
         },
         {
           "calculation_strategy": "fixed",
@@ -3573,7 +3655,7 @@
           "device_type": "camera",
           "measure_device": "Shelly Plug S",
           "measure_method": "script",
-          "name": "Indoor Cam Pan&Tilt",
+          "name": "Indoor Cam E220",
           "authors": [
             {
               "name": "Bram Gerritsen",
@@ -3583,10 +3665,10 @@
           ],
           "id": "T8410",
           "manufacturer": "eufy",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:24:09",
           "max_power": 2.35,
           "sub_profile_count": 2,
-          "hash": "7b25f1a64ebf6cfde980610c2f28db51"
+          "hash": "8a596d72dd28ae3b396b1c5041689e5e"
         }
       ],
       "device_types": [
@@ -3594,7 +3676,9 @@
       ]
     },
     {
-      "aliases": [],
+      "aliases": [
+        "Eve Systems"
+      ],
       "name": "eve",
       "full_name": "Eve",
       "dir_name": "eve",
@@ -3659,10 +3743,10 @@
           ],
           "id": "AN158",
           "manufacturer": "everspring",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:31:51",
           "max_power": 0.5,
           "sub_profile_count": 0,
-          "hash": "7e944eb159d3273bb746b6d35de0689d"
+          "hash": "2e958027e8d0c3109b20c41b50d873ac"
         }
       ],
       "device_types": [
@@ -3686,7 +3770,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.10.6:docker"
           },
-          "name": "Smart light JL01",
+          "name": "RGBCW 5W GU10 Smart Bulb",
           "standby_power": 0.4,
           "authors": [
             {
@@ -3696,7 +3780,7 @@
           ],
           "id": "2APYC-JL01",
           "manufacturer": "ewelight",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:40:06",
           "max_power": 4.88,
           "sub_profile_count": 0,
           "color_modes": [
@@ -3707,7 +3791,7 @@
             "score": 98.1,
             "color_temp": 98.1
           },
-          "hash": "7e8596b16dab4abdce5784141ced2f2d"
+          "hash": "de670fa33a6aa6061e398a043d73bd8d"
         }
       ],
       "device_types": [
@@ -3725,7 +3809,7 @@
           "created_at": "2024-12-01T20:44:00Z",
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "manual",
+          "measure_method": "script",
           "name": "Zigbee Smart Plug",
           "only_self_usage": false,
           "standby_power": 0.378,
@@ -3739,10 +3823,10 @@
           ],
           "id": "SA-003-Zigbee",
           "manufacturer": "ewelink",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:40:06",
           "max_power": 1.191,
           "sub_profile_count": 0,
-          "hash": "4347f80460fb8f25e79707afc54238bb"
+          "hash": "6f566170e37457b1aae435c0028d23be"
         }
       ],
       "device_types": [
@@ -3758,14 +3842,20 @@
       "dir_name": "fibaro",
       "models": [
         {
+          "aliases": [
+            "FGWP102"
+          ],
           "calculation_strategy": "fixed",
           "created_at": "2022-09-06T08:26:19Z",
           "device_type": "smart_switch",
+          "legacy_ids": [
+            "FGWP102"
+          ],
           "measure_device": "Fibaro FGWP102",
           "measure_method": "manual",
           "name": "Wall Plug (Z-Wave Plus)",
           "only_self_usage": true,
-          "standby_power": 0.3,
+          "standby_power": 0.5,
           "standby_power_on": 0.8,
           "authors": [
             {
@@ -3774,12 +3864,12 @@
               "github": "bramstroker"
             }
           ],
-          "id": "FGWP102",
+          "id": "FGWP-102",
           "manufacturer": "fibaro",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T14:47:37",
           "max_power": 0.8,
           "sub_profile_count": 0,
-          "hash": "4955d269439adc909bb3bf2259e9cbce"
+          "hash": "2d6c21fb10aa74bb3bd86723edf2a7c1"
         }
       ],
       "device_types": [
@@ -3804,7 +3894,7 @@
           "device_type": "generic_iot",
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "script",
-          "name": "Player POP",
+          "name": "Player Pop",
           "standby_power": 1.63,
           "authors": [
             {
@@ -3815,15 +3905,14 @@
           ],
           "id": "Freebox Player POP",
           "manufacturer": "free",
-          "updated_at": "2026-08-21T12:12:06",
+          "updated_at": "2026-08-28T15:00:18",
           "max_power": 2.81,
           "sub_profile_count": 0,
-          "hash": "7b2314376eeb687c95060b0bf2103e1e"
+          "hash": "8e2c9215fb84d2a2bd845c5a5d6e3a37"
         },
         {
           "aliases": [
-            "fbxgw8-r1",
-            "Freebox v8 (r1) (fbxgw8-r1)"
+            "fbxgw8-r1"
           ],
           "calculation_strategy": "fixed",
           "created_at": "2025-10-12T09:03:14Z",
@@ -3831,7 +3920,7 @@
           "discovery_by": "device",
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "script",
-          "name": "V8 (r1)",
+          "name": "Server Pop",
           "authors": [
             {
               "name": "Alexandre Bertrand",
@@ -3841,10 +3930,10 @@
           ],
           "id": "Freebox v8 (r1)",
           "manufacturer": "free",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:00:18",
           "max_power": 10.42,
           "sub_profile_count": 0,
-          "hash": "5837d468ad8d9730fd3dcb0ff0d49b10"
+          "hash": "6b48520fe7a252cae7350c8febd3ed96"
         }
       ],
       "device_types": [
