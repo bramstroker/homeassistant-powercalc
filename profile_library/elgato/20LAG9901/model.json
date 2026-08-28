@@ -1,7 +1,13 @@
 {
+  "aliases": [
+    "Elgato Light Strip Pro"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-03-18T18:12:40Z",
   "device_type": "light",
+  "legacy_ids": [
+    "Elgato Light Strip Pro"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
