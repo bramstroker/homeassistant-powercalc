@@ -37,7 +37,7 @@ If no unique identifier can be established, request manual verification. If the 
 | TP-Link Kasa / Tapo | Product models such as `HS110`, `KP115`, `P110`, `P110M`, `L530` | Product label or body, Kasa/Tapo Device Info, HA Device information, official support page | Exclude nicknames and serial numbers. Record a hardware revision only when it is reported as part of the discovery identifier or measurements establish materially different power behavior. |
 | Aqara / Xiaomi | Stable Zigbee identifiers such as `lumi.plug.maeu01` or printed product codes such as `ZNLDP12LM`, depending on what identifies the hardware | Product label/manual and HA ZHA/Zigbee device signature; cross-check the other stable code and add it as an alias when appropriate | Marketing names such as `Aqara Smart Plug` are not enough on their own. Confirm that a `lumi.*` identifier is specific to one hardware model. |
 | LEDVANCE / OSRAM | Prefer the exact official manufacturer article/model code, such as an `AC...` code or an older OSRAM article number. Retain a device-reported Zigbee model such as `CLA60 RGBW Z3` as canonical only when no more specific official article code can be established for the measured hardware. | Official LEDVANCE product datasheet, declaration or catalog; product label; then HA/integration diagnostics and Zigbee signature | Exact protocol model strings, integration-specific IDs, and officially mapped GTINs can be aliases. Follow the detailed LEDVANCE guidance below. |
-| Innr | Printed and device-reported codes such as `RB 285 C`, `RS 230 C`, `SP 240` | Product label/manual and HA ZHA/Zigbee device signature | Keep spaces and suffix letters when they are part of the model code; do not reduce the directory to the marketing family. |
+| Innr | Printed and device-reported codes such as `RB 285 C`, `RS 230 C`, `SP 240` | Official Innr product page or declaration, product label/manual, then HA ZHA/Zigbee device signature | Keep spaces and suffix letters when they are part of the model code. Bundle SKUs and regional sibling models are not aliases by default. Follow the detailed Innr guidance below. |
 | Sonoff | Printed product codes such as `ZBMINI`, `ZBMINIR2`, and `B02BA60` | Product label/manual, eWeLink or HA Device information, Zigbee device signature | Do not substitute an underlying generic Tuya/Zigbee identifier for a branded Sonoff code. |
 | Tuya and white-label devices | No safe universal pattern | Require a branded model from the product label/manufacturer and compare its full Zigbee signature with known devices | Identifiers such as `TS0601`, `TS0505B`, and `_TZE...` values can cover different hardware. Do not add them as a directory or alias unless uniqueness for the measured device is demonstrated. |
 
@@ -55,6 +55,20 @@ Apply these rules when reviewing or normalizing LEDVANCE and OSRAM profiles:
 
 When the official code and the measured variant still cannot be reconciled, ask the contributor for a product-label or packaging photo, the exact identifier from Home Assistant or the originating integration, and confirmation of relevant capabilities such as RGB versus tunable white. Do not block on a cosmetic finish alone when the variants are demonstrably electrically identical.
 
+## Innr
+
+Apply these rules when reviewing or normalizing Innr profiles:
+
+1. Use the exact Innr type code as the canonical directory ID, including spaces and capability suffixes: for example, `RB 285 C`, `RS 230 C`, and `SP 240`. Do not collapse the spaces, remove suffix letters such as `C` or `T`, or replace the code with a marketing-family name.
+2. Confirm the code through the type-number section of an official Innr product page, a declaration of conformity, or the product label/manual. Use Home Assistant device information and the raw Zigbee signature to establish what integrations actually report. Treat Zigbee2MQTT mappings as corroboration rather than proof that grouped devices have identical power behavior.
+3. Add a stable integration-reported model string to `aliases` only when it uniquely maps to the same hardware. A verified value such as `On/Off plug (SP 220)` is a valid alias; do not generate aliases merely by removing spaces or punctuation from the canonical code.
+4. Do not add retail bundle suffixes such as `-2` or `-4`, EANs, or package SKUs as aliases unless an integration demonstrably reports them as the device model. Likewise, do not alias regional siblings such as `SP 240`, `SP 242`, and `SP 244` without evidence that socket type, voltage range, electronics, and measured self-usage are equivalent.
+5. Keep distinct type codes separate when they merely share a marketing name or appear in one Zigbee catalog entry. For example, sibling codes such as `RB 247 T`, `RB 248 T`, and `RB 249 T` are not interchangeable without official hardware equivalence and compatible measurements.
+6. Put the official product description in `name`, omit the manufacturer and protocol name (`Innr`, `Zigbee`), and match the verified fitting and capabilities. Prefer concise Innr family wording such as `Smart Bulb Colour E27`, `Smart Plug`, `Strip Light Colour`, `Outdoor Smart Plug`, and `Round Ceiling Light`. Do not claim tunable-white or colour support when the profile strategy and device capabilities do not support it.
+7. Cross-check `only_self_usage` per exact plug model. Current verified mappings are metering for `SP 120` and `SP 240`, and non-metering for `SP 220`, `SP 224`, and `OSP 210`. Reverify when a hardware revision or regional model differs; do not transfer the flag based only on the shared `SP` or plug family name.
+
+When an Innr code, integration-reported value, or regional variant cannot be reconciled, ask for the product-label type code, the exact Home Assistant model value and originating integration, and confirmation of fitting, region, and built-in power metering before adding aliases or sharing measurements.
+
 ## Useful primary references
 
 - [Powercalc library structure](../../../../docs/source/library/structure.md) explains that the directory is the model ID and aliases are alternate discovery identifiers.
@@ -63,6 +77,8 @@ When the official code and the measured variant still cannot be reconciled, ask 
 - [IKEA's E2499 product page](https://www.ikea.com/de/en/p/varmblixt-led-table-wall-lamp-dimmable-smart-white-glass-colour-and-white-spectrum-70612940/) is an example of the **Model identifier** field in IKEA technical product information.
 - [Shelly device information API](https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Shelly/) documents `Shelly.GetDeviceInfo.model`.
 - [TP-Link model-number guidance](https://www.tp-link.com/ae/support/faq/2053/) shows where the product model is printed and exposed in its apps.
+- [Innr product pages](https://innr.com/collections/frontpage) list official product names and type numbers.
+- [Innr declarations of conformity](https://innr.com/pages/declarations-of-conformity) corroborate exact type codes and regional variants.
 
 ## Review evidence
 

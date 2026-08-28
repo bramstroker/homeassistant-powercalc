@@ -5,7 +5,7 @@
   "measure_description": "Manually measured average of 2 plugs",
   "measure_device": "Brennenstuhl PM 231 E",
   "measure_method": "manual",
-  "name": "Zigbee Smart Plug",
+  "name": "Smart Plug",
   "only_self_usage": true,
   "standby_power": 0.2,
   "standby_power_on": 0.75,

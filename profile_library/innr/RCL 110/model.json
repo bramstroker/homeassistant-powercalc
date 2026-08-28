@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.13:docker"
   },
-  "name": "Round Ceiling Light (Tunable White)",
+  "name": "Round Ceiling Light",
   "standby_power": 0.4,
   "authors": [
     {

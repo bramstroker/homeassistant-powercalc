@@ -10,7 +10,7 @@
     "SLEEP_TIME": 15,
     "VERSION": "v0.19.16:docker"
   },
-  "name": "Smart Bulb Color E27",
+  "name": "Smart Bulb Color E26",
   "standby_power": 0.11,
   "authors": [
     {

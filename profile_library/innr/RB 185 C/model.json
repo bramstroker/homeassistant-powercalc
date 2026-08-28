@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.1:docker"
   },
-  "name": "RGBW Bulb Colour E27",
+  "name": "Smart Bulb Colour E27",
   "standby_power": 0.4,
   "authors": [
     {
