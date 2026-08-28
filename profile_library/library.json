@@ -2409,10 +2409,10 @@
           },
           "id": "RLX85CE-5",
           "manufacturer": "dreame",
-          "updated_at": "2026-08-28T15:03:27",
+          "updated_at": "2026-08-28T15:06:17",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "a9aa4b0611906869f35dc07c79570ebd"
+          "hash": "5c5d69560a19072dd6699b12925188e2"
         }
       ],
       "device_types": [
@@ -3943,13 +3943,17 @@
     },
     {
       "aliases": [
-        "GE Appliances"
+        "GE Appliances",
+        "GE_Appliances"
       ],
       "name": "ge",
       "full_name": "GE",
       "dir_name": "ge",
       "models": [
         {
+          "aliases": [
+            "ZLL Light"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2023-11-01T15:33:48Z",
           "device_type": "light",
@@ -3970,7 +3974,7 @@
           ],
           "id": "PSB30-SW27",
           "manufacturer": "ge",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:11:33",
           "max_power": 9.8,
           "sub_profile_count": 0,
           "color_modes": [
@@ -3980,9 +3984,12 @@
             "score": 98.7,
             "brightness": 98.7
           },
-          "hash": "9f099db236cb21bbda1cea1d3bfdf03e"
+          "hash": "dae1467bed7080ae10c7210ec699c540"
         },
         {
+          "aliases": [
+            "ZLL Light"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2023-11-01T15:33:48Z",
           "device_type": "light",
@@ -4003,7 +4010,7 @@
           ],
           "id": "PSB38-BW30",
           "manufacturer": "ge",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:11:33",
           "max_power": 13.3,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4013,7 +4020,7 @@
             "score": 98.6,
             "brightness": 98.6
           },
-          "hash": "cc2e1e4e8b05b7c9f76b5e410527c666"
+          "hash": "89ccd7f7537fc015563ffbdf516fd54c"
         }
       ],
       "device_types": [
@@ -4071,7 +4078,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.22.1:docker"
           },
-          "name": "Wi-Fi Dimmable Cool White 9 W LED GLS Bulb",
+          "name": "Wi-Fi Dimmable Cool White ES 9W LED GLS Bulb",
           "standby_power": 0.7,
           "authors": [
             {
@@ -4082,7 +4089,7 @@
           ],
           "id": "I002334",
           "manufacturer": "genio",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:19:16",
           "max_power": 8.31,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4092,7 +4099,7 @@
             "score": 98.3,
             "brightness": 98.3
           },
-          "hash": "d55fdcf8b2d10402e401f44d57c0fb66"
+          "hash": "02d69940543aedc26062d52acda3c200"
         },
         {
           "calculation_strategy": "lut",
@@ -4135,7 +4142,7 @@
             "SLEEP_TIME": 15,
             "VERSION": "v1.10.5:docker"
           },
-          "name": "Wi-Fi Dimmable 9 W LED CCT Downlight",
+          "name": "Wi-Fi Dimmable RGB+CCT 9W LED Downlight",
           "standby_power": 1.2,
           "authors": [
             {
@@ -4146,7 +4153,7 @@
           ],
           "id": "I002741",
           "manufacturer": "genio",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:19:16",
           "max_power": 13.4,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4157,7 +4164,7 @@
             "score": 95.6,
             "color_temp": 95.6
           },
-          "hash": "70417f0f6a3b415369a0e0ca1fae0fd0"
+          "hash": "041f347af6ede652daf5b842e787104b"
         },
         {
           "calculation_strategy": "lut",
@@ -4170,7 +4177,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.23.2:docker"
           },
-          "name": "Wi-Fi Dimmable 5 W G95 CCT Filament LED Bulb",
+          "name": "Wi-Fi Dimmable CCT ES 5W LED G95 Filament Bulb",
           "standby_power": 0.7,
           "authors": [
             {
@@ -4181,7 +4188,7 @@
           ],
           "id": "I002747",
           "manufacturer": "genio",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:19:16",
           "max_power": 1.91,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4191,7 +4198,7 @@
             "score": 89.9,
             "color_temp": 89.9
           },
-          "hash": "7b4e77a4830c5baac1278d736d1ea26f"
+          "hash": "fc51f7253ee9115ead9ac24a70219144"
         },
         {
           "calculation_strategy": "lut",
@@ -4204,7 +4211,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.23.2:docker"
           },
-          "name": "Wi-Fi Dimmable 5.5W ES RGBW Spiral Filament LED Bulb",
+          "name": "Wi-Fi Dimmable RGBW ES 5.5W LED ST64 Filament Bulb",
           "standby_power": 0.7,
           "authors": [
             {
@@ -4215,13 +4222,13 @@
           ],
           "id": "I002926",
           "manufacturer": "genio",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:19:16",
           "max_power": 5.5,
           "sub_profile_count": 0,
           "color_modes": [
             "hs"
           ],
-          "hash": "e0d962d54438ded420e0ca5c273c290e"
+          "hash": "fdd9f5afc0041c5b06db0a603de29930"
         },
         {
           "calculation_strategy": "lut",
@@ -4264,7 +4271,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "Wi-Fi Dimmable 15W ES Par38 LED Bulb",
+          "name": "Wi-Fi Dimmable RGB+CCT ES 15W LED PAR38 Bulb",
           "standby_power": 0.51,
           "authors": [
             {
@@ -4274,7 +4281,7 @@
           ],
           "id": "I003869",
           "manufacturer": "genio",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:19:16",
           "max_power": 4.15,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4284,7 +4291,7 @@
             "score": 92.9,
             "color_temp": 92.9
           },
-          "hash": "95f924827537170b9489ca8cad301e53"
+          "hash": "5845c8c8e16c0783222d295df1aa9c24"
         },
         {
           "calculation_strategy": "lut",
@@ -4297,7 +4304,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "Wi-Fi Smart RGBW/CCT 9 W Downlight (750lm)",
+          "name": "Wi-Fi Dimmable RGB+CCT 9W LED Downlight (750lm)",
           "standby_power": 0.24,
           "authors": [
             {
@@ -4307,7 +4314,7 @@
           ],
           "id": "I004544",
           "manufacturer": "genio",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:19:16",
           "max_power": 5.22,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4317,7 +4324,7 @@
             "score": 96.2,
             "color_temp": 96.2
           },
-          "hash": "10490a84c3a67009e4fbfbbb8d3418bd"
+          "hash": "8cc649410bc99a36642919a374c1bec9"
         }
       ],
       "device_types": [
@@ -4341,7 +4348,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.25.4:docker"
           },
-          "name": "RGB+CCT Zigbee E14 LED Candle Bulb (4 W)",
+          "name": "RGB+CCT 4W E14 Zigbee Candle Bulb",
           "standby_power": 0.31,
           "authors": [
             {
@@ -4352,7 +4359,7 @@
           ],
           "id": "GL-B-001P",
           "manufacturer": "gledopto",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:24:29",
           "max_power": 3.54,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4363,7 +4370,7 @@
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "4ce505a5c174ae482aa52523e098d596"
+          "hash": "14a32bdae48752b4f80bb9b442da997f"
         },
         {
           "calculation_strategy": "lut",
@@ -4376,7 +4383,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.23:docker"
           },
-          "name": "Filament LED light bulb A60 7W",
+          "name": "CCT 7W E27 A60 Zigbee Filament Bulb",
           "standby_power": 0.12,
           "authors": [
             {
@@ -4386,7 +4393,7 @@
           ],
           "id": "GL-B-003P",
           "manufacturer": "gledopto",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:24:29",
           "max_power": 6.36,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4396,7 +4403,7 @@
             "score": 97.3,
             "color_temp": 97.3
           },
-          "hash": "c6f47f514d7500f470e5a12c8509d56a"
+          "hash": "96395095f87fb9074e7fea9b644e2386"
         },
         {
           "calculation_strategy": "lut",
@@ -4409,7 +4416,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.22:docker"
           },
-          "name": "Filament LED light bulb E27 G95 7W",
+          "name": "CCT 7W E27 G95 Zigbee Filament Bulb",
           "standby_power": 0.36,
           "authors": [
             {
@@ -4419,7 +4426,7 @@
           ],
           "id": "GL-B-004P",
           "manufacturer": "gledopto",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:24:29",
           "max_power": 6.7,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4429,7 +4436,7 @@
             "score": 96.8,
             "color_temp": 96.8
           },
-          "hash": "da15aefaa9f1e2cd905ebdb2bb658091"
+          "hash": "755c7eafcd02d6ff063e830bf3c1f5dd"
         },
         {
           "calculation_strategy": "lut",
@@ -4442,7 +4449,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.24:docker"
           },
-          "name": "RGB+CCT 9 W Zigbee Downlight",
+          "name": "RGB+CCT 9W Zigbee Downlight",
           "standby_power": 0.22,
           "authors": [
             {
@@ -4452,7 +4459,7 @@
           ],
           "id": "GL-D-004P",
           "manufacturer": "gledopto",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:24:29",
           "max_power": 8.15,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4463,7 +4470,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "6841188a973dbc04adeb349db4956913"
+          "hash": "22e588213f76829b8c5353d54b05543d"
         },
         {
           "calculation_strategy": "lut",
@@ -4476,7 +4483,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.24.8:docker"
           },
-          "name": "RGB+CCT 4 W MR16 Zigbee Spot Light",
+          "name": "RGB+CCT 4W MR16 Zigbee Spotlight",
           "standby_power": 0.49,
           "authors": [
             {
@@ -4487,7 +4494,7 @@
           ],
           "id": "GL-S-005Z",
           "manufacturer": "gledopto",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:24:29",
           "max_power": 4.12,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4498,7 +4505,7 @@
             "score": 94.4,
             "color_temp": 94.4
           },
-          "hash": "8fa7f4b02c2948a2b958a998025bcf3f"
+          "hash": "95ba61579f1728a29d4f4e0027ff9aeb"
         },
         {
           "calculation_strategy": "lut",
@@ -4511,7 +4518,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.24.8:docker"
           },
-          "name": "RGB+CCT Zigbee 5 W GU10 Spotlight",
+          "name": "RGB+CCT 5W GU10 Zigbee Spotlight",
           "standby_power": 0.7,
           "authors": [
             {
@@ -4522,7 +4529,7 @@
           ],
           "id": "GL-S-007Z",
           "manufacturer": "gledopto",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:24:29",
           "max_power": 5.08,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4533,7 +4540,7 @@
             "score": 98.1,
             "color_temp": 98.1
           },
-          "hash": "064f59fa9dff8fd5513714051d1c83c2"
+          "hash": "906ea135731dacf2bbd9df58a4a356b8"
         }
       ],
       "device_types": [
@@ -4549,9 +4556,107 @@
       "dir_name": "google",
       "models": [
         {
+          "aliases": [
+            "Nest Hub 2gen"
+          ],
+          "calculation_strategy": "linear",
+          "created_at": "2023-03-24T08:27:29Z",
+          "device_type": "smart_speaker",
+          "legacy_ids": [
+            "Nest Hub 2gen"
+          ],
+          "measure_device": "Tuya",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.3.12:docker"
+          },
+          "name": "Nest Hub (2nd Gen)",
+          "standby_power": 0.39,
+          "authors": [
+            {
+              "name": "Patrik Malina",
+              "github": "patrik-malina"
+            }
+          ],
+          "id": "GUIK2",
+          "manufacturer": "google",
+          "updated_at": "2026-08-28T15:34:10",
+          "max_power": 4.8,
+          "sub_profile_count": 0,
+          "hash": "757f6cf9a9f74cc40a428bad3a1ff378"
+        },
+        {
+          "aliases": [
+            "Nest Audio"
+          ],
+          "calculation_strategy": "linear",
+          "created_at": "2023-04-08T08:07:56Z",
+          "device_type": "smart_speaker",
+          "legacy_ids": [
+            "Nest Audio"
+          ],
+          "measure_device": "Centralite 3200-Sgb",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 5,
+            "VERSION": "v1.4.0:docker"
+          },
+          "name": "Nest Audio",
+          "standby_power": 1.8,
+          "authors": [
+            {
+              "name": "sunjaxx",
+              "github": "sunjaxx"
+            }
+          ],
+          "id": "GXCA6",
+          "manufacturer": "google",
+          "updated_at": "2026-08-28T15:34:10",
+          "max_power": 6.0,
+          "sub_profile_count": 0,
+          "hash": "3f34a9f2c6dde6b1443d4b2cd4a3d1c0"
+        },
+        {
+          "aliases": [
+            "Home Mini"
+          ],
+          "calculation_strategy": "linear",
+          "created_at": "2022-10-05T10:14:54Z",
+          "device_type": "smart_speaker",
+          "legacy_ids": [
+            "Home Mini (HOA)"
+          ],
+          "measure_device": "Shelly Plug S",
+          "measure_method": "manual",
+          "name": "Home Mini",
+          "standby_power": 1.65,
+          "authors": [
+            {
+              "name": "Daniel O'Connor",
+              "email": "daniel.oconnor@gmail.com",
+              "github": "CloCkWeRX"
+            }
+          ],
+          "id": "H0A",
+          "manufacturer": "google",
+          "updated_at": "2026-08-28T15:34:10",
+          "max_power": 2.49,
+          "sub_profile_count": 0,
+          "hash": "a132fad8e01b163cf1da2b403fa75446"
+        },
+        {
+          "aliases": [
+            "Home"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2025-02-10T17:04:27Z",
           "device_type": "smart_speaker",
+          "legacy_ids": [
+            "Home"
+          ],
           "measure_device": "Nous A8T",
           "measure_device_firmware": "EspHome",
           "measure_method": "script",
@@ -4569,17 +4674,23 @@
               "github": "CloCkWeRX"
             }
           ],
-          "id": "Home",
+          "id": "H0ME",
           "manufacturer": "google",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:34:10",
           "max_power": 3.69,
           "sub_profile_count": 0,
-          "hash": "11562256fd31092aaa15216beef2e8e5"
+          "hash": "c4c0856e967f362267a13c4fc358b174"
         },
         {
+          "aliases": [
+            "Home Hub Max"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2025-01-08T16:05:27Z",
           "device_type": "smart_speaker",
+          "legacy_ids": [
+            "Home Hub Max"
+          ],
           "measure_device": "Innr SP 242",
           "measure_method": "script",
           "measure_settings": {
@@ -4596,97 +4707,23 @@
               "github": "greghesp"
             }
           ],
-          "id": "Home Hub Max",
+          "id": "H2A",
           "manufacturer": "google",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:34:10",
           "max_power": 10.2,
           "sub_profile_count": 0,
-          "hash": "81acfd9f87712739ae415fe42f5e4d9d"
+          "hash": "6373dd41b8cd752b8519200495b2186d"
         },
         {
           "aliases": [
-            "Google Home Mini"
+            "Nest Mini"
           ],
           "calculation_strategy": "linear",
           "created_at": "2022-10-05T10:14:54Z",
           "device_type": "smart_speaker",
-          "measure_device": "Shelly Plug S",
-          "measure_method": "manual",
-          "name": "Home Mini",
-          "standby_power": 1.65,
-          "authors": [
-            {
-              "name": "Daniel O'Connor",
-              "email": "daniel.oconnor@gmail.com",
-              "github": "CloCkWeRX"
-            }
+          "legacy_ids": [
+            "Nest Mini (H2C)"
           ],
-          "id": "Home Mini (HOA)",
-          "manufacturer": "google",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 2.49,
-          "sub_profile_count": 0,
-          "hash": "0c1ab0157db7cbdb5f74686ad691c475"
-        },
-        {
-          "calculation_strategy": "linear",
-          "created_at": "2023-04-08T08:07:56Z",
-          "device_type": "smart_speaker",
-          "measure_device": "Centralite 3200-Sgb",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 5,
-            "VERSION": "v1.4.0:docker"
-          },
-          "name": "Nest Audio",
-          "standby_power": 1.8,
-          "authors": [
-            {
-              "name": "sunjaxx",
-              "github": "sunjaxx"
-            }
-          ],
-          "id": "Nest Audio",
-          "manufacturer": "google",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 6.0,
-          "sub_profile_count": 0,
-          "hash": "578dd5c3d26396c8c37de937b77e73e3"
-        },
-        {
-          "calculation_strategy": "linear",
-          "created_at": "2023-03-24T08:27:29Z",
-          "device_type": "smart_speaker",
-          "measure_device": "Tuya",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.3.12:docker"
-          },
-          "name": "Nest Hub (2nd Gen)",
-          "standby_power": 0.39,
-          "authors": [
-            {
-              "name": "Patrik Malina",
-              "github": "patrik-malina"
-            }
-          ],
-          "id": "Nest Hub 2gen",
-          "manufacturer": "google",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 4.8,
-          "sub_profile_count": 0,
-          "hash": "ae498f606fda091d574932df1d808f81"
-        },
-        {
-          "aliases": [
-            "Google Nest Mini"
-          ],
-          "calculation_strategy": "linear",
-          "created_at": "2022-10-05T10:14:54Z",
-          "device_type": "smart_speaker",
           "measure_device": "Shelly Plug S",
           "measure_method": "manual",
           "name": "Nest Mini",
@@ -4698,20 +4735,23 @@
               "github": "CloCkWeRX"
             }
           ],
-          "id": "Nest Mini (H2C)",
+          "id": "H2C",
           "manufacturer": "google",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:34:10",
           "max_power": 3.66,
           "sub_profile_count": 0,
-          "hash": "38197c26960fac6315c016a370cd1f7b"
+          "hash": "46e2e4d2173cc5d1494a04db0035e2b6"
         },
         {
           "aliases": [
-            "Nest Wifi point"
+            "Nest Wifi Point"
           ],
           "calculation_strategy": "linear",
           "created_at": "2026-01-21T21:30:47Z",
           "device_type": "generic_iot",
+          "legacy_ids": [
+            "Nest Wifi Point (H2E)"
+          ],
           "measure_device": "TP-Link Tapo P110M",
           "measure_method": "script",
           "measure_settings": {
@@ -4728,12 +4768,12 @@
               "github": "EpicBurrito"
             }
           ],
-          "id": "Nest Wifi Point (H2E)",
+          "id": "H2E",
           "manufacturer": "google",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:34:10",
           "max_power": 5.18,
           "sub_profile_count": 0,
-          "hash": "f93d14c2eea939b2da9e4bae1452eca3"
+          "hash": "6eee5a56bb85185d59daa79523abeec5"
         }
       ],
       "device_types": [
@@ -4751,6 +4791,9 @@
           "calculation_strategy": "lut",
           "created_at": "2026-01-03T10:49:39Z",
           "device_type": "light",
+          "legacy_ids": [
+            "sl2"
+          ],
           "measure_device": "Nous A1T",
           "measure_method": "script",
           "measure_settings": {
@@ -4766,9 +4809,9 @@
               "github": "Jarod2801"
             }
           ],
-          "id": "sl2",
+          "id": "SL2",
           "manufacturer": "gosund",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:43:35",
           "max_power": 16.1,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4779,7 +4822,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "c5567eece86595b705d8babd3a999aca"
+          "hash": "330f9638baeab414d6be51a92e299903"
         }
       ],
       "device_types": [
@@ -4805,7 +4848,7 @@
             "SLEEP_TIME": 1,
             "VERSION": "v1.21.2:docker"
           },
-          "name": "Govee ST19 Smart Edison Light Bulb E26",
+          "name": "ST19 Smart Edison Light Bulb E26 500lm",
           "standby_power": 0.5,
           "authors": [
             {
@@ -4816,7 +4859,7 @@
           ],
           "id": "H14C0",
           "manufacturer": "govee",
-          "updated_at": "2026-08-22T17:31:23",
+          "updated_at": "2026-08-28T15:55:17",
           "max_power": 5.25,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4827,7 +4870,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "d6cd42bba0bf3dee73a9fb144510194d"
+          "hash": "329a7579cb58dee772303680723cea19"
         },
         {
           "calculation_strategy": "lut",
@@ -4840,7 +4883,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.19.5:docker"
           },
-          "name": "Smart Bulb GU10",
+          "name": "RGBWW Smart Light Bulb GU10",
           "standby_power": 0.27,
           "authors": [
             {
@@ -4851,7 +4894,7 @@
           ],
           "id": "H600D",
           "manufacturer": "govee",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:55:17",
           "max_power": 4.47,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4862,7 +4905,7 @@
             "score": 98.4,
             "color_temp": 98.4
           },
-          "hash": "1de1900d482da08e2a819500d3ec6aab"
+          "hash": "a9bbeb3fb5ea75c83de96b2d0e2cad57"
         },
         {
           "calculation_strategy": "lut",
@@ -4875,7 +4918,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "Smart LED Downlight",
+          "name": "6-Inch Smart Retrofit Recessed Can Light",
           "standby_power": 0.85,
           "authors": [
             {
@@ -4886,7 +4929,7 @@
           ],
           "id": "H601C",
           "manufacturer": "govee",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:55:17",
           "max_power": 13.15,
           "sub_profile_count": 0,
           "color_modes": [
@@ -4897,7 +4940,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "c6c399eb481df64760b57b70ad3f19aa"
+          "hash": "740804e5710cb0706a9bf7cfffcd6b65"
         },
         {
           "calculation_strategy": "lut",
@@ -4980,7 +5023,7 @@
             "SLEEP_TIME": 30,
             "VERSION": "v1.9.8:docker"
           },
-          "name": "RGBICW Smart Corner Floor Lamp",
+          "name": "RGBICW Smart Floor Lamp Basic",
           "standby_power": 2.14,
           "authors": [
             {
@@ -4990,7 +5033,7 @@
           ],
           "id": "H6076",
           "manufacturer": "govee",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:55:17",
           "max_power": 23.14,
           "sub_profile_count": 0,
           "color_modes": [
@@ -5003,7 +5046,7 @@
             "brightness": 98.9,
             "color_temp": 84.6
           },
-          "hash": "e17a259544793154c279c88b57544f20"
+          "hash": "04835952fb909ceed4ca6b0d5c1e8e05"
         },
         {
           "calculation_strategy": "lut",
@@ -5052,7 +5095,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.20.0:docker"
           },
-          "name": "Smart Ceiling Light",
+          "name": "12-Inch RGBWW + RGBIC Smart Ceiling Light",
           "standby_power": 0.45,
           "authors": [
             {
@@ -5062,7 +5105,7 @@
           ],
           "id": "H60A1",
           "manufacturer": "govee",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:55:17",
           "max_power": 23.35,
           "sub_profile_count": 0,
           "color_modes": [
@@ -5074,7 +5117,7 @@
             "score": 98.4,
             "color_temp": 98.4
           },
-          "hash": "5544593953d682f73d5a742f53f9fc20"
+          "hash": "4f964c7a141d9da6cba182b47b12dd0d"
         },
         {
           "calculation_strategy": "lut",
@@ -5189,7 +5232,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "String lights",
+          "name": "RGBIC Warm White Smart Outdoor String Lights (48ft)",
           "standby_power": 1.8,
           "authors": [
             {
@@ -5200,7 +5243,7 @@
           ],
           "id": "H7020",
           "manufacturer": "govee",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:55:17",
           "max_power": 6.65,
           "sub_profile_count": 0,
           "color_modes": [
@@ -5211,7 +5254,7 @@
             "score": 24.3,
             "color_temp": 24.3
           },
-          "hash": "ecdf075c0ca5002fec0595c90832578b"
+          "hash": "c286839c184059a9e33e2055c2f80a00"
         },
         {
           "calculation_strategy": "lut",
@@ -5224,7 +5267,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.19.4:docker"
           },
-          "name": "Smart Outdoor String Lights",
+          "name": "RGBIC Warm White Smart Outdoor String Lights (96ft)",
           "standby_power": 2.65,
           "authors": [
             {
@@ -5235,7 +5278,7 @@
           ],
           "id": "H7021",
           "manufacturer": "govee",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T15:55:17",
           "max_power": 20.4,
           "sub_profile_count": 0,
           "color_modes": [
@@ -5247,7 +5290,7 @@
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "eb04914a2a011bc4323d32c0f046b73a"
+          "hash": "9fe18005bb9fa15690d0d87516b52b54"
         }
       ],
       "device_types": [
@@ -5308,7 +5351,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.3:docker"
           },
-          "name": "Smart 24ft LED Color Changing Plug-In String Lights",
+          "name": "12-Light 24ft RGBW LED Smart Hubspace Cafe String Light",
           "standby_power": 1.45,
           "authors": [
             {
@@ -5319,7 +5362,7 @@
           ],
           "id": "HB-10521-HS",
           "manufacturer": "hampton bay",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:04:50",
           "max_power": 4.85,
           "sub_profile_count": 0,
           "color_modes": [
@@ -5330,7 +5373,7 @@
             "score": 92.2,
             "color_temp": 92.2
           },
-          "hash": "b31f2dcee23f03f147e4cc75844f7929"
+          "hash": "136a4afafdb3a3b60c789ff82fe192e4"
         }
       ],
       "device_types": [
@@ -5411,6 +5454,12 @@
           "calculation_strategy": "lut",
           "created_at": "2026-08-17T11:48:24Z",
           "device_type": "light",
+          "aliases": [
+            "VIYU_A60_806_CCT_10454469"
+          ],
+          "legacy_ids": [
+            "VIYU_A60_806_CCT_10454469"
+          ],
           "measure_device": "Shelly Plus 1PM",
           "measure_method": "script",
           "measure_settings": {
@@ -5418,7 +5467,7 @@
             "SLEEP_TIME": 3.0,
             "VERSION": "v0.3.0:cli"
           },
-          "name": "FLAIR VIYU A60 E27 806lm 8.5W CCT",
+          "name": "FLAIR Viyu A60 E27 CCT Bulb (8.5W, 806 lm)",
           "standby_power": 0.3,
           "voltage_range": {
             "min": 228.3,
@@ -5430,9 +5479,9 @@
               "github": "philscottydev"
             }
           ],
-          "id": "VIYU_A60_806_CCT_10454469",
+          "id": "10454469",
           "manufacturer": "hornbach",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:28:11",
           "max_power": 8.6,
           "sub_profile_count": 0,
           "color_modes": [
@@ -5442,7 +5491,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "a3de4632177cd770f2898ef2f5e831ce"
+          "hash": "6945fb91c0e90fa387cb599febdcffd3"
         }
       ],
       "device_types": [
@@ -5466,7 +5515,7 @@
           "device_type": "printer",
           "measure_device": "Shelly 4PM",
           "measure_method": "manual",
-          "name": "Color LaserJet Pro MFP 3301",
+          "name": "Color LaserJet Pro Multifunction Printer",
           "authors": [
             {
               "name": "Brian Egge",
@@ -5476,10 +5525,10 @@
           ],
           "id": "MFP 3301",
           "manufacturer": "hp",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:32:28",
           "max_power": 2.2,
           "sub_profile_count": 0,
-          "hash": "5e5e91a83eb823e7a4310989d4a9f3fa"
+          "hash": "8ced59b05f034b7058f713cf10b8ca92"
         }
       ],
       "device_types": [
@@ -5501,6 +5550,9 @@
           "calculation_strategy": "fixed",
           "created_at": "2022-11-23T08:42:12Z",
           "device_type": "smart_switch",
+          "legacy_ids": [
+            "TRADFRI control outlet"
+          ],
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
           "name": "TRADFRI control outlet",
@@ -5515,10 +5567,10 @@
           ],
           "id": "E1603",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 0.98,
           "sub_profile_count": 0,
-          "hash": "ae64f51ae742051b9dbdfe8e18ae2f05"
+          "hash": "2edc000b83ad8995d8f387fe691cf537"
         },
         {
           "calculation_strategy": "fixed",
@@ -5550,6 +5602,9 @@
           "calculation_strategy": "fixed",
           "created_at": "2023-12-31T20:16:31Z",
           "device_type": "smart_switch",
+          "legacy_ids": [
+            "ASKVADER"
+          ],
           "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",
           "measure_method": "manual",
           "name": "ASKVADER on/off switch",
@@ -5565,10 +5620,10 @@
           ],
           "id": "E1836",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 0.78,
           "sub_profile_count": 0,
-          "hash": "29ae98dbde9e5adf8b9c00929a1c86eb"
+          "hash": "cef24169473df19b1c06342424448087"
         },
         {
           "aliases": [
@@ -5577,6 +5632,9 @@
           "calculation_strategy": "linear",
           "created_at": "2025-04-18T12:32:08Z",
           "device_type": "fan",
+          "legacy_ids": [
+            "STARKVIND Air purifier table"
+          ],
           "measure_device": "GreenWave GWPN1",
           "measure_method": "manual",
           "name": "STARKVIND air purifier table",
@@ -5589,10 +5647,40 @@
           ],
           "id": "E2007",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 24.8,
           "sub_profile_count": 0,
-          "hash": "5c3047b9c7d5fd572f0b792bcd52348b"
+          "hash": "5ee5f278c630525d172b60dce143cc7d"
+        },
+        {
+          "aliases": [
+            "TRETAKT Smart plug"
+          ],
+          "calculation_strategy": "fixed",
+          "created_at": "2025-02-02T13:27:12Z",
+          "device_type": "smart_switch",
+          "legacy_ids": [
+            "TRETAKT Smart plug",
+            "E22x4"
+          ],
+          "measure_device": "Zhurui PR10",
+          "measure_method": "manual",
+          "name": "TRETAKT smart plug",
+          "only_self_usage": false,
+          "standby_power": 0.13,
+          "standby_power_on": 0.73,
+          "authors": [
+            {
+              "name": "ZleekWolf",
+              "github": "folfy"
+            }
+          ],
+          "id": "E2204",
+          "manufacturer": "ikea",
+          "updated_at": "2026-08-28T16:48:36",
+          "max_power": 0.73,
+          "sub_profile_count": 0,
+          "hash": "967ce65860225d0f9c662ec1b278ea9b"
         },
         {
           "aliases": [
@@ -5601,6 +5689,9 @@
           "calculation_strategy": "fixed",
           "created_at": "2025-01-24T08:23:25Z",
           "device_type": "smart_switch",
+          "legacy_ids": [
+            "INSPELNING Smart plug"
+          ],
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
           "name": "INSPELNING smart plug",
@@ -5615,10 +5706,10 @@
           ],
           "id": "E2206",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 0.8,
           "sub_profile_count": 0,
-          "hash": "e5b3a0282371779e86152a885eebf274"
+          "hash": "e508fbf9120a508b5929492eb384291a"
         },
         {
           "aliases": [
@@ -5648,32 +5739,6 @@
         },
         {
           "aliases": [
-            "TRETAKT Smart plug"
-          ],
-          "calculation_strategy": "fixed",
-          "created_at": "2025-02-02T13:27:12Z",
-          "device_type": "smart_switch",
-          "measure_device": "Zhurui PR10",
-          "measure_method": "manual",
-          "name": "TRETAKT smart plug",
-          "only_self_usage": false,
-          "standby_power": 0.13,
-          "standby_power_on": 0.73,
-          "authors": [
-            {
-              "name": "ZleekWolf",
-              "github": "folfy"
-            }
-          ],
-          "id": "E22x4",
-          "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 0.73,
-          "sub_profile_count": 0,
-          "hash": "a85dee0e5f5a35c65bb343101a9fa4e4"
-        },
-        {
-          "aliases": [
             "4096"
           ],
           "calculation_strategy": "fixed",
@@ -5681,7 +5746,7 @@
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "manual",
-          "name": "GRILLPLATS Smart Plug (Matter)",
+          "name": "GRILLPLATS smart plug",
           "only_self_usage": true,
           "standby_power": 0.22,
           "standby_power_on": 0.47,
@@ -5693,14 +5758,15 @@
           ],
           "id": "E2491",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 0.47,
           "sub_profile_count": 0,
-          "hash": "9f4433e7caef04b6865d6b01e22efa48"
+          "hash": "f2c1ba06c40e05d57652ce379338a86e"
         },
         {
           "aliases": [
-            "TRADFRI LED driver, 30 w (ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2"
+            "TRADFRI LED driver, 30 w",
+            "ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2"
           ],
           "calculation_strategy": "linear",
           "created_at": "2025-02-12T13:05:00Z",
@@ -5708,7 +5774,7 @@
           "measure_device": "Nous A8T",
           "measure_device_firmware": "EspHome",
           "measure_method": "manual",
-          "name": "TRADFRI LED driver, 30 w",
+          "name": "TRADFRI LED Driver (30W)",
           "standby_power": 0.31,
           "standby_power_on": 0.35,
           "authors": [
@@ -5719,10 +5785,10 @@
           ],
           "id": "ICPSHC24-30EU-IL-1",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 0.35,
           "sub_profile_count": 0,
-          "hash": "94b5a6a9580995c48fe768f32cb8154f"
+          "hash": "18ecb388bdf720e11a0286b2871472ec"
         },
         {
           "aliases": [
@@ -5848,7 +5914,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "master"
           },
-          "name": "SLAGSIDA under cupboard light (60cm)",
+          "name": "SLAGSIDA Under-Cabinet Light (60 cm)",
           "standby_power": 0.62,
           "authors": [
             {
@@ -5859,7 +5925,7 @@
           ],
           "id": "L1616",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 7.57,
           "sub_profile_count": 0,
           "color_modes": [
@@ -5869,7 +5935,7 @@
             "score": 98.9,
             "brightness": 98.9
           },
-          "hash": "15b688ef5004e55f7b76ca56a63d36b3"
+          "hash": "961b2cf9d66a4fa7a5592b6415c1e3fb"
         },
         {
           "aliases": [
@@ -5878,6 +5944,9 @@
           "calculation_strategy": "lut",
           "created_at": "2024-11-09T00:06:13Z",
           "device_type": "light",
+          "legacy_ids": [
+            "ORMANAS LED Strip"
+          ],
           "measure_device": "Fibaro FGWP102",
           "measure_method": "script",
           "measure_settings": {
@@ -5885,7 +5954,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.15.2:docker"
           },
-          "name": "ORMANAS LED Strip",
+          "name": "ORMANAS LED lighting strip (4 m)",
           "standby_power": 0.1,
           "authors": [
             {
@@ -5895,7 +5964,7 @@
           ],
           "id": "L2112",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 6.3,
           "sub_profile_count": 0,
           "color_modes": [
@@ -5903,10 +5972,10 @@
             "hs"
           ],
           "lut_quality": {
-            "score": 71.8,
-            "color_temp": 71.8
+            "score": 98.1,
+            "color_temp": 98.1
           },
-          "hash": "a79a2d7594f03f4b2052cf75a9b41b43"
+          "hash": "04e7dca845ca1462db95a973a69723cd"
         },
         {
           "calculation_strategy": "lut",
@@ -6029,17 +6098,17 @@
           ],
           "id": "LED1537R6",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 5.47,
           "sub_profile_count": 0,
           "color_modes": [
             "color_temp"
           ],
           "lut_quality": {
-            "score": 83.1,
-            "color_temp": 83.1
+            "score": 94.5,
+            "color_temp": 94.5
           },
-          "hash": "1e6310fbb94b3c89b83b457fde128fa2"
+          "hash": "4362e2d4a95652740a3ea9ba05c0981b"
         },
         {
           "aliases": [
@@ -7080,7 +7149,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.9.2:docker"
           },
-          "name": "TRADFRI bulb E12/E14 WS globe 450/470 lumen, dimmable, white spectrum, opal white (LED2101G4)",
+          "name": "TRADFRI E12/E14 White Spectrum Globe Bulb (450/470 lm)",
           "standby_power": 0.2,
           "authors": [
             {
@@ -7090,7 +7159,7 @@
           ],
           "id": "LED2101G4",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 4.66,
           "sub_profile_count": 0,
           "color_modes": [
@@ -7100,7 +7169,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "7243c756d1aae9a67f814f6974ec8b1e"
+          "hash": "3ee529ade96eba0a26cc516690329e29"
         },
         {
           "aliases": [
@@ -7943,7 +8012,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.20.11:docker"
           },
-          "name": "GUNNARP LED Ceiling / Wall Lamp 40cm",
+          "name": "GUNNARP LED Ceiling/Wall Lamp (40 cm)",
           "standby_power": 0.05,
           "authors": [
             {
@@ -7953,7 +8022,7 @@
           ],
           "id": "T1828",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 22.9,
           "sub_profile_count": 0,
           "color_modes": [
@@ -7963,9 +8032,12 @@
             "score": 99.0,
             "color_temp": 99.0
           },
-          "hash": "e0db6fd0385f1d7a38071cdfb7b8512c"
+          "hash": "b881d4ceeb17d691c6f0317257479d4b"
         },
         {
+          "aliases": [
+            "STOFTMOLN ceiling/wall lamp 24 warm light dimmable"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2023-03-04T11:53:20Z",
           "device_type": "light",
@@ -7976,7 +8048,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.3.5:docker"
           },
-          "name": "STOFTMOLN ceiling/wall lamp 24 warm light dimmable",
+          "name": "STOFTMOLN LED Ceiling/Wall Lamp (24 cm)",
           "standby_power": 0.25,
           "authors": [
             {
@@ -7987,7 +8059,7 @@
           ],
           "id": "T2035",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 8.98,
           "sub_profile_count": 0,
           "color_modes": [
@@ -7997,9 +8069,12 @@
             "score": 98.5,
             "brightness": 98.5
           },
-          "hash": "28d1acac7ce7447c331d7b5a15c68c2e"
+          "hash": "6eed41b80773dbf2a5abe9256a8629dd"
         },
         {
+          "aliases": [
+            "STOFTMOLN ceiling/wall lamp WW37"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2023-09-19T18:51:11Z",
           "device_type": "light",
@@ -8010,7 +8085,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.9.4:docker"
           },
-          "name": "STOFTMOLN ceiling/wall lamp WW37",
+          "name": "STOFTMOLN LED Ceiling/Wall Lamp (37 cm)",
           "standby_power": 0.11,
           "authors": [
             {
@@ -8020,7 +8095,7 @@
           ],
           "id": "T2037",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:48:36",
           "max_power": 19.95,
           "sub_profile_count": 0,
           "color_modes": [
@@ -8030,7 +8105,7 @@
             "score": 98.9,
             "brightness": 98.9
           },
-          "hash": "0396901a434263babfa22944b2bed0ec"
+          "hash": "f85e696ebc996f4cdb545672c98eeb3a"
         }
       ],
       "device_types": [
@@ -9032,7 +9107,7 @@
           "device_type": "smart_dimmer",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "manual",
-          "name": "2-in-1 Dimmer Switch",
+          "name": "Blue Series Dimmer Switch",
           "only_self_usage": true,
           "standby_power": 0.26,
           "standby_power_on": 0.29,
@@ -9045,10 +9120,10 @@
           ],
           "id": "VZM31-SN",
           "manufacturer": "inovelli",
-          "updated_at": "2026-08-22T18:08:08",
+          "updated_at": "2026-08-28T16:52:29",
           "max_power": 0.29,
           "sub_profile_count": 0,
-          "hash": "95fce66eac632846f7ea61affba9e57a"
+          "hash": "3cccac3176f462ecef8cd6978810b31c"
         },
         {
           "calculation_strategy": "fixed",
@@ -9056,7 +9131,7 @@
           "device_type": "smart_dimmer",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
-          "name": "2-in-1 mmWave Dimmer Switch (VZM32-SN)",
+          "name": "Blue Series mmWave Presence Dimmer Switch",
           "only_self_usage": true,
           "standby_power": 1.54,
           "standby_power_on": 1.59,
@@ -9069,10 +9144,10 @@
           ],
           "id": "VZM32-SN",
           "manufacturer": "inovelli",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:52:29",
           "max_power": 1.59,
           "sub_profile_count": 0,
-          "hash": "0e4abeaaf26f25904ed32819a7b56f62"
+          "hash": "636f5128124522e80e4e7718e0745faa"
         }
       ],
       "device_types": [
@@ -9089,6 +9164,9 @@
           "calculation_strategy": "lut",
           "created_at": "2025-09-06T16:10:21Z",
           "device_type": "light",
+          "legacy_ids": [
+            "EWS410"
+          ],
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "script",
           "measure_settings": {
@@ -9096,7 +9174,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.19:docker"
           },
-          "name": "Smart Wi-Fi RGB LED Light Bulb (10 W, E27)",
+          "name": "Smart Wi-Fi RGB LED Light Bulb (10W, E27)",
           "standby_power": 0.62,
           "authors": [
             {
@@ -9105,9 +9183,9 @@
               "github": "felipemarinho97"
             }
           ],
-          "id": "EWS410",
+          "id": "EWS 410",
           "manufacturer": "intelbras",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T16:57:26",
           "max_power": 10.06,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9115,10 +9193,10 @@
             "hs"
           ],
           "lut_quality": {
-            "score": 80.6,
-            "color_temp": 80.6
+            "score": 95.9,
+            "color_temp": 95.9
           },
-          "hash": "bc469ff16c1eb2a92ba19bb03d9db1b1"
+          "hash": "30a94b159ba0bfa9089134c4b1e9eea5"
         }
       ],
       "device_types": [
