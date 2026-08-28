@@ -13371,39 +13371,6 @@
         },
         {
           "calculation_strategy": "lut",
-          "created_at": "2025-02-02T20:03:18Z",
-          "device_type": "light",
-          "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.3:docker"
-          },
-          "name": "Areo VariFit 230mm 2000lm 500.46",
-          "standby_power": 0.25,
-          "authors": [
-            {
-              "name": "metzi",
-              "github": "mime24"
-            }
-          ],
-          "id": "500.46",
-          "manufacturer": "paulmann licht",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 15.6,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 99.2,
-            "color_temp": 99.2
-          },
-          "hash": "a04584acb862748de488c0fe5964f476"
-        },
-        {
-          "calculation_strategy": "lut",
           "created_at": "2024-11-15T11:59:34Z",
           "device_type": "light",
           "measure_device": "TS011F",
@@ -13487,6 +13454,45 @@
             "color_temp": 99.5
           },
           "hash": "9f85cac6165c63c100b86c014e4f9c65"
+        },
+        {
+          "aliases": [
+            "500.46"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-02-02T20:03:18Z",
+          "device_type": "light",
+          "legacy_ids": [
+            "500.46"
+          ],
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.3:docker"
+          },
+          "name": "Areo VariFit Round Recessed Panel 230mm 1400lm 16W Tunable White",
+          "standby_power": 0.25,
+          "authors": [
+            {
+              "name": "metzi",
+              "github": "mime24"
+            }
+          ],
+          "id": "93044",
+          "manufacturer": "paulmann licht",
+          "updated_at": "2026-08-28T17:19:57",
+          "max_power": 15.6,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "55eb729d2e98fca495c3ed0bb237f574"
         }
       ],
       "device_types": [
