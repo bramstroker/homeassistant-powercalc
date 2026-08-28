@@ -21,15 +21,13 @@
       "0 -> 1.01"
     ]
   },
-  "measure_description": "Measured with utils/measure script",
+  "legacy_ids": [
+    "MQJ83"
+  ],
+  "measure_description": "Manually changed the volume in 10% steps, streamed pink noise, and used the measure utility to average each level for 60 seconds.",
   "measure_device": "Shelly Plus Plug",
-  "measure_method": "script",
-  "measure_settings": {
-    "SAMPLE_COUNT": 2,
-    "SLEEP_TIME": 3,
-    "VERSION": "v1.9.14:docker"
-  },
-  "name": "HomePod Gen 2",
+  "measure_method": "manual",
+  "name": "HomePod (Gen 2)",
   "standby_power": 1.01,
   "authors": [
     {

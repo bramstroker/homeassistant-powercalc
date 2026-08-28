@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "HomePod Mini"
+  ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
   "config_flow_discovery_remarks": "**Warning**, please verify this device is a single speaker and not part of a stereo or Home theater configuration. This powercalc profile is specifically for a single speaker, so when you accept it anyway power estimation will be way off. When this is the case for you please ignore this discovery by clicking the three dots and ignore.",
@@ -19,10 +22,13 @@
       "100 -> 4.22"
     ]
   },
+  "legacy_ids": [
+    "HomePod Mini"
+  ],
   "measure_description": "Streamed white noise for this test",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
-  "name": "HomePod Mini",
+  "name": "HomePod mini",
   "standby_power": 0.65,
   "authors": [
     {
