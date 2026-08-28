@@ -9097,7 +9097,7 @@
           ],
           "id": "4058075208339",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:25:06",
           "max_power": 8.73,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9108,7 +9108,7 @@
             "score": 45.0,
             "color_temp": 45.0
           },
-          "hash": "ccca01e171e4caabda6e07633d5e1460"
+          "hash": "d451e884d736daf288d245cea8d8c95e"
         },
         {
           "calculation_strategy": "lut",
@@ -9133,13 +9133,13 @@
           ],
           "id": "73741",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:25:06",
           "max_power": 8.75,
           "sub_profile_count": 0,
           "color_modes": [
             "hs"
           ],
-          "hash": "f4603e0551207addcb092e2373daf9d9"
+          "hash": "e610b4f075befab78f5a1c5a364e83f2"
         },
         {
           "calculation_strategy": "lut",
@@ -9164,7 +9164,7 @@
           ],
           "id": "73742",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:25:06",
           "max_power": 10.0,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9174,7 +9174,7 @@
             "score": 97.6,
             "color_temp": 97.6
           },
-          "hash": "e241624d7107eaa6dab6eb559e3dcefe"
+          "hash": "530f45c2c74fc0bfc7380bbdb375f374"
         },
         {
           "calculation_strategy": "lut",
@@ -9197,7 +9197,7 @@
           ],
           "id": "AC25697",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:25:06",
           "max_power": 8.18,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9208,7 +9208,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "d5b0050fe00ad9e800af74f9c13b6ae8"
+          "hash": "dce7a00525fa8eee07f93c8ccdc3179f"
         },
         {
           "calculation_strategy": "lut",
@@ -9232,7 +9232,7 @@
           ],
           "id": "ac264430155",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:25:06",
           "max_power": 19.35,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9242,7 +9242,7 @@
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "6a7900dac3c47a34b900825c4f7eeb7e"
+          "hash": "ebfb32a1539a508ba9393228124f43be"
         },
         {
           "aliases": [
@@ -9272,7 +9272,7 @@
           ],
           "id": "AC26447",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:25:06",
           "max_power": 34.65,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9283,7 +9283,7 @@
             "score": 99.7,
             "color_temp": 99.7
           },
-          "hash": "7caa4abfad7899674bd2938a54d62302"
+          "hash": "f452594fe01d75f54f123247494e5a5e"
         },
         {
           "aliases": [
@@ -9315,7 +9315,7 @@
           ],
           "id": "AC26827",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:32:11",
           "max_power": 24.0,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9325,7 +9325,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "3839c8809c75d65f44cdc8857fd017dc"
+          "hash": "f48f7d39ecee40b8b833022a85d6c41e"
         },
         {
           "aliases": [
@@ -9355,7 +9355,7 @@
           ],
           "id": "AC32960",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:25:06",
           "max_power": 4.65,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9366,7 +9366,7 @@
             "score": 96.1,
             "color_temp": 96.1
           },
-          "hash": "37ec453e2658a667d88eca087b092e2c"
+          "hash": "deebb906bb36d3232bd7d2c5dc1b56b1"
         },
         {
           "aliases": [
@@ -9395,7 +9395,7 @@
           ],
           "id": "AC41293",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:25:06",
           "max_power": 5.57,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9405,7 +9405,7 @@
             "score": 99.2,
             "brightness": 99.2
           },
-          "hash": "1a2ff49798b0f24778dcb07a835dba77"
+          "hash": "cdf976801b3ee1f1c362ade22a4053d1"
         },
         {
           "calculation_strategy": "lut",
@@ -9429,7 +9429,7 @@
           ],
           "id": "CLA60 RGBW Z3",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:25:06",
           "max_power": 9.75,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9440,7 +9440,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "5ceb7936b4cc370dd17fd97b1695a5cd"
+          "hash": "5c1983bd6b90aefd01ebe0b1f18f65be"
         },
         {
           "aliases": [
@@ -9462,7 +9462,7 @@
           ],
           "id": "Tibea TW Z3",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T05:25:06",
           "max_power": 20.49,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9472,7 +9472,7 @@
             "score": 97.5,
             "color_temp": 97.5
           },
-          "hash": "bfd8cfc4585baafe5241df85debfed26"
+          "hash": "6ddf7352b57e73625d8217ba06a15ad3"
         }
       ],
       "device_types": [
