@@ -10,7 +10,13 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.23.2:docker"
   },
-  "name": "12W 1050lm RGB Colour Mode Grid Connect Smart LED B22 Globe",
+  "name": "Grid Connect Smart RGB+CCT B22 Globe (12 W, 1050 lm)",
+  "aliases": [
+    "GLD130P3HA"
+  ],
+  "legacy_ids": [
+    "GLD130P3HA"
+  ],
   "standby_power": 0.7,
   "authors": [
     {

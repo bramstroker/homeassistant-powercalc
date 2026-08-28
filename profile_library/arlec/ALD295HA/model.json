@@ -10,7 +10,13 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.12:docker"
   },
-  "name": "9W 92mm Grid Connect Smart RGB+CCT LED Downlight",
+  "name": "Grid Connect Smart RGB+CCT LED Downlight (9 W, 740 lm, 92 mm)",
+  "aliases": [
+    "ALD295P5HA"
+  ],
+  "legacy_ids": [
+    "ALD295P5HA"
+  ],
   "standby_power": 0.5,
   "authors": [
     {
