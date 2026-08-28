@@ -24367,10 +24367,13 @@
     {
       "aliases": [],
       "name": "wiz",
-      "full_name": "Wiz",
+      "full_name": "WiZ",
       "dir_name": "wiz",
       "models": [
         {
+          "aliases": [
+            "SHTW"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2022-07-22T08:24:09Z",
           "device_type": "light",
@@ -24392,7 +24395,7 @@
           ],
           "id": "7DGU10LEDCCTWVB-K",
           "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T07:35:35",
           "max_power": 7.03,
           "sub_profile_count": 0,
           "color_modes": [
@@ -24402,7 +24405,7 @@
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "3c4fe639ad18d8fe83c203fd8d66c015"
+          "hash": "01a5f78cfbe00b0ad21f05fece8f8c66"
         },
         {
           "aliases": [
@@ -24442,6 +24445,9 @@
           "hash": "439ed855f0f565a08e9ef96fa85dba7e"
         },
         {
+          "aliases": [
+            "SHRGB1C"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2022-07-22T08:24:09Z",
           "device_type": "light",
@@ -24463,7 +24469,7 @@
           ],
           "id": "9290022656",
           "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T07:35:35",
           "max_power": 7.86,
           "sub_profile_count": 0,
           "color_modes": [
@@ -24474,9 +24480,12 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "74d03755f5305a40fe68632bf560d3a0"
+          "hash": "5feb779c1217501bdc834e663f35d63c"
         },
         {
+          "aliases": [
+            "SHDW9"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2022-07-22T08:24:09Z",
           "device_type": "light",
@@ -24498,7 +24507,7 @@
           ],
           "id": "9290022662",
           "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T07:35:35",
           "max_power": 4.64,
           "sub_profile_count": 0,
           "color_modes": [
@@ -24508,9 +24517,93 @@
             "score": 99.3,
             "brightness": 99.3
           },
-          "hash": "036249bc2f7ffb568edd6dfed7f65394"
+          "hash": "221066bf2f53dd9e32001a451017244b"
         },
         {
+          "aliases": [
+            "SHTW1C"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-12-20T18:57:50Z",
+          "device_type": "light",
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 5,
+            "VERSION": "master"
+          },
+          "legacy_ids": [
+            "SHTW1C"
+          ],
+          "name": "Bulb A67 E27 Tunable White (8 W, 806 lm)",
+          "standby_power": 0.3,
+          "authors": [
+            {
+              "name": "Jari Eskelinen",
+              "email": "jari.eskelinen@iki.fi",
+              "github": "jarpatus"
+            }
+          ],
+          "id": "9290023835",
+          "manufacturer": "wiz",
+          "updated_at": "2026-08-28T07:35:35",
+          "max_power": 7.85,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "fde0b3a3b15139e01dfec11107c3f14c"
+        },
+        {
+          "aliases": [
+            "SHRGBC"
+          ],
+          "calculation_strategy": "composite",
+          "created_at": "2025-10-11T10:30:22Z",
+          "device_type": "light",
+          "measure_device": "Shelly Plus Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 4,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.22:docker"
+          },
+          "legacy_ids": [
+            "SHRGBC"
+          ],
+          "name": "Philips Smart LED A60 E27 RGB + Tunable White (8.5 W, 806 lm)",
+          "standby_power": 0.25,
+          "authors": [
+            {
+              "name": "schuppan",
+              "github": "schuppan"
+            }
+          ],
+          "id": "9290023836AA",
+          "manufacturer": "wiz",
+          "updated_at": "2026-08-28T07:35:35",
+          "max_power": null,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "cf3b2998df46c1ad0598afb8c4722352"
+        },
+        {
+          "aliases": [
+            "SHRGB1C"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2022-07-11T18:57:12Z",
           "device_type": "light",
@@ -24532,7 +24625,7 @@
           ],
           "id": "9290023839",
           "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T07:35:35",
           "max_power": 10.48,
           "sub_profile_count": 0,
           "color_modes": [
@@ -24543,9 +24636,52 @@
             "score": 97.7,
             "color_temp": 97.7
           },
-          "hash": "943b9541cd5cb638e3f6e5783dd45d5f"
+          "hash": "c80b646d831afd224732ce3c4ceb41da"
         },
         {
+          "aliases": [
+            "SHTWC"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-04-29T09:47:02Z",
+          "device_type": "light",
+          "measure_device": "Shelly Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "legacy_ids": [
+            "SHTWC"
+          ],
+          "name": "Tunable White GU10 Bulb (4.7 W, 345 lm)",
+          "standby_power": 0.3,
+          "authors": [
+            {
+              "name": "Dieter",
+              "email": "dieter.kuhn@koeln.de",
+              "github": "dieterxy"
+            }
+          ],
+          "id": "9290024483A",
+          "manufacturer": "wiz",
+          "updated_at": "2026-08-28T07:35:35",
+          "max_power": 4.7,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 95.8,
+            "color_temp": 95.8
+          },
+          "hash": "c120a03f96a23519ad8c7ad790d4d076"
+        },
+        {
+          "aliases": [
+            "SHRGBC"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2024-01-07T13:54:56Z",
           "device_type": "light",
@@ -24566,7 +24702,7 @@
           ],
           "id": "9290024484A",
           "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T07:35:35",
           "max_power": 4.55,
           "sub_profile_count": 0,
           "color_modes": [
@@ -24577,9 +24713,214 @@
             "score": 93.2,
             "color_temp": 93.2
           },
-          "hash": "f3154c9f03199b3b1838b2ff52ca5558"
+          "hash": "362fc768fc411750203821e396fac2e7"
         },
         {
+          "aliases": [
+            "SHTW1W"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-12-20T18:57:50Z",
+          "device_type": "light",
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 5,
+            "VERSION": "master"
+          },
+          "legacy_ids": [
+            "SHTW1W"
+          ],
+          "name": "Bulb A67 E27 Tunable White (13 W, 1521 lm)",
+          "standby_power": 0.13,
+          "authors": [
+            {
+              "name": "Jari Eskelinen",
+              "email": "jari.eskelinen@iki.fi",
+              "github": "jarpatus"
+            }
+          ],
+          "id": "9290024496",
+          "manufacturer": "wiz",
+          "updated_at": "2026-08-28T07:35:35",
+          "max_power": 12.32,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
+          "hash": "85e18182b60f8fbcd094cd328e982eb9"
+        },
+        {
+          "aliases": [
+            "SHTWW"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-10-10T17:24:09Z",
+          "device_type": "light",
+          "measure_device": "Shelly Plus Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 4,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.22:docker"
+          },
+          "legacy_ids": [
+            "SHTWW"
+          ],
+          "name": "Philips Smart LED A67 E27 Tunable White (13 W, 1521 lm)",
+          "standby_power": 0.3,
+          "authors": [
+            {
+              "name": "schuppan",
+              "github": "schuppan"
+            }
+          ],
+          "id": "9290024496A",
+          "manufacturer": "wiz",
+          "updated_at": "2026-08-28T07:35:35",
+          "max_power": 12.47,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "b5558ab096557ae648f8daf1c346cf56"
+        },
+        {
+          "aliases": [
+            "SHRGB1W"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-12-20T18:57:50Z",
+          "device_type": "light",
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 5,
+            "VERSION": "master"
+          },
+          "legacy_ids": [
+            "SHRGB1W"
+          ],
+          "name": "Bulb A67 E27 RGB + Tunable White (13 W, 1521 lm)",
+          "standby_power": 0.26,
+          "authors": [
+            {
+              "name": "Jari Eskelinen",
+              "email": "jari.eskelinen@iki.fi",
+              "github": "jarpatus"
+            }
+          ],
+          "id": "9290024497",
+          "manufacturer": "wiz",
+          "updated_at": "2026-08-28T07:35:35",
+          "max_power": 12.61,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 99.6,
+            "color_temp": 99.6
+          },
+          "hash": "1974f8144f64bbfb623054b2bd455994"
+        },
+        {
+          "aliases": [
+            "SHRGBW"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-12-20T18:57:50Z",
+          "device_type": "light",
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 5,
+            "VERSION": "master"
+          },
+          "legacy_ids": [
+            "SHRGBW"
+          ],
+          "name": "Bulb A67 E27 RGB + Tunable White (13 W, 1521 lm)",
+          "standby_power": 0.33,
+          "authors": [
+            {
+              "name": "Jari Eskelinen",
+              "email": "jari.eskelinen@iki.fi",
+              "github": "jarpatus"
+            }
+          ],
+          "id": "9290024497A",
+          "manufacturer": "wiz",
+          "updated_at": "2026-08-28T07:35:35",
+          "max_power": 11.97,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
+          "hash": "248398d0a1f4984a35527296dea0a283"
+        },
+        {
+          "aliases": [
+            "SHRGB"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-11-08T06:11:27Z",
+          "device_type": "light",
+          "measure_device": "Shelly 2.5",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.24:docker"
+          },
+          "legacy_ids": [
+            "WIZ294819"
+          ],
+          "name": "3.5-inch Recessed Downlight (8 W, 800 lm)",
+          "standby_power": 0.2,
+          "authors": [
+            {
+              "name": "Mike Debney",
+              "email": "mike.debney@outlook.com",
+              "github": "mike-debney"
+            }
+          ],
+          "id": "929003294819",
+          "manufacturer": "wiz",
+          "updated_at": "2026-08-28T07:35:35",
+          "max_power": 7.83,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "ce03a96148c57f1aa6c744cf34a9f164"
+        },
+        {
+          "aliases": [
+            "SHRGB"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2024-06-10T05:56:15Z",
           "device_type": "light",
@@ -24601,15 +24942,18 @@
           ],
           "id": "929003500001",
           "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T07:35:35",
           "max_power": 7.09,
           "sub_profile_count": 0,
           "color_modes": [
             "hs"
           ],
-          "hash": "1fa4d33c33a02d6128de19a59c2172d9"
+          "hash": "05a7b39b47f7c030cf94225813fce671"
         },
         {
+          "aliases": [
+            "SHRGB"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2024-01-07T13:57:39Z",
           "device_type": "light",
@@ -24630,7 +24974,7 @@
           ],
           "id": "9290036010",
           "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-28T07:35:35",
           "max_power": 8.07,
           "sub_profile_count": 0,
           "color_modes": [
@@ -24641,7 +24985,7 @@
             "score": 95.9,
             "color_temp": 95.9
           },
-          "hash": "9656d776bacd81d4ff87ad5cc8670c37"
+          "hash": "c8bb86f84c7d40c2a8f28e89cf40d61a"
         },
         {
           "calculation_strategy": "lut",
@@ -24679,111 +25023,6 @@
         },
         {
           "calculation_strategy": "lut",
-          "created_at": "2022-12-20T18:57:50Z",
-          "device_type": "light",
-          "measure_device": "TP-Link Kasa HS110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 5,
-            "VERSION": "master"
-          },
-          "name": "Bulb A67 E27 RGBWW (type SHRGB1W, model 9290024497, 13 W 220-240 V, 1521 lm)",
-          "standby_power": 0.26,
-          "authors": [
-            {
-              "name": "Jari Eskelinen",
-              "email": "jari.eskelinen@iki.fi",
-              "github": "jarpatus"
-            }
-          ],
-          "id": "SHRGB1W",
-          "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 12.61,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 99.6,
-            "color_temp": 99.6
-          },
-          "hash": "e7be2506316b8e92b7b8483322d20aaa"
-        },
-        {
-          "calculation_strategy": "composite",
-          "created_at": "2025-10-11T10:30:22Z",
-          "device_type": "light",
-          "measure_device": "Shelly Plus Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 4,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.22:docker"
-          },
-          "name": "Philips Smart LED A60 E27 RGB 2200K-6500K (type SHRGBC, model 9290023836AA, 8.5 W, 220-240 V, 50/60 Hz, 806 lm, beam angle: 360\u00b0)",
-          "standby_power": 0.25,
-          "authors": [
-            {
-              "name": "schuppan",
-              "github": "schuppan"
-            }
-          ],
-          "id": "SHRGBC",
-          "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": null,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp",
-            "effect",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.0,
-            "color_temp": 98.0
-          },
-          "hash": "9ce2a8ea311cdc3d726fb5329fbc1952"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-12-20T18:57:50Z",
-          "device_type": "light",
-          "measure_device": "TP-Link Kasa HS110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 5,
-            "VERSION": "master"
-          },
-          "name": "WiZ Bulb A67 E27 RGBWW (type SHRGBW, model 9290024497A, 13 W 220-240 V, 1521 lm)",
-          "standby_power": 0.33,
-          "authors": [
-            {
-              "name": "Jari Eskelinen",
-              "email": "jari.eskelinen@iki.fi",
-              "github": "jarpatus"
-            }
-          ],
-          "id": "SHRGBW",
-          "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 11.97,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 99.4,
-            "color_temp": 99.4
-          },
-          "hash": "855915938d02f20d81d3e77990d2066f"
-        },
-        {
-          "calculation_strategy": "lut",
           "created_at": "2023-08-10T08:41:48Z",
           "device_type": "light",
           "measure_device": "Kasa EP25",
@@ -24815,179 +25054,6 @@
             "color_temp": 97.9
           },
           "hash": "ea82f3cbb9a5abca1070b189a3d48656"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-12-20T18:57:50Z",
-          "device_type": "light",
-          "measure_device": "TP-Link Kasa HS110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 5,
-            "VERSION": "master"
-          },
-          "name": "Bulb A67 E27 Tunable White (type SHTW1C, model 9290023835, 8 W 220-240 V, 806 lm)",
-          "standby_power": 0.3,
-          "authors": [
-            {
-              "name": "Jari Eskelinen",
-              "email": "jari.eskelinen@iki.fi",
-              "github": "jarpatus"
-            }
-          ],
-          "id": "SHTW1C",
-          "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 7.85,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 98.9,
-            "color_temp": 98.9
-          },
-          "hash": "6834ff073b75c201b9f98bf8fdcab5ce"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-12-20T18:57:50Z",
-          "device_type": "light",
-          "measure_device": "TP-Link Kasa HS110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 5,
-            "VERSION": "master"
-          },
-          "name": "Bulb A67 E27 Tunable White (type SHTW1W, model 9290024496, 13 W 220-240 V, 1521 lm)",
-          "standby_power": 0.13,
-          "authors": [
-            {
-              "name": "Jari Eskelinen",
-              "email": "jari.eskelinen@iki.fi",
-              "github": "jarpatus"
-            }
-          ],
-          "id": "SHTW1W",
-          "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 12.32,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 99.4,
-            "color_temp": 99.4
-          },
-          "hash": "8ccacdd23a948cd22ef3b5f5a13ff8bf"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2023-04-29T09:47:02Z",
-          "device_type": "light",
-          "measure_device": "Shelly Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "Bulb TW GU10 (type SHTWC, model 9290024483A, 4.7W 345 lumen 240V)",
-          "standby_power": 0.3,
-          "authors": [
-            {
-              "name": "Dieter",
-              "email": "dieter.kuhn@koeln.de",
-              "github": "dieterxy"
-            }
-          ],
-          "id": "SHTWC",
-          "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 4.7,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 95.8,
-            "color_temp": 95.8
-          },
-          "hash": "3f55ba6cbcf08dd9164d3ea1ebae77ea"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2025-10-10T17:24:09Z",
-          "device_type": "light",
-          "measure_device": "Shelly Plus Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 4,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.22:docker"
-          },
-          "name": "Philips Smart LED A67 E27 Tunable White 2700K-6500K (type SHTWW, model 9290024496A, 13 W, 220-240 V, 50/60 Hz, 1521 lm, beam angle: 360\u00b0)",
-          "standby_power": 0.3,
-          "authors": [
-            {
-              "name": "schuppan",
-              "github": "schuppan"
-            }
-          ],
-          "id": "SHTWW",
-          "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 12.47,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 99.1,
-            "color_temp": 99.1
-          },
-          "hash": "82f161adb01069b4283aa60ddc1d98fd"
-        },
-        {
-          "aliases": [
-            "SHRGB"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2025-11-08T06:11:27Z",
-          "device_type": "light",
-          "measure_device": "Shelly 2.5",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.24:docker"
-          },
-          "name": "3.5 inch recessed downlight 8W",
-          "standby_power": 0.2,
-          "authors": [
-            {
-              "name": "Mike Debney",
-              "email": "mike.debney@outlook.com",
-              "github": "mike-debney"
-            }
-          ],
-          "id": "WIZ294819",
-          "manufacturer": "wiz",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 7.83,
-          "sub_profile_count": 0,
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.7,
-            "color_temp": 98.7
-          },
-          "hash": "5ea066db2593f2a2a911c6bf86da5781"
         }
       ],
       "device_types": [
