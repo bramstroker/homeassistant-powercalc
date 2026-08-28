@@ -25,7 +25,10 @@ class ProfilePreparationError(ValueError):
 @dataclass(frozen=True)
 class ManufacturerResolution:
     directory: str
-    names: frozenset[str]
+    #: Only the manufacturer's own name(s), never its aliases: aliases are commonly
+    #: sub-brands or product lines ("FRITZ!", "Tapo", "Kasa") that legitimately start
+    #: a product name, so they must not be rejected as a repeated manufacturer.
+    primary_names: frozenset[str]
     exists: bool
 
     @property
@@ -61,7 +64,7 @@ class ProfilePreparer:
         csv_names = self._artifact_csv_names(artifact_directory)
         model = self._apply_metadata(self._read_object(artifact_directory / MODEL_JSON), metadata)
         manufacturer = self._resolve_manufacturer(metadata.manufacturer, metadata.manufacturer_directory)
-        self._validate_product_name(str(model.get("name", "")), metadata.manufacturer, manufacturer.names)
+        self._validate_product_name(str(model.get("name", "")), metadata.manufacturer, manufacturer.primary_names)
         if model.get("calculation_strategy") == "lut" and not csv_names:
             raise ProfilePreparationError("At least one .csv.gz artifact is required for LUT profiles")
         self.validator(model, self._read_object(self.model_schema_path))
@@ -129,7 +132,7 @@ class ProfilePreparer:
             if requested in self._known_names(manifest, "name"):
                 return ManufacturerResolution(
                     directory=directory,
-                    names=frozenset(self._known_name_values(manifest, "name")),
+                    primary_names=frozenset(self._name_values(manifest, "name")),
                     exists=True,
                 )
         for entry in self._manufacturers_in_index():
@@ -137,13 +140,23 @@ class ProfilePreparer:
             if isinstance(dir_name, str) and dir_name and requested in self._known_names(entry, "name", "full_name"):
                 return ManufacturerResolution(
                     directory=dir_name,
-                    names=frozenset(self._known_name_values(entry, "name", "full_name")),
+                    primary_names=frozenset(self._name_values(entry, "name", "full_name")),
                     exists=True,
                 )
+        directory = requested_directory or self._slugify(manufacturer)
         return ManufacturerResolution(
-            directory=requested_directory or self._slugify(manufacturer),
-            names=frozenset({manufacturer}),
-            exists=False,
+            directory=directory,
+            primary_names=frozenset({manufacturer}),
+            # The entered name matched nothing, but the directory it resolves to may
+            # still be an existing manufacturer (the directory is user-editable), and
+            # overwriting its manifest would drop the upstream name and aliases.
+            exists=self._manufacturer_directory_exists(directory),
+        )
+
+    def _manufacturer_directory_exists(self, directory: str) -> bool:
+        """Whether ``directory`` is already a manufacturer in the checkout or the index."""
+        return (self.library_root / directory).is_dir() or any(
+            entry.get("dir_name") == directory for entry in self._manufacturers_in_index()
         )
 
     @classmethod
@@ -239,13 +252,19 @@ class ProfilePreparer:
         """All normalized names an entry answers to: the values of ``keys`` plus its aliases."""
         return {cls._normalize(name) for name in cls._known_name_values(entry, *keys)}
 
-    @staticmethod
-    def _known_name_values(entry: dict[str, Any], *keys: str) -> set[str]:
-        names = [entry.get(key) for key in keys]
+    @classmethod
+    def _known_name_values(cls, entry: dict[str, Any], *keys: str) -> set[str]:
         aliases = entry.get("aliases")
-        if isinstance(aliases, list):
-            names.extend(aliases)
-        return {str(name).strip() for name in names if name and str(name).strip()}
+        return cls._name_values(entry, *keys) | (
+            {str(alias).strip() for alias in aliases if alias and str(alias).strip()}
+            if isinstance(aliases, list)
+            else set()
+        )
+
+    @staticmethod
+    def _name_values(entry: dict[str, Any], *keys: str) -> set[str]:
+        """The entry's own name(s) under ``keys``, without its aliases."""
+        return {str(entry[key]).strip() for key in keys if entry.get(key) and str(entry[key]).strip()}
 
     def _build_prepared_file(
         self,

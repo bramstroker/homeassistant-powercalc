@@ -1,3 +1,4 @@
+from collections.abc import Callable
 import gzip
 import json
 from pathlib import Path
@@ -12,11 +13,13 @@ def metadata(
     manufacturer: str = "Philips",
     model_id: str = "LCT999",
     product_name: str | None = None,
+    manufacturer_directory: str | None = None,
 ) -> ContributionMetadata:
     return ContributionMetadata(
         manufacturer=manufacturer,
         model_id=model_id,
         product_name=product_name,
+        manufacturer_directory=manufacturer_directory,
         author=ContributionAuthor(name="Test User", github="test-user", email="test@example.com"),
     )
 
@@ -231,6 +234,42 @@ def test_new_manufacturer_has_no_library_url_and_still_cannot_prefix_product_nam
 
     with pytest.raises(ProfilePreparationError, match="must not start with the manufacturer"):
         preparer.prepare(artifacts, metadata("Acme", product_name="Acme Smart Bulb A19"))
+
+
+def test_preparer_allows_product_names_starting_with_a_sub_brand_alias(tmp_path: Path) -> None:
+    """Aliases are often product lines ("Philips" for Signify, "FRITZ!" for AVM) that
+    legitimately open a marketed product name, so only the canonical manufacturer name
+    and the name the contributor actually entered may be rejected as a repetition."""
+    artifacts = tmp_path / "artifacts"
+    write_library(tmp_path)
+    write_profile_artifacts(artifacts)
+
+    preview = make_preparer(tmp_path).prepare(
+        artifacts,
+        metadata(EXISTING_MANUFACTURER, product_name=f"{EXISTING_ALIAS} Hue Go"),
+    )
+
+    assert preview.manufacturer_directory == EXISTING_DIRECTORY
+
+
+@pytest.mark.parametrize("seed_library", [write_library, write_library_index])
+def test_preparer_keeps_existing_manufacturer_manifest_when_only_the_directory_matches(
+    tmp_path: Path,
+    seed_library: Callable[[Path], None],
+) -> None:
+    """The manufacturer directory is user-editable, so an unrecognised manufacturer name
+    can still point at an existing manufacturer whose manifest must not be overwritten."""
+    artifacts = tmp_path / "artifacts"
+    seed_library(tmp_path)
+    write_profile_artifacts(artifacts)
+
+    preview = make_preparer(tmp_path).prepare(
+        artifacts,
+        metadata("Unrecognised Brand", manufacturer_directory=EXISTING_DIRECTORY),
+    )
+
+    assert preview.manufacturer_directory == EXISTING_DIRECTORY
+    assert f"profile_library/{EXISTING_DIRECTORY}/manufacturer.json" not in {file.path for file in preview.files}
 
 
 def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts(tmp_path: Path) -> None:
