@@ -9409,6 +9409,48 @@
         },
         {
           "calculation_strategy": "lut",
+          "created_at": "2026-08-26T10:26:57Z",
+          "device_type": "light",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.4.1:cli"
+          },
+          "name": "SMART+ Classic B40 E14 RGBW",
+          "standby_power": 0.14,
+          "voltage_range": {
+            "max": 237.1,
+            "min": 231.6
+          },
+          "authors": [
+            {
+              "name": "philscottydev",
+              "github": "philscottydev"
+            }
+          ],
+          "aliases": [
+            "SMART MAT B40 RGBW 827 FR E14",
+            "2766"
+          ],
+          "id": "AC74759",
+          "manufacturer": "ledvance",
+          "updated_at": "2026-08-28T08:14:25",
+          "max_power": 4.68,
+          "sub_profile_count": 0,
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "e792480c88782a82e53c5e1a1a71caee"
+        },
+        {
+          "calculation_strategy": "lut",
           "created_at": "2023-09-03T13:31:57Z",
           "device_type": "light",
           "measure_device": "Shelly Plus Plug S",
