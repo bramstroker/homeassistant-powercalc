@@ -14,7 +14,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.1.2:docker"
   },
-  "name": "Moonlamp (esphome)",
+  "name": "Moon Lamp (ESPHome)",
   "standby_power": 0.5,
   "authors": [
     {
