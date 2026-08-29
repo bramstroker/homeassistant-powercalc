@@ -2,6 +2,9 @@
   "aliases": [
     "9150059977"
   ],
+  "legacy_ids": [
+    "915005987701"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-12-10T01:04:33Z",
   "device_type": "light",

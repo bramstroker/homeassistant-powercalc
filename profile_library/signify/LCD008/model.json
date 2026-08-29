@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "9290037121"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2024-12-05T07:26:13Z",
   "device_type": "light",

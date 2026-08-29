@@ -18,7 +18,7 @@
     "SLEEP_TIME": 5,
     "VERSION": "v1.17.15:docker"
   },
-  "name": "Hue White and Color ambiance A19 800lm",
+  "name": "Hue White and Color Ambiance A19 800lm",
   "standby_power": 0.2,
   "authors": [
     {

@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "8720169392540"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-02-22T03:16:31Z",
   "device_type": "light",
@@ -14,7 +17,7 @@
     "SLEEP_TIME": 8,
     "VERSION": "v1.20.6:docker"
   },
-  "name": "Hue Essential spot GU10 color&ambience",
+  "name": "Hue Essential GU10 Color Ambiance Spotlight",
   "standby_power": 0.2,
   "authors": [
     {

@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "929003597701"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-04-21T17:42:12Z",
   "device_type": "light",
@@ -14,7 +17,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.13:docker"
   },
-  "name": "Hue white ambiance Aurelle square panel light 120x30",
+  "name": "Hue White Ambiance Aurelle Rectangular Panel Light 120x30cm",
   "standby_power": 0.43,
   "authors": [
     {

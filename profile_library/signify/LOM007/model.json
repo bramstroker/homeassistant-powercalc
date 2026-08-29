@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "929003050601"
+  ],
   "calculation_strategy": "fixed",
   "created_at": "2022-10-21T09:32:56Z",
   "device_type": "smart_switch",

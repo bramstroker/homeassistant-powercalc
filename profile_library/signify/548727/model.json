@@ -10,7 +10,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "v1.1.1:docker"
   },
-  "name": "Hue White and Color Ambiance BR30 with bluetooth",
+  "name": "Hue White and Color Ambiance BR30 with Bluetooth",
   "standby_power": 0.3,
   "authors": [
     {

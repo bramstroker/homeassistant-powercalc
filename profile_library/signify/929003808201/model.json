@@ -10,7 +10,9 @@
     "929003808901_02",
     "929003808901_03",
     "929003808901_04",
-    "929003808901_05"
+    "929003808901_05",
+    "5062431P7",
+    "929003808901"
   ],
   "calculation_strategy": "lut",
   "created_at": "2025-05-17T02:32:38Z",
@@ -28,7 +30,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.12:docker"
   },
-  "name": "Hue white and color GU10 4.2W 400lm",
+  "name": "Hue White and Color Ambiance GU10 4.2W 400lm",
   "standby_power": 0.14,
   "authors": [
     {
