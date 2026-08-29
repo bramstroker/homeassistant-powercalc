@@ -18,6 +18,8 @@
       "name": "3a smarthome",
       "full_name": "3A Smart Home",
       "dir_name": "3a smarthome",
+      "country": "AU",
+      "description": "Australian smart-home company behind Nue Zigbee lighting, switches and power controls.",
       "models": [
         {
           "aliases": [
@@ -251,6 +253,9 @@
       "name": "ajax online",
       "full_name": "Ajax Online",
       "dir_name": "ajax online",
+      "website": "https://zignito.com",
+      "country": "GB",
+      "description": "British home-automation supplier offering Zigbee and Wi-Fi lighting, plugs and controls.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -702,6 +707,9 @@
       "name": "anko",
       "full_name": "Anko",
       "dir_name": "anko",
+      "website": "https://anko.com",
+      "country": "AU",
+      "description": "Kmart Australia's home and lifestyle brand, covering appliances, lighting and smart-home products.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -760,6 +768,9 @@
       "name": "apc",
       "full_name": "APC",
       "dir_name": "apc",
+      "website": "https://www.se.com/ww/en/brands/apc/",
+      "country": "US",
+      "description": "American power-protection brand of Schneider Electric, best known for uninterruptible power supplies.",
       "models": [
         {
           "name": "Back-UPS ES 650G1",
@@ -1512,6 +1523,9 @@
       "name": "athom",
       "full_name": "Athom",
       "dir_name": "athom",
+      "website": "https://www.athom.tech",
+      "country": "CN",
+      "description": "Chinese smart-home manufacturer offering devices preflashed with open-source firmware such as ESPHome and Tasmota.",
       "models": [
         {
           "aliases": [
@@ -1931,6 +1945,9 @@
       "name": "bang olufsen",
       "full_name": "Bang & Olufsen",
       "dir_name": "bang olufsen",
+      "website": "https://www.bang-olufsen.com",
+      "country": "DK",
+      "description": "Danish luxury-audio manufacturer known for distinctive speakers, televisions and headphones.",
       "models": [
         {
           "aliases": [
@@ -2072,6 +2089,9 @@
       "name": "belkin",
       "full_name": "Belkin",
       "dir_name": "belkin",
+      "website": "https://www.belkin.com",
+      "country": "US",
+      "description": "American consumer-electronics brand producing connectivity accessories and smart-home devices.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -2152,6 +2172,9 @@
       "name": "blitzwolf",
       "full_name": "BlitzWolf",
       "dir_name": "blitzwolf",
+      "website": "https://www.blitzwolf.com",
+      "country": "CN",
+      "description": "Chinese consumer-electronics brand whose range includes connected lighting and smart-home devices.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -2388,6 +2411,9 @@
       "name": "bseed",
       "full_name": "BSEED",
       "dir_name": "bseed",
+      "website": "https://www.bseed.com",
+      "country": "CN",
+      "description": "Chinese brand of wall switches, sockets and connected electrical controls.",
       "models": [
         {
           "aliases": [
@@ -2526,6 +2552,8 @@
       "name": "casalux",
       "full_name": "Casalux",
       "dir_name": "casalux",
+      "country": "DE",
+      "description": "Aldi lighting label used for products supplied by German manufacturers and importers.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -2586,6 +2614,9 @@
       "name": "cree",
       "full_name": "Cree",
       "dir_name": "cree",
+      "website": "https://www.creelighting.com",
+      "country": "US",
+      "description": "American lighting company specializing in energy-efficient LED lamps and luminaires.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -2746,6 +2777,9 @@
       "name": "dreame",
       "full_name": "Dreame",
       "dir_name": "dreame",
+      "website": "https://www.dreametech.com",
+      "country": "CN",
+      "description": "Chinese home-appliance company known for robotic vacuums and other smart cleaning devices.",
       "models": [
         {
           "calculation_strategy": "composite",
@@ -3017,6 +3051,9 @@
       "name": "dygsm",
       "full_name": "DYGSM",
       "dir_name": "dygsm",
+      "website": "https://www.dygsm.com",
+      "country": "CN",
+      "description": "Dongguan-based manufacturer of GSM and smart-home power sockets and alarms.",
       "models": [
         {
           "aliases": [
@@ -3060,6 +3097,9 @@
       "name": "dyson",
       "full_name": "Dyson",
       "dir_name": "dyson",
+      "website": "https://www.dyson.com",
+      "country": "SG",
+      "description": "Singapore-headquartered technology company founded in Britain, known for vacuum cleaners and air-treatment appliances.",
       "models": [
         {
           "calculation_strategy": "composite",
@@ -3101,6 +3141,9 @@
       "name": "ecodim",
       "full_name": "Ecodim",
       "dir_name": "ecodim",
+      "website": "https://www.ecodim.nl",
+      "country": "NL",
+      "description": "Dutch manufacturer of LED dimmers and connected lighting controls.",
       "models": [
         {
           "aliases": [
@@ -3609,6 +3652,9 @@
       "name": "elgin",
       "full_name": "Elgin",
       "dir_name": "elgin",
+      "website": "https://www.elgin.com.br",
+      "country": "BR",
+      "description": "Brazilian electronics company whose portfolio includes lighting, appliances and smart-home products.",
       "models": [
         {
           "aliases": [
@@ -3755,6 +3801,9 @@
       "name": "emos",
       "full_name": "Emos",
       "dir_name": "emos",
+      "website": "https://www.emos.eu",
+      "country": "CZ",
+      "description": "Czech supplier of electrical and lighting products, including the GoSmart connected-home range.",
       "models": [
         {
           "aliases": [
@@ -4391,6 +4440,9 @@
       "name": "everspring",
       "full_name": "Everspring",
       "dir_name": "everspring",
+      "website": "https://www.everspring.com",
+      "country": "TW",
+      "description": "Taiwanese manufacturer of security, automation and smart-home devices, including Z-Wave products.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -4430,6 +4482,8 @@
       "name": "ewelight",
       "full_name": "eWeLight",
       "dir_name": "ewelight",
+      "country": "CN",
+      "description": "Smart-lighting brand used on Wi-Fi lamps made by Zhongshan Julun Technology Lighting.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -4656,6 +4710,9 @@
       "name": "ge",
       "full_name": "GE",
       "dir_name": "ge",
+      "website": "https://www.gelighting.com",
+      "country": "US",
+      "description": "American lighting brand, now part of Savant, whose connected products include Link and Cync lamps.",
       "models": [
         {
           "aliases": [
@@ -4755,6 +4812,9 @@
       "name": "genio",
       "full_name": "Genio",
       "dir_name": "genio",
+      "website": "https://www.mirabella.com.au/collections/genio",
+      "country": "AU",
+      "description": "Mirabella's Australian smart-home range of lighting, plugs, cameras and other connected devices.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -5681,6 +5741,9 @@
       "name": "gosund",
       "full_name": "Gosund",
       "dir_name": "gosund",
+      "website": "https://www.gosund.com",
+      "country": "CN",
+      "description": "Chinese smart-home brand offering connected plugs, switches, lighting and related devices.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -6325,6 +6388,8 @@
       "name": "greenwave",
       "full_name": "GreenWave",
       "dir_name": "greenwave",
+      "country": "US",
+      "description": "American smart-energy company behind PowerNode connected plugs and home energy-management systems.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -6364,6 +6429,9 @@
       "name": "hampton bay",
       "full_name": "Hampton Bay",
       "dir_name": "hampton bay",
+      "website": "https://www.homedepot.com/b/Hampton-Bay/N-5yc1vZp4",
+      "country": "US",
+      "description": "The Home Depot's American house brand for lighting, ceiling fans and outdoor furnishings.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -6494,6 +6562,9 @@
       "name": "hornbach",
       "full_name": "Hornbach",
       "dir_name": "hornbach",
+      "website": "https://www.hornbach-holding.de/en",
+      "country": "DE",
+      "description": "German home-improvement retailer whose range includes lighting and electrical products.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -6561,6 +6632,9 @@
       "name": "hp",
       "full_name": "HP",
       "dir_name": "hp",
+      "website": "https://www.hp.com",
+      "country": "US",
+      "description": "American technology company producing personal computers, printers and related devices.",
       "models": [
         {
           "aliases": [
@@ -11133,6 +11207,9 @@
       "name": "intelbras",
       "full_name": "Intelbras",
       "dir_name": "intelbras",
+      "website": "https://www.intelbras.com",
+      "country": "BR",
+      "description": "Brazilian technology manufacturer producing security, networking, communication and smart-home devices.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -11194,6 +11271,9 @@
       "name": "jbl",
       "full_name": "JBL",
       "dir_name": "jbl",
+      "website": "https://www.jbl.com",
+      "country": "US",
+      "description": "American audio brand of HARMAN producing speakers, headphones and other sound equipment.",
       "models": [
         {
           "aliases": [
@@ -11239,6 +11319,9 @@
       "name": "kauf",
       "full_name": "Kauf",
       "dir_name": "kauf",
+      "website": "https://kaufha.com",
+      "country": "US",
+      "description": "American home-automation brand offering locally controlled ESPHome-native bulbs and plugs.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -11295,6 +11378,9 @@
       "name": "kogan",
       "full_name": "Kogan",
       "dir_name": "kogan",
+      "website": "https://www.kogan.com",
+      "country": "AU",
+      "description": "Australian online retailer offering consumer electronics and Kogan-branded smart-home products.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -11892,6 +11978,9 @@
       "name": "ledworks",
       "full_name": "Ledworks",
       "dir_name": "ledworks",
+      "website": "https://twinkly.com",
+      "country": "IT",
+      "description": "Italian company behind Twinkly app-controlled decorative lighting.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -11986,6 +12075,9 @@
       "name": "lexman",
       "full_name": "Lexman",
       "dir_name": "lexman",
+      "website": "https://www.leroymerlin.fr/marques/lexman/",
+      "country": "FR",
+      "description": "ADEO's French house brand for lighting and electrical products, sold through retailers such as Leroy Merlin.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -13755,6 +13847,9 @@
       "name": "lightinginside",
       "full_name": "Lightinginside",
       "dir_name": "lightinginside",
+      "website": "https://lightinginside.com",
+      "country": "US",
+      "description": "California-based smart-lighting brand offering Wi-Fi lamps, switches and decorative fixtures.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -13871,6 +13966,9 @@
       "name": "lindby",
       "full_name": "Lindby",
       "dir_name": "lindby",
+      "website": "https://www.lampenwelt.de/c/marken/lindby",
+      "country": "DE",
+      "description": "Lighting brand of the German LUQOM Group, covering decorative and smart luminaires.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -14246,6 +14344,9 @@
       "name": "luedd",
       "full_name": "Luedd",
       "dir_name": "luedd",
+      "website": "https://www.luedd.com",
+      "country": "NL",
+      "description": "Dutch lighting brand offering decorative and smart LED lamps.",
       "models": [
         {
           "aliases": [
@@ -14308,6 +14409,8 @@
       "name": "lumiman",
       "full_name": "Lumiman",
       "dir_name": "lumiman",
+      "website": "https://www.lumiman.com",
+      "description": "Smart-lighting brand offering Wi-Fi lamps controlled through the PlusMinus app.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -14409,6 +14512,9 @@
       "name": "malmbergs",
       "full_name": "Malmbergs",
       "dir_name": "malmbergs",
+      "website": "https://www.malmbergs.com",
+      "country": "SE",
+      "description": "Swedish electrical wholesaler and supplier with its own lighting and smart-home products.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -14459,6 +14565,9 @@
       "name": "mammotion",
       "full_name": "Mammotion",
       "dir_name": "mammotion",
+      "website": "https://mammotion.com",
+      "country": "CN",
+      "description": "Chinese outdoor-robotics company known for wire-free robotic lawn mowers.",
       "models": [
         {
           "calculation_strategy": "composite",
@@ -14499,6 +14608,9 @@
       "name": "melitec",
       "full_name": "MeLiTec",
       "dir_name": "melitec",
+      "website": "https://www.melitec.de",
+      "country": "DE",
+      "description": "German lighting company offering LED luminaires and smart-home lighting under MeLiTec and related labels.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -14559,6 +14671,9 @@
       "name": "mercator ikuu",
       "full_name": "Mercator Iku\u00fc",
       "dir_name": "mercator ikuu",
+      "website": "https://www.ikuu.com.au",
+      "country": "AU",
+      "description": "Smart-home range from Australian lighting and fan supplier Mercator.",
       "models": [
         {
           "aliases": [
@@ -15364,6 +15479,7 @@
       "name": "neo-coolcam",
       "full_name": "Neo CoolCam",
       "dir_name": "neo-coolcam",
+      "website": "https://www.szneo.com",
       "country": "CN",
       "description": "Shenzhen NEO, making Zigbee and Wi-Fi sensors, plugs and sirens.",
       "models": [
@@ -15453,6 +15569,9 @@
       "name": "netgear",
       "full_name": "NETGEAR",
       "dir_name": "netgear",
+      "website": "https://www.netgear.com",
+      "country": "US",
+      "description": "American networking company producing routers, switches, access points and connected-home equipment.",
       "models": [
         {
           "discovery_by": "manual",
@@ -15491,6 +15610,9 @@
       "name": "nodon",
       "full_name": "NodOn",
       "dir_name": "nodon",
+      "website": "https://nodon.fr",
+      "country": "FR",
+      "description": "French manufacturer of wireless sensors and actuators for smart homes and buildings.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -16073,6 +16195,9 @@
       "name": "oz smart things",
       "full_name": "Oz Smart Things",
       "dir_name": "oz smart things",
+      "website": "https://www.ozsmartthings.com.au",
+      "country": "AU",
+      "description": "Australian home-automation retailer and supplier of Zigbee and Z-Wave devices.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -16483,6 +16608,9 @@
       "name": "philips",
       "full_name": "Philips",
       "dir_name": "philips",
+      "website": "https://www.philips.com",
+      "country": "NL",
+      "description": "Dutch health-technology company producing personal-care and household appliances, including air purifiers.",
       "models": [
         {
           "aliases": [
@@ -16713,6 +16841,9 @@
       "name": "robb",
       "full_name": "ROBB",
       "dir_name": "robb",
+      "website": "https://www.robbshop.nl/robb-smarrt-ontdek-jouw-vervolgstap-in-smart-home",
+      "country": "NL",
+      "description": "ROBBshop's Dutch smart-home brand of Zigbee dimmers, switches, plugs and other accessories.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -16878,6 +17009,8 @@
       "name": "rye",
       "full_name": "Rye",
       "dir_name": "rye",
+      "country": "CN",
+      "description": "Smart-lighting brand used on Wi-Fi lamps made by Shenzhen Bling Lighting Technologies.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -27405,6 +27538,9 @@
       "name": "smarthomeshop",
       "full_name": "SmartHomeShop",
       "dir_name": "smarthomeshop",
+      "website": "https://smarthomeshop.io",
+      "country": "NL",
+      "description": "Dutch maker of locally controlled, open-source hardware designed for Home Assistant.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -27442,6 +27578,9 @@
       "name": "snooz",
       "full_name": "SNOOZ",
       "dir_name": "snooz",
+      "website": "https://getsnooz.com",
+      "country": "US",
+      "description": "Sleep-technology company known for app-controlled white-noise machines.",
       "models": [
         {
           "calculation_strategy": "linear",
@@ -28397,6 +28536,9 @@
       "name": "sylvania",
       "full_name": "Sylvania",
       "dir_name": "sylvania",
+      "website": "https://www.ledvance.com/en-us",
+      "country": "US",
+      "description": "North American lighting brand licensed to LEDVANCE, including the SYLVANIA SMART+ range.",
       "models": [
         {
           "aliases": [
@@ -28652,6 +28794,9 @@
       "name": "teckin",
       "full_name": "Teckin",
       "dir_name": "teckin",
+      "website": "https://www.teckinhome.com",
+      "country": "CN",
+      "description": "Chinese smart-home brand offering connected plugs, lighting, cameras and household devices.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -28705,6 +28850,9 @@
       "name": "telefunken",
       "full_name": "Telefunken",
       "dir_name": "telefunken",
+      "website": "https://telefunken.com",
+      "country": "DE",
+      "description": "German electronics brand licensed across consumer products, including televisions and lighting.",
       "models": [
         {
           "calculation_strategy": "linear",
@@ -28751,6 +28899,7 @@
       "full_name": "Third Reality",
       "dir_name": "third reality",
       "website": "https://www.thirdreality.com",
+      "country": "CN",
       "description": "Maker of inexpensive Zigbee and Matter sensors, plugs and switches.",
       "models": [
         {
@@ -29395,6 +29544,9 @@
       "name": "treatlife",
       "full_name": "Treatlife",
       "dir_name": "treatlife",
+      "website": "https://www.treatlife.tech",
+      "country": "CN",
+      "description": "Chinese smart-home brand offering Wi-Fi and Zigbee switches, dimmers, plugs and lighting.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -29457,6 +29609,9 @@
       "name": "tripp lite",
       "full_name": "Tripp Lite",
       "dir_name": "tripp lite",
+      "website": "https://tripplite.eaton.com",
+      "country": "US",
+      "description": "American Eaton brand producing power protection, connectivity and infrastructure equipment.",
       "models": [
         {
           "name": "UPS Power Estimate",
@@ -29510,6 +29665,9 @@
       "name": "trust",
       "full_name": "Trust",
       "dir_name": "trust",
+      "website": "https://www.trust.com",
+      "country": "NL",
+      "description": "Dutch digital-lifestyle brand offering computer accessories, gaming products and smart-home devices.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -32098,6 +32256,9 @@
       "name": "ynoa",
       "full_name": "Ynoa",
       "dir_name": "ynoa",
+      "website": "https://www.ledlampenkopen.nu/slimme-verlichting",
+      "country": "NL",
+      "description": "Smart-lighting brand of LEDlampenkopen.nu, offering Zigbee lamps and controls.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -32198,6 +32359,9 @@
       "name": "zemismart",
       "full_name": "Zemismart",
       "dir_name": "zemismart",
+      "website": "https://www.zemismart.com",
+      "country": "CN",
+      "description": "Chinese smart-home manufacturer specializing in connected lighting, sensors, switches and motorized shades.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -32316,6 +32480,9 @@
       "name": "zipato",
       "full_name": "Zipato",
       "dir_name": "zipato",
+      "website": "https://www.zipato.com",
+      "country": "HR",
+      "description": "Croatian smart-home brand offering controllers and devices using Z-Wave, Zigbee and other protocols.",
       "models": [
         {
           "calculation_strategy": "lut",
