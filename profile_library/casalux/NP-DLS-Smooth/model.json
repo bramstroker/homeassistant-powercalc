@@ -8,6 +8,9 @@
     "lumens": 600,
     "rated_power": 12.0
   },
+  "ean": [
+    "4061463471048"
+  ],
   "measure_description": "Measured with utils/measure script after converting the lamp to ESPHome.",
   "measure_device": "Shelly Plug",
   "measure_method": "script",
