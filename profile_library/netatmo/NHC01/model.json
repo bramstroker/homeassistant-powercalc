@@ -11,6 +11,9 @@
   "aliases": [
     "Smart Indoor Air Quality Monitor"
   ],
+  "legacy_ids": [
+    "indoor_air_quality_monitor"
+  ],
   "device_type": "generic_iot",
   "calculation_strategy": "fixed",
   "fixed_config": {
