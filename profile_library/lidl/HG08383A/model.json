@@ -7,6 +7,9 @@
     "socket": "integrated",
     "rated_power": 7.7
   },
+  "ean": [
+    "4054599013275"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",

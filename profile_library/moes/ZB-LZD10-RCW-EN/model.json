@@ -8,6 +8,7 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "downlight",
+    "lumens": 900,
     "rated_power": 10.0
   },
   "measure_description": "Measured with utils/measure script",

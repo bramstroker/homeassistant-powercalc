@@ -4,7 +4,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "strip"
+    "form_factor": "strip",
+    "lumens": 1750,
+    "rated_power": 35.0
   },
   "ean": [
     "6974316990376"
@@ -17,7 +19,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "v1.20.2:docker"
   },
-  "name": "Strip Light 2 Pro",
+  "name": "Strip Light 2 Pro (5m)",
   "standby_power": 1.2,
   "authors": [
     {

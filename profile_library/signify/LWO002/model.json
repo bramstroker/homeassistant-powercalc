@@ -11,6 +11,9 @@
     "lumens": 530,
     "rated_power": 7.0
   },
+  "ean": [
+    "046677551803"
+  ],
   "linked_profile": "signify/LWO001",
   "measure_description": "Measured with utils/measure, SAMPLE_COUNT=3",
   "measure_device": "Shelly Plug S",

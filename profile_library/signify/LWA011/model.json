@@ -9,8 +9,12 @@
   "device_specs": {
     "form_factor": "bulb",
     "socket": "E27",
-    "lumens": 800
+    "lumens": 806,
+    "rated_power": 9.0
   },
+  "ean": [
+    "8719514250888"
+  ],
   "measure_description": "Measured with utils/measure script; 2 bulbs, no dummy load",
   "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
   "measure_method": "script",
@@ -19,7 +23,7 @@
     "SLEEP_TIME": 60,
     "VERSION": "v0.26.1:docker"
   },
-  "name": "Hue White A60 E27 800lm with Bluetooth",
+  "name": "Hue White A60 E27 806lm Bluetooth",
   "standby_power": 0.41,
   "authors": [
     {
