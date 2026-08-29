@@ -13,7 +13,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "v1.17.13:docker"
   },
-  "name": "SMART COLOR BULB ZL1",
+  "name": "Smart Color Bulb ZL1",
   "standby_power": 0.38,
   "authors": [
     {
