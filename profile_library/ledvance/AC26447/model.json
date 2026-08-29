@@ -16,7 +16,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.1.1:docker"
   },
-  "name": "SMART+ WiFi Planon Frameless 600x600 mm RGB + TW",
+  "name": "SMART+ WiFi Planon Frameless 600x600mm RGB + TW",
   "standby_power": 1.0,
   "authors": [
     {

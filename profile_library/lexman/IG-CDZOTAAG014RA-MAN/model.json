@@ -10,7 +10,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.18.4:docker"
   },
-  "name": "RGBW E27 Smart LED Bulb (14 W to 100 W equivalent)",
+  "name": "ENKI RGBW E27 Globe Bulb 14W",
   "standby_power": 0.4,
   "authors": [
     {

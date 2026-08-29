@@ -13,7 +13,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.11:docker"
   },
-  "name": "Smart RGB-CCT GU10 LED Reflector Lamp",
+  "name": "RGB-CCT Reflector Bulb, GU10 (4.9W, 380 lm)",
   "standby_power": 1.13,
   "authors": [
     {

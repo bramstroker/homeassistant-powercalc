@@ -10,7 +10,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "v1.21.2:docker"
   },
-  "name": "A60 RGB-CCT E27 806lm",
+  "name": "RGB-CCT Bulb, A60/E27 (9W, 806 lm)",
   "standby_power": 0.9,
   "authors": [
     {
