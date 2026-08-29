@@ -18,7 +18,7 @@
     "SLEEP_TIME": 5,
     "VERSION": "v1.14.10:docker"
   },
-  "name": "Bluetooth Mesh Smart LED Bulb (Dimmable CCT, 4 W)",
+  "name": "Bluetooth Mesh Smart LED Bulb (Dimmable CCT, 4W)",
   "standby_power": 0.27,
   "authors": [
     {
