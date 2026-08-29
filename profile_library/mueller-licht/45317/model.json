@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.20.3:docker"
   },
-  "name": "E27 Bulb white+color",
+  "name": "tint White+Color LED Bulb (E27)",
   "standby_power": 0.43,
   "authors": [
     {

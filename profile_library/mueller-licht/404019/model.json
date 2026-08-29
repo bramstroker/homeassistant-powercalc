@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.4.0:docker"
   },
-  "name": "Tint LED-Kerzenform white+color",
+  "name": "tint White+Color LED Candle Bulb (E14)",
   "standby_power": 0.38,
   "authors": [
     {
