@@ -1,4 +1,7 @@
 {
   "name": "Amazon",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.amazon.com",
+  "country": "US",
+  "description": "Echo speakers and displays, and Fire TV players."
 }

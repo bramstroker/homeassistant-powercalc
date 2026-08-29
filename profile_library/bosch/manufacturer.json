@@ -1,4 +1,7 @@
 {
   "name": "Bosch",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.bosch-smarthome.com",
+  "country": "DE",
+  "description": "German engineering group. Its home automation is sold as Bosch Smart Home."
 }

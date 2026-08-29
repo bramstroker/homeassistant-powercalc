@@ -1,4 +1,7 @@
 {
   "name": "Apple",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.apple.com",
+  "country": "US",
+  "description": "American maker of the HomePod and Apple TV."
 }

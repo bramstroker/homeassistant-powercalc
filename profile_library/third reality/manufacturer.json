@@ -2,5 +2,7 @@
   "name": "Third Reality",
   "aliases": [
     "Third Reality, Inc"
-  ]
+  ],
+  "website": "https://www.thirdreality.com",
+  "description": "Maker of inexpensive Zigbee and Matter sensors, plugs and switches."
 }

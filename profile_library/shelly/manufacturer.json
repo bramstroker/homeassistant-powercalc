@@ -2,5 +2,8 @@
   "name": "Shelly",
   "aliases": [
     "Shelly Europe Ltd."
-  ]
+  ],
+  "website": "https://www.shelly.com",
+  "country": "BG",
+  "description": "Smart home brand of Allterco, based in Sofia. Its relays and plugs are made for retrofitting existing wiring."
 }

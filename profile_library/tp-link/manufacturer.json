@@ -3,5 +3,8 @@
   "aliases": [
     "Tapo",
     "Kasa"
-  ]
+  ],
+  "website": "https://www.tp-link.com",
+  "country": "CN",
+  "description": "Chinese networking manufacturer. Its smart home products are sold as Kasa and Tapo."
 }

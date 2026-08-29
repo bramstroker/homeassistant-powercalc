@@ -1,4 +1,7 @@
 {
   "name": "Tuya",
-  "aliases": []
+  "aliases": [],
+  "website": "https://tuya.com",
+  "country": "CN",
+  "description": "Chinese IoT platform rather than a brand: devices from many manufacturers ship its firmware and are recognised under this name."
 }

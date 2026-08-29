@@ -2,5 +2,8 @@
   "name": "Google",
   "aliases": [
     "Google Inc."
-  ]
+  ],
+  "website": "https://store.google.com",
+  "country": "US",
+  "description": "Nest speakers, displays and thermostats."
 }

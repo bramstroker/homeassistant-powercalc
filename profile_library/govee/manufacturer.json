@@ -2,5 +2,8 @@
   "name": "Govee",
   "aliases": [
     "Shenzhen Qianyan Technology"
-  ]
+  ],
+  "website": "https://www.govee.com",
+  "country": "CN",
+  "description": "Chinese maker of smart lighting, best known for its addressable RGBIC strips and lamps."
 }

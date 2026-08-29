@@ -2,5 +2,8 @@
   "name": "IKEA",
   "aliases": [
     "IKEA of Sweden"
-  ]
+  ],
+  "website": "https://www.ikea.com",
+  "country": "SE",
+  "description": "Swedish furniture retailer. Its smart lighting ran under the TRÅDFRI name and, more recently, KAJPLATS."
 }

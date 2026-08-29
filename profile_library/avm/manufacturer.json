@@ -2,5 +2,8 @@
   "name": "AVM",
   "aliases": [
     "FRITZ!"
-  ]
+  ],
+  "website": "https://avm.de",
+  "country": "DE",
+  "description": "Berlin manufacturer of FRITZ!Box routers and the FRITZ!DECT smart home range."
 }

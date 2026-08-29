@@ -1,4 +1,7 @@
 {
   "name": "OSRAM",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.osram.com",
+  "country": "DE",
+  "description": "German lighting manufacturer. Its consumer lamp business, including the LIGHTIFY range, moved to LEDVANCE in 2016."
 }
