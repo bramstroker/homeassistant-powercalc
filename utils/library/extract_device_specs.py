@@ -83,10 +83,10 @@ class Extraction(NamedTuple):
     skipped: list[str]
 
 
-def extract_socket(name: str) -> tuple[str | None, str | None]:
+def extract_socket(name: str) -> tuple[str | list[str] | None, str | None]:
     sockets = {match.upper().replace("GU5.3", "GU5.3") for match in SOCKET_PATTERN.findall(name)}
     if len(sockets) > 1:
-        return None, f"names {len(sockets)} sockets ({', '.join(sorted(sockets))})"
+        return sorted(sockets), None
     if not sockets:
         return None, None
     return sockets.pop(), None

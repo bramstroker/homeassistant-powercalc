@@ -25,12 +25,11 @@ def test_reads_the_socket(name: str, expected: str) -> None:
     assert extract_specs(name).specs["socket"] == expected
 
 
-def test_leaves_the_socket_out_when_a_name_offers_two() -> None:
-    """A lamp sold as E26 and E27 does not say which one this profile measured."""
+def test_reads_all_sockets_when_a_profile_covers_regional_variants() -> None:
     extraction = extract_specs("Hue White and Color Ambiance A19 E26/E27 (Gen 5)")
 
-    assert "socket" not in extraction.specs
-    assert extraction.skipped == ["names 2 sockets (E26, E27)"]
+    assert extraction.specs["socket"] == ["E26", "E27"]
+    assert extraction.skipped == []
 
 
 @pytest.mark.parametrize(

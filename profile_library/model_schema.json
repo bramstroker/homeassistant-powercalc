@@ -585,27 +585,42 @@
     }
   },
   "definitions": {
+    "light_socket": {
+      "type": "string",
+      "enum": [
+        "E27",
+        "E26",
+        "E14",
+        "E12",
+        "B22",
+        "GU10",
+        "GU5.3",
+        "GU24",
+        "GX53",
+        "G9",
+        "G4",
+        "integrated"
+      ]
+    },
     "light_specs": {
       "type": "object",
       "description": "device_specs of a light. Manufacturer claims, not measurements: rated_power is what the box says, max_power in the library index is what was measured",
       "properties": {
         "socket": {
-          "type": "string",
-          "enum": [
-            "E27",
-            "E26",
-            "E14",
-            "E12",
-            "B22",
-            "GU10",
-            "GU5.3",
-            "GU24",
-            "GX53",
-            "G9",
-            "G4",
-            "integrated"
+          "oneOf": [
+            {
+              "$ref": "#/definitions/light_socket"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/light_socket"
+              },
+              "minItems": 2,
+              "uniqueItems": true
+            }
           ],
-          "description": "Lamp base the bulb fits, or integrated when the light source is not replaceable"
+          "description": "Lamp base or bases the bulb fits, or integrated when the light source is not replaceable"
         },
         "form_factor": {
           "type": "string",

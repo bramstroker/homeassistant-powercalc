@@ -77,7 +77,7 @@ Which keys are allowed depends on `device_type`; only lights are described so fa
 
 ```json
 "device_specs": {
-  "socket": "E27",
+  "socket": ["E26", "E27"],
   "form_factor": "bulb",
   "lumens": 806,
   "rated_power": 9.5
@@ -86,7 +86,7 @@ Which keys are allowed depends on `device_type`; only lights are described so fa
 
 | Key           | Type   | Description                                                                                                    |
 |---------------|--------|----------------------------------------------------------------------------------------------------------------|
-| `socket`      | string | Lamp base: `E27`, `E26`, `E14`, `E12`, `B22`, `GU10`, `GU5.3`, `GU24`, `GX53`, `G9`, `G4`, or `integrated` when the light source cannot be replaced |
+| `socket`      | string or array | Lamp base(s): `E27`, `E26`, `E14`, `E12`, `B22`, `GU10`, `GU5.3`, `GU24`, `GX53`, `G9`, `G4`, or `integrated` when the light source cannot be replaced |
 | `form_factor` | string | `bulb`, `spot`, `candle`, `globe`, `filament`, `strip`, `panel`, `downlight`, `tube`, `fixture` or `other`      |
 | `lumens`      | number | Nominal luminous flux at full brightness                                                                        |
 | `rated_power` | number | Power draw claimed by the manufacturer, in watts. The library website shows it next to the measured maximum     |
