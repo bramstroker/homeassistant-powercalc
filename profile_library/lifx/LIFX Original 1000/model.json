@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "Original"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-02-19T20:16:46Z",
   "device_type": "light",

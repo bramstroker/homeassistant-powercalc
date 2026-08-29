@@ -1,6 +1,7 @@
 {
   "aliases": [
-    "LIFX A21 1600lm US"
+    "LIFX A21 1600lm US",
+    "LIFX A21"
   ],
   "calculation_strategy": "lut",
   "created_at": "2024-10-17T18:51:25Z",

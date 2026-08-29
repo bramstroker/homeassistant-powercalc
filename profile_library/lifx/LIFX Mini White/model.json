@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "LIFX Mini W"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-08-06T11:55:31Z",
   "device_type": "light",
