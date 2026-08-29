@@ -5,6 +5,7 @@
   "device_specs": {
     "socket": "B22",
     "form_factor": "bulb",
+    "lumens": 1050,
     "rated_power": 10.0
   },
   "measure_description": "Measured with utils/measure script",

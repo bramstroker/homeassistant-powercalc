@@ -5,7 +5,8 @@
   "device_specs": {
     "socket": "GU10",
     "form_factor": "bulb",
-    "lumens": 400
+    "lumens": 400,
+    "rated_power": 5
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

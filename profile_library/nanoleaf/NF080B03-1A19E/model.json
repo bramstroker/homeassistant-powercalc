@@ -8,8 +8,14 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 1100,
+    "rated_power": 9.0
   },
+  "ean": [
+    "4897105331322",
+    "4897105331339"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "script",

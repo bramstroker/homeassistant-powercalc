@@ -4,8 +4,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "rated_power": 4.2
   },
+  "ean": [
+    "8718781552015",
+    "8718781552022"
+  ],
   "measure_description": "Measured 3 bulbs simultaneously with utils/measure script",
   "measure_device": "Nous A1T",
   "measure_method": "script",

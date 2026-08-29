@@ -34,13 +34,19 @@
   "device_type": "light",
   "device_specs": {
     "socket": "GU10",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 350,
+    "rated_power": 5.7
   },
+  "ean": [
+    "8718699628659",
+    "8718699629250"
+  ],
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
-  "name": "Hue White and Color Ambiance GU10 BT",
+  "name": "Hue White and Color Ambiance GU10 Bluetooth",
   "standby_power": 0.4,
   "authors": [
     {

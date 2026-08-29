@@ -7,7 +7,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "strip"
+    "form_factor": "strip",
+    "lumens": 640,
+    "rated_power": 5
   },
   "legacy_ids": [
     "ORMANAS LED Strip"

@@ -4,9 +4,19 @@
     "4058075486560",
     "4058075486584"
   ],
+  "ean": [
+    "4058075486560",
+    "4058075486584"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-11-30T17:57:54Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "integrated",
+    "form_factor": "fixture",
+    "lumens": 1050,
+    "rated_power": 26
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

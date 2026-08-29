@@ -11,6 +11,9 @@
     "socket": "integrated",
     "form_factor": "panel"
   },
+  "ean": [
+    "8718696169353"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

@@ -4,8 +4,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "GU10",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 400,
+    "rated_power": 4.8
   },
+  "ean": [
+    "6974316994756"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",

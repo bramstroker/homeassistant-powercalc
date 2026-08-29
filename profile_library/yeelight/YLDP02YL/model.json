@@ -4,8 +4,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 600,
+    "rated_power": 10
   },
+  "ean": [
+    "6924922200116"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P115",
   "measure_method": "script",

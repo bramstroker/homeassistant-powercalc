@@ -4,8 +4,15 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 806,
+    "rated_power": 9
   },
+  "ean": [
+    "8718781552220",
+    "8718781552237",
+    "8718781552244"
+  ],
   "measure_description": "Measured 2 bulbs simultaneously with utils/measure script",
   "measure_device": "Nous A1T",
   "measure_method": "script",

@@ -8,7 +8,8 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
-    "lumens": 980
+    "lumens": 980,
+    "rated_power": 12
   },
   "measure_device": "AVM Fritz!DECT 200",
   "measure_method": "script",

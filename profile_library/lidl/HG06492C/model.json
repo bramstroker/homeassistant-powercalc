@@ -4,8 +4,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 806,
+    "rated_power": 9
   },
+  "ean": [
+    "4056233505252"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Gosund SP1",
   "measure_device_firmware": "Tasmota",

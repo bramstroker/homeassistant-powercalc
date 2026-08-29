@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 2800,
+    "rated_power": 45.0
   },
+  "ean": [
+    "4260195391758"
+  ],
   "legacy_ids": [
     "Elgato Key Light"
   ],

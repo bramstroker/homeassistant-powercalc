@@ -2,12 +2,17 @@
   "aliases": [
     "9290038539"
   ],
+  "ean": [
+    "046677591298"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-02-15T09:02:05Z",
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 1600,
+    "rated_power": 13.5
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug US Gen4",

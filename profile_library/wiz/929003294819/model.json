@@ -5,7 +5,11 @@
   "calculation_strategy": "lut",
   "created_at": "2025-11-08T06:11:27Z",
   "device_type": "light",
+  "ean": [
+    "8720169072251"
+  ],
   "device_specs": {
+    "socket": "integrated",
     "form_factor": "downlight",
     "lumens": 800,
     "rated_power": 8.0

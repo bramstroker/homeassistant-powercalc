@@ -5,8 +5,12 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "filament",
+    "lumens": 800,
     "rated_power": 7.0
   },
+  "ean": [
+    "4260567172459"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini Gen3",
   "measure_method": "script",

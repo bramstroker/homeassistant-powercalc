@@ -2,12 +2,21 @@
   "aliases": [
     "4058075484474"
   ],
+  "ean": [
+    "4058075484474"
+  ],
   "legacy_ids": [
     "40580754884474"
   ],
   "calculation_strategy": "lut",
   "created_at": "2022-11-16T20:39:28Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "panel",
+    "socket": "integrated",
+    "lumens": 3400,
+    "rated_power": 40
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

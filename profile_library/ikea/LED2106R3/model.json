@@ -5,7 +5,8 @@
   "device_specs": {
     "socket": "GU10",
     "form_factor": "bulb",
-    "lumens": 345
+    "lumens": 345,
+    "rated_power": 3
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",

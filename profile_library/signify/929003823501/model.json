@@ -2,9 +2,14 @@
   "calculation_strategy": "lut",
   "created_at": "2026-02-08T17:54:27Z",
   "device_type": "light",
+  "ean": [
+    "8720169330917"
+  ],
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "panel"
+    "lumens": 2250,
+    "form_factor": "panel",
+    "rated_power": 16.6
   },
   "measure_description": "Measured with powercalc-measure Docker script using dummy load for accuracy",
   "measure_device": "Shelly 1PM Mini Gen4",
@@ -14,7 +19,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.4:docker"
   },
-  "name": "Hue Tento round panel (White Ambiance)",
+  "name": "Hue Tento Round Panel (White and Color Ambiance)",
   "standby_power": 0.05,
   "authors": [
     {

@@ -5,9 +5,14 @@
   "calculation_strategy": "lut",
   "created_at": "2026-04-21T17:42:12Z",
   "device_type": "light",
+  "ean": [
+    "8720169328952"
+  ],
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "panel"
+    "lumens": 3750,
+    "form_factor": "panel",
+    "rated_power": 39.0
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini Gen4",

@@ -13,6 +13,15 @@
   "calculation_strategy": "lut",
   "created_at": "2021-09-06T21:09:25Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "integrated",
+    "form_factor": "fixture",
+    "lumens": 520,
+    "rated_power": 6
+  },
+  "ean": [
+    "8718696173992"
+  ],
   "measure_description": "Measured with measure script made by smonesi (SAMPLE_COUNT=6, steps: bri 40/sat 40/mired 30/hue 2000) and linearly interpolated to provide more data",
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",

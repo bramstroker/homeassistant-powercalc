@@ -11,6 +11,9 @@
     "lumens": 600,
     "rated_power": 8.0
   },
+  "ean": [
+    "4897037690801"
+  ],
   "measure_description": "No comments",
   "measure_device": "RRPM02 (Model); 4897037690801 (Barcode); Reduction Revolution Plug-in Power Meter",
   "measure_method": "manual",

@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 120,
+    "rated_power": 8
   },
+  "ean": [
+    "8718291488668"
+  ],
   "linked_profile": "signify/LLC012",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

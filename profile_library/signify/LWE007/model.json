@@ -8,8 +8,13 @@
   "device_specs": {
     "socket": "E14",
     "form_factor": "candle",
+    "lumens": 470,
     "rated_power": 5.5
   },
+  "ean": [
+    "8719514320666",
+    "8719514320628"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",

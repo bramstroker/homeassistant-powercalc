@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "strip"
+    "form_factor": "strip",
+    "lumens": 2000,
+    "rated_power": 30.0
   },
+  "ean": [
+    "0840006636342"
+  ],
   "legacy_ids": [
     "Elgato Light Strip"
   ],

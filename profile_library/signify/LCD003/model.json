@@ -3,10 +3,16 @@
     "8719514344723",
     "9290030168"
   ],
+  "ean": [
+    "8719514344723"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2024-07-24T06:28:09Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "integrated",
+    "lumens": 800,
+    "rated_power": 8.5,
     "form_factor": "downlight"
   },
   "measure_description": "Measured with utils/measure script, 2 lights",

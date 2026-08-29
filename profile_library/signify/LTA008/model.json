@@ -6,11 +6,17 @@
     "929002226711",
     "9290022267A"
   ],
+  "ean": [
+    "046677548490",
+    "046677548568"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-07-17T07:39:07Z",
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "lumens": 806,
+    "rated_power": 7.5,
     "form_factor": "bulb"
   },
   "measure_description": "Measured with utils/measure script",

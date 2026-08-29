@@ -2,11 +2,15 @@
   "aliases": [
     "5061030P7_01"
   ],
+  "ean": [
+    "8718696175989"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2024-12-20T00:55:44Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "spot"
+    "socket": "integrated",
+    "form_factor": "panel"
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
@@ -16,7 +20,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "master"
   },
-  "name": "Hue Centris 2-Spot Ceiling Light",
+  "name": "Hue Centris 2-Spot Ceiling Light LED Panel",
   "standby_power": 0.4,
   "authors": [
     {

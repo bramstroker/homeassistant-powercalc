@@ -6,9 +6,14 @@
   "created_at": "2022-05-29T15:18:24Z",
   "device_type": "light",
   "device_specs": {
+    "form_factor": "bulb",
     "socket": "E26",
-    "lumens": 1100
+    "lumens": 1100,
+    "rated_power": 10.5
   },
+  "ean": [
+    "046677563257"
+  ],
   "linked_profile": "signify/LCA006",
   "measure_description": "Used script in utils/measure from repository with SAMPLE_COUNT=10",
   "measure_device": "Nous A1",

@@ -4,8 +4,13 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 210,
+    "rated_power": 36.0
   },
+  "ean": [
+    "8056326673147"
+  ],
   "fixed_config": {
     "power": 37.0
   },

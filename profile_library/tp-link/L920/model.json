@@ -4,8 +4,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "strip"
+    "form_factor": "strip",
+    "lumens": 500,
+    "rated_power": 20.5
   },
+  "ean": [
+    "4897098682609"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "script",

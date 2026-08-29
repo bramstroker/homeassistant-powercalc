@@ -7,7 +7,9 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 2000,
+    "rated_power": 20
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",

@@ -4,8 +4,14 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "strip"
+    "form_factor": "strip",
+    "lumens": 1400,
+    "rated_power": 36
   },
+  "ean": [
+    "6974316995838",
+    "810172720374"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",

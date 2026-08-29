@@ -4,6 +4,7 @@
   "device_type": "light",
   "device_specs": {
     "socket": "B22",
+    "form_factor": "bulb",
     "lumens": 1050,
     "rated_power": 12.0
   },

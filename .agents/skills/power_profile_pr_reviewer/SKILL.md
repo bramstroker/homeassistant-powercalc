@@ -110,6 +110,7 @@ Ensure:
 
 - `created_at` is ISO formatted
 - integration restrictions use `compatible_integrations`; do not use the obsolete root-level `integration` key, which discovery ignores
+- Put verified retail packaging barcodes (EAN-8, UPC-12, EAN-13, or GTIN-14) in the `ean` array. Include the verified barcodes of single-device and multipack packaging when every pack contains the exact same device model, because each barcode can help users find the profile. Exclude bundles, fittings, revisions, or packs containing a different electrical model. Do not infer that a numeric model, article, SKU, or 12NC is a barcode merely because its length or check digit is valid. Keep a barcode in `aliases` as well when an integration reports it as a model identifier and removing it would break discovery; `ean` is product metadata, not a replacement for discovery aliases.
 
 ### 5. Validate Strategy-Specific Data
 
@@ -205,12 +206,17 @@ Large deviations should be questioned.
 
 During an ongoing manufacturer-by-manufacturer consistency audit, automatically record new, reusable, evidence-backed identifier, discovery, naming, or measurement rules in `references/model_identifiers.md` after completing each manufacturer. Keep additions concise and manufacturer-specific; do not add a section when the review produced no non-obvious reusable guidance.
 
+### 10. Track Unresolved Research
+
+During a profile-library consistency audit, read and maintain [references/profile_review_todo.md](references/profile_review_todo.md). Add a checkbox only for a concrete unresolved identity, revision, discovery, barcode, or measurement question with a clear next evidence requirement; do not use it as a duplicate list of every missing metadata field. Mark an item complete when it is resolved and record the deciding evidence and commit or PR when available.
+
 ## Review Checklist
 
 - [ ] Directory structure correct
 - [ ] Directory uses the canonical, stable manufacturer model identifier
 - [ ] `name` is meaningful and does not merely repeat the canonical model ID or directory
 - [ ] Integration-specific discovery identifiers are aliases; friendly, resource, serial, and undocumented generic identifiers are excluded
+- [ ] Verified single-device and exact-model multipack barcodes use `ean`; discovery aliases are retained independently
 - [ ] Generated files not manually edited
 - [ ] `manufacturer.json` present
 - [ ] `model.json` schema appears valid`
@@ -222,6 +228,7 @@ During an ongoing manufacturer-by-manufacturer consistency audit, automatically 
 - [ ] Standby behaviour sensible
 - [ ] `only_self_usage` matches a real built-in power meter, no sensor naming overrides
 - [ ] Naming consistent with existing profiles
+- [ ] Concrete unresolved questions recorded in the profile review TODO
 
 ## Output Format
 

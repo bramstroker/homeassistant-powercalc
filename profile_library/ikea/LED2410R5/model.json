@@ -8,7 +8,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "GU10",
-    "lumens": 470
+    "form_factor": "spot",
+    "lumens": 470,
+    "rated_power": 4.9
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

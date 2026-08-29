@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "panel"
+    "form_factor": "panel",
+    "lumens": 4200,
+    "rated_power": 55
   },
+  "ean": [
+    "8718696169377"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

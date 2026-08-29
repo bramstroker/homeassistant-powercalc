@@ -2,6 +2,9 @@
   "aliases": [
     "4058075729223"
   ],
+  "ean": [
+    "4058075729223"
+  ],
   "legacy_ids": [
     "4058075729223"
   ],
@@ -10,6 +13,7 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "lumens": 680,
     "form_factor": "filament",
     "rated_power": 6.0
   },

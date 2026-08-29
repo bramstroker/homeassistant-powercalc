@@ -8,7 +8,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E14",
-    "lumens": 806
+    "form_factor": "bulb",
+    "lumens": 806,
+    "rated_power": 5.9
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

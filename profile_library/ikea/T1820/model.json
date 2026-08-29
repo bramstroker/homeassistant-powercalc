@@ -6,7 +6,10 @@
   "created_at": "2021-12-29T19:34:57Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "spot"
+    "socket": "integrated",
+    "form_factor": "spot",
+    "lumens": 600,
+    "rated_power": 9
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

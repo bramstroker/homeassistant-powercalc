@@ -1,10 +1,19 @@
 {
+  "aliases": [
+    "philips.light.hbulb"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2024-12-08T13:31:31Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "bulb"
+    "socket": "E27",
+    "lumens": 806,
+    "form_factor": "bulb",
+    "rated_power": 9.0
   },
+  "ean": [
+    "6947939158928"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",
@@ -21,5 +30,8 @@
       "email": "andrzej.dopierala@currency-one.com",
       "github": "theundefined"
     }
+  ],
+  "legacy_ids": [
+    "philips.light.hbulb"
   ]
 }

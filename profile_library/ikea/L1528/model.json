@@ -7,7 +7,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "panel"
+    "form_factor": "panel",
+    "lumens": 2200,
+    "rated_power": 29
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 3EM",

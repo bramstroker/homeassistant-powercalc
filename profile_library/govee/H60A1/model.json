@@ -4,8 +4,13 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 2400,
+    "rated_power": 24
   },
+  "ean": [
+    "810088347870"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini Gen4",
   "measure_method": "script",

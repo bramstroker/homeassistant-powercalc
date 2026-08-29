@@ -4,11 +4,16 @@
     "9290024784",
     "929002478401"
   ],
+  "ean": [
+    "046677563585"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-07-18T03:17:17Z",
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
+    "lumens": 550,
+    "rated_power": 7.0,
     "form_factor": "filament"
   },
   "measure_description": "Measured with utils/measure script",

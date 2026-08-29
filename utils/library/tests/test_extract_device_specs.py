@@ -43,6 +43,13 @@ def test_reads_all_sockets_when_a_profile_covers_regional_variants() -> None:
         ("Livarno Home E14 CCT Candle Bulb", "candle"),
         ("Areo VariFit Round Recessed Panel", "panel"),
         ("Smart Bulb Colour E27", "bulb"),
+        ("LIFX A19 Night Vision", "bulb"),
+        ("LIFX BR30 Night Vision", "spot"),
+        ("SMART+ Classic B40 E14 RGBW", "candle"),
+        ("KAJPLATS E27 WS G95 clear 806lm", "globe"),
+        ("SMART+ WiFi Planon Frameless 600x600mm", "panel"),
+        ("LIGHTIFY LED Adjustable White RT5/6", "downlight"),
+        ("6-Inch Smart Retrofit Recessed Can Light", "downlight"),
     ],
 )
 def test_reads_the_shape_most_specific_word_first(name: str, expected: str) -> None:

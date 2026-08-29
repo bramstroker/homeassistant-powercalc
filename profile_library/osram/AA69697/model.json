@@ -5,6 +5,15 @@
   "calculation_strategy": "lut",
   "created_at": "2023-09-05T19:14:04Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "E27",
+    "form_factor": "bulb",
+    "lumens": 810,
+    "rated_power": 10
+  },
+  "ean": [
+    "4052899926097"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",

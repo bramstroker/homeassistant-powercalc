@@ -7,7 +7,8 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "bulb",
-    "lumens": 840
+    "lumens": 840,
+    "socket": "E27"
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Smart Wi-Fi Plug Mini",

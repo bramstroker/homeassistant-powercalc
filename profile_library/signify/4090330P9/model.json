@@ -17,8 +17,16 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 3000,
+    "rated_power": 39
   },
+  "ean": [
+    "8718696176214",
+    "8718696169698",
+    "8719514343368",
+    "8719514343467"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

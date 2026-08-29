@@ -4,8 +4,14 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "lumens": 640,
+    "rated_power": 7
   },
+  "ean": [
+    "8718781555597",
+    "8718781556389"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A1T",
   "measure_device_firmware": "ESPHome 2026.4.2",

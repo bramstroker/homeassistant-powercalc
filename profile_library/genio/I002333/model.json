@@ -3,6 +3,7 @@
   "created_at": "2022-08-13T17:54:04Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "B22",
     "form_factor": "bulb",
     "rated_power": 9.0
   },

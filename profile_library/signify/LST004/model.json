@@ -1,8 +1,4 @@
 {
-  "aliases": [
-    "LST003",
-    "9290018187B"
-  ],
   "calculation_strategy": "lut",
   "created_at": "2021-08-29T21:30:20Z",
   "device_type": "light",

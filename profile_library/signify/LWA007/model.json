@@ -8,7 +8,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 600,
+    "rated_power": 7.0
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Fluke 87",
@@ -18,7 +20,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.12.13:docker"
   },
-  "name": "Hue White Bulb A19 E26 with Bluetooth",
+  "name": "Hue White A19 E26 Bluetooth",
   "standby_power": 0.35,
   "authors": [
     {

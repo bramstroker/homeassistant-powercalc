@@ -5,9 +5,14 @@
   "calculation_strategy": "lut",
   "created_at": "2023-04-03T21:42:31Z",
   "device_type": "light",
+  "ean": [
+    "8719514382640"
+  ],
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "panel"
+    "lumens": 3750,
+    "form_factor": "panel",
+    "rated_power": 39.0
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

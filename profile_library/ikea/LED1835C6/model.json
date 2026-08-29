@@ -9,7 +9,8 @@
   "device_specs": {
     "socket": "E14",
     "form_factor": "bulb",
-    "lumens": 470
+    "lumens": 470,
+    "rated_power": 5.2
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

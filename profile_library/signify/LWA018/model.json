@@ -9,8 +9,13 @@
   "device_specs": {
     "socket": "B22",
     "form_factor": "bulb",
-    "lumens": 1100
+    "lumens": 1100,
+    "rated_power": 9.5
   },
+  "ean": [
+    "8719514288270",
+    "8719514289154"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "HOPI HP-9800",
   "measure_method": "script",

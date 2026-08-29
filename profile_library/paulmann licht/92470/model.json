@@ -5,6 +5,9 @@
     "92467",
     "92468"
   ],
+  "ean": [
+    "4000870924709"
+  ],
   "legacy_ids": [
     "924.70",
     "92466"
@@ -13,6 +16,8 @@
   "created_at": "2024-12-14T09:59:57Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "integrated",
+    "form_factor": "downlight",
     "lumens": 420,
     "rated_power": 4.9
   },

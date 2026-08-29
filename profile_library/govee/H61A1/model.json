@@ -9,13 +9,16 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.1:docker"
   },
-  "name": "Neon Rope Light",
+  "name": "Neon Rope Light (2m)",
   "standby_power": 2.67,
   "device_type": "light",
   "device_specs": {
     "form_factor": "strip",
     "socket": "integrated"
   },
+  "ean": [
+    "6974316994220"
+  ],
   "authors": [
     {
       "name": "Minne",

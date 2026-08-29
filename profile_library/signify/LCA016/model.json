@@ -2,11 +2,15 @@
   "aliases": [
     "8720169392182"
   ],
+  "ean": [
+    "8720169392182"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-02-08T20:15:13Z",
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "lumens": 806,
     "rated_power": 8.0,
     "form_factor": "bulb"
   },

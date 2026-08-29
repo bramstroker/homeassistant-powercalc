@@ -8,7 +8,8 @@
   "device_specs": {
     "socket": "GU10",
     "form_factor": "bulb",
-    "lumens": 345
+    "lumens": 345,
+    "rated_power": 4.6
   },
   "measure_description": "Measured with utils/measure script, manual correction of values measured as 0.0",
   "measure_device": "Shelly 1PM",

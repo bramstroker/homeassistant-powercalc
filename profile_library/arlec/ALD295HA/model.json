@@ -3,10 +3,14 @@
   "created_at": "2025-05-13T15:07:15Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "integrated",
     "form_factor": "downlight",
     "lumens": 740,
     "rated_power": 9.0
   },
+  "ean": [
+    "9311644123767"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

@@ -6,8 +6,14 @@
   "created_at": "2022-05-29T15:18:24Z",
   "device_type": "light",
   "device_specs": {
-    "socket": "E26"
+    "form_factor": "bulb",
+    "socket": "E26",
+    "lumens": 800,
+    "rated_power": 9.5
   },
+  "ean": [
+    "046677476861"
+  ],
   "linked_profile": "signify/LWA001",
   "measure_description": "Used script utils/measure_shelly.py from repository, estimated standby",
   "measure_device": "Shelly 1PM",

@@ -4,11 +4,16 @@
     "9290018216",
     "9290018217"
   ],
+  "ean": [
+    "8718699673147"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2021-09-01T18:40:45Z",
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "lumens": 806,
+    "rated_power": 8.5,
     "form_factor": "bulb"
   },
   "measure_description": "Used script utils/measure_shelly.py from repository, estimated standby",

@@ -8,8 +8,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "lumens": 550,
+    "rated_power": 7.0
   },
+  "ean": [
+    "8718699688868"
+  ],
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",

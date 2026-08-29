@@ -5,8 +5,12 @@
   "device_specs": {
     "socket": "B22",
     "form_factor": "bulb",
-    "lumens": 806
+    "lumens": 806,
+    "rated_power": 9
   },
+  "ean": [
+    "8718781552251"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",

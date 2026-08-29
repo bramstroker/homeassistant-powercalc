@@ -6,6 +6,10 @@
   "created_at": "2021-08-17T10:46:54Z",
   "device_type": "light",
   "device_specs": {
+    "socket": [
+      "B22",
+      "E27"
+    ],
     "form_factor": "bulb"
   },
   "measure_description": "Measured with utils/measure script",

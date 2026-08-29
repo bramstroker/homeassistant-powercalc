@@ -5,9 +5,14 @@
   "calculation_strategy": "lut",
   "created_at": "2024-10-15T22:25:27Z",
   "device_type": "light",
+  "ean": [
+    "8718696176559"
+  ],
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 2350,
+    "rated_power": 33.5
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

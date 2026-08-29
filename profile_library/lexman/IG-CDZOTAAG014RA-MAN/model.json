@@ -5,8 +5,12 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
+    "lumens": 1521,
     "rated_power": 14.0
   },
+  "ean": [
+    "3276007273854"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "GreenWave GWPN1",
   "measure_method": "script",

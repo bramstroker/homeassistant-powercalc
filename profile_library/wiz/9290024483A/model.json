@@ -11,6 +11,10 @@
     "lumens": 345,
     "rated_power": 4.7
   },
+  "ean": [
+    "8719514372320",
+    "8719514372665"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

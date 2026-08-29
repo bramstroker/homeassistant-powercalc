@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "lumens": 530,
+    "rated_power": 7.0
   },
+  "ean": [
+    "046677551773"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Sonoff S31",
   "measure_method": "script",

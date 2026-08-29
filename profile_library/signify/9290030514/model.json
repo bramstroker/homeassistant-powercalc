@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "lumens": 580,
+    "rated_power": 7
   },
+  "ean": [
+    "8719514342941"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",

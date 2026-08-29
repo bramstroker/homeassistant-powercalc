@@ -4,7 +4,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "lumens": 350,
+    "rated_power": 4.9
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug",

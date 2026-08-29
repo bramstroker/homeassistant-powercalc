@@ -4,12 +4,17 @@
     "9290022266A",
     "929002226611"
   ],
+  "ean": [
+    "046677548483"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-07-24T09:10:34Z",
   "device_type": "light",
   "device_specs": {
+    "form_factor": "bulb",
+    "socket": "E26",
     "lumens": 800,
-    "form_factor": "bulb"
+    "rated_power": 9.5
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug",
