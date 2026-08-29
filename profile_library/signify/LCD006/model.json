@@ -1,9 +1,13 @@
 {
+  "aliases": [
+    "9290031346"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2024-01-08T20:35:44Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "downlight"
+    "form_factor": "downlight",
+    "socket": "integrated"
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",

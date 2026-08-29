@@ -7,7 +7,8 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "lumens": 800
+    "lumens": 800,
+    "form_factor": "bulb"
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
@@ -17,7 +18,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.1:docker"
   },
-  "name": "Hue White and Color ambiance E27 800lm",
+  "name": "Hue White and Color Ambiance E27 800lm",
   "standby_power": 0.33,
   "authors": [
     {

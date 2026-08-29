@@ -2,6 +2,9 @@
   "calculation_strategy": "lut",
   "created_at": "2023-01-02T22:13:02Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "spot"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
@@ -10,7 +13,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "v1.1.1:docker"
   },
-  "name": "Hue White and Color Ambiance BR30 with bluetooth",
+  "name": "Hue White and Color Ambiance BR30 with Bluetooth",
   "standby_power": 0.3,
   "authors": [
     {

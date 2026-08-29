@@ -3,7 +3,8 @@
   "created_at": "2024-02-19T18:29:50Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "bulb"
+    "socket": "E26",
+    "form_factor": "spot"
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Third Reality 3RSP02028BZ",
@@ -13,7 +14,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.10.4:docker"
   },
-  "name": "Motion Sensor Bulb PAR38 E13-N11 Zigbee",
+  "name": "Smart LED with Motion Sensor PAR38 Bulb",
   "standby_power": 0.3,
   "authors": [
     {

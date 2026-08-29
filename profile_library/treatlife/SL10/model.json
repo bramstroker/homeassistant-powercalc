@@ -3,6 +3,7 @@
   "created_at": "2024-12-09T05:14:29Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "E26",
     "form_factor": "bulb",
     "lumens": 800,
     "rated_power": 9.0
@@ -16,6 +17,9 @@
     "VERSION": "master"
   },
   "name": "Smart Color Changing Light Bulb 9W 800LM",
+  "aliases": [
+    "odsywzgrtvaz3b79"
+  ],
   "standby_power": 0.35,
   "authors": [
     {

@@ -1,10 +1,14 @@
 {
+  "aliases": [
+    "8720169392182"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-02-08T20:15:13Z",
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "rated_power": 8.0
+    "rated_power": 8.0,
+    "form_factor": "bulb"
   },
   "measure_description": "Measured with utils/measure script (2 bulbs, with dummy load)",
   "measure_device": "Shelly 1PM Gen4",

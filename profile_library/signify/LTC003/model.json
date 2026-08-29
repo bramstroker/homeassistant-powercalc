@@ -4,9 +4,16 @@
     "3261331P7",
     "3261348P7"
   ],
+  "legacy_ids": [
+    "3261331P7"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-05-03T20:17:15Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Sonoff POWR2",
   "measure_method": "script",
@@ -15,7 +22,7 @@
     "SLEEP_TIME": 20,
     "VERSION": "v1.17.11:docker"
   },
-  "name": "Hue white ambiance Still",
+  "name": "Hue White Ambiance Still",
   "standby_power": 0.48,
   "authors": [
     {

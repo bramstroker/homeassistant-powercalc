@@ -1,5 +1,7 @@
 {
-  "aliases": [],
+  "aliases": [
+    "7099930PH"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-01-15T15:26:20Z",
   "device_type": "light",

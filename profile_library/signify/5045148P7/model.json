@@ -9,11 +9,15 @@
     "929003045501_02",
     "929003045501_03",
     "929003047401",
-    "929003047501"
+    "929003047501",
+    "929003045501"
   ],
   "calculation_strategy": "lut",
   "created_at": "2023-02-10T11:19:36Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "spot"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",

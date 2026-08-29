@@ -1,9 +1,13 @@
 {
+  "aliases": [
+    "5900131C5"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-04-18T08:54:05Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "downlight"
+    "form_factor": "downlight",
+    "socket": "integrated"
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini Gen3",

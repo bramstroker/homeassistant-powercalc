@@ -1,9 +1,13 @@
 {
+  "aliases": [
+    "9290011998B"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2024-05-09T16:01:49Z",
   "device_type": "light",
   "device_specs": {
-    "socket": "E26"
+    "socket": "E26",
+    "form_factor": "bulb"
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Eve Energy",

@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "929003115701"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-04-05T23:41:01Z",
   "device_type": "light",
@@ -13,7 +16,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.9:docker"
   },
-  "name": "Hue White and Color Ambiance Perifo cylinder spotlight",
+  "name": "Hue White and Color Ambiance Perifo Cylinder Spotlight",
   "standby_power": 0.15,
   "authors": [
     {

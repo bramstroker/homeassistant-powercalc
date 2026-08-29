@@ -6,7 +6,7 @@
     "VERSION": "v1.17.11:docker"
   },
   "measure_device": "Shelly PM Mini Gen3",
-  "name": "lumi.gateway.mgl03",
+  "name": "Multimode Gateway",
   "aliases": [
     "Gateway: ZNDMWG03LM, ZNDMWG02LM, YTC4044GL, lumi.gateway.mgl03",
     "gateway ZNDMWG03LM"

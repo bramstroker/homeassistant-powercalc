@@ -1,7 +1,14 @@
 {
+  "aliases": [
+    "7199960PH"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2021-08-21T14:47:39Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "measure_description": "Measured with script made by smonesi (steps: bri 50/sat 60/hue 2000) and linearly interpolated to provide more data",
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",

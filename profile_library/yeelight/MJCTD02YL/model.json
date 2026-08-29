@@ -14,7 +14,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.9:docker"
   },
-  "name": "Xiaomi Mi Bedside Lamp 2",
+  "name": "Mi Bedside Lamp 2",
   "standby_power": 0.86,
   "authors": [
     {

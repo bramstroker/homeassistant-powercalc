@@ -1,9 +1,16 @@
 {
   "calculation_strategy": "lut",
+  "aliases": [
+    "Candlebra",
+    "RYE Candlebra"
+  ],
   "created_at": "2022-09-20T10:04:24Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "bulb"
+    "socket": "E12",
+    "lumens": 450,
+    "form_factor": "candle",
+    "rated_power": 5.0
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Athom Smart Plug v2",
@@ -13,7 +20,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Dusk-to-Dawn Candelabra LED Bulb",
+  "legacy_ids": [
+    "Candlebra"
+  ],
+  "name": "5W 450 lm E12 RGBCCT Candle Bulb",
   "standby_power": 0.4,
   "authors": [
     {

@@ -34,7 +34,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.12:docker"
   },
-  "name": "Smart White Noise Machine",
+  "name": "Original White Noise Machine",
   "standby_power": 0.31,
   "authors": [
     {

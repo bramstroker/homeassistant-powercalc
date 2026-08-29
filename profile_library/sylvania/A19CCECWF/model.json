@@ -6,8 +6,10 @@
   "created_at": "2024-02-19T18:25:11Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "E26",
     "form_factor": "bulb",
-    "rated_power": 8.5
+    "rated_power": 8.5,
+    "lumens": 800
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug US",
@@ -17,7 +19,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.10.0:docker"
   },
-  "name": "Wifi LED Smart Light Bulb, 60W=8.5W, Full Color A19 (2700K - 6500K)",
+  "name": "SMART+ Wi-Fi Full Color A19 LED Bulb (8.5W, 2700–6500K)",
   "standby_power": 0.52,
   "authors": [
     {

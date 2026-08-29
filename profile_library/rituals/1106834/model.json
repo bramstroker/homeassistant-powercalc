@@ -2,6 +2,9 @@
   "aliases": [
     "The Perfume Genie 2.0"
   ],
+  "legacy_ids": [
+    "genie 2.0"
+  ],
   "calculation_enabled_condition": "{{ is_state('[[switch_entity]]', 'on') }}",
   "calculation_strategy": "fixed",
   "compatible_integrations": [

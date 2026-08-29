@@ -19,7 +19,7 @@
     "VERSION": "v1.20.5:docker"
   },
   "min_version": "1.20.6",
-  "name": "Hue Datura ceiling light",
+  "name": "Hue Datura Ceiling Light",
   "sub_profile_select": {
     "default": "bottom",
     "matchers": [

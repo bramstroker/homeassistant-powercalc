@@ -8,7 +8,8 @@
   "created_at": "2025-07-24T09:10:34Z",
   "device_type": "light",
   "device_specs": {
-    "lumens": 800
+    "lumens": 800,
+    "form_factor": "bulb"
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug",
@@ -18,7 +19,7 @@
     "SLEEP_TIME": 5,
     "VERSION": "v1.17.15:docker"
   },
-  "name": "Hue White and Color ambiance A19 800lm",
+  "name": "Hue White and Color Ambiance A19 800lm",
   "standby_power": 0.2,
   "authors": [
     {

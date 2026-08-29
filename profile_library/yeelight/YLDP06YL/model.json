@@ -16,7 +16,7 @@
     "SLEEP_TIME": 10,
     "VERSION": "v0.19.7"
   },
-  "name": "Smart LED Bulb II Color",
+  "name": "LED Bulb (Color, 2nd Generation)",
   "standby_power": 1.07,
   "authors": [
     {

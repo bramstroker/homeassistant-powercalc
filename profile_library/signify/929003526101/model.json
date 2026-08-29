@@ -1,6 +1,7 @@
 {
   "aliases": [
-    "9290035261"
+    "9290035261",
+    "929001953101"
   ],
   "calculation_strategy": "lut",
   "created_at": "2025-12-20T00:35:52Z",
@@ -16,7 +17,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.19.5:docker"
   },
-  "name": "Hue Xamento rececessed spotlight",
+  "name": "Hue Xamento Recessed Spotlight",
   "standby_power": 0.07,
   "authors": [
     {

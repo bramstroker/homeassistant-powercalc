@@ -14,7 +14,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "RGBW E27 Smart LED Bulb",
+  "name": "LED Bulb (Color, E27)",
   "standby_power": 1.29,
   "authors": [
     {

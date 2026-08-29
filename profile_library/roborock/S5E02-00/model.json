@@ -1,4 +1,11 @@
 {
+  "aliases": [
+    "roborock.vacuum.s5e",
+    "S5E52-00"
+  ],
+  "legacy_ids": [
+    "S5 Max"
+  ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'docked') }}",
   "calculation_strategy": "linear",
   "created_at": "2026-08-08T12:29:23Z",
@@ -97,7 +104,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.3.0:app"
   },
-  "name": "Roborock S5 Max",
+  "name": "S5 Max Robot Vacuum and Mop",
   "voltage_range": {
     "min": 240.08,
     "max": 244.58

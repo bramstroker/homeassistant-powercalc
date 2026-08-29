@@ -7,7 +7,7 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "bulb",
+    "form_factor": "filament",
     "rated_power": 7.2
   },
   "measure_description": "Measured with utils/measure script",
@@ -18,7 +18,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.8:docker"
   },
-  "name": "Hue smart bulb G93 warm white E27 7,2W",
+  "name": "Hue White G93 E27 Filament Bulb 7.2W",
   "standby_power": 0.18,
   "authors": [
     {

@@ -1,7 +1,13 @@
 {
+  "aliases": [
+    "9290012573A"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2021-09-01T18:40:45Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "bulb"
+  },
   "measure_description": "Used HASS based script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

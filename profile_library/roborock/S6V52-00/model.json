@@ -2,6 +2,9 @@
   "aliases": [
     "roborock.vacuum.a10"
   ],
+  "legacy_ids": [
+    "s6_maxv"
+  ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'docked') }}",
   "calculation_strategy": "linear",
   "created_at": "2024-11-11T17:19:55Z",
@@ -113,7 +116,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "S6 MaxV",
+  "name": "S6 MaxV Robot Vacuum and Mop with ReactiveAI",
   "standby_power": 0.1,
   "authors": [
     {

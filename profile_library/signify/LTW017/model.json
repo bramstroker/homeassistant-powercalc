@@ -1,10 +1,15 @@
 {
   "aliases": [
-    "3417711P6"
+    "3417711P6",
+    "915005587401"
   ],
   "calculation_strategy": "lut",
   "created_at": "2021-12-05T11:25:07Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
