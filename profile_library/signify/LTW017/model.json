@@ -8,8 +8,13 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 3000,
+    "rated_power": 40
   },
+  "ean": [
+    "8718696175729"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
@@ -18,7 +23,7 @@
     "SLEEP_TIME": 1,
     "VERSION": "v0.12.2"
   },
-  "name": "Hue Adore Bathroom Mirror Light",
+  "name": "Hue Adore Bathroom Wall Light",
   "standby_power": 0.42,
   "authors": [
     {

@@ -10,8 +10,16 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 2400,
+    "rated_power": 32
   },
+  "ean": [
+    "8718696175187",
+    "8718696175170",
+    "8718696175194",
+    "8718696159217"
+  ],
   "measure_description": "Used script utils/measure_shelly.py from repository. standby_power is guessed",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

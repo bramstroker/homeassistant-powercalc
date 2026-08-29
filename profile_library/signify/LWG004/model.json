@@ -7,8 +7,14 @@
   "device_type": "light",
   "device_specs": {
     "socket": "GU10",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 400,
+    "rated_power": 5.2
   },
+  "ean": [
+    "8718699628697",
+    "8718699629311"
+  ],
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Hue White GU10 Bluetooth",

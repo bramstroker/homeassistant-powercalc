@@ -6,6 +6,9 @@
     "form_factor": "fixture",
     "socket": "integrated"
   },
+  "ean": [
+    "850030064714"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
