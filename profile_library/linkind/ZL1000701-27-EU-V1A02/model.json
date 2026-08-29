@@ -1,7 +1,13 @@
 {
+  "aliases": [
+    "ZBT-DIMLight-D0120"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2023-09-03T13:47:50Z",
   "device_type": "light",
+  "legacy_ids": [
+    "ZBT-DIMLight-D0120"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",
@@ -10,7 +16,7 @@
     "SLEEP_TIME": 1,
     "VERSION": "v1.9.2:docker"
   },
-  "name": "Dimmable Warm White Filament E27 6.2W 806lm Bulb",
+  "name": "Dimmable Warm White Filament Bulb, E27 (6.2W, 806 lm)",
   "standby_power": 0.3,
   "authors": [
     {
