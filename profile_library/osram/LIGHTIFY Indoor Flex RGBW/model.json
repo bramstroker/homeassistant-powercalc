@@ -1,6 +1,8 @@
 {
   "aliases": [
-    "4052899926110"
+    "4052899926110",
+    "Flex RGBW",
+    "LIGHTIFY Flex RGBW"
   ],
   "calculation_strategy": "lut",
   "created_at": "2021-08-29T21:45:54Z",
@@ -9,7 +11,7 @@
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
-  "name": "LIGHTIFY Indoor Flex RGBW 3P (1.8m)",
+  "name": "LIGHTIFY Indoor Flex RGBW (1.8 m)",
   "standby_power": 0.3,
   "authors": [
     {
