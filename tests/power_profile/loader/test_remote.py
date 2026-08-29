@@ -182,7 +182,7 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
     remote_files = [
         {
             "path": "model.json",
-            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/google/Home Mini (HOA)/model.json",  # noqa: E501
+            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/google/H0A/model.json",
         },
     ]
 
@@ -194,7 +194,7 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
     )
 
     for remote_file in remote_files:
-        with open(get_library_path("google/Home Mini (HOA)") + f"/{remote_file['path']}", "rb") as f:
+        with open(get_library_path("google/H0A") + f"/{remote_file['path']}", "rb") as f:
             mock_aioresponse.get(
                 remote_file["url"],
                 status=200,
@@ -1024,19 +1024,19 @@ async def test_profile_redownloaded_when_model_json_corrupt(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Corrupt the model.json file and check if it is redownloaded."""
-    local_storage_path = remote_loader.get_storage_path("apple", "HomePod Mini")
+    local_storage_path = remote_loader.get_storage_path("apple", "A2374")
     shutil.rmtree(local_storage_path, ignore_errors=True)
     os.makedirs(local_storage_path)
 
     remote_files = [
         {
             "path": "model.json",
-            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/apple/HomePod Mini/model.json",  # noqa: E501
+            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/apple/A2374/model.json",
         },
     ]
 
     mock_aioresponse.get(
-        re.compile(rf"{ENDPOINT_DOWNLOAD}/apple/HomePod.*"),
+        re.compile(rf"{ENDPOINT_DOWNLOAD}/apple/A2374.*"),
         status=200,
         payload=remote_files,
         repeat=True,
@@ -1047,14 +1047,14 @@ async def test_profile_redownloaded_when_model_json_corrupt(
         status=200,
         body="invalid json",
     )
-    with open(get_library_path("apple/HomePod Mini/model.json"), "rb") as f:
+    with open(get_library_path("apple/A2374/model.json"), "rb") as f:
         mock_aioresponse.get(
             remote_files[0]["url"],
             status=200,
             body=f.read(),
         )
 
-    await remote_loader.load_model("apple", "HomePod Mini")
+    await remote_loader.load_model("apple", "A2374")
 
     recovery_records = [record for record in caplog.records if "model.json is not valid JSON" in record.message]
     assert len(recovery_records) == 1
@@ -1071,19 +1071,19 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
     When model.json is corrupt, retry 3 times before giving up.
     After 3 times it should raise a LibraryLoadingError.
     """
-    local_storage_path = remote_loader.get_storage_path("apple", "HomePod Mini")
+    local_storage_path = remote_loader.get_storage_path("apple", "A2374")
     shutil.rmtree(local_storage_path, ignore_errors=True)
     os.makedirs(local_storage_path)
 
     remote_files = [
         {
             "path": "model.json",
-            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/apple/HomePod Mini/model.json",  # noqa: E501
+            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/apple/A2374/model.json",
         },
     ]
 
     mock_aioresponse.get(
-        re.compile(rf"{ENDPOINT_DOWNLOAD}/apple/HomePod.*"),
+        re.compile(rf"{ENDPOINT_DOWNLOAD}/apple/A2374.*"),
         status=200,
         payload=remote_files,
         repeat=True,
@@ -1097,7 +1097,7 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
     )
 
     with pytest.raises(LibraryLoadingError):
-        await remote_loader.load_model("apple", "HomePod Mini")
+        await remote_loader.load_model("apple", "A2374")
 
     recovery_records = [record for record in caplog.records if "model.json is not valid JSON" in record.message]
     assert len(recovery_records) == 2
@@ -1110,7 +1110,7 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
 @pytest.mark.parametrize(
     "manufacturer,phrases,expected_models,library_dir",
     [
-        ("apple", {"HomePod (gen 2)"}, ["MQJ83"], None),
+        ("apple", {"HomePod (gen 2)"}, ["A2825"], None),
         ("apple", {"Non existing model"}, [], None),
         ("signify", {"LCA001", "LCT010"}, ["LCA001", "LCT010"], None),
         ("signify", {"lca001"}, ["LCA001"], None),

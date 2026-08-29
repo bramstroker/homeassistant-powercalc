@@ -517,7 +517,7 @@ async def test_get_power_profile_by_source_entity_returns_none_without_entity_en
             "media_player.test",
             ModelInfo("Apple", "HomePod (gen 2)"),
             "apple",
-            "MQJ83",
+            "A2825",
         ),
         (
             "light.test",
