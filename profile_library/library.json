@@ -9232,7 +9232,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.6:docker"
           },
-          "name": "Link Music",
+          "name": "Wi-Fi Speaker",
           "standby_power": 1.7,
           "authors": [
             {
@@ -9242,10 +9242,10 @@
           ],
           "id": "Link Music",
           "manufacturer": "jbl",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T04:33:52",
           "max_power": 8.56,
           "sub_profile_count": 0,
-          "hash": "de65063cbf701b2871b2ad1b3863b9df"
+          "hash": "ebd7b2933ee7fd40b6b4ec657da34f3f"
         }
       ],
       "device_types": [
@@ -9269,7 +9269,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.14.4:docker"
           },
-          "name": "RGBWW Smart LED Bulb A21 (10 W)",
+          "name": "RGBWW Smart LED Bulb A21 (10W)",
           "standby_power": 0.5,
           "authors": [
             {
@@ -9279,7 +9279,7 @@
           ],
           "id": "BLF10",
           "manufacturer": "kauf",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T04:39:21",
           "max_power": 9.57,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9292,7 +9292,7 @@
             "brightness": 98.9,
             "color_temp": 33.4
           },
-          "hash": "424d0b7fcc70b0b4938e6f40072c80ff"
+          "hash": "b200b028baf436c0a1888ef6d9cf101e"
         }
       ],
       "device_types": [
@@ -9316,7 +9316,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.14:docker"
           },
-          "name": "SmarterHome 10W White Smart Bulb",
+          "name": "SmarterHome 10W White Smart Bulb (B22)",
           "standby_power": 1.0,
           "authors": [
             {
@@ -9326,7 +9326,7 @@
           ],
           "id": "KASB10WB22HA",
           "manufacturer": "kogan",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T04:42:06",
           "max_power": 9.75,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9336,7 +9336,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "26c73d883a1881df781f0b81592fe142"
+          "hash": "57356ddf8abfebff940e3049721dabf9"
         }
       ],
       "device_types": [
@@ -9464,7 +9464,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.0.3:docker"
           },
-          "name": "SMART+ ZB CLA60 60 9 W E27",
+          "name": "SMART+ ZB CLA60 60 9W E27",
           "standby_power": 0.31,
           "authors": [
             {
@@ -9474,7 +9474,7 @@
           ],
           "id": "AC25697",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-28T05:25:06",
+          "updated_at": "2026-08-29T04:53:03",
           "max_power": 8.18,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9485,7 +9485,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "dce7a00525fa8eee07f93c8ccdc3179f"
+          "hash": "bb2a3648422552d4b40e2df283144916"
         },
         {
           "calculation_strategy": "lut",
@@ -9498,7 +9498,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.1.1:docker"
           },
-          "name": "SMART+ WiFi Planon Frameless 300x300 mm TW",
+          "name": "SMART+ WiFi Planon Frameless 300x300mm TW",
           "standby_power": 0.9,
           "authors": [
             {
@@ -9509,7 +9509,7 @@
           ],
           "id": "ac264430155",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-28T05:25:06",
+          "updated_at": "2026-08-29T04:53:03",
           "max_power": 19.35,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9519,7 +9519,7 @@
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "ebfb32a1539a508ba9393228124f43be"
+          "hash": "9311329fcf996a4c71f2edef599517bd"
         },
         {
           "aliases": [
@@ -9538,7 +9538,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.1.1:docker"
           },
-          "name": "SMART+ WiFi Planon Frameless 600x600 mm RGB + TW",
+          "name": "SMART+ WiFi Planon Frameless 600x600mm RGB + TW",
           "standby_power": 1.0,
           "authors": [
             {
@@ -9549,7 +9549,7 @@
           ],
           "id": "AC26447",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-28T05:25:06",
+          "updated_at": "2026-08-29T04:53:03",
           "max_power": 34.65,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9560,7 +9560,7 @@
             "score": 99.7,
             "color_temp": 99.7
           },
-          "hash": "f452594fe01d75f54f123247494e5a5e"
+          "hash": "c4539afd51e35c07e89ea47ff4a50106"
         },
         {
           "aliases": [
@@ -9621,7 +9621,7 @@
             "SLEEP_TIME": 1,
             "VERSION": "master"
           },
-          "name": "SMART+ WiFi Filament Globe RGBW 30 4.5 W E27",
+          "name": "SMART+ WiFi Filament Globe RGBW 30 4.5W E27",
           "standby_power": 1.04,
           "authors": [
             {
@@ -9632,7 +9632,7 @@
           ],
           "id": "AC32960",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-28T05:25:06",
+          "updated_at": "2026-08-29T04:53:03",
           "max_power": 4.65,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9643,7 +9643,7 @@
             "score": 96.1,
             "color_temp": 96.1
           },
-          "hash": "deebb906bb36d3232bd7d2c5dc1b56b1"
+          "hash": "a24483ddb75fe3e2d00f80389769c136"
         },
         {
           "aliases": [
@@ -9662,7 +9662,7 @@
             "SLEEP_TIME": 10,
             "VERSION": "v1.17.11:docker"
           },
-          "name": "SMART+ ZB Filament Edison 52 DIM 6 W 824 Gold E27",
+          "name": "SMART+ ZB Filament Edison 52 DIM 6W 824 Gold E27",
           "standby_power": 0.24,
           "authors": [
             {
@@ -9672,7 +9672,7 @@
           ],
           "id": "AC41293",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-28T05:25:06",
+          "updated_at": "2026-08-29T04:53:03",
           "max_power": 5.57,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9682,7 +9682,7 @@
             "score": 99.2,
             "brightness": 99.2
           },
-          "hash": "cdf976801b3ee1f1c362ade22a4053d1"
+          "hash": "b9b57aa154a65e663620bebd8696dee7"
         },
         {
           "calculation_strategy": "lut",
@@ -9770,7 +9770,7 @@
           "device_type": "light",
           "measure_device": "Shelly Plug S",
           "measure_method": "script",
-          "name": "SMART+ ZB Tibea TW 22 W Gold E27",
+          "name": "SMART+ ZB Tibea TW 22W Gold E27",
           "standby_power": 0.51,
           "authors": [
             {
@@ -9781,7 +9781,7 @@
           ],
           "id": "Tibea TW Z3",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-28T05:25:06",
+          "updated_at": "2026-08-29T04:53:03",
           "max_power": 20.49,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9791,7 +9791,7 @@
             "score": 97.5,
             "color_temp": 97.5
           },
-          "hash": "6ddf7352b57e73625d8217ba06a15ad3"
+          "hash": "d1707727fa4d555f9bef9f763b3bcde9"
         }
       ],
       "device_types": [
@@ -9815,7 +9815,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.15.5:docker"
           },
-          "name": "Twinkly 600 String Lights",
+          "name": "Twinkly Strings Multicolor (600 LEDs)",
           "standby_power": 2.2,
           "authors": [
             {
@@ -9826,10 +9826,10 @@
           ],
           "id": "TWS600STP",
           "manufacturer": "ledworks",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T04:57:46",
           "max_power": 37.0,
           "sub_profile_count": 0,
-          "hash": "bb466da4f6fd822f77509911ef15d906"
+          "hash": "c2b076011af573dbb9f2f67fd0df4032"
         }
       ],
       "device_types": [
@@ -9846,12 +9846,15 @@
           "aliases": [
             "Lenovo Smart Clock"
           ],
+          "legacy_ids": [
+            "Smart Clock with Google Assistant"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2022-10-05T10:14:54Z",
           "device_type": "smart_speaker",
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "manual",
-          "name": "Smart Clock with Google Assistant",
+          "name": "Smart Clock",
           "standby_power": 2.51,
           "authors": [
             {
@@ -9860,12 +9863,12 @@
               "github": "CloCkWeRX"
             }
           ],
-          "id": "Smart Clock with Google Assistant",
+          "id": "CD-24501F",
           "manufacturer": "lenovo",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T05:03:07",
           "max_power": 4.41,
           "sub_profile_count": 0,
-          "hash": "f99418bb22cc81efd229130db2d2674a"
+          "hash": "eafb575b6e1bc9b431072debd25764ba"
         }
       ],
       "device_types": [
@@ -9891,7 +9894,7 @@
             "SLEEP_TIME": 2,
             "VERSION": "v0.18.4:docker"
           },
-          "name": "RGBW E27 Smart LED Bulb (14 W to 100 W equivalent)",
+          "name": "ENKI RGBW E27 Globe Bulb 14W",
           "standby_power": 0.4,
           "authors": [
             {
@@ -9902,7 +9905,7 @@
           ],
           "id": "IG-CDZOTAAG014RA-MAN",
           "manufacturer": "lexman",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T05:09:23",
           "max_power": 13.4,
           "sub_profile_count": 0,
           "color_modes": [
@@ -9913,7 +9916,7 @@
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "50dc4b4791734d4949e78eea00aa0ac2"
+          "hash": "accf2ea72e37d0ca99832bdad287382f"
         }
       ],
       "device_types": [
@@ -11327,7 +11330,7 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.3.0:app"
           },
-          "name": "Matter RGBCW A19 E26 Smart Bulb",
+          "name": "Matter RGBCW A19 E26 Smart Bulb (11W)",
           "voltage_range": {
             "min": 118.95,
             "max": 121.41
@@ -11345,7 +11348,7 @@
           ],
           "id": "LI-A19-11W-MT",
           "manufacturer": "lightinginside",
-          "updated_at": "2026-08-22T17:01:01",
+          "updated_at": "2026-08-29T05:59:06",
           "max_power": 10.96,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11356,7 +11359,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "fff02c9600a63b3078d439c13877d87c"
+          "hash": "c9b3bc50c7b98d60cbd34894263e84fc"
         },
         {
           "calculation_strategy": "lut",
@@ -11369,7 +11372,7 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.3.0:app"
           },
-          "name": "Matter RGBCW A19 E26 Smart Bulb",
+          "name": "Matter RGBCW A19 E26 Smart Bulb (9W)",
           "voltage_range": {
             "min": 119.45,
             "max": 123.15
@@ -11386,7 +11389,7 @@
           ],
           "id": "LM-MT-C2-A19-9W",
           "manufacturer": "lightinginside",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T05:59:06",
           "max_power": 8.58,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11397,7 +11400,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "2aed154d753c01afaaadf4af73c894a2"
+          "hash": "c93be8d720eec53ea979d0a45137b64d"
         }
       ],
       "device_types": [
@@ -11423,7 +11426,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.11:docker"
           },
-          "name": "Dimmable CCT LED Light Bulb, E27 (10 W)",
+          "name": "Dimmable RGBW LED Bulb, E27 (10W)",
           "standby_power": 0.38,
           "authors": [
             {
@@ -11433,7 +11436,7 @@
           ],
           "id": "9971013",
           "manufacturer": "lindby",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T06:23:14",
           "max_power": 9.95,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11444,7 +11447,7 @@
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "b940a23a4fe4b507bd83fbb3bd6df728"
+          "hash": "656b5448f594eb756f2f51e54c98c257"
         }
       ],
       "device_types": [
@@ -11474,7 +11477,7 @@
             "SLEEP_TIME": 2.0,
             "VERSION": "v0.2.1:app"
           },
-          "name": "Matter Smart RGBTW Lampe, Wifi E27 800 Lumen",
+          "name": "Matter RGBTW Bulb, E27 (9W, 800 lm)",
           "standby_power": 0.29,
           "voltage_range": {
             "min": 231.7,
@@ -11488,7 +11491,7 @@
           ],
           "id": "LS0101911261",
           "manufacturer": "linkind",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T06:34:45",
           "max_power": 8.93,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11499,7 +11502,7 @@
             "score": 85.8,
             "color_temp": 85.8
           },
-          "hash": "e1db57440d7dab71dcec7499b49da67b"
+          "hash": "425d463a18eb99723072c03bd5334087"
         },
         {
           "calculation_strategy": "lut",
@@ -11515,7 +11518,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.20.4:docker"
           },
-          "name": "A19 Matter Smart CCT Light Bulb - 800lm",
+          "name": "Matter CCT Bulb, A19/E26 (9W, 800 lm)",
           "standby_power": 0.91,
           "authors": [
             {
@@ -11526,7 +11529,7 @@
           ],
           "id": "LS0102411267",
           "manufacturer": "linkind",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T06:34:45",
           "max_power": 9.01,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11536,12 +11539,18 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "9ad408cc4fa0d1f8a746bacb43f1c32c"
+          "hash": "991f49ba12f2989245a0de7cf6773fef"
         },
         {
+          "aliases": [
+            "ZBT-DIMLight-D0120"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2023-09-03T13:47:50Z",
           "device_type": "light",
+          "legacy_ids": [
+            "ZBT-DIMLight-D0120"
+          ],
           "measure_device": "Shelly Plus Plug S",
           "measure_method": "script",
           "measure_settings": {
@@ -11549,7 +11558,7 @@
             "SLEEP_TIME": 1,
             "VERSION": "v1.9.2:docker"
           },
-          "name": "Dimmable Warm White Filament E27 6.2W 806lm Bulb",
+          "name": "Dimmable Warm White Filament Bulb, E27 (6.2W, 806 lm)",
           "standby_power": 0.3,
           "authors": [
             {
@@ -11558,9 +11567,9 @@
               "github": "PalminX"
             }
           ],
-          "id": "ZBT-DIMLight-D0120",
+          "id": "ZL1000701-27-EU-V1A02",
           "manufacturer": "linkind",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T06:34:45",
           "max_power": 6.2,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11570,7 +11579,7 @@
             "score": 97.4,
             "brightness": 97.4
           },
-          "hash": "61b701dfaf4d2e855c20857dd8bb7c3c"
+          "hash": "2bf1fa0fa904e2f886bdc1a96ec08302"
         }
       ],
       "device_types": [
@@ -11584,11 +11593,8 @@
       "dir_name": "lsc",
       "models": [
         {
-          "manufacturer": "lsc",
-          "model": "3012586",
-          "name": "Frameless Ceiling Light",
-          "created_at": "2026-04-07T11:55:06Z",
           "calculation_strategy": "lut",
+          "created_at": "2026-04-07T11:55:06Z",
           "device_type": "light",
           "measure_device": "Shelly Plug",
           "measure_method": "script",
@@ -11597,6 +11603,7 @@
             "SLEEP_TIME": 5,
             "VERSION": "master"
           },
+          "name": "Frameless Ceiling Light",
           "standby_power": 0.41,
           "authors": [
             {
@@ -11605,7 +11612,8 @@
             }
           ],
           "id": "3012586",
-          "updated_at": "2026-08-21T10:30:36",
+          "manufacturer": "lsc",
+          "updated_at": "2026-08-29T06:44:06",
           "max_power": 19.7,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11615,7 +11623,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "f295c27af2ce678e971631f22c7f37de"
+          "hash": "aef3cdf62afc10fd269fa6284be58b43"
         },
         {
           "aliases": [
@@ -11631,7 +11639,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.11:docker"
           },
-          "name": "Smart RGB-CCT GU10 LED Reflector Lamp",
+          "name": "RGB-CCT Reflector Bulb, GU10 (4.9W, 380 lm)",
           "standby_power": 1.13,
           "authors": [
             {
@@ -11641,7 +11649,7 @@
           ],
           "id": "970710",
           "manufacturer": "lsc",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T06:44:06",
           "max_power": 5.45,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11652,7 +11660,7 @@
             "score": 97.1,
             "color_temp": 97.1
           },
-          "hash": "afdb7755d0275a8b4793607feddafa37"
+          "hash": "ab99da2bb22ecbde115e8b38a8c91212"
         },
         {
           "calculation_strategy": "lut",
@@ -11665,7 +11673,7 @@
             "SLEEP_TIME": 2,
             "VERSION": "v1.21.2:docker"
           },
-          "name": "A60 RGB-CCT E27 806lm",
+          "name": "RGB-CCT Bulb, A60/E27 (9W, 806 lm)",
           "standby_power": 0.9,
           "authors": [
             {
@@ -11676,7 +11684,7 @@
           ],
           "id": "970714",
           "manufacturer": "lsc",
-          "updated_at": "2026-08-22T17:06:08",
+          "updated_at": "2026-08-29T06:44:06",
           "max_power": 9.9,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11688,7 +11696,7 @@
             "score": 95.7,
             "color_temp": 95.7
           },
-          "hash": "e4e0e5b071c5db19c90457a7bfa254da"
+          "hash": "297f5dc67b477a2502b619aaa66a34bc"
         }
       ],
       "device_types": [
@@ -11704,7 +11712,9 @@
       "dir_name": "luedd",
       "models": [
         {
-          "aliases": [],
+          "aliases": [
+            "LUEDD Smart GU10 5W 2200-4000K + RGB"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2025-04-29T00:51:48Z",
           "device_type": "light",
@@ -11715,7 +11725,10 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.11:docker"
           },
-          "name": "Smart GU10 5W 2200-4000K + RGB",
+          "name": "Smart RGBW GU10 Bulb (5W, 350 lm, 2200-4000K)",
+          "legacy_ids": [
+            "LUEDD Smart GU10 5W 2200-4000K + RGB"
+          ],
           "standby_power": 0.8,
           "authors": [
             {
@@ -11723,9 +11736,9 @@
               "github": "JortvanSchijndel"
             }
           ],
-          "id": "LUEDD Smart GU10 5W 2200-4000K + RGB",
+          "id": "02626",
           "manufacturer": "luedd",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T06:54:12",
           "max_power": 5.49,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11736,7 +11749,7 @@
             "score": 96.2,
             "color_temp": 96.2
           },
-          "hash": "9214f867d8ecb558bb5b53299a881d2c"
+          "hash": "48b86db7da2bfd982675a495df94e223"
         }
       ],
       "device_types": [
@@ -11760,7 +11773,7 @@
             "SLEEP_TIME": 15,
             "VERSION": "v1.10.4:docker"
           },
-          "name": "Smart Color Changing Bulb A19 800LM 2.4Ghz",
+          "name": "RGBW A19/E26 Bulb (7.5W, 800 lm)",
           "standby_power": 0.3,
           "authors": [
             {
@@ -11770,7 +11783,7 @@
           ],
           "id": "LM530",
           "manufacturer": "lumiman",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-29T07:04:44",
           "max_power": 6.9,
           "sub_profile_count": 0,
           "color_modes": [
@@ -11781,7 +11794,7 @@
             "score": 95.1,
             "color_temp": 95.1
           },
-          "hash": "28edef91ea3d84b504982e10e97b93c0"
+          "hash": "64c68d509ca688e4b08f6b40ea8ea75f"
         }
       ],
       "device_types": [
@@ -11809,7 +11822,7 @@
           "discovery_by": "entity",
           "measure_device": "Shelly Plus Plug",
           "measure_method": "script",
-          "name": "Plug-In Lamp Dimmer (Wireless Smart Dimmer)",
+          "name": "Plug-In Lamp Dimmer",
           "standby_power": 0.1,
           "standby_power_on": 0.56,
           "authors": [
@@ -11820,10 +11833,10 @@
           ],
           "id": "PD-3PCL-WH",
           "manufacturer": "lutron",
-          "updated_at": "2026-08-23T08:22:52",
+          "updated_at": "2026-08-29T07:13:39",
           "max_power": 0.56,
           "sub_profile_count": 0,
-          "hash": "2417f8f315317aa70c0ed3a39988babe"
+          "hash": "6532460c600b97540d88b8bacc713dc2"
         }
       ],
       "device_types": [
