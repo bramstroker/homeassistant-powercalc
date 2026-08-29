@@ -3,6 +3,10 @@
   "calculation_strategy": "lut",
   "created_at": "2021-10-08T13:31:47Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Hue Bloom Table Lamp",

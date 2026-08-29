@@ -2,6 +2,10 @@
   "calculation_strategy": "lut",
   "created_at": "2021-08-26T21:06:04Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",

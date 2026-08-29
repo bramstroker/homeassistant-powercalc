@@ -2,6 +2,10 @@
   "calculation_strategy": "lut",
   "created_at": "2026-04-17T17:03:41Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "IKEA INSPELNING smart plug",
   "measure_method": "script",

@@ -12,6 +12,10 @@
   "name": "Neon Rope Light",
   "standby_power": 2.67,
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "strip",
+    "socket": "integrated"
+  },
   "authors": [
     {
       "name": "Minne",

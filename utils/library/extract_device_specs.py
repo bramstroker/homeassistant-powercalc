@@ -35,14 +35,34 @@ SOCKET_PATTERN = re.compile(r"\b(E27|E26|E14|E12|B22|GU10|GU5\.3|GU24|GX53|G9|G4
 # Bulb" is a filament. The last entry only wins when nothing above it matched.
 FORM_FACTOR_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\bdownlight\b", re.IGNORECASE), "downlight"),
-    (re.compile(r"\b(?:light ?strip|led strip|strip)\b", re.IGNORECASE), "strip"),
-    (re.compile(r"\bpanel\b", re.IGNORECASE), "panel"),
+    (
+        re.compile(r"\b(?:light ?strip|led ?strip|striplight|neon rope|rope light|led band|flex)\b", re.IGNORECASE),
+        "strip",
+    ),
+    (re.compile(r"\bstrip\b", re.IGNORECASE), "strip"),
+    (re.compile(r"\bpanels?\b", re.IGNORECASE), "panel"),
     (re.compile(r"\btube\b", re.IGNORECASE), "tube"),
     (re.compile(r"\bcandle\b", re.IGNORECASE), "candle"),
     (re.compile(r"\bspot(?:light)?\b", re.IGNORECASE), "spot"),
     (re.compile(r"\bfilament\b", re.IGNORECASE), "filament"),
+    (
+        # A luminaire, named after where it hangs rather than what goes in it.
+        re.compile(
+            r"\b(?:ceiling|pendant|suspension|wall (?:light|lamp|washer)|"
+            r"floor (?:lamp|light)|table lamp|desk lamp|bedside|under.?cabinet|"
+            r"surface.?mounted|surface light|bollard|pedestal|flood ?light|"
+            r"key light|ring light|mood ?light|moonlamp|"
+            r"string(?:s| lights?)?|light chain|christmas lights)\b",
+            re.IGNORECASE,
+        ),
+        "fixture",
+    ),
     (re.compile(r"\bbulb\b", re.IGNORECASE), "bulb"),
 ]
+
+# Shapes that hold their light source rather than take a lamp. A downlight or a tube is left
+# out: those come in both integrated and GU10 or G13 versions, and the name rarely says which.
+INTEGRATED_FORM_FACTORS = frozenset({"fixture", "panel", "strip"})
 
 LUMENS_PATTERN = re.compile(r"\b(\d{2,5})\s?(?:lm|lumens?)\b", re.IGNORECASE)
 # Two figures for two variants of the same lamp, e.g. "(450/470 lm)". Which one belongs to
@@ -128,6 +148,9 @@ def extract_specs(name: str, max_power: float | None = None) -> Extraction:
     form_factor = extract_form_factor(name)
     if form_factor:
         specs["form_factor"] = form_factor
+        # Nothing screws into a light panel or a ceiling lamp.
+        if not socket and form_factor in INTEGRATED_FORM_FACTORS:
+            specs["socket"] = "integrated"
 
     lumens, lumens_skip = extract_lumens(name)
     if lumens:
@@ -160,15 +183,26 @@ def load_max_powers() -> dict[str, float]:
 
 
 def add_device_specs(model_data: dict[str, Any], specs: dict[str, Any]) -> dict[str, Any]:
-    """Return the model with `device_specs` inserted, next to the device type it describes."""
+    """Return the model carrying `specs`, next to the device type they describe.
+
+    Existing values win. A later pass fills the gaps an earlier one left, and never argues
+    with a spec somebody has already written by hand.
+    """
+    merged = {**specs, **(model_data.get("device_specs") or {})}
     updated: dict[str, Any] = {}
     for key, value in model_data.items():
-        updated[key] = value
-        if key == "device_type":
-            updated["device_specs"] = specs
+        updated[key] = merged if key == "device_specs" else value
+        if key == "device_type" and "device_specs" not in model_data:
+            updated["device_specs"] = merged
     if "device_specs" not in updated:
-        updated["device_specs"] = specs
+        updated["device_specs"] = merged
     return updated
+
+
+def missing_specs(model_data: dict[str, Any], specs: dict[str, Any]) -> dict[str, Any]:
+    """The subset of `specs` the profile does not already carry."""
+    existing = model_data.get("device_specs") or {}
+    return {key: value for key, value in specs.items() if key not in existing}
 
 
 def main() -> int:
@@ -184,23 +218,25 @@ def main() -> int:
     for path in sorted(glob.glob(f"{DATA_DIR}/*/*/model.json")):
         model_path = Path(path)
         model_data = json.loads(model_path.read_text(encoding="utf-8"))
-        if model_data.get("device_type") != "light" or "device_specs" in model_data:
+        if model_data.get("device_type") != "light":
             continue
 
         profile = "/".join(model_path.parts[-3:-1])
         extraction = extract_specs(model_data.get("name") or "", max_powers.get(profile))
         if extraction.skipped:
             skipped_profiles.append((profile, extraction.skipped))
-        if not extraction.specs:
+
+        additions = missing_specs(model_data, extraction.specs)
+        if not additions:
             continue
 
         changed += 1
-        for key in extraction.specs:
+        for key in additions:
             counts[key] += 1
-        print(f"{profile}: {json.dumps(extraction.specs)}")  # noqa: T201
+        print(f"{profile}: {json.dumps(additions)}")  # noqa: T201
 
         if args.write:
-            updated = add_device_specs(model_data, extraction.specs)
+            updated = add_device_specs(model_data, additions)
             model_path.write_text(json.dumps(updated, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     print(f"\n{changed} profiles {'updated' if args.write else 'would be updated'}")  # noqa: T201

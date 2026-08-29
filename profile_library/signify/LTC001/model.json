@@ -8,6 +8,10 @@
   "calculation_strategy": "lut",
   "created_at": "2021-06-19T18:55:29Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "measure_description": "Used script utils/measure_shelly.py from repository. standby_power is guessed",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

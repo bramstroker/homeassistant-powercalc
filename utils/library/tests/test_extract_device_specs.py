@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from utils.library.extract_device_specs import add_device_specs, extract_specs
+from utils.library.extract_device_specs import add_device_specs, extract_specs, missing_specs
 
 
 def test_reads_every_spec_a_well_formed_name_states() -> None:
@@ -106,3 +106,65 @@ def test_device_specs_are_appended_when_there_is_no_device_type() -> None:
     updated = add_device_specs({"name": "A light"}, {"socket": "E27"})
 
     assert list(updated) == ["name", "device_specs"]
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "Hue Being Ceiling Light",
+        "NYMANE pendant lamp",
+        "Hue Cher Suspension Light",
+        "Hue Sana Wall Light",
+        "Lyra RGBICWW Corner Floor Lamp",
+        "Hue Wellness White Ambiance Table lamp",
+        "Mi LED Desk Lamp 1S",
+        "SLAGSIDA Under-Cabinet Light (60 cm)",
+        "FUEVA-Z Surface-Mounted Light (285mm)",
+        "Hue Calla outdoor bollard",
+        "Hue Discover white and color ambiance flood light",
+        "Key Light Air",
+        "Smart String Lights",
+        "Melinera Christmas Lights",
+        "Livarno outdoor LED light chain",
+        "Livarno Lux smart LED mood light",
+    ],
+)
+def test_a_luminaire_is_a_fixture_that_takes_no_lamp(name: str) -> None:
+    assert extract_specs(name).specs == {"form_factor": "fixture", "socket": "integrated"}
+
+
+@pytest.mark.parametrize(
+    "name, form_factor",
+    [
+        ("Glide Hexa Light Panels (10 panels)", "panel"),
+        ("Neon Rope Light", "strip"),
+        ("SMART+ ZB Flex 3P RGB + TW", "strip"),
+        ("Hue OmniGlow striplight 3m", "strip"),
+    ],
+)
+def test_a_panel_or_a_strip_holds_its_own_light_source(name: str, form_factor: str) -> None:
+    assert extract_specs(name).specs == {"form_factor": form_factor, "socket": "integrated"}
+
+
+@pytest.mark.parametrize("name", ["Wi-Fi Dimmable RGB+CCT 9W LED Downlight", "Wi-Fi 7W LED Tube Lamp"])
+def test_a_downlight_or_a_tube_is_left_alone(name: str) -> None:
+    """Both ship as integrated units and as fittings for a GU10 or a G13, and names rarely say."""
+    assert "socket" not in extract_specs(name).specs
+
+
+def test_a_stated_socket_beats_the_integrated_rule() -> None:
+    assert extract_specs("Smart Zigbee GU10 Ceiling Spotlight").specs["socket"] == "GU10"
+
+
+def test_an_existing_spec_is_never_argued_with() -> None:
+    model = {"device_type": "light", "device_specs": {"socket": "E14", "lumens": 470}}
+
+    updated = add_device_specs(model, {"socket": "E27", "form_factor": "candle"})
+
+    assert updated["device_specs"] == {"socket": "E14", "lumens": 470, "form_factor": "candle"}
+
+
+def test_only_the_gaps_are_proposed() -> None:
+    model = {"device_specs": {"socket": "E27"}}
+
+    assert missing_specs(model, {"socket": "E14", "lumens": 806}) == {"lumens": 806}

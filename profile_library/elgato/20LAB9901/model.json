@@ -5,6 +5,10 @@
   "calculation_strategy": "lut",
   "created_at": "2022-08-02T15:23:27Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "legacy_ids": [
     "Elgato Key Light Air"
   ],
