@@ -2,5 +2,8 @@
   "name": "Wyze",
   "aliases": [
     "WyzeLabs"
-  ]
+  ],
+  "website": "https://www.wyze.com",
+  "country": "US",
+  "description": "American maker of low-cost cameras, plugs and bulbs."
 }

@@ -1,4 +1,7 @@
 {
   "name": "Meross",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.meross.com",
+  "country": "CN",
+  "description": "Chinese maker of HomeKit and Matter plugs, lights and garage door openers."
 }

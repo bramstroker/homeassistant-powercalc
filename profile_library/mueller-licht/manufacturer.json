@@ -3,5 +3,8 @@
   "aliases": [
     "mueller-licht",
     "MLI"
-  ]
+  ],
+  "website": "https://www.mueller-licht.de",
+  "country": "DE",
+  "description": "German lamp manufacturer. Its connected range is sold as tint."
 }

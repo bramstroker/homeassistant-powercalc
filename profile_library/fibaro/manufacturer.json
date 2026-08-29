@@ -2,5 +2,8 @@
   "name": "Fibaro",
   "aliases": [
     "Fibargroup"
-  ]
+  ],
+  "website": "https://www.fibaro.com",
+  "country": "PL",
+  "description": "Polish maker of Z-Wave sensors, dimmers and controllers."
 }

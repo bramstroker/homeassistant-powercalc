@@ -2,5 +2,8 @@
   "name": "Denon",
   "aliases": [
     "HEOS"
-  ]
+  ],
+  "website": "https://www.denon.com",
+  "country": "JP",
+  "description": "Japanese audio manufacturer. Its wireless speakers run the HEOS platform."
 }

@@ -1,4 +1,7 @@
 {
   "name": "eWeLink",
-  "aliases": []
+  "aliases": [],
+  "website": "https://ewelink.cc",
+  "country": "CN",
+  "description": "App and cloud platform behind Sonoff and a long list of other Shenzhen brands."
 }

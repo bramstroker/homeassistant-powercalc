@@ -1,4 +1,7 @@
 {
   "name": "Elgato",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.elgato.com",
+  "country": "DE",
+  "description": "Munich maker of streaming gear, including the Key Light range. A Corsair brand since 2018."
 }

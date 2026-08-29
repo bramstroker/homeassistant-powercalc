@@ -1,4 +1,7 @@
 {
   "name": "Paulmann Licht",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.paulmann.com",
+  "country": "DE",
+  "description": "German lighting manufacturer from Springe, with a large 12 V and smart range."
 }

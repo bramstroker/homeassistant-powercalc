@@ -1,4 +1,7 @@
 {
   "name": "Harman Kardon",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.harmankardon.com",
+  "country": "US",
+  "description": "American audio brand, part of Harman International and owned by Samsung."
 }

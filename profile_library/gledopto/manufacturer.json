@@ -1,4 +1,7 @@
 {
   "name": "Gledopto",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.gledopto.com",
+  "country": "CN",
+  "description": "Shenzhen maker of Zigbee LED controllers and lamps."
 }

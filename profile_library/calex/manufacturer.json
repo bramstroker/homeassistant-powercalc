@@ -2,5 +2,8 @@
   "name": "Calex",
   "aliases": [
     "Tuya"
-  ]
+  ],
+  "website": "https://www.calex.eu",
+  "country": "NL",
+  "description": "Dutch lamp brand, known for filament LEDs and its Calex Smart range."
 }

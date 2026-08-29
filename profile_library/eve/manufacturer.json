@@ -2,5 +2,8 @@
   "name": "Eve",
   "aliases": [
     "Eve Systems"
-  ]
+  ],
+  "website": "https://www.evehome.com",
+  "country": "DE",
+  "description": "Munich maker of HomeKit and Matter accessories, formerly Elgato Eve."
 }

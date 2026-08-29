@@ -1,4 +1,7 @@
 {
   "name": "Nuki Home Solutions GmbH",
-  "aliases": []
+  "aliases": [],
+  "website": "https://nuki.io",
+  "country": "AT",
+  "description": "Austrian maker of retrofit smart locks, from Graz."
 }
