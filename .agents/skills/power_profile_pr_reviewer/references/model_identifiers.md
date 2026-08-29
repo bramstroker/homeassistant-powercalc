@@ -116,6 +116,7 @@ If no unique identifier can be established, request manual verification. If the 
 | Sonos | Prefer the exact manufacturer article/model number printed on the product or packaging when it uniquely identifies the measured hardware. Preserve established product-name directories unless a verified canonical migration is intentionally requested. | Product label/packaging and official Sonos documentation; then HA Sonos Device information, where `model_id` comes from the speaker's `modelNumber` | `S...` values are useful discovery aliases when one-to-one with the measured generation, but are not automatically retail article numbers. Product names and S-codes can both be generation-ambiguous. Follow the detailed Sonos guidance below. |
 | SONOFF | Printed product codes such as `B1`, `B02-B-A60`, `S20`, `ZBMINI`, and `ZBMINIR2` | Official product page/manual and product label, then exact eWeLink or HA Device Info and Zigbee device definitions | Preserve punctuation in the official model. Retain confirmed integration or raw Zigbee values as aliases, but do not substitute a generic Tuya identifier. Follow the concise SONOFF guidance below. |
 | Sony | Exact printed model codes such as `LF-S50G` | Official Sony support page/manual and product label; then exact HA Cast Device Info and original profile evidence | Keep the official product description in `name` without repeating the model code or manufacturer. Follow the concise Sony guidance below. |
+| Sylvania | Exact model codes printed on the lamp, such as `A19CCECWF` and `40A19FILCCLWIFI` | Lamp label, official LEDVANCE/Sylvania catalog, then exact Tuya product data and original profile evidence | A Tuya cloud product ID can be retained as an alias, but LocalTuya may expose only a device-unique ID. Stock-firmware LUTs are not automatically valid after reflashing. Follow the concise Sylvania guidance below. |
 | Tuya and white-label devices | No safe universal pattern | Require a branded model from the product label/manufacturer and compare its full Zigbee signature with known devices | Identifiers such as `TS0601`, `TS0505B`, and `_TZE...` values can cover different hardware. Do not add them as a directory or alias unless uniqueness for the measured device is demonstrated. |
 
 ## Amazon
@@ -584,6 +585,10 @@ Use the exact SONOFF model from the label or official manual, including punctuat
 
 Use the exact Sony model code from the product label or official support documentation, such as `LF-S50G`. For Cast-connected products, confirm the exact `model_name` exposed in Home Assistant before adding a discovery alias; do not infer aliases from the shortened family name used in a support-page title. Use Sony's concise official product description for `name` while omitting both the manufacturer and canonical model code.
 
+## Sylvania
+
+Prefer the exact model printed on the Sylvania lamp, such as `A19CCECWF` or `40A19FILCCLWIFI`, over a retail SKU or descriptive catalog abbreviation. Preserve an exact Tuya cloud `product_id` as an alias when it was retrieved for the measured product, but recognize that LocalTuya and Tuya Local may expose only a device-unique ID and therefore cannot currently use that alias for discovery. Record the firmware context: a LUT measured with stock Tuya firmware is not automatically valid after flashing ESPHome, Tasmota, or OpenBeken because channel behavior and brightness curves can change. Use a concise `SMART+ Wi-Fi` product description with compact wattage and temperature notation.
+
 ## WiZ
 
 Apply these rules when reviewing or normalizing WiZ and WiZ-powered Philips Smart LED profiles:
@@ -638,6 +643,8 @@ When the printed article number, S-code, product name, or generation cannot be r
 - [The SONOFF B1 manual](https://sonoff.ee/wp-content/uploads/2019/04/Instrukcija-B1-EN-LT-LV-EE.pdf) identifies the older RGB bulb's model as `Sonoff B1`.
 - [The current Zigbee2MQTT SONOFF definitions](https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/src/devices/sonoff.ts) map raw identifiers `01MINIZB` and `MINI-ZBD` to `ZBMINI` and `ZBMINIR2` respectively.
 - [Sony's official LF-S50G support page](https://www.sony.com/electronics/support/speakers-wireless-speakers/lf-s50g) identifies `LF-S50G` and describes it as a Google Assistant built-in wireless speaker.
+- [Sylvania's SMART+ Wi-Fi device catalog](https://assets3.ledvanceus.com/media/resource/original/asset-13109863) identifies the full-color A19 product family, product number `75663`, 2700–6500K range, and official `SMART+ WiFi` branding.
+- [The original A19CCECWF PR](https://github.com/bramstroker/homeassistant-powercalc/pull/2018) and [40A19FILCCLWIFI PR](https://github.com/bramstroker/homeassistant-powercalc/pull/2019) record the printed lamp models, exact Tuya product IDs, LocalTuya limitation, stock-firmware measurements, and reflashing caveat.
 - [TP-Link model-number guidance](https://www.tp-link.com/ae/support/faq/2053/) shows where the product model is printed and exposed in its apps.
 - [Aqara's security and compliance tables](https://www.aqara.com/en/security-certifications/) map official product names to exact model codes and regional variants.
 - [Aqara's supported-device list](https://opendoc.aqara.com/en/docs/SDKDevelopment/IOSDevelopmentGuide/Equipmentcontrol/DeviceControlSDKSupportedDeviceList.html) maps product variants to their `lumi.*` and Matter discovery identifiers.
