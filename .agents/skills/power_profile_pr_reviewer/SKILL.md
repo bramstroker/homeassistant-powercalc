@@ -206,6 +206,10 @@ Large deviations should be questioned.
 
 During an ongoing manufacturer-by-manufacturer consistency audit, automatically record new, reusable, evidence-backed identifier, discovery, naming, or measurement rules in `references/model_identifiers.md` after completing each manufacturer. Keep additions concise and manufacturer-specific; do not add a section when the review produced no non-obvious reusable guidance.
 
+### 10. Track Unresolved Research
+
+During a profile-library consistency audit, read and maintain [references/profile_review_todo.md](references/profile_review_todo.md). Add a checkbox only for a concrete unresolved identity, revision, discovery, barcode, or measurement question with a clear next evidence requirement; do not use it as a duplicate list of every missing metadata field. Mark an item complete when it is resolved and record the deciding evidence and commit or PR when available.
+
 ## Review Checklist
 
 - [ ] Directory structure correct
@@ -224,6 +228,7 @@ During an ongoing manufacturer-by-manufacturer consistency audit, automatically 
 - [ ] Standby behaviour sensible
 - [ ] `only_self_usage` matches a real built-in power meter, no sensor naming overrides
 - [ ] Naming consistent with existing profiles
+- [ ] Concrete unresolved questions recorded in the profile review TODO
 
 ## Output Format
 
