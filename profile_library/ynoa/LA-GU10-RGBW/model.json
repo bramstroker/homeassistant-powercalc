@@ -10,7 +10,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.6:docker"
   },
-  "name": "Smart White & Color Tones",
+  "name": "Smart LED GU10 RGBW Bulb (4.8W)",
+  "aliases": [
+    "ZBT-RGBWLight-M0000"
+  ],
   "standby_power": 0.19,
   "authors": [
     {
