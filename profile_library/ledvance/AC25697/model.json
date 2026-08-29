@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.0.3:docker"
   },
-  "name": "SMART+ ZB CLA60 60 9 W E27",
+  "name": "SMART+ ZB CLA60 60 9W E27",
   "standby_power": 0.31,
   "authors": [
     {
