@@ -6,6 +6,10 @@
   "calculation_strategy": "lut",
   "created_at": "2023-03-12T09:45:12Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "linked_profile": "signify/LTA001",
   "measure_device": "See linked profile",
   "measure_method": "script",

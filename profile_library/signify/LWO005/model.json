@@ -7,7 +7,7 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "bulb",
+    "form_factor": "filament",
     "rated_power": 7.2
   },
   "measure_description": "Measured with utils/measure script",

@@ -8,6 +8,9 @@
   "calculation_strategy": "lut",
   "created_at": "2023-03-19T08:54:20Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "spot"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

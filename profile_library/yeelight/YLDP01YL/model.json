@@ -6,6 +6,8 @@
   "created_at": "2021-08-31T08:42:26Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "E27",
+    "form_factor": "bulb",
     "lumens": 600,
     "rated_power": 8.0
   },

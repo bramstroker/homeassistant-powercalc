@@ -5,6 +5,10 @@
   "calculation_strategy": "lut",
   "created_at": "2023-09-02T09:08:23Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "linked_profile": "signify/LLC012",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

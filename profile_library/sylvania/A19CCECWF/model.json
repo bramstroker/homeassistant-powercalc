@@ -6,8 +6,10 @@
   "created_at": "2024-02-19T18:25:11Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "E26",
     "form_factor": "bulb",
-    "rated_power": 8.5
+    "rated_power": 8.5,
+    "lumens": 800
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug US",

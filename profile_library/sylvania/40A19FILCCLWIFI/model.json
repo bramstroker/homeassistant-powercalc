@@ -5,6 +5,12 @@
   "calculation_strategy": "lut",
   "created_at": "2024-02-19T18:25:47Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "E26",
+    "form_factor": "filament",
+    "rated_power": 7.0,
+    "lumens": 500
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug US",
   "measure_method": "script",

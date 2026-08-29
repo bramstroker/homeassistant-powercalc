@@ -7,7 +7,8 @@
   "created_at": "2023-02-14T18:42:39Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "socket": "integrated"
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
