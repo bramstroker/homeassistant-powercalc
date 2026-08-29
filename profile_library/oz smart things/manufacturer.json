@@ -1,4 +1,7 @@
 {
   "name": "Oz Smart Things",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.ozsmartthings.com.au",
+  "country": "AU",
+  "description": "Australian home-automation retailer and supplier of Zigbee and Z-Wave devices."
 }

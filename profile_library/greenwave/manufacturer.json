@@ -2,5 +2,7 @@
   "name": "GreenWave",
   "aliases": [
     "GreenWave Reality Inc."
-  ]
+  ],
+  "country": "US",
+  "description": "American smart-energy company behind PowerNode connected plugs and home energy-management systems."
 }

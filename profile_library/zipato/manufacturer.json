@@ -1,4 +1,7 @@
 {
   "name": "Zipato",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.zipato.com",
+  "country": "HR",
+  "description": "Croatian smart-home brand offering controllers and devices using Z-Wave, Zigbee and other protocols."
 }

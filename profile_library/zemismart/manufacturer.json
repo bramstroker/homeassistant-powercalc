@@ -1,4 +1,7 @@
 {
   "name": "Zemismart",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.zemismart.com",
+  "country": "CN",
+  "description": "Chinese smart-home manufacturer specializing in connected lighting, sensors, switches and motorized shades."
 }

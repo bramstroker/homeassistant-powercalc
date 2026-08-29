@@ -1,4 +1,7 @@
 {
   "name": "Telefunken",
-  "aliases": []
+  "aliases": [],
+  "website": "https://telefunken.com",
+  "country": "DE",
+  "description": "German electronics brand licensed across consumer products, including televisions and lighting."
 }

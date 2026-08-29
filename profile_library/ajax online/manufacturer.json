@@ -1,4 +1,7 @@
 {
   "name": "Ajax Online",
-  "aliases": []
+  "aliases": [],
+  "website": "https://zignito.com",
+  "country": "GB",
+  "description": "British home-automation supplier offering Zigbee and Wi-Fi lighting, plugs and controls."
 }

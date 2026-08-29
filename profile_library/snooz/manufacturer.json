@@ -1,4 +1,7 @@
 {
   "name": "SNOOZ",
-  "aliases": []
+  "aliases": [],
+  "website": "https://getsnooz.com",
+  "country": "US",
+  "description": "Sleep-technology company known for app-controlled white-noise machines."
 }

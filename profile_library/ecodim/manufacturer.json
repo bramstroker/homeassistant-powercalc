@@ -1,4 +1,7 @@
 {
   "name": "Ecodim",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.ecodim.nl",
+  "country": "NL",
+  "description": "Dutch manufacturer of LED dimmers and connected lighting controls."
 }

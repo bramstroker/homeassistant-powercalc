@@ -2,5 +2,8 @@
   "name": "Tripp Lite",
   "aliases": [
     "Tripplite"
-  ]
+  ],
+  "website": "https://tripplite.eaton.com",
+  "country": "US",
+  "description": "American Eaton brand producing power protection, connectivity and infrastructure equipment."
 }

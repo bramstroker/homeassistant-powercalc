@@ -1,4 +1,7 @@
 {
   "name": "Kauf",
-  "aliases": []
+  "aliases": [],
+  "website": "https://kaufha.com",
+  "country": "US",
+  "description": "American home-automation brand offering locally controlled ESPHome-native bulbs and plugs."
 }

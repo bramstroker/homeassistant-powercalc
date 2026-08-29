@@ -1,4 +1,7 @@
 {
   "name": "Intelbras",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.intelbras.com",
+  "country": "BR",
+  "description": "Brazilian technology manufacturer producing security, networking, communication and smart-home devices."
 }

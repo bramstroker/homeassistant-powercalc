@@ -1,4 +1,7 @@
 {
   "name": "NETGEAR",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.netgear.com",
+  "country": "US",
+  "description": "American networking company producing routers, switches, access points and connected-home equipment."
 }
