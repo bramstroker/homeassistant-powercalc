@@ -4,7 +4,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 1200,
+    "rated_power": 12.5
   },
   "ean": [
     "840696101724"
