@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.1.3:docker"
   },
-  "name": "Zigbee Downlight",
+  "name": "RGBW Zigbee Downlight 10W",
   "standby_power": 0.72,
   "authors": [
     {
