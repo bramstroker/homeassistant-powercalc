@@ -1,6 +1,6 @@
 {
   "discovery_by": "manual",
-  "name": "Netgear GS110MX",
+  "name": "8-Port Gigabit Unmanaged Switch with 10G/Multi-Gig Uplinks",
   "measure_device": "Athom ESPHome Wifi plug",
   "measure_method": "manual",
   "device_type": "network",

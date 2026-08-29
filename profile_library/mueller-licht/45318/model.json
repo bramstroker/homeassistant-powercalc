@@ -13,7 +13,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.20.3:docker"
   },
-  "name": "GU10 Spot white+color",
+  "name": "tint White+Color LED Spot (GU10)",
   "standby_power": 0.15,
   "authors": [
     {

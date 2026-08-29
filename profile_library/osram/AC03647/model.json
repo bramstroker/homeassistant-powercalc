@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "CLA60 RGBW Z3"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-01-04T05:18:43Z",
   "device_type": "light",
@@ -10,7 +13,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.1:docker"
   },
-  "name": "SMART+ LED Classic E27 RGBW",
+  "name": "SMART+ Classic E27 RGBW",
   "standby_power": 0.35,
   "authors": [
     {

@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "Classic A60 RGBW"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2023-09-05T19:14:04Z",
   "device_type": "light",
@@ -10,6 +13,9 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.2:docker"
   },
+  "legacy_ids": [
+    "Classic A60 RGBW"
+  ],
   "name": "LIGHTIFY Classic A60 RGBW",
   "standby_power": 0.6,
   "authors": [

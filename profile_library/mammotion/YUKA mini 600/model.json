@@ -1,7 +1,4 @@
 {
-  "aliases": [
-    "YUKA mini 600 (YUKA mini 600)"
-  ],
   "calculation_strategy": "composite",
   "composite_config": [
     {
@@ -120,7 +117,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "YUKA mini 600",
+  "name": "Robot Lawn Mower",
   "standby_power": 2.15,
   "authors": [
     {

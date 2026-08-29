@@ -8,7 +8,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Brennenstuhl PM 231 E",
   "measure_method": "manual",
-  "name": "Smart Zigbee Power Metering Plug / Socket",
+  "name": "Smart Zigbee Socket with Power Meter",
   "only_self_usage": true,
   "standby_power": 0.1,
   "standby_power_on": 0.4,
