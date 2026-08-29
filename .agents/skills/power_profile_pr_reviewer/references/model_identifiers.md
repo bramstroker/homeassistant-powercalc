@@ -553,6 +553,10 @@ Prefer the exact product model `SLZC3705-A` for the Rye 5W 450 lm E12 RGBCCT can
 
 Prefer exact Sengled model codes documented in the manufacturer manual and reported over Zigbee, such as `E11-G13` and `E13-N11`. Do not add retail suffixes such as `W` or `WA` unless the measured label or exact Home Assistant Device Info establishes them. Zigbee2MQTT may map several raw Zigbee models to one slash-separated display model; for the Element Extra Bright A19 family, preserve `E11-N13/E11-N13A/E11-N14/E11-N14A` as the grouped discovery value and also include all four individual raw values as aliases for integrations such as ZHA. Do not choose one member as canonical for an existing grouped measurement unless the measured product label identifies it. Keep profile names descriptive and omit the canonical model and protocol; verify color temperature against the exact manual because `E11-G13` is a 2700K soft-white bulb, not a 5000K daylight bulb.
 
+## Shelly
+
+Use the exact Shelly hardware model returned as `model` by `Shelly.GetDeviceInfo` for Gen2+ devices, or as `type` by the Gen1 `/shelly` endpoint, as the canonical profile ID. Keep human-readable product strings such as `Shelly Plus Plug S` as discovery aliases only when Home Assistant reports them, and never include the MAC-suffixed device ID. A documented revision may share calibration data when the manufacturer confirms that its changes are mechanical only. Treat a regional electrical variant as separate unless measurements of that variant or manufacturer evidence establish equivalent self-consumption; a shared product name or contributor expectation is insufficient, particularly when the nominal mains voltage differs. A linked profile is acceptable when an actual comparison measurement supports the equivalence, even if that comparison is less precise than the canonical measurement.
+
 ## WiZ
 
 Apply these rules when reviewing or normalizing WiZ and WiZ-powered Philips Smart LED profiles:
@@ -590,6 +594,11 @@ When the printed article number, S-code, product name, or generation cannot be r
 - [IKEA's LED2101G4 declaration](https://www.ikea.com/no/en/dec_of_conformity/tradfri-led-bulb-e14-470-lumen-smart-wireless-dimmable-white-spectrum-globe__AA-2378889-1-1.pdf) confirms the official type designation independently of the product description.
 - [Zigbee2MQTT's IKEA device definition](https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/src/devices/ikea.ts) records exact Zigbee descriptions separately from its normalized model values, including the combined TRADFRI driver identifier.
 - [Shelly device information API](https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Shelly/) documents `Shelly.GetDeviceInfo.model`.
+- [Shelly Gen1 API documentation](https://shelly-api-docs.shelly.cloud/gen1/) documents the `/shelly` device-information response and its `type` model identifier.
+- [Shelly Plus Plug S V2 documentation](https://www.shelly.com/blogs/documentation/shelly-plus-plug-s-v2) identifies `SNPL-10112EU` and describes its changes from the earlier model as mechanical.
+- [Shelly Plus 2PM UL documentation](https://us.shelly.com/blogs/documentation/shelly-plus-2pm-ul) identifies the distinct 120V `SNSW-002P15UL` model.
+- [The original Shelly Plus 2PM profile PR](https://github.com/bramstroker/homeassistant-powercalc/pull/3861) records measurements from EU model `SNSW-102P16EU` and adds the UL model based on an unverified expectation of equal self-consumption.
+- [The Shelly Plus Plug US comparison PR](https://github.com/bramstroker/homeassistant-powercalc/pull/3356) records an approximate measurement comparison before the US model was linked to the EU profile.
 - [TP-Link model-number guidance](https://www.tp-link.com/ae/support/faq/2053/) shows where the product model is printed and exposed in its apps.
 - [Aqara's security and compliance tables](https://www.aqara.com/en/security-certifications/) map official product names to exact model codes and regional variants.
 - [Aqara's supported-device list](https://opendoc.aqara.com/en/docs/SDKDevelopment/IOSDevelopmentGuide/Equipmentcontrol/DeviceControlSDKSupportedDeviceList.html) maps product variants to their `lumi.*` and Matter discovery identifiers.
