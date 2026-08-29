@@ -57,6 +57,8 @@
               "returning_to_wash",
               "returning_auto_empty",
               "paused"
+              "idle",
+              "error"
             ]
           },
           {
@@ -66,7 +68,7 @@
         ]
       },
       "fixed": {
-        "power": 1.8
+        "power": 0.234
       }
     },
     {
