@@ -6,6 +6,7 @@
   "created_at": "2022-05-29T15:18:24Z",
   "device_type": "light",
   "device_specs": {
+    "form_factor": "bulb",
     "socket": "E26"
   },
   "linked_profile": "signify/LWA001",

@@ -6,6 +6,12 @@
   "calculation_strategy": "lut",
   "created_at": "2022-10-29T18:30:36Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "integrated",
+    "form_factor": "fixture",
+    "lumens": 2450,
+    "rated_power": 19.2
+  },
   "measure_description": "Measured with utils/measure script using 1 light and a 40W incandescent bulb as a dummy load, which was allowed to heat up for 1 hour before measuring",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

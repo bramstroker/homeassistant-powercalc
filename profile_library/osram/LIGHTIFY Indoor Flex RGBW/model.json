@@ -4,6 +4,9 @@
     "Flex RGBW",
     "LIGHTIFY Flex RGBW"
   ],
+  "ean": [
+    "4052899926110"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2021-08-29T21:45:54Z",
   "device_type": "light",

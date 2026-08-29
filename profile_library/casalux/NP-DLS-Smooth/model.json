@@ -3,6 +3,8 @@
   "created_at": "2024-10-21T22:17:19Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "integrated",
+    "form_factor": "fixture",
     "lumens": 600,
     "rated_power": 12.0
   },

@@ -4,6 +4,7 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "form_factor": "spot",
     "lumens": 806,
     "rated_power": 9.5
   },

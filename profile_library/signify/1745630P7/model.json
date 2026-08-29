@@ -5,6 +5,12 @@
   "calculation_strategy": "lut",
   "created_at": "2023-11-21T13:39:09Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "integrated",
+    "form_factor": "fixture",
+    "lumens": 1020,
+    "rated_power": 13.5
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

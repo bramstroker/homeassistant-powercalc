@@ -3,6 +3,9 @@
     "8718699671211",
     "9290020399"
   ],
+  "ean": [
+    "8718699671211"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-04-11T11:04:39Z",
   "device_type": "light",

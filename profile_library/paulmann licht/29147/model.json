@@ -3,6 +3,7 @@
   "created_at": "2024-09-25T00:00:00Z",
   "device_type": "light",
   "device_specs": {
+    "form_factor": "spot",
     "socket": "GU10",
     "lumens": 350,
     "rated_power": 4.8

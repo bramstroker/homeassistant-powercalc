@@ -3,6 +3,9 @@
     "046677551780",
     "9290022413"
   ],
+  "ean": [
+    "046677551780"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-05-29T15:18:24Z",
   "device_type": "light",

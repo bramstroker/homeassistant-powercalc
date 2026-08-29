@@ -6,6 +6,7 @@
   "created_at": "2024-09-22T00:00:00Z",
   "device_type": "light",
   "device_specs": {
+    "form_factor": "bulb",
     "socket": "E14",
     "lumens": 470,
     "rated_power": 5.0

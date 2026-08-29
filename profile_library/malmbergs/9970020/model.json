@@ -2,6 +2,12 @@
   "calculation_strategy": "lut",
   "created_at": "2022-08-02T08:35:28Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "integrated",
+    "form_factor": "panel",
+    "lumens": 3720,
+    "rated_power": 36
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",

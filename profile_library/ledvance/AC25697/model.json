@@ -3,6 +3,7 @@
   "created_at": "2022-11-10T19:42:22Z",
   "device_type": "light",
   "device_specs": {
+    "form_factor": "bulb",
     "socket": "E27",
     "rated_power": 9.0
   },

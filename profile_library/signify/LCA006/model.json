@@ -8,6 +8,7 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "form_factor": "bulb",
     "lumens": 1100
   },
   "measure_description": "Used script in utils/measure from repository with SAMPLE_COUNT=10",

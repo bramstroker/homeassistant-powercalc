@@ -34,16 +34,19 @@ SOCKET_PATTERN = re.compile(r"\b(E27|E26|E14|E12|B22|GU10|GU5\.3|GU24|GX53|G9|G4
 # Ordered by how specific each word is: "GU10 Spotlight Bulb" is a spot, and "Filament Globe
 # Bulb" is a filament. The last entry only wins when nothing above it matched.
 FORM_FACTOR_PATTERNS: list[tuple[re.Pattern[str], str]] = [
-    (re.compile(r"\bdownlight\b", re.IGNORECASE), "downlight"),
+    (
+        re.compile(r"\b(?:downlight|smart retrofit|recessed can light|RT5/6)\b", re.IGNORECASE),
+        "downlight",
+    ),
     (
         re.compile(r"\b(?:light ?strip|led ?strip|striplight|neon rope|rope light|led band|flex)\b", re.IGNORECASE),
         "strip",
     ),
     (re.compile(r"\bstrip\b", re.IGNORECASE), "strip"),
-    (re.compile(r"\bpanels?\b", re.IGNORECASE), "panel"),
+    (re.compile(r"\b(?:panels?|planon)\b", re.IGNORECASE), "panel"),
     (re.compile(r"\btube\b", re.IGNORECASE), "tube"),
-    (re.compile(r"\bcandle\b", re.IGNORECASE), "candle"),
-    (re.compile(r"\bspot(?:light)?\b", re.IGNORECASE), "spot"),
+    (re.compile(r"\b(?:candle|B38|B40)\b", re.IGNORECASE), "candle"),
+    (re.compile(r"\b(?:spot(?:light)?|BR30|PAR38|reflector)\b", re.IGNORECASE), "spot"),
     (re.compile(r"\bfilament\b", re.IGNORECASE), "filament"),
     (
         # A luminaire, named after where it hangs rather than what goes in it.
@@ -57,7 +60,11 @@ FORM_FACTOR_PATTERNS: list[tuple[re.Pattern[str], str]] = [
         ),
         "fixture",
     ),
-    (re.compile(r"\bbulb\b", re.IGNORECASE), "bulb"),
+    (
+        re.compile(r"\b(?:bulb|pear|drop|A19|A21|A60|A67|A80|CLA60)\b", re.IGNORECASE),
+        "bulb",
+    ),
+    (re.compile(r"\bG(?:45|60|80|95|125)\b", re.IGNORECASE), "globe"),
 ]
 
 # Shapes that hold their light source rather than take a lamp. A downlight or a tube is left

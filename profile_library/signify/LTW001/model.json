@@ -2,9 +2,15 @@
   "aliases": [
     "8718696548738"
   ],
+  "ean": [
+    "8718696548738"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2021-06-11T22:01:53Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "bulb"
+  },
   "measure_description": "Used script utils/measure_shelly.py from repository. Standby power is guessed",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

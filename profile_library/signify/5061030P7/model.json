@@ -2,10 +2,17 @@
   "aliases": [
     "5061030P7_01"
   ],
+  "ean": [
+    "8718696175989"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2024-12-20T00:55:44Z",
   "device_type": "light",
   "device_specs": {
+    "socket": [
+      "GU10",
+      "integrated"
+    ],
     "form_factor": "spot"
   },
   "measure_description": "Measured with utils/measure script",

@@ -5,6 +5,12 @@
   "calculation_strategy": "lut",
   "created_at": "2025-12-12T09:58:46Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "integrated",
+    "form_factor": "fixture",
+    "lumens": 4300,
+    "rated_power": 33.5
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Gen4",
   "measure_method": "script",
