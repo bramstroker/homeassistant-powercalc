@@ -664,6 +664,10 @@ Use the exact model returned by the device, such as `LS120`, as the canonical pr
 
 Prefer a printed model or article number when official documentation uniquely identifies the measured product. If an older released profile uses a descriptive slug and neither the product page nor the firmware reference provides a reliable product model, retain that identifier until label evidence is available; do not replace it with an ecommerce-internal numeric SKU. ESPHome node and entity names are user-configurable and therefore are not discovery aliases. When the measurement used replacement firmware and the source documents different power behavior from stock firmware, identify that scope in the display name, for example `Moon Lamp (ESPHome)`.
 
+## Zengge
+
+Magic Home and `flux_led` values such as `Bulb RGBCW (0x35)` describe a protocol/controller class and can be shared by different physical products. Prefer the exact hardware model shown for the measured device in Home Assistant Device Info, retain the complete protocol descriptor as a discovery alias, and preserve a replaced released directory in `legacy_ids`. Do not infer a hardware model from another device with the same protocol type or use an Amazon ASIN as the manufacturer model. Use a concise product description for `name` without repeating either identifier.
+
 ## WiZ
 
 Apply these rules when reviewing or normalizing WiZ and WiZ-powered Philips Smart LED profiles:
@@ -874,6 +878,8 @@ When the printed article number, S-code, product name, or generation cannot be r
 - [The Rye SLZC3705-A Tasmota template](https://templates.blakadder.com/rye_SLZC3705-A.html) identifies the 5W 450 lm E12 RGBCCT candle bulb and records exact template name `RYE Candlebra` with a manufacturer FCC declaration covering the hardware family.
 - [The original Rye profile PR](https://github.com/bramstroker/homeassistant-powercalc/pull/1068) records the Tasmota-flashed measurement setup, the repeated low-brightness investigation and released manual model value `Candlebra`.
 - [Tasmota's Home Assistant documentation](https://tasmota.github.io/docs/Home-Assistant/) explains that the template name becomes the module name reflected in Home Assistant and that the integration identifies the firmware manufacturer as Tasmota.
+- [The original Zengge profile PR](https://github.com/bramstroker/homeassistant-powercalc/pull/1760) records Home Assistant model `Bulb RGBCW (0x35)` and hardware model `AK001-ZJ2104`; [the follow-up PR](https://github.com/bramstroker/homeassistant-powercalc/pull/1762) confirms that the complete parenthesized value is required for discovery.
+- [`flux_led`'s supported-model table](https://github.com/lightinglibs/flux_led) identifies type `0x35` as the generic `Bulb RGBCW` protocol class rather than a unique physical product model.
 - [Sengled's Smart LED Starter Kits guide](https://www.sengled.com.au/wp-content/uploads/2017/11/Sengled-Smart-LED-Starter-Kits-User-Guide.pdf) identifies `E11-G13` as a 2700K soft-white A19 bulb rated at 9W and 800 lm.
 - [Sengled's motion-sensor bulb guide](https://www.sengled.com.au/wp-content/uploads/2018/06/Sengled-Smart-LED-with-Motion-Sensor-User-Guide.pdf) identifies model `E13-N11` as the Smart LED with Motion Sensor PAR38 Bulb.
 - [The Zigbee2MQTT Sengled converter](https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/src/devices/sengled.ts) maps raw models `E11-N13`, `E11-N13A`, `E11-N14`, and `E11-N14A` to the grouped Element Extra Bright display model.

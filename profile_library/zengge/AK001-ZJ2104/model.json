@@ -13,7 +13,13 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.8.1:docker"
   },
-  "name": "Bulb RGBCW",
+  "name": "Wi-Fi RGB+CCT LED Bulb",
+  "aliases": [
+    "Bulb RGBCW (0x35)"
+  ],
+  "legacy_ids": [
+    "Bulb RGBCW (0x35)"
+  ],
   "standby_power": 0.56,
   "authors": [
     {
