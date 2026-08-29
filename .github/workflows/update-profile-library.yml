@@ -72,6 +72,7 @@ jobs:
             --header 'Content-Type: application/json' \
             --data '{
           	"files": [
-          		"https://api.powercalc.nl/library"
+          		"https://api.powercalc.nl/library",
+          		"https://api.powercalc.nl/library/full"
           	]
           }'

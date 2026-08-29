@@ -149,6 +149,133 @@ def test_process_author_update_migrates_legacy_author_info(tmp_path: Path, monke
     assert json.loads(model_path.read_text()) == {"authors": [{"name": "Test User", "github": "test-user"}]}
 
 
+def test_process_model_file_adds_the_power_range_of_the_lut(tmp_path: Path) -> None:
+    model_directory = create_model_directory(tmp_path)
+    write_brightness_lut(model_directory / "brightness.csv.gz", rough=False)
+
+    model = asyncio.run(process_model_file(str(model_directory / "model.json")))
+
+    assert model["power_range"] == {"min": 1.0, "max": 20.0}
+    assert model["max_power"] == 20.0
+
+
+def test_process_model_file_spans_the_power_range_over_sub_profiles(tmp_path: Path) -> None:
+    model_directory = create_model_directory(tmp_path, calculation_strategy="fixed")
+    (model_directory / "model.json").write_text(
+        json.dumps({"name": "Hue Play", "calculation_strategy": "fixed", "fixed_config": {"power": 5}}),
+    )
+    for name, power in (("low", 2), ("high", 9)):
+        sub_profile = model_directory / name
+        sub_profile.mkdir()
+        (sub_profile / "model.json").write_text(json.dumps({"fixed_config": {"power": power}}))
+
+    model = asyncio.run(process_model_file(str(model_directory / "model.json")))
+
+    assert model["power_range"] == {"min": 2, "max": 9}
+
+
+def test_process_model_file_takes_the_power_range_from_linear_calibration(tmp_path: Path) -> None:
+    model_directory = create_model_directory(tmp_path, calculation_strategy="linear")
+    (model_directory / "model.json").write_text(
+        json.dumps(
+            {
+                "name": "Dimmer",
+                "calculation_strategy": "linear",
+                "linear_config": {"calibrate": ["1 -> 1.214", "128 -> 1.484", "255 -> 1.659"]},
+            },
+        ),
+    )
+
+    model = asyncio.run(process_model_file(str(model_directory / "model.json")))
+
+    assert model["power_range"] == {"min": 1.214, "max": 1.659}
+
+
+def test_process_model_file_omits_the_power_range_when_the_low_end_is_unknown(tmp_path: Path) -> None:
+    """A linear profile without calibration points only knows its maximum."""
+    model_directory = create_model_directory(tmp_path, calculation_strategy="linear")
+    (model_directory / "model.json").write_text(
+        json.dumps({"name": "Dimmer", "calculation_strategy": "linear", "linear_config": {"max_power": 0.4}}),
+    )
+
+    model = asyncio.run(process_model_file(str(model_directory / "model.json")))
+
+    assert "power_range" not in model
+    assert model["max_power"] == 0.4
+
+
+def test_library_json_hash_ignores_the_generated_measurement_metadata(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regenerating these must not send every install off to re-download every profile."""
+    monkeypatch.setattr(update_library, "DATA_DIR", str(tmp_path))
+    (tmp_path / "signify").mkdir()
+    (tmp_path / "signify" / "manufacturer.json").write_text(json.dumps({"name": "Signify", "aliases": []}))
+
+    model: dict[str, Any] = {
+        "id": "LCT012",
+        "manufacturer": "signify",
+        "name": "Hue White and Color Ambiance",
+        "device_type": "light",
+        "power_range": {"min": 0.72, "max": 8.5},
+        "measurement_updated_at": "2024-05-03T09:11:32",
+    }
+    asyncio.run(generate_library_json([model]))
+    first = json.loads((tmp_path / "library.json").read_text())["manufacturers"][0]["models"][0]
+
+    asyncio.run(
+        generate_library_json(
+            [{**model, "power_range": {"min": 0.8, "max": 9.0}, "measurement_updated_at": "2026-08-29T07:23:00"}],
+        ),
+    )
+    second = json.loads((tmp_path / "library.json").read_text())["manufacturers"][0]["models"][0]
+
+    assert first["power_range"] != second["power_range"]
+    assert first["hash"] == second["hash"]
+
+
+def test_generate_library_json_carries_manufacturer_brand_details(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(update_library, "DATA_DIR", str(tmp_path))
+    (tmp_path / "signify").mkdir()
+    (tmp_path / "signify" / "manufacturer.json").write_text(
+        json.dumps(
+            {
+                "name": "Signify",
+                "aliases": ["Philips"],
+                "website": "https://www.signify.com",
+                "country": "NL",
+                "description": "Dutch lighting manufacturer, formerly Philips Lighting.",
+            },
+        ),
+    )
+
+    asyncio.run(generate_library_json([{"id": "LCT012", "manufacturer": "signify", "device_type": "light"}]))
+
+    manufacturer = json.loads((tmp_path / "library.json").read_text())["manufacturers"][0]
+    assert manufacturer["website"] == "https://www.signify.com"
+    assert manufacturer["country"] == "NL"
+    assert manufacturer["description"].startswith("Dutch lighting")
+
+
+def test_generate_library_json_leaves_out_brand_details_a_manufacturer_does_not_have(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(update_library, "DATA_DIR", str(tmp_path))
+    (tmp_path / "govee").mkdir()
+    (tmp_path / "govee" / "manufacturer.json").write_text(json.dumps({"name": "Govee"}))
+
+    asyncio.run(generate_library_json([{"id": "H61F5", "manufacturer": "govee", "device_type": "light"}]))
+
+    manufacturer = json.loads((tmp_path / "library.json").read_text())["manufacturers"][0]
+    assert "website" not in manufacturer
+    assert "country" not in manufacturer
+
+
 def generate_library(data_dir: Path, lut_quality: dict[str, float]) -> dict[str, Any]:
     """Run the library.json generation for a single model and return its entry."""
     model = {

@@ -7,7 +7,7 @@
   "measure_device": "Nous A1",
   "measure_device_firmware": "TASMOTA 9.5.0",
   "measure_method": "script",
-  "measure_setting": {
+  "measure_settings": {
     "SAMPLE_COUNT": 10,
     "SLEEP_TIME": 2,
     "SLEEP_TIME_CT": 10,

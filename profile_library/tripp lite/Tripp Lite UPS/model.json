@@ -12,7 +12,6 @@
   "created_at": "2026-03-20T00:00:00Z",
   "measure_method": "manual",
   "measure_device": "N/A",
-  "documentation_url": "https://docs.powercalc.nl/cookbook/ups/",
   "config_flow_discovery_remarks": "Before setting up, enable the **Nominal Power** entity on your NUT device (Settings → Devices → your UPS → disabled entities). This profile needs it to calculate power output.",
   "fields": {
     "power_factor": {

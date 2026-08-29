@@ -7,7 +7,15 @@ The library follows a multi-level tree structure:
 - **Second level**: Model ID
 - **Optional**: Sub-profiles for specific device behaviors
 
-Each **manufacturer directory** must include a `manufacturer.json` file. This file should contain the manufacturer's name and optionally a list of aliases.
+Each **manufacturer directory** must include a `manufacturer.json` file:
+
+| Field         | Type             | Required | Description                                                                          |
+|---------------|------------------|----------|--------------------------------------------------------------------------------------|
+| `name`        | string           | Yes | The full vendor/brand name                                                                |
+| `aliases`     | array of strings | No | Other names the same brand ships under, used for discovery                                 |
+| `website`     | string           | No | Home page of the brand, linked from its page on the library website                        |
+| `country`     | string           | No | Country the brand is based in, as an ISO 3166-1 alpha-2 code such as `NL`                  |
+| `description` | string           | No | A sentence or two about the brand, shown on its page on the library website                |
 
 Each **device profile** resides in its own subdirectory:
 `{manufacturer}/{modelid}` (e.g., `signify/LCT010`)
@@ -37,23 +45,54 @@ Below is a comprehensive table of all fields that can be used in a `model.json` 
 | `composite_config`                | object/array     | No | Configuration for [composite](../strategies/composite.md) calculation strategy                                                          |
 | `config_flow_discovery_remarks`   | string           | No | Remarks to show in the GUI config flow on first step of discovery                                                                       |
 | `config_flow_sub_profile_remarks` | string           | No | Remarks to show in the GUI config flow on sub profile selection step                                                                    |
+| `connectivity`                    | array of strings | No | Protocols the device talks: `zigbee`, `wifi`, `zwave`, `matter`, `thread`, `bluetooth`, `ethernet`, `rf433`, `infrared`, `proprietary`   |
 | `description`                     | string           | No | A short description of the device                                                                                                       |
+| `device_specs`                    | object           | No | Physical attributes of the device, as printed on the box. Which keys are allowed depends on `device_type`, see [Device specs](#device-specs) |
 | `discovery_by`                    | string           | No | Whether to discover the profile by config entry, device, or entity                                                                       |
+| `ean`                             | array of strings | No | Barcode numbers on the packaging (EAN-8, UPC-12, EAN-13 or GTIN-14). A model often ships under several, one per region                  |
 | `fields`                          | array of objects | No | Custom fields for the profile, more about it explained in [Variables](variables.md)                                                     |
 | `fixed_config`                    | object           | No | Configuration for [fixed](../strategies/fixed.md) calculation strategy                                                                  |
 | `is_dumb_bulb`                    | boolean          | No | Indicates if the profile is for a dumb light bulb without smart capabilities                                                            |
 | `linear_config`                   | object           | No | Configuration for [linear](../strategies/linear.md) calculation strategy                                                                |
 | `linked_profile`                  | string           | No | Use data from another model                                                                                                             |
+| `mains_voltage`                   | number           | No | Nominal mains voltage the measurements were taken on, e.g. `230` or `120`                                                                |
 | `measure_description`             | string           | No | Additional information about how the device was measured                                                                                |
 | `measure_device_firmware`         | string           | No | Firmware version of the device used to measure                                                                                          |
 | `measure_settings`                | object           | No | Settings used for measure script, for future reference                                                                                  |
 | `min_version`                     | boolean          | No | Minimum required Powercalc version for the profile                                                                                      |
+| `multi_switch_config`             | object           | No | Configuration for [multi switch](../strategies/multi-switch.md) calculation strategy                                                    |
 | `only_self_usage`                 | boolean          | No | Set for devices with a built-in power meter, which already measure the connected appliance themselves. The profile then only provides the self usage of the device, and its sensors are named `{} Device Power` / `{} Device Energy` |
 | `playbook_config`                 | object           | No | Configuration for [playbook](../strategies/playbook.md) calculation strategy                                                            |
+| `product_url`                     | string           | No | Manufacturer product page for this model                                                                                                |
 | `sensor_config`                   | object           | No | Sensor configuration options. See [Sensor configuration](../configuration/sensor-configuration.md). Naming options (`power_sensor_naming`, `energy_sensor_naming` and their `_friendly_` variants) are not allowed, naming is a user preference |
 | `standby_power`                   | number           | No | Power draw when the device is turned off                                                                                                |
+| `standby_power_estimated`         | boolean          | No | Set when `standby_power` holds an assumed value you could not measure, so the library website does not present a guess as a measurement |
 | `standby_power_on`                | number           | No | Power draw when the device is turned on                                                                                                 |
 | `sub_profile_select`              | object           | No | Configuration to automatically select a sub profile, see [sub profiles](sub-profiles.md)                                                |
+
+#### Device specs
+
+`device_specs` holds what the box says about the device, as opposed to what the measurements say.
+Which keys are allowed depends on `device_type`; only lights are described so far.
+
+```json
+"device_specs": {
+  "socket": "E27",
+  "form_factor": "bulb",
+  "lumens": 806,
+  "rated_power": 9.5
+}
+```
+
+| Key           | Type   | Description                                                                                                    |
+|---------------|--------|----------------------------------------------------------------------------------------------------------------|
+| `socket`      | string | Lamp base: `E27`, `E26`, `E14`, `E12`, `B22`, `GU10`, `GU5.3`, `GU24`, `GX53`, `G9`, `G4`, or `integrated` when the light source cannot be replaced |
+| `form_factor` | string | `bulb`, `spot`, `candle`, `globe`, `filament`, `strip`, `panel`, `downlight`, `tube`, `fixture` or `other`      |
+| `lumens`      | number | Nominal luminous flux at full brightness                                                                        |
+| `rated_power` | number | Power draw claimed by the manufacturer, in watts. The library website shows it next to the measured maximum     |
+
+Leave a key out rather than guessing. These are manufacturer claims, and the website presents
+them as such.
 
 #### Calculation Strategy Specific Fields
 

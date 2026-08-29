@@ -1,0 +1,49 @@
+name: Validate profile library
+
+# The pull request validation only sees the files a PR touched. This one holds the whole library
+# to the schemas, so a rule tightened today is enforced on every profile written before it.
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'profile_library/**'
+      - 'utils/library/validate_model_json.py'
+      - '.github/workflows/validate-profile-library.yml'
+  pull_request:
+    paths:
+      - 'profile_library/model_schema.json'
+      - 'profile_library/manufacturer_schema.json'
+      - 'utils/library/validate_model_json.py'
+      - '.github/workflows/validate-profile-library.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  validate_profile_library:
+    name: Validate whole profile library
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: '0.12.6'
+          enable-cache: true
+          cache-dependency-glob: |
+            pyproject.toml
+            uv.lock
+      - name: Validate every model.json and manufacturer.json against its schema
+        run: >-
+          uv run --locked --only-group library --no-build
+          python -m utils.library.validate_model_json
