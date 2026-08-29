@@ -1,4 +1,7 @@
 {
   "name": "SmartHomeShop",
-  "aliases": []
+  "aliases": [],
+  "website": "https://smarthomeshop.io",
+  "country": "NL",
+  "description": "Dutch maker of locally controlled, open-source hardware designed for Home Assistant."
 }

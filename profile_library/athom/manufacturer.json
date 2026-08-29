@@ -3,5 +3,8 @@
   "aliases": [
     "Athom_Technology",
     "China Athom Technology"
-  ]
+  ],
+  "website": "https://www.athom.tech",
+  "country": "CN",
+  "description": "Chinese smart-home manufacturer offering devices preflashed with open-source firmware such as ESPHome and Tasmota."
 }

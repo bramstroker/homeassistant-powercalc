@@ -2,5 +2,8 @@
   "name": "HP",
   "aliases": [
     "Hewlett-Packard"
-  ]
+  ],
+  "website": "https://www.hp.com",
+  "country": "US",
+  "description": "American technology company producing personal computers, printers and related devices."
 }

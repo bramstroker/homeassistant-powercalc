@@ -2,5 +2,8 @@
   "name": "NodOn",
   "aliases": [
     "ID-RF"
-  ]
+  ],
+  "website": "https://nodon.fr",
+  "country": "FR",
+  "description": "French manufacturer of wireless sensors and actuators for smart homes and buildings."
 }

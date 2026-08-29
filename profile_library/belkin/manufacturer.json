@@ -1,4 +1,7 @@
 {
   "name": "Belkin",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.belkin.com",
+  "country": "US",
+  "description": "American consumer-electronics brand producing connectivity accessories and smart-home devices."
 }

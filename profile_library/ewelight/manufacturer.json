@@ -1,4 +1,6 @@
 {
   "name": "eWeLight",
-  "aliases": []
+  "aliases": [],
+  "country": "CN",
+  "description": "Smart-lighting brand used on Wi-Fi lamps made by Zhongshan Julun Technology Lighting."
 }

@@ -1,4 +1,7 @@
 {
   "name": "Kogan",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.kogan.com",
+  "country": "AU",
+  "description": "Australian online retailer offering consumer electronics and Kogan-branded smart-home products."
 }

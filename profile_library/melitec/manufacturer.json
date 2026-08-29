@@ -2,5 +2,8 @@
   "name": "MeLiTec",
   "aliases": [
     "LightZone"
-  ]
+  ],
+  "website": "https://www.melitec.de",
+  "country": "DE",
+  "description": "German lighting company offering LED luminaires and smart-home lighting under MeLiTec and related labels."
 }

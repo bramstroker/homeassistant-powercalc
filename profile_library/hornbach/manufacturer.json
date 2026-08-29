@@ -2,5 +2,8 @@
   "name": "Hornbach",
   "aliases": [
     "HORNBACH Baumarkt AG"
-  ]
+  ],
+  "website": "https://www.hornbach-holding.de/en",
+  "country": "DE",
+  "description": "German home-improvement retailer whose range includes lighting and electrical products."
 }

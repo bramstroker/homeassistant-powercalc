@@ -2,5 +2,8 @@
   "name": "Treatlife",
   "aliases": [
     "Tuya"
-  ]
+  ],
+  "website": "https://www.treatlife.tech",
+  "country": "CN",
+  "description": "Chinese smart-home brand offering Wi-Fi and Zigbee switches, dimmers, plugs and lighting."
 }
