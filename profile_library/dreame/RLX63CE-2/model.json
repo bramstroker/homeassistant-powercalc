@@ -56,7 +56,7 @@
               "returning",
               "returning_to_wash",
               "returning_auto_empty",
-              "paused"
+              "paused",
               "idle",
               "error"
             ]
