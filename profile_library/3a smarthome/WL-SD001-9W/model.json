@@ -5,6 +5,10 @@
   "calculation_strategy": "lut",
   "created_at": "2023-12-06T18:41:16Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "downlight",
+    "rated_power": 9.0
+  },
   "legacy_ids": [
     "LXN60-LS27-Z30"
   ],

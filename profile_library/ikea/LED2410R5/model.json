@@ -6,6 +6,10 @@
   "calculation_strategy": "lut",
   "created_at": "2026-01-25T17:26:36Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "GU10",
+    "lumens": 470
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",

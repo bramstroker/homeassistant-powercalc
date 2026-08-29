@@ -5,6 +5,12 @@
   "calculation_strategy": "lut",
   "created_at": "2023-04-29T09:47:02Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "GU10",
+    "form_factor": "bulb",
+    "lumens": 345,
+    "rated_power": 4.7
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

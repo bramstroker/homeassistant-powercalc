@@ -5,6 +5,11 @@
   "calculation_strategy": "lut",
   "created_at": "2022-07-22T08:24:09Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "bulb",
+    "lumens": 800,
+    "rated_power": 8.8
+  },
   "measure_description": "Measured 5 bulbs with utils/measure script with no dummy load",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",

@@ -5,6 +5,11 @@
   ],
   "created_at": "2024-12-08T14:20:08Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "bulb",
+    "lumens": 800,
+    "rated_power": 7.5
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",

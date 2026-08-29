@@ -6,6 +6,10 @@
   "calculation_strategy": "lut",
   "created_at": "2025-09-10T07:24:05Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "E26",
+    "lumens": 1600
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug",
   "measure_method": "script",

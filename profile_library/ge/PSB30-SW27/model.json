@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2023-11-01T15:33:48Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "bulb"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 2 PM",
   "measure_method": "script",

@@ -5,6 +5,10 @@
   "calculation_strategy": "lut",
   "created_at": "2022-09-20T11:51:15Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "downlight",
+    "rated_power": 12.0
+  },
   "legacy_ids": [
     "LXT56-LS27LX1.7"
   ],

@@ -2,6 +2,10 @@
   "calculation_strategy": "lut",
   "created_at": "2024-08-11T14:22:26Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "strip",
+    "socket": "integrated"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

@@ -5,6 +5,10 @@
   "calculation_strategy": "lut",
   "created_at": "2025-03-17T06:13:30Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",

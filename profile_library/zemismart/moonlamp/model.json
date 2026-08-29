@@ -2,6 +2,10 @@
   "calculation_strategy": "lut",
   "created_at": "2022-11-30T17:57:54Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2023-01-19T11:04:29Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "spot"
+  },
   "linked_profile": "signify/LCG002",
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",

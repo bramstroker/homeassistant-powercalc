@@ -2,6 +2,9 @@
   "calculation_strategy": "lut",
   "created_at": "2021-11-20T19:46:07Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "bulb"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug E",
   "measure_method": "script",

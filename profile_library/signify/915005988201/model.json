@@ -6,6 +6,9 @@
   "calculation_strategy": "lut",
   "created_at": "2023-10-04T20:29:36Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "tube"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

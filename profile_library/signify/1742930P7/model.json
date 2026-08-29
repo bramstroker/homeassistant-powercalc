@@ -5,6 +5,10 @@
   "calculation_strategy": "lut",
   "created_at": "2022-06-22T07:54:58Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated"
+  },
   "measure_description": "Measured with utils/measure script using OCR",
   "measure_device": "Zhurui PR10",
   "measure_method": "script",

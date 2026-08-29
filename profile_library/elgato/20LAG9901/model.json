@@ -5,6 +5,10 @@
   "calculation_strategy": "lut",
   "created_at": "2025-03-18T18:12:40Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "integrated",
+    "form_factor": "strip"
+  },
   "legacy_ids": [
     "Elgato Light Strip Pro"
   ],
