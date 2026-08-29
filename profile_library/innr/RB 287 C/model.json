@@ -5,8 +5,13 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
-    "lumens": 1200
+    "lumens": 1210,
+    "rated_power": 10.3
   },
+  "ean": [
+    "8718781556129",
+    "8718781556136"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

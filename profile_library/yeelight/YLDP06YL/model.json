@@ -14,6 +14,9 @@
     "form_factor": "bulb",
     "rated_power": 10.0
   },
+  "ean": [
+    "0608887786309"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",

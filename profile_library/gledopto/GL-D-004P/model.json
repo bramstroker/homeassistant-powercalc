@@ -7,6 +7,9 @@
     "form_factor": "downlight",
     "rated_power": 9.0
   },
+  "ean": [
+    "4260567172046"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini",
   "measure_method": "script",

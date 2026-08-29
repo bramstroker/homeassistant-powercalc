@@ -8,8 +8,12 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "filament",
+    "lumens": 150,
     "rated_power": 4.0
   },
+  "ean": [
+    "9008606277971"
+  ],
   "measure_description": "Measured two identical bulbs simultaneously with utils/measure; values were divided per bulb",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",

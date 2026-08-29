@@ -9,6 +9,9 @@
     "socket": "integrated",
     "form_factor": "strip"
   },
+  "ean": [
+    "608887786590"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug",
   "measure_method": "script",

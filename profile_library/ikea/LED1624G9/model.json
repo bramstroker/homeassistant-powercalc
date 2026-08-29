@@ -10,7 +10,8 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
-    "lumens": 600
+    "lumens": 600,
+    "rated_power": 8.6
   },
   "measure_description": "Measured with utils/measure script, manually added values approximately corresponding with xy_color: [0.458, 0.41]",
   "measure_device": "Shelly 1PM",

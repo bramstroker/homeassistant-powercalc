@@ -4,8 +4,14 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E14",
-    "form_factor": "candle"
+    "form_factor": "candle",
+    "lumens": 520,
+    "rated_power": 4.6
   },
+  "ean": [
+    "8718781555160",
+    "8718781555177"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

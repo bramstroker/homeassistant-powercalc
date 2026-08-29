@@ -8,7 +8,8 @@
   "device_specs": {
     "socket": "E14",
     "form_factor": "bulb",
-    "lumens": 400
+    "lumens": 400,
+    "rated_power": 5
   },
   "measure_description": "Measured with script made by bramstroker and partially verified manual",
   "measure_device": "Shelly Plug S",

@@ -7,7 +7,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 600,
+    "rated_power": 9
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

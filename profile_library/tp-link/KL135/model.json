@@ -8,8 +8,12 @@
   "device_specs": {
     "form_factor": "bulb",
     "socket": "E26",
-    "lumens": 1000
+    "lumens": 1000,
+    "rated_power": 10.8
   },
+  "ean": [
+    "840030703706"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",

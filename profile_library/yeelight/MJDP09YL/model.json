@@ -9,6 +9,7 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
+    "lumens": 500,
     "rated_power": 5.0
   },
   "measure_description": "Measured with utils/measure script",

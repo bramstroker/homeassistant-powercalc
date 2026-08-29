@@ -110,7 +110,7 @@ Ensure:
 
 - `created_at` is ISO formatted
 - integration restrictions use `compatible_integrations`; do not use the obsolete root-level `integration` key, which discovery ignores
-- Put verified retail packaging barcodes (EAN-8, UPC-12, EAN-13, or GTIN-14) in the `ean` array. Do not infer that a numeric model, article, SKU, or 12NC is a barcode merely because its length or check digit is valid. Keep a barcode in `aliases` as well when an integration reports it as a model identifier and removing it would break discovery; `ean` is product metadata, not a replacement for discovery aliases.
+- Put verified retail packaging barcodes (EAN-8, UPC-12, EAN-13, or GTIN-14) in the `ean` array. Include the verified barcodes of single-device and multipack packaging when every pack contains the exact same device model, because each barcode can help users find the profile. Exclude bundles, fittings, revisions, or packs containing a different electrical model. Do not infer that a numeric model, article, SKU, or 12NC is a barcode merely because its length or check digit is valid. Keep a barcode in `aliases` as well when an integration reports it as a model identifier and removing it would break discovery; `ean` is product metadata, not a replacement for discovery aliases.
 
 ### 5. Validate Strategy-Specific Data
 
@@ -212,7 +212,7 @@ During an ongoing manufacturer-by-manufacturer consistency audit, automatically 
 - [ ] Directory uses the canonical, stable manufacturer model identifier
 - [ ] `name` is meaningful and does not merely repeat the canonical model ID or directory
 - [ ] Integration-specific discovery identifiers are aliases; friendly, resource, serial, and undocumented generic identifiers are excluded
-- [ ] Verified packaging barcodes use `ean`; discovery aliases are retained independently
+- [ ] Verified single-device and exact-model multipack barcodes use `ean`; discovery aliases are retained independently
 - [ ] Generated files not manually edited
 - [ ] `manufacturer.json` present
 - [ ] `model.json` schema appears valid`

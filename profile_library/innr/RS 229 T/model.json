@@ -4,8 +4,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "GU10",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 350,
+    "rated_power": 5
   },
+  "ean": [
+    "8718781552633"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

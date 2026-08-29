@@ -5,6 +5,7 @@
   "device_specs": {
     "socket": "GU10",
     "form_factor": "spot",
+    "lumens": 300,
     "rated_power": 4.0
   },
   "measure_description": "Measured with utils/measure script",

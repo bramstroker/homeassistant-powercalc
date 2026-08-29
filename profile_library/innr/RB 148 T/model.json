@@ -4,8 +4,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E14",
-    "form_factor": "candle"
+    "form_factor": "candle",
+    "lumens": 470
   },
+  "ean": [
+    "8718781551643",
+    "8718781551810"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A1T",
   "measure_method": "script",

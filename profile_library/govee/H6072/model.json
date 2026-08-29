@@ -4,8 +4,13 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 1500,
+    "rated_power": 23
   },
+  "ean": [
+    "6974316990864"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",

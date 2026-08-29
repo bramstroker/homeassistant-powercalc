@@ -10,7 +10,9 @@
       "E12",
       "E14"
     ],
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 470,
+    "rated_power": 4.2
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

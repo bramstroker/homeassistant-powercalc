@@ -4,7 +4,8 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "strip"
+    "form_factor": "strip",
+    "rated_power": 22
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 600,
+    "rated_power": 6.0
   },
+  "ean": [
+    "6920075770322"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",

@@ -5,8 +5,12 @@
   "device_specs": {
     "socket": "E14",
     "form_factor": "candle",
-    "lumens": 470
+    "lumens": 470,
+    "rated_power": 6
   },
+  "ean": [
+    "8718781552077"
+  ],
   "measure_description": "Measured 3 bulbs simultaneously with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

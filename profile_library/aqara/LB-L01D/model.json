@@ -9,7 +9,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 1100,
+    "rated_power": 10.5
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug US Gen4",

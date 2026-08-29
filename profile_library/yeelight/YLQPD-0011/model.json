@@ -8,6 +8,10 @@
     "lumens": 806,
     "rated_power": 9
   },
+  "ean": [
+    "6924922222477",
+    "6924922224051"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "IKEA INSPELNING smart plug",
   "measure_method": "script",

@@ -11,7 +11,8 @@
   "device_specs": {
     "socket": "integrated",
     "lumens": 2850,
-    "form_factor": "panel"
+    "form_factor": "panel",
+    "rated_power": 40
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini Gen4",

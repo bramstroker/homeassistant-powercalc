@@ -9,7 +9,8 @@
   "device_specs": {
     "form_factor": "globe",
     "socket": "E27",
-    "lumens": 470
+    "lumens": 470,
+    "rated_power": 3.4
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

@@ -4,8 +4,14 @@
   "device_type": "light",
   "device_specs": {
     "socket": "GU10",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 420,
+    "rated_power": 4.9
   },
+  "ean": [
+    "8718781553302",
+    "8718781553319"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

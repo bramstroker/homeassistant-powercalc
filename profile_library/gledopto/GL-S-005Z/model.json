@@ -5,6 +5,7 @@
   "device_specs": {
     "socket": "GU5.3",
     "form_factor": "spot",
+    "lumens": 250,
     "rated_power": 4.0
   },
   "measure_description": "Measured with utils/measure script.  Controller: hue, Bulbs: 1, Dummy Load: None",

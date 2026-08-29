@@ -6,6 +6,9 @@
     "socket": "integrated",
     "form_factor": "strip"
   },
+  "ean": [
+    "6974316990376"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",

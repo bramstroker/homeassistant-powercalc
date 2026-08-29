@@ -11,8 +11,13 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
-    "lumens": 800
+    "lumens": 880,
+    "rated_power": 8.6
   },
+  "ean": [
+    "8718781556105",
+    "8718781556112"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",

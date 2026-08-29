@@ -7,7 +7,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "panel"
+    "form_factor": "panel",
+    "lumens": 670,
+    "rated_power": 12.5
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

@@ -8,7 +8,8 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
-    "lumens": 470
+    "lumens": 470,
+    "rated_power": 2.9
   },
   "measure_description": "Measured with utils/measure script; 6.1 Watts dummy load",
   "measure_device": "Shelly Plus Plug S",

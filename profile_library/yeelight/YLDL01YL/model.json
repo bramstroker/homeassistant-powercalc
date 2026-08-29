@@ -8,8 +8,13 @@
   "device_specs": {
     "form_factor": "fixture",
     "socket": "integrated",
+    "lumens": 1700,
     "rated_power": 33.0
   },
+  "ean": [
+    "6924922203292",
+    "6924922226765"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

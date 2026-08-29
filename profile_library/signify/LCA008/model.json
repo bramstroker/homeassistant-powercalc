@@ -9,8 +9,12 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
-    "lumens": 1600
+    "lumens": 1600,
+    "rated_power": 13.5
   },
+  "ean": [
+    "8719514288157"
+  ],
   "measure_description": "Measured 1 bulb with utils/measure script using an additional dummy load (IKEA LED1457C3 E14 bulb measured at 2.61 W)",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

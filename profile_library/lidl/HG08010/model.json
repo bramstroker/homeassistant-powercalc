@@ -5,7 +5,8 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "fixture",
-    "lumens": 3000
+    "lumens": 3000,
+    "rated_power": 30
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug E",

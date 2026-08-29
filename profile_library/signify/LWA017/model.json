@@ -9,8 +9,13 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
-    "lumens": 1050
+    "lumens": 1050,
+    "rated_power": 9.5
   },
+  "ean": [
+    "8719514288232",
+    "8719514289192"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",

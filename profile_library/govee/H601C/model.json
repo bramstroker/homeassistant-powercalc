@@ -4,8 +4,14 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "downlight"
+    "form_factor": "downlight",
+    "lumens": 1000,
+    "rated_power": 13
   },
+  "ean": [
+    "810088347191",
+    "810088347207"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 3",
   "measure_method": "script",
