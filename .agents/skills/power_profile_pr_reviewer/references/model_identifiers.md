@@ -115,6 +115,7 @@ If no unique identifier can be established, request manual verification. If the 
 | WiZ | Prefer the exact WiZ/Signify material or article number (12NC), commonly beginning with `929...`; retain another verified printed manufacturer model when no 12NC can be established | Official WiZ product specifications, product or packaging label, then HA WiZ Device information and the raw `moduleName` | `SHRGB`, `SHRGBC`, `SHTW`, and related `SH...` values are module/configuration codes rather than unique article numbers. Keep confirmed values as intentionally shared discovery aliases. Follow the detailed WiZ guidance below. |
 | Sonos | Prefer the exact manufacturer article/model number printed on the product or packaging when it uniquely identifies the measured hardware. Preserve established product-name directories unless a verified canonical migration is intentionally requested. | Product label/packaging and official Sonos documentation; then HA Sonos Device information, where `model_id` comes from the speaker's `modelNumber` | `S...` values are useful discovery aliases when one-to-one with the measured generation, but are not automatically retail article numbers. Product names and S-codes can both be generation-ambiguous. Follow the detailed Sonos guidance below. |
 | SONOFF | Printed product codes such as `B1`, `B02-B-A60`, `S20`, `ZBMINI`, and `ZBMINIR2` | Official product page/manual and product label, then exact eWeLink or HA Device Info and Zigbee device definitions | Preserve punctuation in the official model. Retain confirmed integration or raw Zigbee values as aliases, but do not substitute a generic Tuya identifier. Follow the concise SONOFF guidance below. |
+| Sony | Exact printed model codes such as `LF-S50G` | Official Sony support page/manual and product label; then exact HA Cast Device Info and original profile evidence | Keep the official product description in `name` without repeating the model code or manufacturer. Follow the concise Sony guidance below. |
 | Tuya and white-label devices | No safe universal pattern | Require a branded model from the product label/manufacturer and compare its full Zigbee signature with known devices | Identifiers such as `TS0601`, `TS0505B`, and `_TZE...` values can cover different hardware. Do not add them as a directory or alias unless uniqueness for the measured device is demonstrated. |
 
 ## Amazon
@@ -579,6 +580,10 @@ Prefer the exact model printed on the underside of the measured device, such as 
 
 Use the exact SONOFF model from the label or official manual, including punctuation such as `B02-B-A60`; do not collapse it to `B02BA60` or replace a concrete code such as `B1` with a descriptive directory slug. Preserve former released directories in `legacy_ids` and retain a former discovery-compatible directory value as an alias when it is unique to that profile. For Zigbee devices, retain exact raw model identifiers as aliases when the current device definition maps them to the measured product: `01MINIZB` maps to `ZBMINI`, while `MINI-ZBD` is a confirmed `ZBMINIR2` variant. Use the official product-family wording for the display name without repeating the SONOFF brand or canonical model ID.
 
+## Sony
+
+Use the exact Sony model code from the product label or official support documentation, such as `LF-S50G`. For Cast-connected products, confirm the exact `model_name` exposed in Home Assistant before adding a discovery alias; do not infer aliases from the shortened family name used in a support-page title. Use Sony's concise official product description for `name` while omitting both the manufacturer and canonical model code.
+
 ## WiZ
 
 Apply these rules when reviewing or normalizing WiZ and WiZ-powered Philips Smart LED profiles:
@@ -632,6 +637,7 @@ When the printed article number, S-code, product name, or generation cannot be r
 - [SONOFF's official Wi-Fi smart LED bulb page](https://itead.cc/product/sonoff-wi-fi-smart-led-bulb/) identifies the punctuated `B02-B-A60` model and distinguishes it from RGB model `B05-B-A60`.
 - [The SONOFF B1 manual](https://sonoff.ee/wp-content/uploads/2019/04/Instrukcija-B1-EN-LT-LV-EE.pdf) identifies the older RGB bulb's model as `Sonoff B1`.
 - [The current Zigbee2MQTT SONOFF definitions](https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/src/devices/sonoff.ts) map raw identifiers `01MINIZB` and `MINI-ZBD` to `ZBMINI` and `ZBMINIR2` respectively.
+- [Sony's official LF-S50G support page](https://www.sony.com/electronics/support/speakers-wireless-speakers/lf-s50g) identifies `LF-S50G` and describes it as a Google Assistant built-in wireless speaker.
 - [TP-Link model-number guidance](https://www.tp-link.com/ae/support/faq/2053/) shows where the product model is printed and exposed in its apps.
 - [Aqara's security and compliance tables](https://www.aqara.com/en/security-certifications/) map official product names to exact model codes and regional variants.
 - [Aqara's supported-device list](https://opendoc.aqara.com/en/docs/SDKDevelopment/IOSDevelopmentGuide/Equipmentcontrol/DeviceControlSDKSupportedDeviceList.html) maps product variants to their `lumi.*` and Matter discovery identifiers.
