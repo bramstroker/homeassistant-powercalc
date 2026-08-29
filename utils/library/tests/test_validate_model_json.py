@@ -8,6 +8,7 @@ import pytest
 from utils.library.validate_model_json import (
     load_json,
     main,
+    sub_profile_schema,
     validate_file,
     validate_files_with_glob,
     validate_manufacturers_with_glob,
@@ -67,15 +68,72 @@ def test_validate_files_with_glob_walks_matches_in_order(tmp_path: Path, capsys:
     )
 
 
-def test_validate_models_with_glob_only_matches_model_files(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_validate_models_with_glob_covers_profiles_and_their_sub_profiles(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     schema = write_json(tmp_path / "schema.json", NAME_SCHEMA)
     write_json(tmp_path / "signify" / "LCT010" / "model.json", {"name": "LCT010"})
     write_json(tmp_path / "signify" / "manufacturer.json", {"name": "signify"})
+    write_json(tmp_path / "signify" / "LCT010" / "length_2m" / "model.json", {"name": "2 metre"})
+
+    assert validate_models_with_glob(str(tmp_path), str(schema)) is True
+
+    assert capsys.readouterr().out == (
+        f"VALID: {tmp_path / 'signify' / 'LCT010' / 'model.json'}\n"
+        f"VALID: {tmp_path / 'signify' / 'LCT010' / 'length_2m' / 'model.json'}\n"
+    )
+
+
+def test_validate_models_with_glob_reports_an_invalid_sub_profile(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    schema = write_json(tmp_path / "schema.json", {**NAME_SCHEMA, "additionalProperties": False})
+    write_json(tmp_path / "signify" / "LCT010" / "model.json", {"name": "LCT010"})
     write_json(tmp_path / "signify" / "LCT010" / "length_2m" / "model.json", {"nope": True})
 
-    validate_models_with_glob(str(tmp_path), str(schema))
+    assert validate_models_with_glob(str(tmp_path), str(schema)) is False
 
-    assert capsys.readouterr().out == f"VALID: {tmp_path / 'signify' / 'LCT010' / 'model.json'}\n"
+    assert "INVALID" in capsys.readouterr().out
+
+
+def test_sub_profile_schema_drops_the_rules_that_only_hold_for_a_whole_profile() -> None:
+    schema = {
+        "type": "object",
+        "required": ["name", "device_type"],
+        "allOf": [{"if": {"const": "light"}, "then": {"required": ["standby_power"]}}],
+        "additionalProperties": False,
+        "properties": {"name": {"type": "string"}, "standby_power": {"type": "number", "minimum": 0.05}},
+    }
+
+    derived = sub_profile_schema(schema)
+
+    assert "required" not in derived
+    assert "allOf" not in derived
+    assert derived["additionalProperties"] is False
+    assert derived["properties"]["standby_power"]["minimum"] == 0
+    assert schema["properties"]["standby_power"]["minimum"] == 0.05
+
+
+def test_sub_profile_may_zero_a_power_value_a_complete_profile_may_not(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A sub profile setting 0 is overriding its parent, not skipping a measurement."""
+    schema = write_json(
+        tmp_path / "schema.json",
+        {
+            "type": "object",
+            "required": ["name"],
+            "properties": {"name": {"type": "string"}, "standby_power": {"type": "number", "minimum": 0.05}},
+        },
+    )
+    write_json(tmp_path / "signify" / "LCT010" / "model.json", {"name": "LCT010", "standby_power": 0.4})
+    write_json(tmp_path / "signify" / "LCT010" / "nightlight" / "model.json", {"standby_power": 0})
+
+    assert validate_models_with_glob(str(tmp_path), str(schema)) is True
+    assert "INVALID" not in capsys.readouterr().out
 
 
 def test_validate_manufacturers_with_glob_only_matches_manufacturer_files(

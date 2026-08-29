@@ -32,8 +32,28 @@
           "standby_power"
         ]
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "device_type": {
+            "const": "light"
+          }
+        },
+        "required": [
+          "device_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "device_specs": {
+            "$ref": "#/definitions/light_specs"
+          }
+        }
+      }
     }
   ],
+  "additionalProperties": false,
   "properties": {
     "aliases": {
       "type": "array",
@@ -55,6 +75,41 @@
         "type": "string"
       },
       "description": "List of compatible integrations for this model"
+    },
+    "connectivity": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "zigbee",
+          "wifi",
+          "zwave",
+          "matter",
+          "thread",
+          "bluetooth",
+          "ethernet",
+          "rf433",
+          "infrared",
+          "proprietary"
+        ]
+      },
+      "description": "Protocols the device communicates over"
+    },
+    "ean": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9]{8}$|^[0-9]{12,14}$"
+      },
+      "description": "Barcode numbers printed on the packaging (EAN-8, UPC-12, EAN-13 or GTIN-14). A model often ships under several, one per region"
+    },
+    "product_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "description": "Manufacturer product page for this model"
     },
     "authors": {
       "type": "array",
@@ -179,6 +234,10 @@
         "ups"
       ],
       "description": "Type of device"
+    },
+    "device_specs": {
+      "type": "object",
+      "description": "Physical attributes of the device itself, as printed on the box or datasheet. Which keys are allowed depends on device_type; see the definitions for the ones already described"
     },
     "discovery_by": {
       "type": "string",
@@ -324,6 +383,12 @@
       "deprecated": true,
       "description": "DEPRECATED: use voltage_range.max instead. Maximum voltage observed during measurement"
     },
+    "mains_voltage": {
+      "type": "number",
+      "minimum": 90,
+      "maximum": 260,
+      "description": "Nominal mains voltage the measurements were taken on, e.g. 230 or 120. Derived from voltage_range when that is present"
+    },
     "min_version": {
       "type": "string",
       "description": "Minimum required version of Powercalc for this profile"
@@ -379,6 +444,24 @@
       "type": "string",
       "description": "Use data from another model"
     },
+    "multi_switch_config": {
+      "type": "object",
+      "description": "Configuration for multi_switch calculation strategy",
+      "properties": {
+        "power": {
+          "type": "number",
+          "description": "Power draw of a single switch when it is on"
+        },
+        "power_off": {
+          "type": "number",
+          "description": "Power draw of a single switch when it is off"
+        }
+      },
+      "required": [
+        "power"
+      ],
+      "additionalProperties": false
+    },
     "only_self_usage": {
       "type": "boolean",
       "description": "Indicates if profile only provides power usage for the device itself"
@@ -424,14 +507,24 @@
       }
     },
     "standby_power": {
-      "type": "number",
+      "type": [
+        "number",
+        "string"
+      ],
       "minimum": 0.05,
-      "description": "Power draw when the device is turned off. When you are not able to measure set to 0.4 for lights"
+      "description": "Power draw when the device is turned off, in watts, or a template evaluating to one. When you are not able to measure it, set 0.4 for lights and mark it with standby_power_estimated"
+    },
+    "standby_power_estimated": {
+      "type": "boolean",
+      "description": "Set when standby_power could not be measured and holds an assumed value, so consumers do not present a guess as a measurement"
     },
     "standby_power_on": {
-      "type": "number",
+      "type": [
+        "number",
+        "string"
+      ],
       "minimum": 0.05,
-      "description": "Power draw when the device is turned on."
+      "description": "Power draw when the device is turned on, in watts, or a template evaluating to one."
     },
     "sub_profile_select": {
       "type": "object",
@@ -492,6 +585,58 @@
     }
   },
   "definitions": {
+    "light_specs": {
+      "type": "object",
+      "description": "device_specs of a light. Manufacturer claims, not measurements: rated_power is what the box says, max_power in the library index is what was measured",
+      "properties": {
+        "socket": {
+          "type": "string",
+          "enum": [
+            "E27",
+            "E26",
+            "E14",
+            "E12",
+            "B22",
+            "GU10",
+            "GU5.3",
+            "GU24",
+            "GX53",
+            "G9",
+            "G4",
+            "integrated"
+          ],
+          "description": "Lamp base the bulb fits, or integrated when the light source is not replaceable"
+        },
+        "form_factor": {
+          "type": "string",
+          "enum": [
+            "bulb",
+            "spot",
+            "candle",
+            "globe",
+            "filament",
+            "strip",
+            "panel",
+            "downlight",
+            "tube",
+            "fixture",
+            "other"
+          ],
+          "description": "Shape of the light"
+        },
+        "lumens": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Nominal luminous flux at full brightness, in lumens"
+        },
+        "rated_power": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Power draw claimed by the manufacturer, in watts"
+        }
+      },
+      "additionalProperties": false
+    },
     "sensor_naming_option": {
       "description": "Naming options a profile must not set. Sensor naming is a user preference, configured globally or per sensor.",
       "enum": [

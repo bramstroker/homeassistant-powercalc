@@ -7,6 +7,7 @@
   "measure_method": "manual",
   "name": "Wemo Smart LED Bulb",
   "standby_power": 0.4,
+  "standby_power_estimated": true,
   "authors": [
     {
       "name": "OzGav",

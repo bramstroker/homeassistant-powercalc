@@ -116,7 +116,7 @@ async def generate_library_json(model_listing: list[dict[str, Any]]) -> None:
         # Derived metadata only, not profile content. The hash decides whether a Home Assistant
         # install re-downloads a profile, so folding these in would make every install re-fetch
         # every profile it uses whenever the scoring changes.
-        unhashed_fields = ("sub_profile_count", "lut_quality")
+        unhashed_fields = ("sub_profile_count", "lut_quality", "power_range", "measurement_updated_at")
         hash_dict = {key: value for key, value in mapped_dict.items() if key not in unhashed_fields}
         mapped_dict["hash"] = create_model_hash(hash_dict)
         manufacturer["models"].append(mapped_dict)
@@ -266,12 +266,21 @@ async def get_manufacturer_json(manufacturer: str) -> dict[str, Any]:
         git.Repo(PROJECT_ROOT).git.add(json_path)
         print(f"Added {json_path}")
 
-    return {
+    entry = {
         "aliases": manufacturer_data.get("aliases", []),
         "name": manufacturer,
         "full_name": manufacturer_data.get("name"),
         "dir_name": manufacturer,
     }
+
+    # Brand details, for consumers presenting the manufacturer rather than matching on it.
+    # Left out entirely when a manufacturer.json does not carry them.
+    for key in ("website", "country", "description"):
+        value = manufacturer_data.get(key)
+        if value:
+            entry[key] = value
+
+    return entry
 
 
 async def get_model_list() -> list[dict[str, Any]]:
@@ -305,14 +314,22 @@ async def process_model_file(json_path: str) -> dict[str, Any]:
             model_directory = os.path.join(DATA_DIR, model_data["linked_profile"])
 
         # Get these values concurrently
-        updated_at, power_values, sub_profile_count, color_modes, lut_quality = await asyncio.gather(
+        (
+            updated_at,
+            measurement_updated_at,
+            power_values,
+            sub_profile_count,
+            color_modes,
+            lut_quality,
+        ) = await asyncio.gather(
             get_last_commit_time(model_directory),
+            get_last_measurement_commit_time(model_directory),
             get_power_values(model_directory, model_data),
             asyncio.to_thread(get_sub_profile_count, model_directory),
             get_color_modes(model_directory),
             asyncio.to_thread(get_lut_quality, model_directory),
         )
-        max_power, standby_power = power_values
+        min_power, max_power, standby_power = power_values
 
         model_data.update(
             {
@@ -324,6 +341,17 @@ async def process_model_file(json_path: str) -> dict[str, Any]:
                 "sub_profile_count": sub_profile_count,
             },
         )
+        if measurement_updated_at is not None:
+            model_data["measurement_updated_at"] = measurement_updated_at.isoformat(timespec="seconds").replace(
+                "+00:00",
+                "Z",
+            )
+
+        # Both ends of the curve, so consumers can show the span a device actually draws.
+        # `max_power` stays as it is: it predates this and is part of the profile hash.
+        if min_power is not None and max_power is not None:
+            model_data["power_range"] = {"min": min_power, "max": max_power}
+
         if standby_power is not None:
             model_data["standby_power"] = standby_power
         if "device_type" not in model_data:
@@ -371,14 +399,18 @@ def get_sub_profile_count(model_directory: str) -> int:
     return sum(1 for p in path.iterdir() if p.is_dir())
 
 
-async def get_power_values(model_directory: str, model_data: dict[str, Any]) -> tuple[float | None, float | None]:
-    """Return the highest maximum and standby power across all effective profiles."""
+async def get_power_values(
+    model_directory: str,
+    model_data: dict[str, Any],
+) -> tuple[float | None, float | None, float | None]:
+    """Return the lowest and highest power, and the highest standby power, over all effective profiles."""
     profiles = await asyncio.to_thread(get_effective_profiles, model_directory, model_data)
 
-    max_powers = await asyncio.gather(
-        *(get_max_power(profile_directory, profile_data) for profile_directory, profile_data in profiles),
+    power_ranges = await asyncio.gather(
+        *(get_power_range(profile_directory, profile_data) for profile_directory, profile_data in profiles),
     )
-    valid_max_powers = [power for power in max_powers if power is not None]
+    valid_min_powers = [minimum for minimum, _maximum in power_ranges if minimum is not None]
+    valid_max_powers = [maximum for _minimum, maximum in power_ranges if maximum is not None]
     standby_powers = [
         float(profile_data["standby_power"])
         for _profile_directory, profile_data in profiles
@@ -386,6 +418,7 @@ async def get_power_values(model_directory: str, model_data: dict[str, Any]) -> 
     ]
 
     return (
+        min(valid_min_powers) if valid_min_powers else None,
         max(valid_max_powers) if valid_max_powers else None,
         max(standby_powers) if standby_powers else None,
     )
@@ -408,7 +441,13 @@ def get_effective_profiles(
     return profiles
 
 
-async def get_max_power(model_directory: str, model_data: dict[str, Any]) -> float | None:
+async def get_power_range(model_directory: str, model_data: dict[str, Any]) -> tuple[float | None, float | None]:
+    """Return the lowest and highest power a single profile draws, as far as its strategy knows it.
+
+    The maximum is what the library has always published as `max_power`, so its value per
+    strategy must not shift. The minimum is the other end of the same data: the dimmest row of
+    the LUT, the lowest calibration point, the cheapest state of a fixed profile.
+    """
     calculation_strategy = model_data.get("calculation_strategy", "lut")
     if calculation_strategy == "lut":
         max_power = 0
@@ -418,12 +457,14 @@ async def get_max_power(model_directory: str, model_data: dict[str, Any]) -> flo
         if paths:
             tasks = [process_csv_file(path) for path in paths]
             csv_powers = await asyncio.gather(*tasks)
-            # Filter out None values and find max
-            valid_powers = [p for p in csv_powers if p is not None]
+            # Filter out None values and find the outer bounds
+            valid_powers = [power_range for power_range in csv_powers if power_range is not None]
             if valid_powers:
-                return max(valid_powers)
-            return max_power
-        return max_power
+                return min(minimum for minimum, _maximum in valid_powers), max(
+                    maximum for _minimum, maximum in valid_powers
+                )
+            return None, max_power
+        return None, max_power
 
     if calculation_strategy == "linear":
         linear_config = model_data.get("linear_config", {})
@@ -431,8 +472,14 @@ async def get_max_power(model_directory: str, model_data: dict[str, Any]) -> flo
             calibrate_powers = [
                 float(line.split("->")[1].strip()) for line in linear_config.get("calibrate", []) if "->" in line
             ]
-            return max(calibrate_powers) if calibrate_powers else 0
-        return float(max(linear_config.get("max_power", 0), model_data.get("standby_power_on", 0)))
+            if calibrate_powers:
+                return min(calibrate_powers), max(calibrate_powers)
+            return None, 0
+        min_power = linear_config.get("min_power")
+        return (
+            float(min_power) if is_number(min_power) else None,
+            float(max(linear_config.get("max_power", 0), model_data.get("standby_power_on", 0))),
+        )
 
     if calculation_strategy == "fixed":
         fixed_config = model_data.get("fixed_config", {})
@@ -442,18 +489,24 @@ async def get_max_power(model_directory: str, model_data: dict[str, Any]) -> flo
             *fixed_config.get("states_power", {}).values(),
         ]
         fixed_powers = [float(value) for value in candidates if is_number(value)]
+        # The zeros above stand in for values the profile does not set. They cannot pull the
+        # maximum down, but they would happily claim to be the low end of the range.
+        declared_powers = [power for power in fixed_powers if power > 0]
 
-        return max(fixed_powers) if fixed_powers else 0
+        if fixed_powers:
+            return (min(declared_powers) if declared_powers else None), max(fixed_powers)
+        return None, 0
 
-    return None
+    return None, None
 
 
-async def process_csv_file(path: str) -> float | None:
-    """Process a single CSV file to find the maximum power value"""
+async def process_csv_file(path: str) -> tuple[float, float] | None:
+    """Process a single CSV file to find the lowest and highest power value"""
     try:
         with open_lut_file(Path(path)) as f:
             reader = csv.reader(f)
             next(reader, None)  # skip header row
+            min_power = None
             max_power = 0.0
             for row in reader:
                 if not row:
@@ -462,11 +515,50 @@ async def process_csv_file(path: str) -> float | None:
                     watt = float(row[-1])
                     if watt > max_power:
                         max_power = watt
+                    if min_power is None or watt < min_power:
+                        min_power = watt
                 except ValueError, IndexError:
                     continue
-            return max_power if max_power > 0 else None
+            if max_power > 0 and min_power is not None:
+                return min_power, max_power
+            return None
     except (OSError, EOFError, UnicodeDecodeError, csv.Error) as e:
         print(f"Error processing {path}: {e}")
+        return None
+
+
+async def get_last_measurement_commit_time(directory: str) -> datetime | None:
+    """Return when the measurement data of a profile last changed, None when it has none.
+
+    `updated_at` moves for any commit touching the directory, a typo fix in model.json
+    included, which makes it a poor answer to "when was this device last measured?". This
+    looks at the LUT files alone. Profiles that carry no CSV files keep the field off rather
+    than reporting their metadata date as a measurement date.
+    """
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            "git",
+            "log",
+            "-1",
+            "--format=%ct",
+            "--",
+            "*.csv.gz",
+            "*.csv",
+            cwd=directory,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, _stderr = await proc.communicate()
+
+        if proc.returncode != 0:
+            return None
+
+        out = stdout.decode().strip()
+        if not out:
+            return None
+
+        return datetime.fromtimestamp(int(out))
+    except subprocess.SubprocessError, ValueError, OSError:
         return None
 
 

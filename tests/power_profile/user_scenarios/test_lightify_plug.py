@@ -42,4 +42,6 @@ async def test_lightify_plug_selectable(
     data_schema = result["data_schema"]
     model_select: SelectSelector = data_schema.schema["model"]
     model_options = model_select.config["options"]
-    assert {"value": "LIGHTIFY Plug 01", "label": "LIGHTIFY Plug 01 (Osram Lightify Plug 01)"} in model_options
+    # The profile lives under its real model id; "LIGHTIFY Plug 01" is what the integration
+    # reports, and survives as an alias and a legacy id on the profile.
+    assert {"value": "AB3257001NJ", "label": "AB3257001NJ (LIGHTIFY Smart Plug)"} in model_options

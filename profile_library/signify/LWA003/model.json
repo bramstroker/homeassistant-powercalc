@@ -11,6 +11,7 @@
   "measure_method": "script",
   "name": "Hue White A19 E26 Bluetooth",
   "standby_power": 0.4,
+  "standby_power_estimated": true,
   "authors": [
     {
       "name": "Bram Gerritsen",
