@@ -27,6 +27,10 @@
     "lumens": 806,
     "rated_power": 8.5
   },
+  "ean": [
+    "8719514489844",
+    "8720169157750"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",

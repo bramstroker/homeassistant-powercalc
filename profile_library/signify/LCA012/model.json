@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 1600,
+    "rated_power": 11.8
   },
+  "ean": [
+    "8720169364226"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini Gen3",
   "measure_method": "script",

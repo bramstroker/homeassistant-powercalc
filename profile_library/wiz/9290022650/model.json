@@ -8,8 +8,12 @@
   "device_specs": {
     "socket": "E26",
     "form_factor": "bulb",
-    "lumens": 800
+    "lumens": 800,
+    "rated_power": 8.8
   },
+  "ean": [
+    "046677555474"
+  ],
   "measure_description": "Measured with utils/measure script. Controller: hass, Bulbs: 1, Dummy Load: None",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",
@@ -18,7 +22,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.24.8:docker"
   },
-  "name": "Smart Wi-Fi LED Light Bulb (dimmable, soft white)",
+  "name": "A19 E26 Soft White Bulb (8.8W, 800 lm)",
   "standby_power": 0.42,
   "authors": [
     {

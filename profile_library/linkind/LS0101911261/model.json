@@ -11,6 +11,10 @@
     "lumens": 800,
     "rated_power": 9.0
   },
+  "ean": [
+    "850053671883",
+    "850058571638"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",

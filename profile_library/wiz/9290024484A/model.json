@@ -7,8 +7,14 @@
   "device_type": "light",
   "device_specs": {
     "socket": "GU10",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 345,
+    "rated_power": 4.7
   },
+  "ean": [
+    "8719514372344",
+    "8719514372689"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Meross mss315",
   "measure_method": "script",
@@ -17,7 +23,7 @@
     "SLEEP_TIME": 4,
     "VERSION": "v1.9.14:docker"
   },
-  "name": "Smart Wi-Fi RGB + Tunable White GU10 LED Spotlight Bulb (PAR16)",
+  "name": "GU10 RGB + Tunable White Spotlight (4.7W, 345 lm)",
   "standby_power": 0.17,
   "authors": [
     {

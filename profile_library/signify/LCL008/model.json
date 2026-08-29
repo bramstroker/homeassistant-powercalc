@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "strip"
+    "form_factor": "strip",
+    "lumens": 1700,
+    "rated_power": 20
   },
+  "ean": [
+    "046677589875"
+  ],
   "measure_description": "Measured with utils/measure script with 10kOM dummy load",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",

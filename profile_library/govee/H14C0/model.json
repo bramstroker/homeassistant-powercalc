@@ -5,8 +5,12 @@
   "device_specs": {
     "socket": "E26",
     "form_factor": "bulb",
-    "lumens": 500
+    "lumens": 500,
+    "rated_power": 5.5
   },
+  "ean": [
+    "810172721777"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
@@ -15,7 +19,7 @@
     "SLEEP_TIME": 1,
     "VERSION": "v1.21.2:docker"
   },
-  "name": "ST19 Smart Edison Light Bulb E26 500lm",
+  "name": "ST19 Edison Bulb, E26 (5.5W, 500 lm)",
   "standby_power": 0.5,
   "authors": [
     {

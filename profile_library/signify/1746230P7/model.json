@@ -8,8 +8,13 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "spot",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 1060,
+    "rated_power": 15
   },
+  "ean": [
+    "8718696174364"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",
   "measure_method": "script",

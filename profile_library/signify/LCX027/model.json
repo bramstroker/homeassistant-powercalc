@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "fixture"
+    "form_factor": "fixture",
+    "lumens": 1500,
+    "rated_power": 25.6
   },
+  "ean": [
+    "8720169371590"
+  ],
   "description": "This device was powered with the Hue 100w outdoor PSU and not the bundled 30w PSU. All other lights were physically disconnected from the chain.",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",

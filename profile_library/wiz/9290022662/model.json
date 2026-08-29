@@ -8,8 +8,12 @@
   "device_specs": {
     "socket": "E26",
     "form_factor": "filament",
+    "lumens": 350,
     "rated_power": 3.8
   },
+  "ean": [
+    "8718699785079"
+  ],
   "measure_description": "Measured 3 bulbs with utils/measure script with no dummy load",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",
@@ -18,7 +22,7 @@
     "SLEEP_TIME": 5,
     "VERSION": "master"
   },
-  "name": "Filament ST19 E26 Transparent (3.8W 120V)",
+  "name": "ST19 E26 Clear Filament Bulb (3.8W, 350 lm)",
   "standby_power": 0.38,
   "authors": [
     {

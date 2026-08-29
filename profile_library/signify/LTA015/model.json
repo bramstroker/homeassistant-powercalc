@@ -8,8 +8,12 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
-    "lumens": 1100
+    "lumens": 1100,
+    "rated_power": 8.1
   },
+  "ean": [
+    "8720169364806"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A1",
   "measure_method": "script",

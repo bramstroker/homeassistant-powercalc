@@ -11,6 +11,10 @@
     "lumens": 1521,
     "rated_power": 13.0
   },
+  "ean": [
+    "8718699786175",
+    "8719514336759"
+  ],
   "measure_description": "Measured 3 bulbs with utils/measure script",
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",

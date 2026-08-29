@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 650,
+    "rated_power": 10
   },
+  "ean": [
+    "840410102877"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 2 PM",
   "measure_method": "script",

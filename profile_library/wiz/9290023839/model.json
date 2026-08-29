@@ -7,8 +7,14 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 1055,
+    "rated_power": 11
   },
+  "ean": [
+    "8718699786359",
+    "8719514336896"
+  ],
   "measure_description": "Measured 1 bulb with utils/measure script using an additional dummy load (IKEA LED1457C3 E14 bulb measured at 2.61 W)",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
@@ -17,7 +23,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Full-Color Smart Wi-Fi LED Light Bulb (E27, RGB + Tunable White)",
+  "name": "G95 E27 RGB + Tunable White Bulb (11W, 1055 lm)",
   "standby_power": 0.96,
   "authors": [
     {
