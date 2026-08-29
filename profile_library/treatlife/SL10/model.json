@@ -16,6 +16,9 @@
     "VERSION": "master"
   },
   "name": "Smart Color Changing Light Bulb 9W 800LM",
+  "aliases": [
+    "odsywzgrtvaz3b79"
+  ],
   "standby_power": 0.35,
   "authors": [
     {
