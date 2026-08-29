@@ -668,6 +668,10 @@ Prefer a printed model or article number when official documentation uniquely id
 
 Magic Home and `flux_led` values such as `Bulb RGBCW (0x35)` describe a protocol/controller class and can be shared by different physical products. Prefer the exact hardware model shown for the measured device in Home Assistant Device Info, retain the complete protocol descriptor as a discovery alias, and preserve a replaced released directory in `legacy_ids`. Do not infer a hardware model from another device with the same protocol type or use an Amazon ASIN as the manufacturer model. Use a concise product description for `name` without repeating either identifier.
 
+## Zipato
+
+Retain an established Z-Wave model such as `RGBWE2` when it is the exact discovery value and the measured regional suffix cannot be proven. Zipato's Bulb 2 documentation inconsistently uses `rgbw2.eu`, `rgbwe2.eu`, and wildcard SKU `rgbw2.*`; do not select or add one of these regional values by inference. `RGBW Bulb V2` is a suitable concise product name because it identifies the official Bulb 2 generation without merely repeating the canonical code. Preserve a counterintuitive LUT curve when the original contributor manually reproduced the readings; a smoothness warning alone does not justify replacing verified device behavior.
+
 ## WiZ
 
 Apply these rules when reviewing or normalizing WiZ and WiZ-powered Philips Smart LED profiles:
@@ -880,6 +884,8 @@ When the printed article number, S-code, product name, or generation cannot be r
 - [Tasmota's Home Assistant documentation](https://tasmota.github.io/docs/Home-Assistant/) explains that the template name becomes the module name reflected in Home Assistant and that the integration identifies the firmware manufacturer as Tasmota.
 - [The original Zengge profile PR](https://github.com/bramstroker/homeassistant-powercalc/pull/1760) records Home Assistant model `Bulb RGBCW (0x35)` and hardware model `AK001-ZJ2104`; [the follow-up PR](https://github.com/bramstroker/homeassistant-powercalc/pull/1762) confirms that the complete parenthesized value is required for discovery.
 - [`flux_led`'s supported-model table](https://github.com/lightinglibs/flux_led) identifies type `0x35` as the generic `Bulb RGBCW` protocol class rather than a unique physical product model.
+- [Zipato's official Bulb 2 product page](https://www.zipato.com/product/zipato-bulb2-zwave) identifies the product name and wildcard SKU `rgbw2.*`; its [official Bulb 2 manual](https://www.zipato.com/wp-content/uploads/2017/04/rgbw2-Zipato-RGBW-gen2-Bulb-User-Manual-Z-Wave-v1.3.pdf) records the inconsistent regional `rgbw2` and `rgbwe2` spellings.
+- [The original Zipato profile PR](https://github.com/bramstroker/homeassistant-powercalc/pull/1126) records the `RGBWE2` contribution and the contributor's manual confirmation of its unusual color-temperature power curve.
 - [Sengled's Smart LED Starter Kits guide](https://www.sengled.com.au/wp-content/uploads/2017/11/Sengled-Smart-LED-Starter-Kits-User-Guide.pdf) identifies `E11-G13` as a 2700K soft-white A19 bulb rated at 9W and 800 lm.
 - [Sengled's motion-sensor bulb guide](https://www.sengled.com.au/wp-content/uploads/2018/06/Sengled-Smart-LED-with-Motion-Sensor-User-Guide.pdf) identifies model `E13-N11` as the Smart LED with Motion Sensor PAR38 Bulb.
 - [The Zigbee2MQTT Sengled converter](https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/src/devices/sengled.ts) maps raw models `E11-N13`, `E11-N13A`, `E11-N14`, and `E11-N14A` to the grouped Element Extra Bright display model.
