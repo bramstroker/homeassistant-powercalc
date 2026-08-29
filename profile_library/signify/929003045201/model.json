@@ -9,9 +9,14 @@
   "calculation_strategy": "lut",
   "created_at": "2024-10-05T15:28:08Z",
   "device_type": "light",
+  "ean": [
+    "8719514342880"
+  ],
   "device_specs": {
-    "socket": "integrated",
-    "form_factor": "spot"
+    "socket": "GU10",
+    "lumens": 350,
+    "form_factor": "spot",
+    "rated_power": 5.7
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

@@ -12,13 +12,15 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "lumens": 550,
+    "rated_power": 7.0,
     "form_factor": "filament"
   },
   "linked_profile": "signify/LTO001",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
-  "name": "Hue White Ambiance E27 ST64 Filament Bulb",
+  "name": "Hue White Ambiance ST72 Filament Bulb",
   "standby_power": 0.17,
   "authors": [
     {

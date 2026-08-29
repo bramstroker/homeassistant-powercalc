@@ -5,12 +5,16 @@
   "legacy_ids": [
     "LDVWF30FILE27RGBW"
   ],
+  "ean": [
+    "4058075609938"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-04-03T10:46:35Z",
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
     "form_factor": "filament",
+    "lumens": 300,
     "rated_power": 4.5
   },
   "measure_description": "Measured with utils/measure script",

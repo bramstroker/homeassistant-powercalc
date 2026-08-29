@@ -1,10 +1,15 @@
 {
+  "ean": [
+    "4058075484313"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-11-16T20:39:28Z",
   "device_type": "light",
   "device_specs": {
     "form_factor": "panel",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 1600,
+    "rated_power": 20
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

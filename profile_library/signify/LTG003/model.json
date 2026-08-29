@@ -10,6 +10,7 @@
   "device_type": "light",
   "device_specs": {
     "socket": "GU5.3",
+    "lumens": 400,
     "rated_power": 5.1,
     "form_factor": "spot"
   },

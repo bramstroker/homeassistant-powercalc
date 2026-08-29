@@ -3,6 +3,11 @@
   "created_at": "2022-11-10T19:42:22Z",
   "device_type": "light",
   "device_specs": {
+    "socket": [
+      "B22",
+      "E27"
+    ],
+    "lumens": 1100,
     "form_factor": "bulb",
     "rated_power": 12.0
   },

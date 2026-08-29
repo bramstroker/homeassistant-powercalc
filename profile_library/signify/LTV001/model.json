@@ -12,6 +12,8 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "lumens": 550,
+    "rated_power": 7.0,
     "form_factor": "filament"
   },
   "linked_profile": "signify/LTO001",

@@ -10,7 +10,10 @@
   "created_at": "2022-10-24T18:43:24Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "socket": "E27",
+    "lumens": 550,
+    "rated_power": 7
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

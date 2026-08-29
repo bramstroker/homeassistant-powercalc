@@ -10,6 +10,8 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
+    "lumens": 1200,
+    "rated_power": 12.5,
     "form_factor": "spot"
   },
   "measure_description": "Measured with utils/measure script",

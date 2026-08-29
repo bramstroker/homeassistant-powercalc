@@ -13,6 +13,8 @@
       "E26",
       "E27"
     ],
+    "lumens": 806,
+    "rated_power": 9.5,
     "form_factor": "bulb"
   },
   "measure_description": "Measured with utils/measure script",

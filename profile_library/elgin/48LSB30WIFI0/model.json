@@ -1,9 +1,13 @@
 {
+  "ean": [
+    "7908412514418"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-09-07T05:20:12Z",
   "device_type": "light",
   "device_specs": {
     "form_factor": "bulb",
+    "socket": "E27",
     "lumens": 2600,
     "rated_power": 30
   },

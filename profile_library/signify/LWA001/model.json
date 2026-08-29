@@ -12,6 +12,8 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "lumens": 806,
+    "rated_power": 8.5,
     "form_factor": "bulb"
   },
   "measure_description": "Used script utils/measure_shelly.py from repository, estimated standby",

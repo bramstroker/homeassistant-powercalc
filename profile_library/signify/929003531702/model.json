@@ -5,9 +5,14 @@
   "calculation_strategy": "lut",
   "created_at": "2025-03-29T13:16:27Z",
   "device_type": "light",
+  "ean": [
+    "046677579845"
+  ],
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 2350,
+    "rated_power": 33.5
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

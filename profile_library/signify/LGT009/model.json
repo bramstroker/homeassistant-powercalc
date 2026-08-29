@@ -10,7 +10,8 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 1035
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Hue Play wall washer",

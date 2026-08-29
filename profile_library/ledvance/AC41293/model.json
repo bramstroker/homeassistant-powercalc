@@ -13,6 +13,7 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "lumens": 680,
     "form_factor": "filament",
     "rated_power": 6.0
   },

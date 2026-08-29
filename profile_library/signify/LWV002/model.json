@@ -11,6 +11,8 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
+    "lumens": 530,
+    "rated_power": 7.0,
     "form_factor": "filament"
   },
   "linked_profile": "signify/LWV001",

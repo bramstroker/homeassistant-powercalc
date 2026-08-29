@@ -1,4 +1,7 @@
 {
+  "ean": [
+    "4000870291450"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2024-09-23T00:00:00Z",
   "device_type": "light",

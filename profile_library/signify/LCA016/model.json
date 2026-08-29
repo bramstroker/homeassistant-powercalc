@@ -10,6 +10,7 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "lumens": 806,
     "rated_power": 8.0,
     "form_factor": "bulb"
   },

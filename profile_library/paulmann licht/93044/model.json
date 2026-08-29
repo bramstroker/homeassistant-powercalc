@@ -2,6 +2,9 @@
   "aliases": [
     "500.46"
   ],
+  "ean": [
+    "4000870930441"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2025-02-02T20:03:18Z",
   "device_type": "light",

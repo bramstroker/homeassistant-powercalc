@@ -11,6 +11,8 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
+    "lumens": 800,
+    "rated_power": 8.5,
     "form_factor": "downlight"
   },
   "measure_description": "Measured with utils/measure script, 2 lights",

@@ -12,7 +12,8 @@
   "device_specs": {
     "socket": "E14",
     "form_factor": "candle",
-    "lumens": 470
+    "lumens": 470,
+    "rated_power": 5.5
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",

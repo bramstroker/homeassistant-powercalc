@@ -11,6 +11,8 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E14",
+    "lumens": 300,
+    "rated_power": 4.5,
     "form_factor": "candle"
   },
   "max_voltage": 231.6,
