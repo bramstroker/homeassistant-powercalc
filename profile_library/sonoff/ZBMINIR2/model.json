@@ -1,11 +1,14 @@
 {
+  "aliases": [
+    "MINI-ZBD"
+  ],
   "calculation_strategy": "fixed",
   "created_at": "2025-11-13T14:22:10Z",
   "device_type": "smart_switch",
   "measure_description": "Measured manually",
   "measure_device": "PeakTech 4350",
   "measure_method": "manual",
-  "name": "Zigbee 3.0 Smart Relay Switch",
+  "name": "Extreme Zigbee Smart Switch",
   "only_self_usage": false,
   "standby_power": 0.8,
   "standby_power_on": 1.56,

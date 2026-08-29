@@ -6,7 +6,7 @@
   "measure_device": "Nous A1T",
   "measure_device_firmware": "ESPHome 2023.10.3",
   "measure_method": "script",
-  "name": "Smart Wi-Fi Power Plug / Smart Outlet",
+  "name": "Wi-Fi Smart Socket",
   "only_self_usage": false,
   "standby_power": 0.29,
   "standby_power_on": 1.14,

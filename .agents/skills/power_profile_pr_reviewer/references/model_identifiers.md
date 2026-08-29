@@ -114,7 +114,7 @@ If no unique identifier can be established, request manual verification. If the 
 | Sengled | Exact printed and raw Zigbee models such as `E11-G13` and `E13-N11` | Official Sengled manual or product label, exact HA Device Info, Zigbee converter definition and original profile PR | A Zigbee2MQTT display model can intentionally group multiple raw model values; preserve the grouped value and each exact member as discovery aliases. Follow the concise Sengled guidance below. |
 | WiZ | Prefer the exact WiZ/Signify material or article number (12NC), commonly beginning with `929...`; retain another verified printed manufacturer model when no 12NC can be established | Official WiZ product specifications, product or packaging label, then HA WiZ Device information and the raw `moduleName` | `SHRGB`, `SHRGBC`, `SHTW`, and related `SH...` values are module/configuration codes rather than unique article numbers. Keep confirmed values as intentionally shared discovery aliases. Follow the detailed WiZ guidance below. |
 | Sonos | Prefer the exact manufacturer article/model number printed on the product or packaging when it uniquely identifies the measured hardware. Preserve established product-name directories unless a verified canonical migration is intentionally requested. | Product label/packaging and official Sonos documentation; then HA Sonos Device information, where `model_id` comes from the speaker's `modelNumber` | `S...` values are useful discovery aliases when one-to-one with the measured generation, but are not automatically retail article numbers. Product names and S-codes can both be generation-ambiguous. Follow the detailed Sonos guidance below. |
-| Sonoff | Printed product codes such as `ZBMINI`, `ZBMINIR2`, and `B02BA60` | Product label/manual, eWeLink or HA Device information, Zigbee device signature | Do not substitute an underlying generic Tuya/Zigbee identifier for a branded Sonoff code. |
+| SONOFF | Printed product codes such as `B1`, `B02-B-A60`, `S20`, `ZBMINI`, and `ZBMINIR2` | Official product page/manual and product label, then exact eWeLink or HA Device Info and Zigbee device definitions | Preserve punctuation in the official model. Retain confirmed integration or raw Zigbee values as aliases, but do not substitute a generic Tuya identifier. Follow the concise SONOFF guidance below. |
 | Tuya and white-label devices | No safe universal pattern | Require a branded model from the product label/manufacturer and compare its full Zigbee signature with known devices | Identifiers such as `TS0601`, `TS0505B`, and `_TZE...` values can cover different hardware. Do not add them as a directory or alias unless uniqueness for the measured device is demonstrated. |
 
 ## Amazon
@@ -575,6 +575,10 @@ Use the model segment from the official ESPHome `esphome.project.name` as the ca
 
 Prefer the exact model printed on the underside of the measured device, such as `SNOOZ-US-2`. Keep the official `SNOOZ` brand capitalization in manufacturer metadata and use the concise product-family name without repeating the brand or canonical model. Home Assistant's SNOOZ integration currently creates device registry entries without manufacturer or model fields, so adding guessed aliases does not make these profiles automatically discoverable.
 
+## SONOFF
+
+Use the exact SONOFF model from the label or official manual, including punctuation such as `B02-B-A60`; do not collapse it to `B02BA60` or replace a concrete code such as `B1` with a descriptive directory slug. Preserve former released directories in `legacy_ids` and retain a former discovery-compatible directory value as an alias when it is unique to that profile. For Zigbee devices, retain exact raw model identifiers as aliases when the current device definition maps them to the measured product: `01MINIZB` maps to `ZBMINI`, while `MINI-ZBD` is a confirmed `ZBMINIR2` variant. Use the official product-family wording for the display name without repeating the SONOFF brand or canonical model ID.
+
 ## WiZ
 
 Apply these rules when reviewing or normalizing WiZ and WiZ-powered Philips Smart LED profiles:
@@ -625,6 +629,9 @@ When the printed article number, S-code, product name, or generation cannot be r
 - [The original SNOOZ-US-2 profile PR](https://github.com/bramstroker/homeassistant-powercalc/pull/3291) records the model from the measured device's underside.
 - [Home Assistant's SNOOZ fan implementation](https://github.com/home-assistant/core/blob/dev/homeassistant/components/snooz/fan.py) currently creates device information without manufacturer or model fields.
 - [The official SNOOZ product page](https://getsnooz.com/products/snooz-white-noise-machine) identifies the product family as the SNOOZ Original white noise machine.
+- [SONOFF's official Wi-Fi smart LED bulb page](https://itead.cc/product/sonoff-wi-fi-smart-led-bulb/) identifies the punctuated `B02-B-A60` model and distinguishes it from RGB model `B05-B-A60`.
+- [The SONOFF B1 manual](https://sonoff.ee/wp-content/uploads/2019/04/Instrukcija-B1-EN-LT-LV-EE.pdf) identifies the older RGB bulb's model as `Sonoff B1`.
+- [The current Zigbee2MQTT SONOFF definitions](https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/src/devices/sonoff.ts) map raw identifiers `01MINIZB` and `MINI-ZBD` to `ZBMINI` and `ZBMINIR2` respectively.
 - [TP-Link model-number guidance](https://www.tp-link.com/ae/support/faq/2053/) shows where the product model is printed and exposed in its apps.
 - [Aqara's security and compliance tables](https://www.aqara.com/en/security-certifications/) map official product names to exact model codes and regional variants.
 - [Aqara's supported-device list](https://opendoc.aqara.com/en/docs/SDKDevelopment/IOSDevelopmentGuide/Equipmentcontrol/DeviceControlSDKSupportedDeviceList.html) maps product variants to their `lumi.*` and Matter discovery identifiers.
