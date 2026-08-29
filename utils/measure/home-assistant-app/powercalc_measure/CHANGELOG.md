@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 0.5.0 - 2026-08-29
+
+- #4556 Add support for the OWON OWH98xx series power meters @MartinJM
+
+### 🚀 Features
+
+- #4614 Improve power profile contribution consistency @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4592 Fix error with lights not having effect list @bramstroker
+
 ## 0.4.1 - 2026-08-21
 
 ### 🐛 Bug Fixes
