@@ -4,7 +4,8 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 1500
   },
   "ean": [
     "850030064738"

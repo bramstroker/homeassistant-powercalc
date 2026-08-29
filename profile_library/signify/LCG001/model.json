@@ -7,7 +7,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "GU10",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 400,
+    "rated_power": 6.0
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",
@@ -17,7 +19,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.15:docker"
   },
-  "name": "Hue White and Color Ambiance GU10 w/BT",
+  "name": "Hue White and Color Ambiance GU10 Bluetooth",
   "standby_power": 0.4,
   "authors": [
     {

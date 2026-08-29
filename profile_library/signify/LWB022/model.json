@@ -7,7 +7,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 800,
+    "rated_power": 9.0
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P115",
