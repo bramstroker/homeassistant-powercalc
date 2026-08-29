@@ -16,7 +16,7 @@
     "SLEEP_TIME": 10,
     "VERSION": "v1.17.11:docker"
   },
-  "name": "SMART+ ZB Filament Edison 52 DIM 6 W 824 Gold E27",
+  "name": "SMART+ ZB Filament Edison 52 DIM 6W 824 Gold E27",
   "standby_power": 0.24,
   "authors": [
     {

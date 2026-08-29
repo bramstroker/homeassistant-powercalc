@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.1.1:docker"
   },
-  "name": "SMART+ WiFi Planon Frameless 300x300 mm TW",
+  "name": "SMART+ WiFi Planon Frameless 300x300mm TW",
   "standby_power": 0.9,
   "authors": [
     {

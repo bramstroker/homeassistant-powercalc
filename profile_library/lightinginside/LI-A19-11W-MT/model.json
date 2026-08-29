@@ -10,7 +10,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.3.0:app"
   },
-  "name": "Matter RGBCW A19 E26 Smart Bulb",
+  "name": "Matter RGBCW A19 E26 Smart Bulb (11W)",
   "voltage_range": {
     "min": 118.95,
     "max": 121.41

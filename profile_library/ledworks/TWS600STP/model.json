@@ -5,7 +5,7 @@
   "fixed_config": {
     "power": 37.0
   },
-  "measure_description": "Measured with utils/measure script however power usage is more or less constant when on",
+  "measure_description": "Measured with the utils/measure script; power usage remained approximately constant across effects and brightness levels when on",
   "measure_device": "Shelly 3",
   "measure_method": "script",
   "measure_settings": {
@@ -13,7 +13,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.15.5:docker"
   },
-  "name": "Twinkly 600 String Lights",
+  "name": "Twinkly Strings Multicolor (600 LEDs)",
   "standby_power": 2.2,
   "authors": [
     {

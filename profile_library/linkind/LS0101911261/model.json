@@ -13,7 +13,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.2.1:app"
   },
-  "name": "Matter Smart RGBTW Lampe, Wifi E27 800 Lumen",
+  "name": "Matter RGBTW Bulb, E27 (9W, 800 lm)",
   "standby_power": 0.29,
   "voltage_range": {
     "min": 231.7,

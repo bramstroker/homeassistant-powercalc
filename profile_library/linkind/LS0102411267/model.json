@@ -13,7 +13,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.4:docker"
   },
-  "name": "A19 Matter Smart CCT Light Bulb - 800lm",
+  "name": "Matter CCT Bulb, A19/E26 (9W, 800 lm)",
   "standby_power": 0.91,
   "authors": [
     {
