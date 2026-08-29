@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "ZB-LZD10-RCW"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-02-24T18:09:22Z",
   "device_type": "light",
@@ -10,12 +13,15 @@
     "SLEEP_TIME": 60,
     "VERSION": "v1.20.6:docker"
   },
-  "name": "Zigbee Smart Downlight",
+  "name": "Zigbee RGB+CCT LED Downlight (10W)",
   "standby_power": 0.7,
   "authors": [
     {
       "name": "Pranjal Joshi",
       "github": "pranjal-joshi"
     }
+  ],
+  "legacy_ids": [
+    "ZB-LZD10-RCW"
   ]
 }
