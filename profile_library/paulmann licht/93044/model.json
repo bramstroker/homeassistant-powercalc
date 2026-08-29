@@ -5,6 +5,11 @@
   "calculation_strategy": "lut",
   "created_at": "2025-02-02T20:03:18Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "panel",
+    "lumens": 1400,
+    "rated_power": 16.0
+  },
   "legacy_ids": [
     "500.46"
   ],

@@ -2,6 +2,12 @@
   "calculation_strategy": "lut",
   "created_at": "2025-10-28T04:32:28Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "E27",
+    "form_factor": "bulb",
+    "lumens": 2452,
+    "rated_power": 18.5
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",

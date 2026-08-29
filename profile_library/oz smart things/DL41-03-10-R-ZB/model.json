@@ -2,6 +2,10 @@
   "calculation_strategy": "lut",
   "created_at": "2022-12-07T08:50:18Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "downlight",
+    "rated_power": 10.0
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 2.5 gen1 (SHSW-25)",
   "measure_method": "script",

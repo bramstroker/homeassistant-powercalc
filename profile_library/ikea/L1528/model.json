@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2022-02-12T15:41:16Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "panel"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 3EM",
   "measure_method": "script",

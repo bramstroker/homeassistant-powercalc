@@ -2,6 +2,12 @@
   "calculation_strategy": "lut",
   "created_at": "2026-08-17T11:48:24Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "E27",
+    "form_factor": "bulb",
+    "lumens": 806,
+    "rated_power": 8.5
+  },
   "aliases": [
     "VIYU_A60_806_CCT_10454469"
   ],

@@ -6,6 +6,10 @@
   "calculation_strategy": "lut",
   "created_at": "2022-10-04T23:07:22Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "E27",
+    "lumens": 800
+  },
   "measure_description": "Measured with utils/measure script; 2 bulbs, no dummy load",
   "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
   "measure_method": "script",

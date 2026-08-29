@@ -2,6 +2,9 @@
   "calculation_strategy": "lut",
   "created_at": "2022-07-24T10:11:16Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "filament"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "script",

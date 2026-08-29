@@ -6,6 +6,10 @@
   "calculation_strategy": "lut",
   "created_at": "2021-08-29T23:49:16Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "E27",
+    "form_factor": "filament"
+  },
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",

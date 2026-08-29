@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2021-09-10T20:49:41Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "strip"
+  },
   "measure_description": "Measured by custom script with all lightstrip extensions detached. Measured standby power with ELV Energy Master Profi 2",
   "measure_device": "AVM Fritz!DECT 200",
   "measure_method": "script",

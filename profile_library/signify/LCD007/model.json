@@ -2,6 +2,9 @@
   "calculation_strategy": "lut",
   "created_at": "2025-03-25T15:48:26Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "downlight"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",

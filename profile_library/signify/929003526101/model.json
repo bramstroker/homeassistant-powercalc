@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2025-12-20T00:35:52Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "spot"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Gen4",
   "measure_method": "script",

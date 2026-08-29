@@ -2,6 +2,10 @@
   "calculation_strategy": "lut",
   "created_at": "2025-05-30T11:16:31Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "E14",
+    "form_factor": "candle"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A1",
   "measure_method": "script",

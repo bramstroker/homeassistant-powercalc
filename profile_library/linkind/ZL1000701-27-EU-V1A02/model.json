@@ -5,6 +5,12 @@
   "calculation_strategy": "lut",
   "created_at": "2023-09-03T13:47:50Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "E27",
+    "form_factor": "filament",
+    "lumens": 806,
+    "rated_power": 6.2
+  },
   "legacy_ids": [
     "ZBT-DIMLight-D0120"
   ],

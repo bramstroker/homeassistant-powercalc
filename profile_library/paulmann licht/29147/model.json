@@ -2,6 +2,11 @@
   "calculation_strategy": "lut",
   "created_at": "2024-09-25T00:00:00Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "GU10",
+    "lumens": 350,
+    "rated_power": 4.8
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",

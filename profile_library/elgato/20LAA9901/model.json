@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2025-03-17T20:00:14Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "strip"
+  },
   "legacy_ids": [
     "Elgato Light Strip"
   ],

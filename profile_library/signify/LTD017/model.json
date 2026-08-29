@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2025-10-08T14:47:08Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "downlight"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug",
   "measure_method": "script",

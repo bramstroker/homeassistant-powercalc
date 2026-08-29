@@ -6,6 +6,9 @@
   "calculation_strategy": "lut",
   "created_at": "2021-08-29T21:30:20Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "strip"
+  },
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",

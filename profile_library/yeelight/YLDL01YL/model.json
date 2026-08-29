@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2022-03-17T21:45:16Z",
   "device_type": "light",
+  "device_specs": {
+    "rated_power": 33.0
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

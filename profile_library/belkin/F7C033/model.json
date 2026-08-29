@@ -2,6 +2,9 @@
   "calculation_strategy": "lut",
   "created_at": "2021-08-17T10:46:54Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "bulb"
+  },
   "measure_description": "Was not able to measure the standby power, the value is assumed",
   "measure_device": "RRPM02 (Model); 4897037690801 (Barcode); Reduction Revolution Plug-in Power Meter",
   "measure_method": "manual",

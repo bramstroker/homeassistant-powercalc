@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2024-11-09T00:06:13Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "strip"
+  },
   "legacy_ids": [
     "ORMANAS LED Strip"
   ],

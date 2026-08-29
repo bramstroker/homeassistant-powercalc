@@ -5,6 +5,9 @@
   "calculation_strategy": "lut",
   "created_at": "2023-08-20T07:30:32Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "panel"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

@@ -2,6 +2,9 @@
   "calculation_strategy": "lut",
   "created_at": "2022-09-27T16:10:29Z",
   "device_type": "light",
+  "device_specs": {
+    "form_factor": "bulb"
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Fibaro FGWP102",
   "measure_method": "script",

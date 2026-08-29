@@ -6,6 +6,12 @@
   "calculation_strategy": "lut",
   "created_at": "2026-08-17T18:25:10Z",
   "device_type": "light",
+  "device_specs": {
+    "socket": "E27",
+    "form_factor": "filament",
+    "lumens": 580,
+    "rated_power": 7.0
+  },
   "linked_profile": "signify/LWV007",
   "measure_description": "LUT data is reused from LWV007 via linked_profile. I verified the equivalence with my own measurement of all 255 brightness steps on a Shelly Plus 1PM with a resistive dummy load and 5 samples per point: mean difference to LWV007 -0.024 W, median -0.020 W, and -0.019 W above brightness 128. Standby measured 0.05 W, matching LWV007. My own data is noisier than LWV007's (64 monotonicity regressions out of 254 against 27) because a single 7 W bulb behind an 8 W dummy load sits inside the meter's quantisation at the bottom of the range, so linking is the better choice than contributing my own LUT.",
   "measure_device": "Shelly Plus 1PM",
