@@ -178,6 +178,9 @@
       "name": "aeotec",
       "full_name": "Aeotec",
       "dir_name": "aeotec",
+      "website": "https://aeotec.com",
+      "country": "DE",
+      "description": "Z-Wave and Zigbee sensor maker run from Hamburg, and the origin of the Aeon Labs range.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -346,6 +349,9 @@
       "name": "amazon",
       "full_name": "Amazon",
       "dir_name": "amazon",
+      "website": "https://www.amazon.com",
+      "country": "US",
+      "description": "Echo speakers and displays, and Fire TV players.",
       "models": [
         {
           "aliases": [
@@ -819,6 +825,9 @@
       "name": "apple",
       "full_name": "Apple",
       "dir_name": "apple",
+      "website": "https://www.apple.com",
+      "country": "US",
+      "description": "American maker of the HomePod and Apple TV.",
       "models": [
         {
           "aliases": [
@@ -896,6 +905,9 @@
       "name": "aqara",
       "full_name": "Aqara",
       "dir_name": "aqara",
+      "website": "https://www.aqara.com",
+      "country": "CN",
+      "description": "Brand of Lumi United in Shenzhen, making Zigbee sensors, switches and cameras.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -1210,6 +1222,9 @@
       "name": "arlec",
       "full_name": "Arlec",
       "dir_name": "arlec",
+      "website": "https://www.arlec.com.au",
+      "country": "AU",
+      "description": "Australian electrical brand. Its Grid Connect smart range is sold through Bunnings.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -1599,6 +1614,9 @@
       "name": "avm",
       "full_name": "AVM",
       "dir_name": "avm",
+      "website": "https://avm.de",
+      "country": "DE",
+      "description": "Berlin manufacturer of FRITZ!Box routers and the FRITZ!DECT smart home range.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -2201,6 +2219,9 @@
       "name": "bosch",
       "full_name": "Bosch",
       "dir_name": "bosch",
+      "website": "https://www.bosch-smarthome.com",
+      "country": "DE",
+      "description": "German engineering group. Its home automation is sold as Bosch Smart Home.",
       "models": [
         {
           "aliases": [
@@ -2284,6 +2305,9 @@
       "name": "bose",
       "full_name": "Bose",
       "dir_name": "bose",
+      "website": "https://www.bose.com",
+      "country": "US",
+      "description": "American audio manufacturer.",
       "models": [
         {
           "aliases": [
@@ -2439,6 +2463,9 @@
       "name": "calex",
       "full_name": "Calex",
       "dir_name": "calex",
+      "website": "https://www.calex.eu",
+      "country": "NL",
+      "description": "Dutch lamp brand, known for filament LEDs and its Calex Smart range.",
       "models": [
         {
           "aliases": [
@@ -2671,6 +2698,9 @@
       "name": "denon",
       "full_name": "Denon",
       "dir_name": "denon",
+      "website": "https://www.denon.com",
+      "country": "JP",
+      "description": "Japanese audio manufacturer. Its wireless speakers run the HEOS platform.",
       "models": [
         {
           "aliases": [
@@ -2833,6 +2863,9 @@
       "name": "dreo",
       "full_name": "Dreo",
       "dir_name": "dreo",
+      "website": "https://www.dreo.com",
+      "country": "US",
+      "description": "American brand of tower fans, space heaters, humidifiers and air purifiers.",
       "models": [
         {
           "calculation_strategy": "linear",
@@ -3112,6 +3145,9 @@
       "name": "eglo",
       "full_name": "EGLO",
       "dir_name": "eglo",
+      "website": "https://www.eglo.com",
+      "country": "AT",
+      "description": "Austrian lighting manufacturer from Tyrol. Its connected range is EGLO connect.",
       "models": [
         {
           "aliases": [
@@ -3314,6 +3350,9 @@
       "name": "elgato",
       "full_name": "Elgato",
       "dir_name": "elgato",
+      "website": "https://www.elgato.com",
+      "country": "DE",
+      "description": "Munich maker of streaming gear, including the Key Light range. A Corsair brand since 2018.",
       "models": [
         {
           "aliases": [
@@ -3820,6 +3859,9 @@
       "name": "epson",
       "full_name": "Epson",
       "dir_name": "epson",
+      "website": "https://www.epson.com",
+      "country": "JP",
+      "description": "Japanese manufacturer of printers and projectors.",
       "models": [
         {
           "aliases": [
@@ -3893,6 +3935,9 @@
       "name": "eq-3",
       "full_name": "eQ-3",
       "dir_name": "eq-3",
+      "website": "https://www.eq-3.de",
+      "country": "DE",
+      "description": "German manufacturer behind Homematic and Homematic IP home automation.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -4233,6 +4278,9 @@
       "name": "eufy",
       "full_name": "Eufy",
       "dir_name": "eufy",
+      "website": "https://www.eufy.com",
+      "country": "CN",
+      "description": "Home brand of Anker Innovations in Shenzhen: cameras, vacuums and lights.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -4295,6 +4343,9 @@
       "name": "eve",
       "full_name": "Eve",
       "dir_name": "eve",
+      "website": "https://www.evehome.com",
+      "country": "DE",
+      "description": "Munich maker of HomeKit and Matter accessories, formerly Elgato Eve.",
       "models": [
         {
           "aliases": [
@@ -4434,6 +4485,9 @@
       "name": "ewelink",
       "full_name": "eWeLink",
       "dir_name": "ewelink",
+      "website": "https://ewelink.cc",
+      "country": "CN",
+      "description": "App and cloud platform behind Sonoff and a long list of other Shenzhen brands.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -4475,6 +4529,9 @@
       "name": "fibaro",
       "full_name": "Fibaro",
       "dir_name": "fibaro",
+      "website": "https://www.fibaro.com",
+      "country": "PL",
+      "description": "Polish maker of Z-Wave sensors, dimmers and controllers.",
       "models": [
         {
           "aliases": [
@@ -4523,6 +4580,9 @@
       "name": "free",
       "full_name": "Free",
       "dir_name": "free",
+      "website": "https://www.free.fr",
+      "country": "FR",
+      "description": "French internet provider. The library covers its Freebox set-top boxes and players.",
       "models": [
         {
           "aliases": [
@@ -5079,6 +5139,9 @@
       "name": "gledopto",
       "full_name": "Gledopto",
       "dir_name": "gledopto",
+      "website": "https://www.gledopto.com",
+      "country": "CN",
+      "description": "Shenzhen maker of Zigbee LED controllers and lamps.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -5355,6 +5418,9 @@
       "name": "google",
       "full_name": "Google",
       "dir_name": "google",
+      "website": "https://store.google.com",
+      "country": "US",
+      "description": "Nest speakers, displays and thermostats.",
       "models": [
         {
           "aliases": [
@@ -5674,6 +5740,9 @@
       "name": "govee",
       "full_name": "Govee",
       "dir_name": "govee",
+      "website": "https://www.govee.com",
+      "country": "CN",
+      "description": "Chinese maker of smart lighting, best known for its addressable RGBIC strips and lamps.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -6350,6 +6419,9 @@
       "name": "harman kardon",
       "full_name": "Harman Kardon",
       "dir_name": "harman kardon",
+      "website": "https://www.harmankardon.com",
+      "country": "US",
+      "description": "American audio brand, part of Harman International and owned by Samsung.",
       "models": [
         {
           "calculation_strategy": "linear",
@@ -6530,6 +6602,9 @@
       "name": "ikea",
       "full_name": "IKEA",
       "dir_name": "ikea",
+      "website": "https://www.ikea.com",
+      "country": "SE",
+      "description": "Swedish furniture retailer. Its smart lighting ran under the TR\u00c5DFRI name and, more recently, KAJPLATS.",
       "models": [
         {
           "aliases": [
@@ -9753,6 +9828,9 @@
       "name": "innr",
       "full_name": "Innr",
       "dir_name": "innr",
+      "website": "https://www.innr.com",
+      "country": "NL",
+      "description": "Zigbee lighting manufacturer from Hilversum, whose lamps are a common alternative to Hue.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -10985,6 +11063,9 @@
       "name": "inovelli",
       "full_name": "Inovelli",
       "dir_name": "inovelli",
+      "website": "https://inovelli.com",
+      "country": "US",
+      "description": "American maker of Z-Wave and Zigbee wall switches aimed at enthusiasts.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -11268,6 +11349,9 @@
       "name": "ledvance",
       "full_name": "LEDVANCE",
       "dir_name": "ledvance",
+      "website": "https://www.ledvance.com",
+      "country": "DE",
+      "description": "German lighting manufacturer, spun out of OSRAM in 2016. Sells consumer lamps under the LEDVANCE, OSRAM and SYLVANIA names.",
       "models": [
         {
           "aliases": [
@@ -11854,6 +11938,9 @@
       "name": "lenovo",
       "full_name": "Lenovo",
       "dir_name": "lenovo",
+      "website": "https://www.lenovo.com",
+      "country": "CN",
+      "description": "Chinese computer manufacturer. Its smart clocks and displays run Google Assistant.",
       "models": [
         {
           "aliases": [
@@ -11962,6 +12049,9 @@
       "name": "lidl",
       "full_name": "Lidl",
       "dir_name": "lidl",
+      "website": "https://www.lidl.com",
+      "country": "DE",
+      "description": "German discount supermarket chain. Its smart home range is sold as Livarno Home and Silvercrest.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -13126,6 +13216,9 @@
       "name": "lifx",
       "full_name": "LIFX",
       "dir_name": "lifx",
+      "website": "https://www.lifx.com",
+      "country": "US",
+      "description": "Wi-Fi smart lighting that needs no bridge. Founded in Australia and part of California-based Feit Electric since 2022.",
       "models": [
         {
           "aliases": [
@@ -13836,6 +13929,8 @@
       "name": "linkind",
       "full_name": "Linkind",
       "dir_name": "linkind",
+      "website": "https://www.linkind.com",
+      "description": "Smart lighting brand whose lamps also ship under the Leedarson name.",
       "models": [
         {
           "aliases": [
@@ -13998,6 +14093,9 @@
       "name": "lsc",
       "full_name": "LSC",
       "dir_name": "lsc",
+      "website": "https://www.lsc-smartconnect.com",
+      "country": "NL",
+      "description": "LSC Smart Connect, the smart home house brand of the Dutch discount retailer Action.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -14271,6 +14369,9 @@
       "name": "lutron",
       "full_name": "Lutron",
       "dir_name": "lutron",
+      "website": "https://www.lutron.com",
+      "country": "US",
+      "description": "American maker of dimmers and shading, and of the Cas\u00e9ta system.",
       "models": [
         {
           "aliases": [
@@ -14516,6 +14617,9 @@
       "name": "meross",
       "full_name": "Meross",
       "dir_name": "meross",
+      "website": "https://www.meross.com",
+      "country": "CN",
+      "description": "Chinese maker of HomeKit and Matter plugs, lights and garage door openers.",
       "models": [
         {
           "aliases": [
@@ -14576,6 +14680,9 @@
       "name": "moes",
       "full_name": "MOES",
       "dir_name": "moes",
+      "website": "https://www.moeshouse.com",
+      "country": "CN",
+      "description": "Chinese brand of Tuya-based switches, thermostats and plugs.",
       "models": [
         {
           "aliases": [
@@ -14689,6 +14796,9 @@
       "name": "mueller-licht",
       "full_name": "M\u00fcller Licht",
       "dir_name": "mueller-licht",
+      "website": "https://www.mueller-licht.de",
+      "country": "DE",
+      "description": "German lamp manufacturer. Its connected range is sold as tint.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -15142,6 +15252,9 @@
       "name": "nanoleaf",
       "full_name": "Nanoleaf",
       "dir_name": "nanoleaf",
+      "website": "https://nanoleaf.me",
+      "country": "CA",
+      "description": "Toronto maker of modular light panels, light strings and Matter bulbs.",
       "models": [
         {
           "aliases": [
@@ -15251,6 +15364,8 @@
       "name": "neo-coolcam",
       "full_name": "Neo CoolCam",
       "dir_name": "neo-coolcam",
+      "country": "CN",
+      "description": "Shenzhen NEO, making Zigbee and Wi-Fi sensors, plugs and sirens.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -15290,6 +15405,9 @@
       "name": "netatmo",
       "full_name": "Netatmo",
       "dir_name": "netatmo",
+      "website": "https://www.netatmo.com",
+      "country": "FR",
+      "description": "French maker of weather stations, cameras and thermostats, part of Legrand.",
       "models": [
         {
           "created_at": "2025-05-01T21:56:26Z",
@@ -15417,6 +15535,9 @@
       "name": "nous",
       "full_name": "NOUS",
       "dir_name": "nous",
+      "website": "https://nous.technology",
+      "country": "PL",
+      "description": "Polish smart home brand selling Wi-Fi and Zigbee plugs and switches, some shipped pre-flashed with Tasmota.",
       "models": [
         {
           "aliases": [
@@ -15488,6 +15609,9 @@
       "name": "nuki",
       "full_name": "Nuki Home Solutions GmbH",
       "dir_name": "nuki",
+      "website": "https://nuki.io",
+      "country": "AT",
+      "description": "Austrian maker of retrofit smart locks, from Graz.",
       "models": [
         {
           "aliases": [
@@ -15527,6 +15651,9 @@
       "name": "osram",
       "full_name": "OSRAM",
       "dir_name": "osram",
+      "website": "https://www.osram.com",
+      "country": "DE",
+      "description": "German lighting manufacturer. Its consumer lamp business, including the LIGHTIFY range, moved to LEDVANCE in 2016.",
       "models": [
         {
           "aliases": [
@@ -16000,6 +16127,9 @@
       "name": "paulmann licht",
       "full_name": "Paulmann Licht",
       "dir_name": "paulmann licht",
+      "website": "https://www.paulmann.com",
+      "country": "DE",
+      "description": "German lighting manufacturer from Springe, with a large 12 V and smart range.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -16391,6 +16521,9 @@
       "name": "qubino",
       "full_name": "Qubino",
       "dir_name": "qubino",
+      "website": "https://qubino.com",
+      "country": "SI",
+      "description": "Z-Wave module maker from Solkan, part of GOAP.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -16430,6 +16563,9 @@
       "name": "reolink",
       "full_name": "Reolink",
       "dir_name": "reolink",
+      "website": "https://reolink.com",
+      "country": "CN",
+      "description": "Chinese manufacturer of security cameras and video doorbells.",
       "models": [
         {
           "aliases": [
@@ -16499,6 +16635,9 @@
       "name": "rituals",
       "full_name": "Rituals",
       "dir_name": "rituals",
+      "website": "https://www.rituals.com",
+      "country": "NL",
+      "description": "Dutch cosmetics retailer. The library covers its smart perfume diffuser.",
       "models": [
         {
           "aliases": [
@@ -16602,6 +16741,9 @@
       "name": "roborock",
       "full_name": "Roborock",
       "dir_name": "roborock",
+      "website": "https://global.roborock.com",
+      "country": "CN",
+      "description": "Chinese manufacturer of robot vacuums, originally part of the Xiaomi ecosystem.",
       "models": [
         {
           "calculation_strategy": "composite",
@@ -16760,6 +16902,8 @@
       "name": "sengled",
       "full_name": "Sengled",
       "dir_name": "sengled",
+      "website": "https://eu.sengled.com",
+      "description": "Smart lighting manufacturer, among the first to ship Zigbee lamps cheaply. Sells through regional sites rather than one global one.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -16901,6 +17045,9 @@
       "name": "shelly",
       "full_name": "Shelly",
       "dir_name": "shelly",
+      "website": "https://www.shelly.com",
+      "country": "BG",
+      "description": "Smart home brand of Allterco, based in Sofia. Its relays and plugs are made for retrofitting existing wiring.",
       "models": [
         {
           "aliases": [
@@ -17789,6 +17936,9 @@
       "name": "signify",
       "full_name": "Signify",
       "dir_name": "signify",
+      "website": "https://www.signify.com",
+      "country": "NL",
+      "description": "Dutch lighting company, formerly Philips Lighting, and the maker of Philips Hue.",
       "models": [
         {
           "aliases": [
@@ -26990,6 +27140,9 @@
       "name": "sonoff",
       "full_name": "Sonoff",
       "dir_name": "sonoff",
+      "website": "https://sonoff.tech",
+      "country": "CN",
+      "description": "Smart home brand of ITEAD in Shenzhen, known for inexpensive Wi-Fi and Zigbee switches.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -27166,6 +27319,9 @@
       "name": "sonos",
       "full_name": "Sonos",
       "dir_name": "sonos",
+      "website": "https://www.sonos.com",
+      "country": "US",
+      "description": "American maker of wireless speakers and home audio.",
       "models": [
         {
           "aliases": [
@@ -27837,6 +27993,9 @@
       "name": "sony",
       "full_name": "Sony",
       "dir_name": "sony",
+      "website": "https://www.sony.com",
+      "country": "JP",
+      "description": "Japanese electronics manufacturer.",
       "models": [
         {
           "calculation_strategy": "linear",
@@ -27974,6 +28133,8 @@
       "name": "tasmota",
       "full_name": "Tasmota",
       "dir_name": "tasmota",
+      "website": "https://tasmota.github.io",
+      "description": "Open-source firmware for ESP-based devices rather than a manufacturer: these profiles were measured on hardware reflashed with it.",
       "models": [
         {
           "aliases": [
@@ -28216,6 +28377,8 @@
       "name": "third reality",
       "full_name": "Third Reality",
       "dir_name": "third reality",
+      "website": "https://www.thirdreality.com",
+      "description": "Maker of inexpensive Zigbee and Matter sensors, plugs and switches.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -28273,6 +28436,9 @@
       "name": "tp-link",
       "full_name": "TP-Link",
       "dir_name": "tp-link",
+      "website": "https://www.tp-link.com",
+      "country": "CN",
+      "description": "Chinese networking manufacturer. Its smart home products are sold as Kasa and Tapo.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -29019,6 +29185,9 @@
       "name": "tuya",
       "full_name": "Tuya",
       "dir_name": "tuya",
+      "website": "https://tuya.com",
+      "country": "CN",
+      "description": "Chinese IoT platform rather than a brand: devices from many manufacturers ship its firmware and are recognised under this name.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -29640,6 +29809,9 @@
       "name": "velux",
       "full_name": "Velux",
       "dir_name": "velux",
+      "website": "https://www.velux.com",
+      "country": "DK",
+      "description": "Danish maker of roof windows. Its blinds and shutters run on io-homecontrol.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -29677,6 +29849,9 @@
       "name": "vesync",
       "full_name": "VeSync",
       "dir_name": "vesync",
+      "website": "https://www.vesync.com",
+      "country": "CN",
+      "description": "Shenzhen company behind the Levoit, Etekcity and Cosori appliance brands.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -29765,6 +29940,9 @@
       "name": "wiz",
       "full_name": "WiZ",
       "dir_name": "wiz",
+      "website": "https://www.wizconnected.com",
+      "country": "HK",
+      "description": "Wi-Fi smart lighting brand from Hong Kong, part of Signify since 2019 and sold alongside Hue.",
       "models": [
         {
           "aliases": [
@@ -30634,6 +30812,9 @@
       "name": "wyze",
       "full_name": "Wyze",
       "dir_name": "wyze",
+      "website": "https://www.wyze.com",
+      "country": "US",
+      "description": "American maker of low-cost cameras, plugs and bulbs.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -30716,6 +30897,9 @@
       "name": "xiaomi",
       "full_name": "Xiaomi",
       "dir_name": "xiaomi",
+      "website": "https://www.mi.com",
+      "country": "CN",
+      "description": "Chinese electronics manufacturer whose Mi Home ecosystem covers much of this library.",
       "models": [
         {
           "created_at": "2025-05-01T21:56:26Z",
@@ -30874,6 +31058,9 @@
       "name": "yeelight",
       "full_name": "Yeelight",
       "dir_name": "yeelight",
+      "website": "https://www.yeelight.com",
+      "country": "CN",
+      "description": "Chinese smart lighting manufacturer that grew up in the Xiaomi ecosystem.",
       "models": [
         {
           "calculation_strategy": "lut",
@@ -31571,6 +31758,9 @@
       "name": "youless",
       "full_name": "YouLess",
       "dir_name": "youless",
+      "website": "https://www.youless.nl",
+      "country": "NL",
+      "description": "Dutch maker of energy monitors that read an existing meter optically.",
       "models": [
         {
           "calculation_strategy": "fixed",
@@ -31664,6 +31854,9 @@
       "name": "zengge",
       "full_name": "Zengge",
       "dir_name": "zengge",
+      "website": "https://www.zenggeai.com",
+      "country": "CN",
+      "description": "Shenzhen maker of Wi-Fi and Bluetooth LED controllers, sold under many names and driven by the Magic Home app.",
       "models": [
         {
           "calculation_strategy": "lut",
