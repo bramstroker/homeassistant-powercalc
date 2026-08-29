@@ -14,7 +14,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.10.4:docker"
   },
-  "name": "White 5000K A19/E26 Bulb E11-G13 Zigbee",
+  "name": "Element Classic Soft White A19 Bulb",
   "standby_power": 0.3,
   "authors": [
     {
