@@ -14,7 +14,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.3.6:docker"
   },
-  "name": "Smart Zigbee Dimmable GU10 LED Spot",
+  "name": "Zigbee Dimmable GU10 LED Spot",
   "standby_power": 0.65,
   "authors": [
     {
