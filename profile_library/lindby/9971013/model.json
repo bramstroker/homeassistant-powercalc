@@ -10,7 +10,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.17.11:docker"
   },
-  "name": "Dimmable CCT LED Light Bulb, E27 (10 W)",
+  "name": "Dimmable RGBW LED Bulb, E27 (10W)",
   "standby_power": 0.38,
   "authors": [
     {
