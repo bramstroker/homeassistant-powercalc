@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "downlight"
+    "form_factor": "downlight",
+    "lumens": 1100,
+    "rated_power": 12
   },
+  "ean": [
+    "046677578527"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug",
   "measure_method": "script",

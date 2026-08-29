@@ -8,6 +8,7 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "downlight",
+    "lumens": 800,
     "rated_power": 12.0
   },
   "legacy_ids": [

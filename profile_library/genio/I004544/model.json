@@ -5,7 +5,7 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "downlight",
-    "lumens": 850,
+    "lumens": 750,
     "rated_power": 9.0
   },
   "measure_description": "Measured with utils/measure script",
@@ -16,7 +16,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "Wi-Fi Dimmable RGB+CCT 9W LED Downlight (850lm)",
+  "name": "Wi-Fi Dimmable RGB+CCT 9W LED Downlight (750lm)",
   "standby_power": 0.24,
   "authors": [
     {

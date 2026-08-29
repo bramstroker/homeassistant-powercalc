@@ -8,8 +8,12 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "downlight",
+    "lumens": 740,
     "rated_power": 9.0
   },
+  "ean": [
+    "9312699205484"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 2PM",
   "measure_method": "script",

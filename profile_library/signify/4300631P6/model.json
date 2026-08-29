@@ -8,12 +8,16 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 806
   },
+  "ean": [
+    "8718696175255"
+  ],
   "linked_profile": "signify/LTA001",
   "measure_device": "See linked profile",
   "measure_method": "script",
-  "name": "Hue Wellness White Ambiance Table Lamp",
+  "name": "Hue Devote Pendant Light",
   "standby_power": 0.29,
   "authors": [
     {

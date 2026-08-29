@@ -4,8 +4,12 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "downlight"
+    "form_factor": "downlight",
+    "lumens": 820
   },
+  "ean": [
+    "046135737411"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Sonoff S31",
   "measure_device_firmware": "Tasmota",

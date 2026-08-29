@@ -8,8 +8,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "lumens": 1100,
+    "rated_power": 8
   },
+  "ean": [
+    "8719514291119"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Gosund UP111",
   "measure_device_firmware": "Tuya",

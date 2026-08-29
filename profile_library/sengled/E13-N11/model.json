@@ -6,6 +6,9 @@
     "socket": "E26",
     "form_factor": "spot"
   },
+  "ean": [
+    "840696101724"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Third Reality 3RSP02028BZ",
   "measure_method": "script",

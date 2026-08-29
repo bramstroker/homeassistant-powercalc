@@ -8,8 +8,13 @@
   "device_specs": {
     "socket": "E26",
     "form_factor": "bulb",
-    "lumens": 1600
+    "lumens": 1600,
+    "rated_power": 17
   },
+  "ean": [
+    "046677557805",
+    "046677557812"
+  ],
   "linked_profile": "signify/LWA009",
   "measure_description": "Measured twice with script made by bramstroker using 9 sec pauses and partially verified manual",
   "measure_device": "Shelly Plug S",

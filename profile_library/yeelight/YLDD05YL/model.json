@@ -7,7 +7,9 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "strip"
+    "form_factor": "strip",
+    "lumens": 200,
+    "rated_power": 7.5
   },
   "ean": [
     "608887786590"

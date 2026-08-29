@@ -5,6 +5,7 @@
   "device_specs": {
     "form_factor": "fixture",
     "socket": "integrated",
+    "lumens": 400,
     "rated_power": 9
   },
   "ean": [

@@ -11,6 +11,9 @@
     "lumens": 803,
     "rated_power": 10
   },
+  "ean": [
+    "7897013500022"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "script",

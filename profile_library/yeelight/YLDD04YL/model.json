@@ -8,7 +8,8 @@
     "rated_power": 7.5
   },
   "ean": [
-    "6924922201809"
+    "6924922201809",
+    "6924922200833"
   ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

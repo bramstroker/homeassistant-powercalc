@@ -5,7 +5,8 @@
   "device_specs": {
     "socket": "GU10",
     "form_factor": "spot",
-    "lumens": 350
+    "lumens": 350,
+    "rated_power": 4.5
   },
   "ean": [
     "8713439711592"

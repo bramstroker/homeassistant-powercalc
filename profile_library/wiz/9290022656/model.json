@@ -11,6 +11,9 @@
     "lumens": 800,
     "rated_power": 8.8
   },
+  "ean": [
+    "046677556136"
+  ],
   "measure_description": "Measured 5 bulbs with utils/measure script with no dummy load",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",
@@ -19,7 +22,7 @@
     "SLEEP_TIME": 5,
     "VERSION": "master"
   },
-  "name": "Smart Wi-Fi RGB + Tunable White LED Light Bulb (A19, 800 lm, 8.8 W)",
+  "name": "A19 E26 RGB + Tunable White Bulb (8.8W, 800 lm)",
   "standby_power": 0.31,
   "authors": [
     {

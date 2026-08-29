@@ -5,6 +5,7 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "strip",
+    "lumens": 500,
     "rated_power": 20.5
   },
   "ean": [

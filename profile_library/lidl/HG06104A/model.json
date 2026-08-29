@@ -7,6 +7,9 @@
     "form_factor": "strip",
     "rated_power": 22
   },
+  "ean": [
+    "4056233505214"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",

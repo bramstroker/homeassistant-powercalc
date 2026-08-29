@@ -12,8 +12,15 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "lumens": 2400,
+    "rated_power": 32
   },
+  "ean": [
+    "8718696159255",
+    "8718696159231",
+    "8718696159248"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Sonoff POWR2",
   "measure_method": "script",

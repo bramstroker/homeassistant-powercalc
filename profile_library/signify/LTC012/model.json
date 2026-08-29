@@ -10,6 +10,9 @@
     "form_factor": "fixture",
     "socket": "integrated"
   },
+  "ean": [
+    "8718696162873"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

@@ -8,6 +8,10 @@
     "lumens": 800,
     "rated_power": 9.0
   },
+  "ean": [
+    "0756171583797",
+    "0756171583827"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",

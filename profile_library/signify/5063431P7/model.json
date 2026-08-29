@@ -7,8 +7,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "GU10",
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "lumens": 1400,
+    "rated_power": 22.8
   },
+  "ean": [
+    "8718696171554"
+  ],
   "linked_profile": "signify/LCG002",
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",

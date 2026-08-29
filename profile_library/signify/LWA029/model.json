@@ -8,8 +8,12 @@
   "device_specs": {
     "socket": "E26",
     "form_factor": "bulb",
-    "lumens": 1100
+    "lumens": 1100,
+    "rated_power": 10.5
   },
+  "ean": [
+    "046677563004"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "HOPI HP-9800",
   "measure_method": "script",

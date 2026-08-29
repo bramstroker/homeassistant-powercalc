@@ -6,6 +6,9 @@
     "socket": "integrated",
     "form_factor": "strip"
   },
+  "ean": [
+    "6972391282317"
+  ],
   "legacy_ids": [
     "sl2"
   ],
