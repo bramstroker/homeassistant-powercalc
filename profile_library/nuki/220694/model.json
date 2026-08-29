@@ -8,7 +8,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "manual",
-  "name": "Hardware Bridge",
+  "name": "Wi-Fi Bridge",
   "discovery_by": "device",
   "fixed_config": {
     "power": 0.51
