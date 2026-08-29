@@ -4,7 +4,7 @@
   "device_type": "fan",
   "measure_device": "P3 International Kill A Watt EZ (Model P4460)",
   "measure_method": "manual",
-  "name": "Core 400S Series Air Purifier",
+  "name": "Smart Air Purifier",
   "standby_power": 1.2,
   "fixed_config": {
     "states_power": {
