@@ -2,5 +2,8 @@
   "name": "Eufy",
   "aliases": [
     "Eufy Security"
-  ]
+  ],
+  "website": "https://www.eufy.com",
+  "country": "CN",
+  "description": "Home brand of Anker Innovations in Shenzhen: cameras, vacuums and lights."
 }

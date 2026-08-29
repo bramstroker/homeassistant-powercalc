@@ -3,5 +3,8 @@
   "aliases": [
     "Freebox SAS",
     "Freebox"
-  ]
+  ],
+  "website": "https://www.free.fr",
+  "country": "FR",
+  "description": "French internet provider. The library covers its Freebox set-top boxes and players."
 }

@@ -1,4 +1,7 @@
 {
   "name": "Lenovo",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.lenovo.com",
+  "country": "CN",
+  "description": "Chinese computer manufacturer. Its smart clocks and displays run Google Assistant."
 }

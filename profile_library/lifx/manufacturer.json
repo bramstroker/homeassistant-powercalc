@@ -1,4 +1,7 @@
 {
   "name": "LIFX",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.lifx.com",
+  "country": "US",
+  "description": "Wi-Fi smart lighting that needs no bridge. Founded in Australia and part of California-based Feit Electric since 2022."
 }

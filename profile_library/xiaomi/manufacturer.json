@@ -1,4 +1,7 @@
 {
   "name": "Xiaomi",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.mi.com",
+  "country": "CN",
+  "description": "Chinese electronics manufacturer whose Mi Home ecosystem covers much of this library."
 }

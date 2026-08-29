@@ -1,4 +1,7 @@
 {
   "name": "Qubino",
-  "aliases": []
+  "aliases": [],
+  "website": "https://qubino.com",
+  "country": "SI",
+  "description": "Z-Wave module maker from Solkan, part of GOAP."
 }

@@ -1,4 +1,7 @@
 {
   "name": "Netatmo",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.netatmo.com",
+  "country": "FR",
+  "description": "French maker of weather stations, cameras and thermostats, part of Legrand."
 }

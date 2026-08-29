@@ -1,4 +1,6 @@
 {
   "name": "Tasmota",
-  "aliases": []
+  "aliases": [],
+  "website": "https://tasmota.github.io",
+  "description": "Open-source firmware for ESP-based devices rather than a manufacturer: these profiles were measured on hardware reflashed with it."
 }

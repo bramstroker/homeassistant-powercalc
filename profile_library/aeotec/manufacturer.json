@@ -3,5 +3,8 @@
   "aliases": [
     "Aeotec Ltd.",
     "AEON Labs"
-  ]
+  ],
+  "website": "https://aeotec.com",
+  "country": "DE",
+  "description": "Z-Wave and Zigbee sensor maker run from Hamburg, and the origin of the Aeon Labs range."
 }

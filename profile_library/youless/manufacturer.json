@@ -1,3 +1,6 @@
 {
-  "name": "YouLess"
+  "name": "YouLess",
+  "website": "https://www.youless.nl",
+  "country": "NL",
+  "description": "Dutch maker of energy monitors that read an existing meter optically."
 }

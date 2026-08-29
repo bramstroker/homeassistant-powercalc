@@ -1,4 +1,7 @@
 {
   "name": "Sonoff",
-  "aliases": []
+  "aliases": [],
+  "website": "https://sonoff.tech",
+  "country": "CN",
+  "description": "Smart home brand of ITEAD in Shenzhen, known for inexpensive Wi-Fi and Zigbee switches."
 }

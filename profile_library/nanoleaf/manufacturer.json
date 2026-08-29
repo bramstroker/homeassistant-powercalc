@@ -1,4 +1,7 @@
 {
   "name": "Nanoleaf",
-  "aliases": []
+  "aliases": [],
+  "website": "https://nanoleaf.me",
+  "country": "CA",
+  "description": "Toronto maker of modular light panels, light strings and Matter bulbs."
 }

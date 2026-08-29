@@ -1,4 +1,7 @@
 {
   "name": "Epson",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.epson.com",
+  "country": "JP",
+  "description": "Japanese manufacturer of printers and projectors."
 }

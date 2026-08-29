@@ -3,5 +3,8 @@
   "aliases": [
     "Philips",
     "Signify Netherlands B.V."
-  ]
+  ],
+  "website": "https://www.signify.com",
+  "country": "NL",
+  "description": "Dutch lighting company, formerly Philips Lighting, and the maker of Philips Hue."
 }

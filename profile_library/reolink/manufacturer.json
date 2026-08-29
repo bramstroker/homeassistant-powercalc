@@ -1,4 +1,7 @@
 {
   "name": "Reolink",
-  "aliases": []
+  "aliases": [],
+  "website": "https://reolink.com",
+  "country": "CN",
+  "description": "Chinese manufacturer of security cameras and video doorbells."
 }

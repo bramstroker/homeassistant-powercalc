@@ -1,4 +1,7 @@
 {
   "name": "Sony",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.sony.com",
+  "country": "JP",
+  "description": "Japanese electronics manufacturer."
 }

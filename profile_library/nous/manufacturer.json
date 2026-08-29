@@ -2,5 +2,8 @@
   "name": "NOUS",
   "aliases": [
     "_TZ3000_2putqrmw"
-  ]
+  ],
+  "website": "https://nous.technology",
+  "country": "PL",
+  "description": "Polish smart home brand selling Wi-Fi and Zigbee plugs and switches, some shipped pre-flashed with Tasmota."
 }

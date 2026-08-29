@@ -1,4 +1,7 @@
 {
   "name": "MOES",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.moeshouse.com",
+  "country": "CN",
+  "description": "Chinese brand of Tuya-based switches, thermostats and plugs."
 }

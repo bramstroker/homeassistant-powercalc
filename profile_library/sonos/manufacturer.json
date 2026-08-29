@@ -2,5 +2,8 @@
   "name": "Sonos",
   "aliases": [
     "Music Assistant"
-  ]
+  ],
+  "website": "https://www.sonos.com",
+  "country": "US",
+  "description": "American maker of wireless speakers and home audio."
 }

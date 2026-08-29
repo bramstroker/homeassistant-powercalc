@@ -3,5 +3,8 @@
   "aliases": [
     "Xiaomi",
     "LUMI"
-  ]
+  ],
+  "website": "https://www.aqara.com",
+  "country": "CN",
+  "description": "Brand of Lumi United in Shenzhen, making Zigbee sensors, switches and cameras."
 }

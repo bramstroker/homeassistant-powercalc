@@ -1,4 +1,7 @@
 {
   "name": "Velux",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.velux.com",
+  "country": "DK",
+  "description": "Danish maker of roof windows. Its blinds and shutters run on io-homecontrol."
 }

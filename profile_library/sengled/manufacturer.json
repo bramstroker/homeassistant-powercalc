@@ -1,4 +1,6 @@
 {
   "name": "Sengled",
-  "aliases": []
+  "aliases": [],
+  "website": "https://eu.sengled.com",
+  "description": "Smart lighting manufacturer, among the first to ship Zigbee lamps cheaply. Sells through regional sites rather than one global one."
 }

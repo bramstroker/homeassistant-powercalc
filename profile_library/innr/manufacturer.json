@@ -1,4 +1,7 @@
 {
   "name": "Innr",
-  "aliases": []
+  "aliases": [],
+  "website": "https://www.innr.com",
+  "country": "NL",
+  "description": "Zigbee lighting manufacturer from Hilversum, whose lamps are a common alternative to Hue."
 }

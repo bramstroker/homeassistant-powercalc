@@ -1,4 +1,7 @@
 {
   "name": "Inovelli",
-  "aliases": []
+  "aliases": [],
+  "website": "https://inovelli.com",
+  "country": "US",
+  "description": "American maker of Z-Wave and Zigbee wall switches aimed at enthusiasts."
 }
