@@ -21227,1406 +21227,6 @@
       "description": "Dutch lighting company, formerly Philips Lighting, and the maker of Philips Hue.",
       "models": [
         {
-          "aliases": [
-            "9150055612",
-            "Hue Outdoor Lucca"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-06-28T07:43:28Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 806,
-            "rated_power": 9.5,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696166048"
-          ],
-          "measure_device": "Shelly Plus 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.6.6:docker"
-          },
-          "name": "Hue Lucca Outdoor Wall Light",
-          "standby_power": 0.35,
-          "authors": [
-            {
-              "name": "TyzzyT",
-              "github": "TyzzyT"
-            }
-          ],
-          "id": "1740193P0",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 9.35,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 1.2,
-            "max": 9.35
-          },
-          "color_modes": [
-            "brightness"
-          ],
-          "lut_quality": {
-            "score": 97.4,
-            "brightness": 97.4
-          },
-          "hash": "42f0c195eb643fbbe393a09e93e440e7"
-        },
-        {
-          "aliases": [
-            "9150056302"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2025-02-24T05:53:56Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 590,
-            "rated_power": 8,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "046677802080"
-          ],
-          "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.7:docker"
-          },
-          "name": "Hue Calla Outdoor Bollard",
-          "standby_power": 0.25,
-          "authors": [
-            {
-              "name": "dewbot6",
-              "email": "drewsnodgrass@comcast.net",
-              "github": "dewbot6"
-            }
-          ],
-          "id": "1741930V7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 9.55,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2025-02-24T17:02:16",
-          "power_range": {
-            "min": 0.13,
-            "max": 9.55
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 97.2,
-            "color_temp": 97.2
-          },
-          "hash": "527851634af621126e7a3b699a35f171"
-        },
-        {
-          "aliases": [
-            "9150057306"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2022-06-22T07:54:58Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 1180,
-            "rated_power": 8,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696170489"
-          ],
-          "measure_device": "Zhurui PR10",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 1,
-            "SLEEP_TIME": 2,
-            "VERSION": "master"
-          },
-          "name": "Hue Impress Outdoor Wall Light Small",
-          "standby_power": 0.17,
-          "authors": [
-            {
-              "name": "Bram Gerritsen",
-              "email": "bgerritsen@gmail.com",
-              "github": "bramstroker"
-            }
-          ],
-          "id": "1742930P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 49.0,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.08,
-            "max": 49.0
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 36.1,
-            "color_temp": 36.1
-          },
-          "hash": "ba773403ba27631e89296a8b99df43f7"
-        },
-        {
-          "aliases": [
-            "1743430P7",
-            "1745430P7",
-            "9150057310"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2022-12-04T08:51:38Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 1180,
-            "rated_power": 8,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696170502"
-          ],
-          "linked_profile": "signify/1742930P7",
-          "measure_device": "Zhurui PR10",
-          "measure_method": "script",
-          "name": "Hue Impress Pedestal Low",
-          "standby_power": 0.17,
-          "authors": [
-            {
-              "name": "Cafun",
-              "github": "Cafun"
-            }
-          ],
-          "id": "1743130P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 49.0,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.08,
-            "max": 49.0
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 36.1,
-            "color_temp": 36.1
-          },
-          "hash": "b641d987fcdd6eb0a4574a86acf9e667"
-        },
-        {
-          "aliases": [
-            "17435/30/P7",
-            "9150057314"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-02-12T12:11:40Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 2250,
-            "rated_power": 15,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696170533"
-          ],
-          "measure_device": "Shelly Plus 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "Hue Discover White and Color Ambiance Flood Light",
-          "standby_power": 0.5,
-          "authors": [
-            {
-              "name": "Marc Geurts",
-              "email": "geurtsmarc@hotmail.com",
-              "github": "marcgeurts"
-            }
-          ],
-          "id": "1743530P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 33.5,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.45,
-            "max": 33.5
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 33.6,
-            "color_temp": 33.6
-          },
-          "hash": "bafc41d3dd55ffd31735208fc2d42379"
-        },
-        {
-          "aliases": [
-            "9150057316",
-            "17436/30/P7"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2024-06-13T13:09:23Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 2300,
-            "rated_power": 15,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696170540"
-          ],
-          "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.12.9:docker"
-          },
-          "name": "Hue Welcome Outdoor Wall Light",
-          "standby_power": 0.5,
-          "authors": [
-            {
-              "name": "Paul Bottein",
-              "email": "paul.bottein@gmail.com",
-              "github": "piitaya"
-            }
-          ],
-          "id": "1743630P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 24.1,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-11-15T10:15:14",
-          "power_range": {
-            "min": 0.8,
-            "max": 24.1
-          },
-          "color_modes": [
-            "brightness"
-          ],
-          "lut_quality": {
-            "score": 98.2,
-            "brightness": 98.2
-          },
-          "hash": "36aac36df0b458d49d54b84adac1f06c"
-        },
-        {
-          "aliases": [
-            "9150057318"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2025-03-17T06:13:30Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 590,
-            "rated_power": 8,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696170557"
-          ],
-          "measure_device": "TP-Link Kasa HS110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.9:docker"
-          },
-          "name": "Hue Calla Large Outdoor Pedestal",
-          "standby_power": 0.32,
-          "authors": [
-            {
-              "name": "James Nobes",
-              "email": "james@Jamess-MacBook-Pro.local",
-              "github": "james-richards-privitar"
-            }
-          ],
-          "id": "1743730P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 9.82,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2025-03-17T06:42:22",
-          "power_range": {
-            "min": 0.28,
-            "max": 9.82
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 24.0,
-            "color_temp": 24.0
-          },
-          "hash": "75d7af952af5368186e0095904331105"
-        },
-        {
-          "aliases": [
-            "9150058417"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-11-21T13:39:09Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "integrated",
-            "form_factor": "fixture",
-            "lumens": 1020,
-            "rated_power": 13.5,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696174302"
-          ],
-          "measure_device": "Shelly Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.9.6:docker"
-          },
-          "name": "Hue Nyro Outdoor Wall",
-          "standby_power": 0.27,
-          "authors": [
-            {
-              "name": "Imperial-Guard",
-              "github": "Imperial-Guard"
-            }
-          ],
-          "id": "1745630P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 13.76,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.01,
-            "max": 13.76
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.1,
-            "color_temp": 98.1
-          },
-          "hash": "59ab297e820857d8fe2c4c3941165634"
-        },
-        {
-          "aliases": [
-            "1746230V7",
-            "9150058426"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-02-14T18:42:39Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "spot",
-            "socket": "integrated",
-            "lumens": 1060,
-            "rated_power": 15,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696174364"
-          ],
-          "measure_device": "Shelly Plus 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "Hue Lily XL Outdoor Spot Light",
-          "standby_power": 0.25,
-          "authors": [
-            {
-              "name": "Marc Geurts",
-              "email": "geurtsmarc@hotmail.com",
-              "github": "marcgeurts"
-            }
-          ],
-          "id": "1746230P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 17.96,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.01,
-            "max": 17.96
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 21.3,
-            "color_temp": 21.3
-          },
-          "hash": "d9ec04df60ab687546dbec8e5a31206b"
-        },
-        {
-          "aliases": [
-            "9150058429"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2025-12-13T11:50:54Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "integrated",
-            "form_factor": "fixture",
-            "lumens": 1180,
-            "rated_power": 16,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696174388"
-          ],
-          "measure_device": "Shelly 1PM Gen4",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.19.2:docker"
-          },
-          "name": "Hue Resonate",
-          "standby_power": 0.05,
-          "authors": [
-            {
-              "name": "Thorsten1982",
-              "email": "ThorstenNiemann.TN@googlemail.com",
-              "github": "Thorsten1982"
-            }
-          ],
-          "id": "1746430P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 17.5,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2025-12-13T13:41:45",
-          "power_range": {
-            "min": 0.01,
-            "max": 17.5
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.8,
-            "color_temp": 98.8
-          },
-          "hash": "53d63565eedd983300d8981aada4a2e2"
-        },
-        {
-          "aliases": [
-            "9150059208"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2022-12-25T09:44:08Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "integrated",
-            "form_factor": "panel",
-            "lumens": 4200,
-            "rated_power": 46.5,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696175859"
-          ],
-          "linked_profile": "signify/3216331P6",
-          "measure_device": "TP-Link Kasa HS110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 5,
-            "VERSION": "master"
-          },
-          "name": "Hue White Ambiance Aurelle Square",
-          "standby_power": 0.35,
-          "authors": [
-            {
-              "name": "Jari Eskelinen",
-              "email": "jari.eskelinen@iki.fi",
-              "github": "jarpatus"
-            }
-          ],
-          "id": "3216231P6",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 51.0,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.35,
-            "max": 51.0
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 99.5,
-            "color_temp": 99.5
-          },
-          "hash": "49a436fdf0a0ac67d7ebbf74cad8d96e"
-        },
-        {
-          "aliases": [
-            "9150059209",
-            "929003099101"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2022-12-25T09:44:08Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "integrated",
-            "form_factor": "panel",
-            "lumens": 4200,
-            "rated_power": 46.5,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696175866"
-          ],
-          "measure_device": "TP-Link Kasa HS110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 5,
-            "VERSION": "master"
-          },
-          "name": "Hue White Ambiance Aurelle Rectangular",
-          "standby_power": 0.35,
-          "authors": [
-            {
-              "name": "Jari Eskelinen",
-              "email": "jari.eskelinen@iki.fi",
-              "github": "jarpatus"
-            }
-          ],
-          "id": "3216331P6",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 51.0,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.35,
-            "max": 51.0
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 99.5,
-            "color_temp": 99.5
-          },
-          "hash": "8dceec965fb8e984ad225eb8e9a9fad2"
-        },
-        {
-          "aliases": [
-            "9150059123",
-            "9290022169"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-03-12T09:45:12Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "E27",
-            "lumens": 806,
-            "rated_power": 8.5,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696175057"
-          ],
-          "linked_profile": "signify/LTA001",
-          "measure_device": "See linked profile",
-          "measure_method": "script",
-          "name": "Hue Wellness Table Lamp",
-          "standby_power": 0.29,
-          "authors": [
-            {
-              "name": "Bram Gerritsen",
-              "email": "bgerritsen@gmail.com",
-              "github": "bramstroker"
-            }
-          ],
-          "id": "4080130P6",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 7.63,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.58,
-            "max": 7.63
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 99.4,
-            "color_temp": 99.4
-          },
-          "hash": "d4d812e937125e0e942843b6f265e67a"
-        },
-        {
-          "aliases": [
-            "9150058716"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-06-19T20:36:20Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 2500,
-            "rated_power": 32,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696174524"
-          ],
-          "measure_device": "Shelly Plus 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.6.6:docker"
-          },
-          "name": "Hue Signe Floor Light",
-          "standby_power": 0.6,
-          "authors": [
-            {
-              "name": "TyzzyT",
-              "github": "TyzzyT"
-            }
-          ],
-          "id": "4080248P9",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 36.25,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.5,
-            "max": 36.25
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 99.2,
-            "color_temp": 99.2
-          },
-          "hash": "dd1402019c617ad6f9d90a78293bbfab"
-        },
-        {
-          "aliases": [
-            "9150058704",
-            "915005987101",
-            "915005987201",
-            "929003479701",
-            "915005987701",
-            "915005987801"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2024-05-20T22:38:20Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 2550,
-            "rated_power": 29,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696176252",
-            "8718696176269",
-            "8718696176276",
-            "8718696176283",
-            "8719514433526"
-          ],
-          "measure_device": "GW Instek GPM-8213",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 1,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "Hue Gradient Signe Floor Light",
-          "standby_power": 0.54,
-          "authors": [
-            {
-              "name": "Manuel Kasper",
-              "email": "mk@neon1.net",
-              "github": "manuelkasper"
-            }
-          ],
-          "id": "4080248U9",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T05:33:07",
-          "max_power": 33.97,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-24T19:01:03",
-          "power_range": {
-            "min": 0.87,
-            "max": 33.97
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 99.2,
-            "color_temp": 99.2
-          },
-          "hash": "759348cc6af7060783d08c59d70942b0"
-        },
-        {
-          "aliases": [
-            "9150058718",
-            "8718696174548"
-          ],
-          "ean": [
-            "8718696174548"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2024-07-21T11:13:03Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 1500,
-            "rated_power": 20.0,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "measure_device": "Shelly Plus Plug S Gen2",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.11.6:docker"
-          },
-          "name": "Hue Sana Wall Light",
-          "standby_power": 0.31,
-          "authors": [
-            {
-              "name": "pwnagepeter",
-              "email": "hauke@pwnagepeter.net",
-              "github": "pwnagepeter"
-            }
-          ],
-          "id": "4090131P9",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 23.66,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-31T19:57:43",
-          "power_range": {
-            "min": 0.11,
-            "max": 23.66
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 99.2,
-            "color_temp": 99.2
-          },
-          "hash": "0659c81d32102dbd47fef0040793d8a1"
-        },
-        {
-          "aliases": [
-            "LCP001",
-            "LCP002",
-            "4090331P9",
-            "4090330P9_01",
-            "4090330P9_02",
-            "4090331P9_01",
-            "4090331P9_02",
-            "929003052501_01",
-            "929003052501_02",
-            "929003053301_01",
-            "929003053301_02"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-01-11T18:46:15Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 3000,
-            "rated_power": 39,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696176214",
-            "8718696169698",
-            "8719514343368",
-            "8719514343467"
-          ],
-          "measure_device": "Shelly 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "Hue Ensis Pendant Light",
-          "standby_power": 0.4,
-          "authors": [
-            {
-              "name": "Matteo VG7",
-              "github": "matteovg7"
-            }
-          ],
-          "id": "4090330P9",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 43.52,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.83,
-            "max": 43.52
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 99.1,
-            "color_temp": 99.1
-          },
-          "hash": "69f1857672bf12d7a856ee1b4081383b"
-        },
-        {
-          "aliases": [
-            "9150058723",
-            "929003053501"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-02-28T18:32:53Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 2400,
-            "rated_power": 32,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696174593"
-          ],
-          "measure_device": "Shelly 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "Hue Flourish Ceiling Light",
-          "standby_power": 0.4,
-          "authors": [
-            {
-              "name": "matteobreschig",
-              "github": "matteobreschig"
-            }
-          ],
-          "id": "4090531P9",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 34.14,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-08-29T13:02:50",
-          "power_range": {
-            "min": 0.34,
-            "max": 34.14
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 97.9,
-            "color_temp": 97.9
-          },
-          "hash": "abf666248d7e20c72caf67525cab17fe"
-        },
-        {
-          "aliases": [
-            "9150059143",
-            "9290022169"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-03-12T09:45:12Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "E27",
-            "lumens": 806,
-            "rated_power": 8.5,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696175255"
-          ],
-          "linked_profile": "signify/LTA001",
-          "measure_device": "See linked profile",
-          "measure_method": "script",
-          "name": "Hue Devote Pendant Light",
-          "standby_power": 0.29,
-          "authors": [
-            {
-              "name": "Bram Gerritsen",
-              "email": "bgerritsen@gmail.com",
-              "github": "bramstroker"
-            }
-          ],
-          "id": "4300631P6",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 7.63,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.58,
-            "max": 7.63
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 99.4,
-            "color_temp": 99.4
-          },
-          "hash": "12d5c64e0929c6dc8706e715a28650f8"
-        },
-        {
-          "aliases": [
-            "9150059237"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2024-03-29T18:50:54Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 2200,
-            "rated_power": 40,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "measure_device": "Hypertec Power-Mate Lite 10A",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 5,
-            "SLEEP_TIME": 4,
-            "VERSION": "master"
-          },
-          "name": "Hue White Ambiance Muscari Ceiling Light",
-          "standby_power": 0.46,
-          "authors": [
-            {
-              "name": "Blake Garner",
-              "email": "blake.garner@gmail.com",
-              "github": "BlakeGarner"
-            }
-          ],
-          "id": "4503748C6",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 42.9,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2025-06-22T20:57:49",
-          "power_range": {
-            "min": 0.46,
-            "max": 42.9
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 99.2,
-            "color_temp": 99.2
-          },
-          "hash": "5ec1c1f24336a7540f28d6b3e5ff9ae9"
-        },
-        {
-          "aliases": [
-            "5045131P7",
-            "9150057666",
-            "915005766701",
-            "929003045301",
-            "929003045401",
-            "929003045501_01",
-            "929003045501_02",
-            "929003045501_03",
-            "929003047401",
-            "929003047501",
-            "929003045501"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-02-10T11:19:36Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "GU10",
-            "form_factor": "spot",
-            "lumens": 350,
-            "rated_power": 5.7,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696171752",
-            "8718696171769",
-            "8719514342866",
-            "8719514342927",
-            "8719514342903",
-            "8719514338623",
-            "8719514338647"
-          ],
-          "measure_device": "Shelly Plus 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "Hue Centura",
-          "standby_power": 0.25,
-          "authors": [
-            {
-              "name": "Marc Geurts",
-              "email": "geurtsmarc@hotmail.com",
-              "github": "marcgeurts"
-            }
-          ],
-          "id": "5045148P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 5.25,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.4,
-            "max": 5.25
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 96.5,
-            "color_temp": 96.5
-          },
-          "hash": "e17233444386e32468e326ddd960c713"
-        },
-        {
-          "aliases": [
-            "5060730P7_01",
-            "5060731P7_01",
-            "5060731P7"
-          ],
-          "ean": [
-            "8718696176047"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-01-11T18:46:15Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": [
-              "GU10",
-              "integrated"
-            ],
-            "form_factor": "spot",
-            "lumens": 2800,
-            "rated_power": 40,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "measure_device": "Shelly 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "Hue Centris 4-Spot Ceiling Light",
-          "standby_power": 0.4,
-          "authors": [
-            {
-              "name": "matteobreschig",
-              "github": "matteobreschig"
-            }
-          ],
-          "id": "5060730P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T08:14:38",
-          "max_power": 44.38,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-08-29T13:02:50",
-          "power_range": {
-            "min": 1.47,
-            "max": 44.38
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 95.4,
-            "color_temp": 95.4
-          },
-          "hash": "34d0918fb4bebe963ca4cab031f1c637"
-        },
-        {
-          "aliases": [
-            "5060830P7_01",
-            "5060831P7_01",
-            "5060831P7"
-          ],
-          "ean": [
-            "8718696176023"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-02-28T18:32:53Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": [
-              "GU10",
-              "integrated"
-            ],
-            "form_factor": "spot",
-            "rated_power": 25,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "measure_device": "Shelly 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "Hue Centris 3-Spot Cross Ceiling Light",
-          "standby_power": 0.4,
-          "authors": [
-            {
-              "name": "matteobreschig",
-              "github": "matteobreschig"
-            }
-          ],
-          "id": "5060830P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T08:14:38",
-          "max_power": 28.8,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-08-29T13:02:50",
-          "power_range": {
-            "min": 1.31,
-            "max": 28.8
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.1,
-            "color_temp": 98.1
-          },
-          "hash": "834673294ccbc6e4393b93433ecb7d0d"
-        },
-        {
-          "aliases": [
-            "5061030P7_01"
-          ],
-          "ean": [
-            "8718696175989"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2024-12-20T00:55:44Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "integrated",
-            "form_factor": "panel",
-            "rated_power": 11,
-            "lumens": 840,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 2,
-            "VERSION": "master"
-          },
-          "name": "Hue Centris 2-Spot Ceiling Light LED Panel",
-          "standby_power": 0.4,
-          "authors": [
-            {
-              "name": "Emil Blixt Hansen",
-              "github": "blixtdevelopment"
-            }
-          ],
-          "id": "5061030P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T06:58:48",
-          "max_power": 12.1,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-08-29T13:02:50",
-          "power_range": {
-            "min": 0.05,
-            "max": 12.1
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 97.4,
-            "color_temp": 97.4
-          },
-          "hash": "b5d966bc25dcab1513ff94900270ab23"
-        },
-        {
-          "aliases": [
-            "9150057617"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-01-19T11:04:29Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "GU10",
-            "form_factor": "spot",
-            "lumens": 1400,
-            "rated_power": 22.8,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "8718696171554"
-          ],
-          "linked_profile": "signify/LCG002",
-          "measure_device": "Gosund SP111",
-          "measure_device_firmware": "Tasmota 9.5.0",
-          "measure_method": "script",
-          "name": "Hue White and Color Ambiance Fugato Quadruple Spotlight",
-          "standby_power": 0.4,
-          "authors": [
-            {
-              "name": "Bram Gerritsen",
-              "email": "bgerritsen@gmail.com",
-              "github": "bramstroker"
-            }
-          ],
-          "id": "5063431P7",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 5.53,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.1,
-            "max": 5.53
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 91.2,
-            "color_temp": 91.2
-          },
-          "hash": "fa1182b71bcd8ea302fba5b5bf8d972f"
-        },
-        {
           "ean": [
             "8719514491106"
           ],
@@ -22675,6 +21275,1438 @@
             "color_temp": 98.0
           },
           "hash": "9a7e24d5056d9f2ade47530c112912d1"
+        },
+        {
+          "aliases": [
+            "1740193P0",
+            "9150055612",
+            "Hue Outdoor Lucca"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-06-28T07:43:28Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 806,
+            "rated_power": 9.5,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696166048"
+          ],
+          "legacy_ids": [
+            "1740193P0"
+          ],
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.6.6:docker"
+          },
+          "name": "Hue Lucca Outdoor Wall Light",
+          "standby_power": 0.35,
+          "authors": [
+            {
+              "name": "TyzzyT",
+              "github": "TyzzyT"
+            }
+          ],
+          "id": "915005561201",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 9.35,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 1.2,
+            "max": 9.35
+          },
+          "color_modes": [
+            "brightness"
+          ],
+          "lut_quality": {
+            "score": 97.4,
+            "brightness": 97.4
+          },
+          "hash": "ef0b6f4d0bacf152ba7ee84a18576184"
+        },
+        {
+          "aliases": [
+            "1741930V7",
+            "9150056302"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-02-24T05:53:56Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 590,
+            "rated_power": 8,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "046677802080"
+          ],
+          "legacy_ids": [
+            "1741930V7"
+          ],
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.7:docker"
+          },
+          "name": "Hue Calla Outdoor Bollard",
+          "standby_power": 0.25,
+          "authors": [
+            {
+              "name": "dewbot6",
+              "email": "drewsnodgrass@comcast.net",
+              "github": "dewbot6"
+            }
+          ],
+          "id": "915005630201",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 9.55,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.13,
+            "max": 9.55
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
+          "hash": "bde9006145f96b317a32d72d82d14e51"
+        },
+        {
+          "aliases": [
+            "1742930P7",
+            "9150057306"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-06-22T07:54:58Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 1180,
+            "rated_power": 8,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696170489"
+          ],
+          "legacy_ids": [
+            "1742930P7"
+          ],
+          "measure_device": "Zhurui PR10",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2,
+            "VERSION": "master"
+          },
+          "name": "Hue Impress Outdoor Wall Light Small",
+          "standby_power": 0.17,
+          "authors": [
+            {
+              "name": "Bram Gerritsen",
+              "email": "bgerritsen@gmail.com",
+              "github": "bramstroker"
+            }
+          ],
+          "id": "915005730601",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 49.0,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.08,
+            "max": 49.0
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 36.1,
+            "color_temp": 36.1
+          },
+          "hash": "1b1aeaba2742e117054a956f2ce2d687"
+        },
+        {
+          "aliases": [
+            "1743130P7",
+            "1743430P7",
+            "1745430P7",
+            "9150057310"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-12-04T08:51:38Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 1180,
+            "rated_power": 8,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696170502"
+          ],
+          "legacy_ids": [
+            "1743130P7"
+          ],
+          "linked_profile": "signify/915005730601",
+          "measure_device": "Zhurui PR10",
+          "measure_method": "script",
+          "name": "Hue Impress Pedestal Low",
+          "standby_power": 0.17,
+          "authors": [
+            {
+              "name": "Cafun",
+              "github": "Cafun"
+            }
+          ],
+          "id": "915005731001",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 49.0,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.08,
+            "max": 49.0
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 36.1,
+            "color_temp": 36.1
+          },
+          "hash": "a513d8dcbe9417a797c180883e64975f"
+        },
+        {
+          "aliases": [
+            "1743530P7",
+            "17435/30/P7",
+            "9150057314"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-02-12T12:11:40Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 2250,
+            "rated_power": 15,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696170533"
+          ],
+          "legacy_ids": [
+            "1743530P7"
+          ],
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "name": "Hue Discover White and Color Ambiance Flood Light",
+          "standby_power": 0.5,
+          "authors": [
+            {
+              "name": "Marc Geurts",
+              "email": "geurtsmarc@hotmail.com",
+              "github": "marcgeurts"
+            }
+          ],
+          "id": "915005731401",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 33.5,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.45,
+            "max": 33.5
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 33.6,
+            "color_temp": 33.6
+          },
+          "hash": "4cfda901939994656a6f87a8b0ad3f46"
+        },
+        {
+          "aliases": [
+            "1743630P7",
+            "9150057316",
+            "17436/30/P7"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2024-06-13T13:09:23Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 2300,
+            "rated_power": 15,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696170540"
+          ],
+          "legacy_ids": [
+            "1743630P7"
+          ],
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.12.9:docker"
+          },
+          "name": "Hue Welcome Outdoor Wall Light",
+          "standby_power": 0.5,
+          "authors": [
+            {
+              "name": "Paul Bottein",
+              "email": "paul.bottein@gmail.com",
+              "github": "piitaya"
+            }
+          ],
+          "id": "915005731601",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 24.1,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.8,
+            "max": 24.1
+          },
+          "color_modes": [
+            "brightness"
+          ],
+          "lut_quality": {
+            "score": 98.2,
+            "brightness": 98.2
+          },
+          "hash": "6a497a6a63cd9859744fdf4f8a3e6f5c"
+        },
+        {
+          "aliases": [
+            "1743730P7",
+            "9150057318"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-03-17T06:13:30Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 590,
+            "rated_power": 8,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696170557"
+          ],
+          "legacy_ids": [
+            "1743730P7"
+          ],
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.9:docker"
+          },
+          "name": "Hue Calla Large Outdoor Pedestal",
+          "standby_power": 0.32,
+          "authors": [
+            {
+              "name": "James Nobes",
+              "email": "james@Jamess-MacBook-Pro.local",
+              "github": "james-richards-privitar"
+            }
+          ],
+          "id": "915005731801",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 9.82,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.28,
+            "max": 9.82
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 24.0,
+            "color_temp": 24.0
+          },
+          "hash": "324c84290c75c2dd6594829e72664fb0"
+        },
+        {
+          "aliases": [
+            "5063431P7",
+            "9150057617"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-01-19T11:04:29Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "GU10",
+            "form_factor": "spot",
+            "lumens": 1400,
+            "rated_power": 22.8,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696171554"
+          ],
+          "legacy_ids": [
+            "5063431P7"
+          ],
+          "linked_profile": "signify/LCG002",
+          "measure_device": "Gosund SP111",
+          "measure_device_firmware": "Tasmota 9.5.0",
+          "measure_method": "script",
+          "name": "Hue White and Color Ambiance Fugato Quadruple Spotlight",
+          "standby_power": 0.4,
+          "authors": [
+            {
+              "name": "Bram Gerritsen",
+              "email": "bgerritsen@gmail.com",
+              "github": "bramstroker"
+            }
+          ],
+          "id": "915005761701",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T04:13:40",
+          "max_power": 5.53,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2024-05-03T07:11:32",
+          "power_range": {
+            "min": 0.1,
+            "max": 5.53
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 91.2,
+            "color_temp": 91.2
+          },
+          "hash": "e40077605e7f7a30f3a2c610e286b55a"
+        },
+        {
+          "aliases": [
+            "5045148P7",
+            "5045131P7",
+            "9150057666",
+            "915005766701",
+            "929003045301",
+            "929003045401",
+            "929003045501_01",
+            "929003045501_02",
+            "929003045501_03",
+            "929003047401",
+            "929003047501",
+            "929003045501"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-02-10T11:19:36Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "GU10",
+            "form_factor": "spot",
+            "lumens": 350,
+            "rated_power": 5.7,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696171752",
+            "8718696171769",
+            "8719514342866",
+            "8719514342927",
+            "8719514342903",
+            "8719514338623",
+            "8719514338647"
+          ],
+          "legacy_ids": [
+            "5045148P7"
+          ],
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "name": "Hue Centura",
+          "standby_power": 0.25,
+          "authors": [
+            {
+              "name": "Marc Geurts",
+              "email": "geurtsmarc@hotmail.com",
+              "github": "marcgeurts"
+            }
+          ],
+          "id": "915005766601",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 5.25,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.4,
+            "max": 5.25
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
+          "hash": "660672b5e070b9052bc9804976e5944c"
+        },
+        {
+          "aliases": [
+            "1745630P7",
+            "9150058417"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-11-21T13:39:09Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "integrated",
+            "form_factor": "fixture",
+            "lumens": 1020,
+            "rated_power": 13.5,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696174302"
+          ],
+          "legacy_ids": [
+            "1745630P7"
+          ],
+          "measure_device": "Shelly Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.9.6:docker"
+          },
+          "name": "Hue Nyro Outdoor Wall",
+          "standby_power": 0.27,
+          "authors": [
+            {
+              "name": "Imperial-Guard",
+              "github": "Imperial-Guard"
+            }
+          ],
+          "id": "915005841701",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 13.76,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.01,
+            "max": 13.76
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
+          "hash": "e5033217e90d29d1b8cc3626f0b39789"
+        },
+        {
+          "aliases": [
+            "1746230P7",
+            "1746230V7",
+            "9150058426"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-02-14T18:42:39Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "spot",
+            "socket": "integrated",
+            "lumens": 1060,
+            "rated_power": 15,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696174364"
+          ],
+          "legacy_ids": [
+            "1746230P7"
+          ],
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "name": "Hue Lily XL Outdoor Spot Light",
+          "standby_power": 0.25,
+          "authors": [
+            {
+              "name": "Marc Geurts",
+              "email": "geurtsmarc@hotmail.com",
+              "github": "marcgeurts"
+            }
+          ],
+          "id": "915005842601",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 17.96,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.01,
+            "max": 17.96
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 21.3,
+            "color_temp": 21.3
+          },
+          "hash": "7f48cc90bf432c319e5978681b49d1fc"
+        },
+        {
+          "aliases": [
+            "1746430P7",
+            "9150058429"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-12-13T11:50:54Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "integrated",
+            "form_factor": "fixture",
+            "lumens": 1180,
+            "rated_power": 16,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696174388"
+          ],
+          "legacy_ids": [
+            "1746430P7"
+          ],
+          "measure_device": "Shelly 1PM Gen4",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.19.2:docker"
+          },
+          "name": "Hue Resonate",
+          "standby_power": 0.05,
+          "authors": [
+            {
+              "name": "Thorsten1982",
+              "email": "ThorstenNiemann.TN@googlemail.com",
+              "github": "Thorsten1982"
+            }
+          ],
+          "id": "915005842901",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 17.5,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.01,
+            "max": 17.5
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "caef746b46a069f50434069092441ea7"
+        },
+        {
+          "aliases": [
+            "4080248P9",
+            "9150058716"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-06-19T20:36:20Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 2500,
+            "rated_power": 32,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696174524"
+          ],
+          "legacy_ids": [
+            "4080248P9"
+          ],
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.6.6:docker"
+          },
+          "name": "Hue Signe Floor Light",
+          "standby_power": 0.6,
+          "authors": [
+            {
+              "name": "TyzzyT",
+              "github": "TyzzyT"
+            }
+          ],
+          "id": "915005871601",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 36.25,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.5,
+            "max": 36.25
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "7d452e1607f83f42ffd6d151a8622243"
+        },
+        {
+          "aliases": [
+            "4090131P9",
+            "9150058718",
+            "8718696174548"
+          ],
+          "ean": [
+            "8718696174548"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2024-07-21T11:13:03Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 1500,
+            "rated_power": 20.0,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "legacy_ids": [
+            "4090131P9"
+          ],
+          "measure_device": "Shelly Plus Plug S Gen2",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.11.6:docker"
+          },
+          "name": "Hue Sana Wall Light",
+          "standby_power": 0.31,
+          "authors": [
+            {
+              "name": "pwnagepeter",
+              "email": "hauke@pwnagepeter.net",
+              "github": "pwnagepeter"
+            }
+          ],
+          "id": "915005871801",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 23.66,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.11,
+            "max": 23.66
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "1cc36e0234492226b91092fb1ddbda58"
+        },
+        {
+          "aliases": [
+            "4090531P9",
+            "9150058723",
+            "929003053501"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-02-28T18:32:53Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 2400,
+            "rated_power": 32,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696174593"
+          ],
+          "legacy_ids": [
+            "4090531P9"
+          ],
+          "measure_device": "Shelly 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "name": "Hue Flourish Ceiling Light",
+          "standby_power": 0.4,
+          "authors": [
+            {
+              "name": "matteobreschig",
+              "github": "matteobreschig"
+            }
+          ],
+          "id": "915005872301",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 34.14,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.34,
+            "max": 34.14
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.9,
+            "color_temp": 97.9
+          },
+          "hash": "9df1158e653f9826133cc8d6e9dfb65b"
+        },
+        {
+          "aliases": [
+            "4080130P6",
+            "9150059123",
+            "9290022169"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-03-12T09:45:12Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "E27",
+            "lumens": 806,
+            "rated_power": 8.5,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696175057"
+          ],
+          "legacy_ids": [
+            "4080130P6"
+          ],
+          "linked_profile": "signify/LTA001",
+          "measure_device": "See linked profile",
+          "measure_method": "script",
+          "name": "Hue Wellness Table Lamp",
+          "standby_power": 0.29,
+          "authors": [
+            {
+              "name": "Bram Gerritsen",
+              "email": "bgerritsen@gmail.com",
+              "github": "bramstroker"
+            }
+          ],
+          "id": "915005912301",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T04:13:40",
+          "max_power": 7.63,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2024-05-03T07:11:32",
+          "power_range": {
+            "min": 0.58,
+            "max": 7.63
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
+          "hash": "42b650418e8849e03426643ef3a1a8ef"
+        },
+        {
+          "aliases": [
+            "4300631P6",
+            "9150059143",
+            "9290022169"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-03-12T09:45:12Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "E27",
+            "lumens": 806,
+            "rated_power": 8.5,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696175255"
+          ],
+          "legacy_ids": [
+            "4300631P6"
+          ],
+          "linked_profile": "signify/LTA001",
+          "measure_device": "See linked profile",
+          "measure_method": "script",
+          "name": "Hue Devote Pendant Light",
+          "standby_power": 0.29,
+          "authors": [
+            {
+              "name": "Bram Gerritsen",
+              "email": "bgerritsen@gmail.com",
+              "github": "bramstroker"
+            }
+          ],
+          "id": "915005914301",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T04:13:40",
+          "max_power": 7.63,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2024-05-03T07:11:32",
+          "power_range": {
+            "min": 0.58,
+            "max": 7.63
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.4,
+            "color_temp": 99.4
+          },
+          "hash": "6d72052106e9c701ea04b28d624417e3"
+        },
+        {
+          "aliases": [
+            "3216231P6",
+            "9150059208"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-12-25T09:44:08Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "integrated",
+            "form_factor": "panel",
+            "lumens": 4200,
+            "rated_power": 46.5,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696175859"
+          ],
+          "legacy_ids": [
+            "3216231P6"
+          ],
+          "linked_profile": "signify/915005920901",
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 5,
+            "VERSION": "master"
+          },
+          "name": "Hue White Ambiance Aurelle Square",
+          "standby_power": 0.35,
+          "authors": [
+            {
+              "name": "Jari Eskelinen",
+              "email": "jari.eskelinen@iki.fi",
+              "github": "jarpatus"
+            }
+          ],
+          "id": "915005920801",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 51.0,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.35,
+            "max": 51.0
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
+          "hash": "b4e6fe75aba82d8ab9523590896c5e7c"
+        },
+        {
+          "aliases": [
+            "3216331P6",
+            "9150059209",
+            "929003099101"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-12-25T09:44:08Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "integrated",
+            "form_factor": "panel",
+            "lumens": 4200,
+            "rated_power": 46.5,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696175866"
+          ],
+          "legacy_ids": [
+            "3216331P6"
+          ],
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 5,
+            "VERSION": "master"
+          },
+          "name": "Hue White Ambiance Aurelle Rectangular",
+          "standby_power": 0.35,
+          "authors": [
+            {
+              "name": "Jari Eskelinen",
+              "email": "jari.eskelinen@iki.fi",
+              "github": "jarpatus"
+            }
+          ],
+          "id": "915005920901",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 51.0,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.35,
+            "max": 51.0
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
+          "hash": "31255a70485574aac9911b8bbcfe26c2"
+        },
+        {
+          "aliases": [
+            "4503748C6",
+            "9150059237"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2024-03-29T18:50:54Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 2200,
+            "rated_power": 40,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "legacy_ids": [
+            "4503748C6"
+          ],
+          "measure_device": "Hypertec Power-Mate Lite 10A",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 5,
+            "SLEEP_TIME": 4,
+            "VERSION": "master"
+          },
+          "name": "Hue White Ambiance Muscari Ceiling Light",
+          "standby_power": 0.46,
+          "authors": [
+            {
+              "name": "Blake Garner",
+              "email": "blake.garner@gmail.com",
+              "github": "BlakeGarner"
+            }
+          ],
+          "id": "915005923701",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 42.9,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.46,
+            "max": 42.9
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "3a3e94c4e7bbce09f06621a3ca1a56d8"
+        },
+        {
+          "aliases": [
+            "5061030P7",
+            "5061030P7_01"
+          ],
+          "ean": [
+            "8718696175989"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2024-12-20T00:55:44Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "integrated",
+            "form_factor": "panel",
+            "rated_power": 11,
+            "lumens": 840,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "legacy_ids": [
+            "5061030P7"
+          ],
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 2,
+            "VERSION": "master"
+          },
+          "name": "Hue Centris 2-Spot Ceiling Light LED Panel",
+          "standby_power": 0.4,
+          "authors": [
+            {
+              "name": "Emil Blixt Hansen",
+              "github": "blixtdevelopment"
+            }
+          ],
+          "id": "915005928101",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 12.1,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.05,
+            "max": 12.1
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.4,
+            "color_temp": 97.4
+          },
+          "hash": "813d1435f1ce605555c01e691823db28"
+        },
+        {
+          "aliases": [
+            "5060830P7",
+            "5060830P7_01",
+            "5060831P7_01",
+            "5060831P7"
+          ],
+          "ean": [
+            "8718696176023"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-02-28T18:32:53Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": [
+              "GU10",
+              "integrated"
+            ],
+            "form_factor": "spot",
+            "rated_power": 25,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "legacy_ids": [
+            "5060830P7"
+          ],
+          "measure_device": "Shelly 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "name": "Hue Centris 3-Spot Cross Ceiling Light",
+          "standby_power": 0.4,
+          "authors": [
+            {
+              "name": "matteobreschig",
+              "github": "matteobreschig"
+            }
+          ],
+          "id": "915005928501",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 28.8,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 1.31,
+            "max": 28.8
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
+          "hash": "e52ea50a9057b5701c23537297e5362f"
+        },
+        {
+          "aliases": [
+            "5060730P7",
+            "5060730P7_01",
+            "5060731P7_01",
+            "5060731P7"
+          ],
+          "ean": [
+            "8718696176047"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-01-11T18:46:15Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": [
+              "GU10",
+              "integrated"
+            ],
+            "form_factor": "spot",
+            "lumens": 2800,
+            "rated_power": 40,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "legacy_ids": [
+            "5060730P7"
+          ],
+          "measure_device": "Shelly 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "name": "Hue Centris 4-Spot Ceiling Light",
+          "standby_power": 0.4,
+          "authors": [
+            {
+              "name": "matteobreschig",
+              "github": "matteobreschig"
+            }
+          ],
+          "id": "915005928701",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 44.38,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 1.47,
+            "max": 44.38
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 95.4,
+            "color_temp": 95.4
+          },
+          "hash": "24b80f0062ea20b82465102048cd04b5"
+        },
+        {
+          "aliases": [
+            "4090330P9",
+            "LCP001",
+            "LCP002",
+            "4090331P9",
+            "4090330P9_01",
+            "4090330P9_02",
+            "4090331P9_01",
+            "4090331P9_02",
+            "929003052501_01",
+            "929003052501_02",
+            "929003053301_01",
+            "929003053301_02"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-01-11T18:46:15Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 3000,
+            "rated_power": 39,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696176214",
+            "8718696169698",
+            "8719514343368",
+            "8719514343467"
+          ],
+          "legacy_ids": [
+            "4090330P9"
+          ],
+          "measure_device": "Shelly 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "name": "Hue Ensis Pendant Light",
+          "standby_power": 0.4,
+          "authors": [
+            {
+              "name": "Matteo VG7",
+              "github": "matteovg7"
+            }
+          ],
+          "id": "915005976401",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 43.52,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.83,
+            "max": 43.52
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "5758cb074444cf42a1b2c0306eac7d0f"
         },
         {
           "aliases": [
@@ -22731,6 +22763,73 @@
             "color_temp": 99.1
           },
           "hash": "50cb79083fb5ea953714cb9294ab22fc"
+        },
+        {
+          "aliases": [
+            "4080248U9",
+            "9150058704",
+            "915005987101",
+            "929003479701",
+            "915005987701",
+            "915005987801"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2024-05-20T22:38:20Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 2550,
+            "rated_power": 29,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "8718696176252",
+            "8718696176269",
+            "8718696176276",
+            "8718696176283",
+            "8719514433526"
+          ],
+          "legacy_ids": [
+            "4080248U9"
+          ],
+          "measure_device": "GW Instek GPM-8213",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "name": "Hue Gradient Signe Floor Light",
+          "standby_power": 0.54,
+          "authors": [
+            {
+              "name": "Manuel Kasper",
+              "email": "mk@neon1.net",
+              "github": "manuelkasper"
+            }
+          ],
+          "id": "915005987201",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T13:03:09",
+          "max_power": 33.97,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T13:03:09",
+          "power_range": {
+            "min": 0.87,
+            "max": 33.97
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 99.2,
+            "color_temp": 99.2
+          },
+          "hash": "da0e487bb8c59f52d1608c47f8680a16"
         },
         {
           "aliases": [
