@@ -344,6 +344,8 @@ Genio Wi-Fi devices may be exposed by Home Assistant's Tuya integration as manuf
 
 Mirabella can reuse an item number for a later hardware revision with different light output. For a measured profile, retain the specifications documented by its original contribution or exact packaging rather than replacing them with values from a current product page solely because the item number matches.
 
+For older monochrome GLS bulbs, match specifications using the complete combination of item number evidence, cap type, fixed color temperature, wattage, and product description. Do not reject an otherwise exact 800 lm listing merely because Genio also sold RGBW GLS bulbs at 800 lm; conversely, do not transfer RGBW metadata to a monochrome profile based on light output alone.
+
 ## Gledopto
 
 Use the exact `GL-*` code from the product label, official Gledopto documentation, and Zigbee Device Info as the canonical model ID. Preserve generation and type suffixes such as `P`, `Z`, and `S`; do not normalize them away. A case-only manufacturer difference such as `Gledopto` versus `GLEDOPTO` does not require an alias because manufacturer matching is case-insensitive.
@@ -639,6 +641,8 @@ For legacy Hue fixtures, distinguish the raw Zigbee model from the retail articl
 Some Hue raw model IDs were reused across materially different retail generations. Establish the measured generation from the original contribution's exact article, integration data and product link, then attach wattage, lumen and barcode metadata only from that generation. An older established integration-normalized alias may remain solely for discovery compatibility when removing it would strand existing installations; explicitly document that it is not metadata provenance. For example, `4080248U9` was measured as Gradient Signe article `915005987201`, while normalized alias `9150058704` belongs to the older non-gradient Signe. Electrically equivalent finish and regional-plug variants of the measured generation can share the profile when Signify documents their identical specifications.
 
 Treat legacy LivingColors model IDs as generation-specific even when later products reused familiar names. `LLC001` identifies the 15W Generation 2 family, while the later 10W/210 lm Iris products use other raw model IDs such as `LLC006` and `LLC010`. A plausible LUT maximum can corroborate the older rated power, but do not transfer the later Iris lumen figure or barcodes without an exact article mapping for the measured lamp.
+
+For Philips/Mijia desk lamps, prefer the exact Philips product model as canonical and retain the Xiaomi/Mi Home device type as a discovery alias and legacy ID when migrating an existing profile. Distinguish luminous flux in lumens from illuminance in lux: the Mijia Philips Desk Lamp 3 manual maps device type `philips.light.sread3` to product model `9290029013`, but its `1900 lx` specification is center illuminance and must not be stored as `lumens`.
 
 Do not infer a screw fitting from the A19 or A60 form factor. Verify the region, voltage and exact article: North-American `LWB014` hardware `9290011369B` is E26, 9.5W and 840 lm. When the same raw Hue model and power profile is documented for both E26 and E27 variants, store both fittings in the `socket` array and omit the fitting from the display name; `LWB004` is such a legacy Hue Lux case. Preserve an established integration-normalized alias even when it describes another regional article, because removing it would break discovery for integrations that still expose that normalized value.
 
