@@ -137,7 +137,7 @@ async def test_non_existing_manufacturer_returns_empty_model_list(
         (ModelInfo("signify", "Hue go", "LLC020"), "signify", "LLC020"),
         (ModelInfo("ikea", "TRADFRI bulb E14 WS opal 400lm"), "ikea", "LED1536G5"),
         (ModelInfo("signify", "Hue Play", "440400982841"), "signify", "LCT024"),
-        (ModelInfo("wiz", "SHRGB"), "wiz", "SHRGB"),
+        (ModelInfo("wiz", "929003500001"), "wiz", "929003500001"),
         (ModelInfo("tuya", "TS011F"), "tuya", "TS011F"),
     ],
 )
