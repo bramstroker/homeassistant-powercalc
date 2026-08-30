@@ -10,6 +10,10 @@
     ]
   },
   "discovery_by": "device",
+  "ean": [
+    "4023125026867",
+    "4023125027123"
+  ],
   "fixed_config": {
     "power": 3.15
   },
