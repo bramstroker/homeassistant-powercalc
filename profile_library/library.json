@@ -18368,7 +18368,9 @@
           "device_type": "light",
           "device_specs": {
             "socket": "E26",
-            "form_factor": "spot"
+            "form_factor": "spot",
+            "lumens": 1200,
+            "rated_power": 12.5
           },
           "ean": [
             "840696101724"
@@ -18390,7 +18392,7 @@
           ],
           "id": "E13-N11",
           "manufacturer": "sengled",
-          "updated_at": "2026-08-29T16:57:34",
+          "updated_at": "2026-08-29T19:25:03",
           "max_power": 12.3,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -18405,7 +18407,7 @@
             "score": 99.1,
             "brightness": 99.1
           },
-          "hash": "579f160c14b062881d6eb83919366de9"
+          "hash": "c866f5c48aa058e981233ed8f9fb78dd"
         }
       ],
       "device_types": [
@@ -19954,8 +19956,9 @@
           "device_type": "light",
           "device_specs": {
             "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 806
+            "socket": "E27",
+            "lumens": 806,
+            "rated_power": 8.5
           },
           "ean": [
             "8718696175057"
@@ -19989,7 +19992,7 @@
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "b40dfddf55a7a33982ae95fc44b219bf"
+          "hash": "77c0ace4b8d0dca1c43d2ae2126ee8f7"
         },
         {
           "aliases": [
@@ -20272,8 +20275,9 @@
           "device_type": "light",
           "device_specs": {
             "form_factor": "fixture",
-            "socket": "integrated",
-            "lumens": 806
+            "socket": "E27",
+            "lumens": 806,
+            "rated_power": 8.5
           },
           "ean": [
             "8718696175255"
@@ -20307,7 +20311,7 @@
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "124dfacf8e2fd0db2f7d271fce483b22"
+          "hash": "f5ca631baab0bbfe6e0d0e6404964511"
         },
         {
           "aliases": [
@@ -20545,7 +20549,8 @@
           "device_type": "light",
           "device_specs": {
             "socket": "integrated",
-            "form_factor": "panel"
+            "form_factor": "panel",
+            "rated_power": 11
           },
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
@@ -20564,7 +20569,7 @@
           ],
           "id": "5061030P7",
           "manufacturer": "signify",
-          "updated_at": "2026-08-29T17:18:57",
+          "updated_at": "2026-08-29T19:25:03",
           "max_power": 12.1,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:02:50",
@@ -20580,7 +20585,7 @@
             "score": 97.4,
             "color_temp": 97.4
           },
-          "hash": "f737bea7d9961899c8173eb4f127e996"
+          "hash": "6224e7e215e8879b3ec7b8d555009f27"
         },
         {
           "aliases": [
@@ -29650,7 +29655,8 @@
           "device_type": "light",
           "device_specs": {
             "form_factor": "fixture",
-            "socket": "integrated"
+            "socket": "integrated",
+            "rated_power": 10
           },
           "measure_device": "IKEA INSPELNING smart plug",
           "measure_method": "script",
@@ -29670,7 +29676,7 @@
           ],
           "id": "philips.light.sread3",
           "manufacturer": "signify",
-          "updated_at": "2026-08-29T10:24:04",
+          "updated_at": "2026-08-29T19:55:35",
           "max_power": 9.7,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-04-21T16:51:54",
@@ -29686,7 +29692,7 @@
             "score": 98.7,
             "brightness": 98.7
           },
-          "hash": "407e987a8b7590ca28a77a517d791789"
+          "hash": "337df5aa7a13ebc020f8e90c1f0023ac"
         }
       ],
       "device_types": [
@@ -33880,7 +33886,8 @@
           "ean": [
             "6924922201809",
             "6924922200833",
-            "4270000806322"
+            "4270000806322",
+            "889148499101"
           ],
           "measure_device": "Shelly Plug S",
           "measure_method": "script",
@@ -33899,7 +33906,7 @@
           ],
           "id": "YLDD04YL",
           "manufacturer": "yeelight",
-          "updated_at": "2026-08-29T18:07:25",
+          "updated_at": "2026-08-29T20:04:15",
           "max_power": 21.23,
           "sub_profile_count": 2,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -33915,7 +33922,7 @@
             "score": 100.0,
             "color_temp": 100.0
           },
-          "hash": "3e8242d34c3a2dfa8a170751c445ed51"
+          "hash": "fcdcfde00b49703217d2c7754586857a"
         },
         {
           "aliases": [
