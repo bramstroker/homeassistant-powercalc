@@ -5,6 +5,7 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "filament",
+    "lumens": 350,
     "rated_power": 4.2,
     "connectivity": [
       "zigbee"
