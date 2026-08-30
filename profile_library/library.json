@@ -1943,6 +1943,7 @@
           "created_at": "2025-12-14T07:22:00Z",
           "device_type": "network",
           "device_specs": {
+            "rated_power": 38,
             "connectivity": [
               "zigbee",
               "wifi",
@@ -1965,20 +1966,21 @@
           ],
           "id": "FRITZ!Box 5690 Pro",
           "manufacturer": "avm",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:03:25",
           "max_power": 14.5,
           "sub_profile_count": 0,
           "power_range": {
             "min": 14.5,
             "max": 14.5
           },
-          "hash": "2930f3feb68903dafad0d5b79a111ead"
+          "hash": "1b5b9b37614993fe27106f88b9eb27b3"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2026-02-14T20:27:59Z",
           "device_type": "network",
           "device_specs": {
+            "rated_power": 30,
             "connectivity": [
               "zigbee",
               "wifi",
@@ -2000,20 +2002,21 @@
           ],
           "id": "FRITZ!Box 6670 Cable",
           "manufacturer": "avm",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:03:25",
           "max_power": 12.14,
           "sub_profile_count": 0,
           "power_range": {
             "min": 12.14,
             "max": 12.14
           },
-          "hash": "a30d58e88ff04a0f2a5637b41e95c643"
+          "hash": "a6d46d423b8cd3d740aa5d620e7d68b8"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2026-04-17T10:48:22Z",
           "device_type": "network",
           "device_specs": {
+            "rated_power": 34,
             "connectivity": [
               "wifi",
               "ethernet"
@@ -2037,14 +2040,14 @@
           ],
           "id": "FRITZ!Box 6690 Cable",
           "manufacturer": "avm",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:03:25",
           "max_power": 15.75,
           "sub_profile_count": 0,
           "power_range": {
             "min": 15.75,
             "max": 15.75
           },
-          "hash": "1042666888fede6f7b0a566ca968c206"
+          "hash": "9c75407754a855eacb25d3a9a77b3996"
         },
         {
           "calculation_strategy": "fixed",
@@ -2174,6 +2177,7 @@
           "created_at": "2023-06-24T08:34:14Z",
           "device_type": "network",
           "device_specs": {
+            "rated_power": 8.4,
             "connectivity": [
               "wifi",
               "ethernet"
@@ -2195,26 +2199,31 @@
           ],
           "id": "FRITZ!Repeater 1200 AX",
           "manufacturer": "avm",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:03:25",
           "max_power": 3.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.0,
             "max": 3.0
           },
-          "hash": "602df6c3d41917092d8f9cf9ad17d1db"
+          "hash": "22a6eaadc7a5ddd654a5fc111314f024"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2023-12-31T08:21:16Z",
           "device_type": "network",
           "device_specs": {
+            "rated_power": 5.5,
             "connectivity": [
               "wifi",
               "ethernet"
             ]
           },
           "discovery_by": "device",
+          "ean": [
+            "4023125026867",
+            "4023125027123"
+          ],
           "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",
           "measure_method": "manual",
           "name": "FRITZ!Repeater 1750E",
@@ -2226,20 +2235,21 @@
           ],
           "id": "FRITZ!Repeater 1750E",
           "manufacturer": "avm",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:07:24",
           "max_power": 3.15,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.15,
             "max": 3.15
           },
-          "hash": "28b57234d06a8c07b90514f23482e1e9"
+          "hash": "2e693a3e8f47151f8e7fa2d531f938be"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2023-12-31T08:21:16Z",
           "device_type": "network",
           "device_specs": {
+            "rated_power": 8.5,
             "connectivity": [
               "wifi",
               "ethernet"
@@ -2260,26 +2270,30 @@
           ],
           "id": "FRITZ!Repeater 2400",
           "manufacturer": "avm",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:03:25",
           "max_power": 3.15,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.15,
             "max": 3.15
           },
-          "hash": "d565de3b546c088deb1d878e4ea15fb6"
+          "hash": "b26f9420f403a4349187bbe2b3bd2067"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2026-02-14T19:53:35Z",
           "device_type": "network",
           "device_specs": {
+            "rated_power": 4.1,
             "connectivity": [
               "wifi",
               "ethernet"
             ]
           },
           "discovery_by": "device",
+          "ean": [
+            "4023125031359"
+          ],
           "measure_device": "Shelly Plug S",
           "measure_method": "script",
           "name": "FRITZ!Repeater 2700",
@@ -2291,20 +2305,21 @@
           ],
           "id": "FRITZ!Repeater 2700",
           "manufacturer": "avm",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:07:24",
           "max_power": 4.79,
           "sub_profile_count": 0,
           "power_range": {
             "min": 4.79,
             "max": 4.79
           },
-          "hash": "fbaba05237532a8b06833005ae5c4215"
+          "hash": "e539bda2a987c0fcb8404b8074286686"
         },
         {
           "calculation_strategy": "fixed",
           "created_at": "2026-02-14T19:16:54Z",
           "device_type": "network",
           "device_specs": {
+            "rated_power": 11,
             "connectivity": [
               "wifi",
               "ethernet"
@@ -2325,14 +2340,14 @@
           ],
           "id": "FRITZ!Repeater 6000",
           "manufacturer": "avm",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:03:25",
           "max_power": 9.73,
           "sub_profile_count": 0,
           "power_range": {
             "min": 9.73,
             "max": 9.73
           },
-          "hash": "5a379703c2b2657fd5c4b860013a486a"
+          "hash": "982cd5da522fbb1b2a0cb955478676d7"
         }
       ],
       "device_types": [
@@ -2584,7 +2599,8 @@
           "device_specs": {
             "connectivity": [
               "wifi"
-            ]
+            ],
+            "rated_power": 3
           },
           "measure_device": "TP-Link Kasa KP125M",
           "measure_method": "manual",
@@ -2600,14 +2616,14 @@
           ],
           "id": "F7C063",
           "manufacturer": "belkin",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:52:43",
           "max_power": 1.3,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.3,
             "max": 1.3
           },
-          "hash": "b5c5017669bc8e0249e4790ec74a4734"
+          "hash": "608ccfefcc3cebca46250a4f5decd797"
         }
       ],
       "device_types": [
@@ -2755,7 +2771,8 @@
           "device_specs": {
             "connectivity": [
               "zigbee"
-            ]
+            ],
+            "rated_power": 1
           },
           "legacy_ids": [
             "PLUG_COMPACT"
@@ -2774,14 +2791,14 @@
           ],
           "id": "BSP-EZ",
           "manufacturer": "bosch",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:52:43",
           "max_power": 0.6,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.6,
             "max": 0.6
           },
-          "hash": "fa988733f745341b6bf78d8a8a70bee4"
+          "hash": "6846b1abf8748c6d647e4e85f9791026"
         }
       ],
       "device_types": [
@@ -4441,7 +4458,8 @@
         },
         {
           "ean": [
-            "7908412514418"
+            "7908412514418",
+            "7897013585661"
           ],
           "calculation_strategy": "lut",
           "created_at": "2025-09-07T05:20:12Z",
@@ -4473,7 +4491,7 @@
           ],
           "id": "48LSB30WIFI0",
           "manufacturer": "elgin",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 29.2,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-06-13T14:19:28",
@@ -4489,7 +4507,7 @@
             "score": 98.1,
             "color_temp": 98.1
           },
-          "hash": "d3f6609b80325197ba9b2c9c9a646e03"
+          "hash": "a0a05f3f4edbe7c5fcd7dc570da30e6d"
         }
       ],
       "device_types": [
@@ -4632,6 +4650,7 @@
           "created_at": "2024-09-23T13:40:20Z",
           "device_type": "printer",
           "device_specs": {
+            "rated_power": 12,
             "connectivity": [
               "wifi",
               "ethernet"
@@ -4652,14 +4671,14 @@
           ],
           "id": "ET-3760",
           "manufacturer": "epson",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 14.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 6.0,
             "max": 14.0
           },
-          "hash": "70e4b476cd4f58461dc56d43b49e13ed"
+          "hash": "0bbf1db6e41e8e437c95b905420302b5"
         },
         {
           "aliases": [
@@ -4669,6 +4688,7 @@
           "created_at": "2024-12-06T12:00:00Z",
           "device_type": "printer",
           "device_specs": {
+            "rated_power": 12,
             "connectivity": [
               "wifi",
               "ethernet"
@@ -4689,14 +4709,14 @@
           ],
           "id": "L6270",
           "manufacturer": "epson",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 12.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.52,
             "max": 12.0
           },
-          "hash": "beb47229c9342d7e01eab14e27febbbe"
+          "hash": "1c8baabbf2a75c3806af4cdae4e386fa"
         }
       ],
       "device_types": [
@@ -4718,6 +4738,7 @@
           "description": "Homematic DIN rail-mounted smart switch with integrated power measurement. This profile only models the switch's self-consumption because the connected load is measured by the device.",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 0.3,
             "connectivity": [
               "proprietary"
             ]
@@ -4739,14 +4760,14 @@
           ],
           "id": "HM-ES-PMSw1-DR",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 0.73,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.73,
             "max": 0.73
           },
-          "hash": "eb19a4b5879e99753a527db103a8c9a2"
+          "hash": "04d9e696ac178ca949f0f24dfb156012"
         },
         {
           "calculation_strategy": "fixed",
@@ -4754,6 +4775,7 @@
           "description": "Homematic DIN rail-mounted smart switch. This profile only models the switch's self-consumption; configure the connected load separately.",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 0.35,
             "connectivity": [
               "proprietary"
             ]
@@ -4777,14 +4799,14 @@
           ],
           "id": "HM-LC-Sw1-DR",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 0.52,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.52,
             "max": 0.52
           },
-          "hash": "5dfe3cb187735d444271a217c6c47ca6"
+          "hash": "e9f717b5feeb34d170280866ec2513a9"
         },
         {
           "calculation_strategy": "fixed",
@@ -4792,6 +4814,7 @@
           "description": "Homematic flush-mounted smart switch actuator for brand switch systems. This profile only models the switch's self-consumption; configure the connected load separately.",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "proprietary"
             ]
@@ -4816,14 +4839,14 @@
           ],
           "id": "HM-LC-Sw1PBU-FM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 1.42,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.42,
             "max": 1.42
           },
-          "hash": "b054020c1ec9ec1bfbbb139684b46951"
+          "hash": "53a0a1f6eca4751d77cc8faf7fdfae3e"
         },
         {
           "calculation_strategy": "linear",
@@ -4831,6 +4854,7 @@
           "description": "Homematic IP trailing-edge dimming actuator for brand switch systems. This profile only models the dimmer's self-consumption; configure the connected load separately.",
           "device_type": "smart_dimmer",
           "device_specs": {
+            "rated_power": 0.4,
             "connectivity": [
               "proprietary"
             ]
@@ -4854,10 +4878,10 @@
           ],
           "id": "HmIP-BDT",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 0.41,
           "sub_profile_count": 0,
-          "hash": "d69365f81ccc0d1a30329741b58a4b6a"
+          "hash": "927220c98ea0d04710d7f331cf3d0da1"
         },
         {
           "calculation_strategy": "fixed",
@@ -4865,6 +4889,7 @@
           "description": "Homematic IP switch actuator with integrated power measurement for brand switch systems. This profile only models the switch's self-consumption because the connected load is measured by the device.",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 0.2,
             "connectivity": [
               "proprietary"
             ]
@@ -4889,14 +4914,14 @@
           ],
           "id": "HmIP-BSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 0.2,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.2,
             "max": 0.2
           },
-          "hash": "60989f9c51e50ea086f853512dca17af"
+          "hash": "aa3d3c7a104a40cfc4a7dccd7421e6bb"
         },
         {
           "calculation_strategy": "fixed",
@@ -4904,6 +4929,7 @@
           "description": "Homematic IP single-channel DIN rail-mounted smart switch. This profile only models the switch's self-consumption; configure the connected load separately.",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 0.3,
             "connectivity": [
               "proprietary"
             ]
@@ -4927,14 +4953,14 @@
           ],
           "id": "HmIP-DRSI1",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 0.3,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.3,
             "max": 0.3
           },
-          "hash": "b144fe2ba82119b960d0302914577e78"
+          "hash": "a8348f3c9d859b700417889e26e49f57"
         },
         {
           "calculation_strategy": "linear",
@@ -4942,6 +4968,7 @@
           "description": "Homematic IP flush-mounted trailing-edge dimming actuator. This profile only models the dimmer's self-consumption; configure the connected load separately.",
           "device_type": "smart_dimmer",
           "device_specs": {
+            "rated_power": 0.4,
             "connectivity": [
               "proprietary"
             ]
@@ -4962,10 +4989,10 @@
           ],
           "id": "HmIP-FDT",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 0.4,
           "sub_profile_count": 0,
-          "hash": "45fed04c2a32c2fa7b2705b2f1b9a1f8"
+          "hash": "d97d90725493808dc73535838bb1b941"
         },
         {
           "calculation_strategy": "fixed",
@@ -5011,6 +5038,7 @@
           "description": "Homematic IP flush-mounted smart switch with integrated power measurement. This profile only models the switch's self-consumption because the connected load is measured by the device.",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 0.2,
             "connectivity": [
               "proprietary"
             ]
@@ -5035,14 +5063,14 @@
           ],
           "id": "HmIP-FSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 0.74,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.74,
             "max": 0.74
           },
-          "hash": "669fd30a7109d77beeeedb5a3007e6b5"
+          "hash": "cac47ecf42767e8d50f2e8d947230987"
         },
         {
           "calculation_strategy": "fixed",
@@ -5050,6 +5078,7 @@
           "description": "Homematic IP flush-mounted 16A smart switch with integrated power measurement. This profile only models the switch's self-consumption because the connected load is measured by the device.",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 0.2,
             "connectivity": [
               "proprietary"
             ]
@@ -5074,14 +5103,14 @@
           ],
           "id": "HmIP-FSM16",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 0.2,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.2,
             "max": 0.2
           },
-          "hash": "3b45a39d12b72b9669d46a1654dd714b"
+          "hash": "6a959659e2de1c86f07e558190758f72"
         },
         {
           "calculation_strategy": "fixed",
@@ -5089,6 +5118,7 @@
           "description": "Homematic IP pluggable smart switch with integrated power measurement. This profile only models the switch's self-consumption because the connected load is measured by the device.",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 0.3,
             "connectivity": [
               "proprietary"
             ]
@@ -5113,14 +5143,14 @@
           ],
           "id": "HmIP-PSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 0.78,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.78,
             "max": 0.78
           },
-          "hash": "d2daf0a5bdcbcbeeaa93306c68c949cb"
+          "hash": "ad51f9a4854a8f247d3ee6336244aa13"
         }
       ],
       "device_types": [
@@ -5491,7 +5521,8 @@
           "device_specs": {
             "connectivity": [
               "zwave"
-            ]
+            ],
+            "rated_power": 0.8
           },
           "legacy_ids": [
             "FGWP102"
@@ -5511,14 +5542,14 @@
           ],
           "id": "FGWP-102",
           "manufacturer": "fibaro",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:52:43",
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.8,
             "max": 0.8
           },
-          "hash": "ebaa72e87ef572b047285a68bacb9494"
+          "hash": "a2daf899f1e5fe7afe2e85583f34e4a5"
         }
       ],
       "device_types": [
@@ -5807,6 +5838,7 @@
           "device_specs": {
             "socket": "B22",
             "form_factor": "bulb",
+            "lumens": 800,
             "rated_power": 9.0,
             "connectivity": [
               "wifi"
@@ -5830,7 +5862,7 @@
           ],
           "id": "I002333",
           "manufacturer": "genio",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T06:20:55",
           "max_power": 9.73,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -5845,7 +5877,7 @@
             "score": 98.3,
             "brightness": 98.3
           },
-          "hash": "aaf0c61f18b572ddf138fec30b3ad904"
+          "hash": "d387cb4c2912c649a1f6df0e26fc4d47"
         },
         {
           "calculation_strategy": "lut",
@@ -5854,6 +5886,7 @@
           "device_specs": {
             "socket": "E27",
             "form_factor": "bulb",
+            "lumens": 800,
             "rated_power": 9.0,
             "connectivity": [
               "wifi"
@@ -5877,7 +5910,7 @@
           ],
           "id": "I002334",
           "manufacturer": "genio",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T06:20:55",
           "max_power": 8.31,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -5892,7 +5925,7 @@
             "score": 98.3,
             "brightness": 98.3
           },
-          "hash": "e22a924ba0a046c9bdfb7f06fc64ea83"
+          "hash": "82e7092e359b5df4c5d166c9d3bd2f88"
         },
         {
           "calculation_strategy": "lut",
@@ -5902,6 +5935,7 @@
             "socket": "integrated",
             "form_factor": "strip",
             "lumens": 1000,
+            "rated_power": 14.4,
             "connectivity": [
               "wifi"
             ]
@@ -5927,7 +5961,7 @@
           ],
           "id": "I002579",
           "manufacturer": "genio",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:43:29",
           "max_power": 14.01,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -5938,7 +5972,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "878445e6296a27abc95c18fb45bd09d3"
+          "hash": "9dec64b0c2b1420bbc90e64624770f38"
         },
         {
           "calculation_strategy": "lut",
@@ -6239,6 +6273,7 @@
           "device_specs": {
             "socket": "E14",
             "form_factor": "candle",
+            "lumens": 300,
             "rated_power": 4.0,
             "connectivity": [
               "zigbee"
@@ -6265,7 +6300,7 @@
           ],
           "id": "GL-B-001P",
           "manufacturer": "gledopto",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:47:19",
           "max_power": 3.54,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -6281,7 +6316,7 @@
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "0b94c8e3c19336df71a574b263052e5b"
+          "hash": "97feb3e94f3325a21b9ed5e4937cb249"
         },
         {
           "calculation_strategy": "lut",
@@ -7514,6 +7549,7 @@
             "form_factor": "fixture",
             "socket": "integrated",
             "lumens": 750,
+            "rated_power": 12.0,
             "connectivity": [
               "wifi",
               "bluetooth"
@@ -7540,7 +7576,7 @@
           ],
           "id": "H7020",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:14:38",
           "max_power": 6.65,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-02-11T20:31:49",
@@ -7556,7 +7592,7 @@
             "score": 24.3,
             "color_temp": 24.3
           },
-          "hash": "d1b9735feef4e0392694e160fb072a6c"
+          "hash": "f8ab2316810a340970044ab70e5b6fc6"
         },
         {
           "calculation_strategy": "lut",
@@ -7566,6 +7602,7 @@
             "form_factor": "fixture",
             "socket": "integrated",
             "lumens": 1500,
+            "rated_power": 24.0,
             "connectivity": [
               "wifi",
               "bluetooth"
@@ -7592,7 +7629,7 @@
           ],
           "id": "H7021",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:14:38",
           "max_power": 20.4,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-12-20T10:42:32",
@@ -7609,7 +7646,7 @@
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "5451f86f8bcd8871429b7e67f46fa645"
+          "hash": "45c7eb8a73f74bbaaf51a29c29851ca3"
         }
       ],
       "device_types": [
@@ -7633,7 +7670,8 @@
           "device_specs": {
             "connectivity": [
               "zwave"
-            ]
+            ],
+            "rated_power": 1
           },
           "measure_device": "Fibaro FGWP102",
           "measure_method": "manual",
@@ -7650,14 +7688,14 @@
           ],
           "id": "GWPN1",
           "manufacturer": "greenwave",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T09:18:11",
           "max_power": 1.1,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.1,
             "max": 1.1
           },
-          "hash": "c22fdad11dfbb35cd5b34e2dda2be7e7"
+          "hash": "0781d95fbf06cd40ddc6fa396b860e8b"
         }
       ],
       "device_types": [
@@ -7683,7 +7721,8 @@
             "connectivity": [
               "wifi",
               "bluetooth"
-            ]
+            ],
+            "lumens": 85
           },
           "ean": [
             "850008271212"
@@ -7706,7 +7745,7 @@
           ],
           "id": "HB-10521-HS",
           "manufacturer": "hampton bay",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:46:56",
           "max_power": 4.85,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-01-30T17:09:03",
@@ -7722,7 +7761,7 @@
             "score": 92.2,
             "color_temp": 92.2
           },
-          "hash": "465de1bd32418ca30376f5070d1e3aca"
+          "hash": "2e72185d8e1b60cf2e44505e13289ac2"
         }
       ],
       "device_types": [
@@ -7835,7 +7874,8 @@
           "device_specs": {
             "form_factor": "fixture",
             "socket": "integrated",
-            "rated_power": 8.0,
+            "lumens": 400,
+            "rated_power": 7,
             "connectivity": [
               "wifi"
             ]
@@ -7860,7 +7900,7 @@
           ],
           "id": "T21",
           "manufacturer": "hifree",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:33:38",
           "max_power": 8.05,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T02:52:19",
@@ -7876,7 +7916,7 @@
             "score": 96.5,
             "color_temp": 96.5
           },
-          "hash": "78e14be6e0b7f67c0f1bc77ca2f8b345"
+          "hash": "67928860f3545b9150abdfdd4290181f"
         }
       ],
       "device_types": [
@@ -11834,6 +11874,7 @@
             "socket": "E14",
             "form_factor": "candle",
             "lumens": 470,
+            "rated_power": 5.3,
             "connectivity": [
               "zigbee"
             ]
@@ -11859,7 +11900,7 @@
           ],
           "id": "RB 148 T",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:27:20",
           "max_power": 7.98,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -11874,7 +11915,7 @@
             "score": 34.1,
             "color_temp": 34.1
           },
-          "hash": "5cc6b6679c90ccb4f3a4326e7d42cb6d"
+          "hash": "a219e6d0a8d04eb51ef0ff0f4a076251"
         },
         {
           "calculation_strategy": "lut",
@@ -11884,6 +11925,7 @@
             "socket": "E27",
             "form_factor": "bulb",
             "lumens": 806,
+            "rated_power": 9,
             "connectivity": [
               "zigbee"
             ]
@@ -11904,7 +11946,7 @@
           ],
           "id": "RB 175 W",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:29:48",
           "max_power": 9.17,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -11919,7 +11961,7 @@
             "score": 98.8,
             "brightness": 98.8
           },
-          "hash": "2a6147779a47440b1dea07ed10bf457f"
+          "hash": "fd58ae1f0e37d3dea934e9e33eec56c7"
         },
         {
           "calculation_strategy": "lut",
@@ -11929,6 +11971,7 @@
             "socket": "E27",
             "form_factor": "bulb",
             "lumens": 806,
+            "rated_power": 9.5,
             "connectivity": [
               "zigbee"
             ]
@@ -11953,7 +11996,7 @@
           ],
           "id": "RB 185 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:27:20",
           "max_power": 12.78,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -11969,7 +12012,7 @@
             "score": 80.5,
             "color_temp": 80.5
           },
-          "hash": "c5798a577a82edaa94786384a2a6036b"
+          "hash": "111cf02edc0d0eaabbfb832c5857bb43"
         },
         {
           "calculation_strategy": "lut",
@@ -12500,6 +12543,7 @@
           "device_specs": {
             "socket": "E27",
             "form_factor": "filament",
+            "lumens": 350,
             "rated_power": 4.2,
             "connectivity": [
               "zigbee"
@@ -12527,7 +12571,7 @@
           ],
           "id": "RF 263",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:24:47",
           "max_power": 3.83,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -12542,7 +12586,7 @@
             "score": 92.3,
             "brightness": 92.3
           },
-          "hash": "34602862b0ff19876f1547edec6a4511"
+          "hash": "a981b3bec1a032a33711f0fe545b981f"
         },
         {
           "calculation_strategy": "lut",
@@ -13511,6 +13555,7 @@
             "socket": "integrated",
             "form_factor": "downlight",
             "lumens": 820,
+            "rated_power": 13.5,
             "connectivity": [
               "zigbee"
             ]
@@ -13537,7 +13582,7 @@
           ],
           "id": "73741",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:14:38",
           "max_power": 8.75,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -13548,7 +13593,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "764de3d22b72c15121ec8196209eba6d"
+          "hash": "a9a2380aa50fb2eff0065a5b0e30a798"
         },
         {
           "calculation_strategy": "lut",
@@ -14302,6 +14347,15 @@
       "description": "German discount supermarket chain. Its smart home range is sold as Livarno Home and Silvercrest.",
       "models": [
         {
+          "aliases": [
+            "IAN-365267_2101"
+          ],
+          "legacy_ids": [
+            "IAN-365267_2101"
+          ],
+          "ean": [
+            "4055334301848"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2024-03-14T18:59:57Z",
           "device_type": "light",
@@ -14313,40 +14367,45 @@
               "zigbee"
             ]
           },
-          "measure_device": "TP-Link Tapo P110",
+          "measure_device": "Shelly 1PM Gen4",
           "measure_method": "script",
           "measure_settings": {
-            "SAMPLE_COUNT": 4,
-            "SLEEP_TIME": 5,
-            "VERSION": "v1.10.0:docker"
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.19.2:docker"
           },
-          "name": "Livarno Lux smart LED mood light",
-          "standby_power": 0.2,
+          "name": "Livarno Home Smart LED Mood Light",
+          "standby_power": 0.05,
           "authors": [
             {
               "name": "martinkura-svk",
               "github": "martinkura-svk"
+            },
+            {
+              "name": "Thorsten1982",
+              "email": "ThorstenNiemann.TN@googlemail.com",
+              "github": "Thorsten1982"
             }
           ],
           "id": "14156506L",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 8.88,
+          "updated_at": "2026-08-30T04:59:09",
+          "max_power": 8.24,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
+          "measurement_updated_at": "2026-08-30T04:59:09",
           "power_range": {
-            "min": 0.33,
-            "max": 8.88
+            "min": 0.19,
+            "max": 8.24
           },
           "color_modes": [
             "color_temp",
             "hs"
           ],
           "lut_quality": {
-            "score": 98.2,
-            "color_temp": 98.2
+            "score": 98.5,
+            "color_temp": 98.5
           },
-          "hash": "07668057c53f7b911f2acea10fdab371"
+          "hash": "209066d8e988932fa86847da8725fcc0"
         },
         {
           "calculation_strategy": "lut",
@@ -15465,7 +15524,8 @@
           "device_specs": {
             "form_factor": "fixture",
             "socket": "integrated",
-            "rated_power": 7.7,
+            "lumens": 700,
+            "rated_power": 8,
             "connectivity": [
               "zigbee"
             ]
@@ -15491,7 +15551,7 @@
           ],
           "id": "HG08383A",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T06:03:43",
           "max_power": 7.11,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -15507,7 +15567,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "74e8dda83f54830cee5a964e628f5bf4"
+          "hash": "dec84ffe3b0582dda0c1bcc758a998df"
         },
         {
           "calculation_strategy": "fixed",
@@ -15540,54 +15600,6 @@
             "max": 1.071
           },
           "hash": "5e1d6ca868196cfbe1892dbf7788a3fa"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2025-12-12T02:44:50Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "rated_power": 11.5,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "measure_device": "Shelly 1PM Gen4",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.19.2:docker"
-          },
-          "name": "Smart LED Mood Light",
-          "standby_power": 0.05,
-          "authors": [
-            {
-              "name": "Thorsten1982",
-              "email": "ThorstenNiemann.TN@googlemail.com",
-              "github": "Thorsten1982"
-            }
-          ],
-          "id": "IAN-365267_2101",
-          "manufacturer": "lidl",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 8.24,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-01-15T07:13:48",
-          "power_range": {
-            "min": 0.19,
-            "max": 8.24
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.5,
-            "color_temp": 98.5
-          },
-          "hash": "4f4a02f34d19c2d9222203809d578160"
         }
       ],
       "device_types": [
@@ -15658,6 +15670,10 @@
           "created_at": "2022-05-10T13:27:29Z",
           "device_type": "light",
           "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E26",
+            "rated_power": 11,
+            "lumens": 1100,
             "connectivity": [
               "wifi"
             ]
@@ -15680,7 +15696,7 @@
           ],
           "id": "LIFX A19",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 11.0,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -15696,13 +15712,14 @@
             "score": 97.1,
             "color_temp": 97.1
           },
-          "hash": "5baca0d0fd665c491b03d68aa3a3114d"
+          "hash": "2ee39237976fc650e5bccb468f5246fd"
         },
         {
           "calculation_strategy": "lut",
           "created_at": "2022-05-03T22:15:08Z",
           "device_type": "light",
           "device_specs": {
+            "rated_power": 11,
             "form_factor": "bulb",
             "lumens": 1100,
             "socket": "E26",
@@ -15728,7 +15745,7 @@
           ],
           "id": "LIFX A19 Night Vision",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:38:03",
+          "updated_at": "2026-08-30T05:33:37",
           "max_power": 11.11,
           "sub_profile_count": 4,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -15744,13 +15761,17 @@
             "score": 25.5,
             "color_temp": 25.5
           },
-          "hash": "fe8d6d921ef1ce127d2341d9ba569a5d"
+          "hash": "8ebfd35e352b7b0f0a15fbf59fdffd1f"
         },
         {
           "calculation_strategy": "lut",
           "created_at": "2022-07-19T22:34:27Z",
           "device_type": "light",
           "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E26",
+            "rated_power": 11,
+            "lumens": 1100,
             "connectivity": [
               "wifi"
             ]
@@ -15772,7 +15793,7 @@
           ],
           "id": "LIFX A19 US",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 10.9,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -15788,13 +15809,17 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "ac43001415ff9a11d0d02f13a0952643"
+          "hash": "5d3c7e234fb21ebfe8a7c06acadeee1f"
         },
         {
           "calculation_strategy": "lut",
           "created_at": "2022-10-21T19:04:10Z",
           "device_type": "light",
           "device_specs": {
+            "form_factor": "spot",
+            "socket": "E26",
+            "rated_power": 11,
+            "lumens": 1100,
             "connectivity": [
               "wifi"
             ]
@@ -15817,7 +15842,7 @@
           ],
           "id": "LIFX BR30",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 11.41,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -15833,13 +15858,14 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "846cc68d52714f5f64d326688ca6fa28"
+          "hash": "c75cee6f9652bfb80eda08f7185e9d17"
         },
         {
           "calculation_strategy": "lut",
           "created_at": "2022-02-19T20:16:46Z",
           "device_type": "light",
           "device_specs": {
+            "rated_power": 11,
             "form_factor": "spot",
             "lumens": 1100,
             "socket": "E26",
@@ -15864,7 +15890,7 @@
           ],
           "id": "LIFX BR30 Night Vision",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:38:03",
+          "updated_at": "2026-08-30T05:33:37",
           "max_power": 11.03,
           "sub_profile_count": 4,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -15880,13 +15906,16 @@
             "score": 25.3,
             "color_temp": 25.3
           },
-          "hash": "bbf98bb87f5e0bc02935522ac8453690"
+          "hash": "9f15b4e09637bc489cd6d38fb35462e5"
         },
         {
           "calculation_strategy": "lut",
           "created_at": "2022-02-19T20:16:46Z",
           "device_type": "light",
           "device_specs": {
+            "socket": "E12",
+            "rated_power": 4.2,
+            "lumens": 130,
             "form_factor": "candle",
             "connectivity": [
               "wifi"
@@ -15909,7 +15938,7 @@
           ],
           "id": "LIFX Candle",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 4.21,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -15925,7 +15954,7 @@
             "score": 21.7,
             "color_temp": 21.7
           },
-          "hash": "635f456f3b9545070e8a341f56e783fa"
+          "hash": "aba7ef5019b5c2730dfd1e14c22cad06"
         },
         {
           "aliases": [
@@ -15935,6 +15964,7 @@
           "created_at": "2022-10-05T13:31:39Z",
           "device_type": "light",
           "device_specs": {
+            "socket": "integrated",
             "form_factor": "downlight",
             "connectivity": [
               "wifi"
@@ -15958,7 +15988,7 @@
           ],
           "id": "LIFX Downlight Color",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 12.55,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -15974,13 +16004,17 @@
             "score": 43.7,
             "color_temp": 43.7
           },
-          "hash": "d21813ca60c45944325b32af3d40c874"
+          "hash": "f574002a428ff68c8c230aeb6255eabe"
         },
         {
           "calculation_strategy": "lut",
           "created_at": "2022-04-30T22:38:23Z",
           "device_type": "light",
           "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E26",
+            "rated_power": 9,
+            "lumens": 800,
             "connectivity": [
               "wifi"
             ]
@@ -16003,7 +16037,7 @@
           ],
           "id": "LIFX Mini Color",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 8.88,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -16019,13 +16053,17 @@
             "score": 95.4,
             "color_temp": 95.4
           },
-          "hash": "3b4eddb23bfcd8cee9c332117ee34009"
+          "hash": "6641c53faa51efe5ee6a2541a2478ea9"
         },
         {
           "calculation_strategy": "lut",
           "created_at": "2022-08-06T11:55:31Z",
           "device_type": "light",
           "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E26",
+            "rated_power": 9,
+            "lumens": 800,
             "connectivity": [
               "wifi"
             ]
@@ -16048,7 +16086,7 @@
           ],
           "id": "LIFX Mini White",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 9.16,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -16063,13 +16101,17 @@
             "score": 98.3,
             "brightness": 98.3
           },
-          "hash": "b2e6ce2dfdb3e39a6216d7f3b2882758"
+          "hash": "60ebce9aba576d2557cf2a607ac9c51f"
         },
         {
           "calculation_strategy": "lut",
           "created_at": "2022-10-05T13:31:39Z",
           "device_type": "light",
           "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E26",
+            "rated_power": 9,
+            "lumens": 800,
             "connectivity": [
               "wifi"
             ]
@@ -16092,7 +16134,7 @@
           ],
           "id": "LIFX Mini White to Warm",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 8.56,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-06-13T14:19:28",
@@ -16107,13 +16149,17 @@
             "score": 92.0,
             "color_temp": 92.0
           },
-          "hash": "6679706f9467ee4a9034a8930783a899"
+          "hash": "f48ba1297fea58cba1607633c6672505"
         },
         {
           "calculation_strategy": "lut",
           "created_at": "2022-02-19T20:16:46Z",
           "device_type": "light",
           "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E26",
+            "rated_power": 17,
+            "lumens": 1017,
             "connectivity": [
               "wifi"
             ]
@@ -16135,7 +16181,7 @@
           ],
           "id": "LIFX Original 1000",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 17.73,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -16151,13 +16197,17 @@
             "score": 52.5,
             "color_temp": 52.5
           },
-          "hash": "d216701aa947cf1da5d8e731220f6d60"
+          "hash": "aef95cf2b9ae5aeea1b18b2f75b9cd25"
         },
         {
           "calculation_strategy": "lut",
           "created_at": "2022-02-19T20:16:46Z",
           "device_type": "light",
           "device_specs": {
+            "form_factor": "strip",
+            "socket": "integrated",
+            "rated_power": 17,
+            "lumens": 1400,
             "connectivity": [
               "wifi"
             ]
@@ -16179,7 +16229,7 @@
           ],
           "id": "LIFX Z",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 37.48,
           "sub_profile_count": 10,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -16195,7 +16245,7 @@
             "score": 33.2,
             "color_temp": 33.2
           },
-          "hash": "f91cde07da4bd393dd495831fc7d1e3a"
+          "hash": "ad7c226fde4ae8ee3ed97f3647f88a3f"
         }
       ],
       "device_types": [
@@ -17127,7 +17177,10 @@
             "form_factor": "fixture",
             "socket": "integrated",
             "lumens": 1200,
-            "rated_power": 19.0
+            "rated_power": 19.0,
+            "connectivity": [
+              "wifi"
+            ]
           },
           "ean": [
             "4047247308793"
@@ -17150,7 +17203,7 @@
           ],
           "id": "DP15",
           "manufacturer": "melitec",
-          "updated_at": "2026-08-29T18:07:25",
+          "updated_at": "2026-08-30T04:50:47",
           "max_power": 17.57,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -17165,7 +17218,7 @@
             "score": 95.0,
             "color_temp": 95.0
           },
-          "hash": "f62df09ec66aeab11852c68d2ecad8ec"
+          "hash": "b22b2a6aeb91448736009dcfdf9f6577"
         }
       ],
       "device_types": [
@@ -17514,6 +17567,69 @@
           "hash": "11ffba3e27d9966378cff240625d4e16"
         },
         {
+          "aliases": [
+            "43961"
+          ],
+          "legacy_ids": [
+            "43961",
+            "ZBT-ColorTemperature"
+          ],
+          "ean": [
+            "4018412343246"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2021-08-21T07:43:16Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "GU10",
+            "form_factor": "spot",
+            "lumens": 350,
+            "rated_power": 5.1,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "measure_device": "Shelly Plug",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v0.20.3:docker"
+          },
+          "name": "tint White LED Spot (GU10, 5.1W / 350 lm)",
+          "standby_power": 0.33,
+          "authors": [
+            {
+              "name": "nepozs",
+              "email": "szopen@os.pl",
+              "github": "nepozs"
+            },
+            {
+              "name": "RubenKelevra",
+              "email": "cyrond@gmail.com",
+              "github": "RubenKelevra"
+            }
+          ],
+          "id": "404006",
+          "manufacturer": "mueller-licht",
+          "updated_at": "2026-08-30T05:09:18",
+          "max_power": 4.94,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T05:09:18",
+          "power_range": {
+            "min": 0.35,
+            "max": 4.94
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 94.6,
+            "color_temp": 94.6
+          },
+          "hash": "af2fd246f912ee463feb71309237ff90"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2023-04-09T18:44:33Z",
           "device_type": "light",
@@ -17676,57 +17792,6 @@
             "color_temp": 98.6
           },
           "hash": "edc8ecb78f9187e94157f3db63f90bac"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-06-01T20:01:14Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "GU10",
-            "form_factor": "spot",
-            "lumens": 350,
-            "rated_power": 5.1,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "ean": [
-            "2009010008172"
-          ],
-          "measure_device": "Shelly Plug",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v0.20.3:docker"
-          },
-          "name": "tint White+Ambiance LED Spot (GU10)",
-          "standby_power": 0.33,
-          "authors": [
-            {
-              "name": "RubenKelevra",
-              "email": "cyrond@gmail.com",
-              "github": "RubenKelevra"
-            }
-          ],
-          "id": "43961",
-          "manufacturer": "mueller-licht",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 4.94,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-06-13T14:19:28",
-          "power_range": {
-            "min": 0.35,
-            "max": 4.94
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 94.6,
-            "color_temp": 94.6
-          },
-          "hash": "865a77a6af0ccceac0ac5573a3bfb086"
         },
         {
           "calculation_strategy": "lut",
@@ -17925,48 +17990,6 @@
             "color_temp": 95.1
           },
           "hash": "c5fb4df629d042277869093e83a1546e"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2021-08-21T07:43:16Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "GU10",
-            "form_factor": "spot",
-            "lumens": 350,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "measure_device": "Shelly Plug S",
-          "measure_method": "script",
-          "name": "tint White+Ambiance LED Spot (GU10, 350 lm)",
-          "standby_power": 0.31,
-          "authors": [
-            {
-              "name": "nepozs",
-              "email": "szopen@os.pl",
-              "github": "nepozs"
-            }
-          ],
-          "id": "ZBT-ColorTemperature",
-          "manufacturer": "mueller-licht",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 5.02,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-06-13T14:19:28",
-          "power_range": {
-            "min": 0.41,
-            "max": 5.02
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 93.5,
-            "color_temp": 93.5
-          },
-          "hash": "c90de806344a45df53e9005639b89357"
         }
       ],
       "device_types": [
@@ -18121,7 +18144,8 @@
           "device_specs": {
             "connectivity": [
               "zwave"
-            ]
+            ],
+            "rated_power": 0.13
           },
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
@@ -18138,14 +18162,14 @@
           ],
           "id": "NAS-WR01Z",
           "manufacturer": "neo-coolcam",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T09:18:11",
           "max_power": 0.58,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.58,
             "max": 0.58
           },
-          "hash": "0e73c8d42322938de00796799a385152"
+          "hash": "0497b2051ed26335e9438dae5184751a"
         }
       ],
       "device_types": [
@@ -18269,7 +18293,8 @@
           "device_specs": {
             "connectivity": [
               "zwave"
-            ]
+            ],
+            "rated_power": 1
           },
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
@@ -18289,14 +18314,14 @@
           ],
           "id": "MSP-3-1-X1",
           "manufacturer": "nodon",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:52:43",
           "max_power": 0.96,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.96,
             "max": 0.96
           },
-          "hash": "8d2e87c62892d773606ca654ddfc439a"
+          "hash": "4e14e5ee6bc1bbad1b2c92b8e633853d"
         }
       ],
       "device_types": [
@@ -18324,7 +18349,8 @@
           "device_specs": {
             "connectivity": [
               "wifi"
-            ]
+            ],
+            "rated_power": 0.53
           },
           "ean": [
             "5907772033722",
@@ -18345,14 +18371,14 @@
           ],
           "id": "A1T",
           "manufacturer": "nous",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:52:43",
           "max_power": 0.54,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.54,
             "max": 0.54
           },
-          "hash": "4c907a06ad35fee0ae0b46c6970030b1"
+          "hash": "427b69eeaababa5cb6b7be7edff1ae85"
         },
         {
           "aliases": [
@@ -18364,7 +18390,8 @@
           "device_specs": {
             "connectivity": [
               "zigbee"
-            ]
+            ],
+            "rated_power": 0.5
           },
           "ean": [
             "5907772033517",
@@ -18384,14 +18411,14 @@
           ],
           "id": "A1Z",
           "manufacturer": "nous",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:52:43",
           "max_power": 0.4,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.4,
             "max": 0.4
           },
-          "hash": "678d0287055cb908d007dfed664021bf"
+          "hash": "2c1349d9f3c67e8191822a10ef43ceba"
         }
       ],
       "device_types": [
@@ -19442,6 +19469,7 @@
           "created_at": "2026-08-16T15:46:12Z",
           "device_type": "fan",
           "device_specs": {
+            "rated_power": 60,
             "connectivity": [
               "wifi"
             ]
@@ -19458,10 +19486,10 @@
           ],
           "id": "AC4236_14",
           "manufacturer": "philips",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "a3d7767e7527c5b57aa29defb40e8c4f"
+          "hash": "0c716d1e627a32b114da2da22aa4adcf"
         }
       ],
       "device_types": [
@@ -19487,7 +19515,8 @@
           "device_specs": {
             "connectivity": [
               "zwave"
-            ]
+            ],
+            "rated_power": 1
           },
           "ean": [
             "3830062071505"
@@ -19510,14 +19539,14 @@
           ],
           "id": "ZMNHYD1",
           "manufacturer": "qubino",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:52:43",
           "max_power": 0.5,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.5,
             "max": 0.5
           },
-          "hash": "a14438acf17cfb23d29955843f291cd1"
+          "hash": "ffbe79a761c56abd52cf08ef672f1840"
         }
       ],
       "device_types": [
@@ -19578,6 +19607,7 @@
           "created_at": "2025-12-14T12:15:00Z",
           "device_type": "camera",
           "device_specs": {
+            "rated_power": 12,
             "connectivity": [
               "wifi",
               "ethernet"
@@ -19595,14 +19625,14 @@
           ],
           "id": "RLC-810WA",
           "manufacturer": "reolink",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 8.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 8.0,
             "max": 8.0
           },
-          "hash": "7c4c3a836aed1d034e7f907a32727cd1"
+          "hash": "e5f668d3b6f682523de2f12bf8117195"
         }
       ],
       "device_types": [
@@ -20151,6 +20181,7 @@
           "created_at": "2025-05-01T21:56:26Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi",
               "matter",
@@ -20174,7 +20205,7 @@
           ],
           "id": "S3PL-00112EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.69,
           "sub_profile_count": 2,
           "power_range": {
@@ -20182,7 +20213,7 @@
             "max": 0.69
           },
           "standby_power": 0.4,
-          "hash": "94306a760fd8681f65e4ee6da18f0109"
+          "hash": "b786ca94dac75e8d3b5adcf2c93684aa"
         },
         {
           "aliases": [
@@ -20196,6 +20227,7 @@
           "created_at": "2024-12-01T16:51:00Z",
           "device_type": "power_meter",
           "device_specs": {
+            "rated_power": 1.2,
             "connectivity": [
               "wifi",
               "bluetooth"
@@ -20216,10 +20248,10 @@
           ],
           "id": "S3PM-001PCEU16",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "05de91910ba697b6947b344fa8e4c2ca"
+          "hash": "f913385318030c056ec0b56fe0f26960"
         },
         {
           "aliases": [
@@ -20233,6 +20265,7 @@
           "description": "Smart 4-Channel Wi-Fi Input Controller",
           "device_type": "generic_iot",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi",
               "bluetooth"
@@ -20253,14 +20286,14 @@
           ],
           "id": "S3SN-0024X",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.52,
           "sub_profile_count": 3,
           "power_range": {
             "min": 0.15,
             "max": 0.52
           },
-          "hash": "4b7fdfd46cee91d51603ef7a24b24748"
+          "hash": "41ae9d6c0d36a6d4bcb3b283886ad050"
         },
         {
           "aliases": [
@@ -20274,6 +20307,7 @@
           "created_at": "2025-02-23T11:56:26Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1.2,
             "connectivity": [
               "wifi",
               "bluetooth"
@@ -20294,7 +20328,7 @@
           ],
           "id": "S3SW-001P8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.86,
           "sub_profile_count": 3,
           "power_range": {
@@ -20302,7 +20336,7 @@
             "max": 0.86
           },
           "standby_power": 0.58,
-          "hash": "d12f73ba28716cada0404f4eb2477806"
+          "hash": "cf0d9cff283f11bd061e5d252954c025"
         },
         {
           "measure_method": "manual",
@@ -20322,6 +20356,7 @@
           ],
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1.2,
             "connectivity": [
               "wifi",
               "bluetooth"
@@ -20340,7 +20375,7 @@
           ],
           "id": "S3SW-001X16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 1.332,
           "sub_profile_count": 16,
           "power_range": {
@@ -20348,7 +20383,7 @@
             "max": 1.332
           },
           "standby_power": 1.087,
-          "hash": "0d4bebab3bd23d3c5c151bff56e73a2e"
+          "hash": "bf253be32fcb037ff6c65db23003e61a"
         },
         {
           "aliases": [
@@ -20362,6 +20397,7 @@
           "created_at": "2025-02-23T11:56:26Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1.2,
             "connectivity": [
               "wifi",
               "bluetooth"
@@ -20381,7 +20417,7 @@
           ],
           "id": "S3SW-001X8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.81,
           "sub_profile_count": 3,
           "power_range": {
@@ -20389,7 +20425,7 @@
             "max": 0.81
           },
           "standby_power": 0.53,
-          "hash": "4699a4088d230b15eb8fd17126bbe53a"
+          "hash": "5a5b79ed4b96635e38e4011503b9705f"
         },
         {
           "aliases": [
@@ -20407,7 +20443,8 @@
               "wifi",
               "matter",
               "bluetooth"
-            ]
+            ],
+            "rated_power": 1.2
           },
           "discovery_by": "entity",
           "measure_device": "Shelly Plug S Gen3",
@@ -20427,7 +20464,7 @@
           ],
           "id": "S3SW-0A1X1EUL",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T06:37:28",
           "max_power": 2.366,
           "sub_profile_count": 5,
           "power_range": {
@@ -20435,7 +20472,7 @@
             "max": 2.366
           },
           "standby_power": 0.15,
-          "hash": "df95f0ea7c3726feb634fa1097b70f4e"
+          "hash": "b03a5c2d14305ee7285c30d997ffa9d3"
         },
         {
           "aliases": [
@@ -20497,6 +20534,7 @@
           "created_at": "2025-05-10T00:00:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1.2,
             "connectivity": [
               "zigbee",
               "wifi",
@@ -20521,7 +20559,7 @@
           ],
           "id": "S4SW-001X8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.94,
           "sub_profile_count": 4,
           "power_range": {
@@ -20529,7 +20567,7 @@
             "max": 0.94
           },
           "standby_power": 0.655,
-          "hash": "c90a36221162124a6e4751b95e6ade0a"
+          "hash": "e0ee542d0ebdea9ab934caa6414f09b7"
         },
         {
           "aliases": [
@@ -20643,6 +20681,7 @@
           "created_at": "2024-01-06T21:34:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi"
             ]
@@ -20668,14 +20707,14 @@
           ],
           "id": "SHEM",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.923,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.923,
             "max": 0.923
           },
-          "hash": "8a8920e7b45887c53781c414ca10f28b"
+          "hash": "073ea53d5703ce77acc3679c67f6cb42"
         },
         {
           "aliases": [
@@ -20689,6 +20728,7 @@
           "created_at": "2024-12-01T18:27:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1.0,
             "connectivity": [
               "wifi"
             ]
@@ -20709,14 +20749,14 @@
           ],
           "id": "SHEM-3",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:11:54",
           "max_power": 1.22,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.22,
             "max": 1.22
           },
-          "hash": "37cadbc6a1b429adc32e2bd41a8227fc"
+          "hash": "2d0d1925a6300c9f5512b1c26d8383df"
         },
         {
           "aliases": [
@@ -20730,6 +20770,7 @@
           "created_at": "2026-01-09T22:55:00Z",
           "device_type": "generic_iot",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi"
             ]
@@ -20752,14 +20793,14 @@
           ],
           "id": "SHIX3-1",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.587,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.587,
             "max": 0.587
           },
-          "hash": "a3a4043fafe8e50b945b815db1bb8894"
+          "hash": "fa8832f9e47038767b7c7e5c0d192655"
         },
         {
           "aliases": [
@@ -20773,6 +20814,7 @@
           "created_at": "2025-06-07T00:00:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi"
             ]
@@ -20791,7 +20833,7 @@
           ],
           "id": "SHPLG-S",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.8,
           "sub_profile_count": 2,
           "power_range": {
@@ -20799,7 +20841,7 @@
             "max": 0.8
           },
           "standby_power": 0.5,
-          "hash": "df639c09724337c019d80c6d09cbcc00"
+          "hash": "77dab50fd50685242a9a066e323b8d39"
         },
         {
           "aliases": [
@@ -20813,6 +20855,7 @@
           "created_at": "2024-01-05T12:55:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi"
             ]
@@ -20838,14 +20881,14 @@
           ],
           "id": "SHSW-1",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.618,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.618,
             "max": 0.618
           },
-          "hash": "e02d0c734d412abffc3c5d0382a695c6"
+          "hash": "a64e40e0b7f0a5eb53607c07c07b16e2"
         },
         {
           "aliases": [
@@ -20859,6 +20902,7 @@
           "created_at": "2024-01-02T22:39:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi"
             ]
@@ -20886,10 +20930,10 @@
           ],
           "id": "SHSW-25",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "0b83b6245a3bc0d8443bf50a88ac4ac2"
+          "hash": "38c1f54b6d38d621e8f0c2ee116af3f0"
         },
         {
           "aliases": [
@@ -20903,6 +20947,7 @@
           "created_at": "2024-01-09T19:21:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi"
             ]
@@ -20928,14 +20973,14 @@
           ],
           "id": "SHSW-PM",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 0.85,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.85,
             "max": 0.85
           },
-          "hash": "2fa58f193e16271b9aa5cc65692e267d"
+          "hash": "d41aa0e15c0ac6fe1e60503f6eeaa327"
         },
         {
           "aliases": [
@@ -20951,11 +20996,15 @@
           "created_at": "2024-12-01T18:36:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi",
               "bluetooth"
             ]
           },
+          "ean": [
+            "3800235265628"
+          ],
           "discovery_by": "entity",
           "measure_device": "GW Instek GPM-8310",
           "measure_method": "manual",
@@ -20972,14 +21021,14 @@
           ],
           "id": "SNPL-00112EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:53:47",
           "max_power": 1.01,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.01,
             "max": 1.01
           },
-          "hash": "ec575f206292424353eca056c4fe60b8"
+          "hash": "a6dedd98cb995a43daeacac4ee66ee8d"
         },
         {
           "aliases": [
@@ -20993,6 +21042,7 @@
           "created_at": "2025-07-15T04:34:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi",
               "bluetooth"
@@ -21011,10 +21061,10 @@
           ],
           "id": "SNPL-00116US",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:53:47",
           "max_power": 0,
           "sub_profile_count": 0,
-          "hash": "265b24d5cada2d4bd527b30b5446ac16"
+          "hash": "bdabcab7996fbbf6f0b029f98a24736a"
         },
         {
           "aliases": [
@@ -21028,6 +21078,7 @@
           "created_at": "2024-01-09T19:21:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1.2,
             "connectivity": [
               "wifi",
               "bluetooth"
@@ -21051,7 +21102,7 @@
           ],
           "id": "SNSW-001P16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 1.0,
           "sub_profile_count": 3,
           "power_range": {
@@ -21059,7 +21110,7 @@
             "max": 1.0
           },
           "standby_power": 0.78,
-          "hash": "523968bb95dddfa46bc8b0010057ef05"
+          "hash": "ded9bc013608d8704f395fce92cbba58"
         },
         {
           "name": "Plus 2PM",
@@ -21080,7 +21131,8 @@
             "connectivity": [
               "wifi",
               "bluetooth"
-            ]
+            ],
+            "rated_power": 1.4
           },
           "discovery_by": "device",
           "measure_device": "Shelly PM Mini Gen3",
@@ -21104,10 +21156,10 @@
           ],
           "id": "SNSW-102P16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T06:37:28",
           "max_power": null,
           "sub_profile_count": 16,
-          "hash": "0a6dcfc0f632471f3c4215c05fd0dc9f"
+          "hash": "09841232e8b855c8bfb3b47dec9f7809"
         },
         {
           "aliases": [
@@ -21125,7 +21177,8 @@
               "wifi",
               "bluetooth",
               "ethernet"
-            ]
+            ],
+            "rated_power": 3
           },
           "discovery_by": "device",
           "measure_device": "Shelly PM Mini Gen3",
@@ -21146,11 +21199,11 @@
           ],
           "id": "SPEM-003CEBEU63",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T06:37:28",
           "max_power": 0.0,
           "sub_profile_count": 6,
           "standby_power": 1.379,
-          "hash": "4c5bf4ebbc4f5847b3bc3181d7fa3468"
+          "hash": "077603a19a5d571324a131f9f1b45246"
         }
       ],
       "device_types": [
@@ -21941,7 +21994,8 @@
             "915005987101",
             "915005987201",
             "929003479701",
-            "915005987701"
+            "915005987701",
+            "915005987801"
           ],
           "calculation_strategy": "lut",
           "created_at": "2024-05-20T22:38:20Z",
@@ -21949,10 +22003,19 @@
           "device_specs": {
             "form_factor": "fixture",
             "socket": "integrated",
+            "lumens": 2550,
+            "rated_power": 29,
             "connectivity": [
               "zigbee"
             ]
           },
+          "ean": [
+            "8718696176252",
+            "8718696176269",
+            "8718696176276",
+            "8718696176283",
+            "8719514433526"
+          ],
           "measure_device": "GW Instek GPM-8213",
           "measure_method": "script",
           "measure_settings": {
@@ -21971,7 +22034,7 @@
           ],
           "id": "4080248U9",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:33:07",
           "max_power": 33.97,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-24T19:01:03",
@@ -21987,7 +22050,7 @@
             "score": 99.2,
             "color_temp": 99.2
           },
-          "hash": "4727280d4bd8f052acb94491ab9cea30"
+          "hash": "759348cc6af7060783d08c59d70942b0"
         },
         {
           "aliases": [
@@ -22358,6 +22421,8 @@
               "integrated"
             ],
             "form_factor": "spot",
+            "lumens": 2800,
+            "rated_power": 40,
             "connectivity": [
               "zigbee"
             ]
@@ -22379,7 +22444,7 @@
           ],
           "id": "5060730P7",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:14:38",
           "max_power": 44.38,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:02:50",
@@ -22395,7 +22460,7 @@
             "score": 95.4,
             "color_temp": 95.4
           },
-          "hash": "5e3575fc6bcaa3f9fe9c105ba2783116"
+          "hash": "34d0918fb4bebe963ca4cab031f1c637"
         },
         {
           "aliases": [
@@ -22415,6 +22480,7 @@
               "integrated"
             ],
             "form_factor": "spot",
+            "rated_power": 25,
             "connectivity": [
               "zigbee"
             ]
@@ -22436,7 +22502,7 @@
           ],
           "id": "5060830P7",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:14:38",
           "max_power": 28.8,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:02:50",
@@ -22452,7 +22518,7 @@
             "score": 98.1,
             "color_temp": 98.1
           },
-          "hash": "c6f1f45e4b015f05cb748c6dfd69270a"
+          "hash": "834673294ccbc6e4393b93433ecb7d0d"
         },
         {
           "aliases": [
@@ -22468,6 +22534,7 @@
             "socket": "integrated",
             "form_factor": "panel",
             "rated_power": 11,
+            "lumens": 840,
             "connectivity": [
               "zigbee"
             ]
@@ -22489,7 +22556,7 @@
           ],
           "id": "5061030P7",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T06:58:48",
           "max_power": 12.1,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:02:50",
@@ -22505,7 +22572,7 @@
             "score": 97.4,
             "color_temp": 97.4
           },
-          "hash": "65b005dfc5bd4305e7f88b0685b229dc"
+          "hash": "b5d966bc25dcab1513ff94900270ab23"
         },
         {
           "aliases": [
@@ -22558,53 +22625,6 @@
             "color_temp": 91.2
           },
           "hash": "fa1182b71bcd8ea302fba5b5bf8d972f"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2023-01-02T22:13:02Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "E26",
-            "form_factor": "spot",
-            "connectivity": [
-              "zigbee",
-              "bluetooth"
-            ]
-          },
-          "measure_device": "Shelly 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 2,
-            "VERSION": "v1.1.1:docker"
-          },
-          "name": "Hue White and Color Ambiance BR30 with Bluetooth",
-          "standby_power": 0.3,
-          "authors": [
-            {
-              "name": "David F. Severski",
-              "github": "davidski"
-            }
-          ],
-          "id": "548727",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 9.19,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-08-29T13:02:50",
-          "power_range": {
-            "min": 0.19,
-            "max": 9.19
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 90.9,
-            "color_temp": 90.9
-          },
-          "hash": "6bd0b3e8bf737095a15b854320c0e226"
         },
         {
           "ean": [
@@ -23364,6 +23384,60 @@
             "color_temp": 98.5
           },
           "hash": "de356a056bdf107d5cf592fae9911b97"
+        },
+        {
+          "aliases": [
+            "philips.light.sread3"
+          ],
+          "legacy_ids": [
+            "philips.light.sread3"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-04-17T17:03:41Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "rated_power": 10,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "measure_device": "IKEA INSPELNING smart plug",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 5,
+            "VERSION": "v1.20.12:docker"
+          },
+          "name": "Mijia Philips Desk Lamp 3",
+          "standby_power": 0.4,
+          "authors": [
+            {
+              "name": "xxddff",
+              "github": "xxddff",
+              "email": "772327379@qq.com"
+            }
+          ],
+          "id": "9290029013",
+          "manufacturer": "signify",
+          "updated_at": "2026-08-30T06:20:55",
+          "max_power": 9.7,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T06:20:55",
+          "power_range": {
+            "min": 1.5,
+            "max": 9.7
+          },
+          "color_modes": [
+            "brightness",
+            "effect"
+          ],
+          "lut_quality": {
+            "score": 98.7,
+            "brightness": 98.7
+          },
+          "hash": "43d9a30e2fafda88eec266e48263571e"
         },
         {
           "aliases": [
@@ -25358,52 +25432,64 @@
           "aliases": [
             "548727"
           ],
+          "legacy_ids": [
+            "548727"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2022-08-21T08:18:17Z",
           "device_type": "light",
           "device_specs": {
             "socket": "E26",
             "form_factor": "spot",
+            "rated_power": 8.5,
+            "lumens": 650,
             "connectivity": [
               "zigbee",
               "bluetooth"
             ]
           },
-          "measure_device": "TP-Link Kasa KP115",
+          "ean": [
+            "046677548728"
+          ],
+          "measure_device": "Shelly 1PM",
           "measure_method": "script",
           "measure_settings": {
             "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v0.24.8:docker"
+            "SLEEP_TIME": 2,
+            "VERSION": "v1.1.1:docker"
           },
-          "name": "Hue White and Color Ambiance BR30 Bluetooth",
+          "name": "Hue White and Color Ambiance BR30 with Bluetooth",
           "standby_power": 0.12,
           "authors": [
             {
               "name": "Emory Penney",
               "email": "emory.j.penney@intel.com",
               "github": "ejpenney"
+            },
+            {
+              "name": "David F. Severski",
+              "github": "davidski"
             }
           ],
           "id": "LCB001",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 8.03,
+          "updated_at": "2026-08-30T06:58:48",
+          "max_power": 9.19,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
+          "measurement_updated_at": "2026-08-30T04:59:09",
           "power_range": {
-            "min": 0.82,
-            "max": 8.03
+            "min": 0.19,
+            "max": 9.19
           },
           "color_modes": [
             "color_temp",
             "hs"
           ],
           "lut_quality": {
-            "score": 94.5,
-            "color_temp": 94.5
+            "score": 90.9,
+            "color_temp": 90.9
           },
-          "hash": "58709b78c7ad77aff113ab6b3fb2869f"
+          "hash": "7751a65b3166f2f9fb36be8dc883ff28"
         },
         {
           "aliases": [
@@ -25626,7 +25712,7 @@
         },
         {
           "aliases": [
-            "9290031346"
+            "929003134501"
           ],
           "calculation_strategy": "lut",
           "created_at": "2024-01-08T20:35:44Z",
@@ -25661,7 +25747,7 @@
           ],
           "id": "LCD006",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T04:50:47",
           "max_power": 10.31,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -25677,7 +25763,7 @@
             "score": 96.5,
             "color_temp": 96.5
           },
-          "hash": "5f22519119104c949b4d7d21e6d9e1f9"
+          "hash": "26d8cea5ec88c3b5fab54a1e681fad9b"
         },
         {
           "aliases": [
@@ -25797,6 +25883,8 @@
           "created_at": "2021-08-18T20:12:14Z",
           "device_type": "light",
           "device_specs": {
+            "lumens": 470,
+            "rated_power": 5.3,
             "socket": "E14",
             "form_factor": "candle",
             "connectivity": [
@@ -25816,7 +25904,7 @@
           ],
           "id": "LCE002",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:28:39",
           "max_power": 4.72,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -25832,7 +25920,7 @@
             "score": 93.6,
             "color_temp": 93.6
           },
-          "hash": "af5af55e92569b7f8c86fdd21266ff71"
+          "hash": "e28ee492e94871b7d67e1a3a1691959f"
         },
         {
           "aliases": [
@@ -26463,6 +26551,8 @@
           "device_specs": {
             "socket": "E26",
             "form_factor": "spot",
+            "lumens": 630,
+            "rated_power": 8,
             "connectivity": [
               "zigbee"
             ]
@@ -26484,7 +26574,7 @@
           ],
           "id": "LCT002",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:14:38",
           "max_power": 6.93,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:02:50",
@@ -26500,7 +26590,7 @@
             "score": 93.2,
             "color_temp": 93.2
           },
-          "hash": "42b482056c2275f2fc97c7af1088b77c"
+          "hash": "1b832a5bef7bb367ecd66d5a27281a87"
         },
         {
           "aliases": [
@@ -26658,6 +26748,7 @@
           "created_at": "2021-06-11T22:01:53Z",
           "device_type": "light",
           "device_specs": {
+            "lumens": 450,
             "socket": "E12",
             "form_factor": "candle",
             "connectivity": [
@@ -26677,7 +26768,7 @@
           ],
           "id": "LCT012",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:58:22",
           "max_power": 5.43,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -26693,7 +26784,7 @@
             "score": 54.6,
             "color_temp": 54.6
           },
-          "hash": "9840704a7134ff48c81d1048e8868c83"
+          "hash": "c7c634e7ae280629e08c717718cb2210"
         },
         {
           "aliases": [
@@ -27353,6 +27444,7 @@
             "form_factor": "downlight",
             "socket": "integrated",
             "lumens": 600,
+            "rated_power": 9.0,
             "connectivity": [
               "zigbee"
             ]
@@ -27377,7 +27469,7 @@
           ],
           "id": "LDT001",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:21:44",
           "max_power": 8.05,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-04-19T02:55:31",
@@ -27392,7 +27484,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "fd5e23897ff1578787b7c61a8623afce"
+          "hash": "bb0375305d543edded087c5de6ef2265"
         },
         {
           "aliases": [
@@ -27408,6 +27500,7 @@
             "form_factor": "fixture",
             "socket": "integrated",
             "lumens": 1035,
+            "rated_power": 10.3,
             "connectivity": [
               "zigbee"
             ]
@@ -27429,7 +27522,7 @@
           ],
           "id": "LGT009",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T12:47:11",
           "max_power": 11.86,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:02:50",
@@ -27446,7 +27539,7 @@
             "score": 94.6,
             "color_temp": 94.6
           },
-          "hash": "d897818bbf83244f7f972720d9bc0ff2"
+          "hash": "b4dd6f694d1cd2cc251bdf5be0b26507"
         },
         {
           "calculation_strategy": "lut",
@@ -27455,6 +27548,7 @@
           "device_specs": {
             "socket": "integrated",
             "form_factor": "fixture",
+            "rated_power": 15,
             "connectivity": [
               "zigbee"
             ]
@@ -27471,7 +27565,7 @@
           ],
           "id": "LLC001",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T06:13:44",
           "max_power": 12.88,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -27482,7 +27576,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "fbcef548efc0d7aecb6b35438fd044ae"
+          "hash": "2066732ab88f9a8ba9372d2b36b9bc90"
         },
         {
           "aliases": [
@@ -27779,6 +27873,9 @@
               "zigbee"
             ]
           },
+          "ean": [
+            "8718699689285"
+          ],
           "measure_device": "Shelly Plug S",
           "measure_method": "manual",
           "name": "Hue Smart Plug",
@@ -27793,14 +27890,14 @@
           ],
           "id": "LOM001",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:52:43",
           "max_power": 0.91,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.91,
             "max": 0.91
           },
-          "hash": "4ed2bf6914e372e945bb986264a0db3f"
+          "hash": "97f95babc5e2ab296a7ae1235be80083"
         },
         {
           "aliases": [
@@ -27850,6 +27947,9 @@
               "zigbee"
             ]
           },
+          "ean": [
+            "8719514342309"
+          ],
           "measure_device": "Shelly Plug S",
           "measure_method": "manual",
           "name": "Hue Smart Plug",
@@ -27864,14 +27964,14 @@
           ],
           "id": "LOM007",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:52:43",
           "max_power": 0.85,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.85,
             "max": 0.85
           },
-          "hash": "6abd1534b01903186d89ebe6ca6aa241"
+          "hash": "1ac94409a37863dc7404a933779a4015"
         },
         {
           "aliases": [
@@ -27916,6 +28016,8 @@
           "created_at": "2021-10-08T13:31:47Z",
           "device_type": "light",
           "device_specs": {
+            "lumens": 120,
+            "rated_power": 12,
             "socket": "integrated",
             "form_factor": "strip",
             "connectivity": [
@@ -27939,7 +28041,7 @@
           ],
           "id": "LST001",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:14:38",
           "max_power": 6.07,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -27950,7 +28052,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "d5ac6ccb0c1c23ca9036b38f6ce3c565"
+          "hash": "b40c09bb5f89e62ab4d6964d2d643bbd"
         },
         {
           "aliases": [
@@ -28007,12 +28109,17 @@
           "created_at": "2021-08-29T21:30:20Z",
           "device_type": "light",
           "device_specs": {
+            "lumens": 1650,
+            "rated_power": 37.5,
             "socket": "integrated",
             "form_factor": "strip",
             "connectivity": [
               "zigbee"
             ]
           },
+          "ean": [
+            "8718699709938"
+          ],
           "measure_device": "Gosund SP111",
           "measure_device_firmware": "Tasmota 9.5.0",
           "measure_method": "script",
@@ -28026,7 +28133,7 @@
           ],
           "id": "LST004",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:19:58",
           "max_power": 46.16,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -28042,7 +28149,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "0cc47d0dec6e33dec62e19f085a82c02"
+          "hash": "7edd293dba515b436006662bf59e735e"
         },
         {
           "aliases": [
@@ -28100,6 +28207,8 @@
           "device_specs": {
             "socket": "E26",
             "form_factor": "bulb",
+            "lumens": 800,
+            "rated_power": 7.5,
             "connectivity": [
               "zigbee"
             ]
@@ -28122,7 +28231,7 @@
           ],
           "id": "LTA003",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:14:38",
           "max_power": 7.59,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -28137,7 +28246,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "da4eb7b44213c810e866aca58de66c9a"
+          "hash": "7518d79522a0100f2e4c472f366f49da"
         },
         {
           "aliases": [
@@ -28903,9 +29012,7 @@
         },
         {
           "aliases": [
-            "929003099201",
-            "3216131P5",
-            "929003099001"
+            "3216131P5"
           ],
           "calculation_strategy": "lut",
           "created_at": "2023-06-05T11:09:22Z",
@@ -28913,6 +29020,8 @@
           "device_specs": {
             "socket": "integrated",
             "form_factor": "panel",
+            "lumens": 2200,
+            "rated_power": 28,
             "connectivity": [
               "zigbee"
             ]
@@ -28937,7 +29046,7 @@
           ],
           "id": "LTC013",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:15:58",
           "max_power": 24.37,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -28952,7 +29061,7 @@
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "c93ad915b3da9478c9c034e311842348"
+          "hash": "eaf76bac39525001e666560cc9248081"
         },
         {
           "aliases": [
@@ -29009,7 +29118,6 @@
         },
         {
           "aliases": [
-            "929003099301",
             "3216431P5"
           ],
           "calculation_strategy": "lut",
@@ -29018,6 +29126,8 @@
           "device_specs": {
             "socket": "integrated",
             "form_factor": "panel",
+            "lumens": 2200,
+            "rated_power": 28,
             "connectivity": [
               "zigbee"
             ]
@@ -29042,7 +29152,7 @@
           ],
           "id": "LTC016",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:15:58",
           "max_power": 28.46,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29057,7 +29167,7 @@
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "c0a2010edcbf5a68cac9ceb55c243f89"
+          "hash": "a6ab03a59f2be296bbf5407f43fb4829"
         },
         {
           "aliases": [
@@ -29177,6 +29287,8 @@
           "device_specs": {
             "socket": "E14",
             "form_factor": "candle",
+            "lumens": 470,
+            "rated_power": 5.2,
             "connectivity": [
               "zigbee"
             ]
@@ -29199,7 +29311,7 @@
           ],
           "id": "LTE002",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T06:42:32",
           "max_power": 4.75,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29214,7 +29326,7 @@
             "score": 92.6,
             "color_temp": 92.6
           },
-          "hash": "b13031ada24a1d1a0d1564d1af3a7225"
+          "hash": "ea12a441acc0aacc658a72a6a4a76f50"
         },
         {
           "aliases": [
@@ -29492,7 +29604,8 @@
         },
         {
           "aliases": [
-            "4033930P7"
+            "4076130P7",
+            "4076131P7"
           ],
           "calculation_strategy": "lut",
           "created_at": "2023-08-20T07:29:54Z",
@@ -29500,10 +29613,16 @@
           "device_specs": {
             "form_factor": "fixture",
             "socket": "integrated",
+            "lumens": 3000,
+            "rated_power": 39,
             "connectivity": [
               "zigbee"
             ]
           },
+          "ean": [
+            "8718696159132",
+            "8718696159125"
+          ],
           "measure_device": "Shelly 1PM",
           "measure_method": "script",
           "measure_settings": {
@@ -29521,7 +29640,7 @@
           ],
           "id": "LTP001",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:13:26",
           "max_power": 40.06,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29536,7 +29655,7 @@
             "score": 99.2,
             "color_temp": 99.2
           },
-          "hash": "f72aee587b79e4eb03245b468b878ae9"
+          "hash": "f3a545bae35319a8df6fbbe980f159f1"
         },
         {
           "aliases": [
@@ -30972,16 +31091,20 @@
           "created_at": "2021-06-21T13:40:20Z",
           "device_type": "light",
           "device_specs": {
-            "socket": "E27",
             "form_factor": "bulb",
             "lumens": 750,
+            "rated_power": 9,
+            "socket": [
+              "E26",
+              "E27"
+            ],
             "connectivity": [
               "zigbee"
             ]
           },
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
-          "name": "Hue Lux E27 750lm",
+          "name": "Hue Lux Bulb 750lm",
           "standby_power": 0.29,
           "authors": [
             {
@@ -30992,7 +31115,7 @@
           ],
           "id": "LWB004",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:24:44",
           "max_power": 9.52,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -31007,7 +31130,7 @@
             "score": 98.8,
             "brightness": 98.8
           },
-          "hash": "b277c364bb3b996e2f7d2e28ff29e680"
+          "hash": "d8973baa584dfad88b11b4d0c0709e57"
         },
         {
           "aliases": [
@@ -31021,6 +31144,7 @@
               "B22",
               "E27"
             ],
+            "lumens": 800,
             "form_factor": "bulb",
             "connectivity": [
               "zigbee"
@@ -31044,7 +31168,7 @@
           ],
           "id": "LWB006",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:14:38",
           "max_power": 9.18,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -31059,7 +31183,7 @@
             "score": 99.3,
             "brightness": 99.3
           },
-          "hash": "c8d6aaaa6ea8f68376e1d436885cf058"
+          "hash": "da5c31bb78db9412bd99e32e910111dc"
         },
         {
           "aliases": [
@@ -31113,7 +31237,9 @@
         },
         {
           "aliases": [
-            "9290011370"
+            "9290011370",
+            "9290011369B",
+            "453100"
           ],
           "calculation_strategy": "lut",
           "created_at": "2022-05-25T11:29:34Z",
@@ -31121,7 +31247,8 @@
           "device_specs": {
             "form_factor": "bulb",
             "lumens": 840,
-            "socket": "E27",
+            "rated_power": 9.5,
+            "socket": "E26",
             "connectivity": [
               "zigbee"
             ]
@@ -31144,7 +31271,7 @@
           ],
           "id": "LWB014",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:24:44",
           "max_power": 8.82,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -31159,7 +31286,7 @@
             "score": 99.0,
             "brightness": 99.0
           },
-          "hash": "61091893de25e3bfe244fe9be4967f8b"
+          "hash": "a650f8e079c7320ea98577e3a61ed845"
         },
         {
           "aliases": [
@@ -32157,54 +32284,6 @@
             "brightness": 98.9
           },
           "hash": "11cd6f2512c2d1ed7ba698985208f7fb"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2026-04-17T17:03:41Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "rated_power": 10,
-            "connectivity": [
-              "wifi"
-            ]
-          },
-          "measure_device": "IKEA INSPELNING smart plug",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 5,
-            "VERSION": "v1.20.12:docker"
-          },
-          "name": "Mijia Philips Desk Lamp 3",
-          "standby_power": 0.4,
-          "authors": [
-            {
-              "name": "xxddff",
-              "github": "xxddff",
-              "email": "772327379@qq.com"
-            }
-          ],
-          "id": "philips.light.sread3",
-          "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 9.7,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-04-21T16:51:54",
-          "power_range": {
-            "min": 1.5,
-            "max": 9.7
-          },
-          "color_modes": [
-            "brightness",
-            "effect"
-          ],
-          "lut_quality": {
-            "score": 98.7,
-            "brightness": 98.7
-          },
-          "hash": "5daf09166cfa2597540a7003094e5349"
         }
       ],
       "device_types": [
@@ -32272,6 +32351,7 @@
           "created_at": "2025-05-10T19:41:31Z",
           "device_type": "fan",
           "device_specs": {
+            "rated_power": 6,
             "connectivity": [
               "bluetooth"
             ]
@@ -32294,14 +32374,14 @@
           ],
           "id": "SNOOZ-US-2",
           "manufacturer": "snooz",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 4.95,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.06,
             "max": 4.95
           },
-          "hash": "33053640c38fff349eb9a364f3d0effd"
+          "hash": "89a8c4ffa73ca34105e616cd757f9e2c"
         }
       ],
       "device_types": [
@@ -32700,7 +32780,7 @@
           },
           "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
           "measure_method": "script",
-          "name": "Beam",
+          "name": "Beam (Gen 2)",
           "standby_power": 6.0,
           "authors": [
             {
@@ -32710,14 +32790,14 @@
           ],
           "id": "beam",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T05:50:07",
           "max_power": 23.6,
           "sub_profile_count": 0,
           "power_range": {
             "min": 7.3,
             "max": 23.6
           },
-          "hash": "deec6dd7474892fb2bec22c88c27ac91"
+          "hash": "cdda66c13ae18c6c34035df24e828f9a"
         },
         {
           "calculation_strategy": "fixed",
@@ -33610,7 +33690,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.10.0:docker"
           },
-          "name": "SMART+ Wi-Fi Full Color Amber Filament A19 LED Bulb (7W, 2000K)",
+          "name": "SMART+ Wi-Fi Full Color Clear Filament A19 LED Bulb (7W)",
           "standby_power": 0.5,
           "authors": [
             {
@@ -33621,7 +33701,7 @@
           ],
           "id": "40A19FILCCLWIFI",
           "manufacturer": "sylvania",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T04:50:47",
           "max_power": 8.05,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -33637,7 +33717,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "49d1ae9898f9b21f66ad02fddb2f6318"
+          "hash": "3d973016b606eb2eb5aca54472286967"
         },
         {
           "aliases": [
@@ -33718,7 +33798,8 @@
           "device_specs": {
             "connectivity": [
               "wifi"
-            ]
+            ],
+            "rated_power": 0.53
           },
           "ean": [
             "5907772033722",
@@ -33746,7 +33827,7 @@
             "min": 0.54,
             "max": 0.54
           },
-          "hash": "6bdb3724dbe2461ae55c1036b99d27b6"
+          "hash": "6b20b9043360c12e85e58888366a0366"
         },
         {
           "aliases": [
@@ -33758,7 +33839,8 @@
           "device_specs": {
             "connectivity": [
               "zigbee"
-            ]
+            ],
+            "rated_power": 0.5
           },
           "ean": [
             "5907772033517",
@@ -33785,7 +33867,7 @@
             "min": 0.4,
             "max": 0.4
           },
-          "hash": "755919b00584da1c1536c9f3ee68774b"
+          "hash": "f1b934fe2c66abb717981f790220b17b"
         },
         {
           "aliases": [
@@ -33799,6 +33881,7 @@
           "created_at": "2025-06-07T00:00:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi"
             ]
@@ -33825,7 +33908,7 @@
             "max": 0.8
           },
           "standby_power": 0.5,
-          "hash": "b449d8fd0f22c808d81f02a35494daab"
+          "hash": "30ec9ad21c20b5467fac2bb861417aef"
         },
         {
           "aliases": [
@@ -33841,11 +33924,15 @@
           "created_at": "2024-12-01T18:36:00Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1,
             "connectivity": [
               "wifi",
               "bluetooth"
             ]
           },
+          "ean": [
+            "3800235265628"
+          ],
           "discovery_by": "entity",
           "measure_device": "GW Instek GPM-8310",
           "measure_method": "manual",
@@ -33869,7 +33956,7 @@
             "min": 1.01,
             "max": 1.01
           },
-          "hash": "3d35c29a44b4b904504158ec23fb4be4"
+          "hash": "81cf6b7a37a8b8cec372837ff32734c4"
         }
       ],
       "device_types": [
@@ -33898,6 +33985,9 @@
               "wifi"
             ]
           },
+          "ean": [
+            "0709016745751"
+          ],
           "measure_device": "Shelly 1PM",
           "measure_method": "script",
           "measure_settings": {
@@ -33915,7 +34005,7 @@
           ],
           "id": "SB50",
           "manufacturer": "teckin",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T07:51:45",
           "max_power": 9.06,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -33931,7 +34021,7 @@
             "score": 97.4,
             "color_temp": 97.4
           },
-          "hash": "e224ae6b6502f28d00ca25c765ee1913"
+          "hash": "9b2e3164577cb701abbf72cb6a8661bb"
         }
       ],
       "device_types": [
@@ -34414,7 +34504,7 @@
               "B22"
             ],
             "lumens": 806,
-            "rated_power": 8.7,
+            "rated_power": 8.3,
             "connectivity": [
               "wifi"
             ]
@@ -34437,7 +34527,7 @@
           ],
           "id": "L510",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T06:37:28",
           "max_power": 7.8,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-06T12:33:25",
@@ -34452,7 +34542,7 @@
             "score": 99.0,
             "brightness": 99.0
           },
-          "hash": "9b493f5c12ec1c9ef9e4c8fec24ea94a"
+          "hash": "3e2b1f80613e6d2b1532c49317671de2"
         },
         {
           "calculation_strategy": "lut",
@@ -34643,6 +34733,7 @@
           "created_at": "2025-03-05T17:26:19Z",
           "device_type": "smart_switch",
           "device_specs": {
+            "rated_power": 1.64,
             "connectivity": [
               "wifi"
             ]
@@ -34661,14 +34752,14 @@
           ],
           "id": "P110",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T08:13:39",
           "max_power": 1.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.0,
             "max": 1.0
           },
-          "hash": "041235d9e5d4fdf82a95c9f78f1ee792"
+          "hash": "71442cccedd60eb697aee2c68c00b8d5"
         },
         {
           "aliases": [
@@ -36230,6 +36321,9 @@
           "aliases": [
             "SHRGB"
           ],
+          "legacy_ids": [
+            "SHRGB"
+          ],
           "ean": [
             "8719514554634"
           ],
@@ -36245,36 +36339,45 @@
               "wifi"
             ]
           },
-          "measure_device": "Shelly 1PM",
+          "measure_device": "Shelly Plus Plug S",
           "measure_method": "script",
           "measure_settings": {
-            "SAMPLE_COUNT": 2,
+            "SAMPLE_COUNT": 4,
             "SLEEP_TIME": 3,
-            "VERSION": "v1.12.6:docker"
+            "VERSION": "v1.17.24:docker"
           },
           "name": "Smart Wi-Fi Full-Color RGB + Tunable White LED Bulb (A80, E27, 18.5 W / 2452 lm)",
-          "standby_power": 0.4,
+          "standby_power": 0.31,
           "authors": [
             {
               "name": "Cam Murray",
               "email": "camurray@microsoft.com",
               "github": "cammurray"
+            },
+            {
+              "name": "schuppan",
+              "github": "schuppan"
             }
           ],
           "id": "929003500001",
           "manufacturer": "wiz",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 7.09,
+          "updated_at": "2026-08-30T04:59:09",
+          "max_power": 18.02,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2024-06-18T19:44:12",
+          "measurement_updated_at": "2026-08-30T04:59:09",
           "power_range": {
-            "min": 0.8,
-            "max": 7.09
+            "min": 0.88,
+            "max": 18.02
           },
           "color_modes": [
+            "color_temp",
             "hs"
           ],
-          "hash": "464c7c3cde7db9636e50b65b958c0fc9"
+          "lut_quality": {
+            "score": 99.5,
+            "color_temp": 99.5
+          },
+          "hash": "7f8c61b0ee85bfc44423cf0ecb7224a1"
         },
         {
           "aliases": [
@@ -36331,54 +36434,6 @@
             "color_temp": 95.9
           },
           "hash": "ab86f0bd6cdcfda0304c276c6ac975ca"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2025-10-28T04:32:28Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "E27",
-            "form_factor": "bulb",
-            "lumens": 2452,
-            "rated_power": 18.5,
-            "connectivity": [
-              "wifi"
-            ]
-          },
-          "measure_device": "Shelly Plus Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 4,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.24:docker"
-          },
-          "name": "Smart Bulb A80 E27 922-65 RGB (type SHRGB, model 8719514554634, 18.5 W, 220-240 V, 50/60 Hz, 2452 lm @ 4000K, CRI: 90, beam angle: 360\u00b0)",
-          "standby_power": 0.31,
-          "authors": [
-            {
-              "name": "schuppan",
-              "github": "schuppan"
-            }
-          ],
-          "id": "SHRGB",
-          "manufacturer": "wiz",
-          "updated_at": "2026-08-30T04:13:40",
-          "max_power": 18.02,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2025-10-28T11:52:34",
-          "power_range": {
-            "min": 0.88,
-            "max": 18.02
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 99.5,
-            "color_temp": 99.5
-          },
-          "hash": "052850fd8be978d6e15bd247a35db984"
         },
         {
           "calculation_strategy": "lut",
