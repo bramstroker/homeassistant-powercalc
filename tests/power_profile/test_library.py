@@ -57,7 +57,7 @@ async def test_model_listing_sorted(hass: HomeAssistant) -> None:
     models = await library.get_model_listing("signify")
 
     expected = [
-        "1740193P0",
+        "915005561201",
         "9290030514",
         "LCA007",
         "LCT010",
