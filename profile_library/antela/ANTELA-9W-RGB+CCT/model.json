@@ -1,9 +1,14 @@
 {
-  "aliases": [],
+  "aliases": [
+    "bf0f80ef7db65f56bfwkpm"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2023-11-17T08:44:45Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "E14",
+    "form_factor": "bulb",
+    "lumens": 806,
     "rated_power": 9.0
   },
   "measure_description": "Measured with utils/measure script",
@@ -14,7 +19,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "ANTELA-9W-RGB+CCT",
+  "name": "RGB+CCT Bulb 9W",
   "standby_power": 0.46,
   "authors": [
     {

@@ -1,6 +1,8 @@
 {
   "name": "LSC",
-  "aliases": [],
+  "aliases": [
+    "Tuya"
+  ],
   "website": "https://www.lsc-smartconnect.com",
   "country": "NL",
   "description": "LSC Smart Connect, the smart home house brand of the Dutch discount retailer Action."

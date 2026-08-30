@@ -5,9 +5,13 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
+    "form_factor": "bulb",
     "lumens": 1400,
     "rated_power": 14.0
   },
+  "ean": [
+    "5902201305425"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "script",
@@ -16,7 +20,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.3:docker"
   },
-  "name": "Ekobi SMART LED E27 14W 1400Lm RGB CCT",
+  "name": "A65 RGB+CCT Bulb 14W 1400 lm",
   "standby_power": 0.46,
   "authors": [
     {
