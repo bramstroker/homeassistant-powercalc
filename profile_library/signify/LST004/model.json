@@ -4,6 +4,7 @@
   "device_type": "light",
   "device_specs": {
     "lumens": 1650,
+    "rated_power": 37.5,
     "socket": "integrated",
     "form_factor": "strip",
     "connectivity": [

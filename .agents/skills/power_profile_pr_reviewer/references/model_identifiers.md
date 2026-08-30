@@ -640,6 +640,8 @@ Do not retain a sibling's raw model code or normalized article code merely becau
 
 Map light metadata through the exact Hue model, 12NC/article and region using Signify's official compatibility tables, product sheets, EPREL records, or product pages. Store verified single- and multipack barcodes when every pack contains that exact model. Do not add a newer revision's EAN merely because nominal specifications look equal, and resolve any existing article-alias collision before attaching metadata to either profile.
 
+Prefer an exact EAN/12NC product page over an unqualified family-level catalog value when they conflict. Compare like electrical quantities: a measured AC mains input may legitimately exceed a power supply's rated DC output because of conversion losses, so that comparison alone does not invalidate the exact product's published light or load wattage.
+
 Signify fixture sheets can show both a rounded marketed `total lamp output` and a higher technical output at 4000K. Use the technical 4000K value consistently for `lumens` when it is explicitly identified for the exact model; do not mix that convention with a per-module value or a sibling revision's marketing output.
 
 A Hue fixture article can remain unchanged while the bundled replaceable bulb is revised from, for example, 8.5W to 9W or 9.5W. The fixture EAN and verified lumen class can still be useful, but omit `rated_power` unless the measured bulb revision is established by dated packaging, the original PR, or a LUT peak that clearly distinguishes it.
