@@ -8,8 +8,9 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated",
-    "lumens": 806
+    "socket": "E27",
+    "lumens": 806,
+    "rated_power": 8.5
   },
   "ean": [
     "8718696175255"
