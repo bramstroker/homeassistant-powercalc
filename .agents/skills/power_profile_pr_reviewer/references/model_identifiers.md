@@ -240,6 +240,8 @@ When an Athom article code, hardware revision, firmware project name, and Home A
 
 Record FRITZ!DECT endpoint connectivity as `proprietary`: DECT ULE is the device-side smart-home transport, while the paired FRITZ!Box's Wi-Fi or Ethernet connection is not endpoint connectivity. Do not infer a FRITZ!DECT device's connectivity from the controller or Home Assistant host.
 
+For `rated_power`, use an exact model-bound AVM technical page, manual, or knowledge-base route. Prefer the published maximum when AVM provides both average and maximum consumption; otherwise the exact model's stated total or average consumption is acceptable. Do not reuse a value from document number 138 unless the route and page heading identify the profile's exact model.
+
 ## Bang & Olufsen / Beoplay
 
 Apply these rules when reviewing or normalizing Bang & Olufsen speaker profiles:
