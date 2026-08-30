@@ -4,6 +4,7 @@
   "description": "Homematic IP single-channel DIN rail-mounted smart switch. This profile only models the switch's self-consumption; configure the connected load separately.",
   "device_type": "smart_switch",
   "device_specs": {
+    "rated_power": 0.3,
     "connectivity": [
       "proprietary"
     ]
