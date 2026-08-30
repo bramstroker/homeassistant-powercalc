@@ -1,6 +1,16 @@
 {
+  "aliases": [
+    "43961"
+  ],
+  "legacy_ids": [
+    "43961",
+    "ZBT-ColorTemperature"
+  ],
+  "ean": [
+    "4018412343246"
+  ],
   "calculation_strategy": "lut",
-  "created_at": "2022-06-01T20:01:14Z",
+  "created_at": "2021-08-21T07:43:16Z",
   "device_type": "light",
   "device_specs": {
     "socket": "GU10",
@@ -11,10 +21,7 @@
       "zigbee"
     ]
   },
-  "ean": [
-    "2009010008172"
-  ],
-  "measure_description": "Measured with utils/measure script",
+  "measure_description": "Measured with utils/measure script under former profile 43961.",
   "measure_device": "Shelly Plug",
   "measure_method": "script",
   "measure_settings": {
@@ -22,9 +29,14 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.20.3:docker"
   },
-  "name": "tint White+Ambiance LED Spot (GU10)",
+  "name": "tint White LED Spot (GU10, 5.1W / 350 lm)",
   "standby_power": 0.33,
   "authors": [
+    {
+      "name": "nepozs",
+      "email": "szopen@os.pl",
+      "github": "nepozs"
+    },
     {
       "name": "RubenKelevra",
       "email": "cyrond@gmail.com",
