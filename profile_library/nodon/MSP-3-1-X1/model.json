@@ -5,7 +5,8 @@
   "device_specs": {
     "connectivity": [
       "zwave"
-    ]
+    ],
+    "rated_power": 1
   },
   "measure_description": "Manually measured",
   "measure_device": "Zhurui PR10",

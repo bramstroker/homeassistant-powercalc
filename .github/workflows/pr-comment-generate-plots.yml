@@ -53,7 +53,9 @@ jobs:
               pull_number: context.payload.pull_request.number
             })
             const files = changed.map((entry) => entry.filename).filter((file) => {
-              if (/^profile_library\/.+\/(brightness|color_temp|hs|effect)\.csv\.gz$/.test(file)) return true
+              if (/^profile_library\/.+\/(brightness|color_temp|hs|effect)\.csv\.gz$/.test(file)) {
+                return fs.existsSync(`pr/${file}`)
+              }
               if (!/^profile_library\/.+\/model\.json$/.test(file) || !fs.existsSync(`pr/${file}`)) return false
               try {
                 const model = JSON.parse(fs.readFileSync(`pr/${file}`, 'utf8'))

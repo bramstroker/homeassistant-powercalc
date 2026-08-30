@@ -10,6 +10,7 @@
       "B22",
       "E27"
     ],
+    "lumens": 800,
     "form_factor": "bulb",
     "connectivity": [
       "zigbee"

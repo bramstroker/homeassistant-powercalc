@@ -12,6 +12,7 @@
   "description": "Smart 4-Channel Wi-Fi Input Controller",
   "device_type": "generic_iot",
   "device_specs": {
+    "rated_power": 1,
     "connectivity": [
       "wifi",
       "bluetooth"

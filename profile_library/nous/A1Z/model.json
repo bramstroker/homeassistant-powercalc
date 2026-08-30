@@ -8,7 +8,8 @@
   "device_specs": {
     "connectivity": [
       "zigbee"
-    ]
+    ],
+    "rated_power": 0.5
   },
   "ean": [
     "5907772033517",

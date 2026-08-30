@@ -11,6 +11,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "0709016745751"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",

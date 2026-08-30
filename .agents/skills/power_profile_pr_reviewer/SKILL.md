@@ -110,7 +110,7 @@ Ensure:
 
 - `created_at` is ISO formatted
 - integration restrictions use `compatible_integrations`; do not use the obsolete root-level `integration` key, which discovery ignores
-- Store the manufacturer's claimed wattage in `device_specs.rated_power` for any device type, not only lights. Keep it distinct from measured power values such as the library index's `max_power`.
+- Store the manufacturer's claimed input or own-consumption wattage in `device_specs.rated_power` for any device type, not only lights. Keep it distinct from measured power values such as the library index's `max_power`. For a power supply or LED driver, an output rating is capacity rather than device consumption; for a switch, plug, UPS, or dimmer, a maximum connected or switchable load is likewise not `rated_power`. Leave the field unset when the manufacturer publishes only those capacity figures.
 - Put the protocols the device itself uses for supported operation in `device_specs.connectivity`. Record Matter together with its verified transport, for example `["matter", "thread"]` or `["wifi", "matter"]`; Matter alone does not identify the radio. For gateways, include both sides that the hardware actually communicates over, such as Zigbee and Ethernet. Do not infer connectivity from the manufacturer, an integration name, a cloud API, or the phone-side setup flow. In particular, Bluetooth required only on the phone for commissioning is not device Bluetooth functionality. Check product generations separately when a manufacturer moved from Zigbee to Matter-over-Thread or otherwise changed protocol.
 - Put verified retail packaging barcodes (EAN-8, UPC-12, EAN-13, or GTIN-14) in the `ean` array. Include the verified barcodes of single-device and multipack packaging when every pack contains the exact same device model, because each barcode can help users find the profile. Exclude bundles, fittings, revisions, or packs containing a different electrical model. Do not infer that a numeric model, article, SKU, or 12NC is a barcode merely because its length or check digit is valid. Keep a barcode in `aliases` as well when an integration reports it as a model identifier and removing it would break discovery; `ean` is product metadata, not a replacement for discovery aliases.
 
@@ -188,6 +188,8 @@ Look for signs the measurement may be unreliable:
 - missing measurement device
 - copied data from similar models
 - incomplete measurement explanation
+
+When several identical lights are measured through one Home Assistant group, inspect the measurement-tool version and the recorded light count before treating the LUT as aggregate power. The light runner divides every reading, including standby, by the configured number of lights; an explicitly configured multi-light run therefore produces a per-light profile.
 
 Flag suspicious cases but avoid assuming bad intent.
 

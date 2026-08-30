@@ -16,6 +16,8 @@
       "integrated"
     ],
     "form_factor": "spot",
+    "lumens": 2800,
+    "rated_power": 40,
     "connectivity": [
       "zigbee"
     ]

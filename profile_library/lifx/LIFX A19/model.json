@@ -3,6 +3,10 @@
   "created_at": "2022-05-10T13:27:29Z",
   "device_type": "light",
   "device_specs": {
+    "form_factor": "bulb",
+    "socket": "E26",
+    "rated_power": 11,
+    "lumens": 1100,
     "connectivity": [
       "wifi"
     ]

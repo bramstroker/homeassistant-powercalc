@@ -5,6 +5,7 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "fixture",
+    "rated_power": 15,
     "connectivity": [
       "zigbee"
     ]

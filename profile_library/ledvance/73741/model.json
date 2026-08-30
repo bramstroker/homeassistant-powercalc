@@ -6,6 +6,7 @@
     "socket": "integrated",
     "form_factor": "downlight",
     "lumens": 820,
+    "rated_power": 13.5,
     "connectivity": [
       "zigbee"
     ]

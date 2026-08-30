@@ -3,12 +3,17 @@
   "created_at": "2023-12-31T08:21:16Z",
   "device_type": "network",
   "device_specs": {
+    "rated_power": 5.5,
     "connectivity": [
       "wifi",
       "ethernet"
     ]
   },
   "discovery_by": "device",
+  "ean": [
+    "4023125026867",
+    "4023125027123"
+  ],
   "fixed_config": {
     "power": 3.15
   },

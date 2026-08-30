@@ -2,32 +2,44 @@
   "aliases": [
     "548727"
   ],
+  "legacy_ids": [
+    "548727"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-08-21T08:18:17Z",
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
     "form_factor": "spot",
+    "rated_power": 8.5,
+    "lumens": 650,
     "connectivity": [
       "zigbee",
       "bluetooth"
     ]
   },
-  "measure_description": "Measured with utils/measure script.  Controller: hue, Bulbs: 2, Dummy Load: None",
-  "measure_device": "TP-Link Kasa KP115",
+  "ean": [
+    "046677548728"
+  ],
+  "measure_description": "LUT measured with utils/measure script using a resistive dummy load under former profile 548727. Standby power measured separately for LCB001 using a TP-Link Kasa KP115.",
+  "measure_device": "Shelly 1PM",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,
-    "SLEEP_TIME": 3,
-    "VERSION": "v0.24.8:docker"
+    "SLEEP_TIME": 2,
+    "VERSION": "v1.1.1:docker"
   },
-  "name": "Hue White and Color Ambiance BR30 Bluetooth",
+  "name": "Hue White and Color Ambiance BR30 with Bluetooth",
   "standby_power": 0.12,
   "authors": [
     {
       "name": "Emory Penney",
       "email": "emory.j.penney@intel.com",
       "github": "ejpenney"
+    },
+    {
+      "name": "David F. Severski",
+      "github": "davidski"
     }
   ]
 }

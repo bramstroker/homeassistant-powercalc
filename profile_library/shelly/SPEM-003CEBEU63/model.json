@@ -14,7 +14,8 @@
       "wifi",
       "bluetooth",
       "ethernet"
-    ]
+    ],
+    "rated_power": 3
   },
   "discovery_by": "device",
   "measure_description": "The measured device fw: 1.4.4, Eco Mode disabled. The result represents the average value of measurements collected from the measurement device API for the following scenarios: dumb device/baseline consumption (~4.9W) and several device configurations. See sub-profiles.",

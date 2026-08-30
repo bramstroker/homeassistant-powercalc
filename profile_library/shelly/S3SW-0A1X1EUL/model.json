@@ -15,7 +15,8 @@
       "wifi",
       "matter",
       "bluetooth"
-    ]
+    ],
+    "rated_power": 1.2
   },
   "discovery_by": "entity",
   "measure_description": "Measured with disconnected load, for about 90 minutes and calculated average from values stored by Home Assistant. Multiple combinations of settings were tested. Firmware version 1.7.1 for the tested Shelly 1L Gen3 device. The power values are long-term averages measured while the device periodically wakes to maintain connectivity. Instantaneous power is higher during wakeups when the relay is off, but the average energy consumption is accurately reflected.",

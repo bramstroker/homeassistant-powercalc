@@ -17,6 +17,7 @@
   ],
   "device_type": "smart_switch",
   "device_specs": {
+    "rated_power": 1.2,
     "connectivity": [
       "wifi",
       "bluetooth"

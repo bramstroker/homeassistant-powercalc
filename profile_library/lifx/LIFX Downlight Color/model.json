@@ -6,6 +6,7 @@
   "created_at": "2022-10-05T13:31:39Z",
   "device_type": "light",
   "device_specs": {
+    "socket": "integrated",
     "form_factor": "downlight",
     "connectivity": [
       "wifi"

@@ -5,6 +5,7 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
+    "lumens": 800,
     "rated_power": 9.0,
     "connectivity": [
       "wifi"

@@ -3,12 +3,17 @@
   "created_at": "2021-08-29T21:30:20Z",
   "device_type": "light",
   "device_specs": {
+    "lumens": 1650,
+    "rated_power": 37.5,
     "socket": "integrated",
     "form_factor": "strip",
     "connectivity": [
       "zigbee"
     ]
   },
+  "ean": [
+    "8718699709938"
+  ],
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",

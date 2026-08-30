@@ -6,6 +6,8 @@
   "created_at": "2021-10-08T13:31:47Z",
   "device_type": "light",
   "device_specs": {
+    "lumens": 120,
+    "rated_power": 12,
     "socket": "integrated",
     "form_factor": "strip",
     "connectivity": [

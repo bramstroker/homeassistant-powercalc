@@ -8,7 +8,8 @@
   "device_specs": {
     "connectivity": [
       "wifi"
-    ]
+    ],
+    "rated_power": 3
   },
   "measure_description": "Manually measured",
   "measure_device": "TP-Link Kasa KP125M",

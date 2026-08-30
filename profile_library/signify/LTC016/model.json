@@ -1,6 +1,5 @@
 {
   "aliases": [
-    "929003099301",
     "3216431P5"
   ],
   "calculation_strategy": "lut",
@@ -9,6 +8,8 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "panel",
+    "lumens": 2200,
+    "rated_power": 28,
     "connectivity": [
       "zigbee"
     ]

@@ -4,6 +4,7 @@
   "description": "Homematic IP switch actuator with integrated power measurement for brand switch systems. This profile only models the switch's self-consumption because the connected load is measured by the device.",
   "device_type": "smart_switch",
   "device_specs": {
+    "rated_power": 0.2,
     "connectivity": [
       "proprietary"
     ]

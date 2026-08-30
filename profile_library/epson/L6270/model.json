@@ -6,6 +6,7 @@
   "created_at": "2024-12-06T12:00:00Z",
   "device_type": "printer",
   "device_specs": {
+    "rated_power": 12,
     "connectivity": [
       "wifi",
       "ethernet"

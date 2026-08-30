@@ -4,6 +4,7 @@
   "description": "Homematic IP flush-mounted trailing-edge dimming actuator. This profile only models the dimmer's self-consumption; configure the connected load separately.",
   "device_type": "smart_dimmer",
   "device_specs": {
+    "rated_power": 0.4,
     "connectivity": [
       "proprietary"
     ]

@@ -140,6 +140,7 @@
   "created_at": "2026-08-16T15:46:12Z",
   "device_type": "fan",
   "device_specs": {
+    "rated_power": 60,
     "connectivity": [
       "wifi"
     ]
