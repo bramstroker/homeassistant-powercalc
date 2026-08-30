@@ -189,6 +189,8 @@ Look for signs the measurement may be unreliable:
 - copied data from similar models
 - incomplete measurement explanation
 
+When several identical lights are measured through one Home Assistant group, inspect the measurement-tool version and the recorded light count before treating the LUT as aggregate power. The light runner divides every reading, including standby, by the configured number of lights; an explicitly configured multi-light run therefore produces a per-light profile.
+
 Flag suspicious cases but avoid assuming bad intent.
 
 ### 8. Compare With Similar Profiles
