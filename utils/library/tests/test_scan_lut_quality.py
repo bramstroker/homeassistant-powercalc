@@ -308,8 +308,8 @@ def test_scan_library_finds_supported_gzipped_luts(tmp_path: Path) -> None:
 
 def test_scan_library_skips_manually_verified_models(tmp_path: Path) -> None:
     verified_paths = [
-        tmp_path / "lifx" / "LIFX BR30 Night Vision" / "brightness.csv.gz",
-        tmp_path / "lifx" / "LIFX A19 Night Vision" / "infrared_100" / "color_temp.csv.gz",
+        tmp_path / "lifx" / "LHB30E27UC10P" / "brightness.csv.gz",
+        tmp_path / "lifx" / "LHLA19E26IRUS" / "infrared_100" / "color_temp.csv.gz",
     ]
     scanned_path = tmp_path / "lifx" / "Other Model" / "brightness.csv.gz"
     scanned_path.parent.mkdir(parents=True)
