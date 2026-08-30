@@ -1,6 +1,8 @@
 {
   "aliases": [
-    "9290011370"
+    "9290011370",
+    "9290011369B",
+    "453100"
   ],
   "calculation_strategy": "lut",
   "created_at": "2022-05-25T11:29:34Z",
@@ -8,7 +10,8 @@
   "device_specs": {
     "form_factor": "bulb",
     "lumens": 840,
-    "socket": "E27",
+    "rated_power": 9.5,
+    "socket": "E26",
     "connectivity": [
       "zigbee"
     ]
