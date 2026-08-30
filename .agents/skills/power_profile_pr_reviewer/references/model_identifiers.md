@@ -360,6 +360,8 @@ Confirm the reported color modes and hardware or firmware revision before reusin
 
 For light metadata, accept a barcode only when the listing identifies the complete exact `GL-*` code, including a finish or revision suffix where one exists. A manufacturer lumen range must remain a range in the evidence; do not select one endpoint as an exact `lumens` value.
 
+For `GL-B-001P`, the v1.9 manual was created in July 2022 and specifies 250–300 lm for the exact 4W E14 model, closely preceding the September 2022 measurement. Treat the current 200 lm page, which describes the product as the latest generation despite retaining the same GTIN, as a later optical revision. Keep `lumens` omitted for the measured profile because the contemporaneous source provides only a range.
+
 ## Google
 
 Use Google's official printed or regulatory hardware model as the canonical ID, for example `H0ME` for Google Home, `H0A` for Home Mini, `H2C` for Nest Mini, `H2A` for Nest Hub Max, `GUIK2` for Nest Hub (2nd gen), `GXCA6` for Nest Audio, and `H2E` for Nest Wifi Point. Preserve the former directory in `legacy_ids` when migrating a marketing-name directory or correcting a transcription such as `HOA` to `H0A`.
