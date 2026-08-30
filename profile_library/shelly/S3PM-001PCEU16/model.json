@@ -10,6 +10,7 @@
   "created_at": "2024-12-01T16:51:00Z",
   "device_type": "power_meter",
   "device_specs": {
+    "rated_power": 1.2,
     "connectivity": [
       "wifi",
       "bluetooth"

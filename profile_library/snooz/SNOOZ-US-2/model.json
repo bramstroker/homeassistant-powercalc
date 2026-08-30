@@ -3,6 +3,7 @@
   "created_at": "2025-05-10T19:41:31Z",
   "device_type": "fan",
   "device_specs": {
+    "rated_power": 6,
     "connectivity": [
       "bluetooth"
     ]
