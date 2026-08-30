@@ -1,0 +1,42 @@
+{
+  "aliases": [
+    "3216231P6",
+    "9150059208"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2022-12-25T09:44:08Z",
+  "device_type": "light",
+  "device_specs": {
+    "socket": "integrated",
+    "form_factor": "panel",
+    "lumens": 4200,
+    "rated_power": 46.5,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "ean": [
+    "8718696175859"
+  ],
+  "legacy_ids": [
+    "3216231P6"
+  ],
+  "linked_profile": "signify/915005920901",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "TP-Link Kasa HS110",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 5,
+    "VERSION": "master"
+  },
+  "name": "Hue White Ambiance Aurelle Square",
+  "standby_power": 0.35,
+  "authors": [
+    {
+      "name": "Jari Eskelinen",
+      "email": "jari.eskelinen@iki.fi",
+      "github": "jarpatus"
+    }
+  ]
+}

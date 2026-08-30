@@ -1,0 +1,41 @@
+{
+  "aliases": [
+    "4090531P9",
+    "9150058723",
+    "929003053501"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2023-02-28T18:32:53Z",
+  "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated",
+    "lumens": 2400,
+    "rated_power": 32,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "ean": [
+    "8718696174593"
+  ],
+  "legacy_ids": [
+    "4090531P9"
+  ],
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly 1PM",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "master"
+  },
+  "name": "Hue Flourish Ceiling Light",
+  "standby_power": 0.4,
+  "authors": [
+    {
+      "name": "matteobreschig",
+      "github": "matteobreschig"
+    }
+  ]
+}
