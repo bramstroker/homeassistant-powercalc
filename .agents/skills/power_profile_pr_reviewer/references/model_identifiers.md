@@ -644,6 +644,8 @@ Prefer an exact EAN/12NC product page over an unqualified family-level catalog v
 
 Signify fixture sheets can show both a rounded marketed `total lamp output` and a higher technical output at 4000K. Use the technical 4000K value consistently for `lumens` when it is explicitly identified for the exact model; do not mix that convention with a per-module value or a sibling revision's marketing output.
 
+Do not interpret malformed fixture-table fields as complete-device power when they expose internal LED counts and per-source wattage. Prefer the wattage embedded in the exact official product designation and corroborate it with a contemporaneous exact-12NC catalog row and the measured power range.
+
 A Hue fixture article can remain unchanged while the bundled replaceable bulb is revised from, for example, 8.5W to 9W or 9.5W. The fixture EAN and verified lumen class can still be useful, but omit `rated_power` unless the measured bulb revision is established by dated packaging, the original PR, or a LUT peak that clearly distinguishes it.
 
 For multi-light luminaires, distinguish a profile for the complete fixture from profiles for separately exposed Hue child entities. Apply total fixture lumens and input power only to a complete-fixture profile; keep per-lamp values on an individual child profile and do not copy a fixture GTIN's aggregate specifications onto every endpoint. Derive an endpoint's output from a fixture total only when official, generation-specific sources identify the exact fixture and every other included light source, so that the remainder is unambiguous; otherwise leave endpoint lumens unset.
