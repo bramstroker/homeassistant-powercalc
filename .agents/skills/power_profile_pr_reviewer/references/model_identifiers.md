@@ -626,6 +626,8 @@ Use the exact Shelly hardware model returned as `model` by `Shelly.GetDeviceInfo
 
 For no-neutral switches that require a bypass, distinguish the manufacturer's device-only consumption limit from a measured circuit value that includes bypass current. Store the declared device limit as `rated_power` when the repository convention represents a published upper bound numerically, but retain the higher measured fixed values and `only_self_usage: false` when the original setup explicitly included the required bypass. Do not reject those measurements merely because they exceed the device-only specification.
 
+More generally, keep Shelly's published device-consumption limit separate from empirical profile values. Store a claim such as `< 1 W` numerically as `rated_power: 1.0`, while preserving a credible higher measurement; do not invent an accessory, tolerance, or measurement-error explanation when the available evidence only establishes that the values differ.
+
 Shelly family pages may document one consumption limit across multiple exact API hardware codes. Preserve the reported code rather than replacing it with the first code on the product page: `SNSW-102P16EU` is a Plus 2PM variant alongside `SNSW-002P16EU`, and `SPEM-003CEBEU63` is the Pro 3EM package with 63A current transformers alongside the base `SPEM-003CEBEU`. A family rating may be used when a maintained device mapping confirms the variant and the profile measurements are compatible. Exclude separately powered or optional Add-On consumption when comparing the bare-device limit.
 
 ## Signify / Philips Hue
