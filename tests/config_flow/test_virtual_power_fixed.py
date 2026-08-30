@@ -8,9 +8,20 @@ from homeassistant.helpers import config_validation as cv
 import voluptuous as vol
 
 try:
-    from voluptuous_serialize import convert as schema_to_field_list
+    from probatio import UNSUPPORTED, to_field_list
 except ImportError:
-    from probatio import to_field_list as schema_to_field_list
+    from voluptuous_serialize import convert as schema_to_field_list
+else:
+
+    def schema_to_field_list(schema: Any, *, custom_serializer: Any) -> Any:  # noqa: ANN401
+        """Serialize a Probatio schema while adapting the legacy HA serializer contract."""
+
+        def probatio_custom_serializer(value: Any) -> Any:  # noqa: ANN401
+            result = custom_serializer(value)
+            return UNSUPPORTED if result is None else result
+
+        return to_field_list(schema, custom_serializer=probatio_custom_serializer)
+
 
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (

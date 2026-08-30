@@ -64,7 +64,7 @@ async def test_lut_manual_flow(hass: HomeAssistant) -> None:
     model_select: SelectSelector = data_schema.schema["model"]
     model_options = model_select.config["options"]
     assert {"value": "LCT010", "label": "LCT010 (Hue White and Color Ambiance A19 E26 (Gen 3))"} in model_options
-    assert {"value": "LWB010", "label": "LWB010 (Hue White Bulb A60 E27 806lm)"} in model_options
+    assert {"value": "LWB010", "label": "LWB010 (Hue White Bulb A60 B22 806lm)"} in model_options
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
