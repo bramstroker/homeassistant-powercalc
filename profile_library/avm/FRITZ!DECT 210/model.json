@@ -3,7 +3,10 @@
   "created_at": "2023-12-31T08:21:16Z",
   "device_type": "smart_switch",
   "device_specs": {
-    "rated_power": 1.5
+    "rated_power": 1.5,
+    "connectivity": [
+      "proprietary"
+    ]
   },
   "ean": [
     "4023125027239"

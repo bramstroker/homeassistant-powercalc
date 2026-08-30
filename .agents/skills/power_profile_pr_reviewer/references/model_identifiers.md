@@ -179,8 +179,13 @@ Apply these rules when reviewing or normalizing 3A Smart Home and Nue profiles:
 4. Preserve complete suffixes and revisions such as `.1` and `.3`. Do not assume sibling controller codes identify equivalent dimmers or share self-usage merely because the base code and product description match.
 5. Accept `3A Smart Home DE` and other manufacturer aliases only when the exact value appears in Home Assistant Device Info for the originating integration. Do not generate capitalization variants solely for completeness or infer aliases from a raw signature without confirming how Home Assistant exposes it.
 6. Use the branded product line, such as `Nue`, and the verified product type in `name`; omit the generic word `Smart`, the protocol name `ZigBee`, and the manufacturer name when they add no product distinction. Format ratings with a space, for example `Nue RGBW Downlight (9 W)`.
+7. Keep connectivity tied to the measured hardware revision rather than a current page for the same retail code. The measured `WL-SD001-9W` profile is the Zigbee revision; do not replace that with Wi-Fi/Bluetooth metadata from a later or parallel product page.
 
 When a controller identifier and apparent product code cannot be reconciled, keep the established profile unchanged and ask for a product-label or packaging photo plus the exact Home Assistant manufacturer, model, originating integration, wattage, and relevant physical specifications.
+
+## Antela
+
+Keep connectivity tied to the measured product and its exact Tuya evidence. The established `ANTELA-9W-RGB+CCT` bulb uses Wi-Fi; do not infer that a similarly named retail revision uses the same transport without exact package or Device Info evidence.
 
 ## Anko / Kmart
 
@@ -230,6 +235,10 @@ Apply these rules when reviewing or normalizing Athom ESPHome and Tasmota profil
 8. Set `only_self_usage: true` only for an exact Athom plug model with a built-in consumption meter. Recheck the hardware revision and regional code because similarly named plugs can use different metering chipsets or current ratings.
 
 When an Athom article code, hardware revision, firmware project name, and Home Assistant Device Info cannot be reconciled, preserve the established profile and ask for the product label, exact region and revision, firmware type, and current Home Assistant manufacturer and model.
+
+## AVM
+
+Record FRITZ!DECT endpoint connectivity as `proprietary`: DECT ULE is the device-side smart-home transport, while the paired FRITZ!Box's Wi-Fi or Ethernet connection is not endpoint connectivity. Do not infer a FRITZ!DECT device's connectivity from the controller or Home Assistant host.
 
 ## Bang & Olufsen / Beoplay
 
@@ -319,6 +328,8 @@ When no printed hardware code is established, retain the exact Freebox API and H
 
 Use Free's official product-role spelling in `name`, such as `Server Pop` and `Player Pop`, rather than repeating a technical revision or retaining all-uppercase `POP`. A historical integration value such as `Freebox Player v8` may remain as an alias when the original contribution confirms it. Do not assume the server and player share measurements merely because both belong to the Freebox Pop offer.
 
+Record both Wi-Fi and Ethernet for Player Pop, which supports either network connection. The established `Freebox v8 (r1)` Server Pop profile uses Wi-Fi. Keep each endpoint's connectivity separate from the paired device's interfaces and hardware revision.
+
 ## GE
 
 Prefer the official printed GE Link product code, such as `PSB30-SW27` or `PSB38-BW30`, as the canonical model ID. Use a concise name that distinguishes the bulb shape and capability, such as `Link BR30 Soft White Bulb`.
@@ -387,7 +398,7 @@ Use a readable product name with official brand casing and concise electrical di
 
 Prefer the exact product model printed on the device when it is known. Otherwise retain the established IPP model value as canonical, for example `MFP 3301`, and preserve the full IPP value `HP Color LaserJet Pro MFP 3301` as an alias. Home Assistant's IPP integration maps the printer's IPP model directly to `model`, exposes the serial number separately and does not set `model_id`; do not turn a serial number or a bracketed UI suffix into an alias.
 
-HP's `3301` family includes more specific suffix variants such as `3301fdn`, `3301sdw`, `3301fdw` and `3301cdw`. Do not guess one from a generic IPP value or add every family member as an alias. HP regulatory model numbers such as `SHNGC-2201-01` are explicitly separate from product model numbers and are not preferable discovery identifiers. Use a descriptive product category such as `Color LaserJet Pro Multifunction Printer` for `name` instead of repeating `MFP 3301`. For IPP fixed profiles, document that the `idle` state may cover several physical power phases and that polling can miss short warm-up, fusing and cool-down peaks; preserve measured idle power without pretending that it models per-page energy.
+HP's `3301` family includes more specific suffix variants such as `3301fdn`, `3301sdw`, `3301fdw` and `3301cdw`. Do not guess one from a generic IPP value or add every family member as an alias. HP regulatory model numbers such as `SHNGC-2201-01` are explicitly separate from product model numbers and are not preferable discovery identifiers. Use a descriptive product category such as `Color LaserJet Pro Multifunction Printer` for `name` instead of repeating `MFP 3301`. For IPP fixed profiles, document that the `idle` state may cover several physical power phases and that polling can miss short warm-up, fusing and cool-down peaks; preserve measured idle power without pretending that it models per-page energy. The established `MFP 3301` profile uses Wi-Fi; do not infer Ethernet merely because IPP can operate over either network transport.
 
 ## IKEA
 
@@ -487,7 +498,7 @@ Prefer the product-specific code printed on the bulb or packaging as canonical, 
 
 ## Lindby
 
-Prefer Lindby's exact model identifier from the product label or EPREL registration as canonical. A Tuya-based Lindby bulb can appear in Home Assistant as manufacturer `Tuya` and a generic model such as `bulb RGBW`; this combination is not specific enough for a model alias or automatic profile discovery. Retain an established exact manufacturer alias when the original Device Info confirms it, but do not add the generic model value. Use a concise name that reflects measured capabilities such as RGBW, fitting, and compact wattage without repeating the canonical identifier.
+Prefer Lindby's exact model identifier from the product label or EPREL registration as canonical. A Tuya-based Lindby bulb can appear in Home Assistant as manufacturer `Tuya` and a generic model such as `bulb RGBW`; this combination is not specific enough for a model alias or automatic profile discovery. Retain an established exact manufacturer alias when the original Device Info confirms it, but do not add the generic model value. Use a concise name that reflects measured capabilities such as RGBW, fitting, and compact wattage without repeating the canonical identifier. The established `9971013` bulb is Wi-Fi; do not generalize that transport to other Lindby/Tuya products.
 
 ## Linkind
 
@@ -495,7 +506,7 @@ Prefer the exact code printed on the bulb or packaging as canonical. For older Z
 
 ## LSC
 
-LSC Smart Connect products can have a consumer-facing Action product number, an LSC/Electro Cirkel article or EPREL model identifier such as `970710`, and one or more factory model strings. Prefer the exact LSC/Electro Cirkel or EPREL identifier when authoritative documentation maps it to the measured hardware. Retain an established specific Action article code when no more authoritative code is verified; do not guess a `970...` replacement. An official Electro Cirkel declaration that pairs the exact article code with a GTIN is strong barcode evidence; generic Action listing numbers are not. Keep an exact factory or Tuya model string as an alias only when Home Assistant Device Info or the original contribution confirms that discovery value. Do not add generic manufacturer `Tuya` merely because LSC uses the platform; it is acceptable only as an intentional compatibility alias after moving an existing `Tuya/<exact model>` profile and verifying that the complete pair resolves uniquely. Preserve revision suffixes such as `.1` only when the measured label establishes them. Use concise names without repeating LSC, `Smart`, or `WiFi`, and format ratings compactly, for example `9W` and `806 lm`.
+LSC Smart Connect products can have a consumer-facing Action product number, an LSC/Electro Cirkel article or EPREL model identifier such as `970710`, and one or more factory model strings. Prefer the exact LSC/Electro Cirkel or EPREL identifier when authoritative documentation maps it to the measured hardware. Retain an established specific Action article code when no more authoritative code is verified; do not guess a `970...` replacement. An official Electro Cirkel declaration that pairs the exact article code with a GTIN is strong barcode evidence; generic Action listing numbers are not. Keep an exact factory or Tuya model string as an alias only when Home Assistant Device Info or the original contribution confirms that discovery value. Do not add generic manufacturer `Tuya` merely because LSC uses the platform; it is acceptable only as an intentional compatibility alias after moving an existing `Tuya/<exact model>` profile and verifying that the complete pair resolves uniquely. Preserve revision suffixes such as `.1` only when the measured label establishes them. Use concise names without repeating LSC, `Smart`, or `WiFi`, and format ratings compactly, for example `9W` and `806 lm`. The established `3012586` ceiling light uses Wi-Fi; do not infer connectivity for sibling article numbers.
 
 ## Luedd
 
@@ -573,7 +584,7 @@ Prefer the exact model code printed on the measured device or packaging. A produ
 
 ## Philips Air Care
 
-Use the exact regional model reported by the device and printed on its label, such as `AC4236/14`. Replace the slash with an underscore only for the canonical directory name and preserve the exact slash-form value in `aliases`: `philips_airpurifier_coap` exposes the device status model in Home Assistant Device Info, so that alias is required for discovery. Do not add sibling region codes such as `/10` without evidence that Home Assistant reports them for the measured hardware, and keep these Philips air-care profiles separate from Signify / Philips Hue guidance. Use Philips' official English product-family wording for `name` without repeating the model code.
+Use the exact regional model reported by the device and printed on its label, such as `AC4236/14`. Replace the slash with an underscore only for the canonical directory name and preserve the exact slash-form value in `aliases`: `philips_airpurifier_coap` exposes the device status model in Home Assistant Device Info, so that alias is required for discovery. Do not add sibling region codes such as `/10` without evidence that Home Assistant reports them for the measured hardware, and keep these Philips air-care profiles separate from Signify / Philips Hue guidance. Use Philips' official English product-family wording for `name` without repeating the model code. The established `AC4236/14` profile uses Wi-Fi.
 
 ## Qubino
 
@@ -671,9 +682,13 @@ Tuya is an IoT platform, not normally the consumer brand that should own a profi
 
 Shared Tuya and Zigbee models such as `TS011F`, `TS0121_plug`, and `TS0505B` can represent many white-label products with different ratings, plug types, or light engines. Do not add one reseller's brand, barcode, or product specifications to such a profile without exact evidence tying the measured unit to that package. A genuinely generic or unbranded profile may remain under Tuya with a functional name.
 
+Do not infer connectivity from the Tuya platform name alone. Preserve profile-specific evidence: the established `TS011F`, `TS0121_plug`, `TY-A60-15W`, and `TYC-300mm-Z` profiles are Zigbee, while `T17` is Wi-Fi; verify every other Tuya identifier independently because similar-looking IDs can use different transports.
+
 ## Tripp Lite
 
 NUT devices can expose only a generic `device.model` such as `Tripp Lite UPS`, even when the physical UPS model is unknown. Preserve that exact discovery model for a generic calculation profile whose nominal capacity and load come from device entities; do not invent a hardware-specific model. Give the profile a functional name such as `UPS Power Estimate` instead of repeating the discovery identifier.
+
+Record the actual UPS-side connection rather than the NUT host's network connection. The established generic Tripp Lite UPS profile uses Ethernet; APC `BE650G1` uses USB. Do not turn a UPS output capacity expressed in VA or W into `rated_power`, because it is not the device's own consumption rating.
 
 ## Trust / KlikAanKlikUit
 
@@ -716,6 +731,8 @@ Use the exact model returned by the device, such as `LS120`, as the canonical pr
 ## Zemismart
 
 Prefer a printed model or article number when official documentation uniquely identifies the measured product. If an older released profile uses a descriptive slug and neither the product page nor the firmware reference provides a reliable product model, retain that identifier until label evidence is available; do not replace it with an ecommerce-internal numeric SKU. ESPHome node and entity names are user-configurable and therefore are not discovery aliases. When the measurement used replacement firmware and the source documents different power behavior from stock firmware, identify that scope in the display name, for example `Moon Lamp (ESPHome)`.
+
+Replacement ESPHome firmware does not by itself change the physical transport category. Record the established Moon Lamp profile as Wi-Fi while keeping the firmware scope in its display name.
 
 ## Zengge
 

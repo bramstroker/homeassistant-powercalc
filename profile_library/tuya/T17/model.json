@@ -5,6 +5,11 @@
     "jpiit02hwjtwjxnd"
   ],
   "device_type": "heating",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
   "compatible_integrations": [
     "tuya"
   ],

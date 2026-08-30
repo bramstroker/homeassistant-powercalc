@@ -4,6 +4,11 @@
     "Tripplite"
   ],
   "device_type": "ups",
+  "device_specs": {
+    "connectivity": [
+      "ethernet"
+    ]
+  },
   "calculation_strategy": "fixed",
   "discovery_by": "device",
   "compatible_integrations": [

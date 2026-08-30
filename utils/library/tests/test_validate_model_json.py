@@ -78,7 +78,7 @@ def test_generic_device_specs_allow_rated_power_and_connectivity(
         tmp_path / "model.json",
         complete_model(
             "smart_speaker",
-            device_specs={"rated_power": 15, "connectivity": ["wifi", "ethernet"]},
+            device_specs={"rated_power": 15, "connectivity": ["wifi", "ethernet", "usb"]},
         ),
     )
 

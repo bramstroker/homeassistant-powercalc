@@ -89,7 +89,7 @@ Generic device specifications:
 | Key            | Type             | Description                                                                                                                       |
 |----------------|------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | `rated_power`  | number           | Power draw claimed by the manufacturer, in watts. The library website shows it next to the measured maximum                      |
-| `connectivity` | array of strings | Protocols the device talks: `zigbee`, `wifi`, `zwave`, `matter`, `thread`, `bluetooth`, `ethernet`, `rf433`, `infrared`, `proprietary` |
+| `connectivity` | array of strings | Protocols the device talks: `zigbee`, `wifi`, `zwave`, `matter`, `thread`, `bluetooth`, `ethernet`, `usb`, `rf433`, `infrared`, `proprietary` |
 
 Additional light specifications:
 

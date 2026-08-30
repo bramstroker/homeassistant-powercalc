@@ -5,6 +5,11 @@
   ],
   "description": "Power profile for the APC Back-UPS ES 650G1 (650 VA / 390 W). Estimates real-time output power from NUT load percentage.",
   "device_type": "ups",
+  "device_specs": {
+    "connectivity": [
+      "usb"
+    ]
+  },
   "calculation_strategy": "fixed",
   "discovery_by": "device",
   "compatible_integrations": [

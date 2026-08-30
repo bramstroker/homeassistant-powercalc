@@ -603,6 +603,7 @@
               "thread",
               "bluetooth",
               "ethernet",
+              "usb",
               "rf433",
               "infrared",
               "proprietary"

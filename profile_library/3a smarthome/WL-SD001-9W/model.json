@@ -6,6 +6,9 @@
   "created_at": "2023-12-06T18:41:16Z",
   "device_type": "light",
   "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ],
     "socket": "integrated",
     "form_factor": "downlight",
     "lumens": 800,

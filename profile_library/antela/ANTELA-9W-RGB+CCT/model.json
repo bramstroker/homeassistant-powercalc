@@ -6,6 +6,9 @@
   "created_at": "2023-11-17T08:44:45Z",
   "device_type": "light",
   "device_specs": {
+    "connectivity": [
+      "wifi"
+    ],
     "socket": "E14",
     "form_factor": "bulb",
     "lumens": 806,
