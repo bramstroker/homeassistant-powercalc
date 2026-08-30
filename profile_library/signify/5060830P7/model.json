@@ -16,6 +16,7 @@
       "integrated"
     ],
     "form_factor": "spot",
+    "rated_power": 25,
     "connectivity": [
       "zigbee"
     ]

@@ -6,6 +6,7 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 1500,
+    "rated_power": 24.0,
     "connectivity": [
       "wifi",
       "bluetooth"
