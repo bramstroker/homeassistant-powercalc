@@ -18,6 +18,9 @@
       "bluetooth"
     ]
   },
+  "ean": [
+    "3800235265628"
+  ],
   "discovery_by": "entity",
   "measure_description": "Manually measured. (LED off). Transcribed from https://www.youtube.com/watch?v=cLtao6yG7ds. V2 added to V1 since the manufacturer doesn't mention other changes than mechanical",
   "measure_device": "GW Instek GPM-8310",
