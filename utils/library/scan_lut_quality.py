@@ -44,7 +44,7 @@ MANUALLY_VERIFIED_MODELS = (
     "lifx/LIFX Downlight Color",
     "lifx/LIFX Candle",
     "linkind/LS0101911261",
-    "osram/Classic A60 RGBW",
+    "osram/AA69697",
     "signify/1742930P7",
     "signify/5060730P7",
     "signify/5060830P7",
