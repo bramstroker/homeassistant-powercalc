@@ -1,11 +1,18 @@
 {
+  "aliases": [
+    "8jz6rasdn7xct1oq"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2026-01-10T23:41:45Z",
   "device_type": "light",
   "device_specs": {
     "form_factor": "fixture",
-    "socket": "integrated"
+    "socket": "integrated",
+    "rated_power": 8.0
   },
+  "ean": [
+    "734598418113"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
@@ -14,7 +21,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.20.2:docker"
   },
-  "name": "Hifree Bedside RGB Lamp",
+  "name": "Bedside RGB Lamp",
   "standby_power": 0.45,
   "authors": [
     {
