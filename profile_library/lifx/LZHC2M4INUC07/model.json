@@ -1,7 +1,16 @@
 {
+  "aliases": [
+    "LIFX Z"
+  ],
+  "legacy_ids": [
+    "LIFX Z"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-02-19T20:16:46Z",
   "device_type": "light",
+  "ean": [
+    "9347403000857"
+  ],
   "device_specs": {
     "form_factor": "strip",
     "socket": "integrated",
@@ -19,7 +28,7 @@
     "SLEEP_TIME": 2,
     "VERSION": "v0.17.0:docker"
   },
-  "name": "Z",
+  "name": "Z 2 m Starter Kit",
   "standby_power": 0.57,
   "authors": [
     {

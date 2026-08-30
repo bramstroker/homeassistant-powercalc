@@ -38,11 +38,11 @@ MANUALLY_VERIFIED_MODELS = (
     "ledvance/4058075208339",
     "lidl/HG07834A",
     "lidl/HG08131B",
-    "lifx/LIFX A19 Night Vision",  # could be firmware bugs, there are outliers in lowest brightness levels
-    "lifx/LIFX BR30 Night Vision",
-    "lifx/LIFX Original 1000",
-    "lifx/LIFX Downlight Color",
-    "lifx/LIFX Candle",
+    "lifx/BUL-11-A21E27-W",
+    "lifx/CC25L3AE14",
+    "lifx/LH4DK1UC08AU",
+    "lifx/LHB30E27UC10P",
+    "lifx/LHLA19E26IRUS",  # could be firmware bugs, there are outliers in lowest brightness levels
     "linkind/LS0101911261",
     "osram/AA69697",
     "signify/915005730601",

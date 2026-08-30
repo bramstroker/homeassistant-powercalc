@@ -1,7 +1,17 @@
 {
+  "aliases": [
+    "LIFX BR30",
+    "LIFX (BR30)"
+  ],
+  "legacy_ids": [
+    "LIFX BR30"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-10-21T19:04:10Z",
   "device_type": "light",
+  "ean": [
+    "9347403000543"
+  ],
   "device_specs": {
     "form_factor": "spot",
     "socket": "E26",
@@ -19,7 +29,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.26.1:docker"
   },
-  "name": "LIFX BR30",
+  "name": "Color BR30 1100 lm",
   "standby_power": 0.63,
   "authors": [
     {

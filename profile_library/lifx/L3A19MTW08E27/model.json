@@ -1,13 +1,22 @@
 {
   "aliases": [
-    "LIFX Downlight"
+    "LIFX Mini White to Warm",
+    "LIFX Mini DD"
+  ],
+  "legacy_ids": [
+    "LIFX Mini White to Warm"
   ],
   "calculation_strategy": "lut",
   "created_at": "2022-10-05T13:31:39Z",
   "device_type": "light",
+  "ean": [
+    "9347403000963"
+  ],
   "device_specs": {
-    "socket": "integrated",
-    "form_factor": "downlight",
+    "form_factor": "bulb",
+    "socket": "E27",
+    "rated_power": 9,
+    "lumens": 800,
     "connectivity": [
       "wifi"
     ]
@@ -20,8 +29,8 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.25.5:docker"
   },
-  "name": "Downlight Color",
-  "standby_power": 0.68,
+  "name": "Mini Day & Dusk",
+  "standby_power": 0.54,
   "authors": [
     {
       "name": "Joshua Rich",

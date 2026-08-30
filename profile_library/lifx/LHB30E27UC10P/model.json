@@ -1,12 +1,22 @@
 {
+  "aliases": [
+    "LIFX BR30 Night Vision",
+    "LIFX+ (BR30)"
+  ],
+  "legacy_ids": [
+    "LIFX BR30 Night Vision"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2022-02-19T20:16:46Z",
   "device_type": "light",
+  "ean": [
+    "9347403000598"
+  ],
   "device_specs": {
     "rated_power": 11,
     "form_factor": "spot",
     "lumens": 1100,
-    "socket": "E26",
+    "socket": "E27",
     "connectivity": [
       "wifi"
     ]
@@ -19,7 +29,7 @@
     "SLEEP_TIME": 1,
     "VERSION": "v0.17.0:docker"
   },
-  "name": "BR30 Night Vision",
+  "name": "Color BR30 Night Vision 1100 lm",
   "standby_power": 0.72,
   "sub_profile_select": {
     "default": "infrared_off",
