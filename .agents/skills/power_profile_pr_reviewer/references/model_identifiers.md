@@ -518,6 +518,8 @@ Apply these rules when reviewing or normalizing Lidl profiles, including Livarno
 
 An exact Lidl manual can establish the type code and complete-product power while omitting luminous flux. In that case, keep `lumens` unset until exact packaging, EPREL, or photometric evidence is found; do not fill it from a sibling suffix or an undocumented internal module.
 
+An archived Lidl retailer listing can establish missing light metadata when it preserves the exact original Lidl product-page ID and a verified consumer EAN for the same product. When its nominal consumption differs from the complete-luminaire maximum in the exact manual, retain the manual's complete-product rating for `rated_power`; do not substitute the LED-module or adapter-capacity value.
+
 When a Lidl label code and integration-reported value cannot be reconciled, ask for a product or packaging label photo and the current Home Assistant Device Info fields. Keep the profile discoverable only through identifiers proven specific to the measured variant.
 
 ## LIFX
