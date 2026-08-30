@@ -634,6 +634,8 @@ A Hue fixture article can remain unchanged while the bundled replaceable bulb is
 
 For multi-light luminaires, distinguish a profile for the complete fixture from profiles for separately exposed Hue child entities. Apply total fixture lumens and input power only to a complete-fixture profile; keep per-lamp values on an individual child profile and do not copy a fixture GTIN's aggregate specifications onto every endpoint.
 
+For legacy Hue fixtures, distinguish the raw Zigbee model from the retail article and later Bluetooth revisions. For example, `LTP001` identifies the older 39W/3000 lm Cher pendant family (`4076130P7` black and `4076131P7` white), while `LTP003` and article `4033930P7` identify the Fair pendant. A current product URL can redirect to a lower-power successor under a new 12NC, so compare the LUT maximum and dated official catalog specification before transferring current-page metadata. Finish variants with identical electrical specifications may share one profile and retain their exact articles and consumer EANs as aliases and barcodes.
+
 Use the official English Hue product description in `name`, with consistent capitalization, `Bluetooth` spelled out, and compact dimensions and wattages such as `30x30cm` and `4.2W`. Do not include the canonical model code in the name. Review legacy Hue LUTs carefully. When only a few points are isolated near-zero readings or multi-watt jumps and their neighbors establish a smooth curve, correct them locally with the LUT validator's expected-value interpolation instead of reopening a very old profile PR. Do not automatically correct a LUT with many or structurally clustered anomalies; leave it for targeted remeasurement or a raw-data explanation.
 
 ## SmartHomeShop
