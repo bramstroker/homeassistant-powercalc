@@ -397,7 +397,7 @@ An explicit wattage field in an exact-model product specification may be used as
 
 ## GreenWave
 
-Prefer the exact printed regional PowerNode model when the measured hardware is known, but retain `GWPN1` as canonical for an established profile whose label variant cannot be recovered. Z-Wave device databases use `GWPN1` as a family/discovery identifier for the one-port PowerNode and document compatibility with both `NS210` and `NS310`; that compatibility does not prove identical self-consumption. Do not add those printed codes as aliases without identifying the measured variant. Preserve `GreenWave Reality Inc.` as a manufacturer alias, while a casing-only `Greenwave` value needs no separate alias. For fixed smart-plug profiles, confirm both off-state and relay-on self-usage and keep `only_self_usage` enabled when the profile represents the plug's own consumption rather than its attached load.
+Prefer the exact printed regional PowerNode model when the measured hardware is known, but retain `GWPN1` as canonical for an established profile whose label variant cannot be recovered. Z-Wave device databases use `GWPN1` as a family/discovery identifier for the one-port PowerNode and document compatibility with both `NS210` and `NS310`; that compatibility does not by itself prove identical detailed specifications. Do not add those printed codes as aliases without identifying the measured variant. The GreenWave PowerNodes user guide does publish one shared standby-consumption limit of below 1W across the regional one-port families, so record that common upper bound as `rated_power: 1`. Preserve `GreenWave Reality Inc.` as a manufacturer alias, while a casing-only `Greenwave` value needs no separate alias. For fixed smart-plug profiles, confirm both off-state and relay-on self-usage and keep `only_self_usage` enabled when the profile represents the plug's own consumption rather than its attached load.
 
 ## Hampton Bay
 
@@ -596,6 +596,8 @@ Use NETGEAR's exact printed model code as canonical and retain the official uppe
 ## Neo CoolCam
 
 Use the exact printed Z-Wave product model as canonical and do not infer regional or hardware-revision suffixes from sibling products. Preserve the exact manufacturer value reported by Home Assistant/Z-Wave as an alias, including its legal-entity wording. A smart-plug profile with `only_self_usage` intentionally records the plug's own relay-off and relay-on consumption rather than the attached load; retain that distinction and describe the product concisely as a Z-Wave smart plug.
+
+The Z-Wave Alliance certification entry for `NAS-WR01Z` publishes 0.13W as the plug's own power consumption. Record that exact-model claim as `rated_power`; keep the independently measured relay-off and relay-on values unchanged even when they are higher.
 
 ## NodOn
 
