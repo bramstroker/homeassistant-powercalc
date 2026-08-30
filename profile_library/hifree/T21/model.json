@@ -8,7 +8,8 @@
   "device_specs": {
     "form_factor": "fixture",
     "socket": "integrated",
-    "rated_power": 8.0,
+    "lumens": 400,
+    "rated_power": 7,
     "connectivity": [
       "wifi"
     ]
