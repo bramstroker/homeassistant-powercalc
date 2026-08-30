@@ -346,6 +346,8 @@ Genio Wi-Fi devices may be exposed by Home Assistant's Tuya integration as manuf
 
 Mirabella can reuse an item number for a later hardware revision with different light output. For a measured profile, retain the specifications documented by its original contribution or exact packaging rather than replacing them with values from a current product page solely because the item number matches.
 
+For `I002579`, use 14.4W as the complete 3 m strip's rated power. The exact Amazon product specification identifies that rating, and the profile's roughly 14.01W LUT peak corroborates it; do not substitute the supplied 12V/1A adapter's nominal capacity.
+
 For older monochrome GLS bulbs, match specifications using the complete combination of item number evidence, cap type, fixed color temperature, wattage, and product description. Do not reject an otherwise exact 800 lm listing merely because Genio also sold RGBW GLS bulbs at 800 lm; conversely, do not transfer RGBW metadata to a monochrome profile based on light output alone.
 
 ## Gledopto
