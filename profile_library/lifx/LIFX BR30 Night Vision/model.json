@@ -3,6 +3,9 @@
   "created_at": "2022-02-19T20:16:46Z",
   "device_type": "light",
   "device_specs": {
+    "form_factor": "spot",
+    "lumens": 1100,
+    "socket": "E26",
     "connectivity": [
       "wifi"
     ]

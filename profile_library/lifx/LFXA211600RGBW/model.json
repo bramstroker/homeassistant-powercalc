@@ -5,9 +5,14 @@
   "calculation_strategy": "lut",
   "created_at": "2024-10-17T18:51:25Z",
   "device_type": "light",
+  "ean": [
+    "9347403004923"
+  ],
   "device_specs": {
     "form_factor": "bulb",
     "lumens": 1600,
+    "rated_power": 15.5,
+    "socket": "E26",
     "connectivity": [
       "wifi"
     ]
