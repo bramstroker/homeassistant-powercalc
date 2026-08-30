@@ -12,6 +12,7 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 1035,
+    "rated_power": 10.3,
     "connectivity": [
       "zigbee"
     ]
