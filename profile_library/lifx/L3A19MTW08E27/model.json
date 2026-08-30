@@ -1,13 +1,20 @@
 {
   "aliases": [
+    "LIFX Mini White to Warm",
     "LIFX Mini DD"
+  ],
+  "legacy_ids": [
+    "LIFX Mini White to Warm"
   ],
   "calculation_strategy": "lut",
   "created_at": "2022-10-05T13:31:39Z",
   "device_type": "light",
+  "ean": [
+    "9347403000963"
+  ],
   "device_specs": {
     "form_factor": "bulb",
-    "socket": "E26",
+    "socket": "E27",
     "rated_power": 9,
     "lumens": 800,
     "connectivity": [
@@ -22,7 +29,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.25.5:docker"
   },
-  "name": "Mini White to Warm",
+  "name": "Mini Day & Dusk",
   "standby_power": 0.54,
   "authors": [
     {

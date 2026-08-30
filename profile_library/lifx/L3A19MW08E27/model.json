@@ -1,13 +1,20 @@
 {
   "aliases": [
+    "LIFX Mini White",
     "LIFX Mini W"
+  ],
+  "legacy_ids": [
+    "LIFX Mini White"
   ],
   "calculation_strategy": "lut",
   "created_at": "2022-08-06T11:55:31Z",
   "device_type": "light",
+  "ean": [
+    "9347403000925"
+  ],
   "device_specs": {
     "form_factor": "bulb",
-    "socket": "E26",
+    "socket": "E27",
     "rated_power": 9,
     "lumens": 800,
     "connectivity": [

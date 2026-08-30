@@ -522,7 +522,11 @@ When a Lidl label code and integration-reported value cannot be reconciled, ask 
 
 ## LIFX
 
-Prefer a verified printed LIFX SKU as canonical when one is available. Otherwise preserve the established exact LIFX LAN product name rather than inventing an article code. Home Assistant obtains the model from aiolifx's mapping of the numeric LAN product ID, and those names can change when the official LIFX product registry is updated. Add a current or historical name as an alias only after proving that it maps to the same product ID or the same established group of regional product IDs. Never map aliases merely because two names describe the same bulb shape or marketing family: an old shared name can split into several current names, and an old name can later be reused for different hardware. Retain explicit subprofiles for settings that materially change consumption, such as infrared intensity and LIFX Z strip length.
+Prefer the commercial LIFX part number printed on the device and packaging as the canonical directory ID. Keep Home Assistant's LIFX LAN product names as discovery aliases; they are labels for numeric LAN product IDs and may be shared across regional fittings or change when LIFX updates its product registry. Preserve both a proven historical LAN name and its current registry name when they resolve the same product ID or the same established group of electrically equivalent regional product IDs.
+
+Establish the measured commercial variant from several matching signals: the official registry and historical `products.json` at the contribution date, LAN product ID and firmware generation, LUT peak versus the product rating, original product links, measurement hardware, and the contributor's region. Fittings are region-sensitive: E26 generally indicates North America, while E27 and B22 occur in UK/Australian ranges and E14 or B15 may identify regional candle variants. When the LAN ID is generic across electrically equivalent fittings and exact label evidence is unavailable, the most plausible measured regional SKU may be selected as canonical; keep the generic LAN ID as an alias so discovery continues to cover that hardware family.
+
+Do not equate products solely because their names describe the same shape or marketing family. A later SKU such as an `L3...` A19 can have a different power generation from an older 11W A19 even when their LAN names are similar. Retain explicit subprofiles for settings that materially change consumption, such as infrared intensity and LIFX Z strip length.
 
 ## Lightinginside
 

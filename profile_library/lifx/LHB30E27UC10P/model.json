@@ -1,26 +1,36 @@
 {
+  "aliases": [
+    "LIFX BR30 Night Vision",
+    "LIFX+ (BR30)"
+  ],
+  "legacy_ids": [
+    "LIFX BR30 Night Vision"
+  ],
   "calculation_strategy": "lut",
-  "created_at": "2022-05-03T22:15:08Z",
+  "created_at": "2022-02-19T20:16:46Z",
   "device_type": "light",
+  "ean": [
+    "9347403000598"
+  ],
   "device_specs": {
     "rated_power": 11,
-    "form_factor": "bulb",
+    "form_factor": "spot",
     "lumens": 1100,
-    "socket": "E26",
+    "socket": "E27",
     "connectivity": [
       "wifi"
     ]
   },
-  "measure_description": "Measured with utils/measure script. TP-link kp125 was having inconsistent readings towards the 0.52 watt and lower range, so I manually smoothed out some of the outliers",
-  "measure_device": "TP-Link Kasa KP125",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",
   "measure_settings": {
-    "SAMPLE_COUNT": 2,
-    "SLEEP_TIME": 2,
-    "VERSION": "v0.19.12:docker"
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 1,
+    "VERSION": "v0.17.0:docker"
   },
-  "name": "A19 Night Vision",
-  "standby_power": 0.47,
+  "name": "Color BR30 Night Vision 1100 lm",
+  "standby_power": 0.72,
   "sub_profile_select": {
     "default": "infrared_off",
     "matchers": [
@@ -38,9 +48,8 @@
   },
   "authors": [
     {
-      "name": "Jacob Donenfeld",
-      "email": "jacobdonenfeld@gmail.com",
-      "github": "jacobdonenfeld"
+      "name": "Jamie De Vivo",
+      "github": "jamiedevivoo"
     }
   ]
 }

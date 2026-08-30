@@ -1,13 +1,23 @@
 {
   "aliases": [
-    "LIFX Downlight"
+    "LIFX Downlight Color",
+    "LIFX Downlight",
+    "LIFX DL"
+  ],
+  "legacy_ids": [
+    "LIFX Downlight Color"
   ],
   "calculation_strategy": "lut",
   "created_at": "2022-10-05T13:31:39Z",
   "device_type": "light",
+  "ean": [
+    "9347403000819"
+  ],
   "device_specs": {
     "socket": "integrated",
     "form_factor": "downlight",
+    "rated_power": 13,
+    "lumens": 800,
     "connectivity": [
       "wifi"
     ]
@@ -20,7 +30,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v0.25.5:docker"
   },
-  "name": "Downlight Color",
+  "name": "100 mm Color Downlight",
   "standby_power": 0.68,
   "authors": [
     {

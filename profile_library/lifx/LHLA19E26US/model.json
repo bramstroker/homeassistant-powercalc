@@ -1,10 +1,17 @@
 {
   "aliases": [
+    "LIFX A19 US",
     "LIFX Color A19 1100lm"
+  ],
+  "legacy_ids": [
+    "LIFX A19 US"
   ],
   "calculation_strategy": "lut",
   "created_at": "2022-07-19T22:34:27Z",
   "device_type": "light",
+  "ean": [
+    "9347403002608"
+  ],
   "device_specs": {
     "form_factor": "bulb",
     "socket": "E26",
@@ -22,7 +29,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "master"
   },
-  "name": "A19 US",
+  "name": "Color A19 1100 lm",
   "standby_power": 0.2,
   "authors": [
     {

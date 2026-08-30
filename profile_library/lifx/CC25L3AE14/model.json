@@ -1,19 +1,26 @@
 {
   "aliases": [
-    "Original"
+    "LIFX Candle",
+    "LIFX Candle C"
+  ],
+  "legacy_ids": [
+    "LIFX Candle"
   ],
   "calculation_strategy": "lut",
   "created_at": "2022-02-19T20:16:46Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "bulb",
-    "socket": "E26",
-    "rated_power": 17,
-    "lumens": 1017,
+    "socket": "E14",
+    "rated_power": 4.2,
+    "lumens": 130,
+    "form_factor": "candle",
     "connectivity": [
       "wifi"
     ]
   },
+  "ean": [
+    "9347403001755"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",
@@ -22,8 +29,8 @@
     "SLEEP_TIME": 1,
     "VERSION": "v0.17.0:docker"
   },
-  "name": "Original 1000",
-  "standby_power": 2.46,
+  "name": "Candle",
+  "standby_power": 0.56,
   "authors": [
     {
       "name": "Jamie De Vivo",
