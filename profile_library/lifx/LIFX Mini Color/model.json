@@ -3,6 +3,8 @@
   "created_at": "2022-04-30T22:38:23Z",
   "device_type": "light",
   "device_specs": {
+    "form_factor": "bulb",
+    "socket": "E26",
     "rated_power": 9,
     "lumens": 800,
     "connectivity": [
