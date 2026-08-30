@@ -15618,7 +15618,299 @@
       "models": [
         {
           "aliases": [
-            "LIFX A21 1600lm US"
+            "LIFX Original 1000",
+            "Original"
+          ],
+          "legacy_ids": [
+            "LIFX Original 1000"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-02-19T20:16:46Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E27",
+            "rated_power": 17,
+            "lumens": 1017,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "ean": [
+            "9347403000307"
+          ],
+          "measure_device": "TP-Link Kasa KP115",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 1,
+            "VERSION": "v0.17.0:docker"
+          },
+          "name": "Original 1000",
+          "standby_power": 2.46,
+          "authors": [
+            {
+              "name": "Jamie De Vivo",
+              "github": "jamiedevivoo"
+            }
+          ],
+          "id": "BUL-11-A21E27-W",
+          "manufacturer": "lifx",
+          "updated_at": "2026-08-30T14:00:45",
+          "max_power": 17.73,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T14:00:45",
+          "power_range": {
+            "min": 2.38,
+            "max": 17.73
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 52.5,
+            "color_temp": 52.5
+          },
+          "hash": "8926e23934438d8a0490f3cd7421108d"
+        },
+        {
+          "aliases": [
+            "LIFX Candle",
+            "LIFX Candle C"
+          ],
+          "legacy_ids": [
+            "LIFX Candle"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-02-19T20:16:46Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E14",
+            "rated_power": 4.2,
+            "lumens": 130,
+            "form_factor": "candle",
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "ean": [
+            "9347403001755"
+          ],
+          "measure_device": "TP-Link Kasa KP115",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 1,
+            "VERSION": "v0.17.0:docker"
+          },
+          "name": "Candle",
+          "standby_power": 0.56,
+          "authors": [
+            {
+              "name": "Jamie De Vivo",
+              "github": "jamiedevivoo"
+            }
+          ],
+          "id": "CC25L3AE14",
+          "manufacturer": "lifx",
+          "updated_at": "2026-08-30T14:00:45",
+          "max_power": 4.21,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T14:00:45",
+          "power_range": {
+            "min": 0.95,
+            "max": 4.21
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 21.7,
+            "color_temp": 21.7
+          },
+          "hash": "a2a5db838141f84ea8137efc507ed1c6"
+        },
+        {
+          "aliases": [
+            "LIFX Mini Color",
+            "LIFX Mini C"
+          ],
+          "legacy_ids": [
+            "LIFX Mini Color"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-04-30T22:38:23Z",
+          "device_type": "light",
+          "ean": [
+            "9347403000871"
+          ],
+          "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E26",
+            "rated_power": 9,
+            "lumens": 800,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "measure_device": "TP-Link Kasa KP125",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 2,
+            "VERSION": "v0.19.12:docker"
+          },
+          "name": "Mini Color",
+          "standby_power": 0.5,
+          "authors": [
+            {
+              "name": "Jacob Donenfeld",
+              "email": "jacobdonenfeld@gmail.com",
+              "github": "jacobdonenfeld"
+            }
+          ],
+          "id": "L3A19MC08E26",
+          "manufacturer": "lifx",
+          "updated_at": "2026-08-30T14:00:45",
+          "max_power": 8.88,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T14:00:45",
+          "power_range": {
+            "min": 0.28,
+            "max": 8.88
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 95.4,
+            "color_temp": 95.4
+          },
+          "hash": "145d5576db2b177e6b7384cc4ed66e7d"
+        },
+        {
+          "aliases": [
+            "LIFX Mini White to Warm",
+            "LIFX Mini DD"
+          ],
+          "legacy_ids": [
+            "LIFX Mini White to Warm"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-10-05T13:31:39Z",
+          "device_type": "light",
+          "ean": [
+            "9347403000963"
+          ],
+          "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E27",
+            "rated_power": 9,
+            "lumens": 800,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "measure_device": "TP-Link Tapo P110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v0.25.5:docker"
+          },
+          "name": "Mini Day & Dusk",
+          "standby_power": 0.54,
+          "authors": [
+            {
+              "name": "Joshua Rich",
+              "email": "joshua.rich@gmail.com",
+              "github": "joshuar"
+            }
+          ],
+          "id": "L3A19MTW08E27",
+          "manufacturer": "lifx",
+          "updated_at": "2026-08-30T14:00:45",
+          "max_power": 8.56,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T14:00:45",
+          "power_range": {
+            "min": 0.44,
+            "max": 8.56
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 92.0,
+            "color_temp": 92.0
+          },
+          "hash": "3516f230b1e4c8eda34050f275deba11"
+        },
+        {
+          "aliases": [
+            "LIFX Mini White",
+            "LIFX Mini W"
+          ],
+          "legacy_ids": [
+            "LIFX Mini White"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-08-06T11:55:31Z",
+          "device_type": "light",
+          "ean": [
+            "9347403000925"
+          ],
+          "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E27",
+            "rated_power": 9,
+            "lumens": 800,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "measure_device": "TP-Link Tapo P110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v0.23.2:docker"
+          },
+          "name": "Mini White",
+          "standby_power": 0.74,
+          "authors": [
+            {
+              "name": "Daniel O'Connor",
+              "email": "daniel.oconnor@gmail.com",
+              "github": "CloCkWeRX"
+            }
+          ],
+          "id": "L3A19MW08E27",
+          "manufacturer": "lifx",
+          "updated_at": "2026-08-30T14:00:45",
+          "max_power": 9.16,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T14:00:45",
+          "power_range": {
+            "min": 0.83,
+            "max": 9.16
+          },
+          "color_modes": [
+            "brightness"
+          ],
+          "lut_quality": {
+            "score": 98.3,
+            "brightness": 98.3
+          },
+          "hash": "beedbe228dfb5c7d8bda32ad5ea48663"
+        },
+        {
+          "aliases": [
+            "LIFX A21 1600lm US",
+            "LIFX A21"
           ],
           "calculation_strategy": "lut",
           "created_at": "2024-10-17T18:51:25Z",
@@ -15652,7 +15944,7 @@
           ],
           "id": "LFXA211600RGBW",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T04:38:03",
+          "updated_at": "2026-08-30T13:28:53",
           "max_power": 17.08,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-10-18T06:52:35",
@@ -15663,15 +15955,85 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "fe513c40b6e333565fcefe7833c34490"
+          "hash": "cf6717a880c86128277cb8292256ca5f"
         },
         {
+          "aliases": [
+            "LIFX Downlight Color",
+            "LIFX Downlight",
+            "LIFX DL"
+          ],
+          "legacy_ids": [
+            "LIFX Downlight Color"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2022-10-05T13:31:39Z",
+          "device_type": "light",
+          "ean": [
+            "9347403000819"
+          ],
+          "device_specs": {
+            "socket": "integrated",
+            "form_factor": "downlight",
+            "rated_power": 13,
+            "lumens": 800,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "measure_device": "TP-Link Tapo P110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v0.25.5:docker"
+          },
+          "name": "100 mm Color Downlight",
+          "standby_power": 0.68,
+          "authors": [
+            {
+              "name": "Joshua Rich",
+              "email": "joshua.rich@gmail.com",
+              "github": "joshuar"
+            }
+          ],
+          "id": "LH4DK1UC08AU",
+          "manufacturer": "lifx",
+          "updated_at": "2026-08-30T14:00:45",
+          "max_power": 12.55,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T14:00:45",
+          "power_range": {
+            "min": 0.53,
+            "max": 12.55
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 43.7,
+            "color_temp": 43.7
+          },
+          "hash": "b5c2a812c5f186c2a57fe2ebef4a2e4f"
+        },
+        {
+          "aliases": [
+            "LIFX A19",
+            "LIFX (A19)"
+          ],
+          "legacy_ids": [
+            "LIFX A19"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2022-05-10T13:27:29Z",
           "device_type": "light",
+          "ean": [
+            "9347403000529"
+          ],
           "device_specs": {
             "form_factor": "bulb",
-            "socket": "E26",
+            "socket": "E27",
             "rated_power": 11,
             "lumens": 1100,
             "connectivity": [
@@ -15686,7 +16048,7 @@
             "SLEEP_TIME": 2,
             "VERSION": "v0.19.15:docker"
           },
-          "name": "A19",
+          "name": "Color A19 1100 lm",
           "standby_power": 0.5,
           "authors": [
             {
@@ -15694,12 +16056,12 @@
               "github": "xpenno255"
             }
           ],
-          "id": "LIFX A19",
+          "id": "LHA19E27UC10",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:58:22",
+          "updated_at": "2026-08-30T14:00:45",
           "max_power": 11.0,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
+          "measurement_updated_at": "2026-08-30T14:00:45",
           "power_range": {
             "min": 0.4,
             "max": 11.0
@@ -15712,109 +16074,22 @@
             "score": 97.1,
             "color_temp": 97.1
           },
-          "hash": "2ee39237976fc650e5bccb468f5246fd"
+          "hash": "1de3eb64c0544bbd6fb9d71b586f1e7c"
         },
         {
-          "calculation_strategy": "lut",
-          "created_at": "2022-05-03T22:15:08Z",
-          "device_type": "light",
-          "device_specs": {
-            "rated_power": 11,
-            "form_factor": "bulb",
-            "lumens": 1100,
-            "socket": "E26",
-            "connectivity": [
-              "wifi"
-            ]
-          },
-          "measure_device": "TP-Link Kasa KP125",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 2,
-            "VERSION": "v0.19.12:docker"
-          },
-          "name": "A19 Night Vision",
-          "standby_power": 8.37,
-          "authors": [
-            {
-              "name": "Jacob Donenfeld",
-              "email": "jacobdonenfeld@gmail.com",
-              "github": "jacobdonenfeld"
-            }
+          "aliases": [
+            "LIFX BR30",
+            "LIFX (BR30)"
           ],
-          "id": "LIFX A19 Night Vision",
-          "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:33:37",
-          "max_power": 11.11,
-          "sub_profile_count": 4,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.24,
-            "max": 11.11
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
+          "legacy_ids": [
+            "LIFX BR30"
           ],
-          "lut_quality": {
-            "score": 25.5,
-            "color_temp": 25.5
-          },
-          "hash": "8ebfd35e352b7b0f0a15fbf59fdffd1f"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-07-19T22:34:27Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "bulb",
-            "socket": "E26",
-            "rated_power": 11,
-            "lumens": 1100,
-            "connectivity": [
-              "wifi"
-            ]
-          },
-          "measure_device": "Shelly Plug US",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "A19 US",
-          "standby_power": 0.2,
-          "authors": [
-            {
-              "name": "Chris",
-              "github": "darthsebulba04"
-            }
-          ],
-          "id": "LIFX A19 US",
-          "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:58:22",
-          "max_power": 10.9,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.2,
-            "max": 10.9
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.3,
-            "color_temp": 98.3
-          },
-          "hash": "5d3c7e234fb21ebfe8a7c06acadeee1f"
-        },
-        {
           "calculation_strategy": "lut",
           "created_at": "2022-10-21T19:04:10Z",
           "device_type": "light",
+          "ean": [
+            "9347403000543"
+          ],
           "device_specs": {
             "form_factor": "spot",
             "socket": "E26",
@@ -15831,7 +16106,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v0.26.1:docker"
           },
-          "name": "LIFX BR30",
+          "name": "Color BR30 1100 lm",
           "standby_power": 0.63,
           "authors": [
             {
@@ -15840,12 +16115,12 @@
               "github": "mlebaugh"
             }
           ],
-          "id": "LIFX BR30",
+          "id": "LHB30E26UC10",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:58:22",
+          "updated_at": "2026-08-30T14:00:45",
           "max_power": 11.41,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
+          "measurement_updated_at": "2026-08-30T14:00:45",
           "power_range": {
             "min": 0.6,
             "max": 11.41
@@ -15858,17 +16133,27 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "c75cee6f9652bfb80eda08f7185e9d17"
+          "hash": "bba7613547f8465501c2a28b3265feca"
         },
         {
+          "aliases": [
+            "LIFX BR30 Night Vision",
+            "LIFX+ (BR30)"
+          ],
+          "legacy_ids": [
+            "LIFX BR30 Night Vision"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2022-02-19T20:16:46Z",
           "device_type": "light",
+          "ean": [
+            "9347403000598"
+          ],
           "device_specs": {
             "rated_power": 11,
             "form_factor": "spot",
             "lumens": 1100,
-            "socket": "E26",
+            "socket": "E27",
             "connectivity": [
               "wifi"
             ]
@@ -15880,7 +16165,7 @@
             "SLEEP_TIME": 1,
             "VERSION": "v0.17.0:docker"
           },
-          "name": "BR30 Night Vision",
+          "name": "Color BR30 Night Vision 1100 lm",
           "standby_power": 8.53,
           "authors": [
             {
@@ -15888,12 +16173,12 @@
               "github": "jamiedevivoo"
             }
           ],
-          "id": "LIFX BR30 Night Vision",
+          "id": "LHB30E27UC10P",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:33:37",
+          "updated_at": "2026-08-30T14:00:45",
           "max_power": 11.03,
           "sub_profile_count": 4,
-          "measurement_updated_at": "2024-05-03T07:11:32",
+          "measurement_updated_at": "2026-08-30T14:00:45",
           "power_range": {
             "min": 0.6,
             "max": 11.03
@@ -15906,115 +16191,27 @@
             "score": 25.3,
             "color_temp": 25.3
           },
-          "hash": "9f15b4e09637bc489cd6d38fb35462e5"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-02-19T20:16:46Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "E12",
-            "rated_power": 4.2,
-            "lumens": 130,
-            "form_factor": "candle",
-            "connectivity": [
-              "wifi"
-            ]
-          },
-          "measure_device": "TP-Link Kasa KP115",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 1,
-            "SLEEP_TIME": 1,
-            "VERSION": "v0.17.0:docker"
-          },
-          "name": "Candle",
-          "standby_power": 0.56,
-          "authors": [
-            {
-              "name": "Jamie De Vivo",
-              "github": "jamiedevivoo"
-            }
-          ],
-          "id": "LIFX Candle",
-          "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:58:22",
-          "max_power": 4.21,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.95,
-            "max": 4.21
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 21.7,
-            "color_temp": 21.7
-          },
-          "hash": "aba7ef5019b5c2730dfd1e14c22cad06"
+          "hash": "4efd99373bdd72b5b9bea9794342a042"
         },
         {
           "aliases": [
-            "LIFX Downlight"
+            "LIFX A19 Night Vision",
+            "LIFX NV A19 1100lm"
+          ],
+          "legacy_ids": [
+            "LIFX A19 Night Vision"
           ],
           "calculation_strategy": "lut",
-          "created_at": "2022-10-05T13:31:39Z",
+          "created_at": "2022-05-03T22:15:08Z",
           "device_type": "light",
-          "device_specs": {
-            "socket": "integrated",
-            "form_factor": "downlight",
-            "connectivity": [
-              "wifi"
-            ]
-          },
-          "measure_device": "TP-Link Tapo P110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v0.25.5:docker"
-          },
-          "name": "Downlight Color",
-          "standby_power": 0.68,
-          "authors": [
-            {
-              "name": "Joshua Rich",
-              "email": "joshua.rich@gmail.com",
-              "github": "joshuar"
-            }
+          "ean": [
+            "9347403002660"
           ],
-          "id": "LIFX Downlight Color",
-          "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:58:22",
-          "max_power": 12.55,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.53,
-            "max": 12.55
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 43.7,
-            "color_temp": 43.7
-          },
-          "hash": "f574002a428ff68c8c230aeb6255eabe"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-04-30T22:38:23Z",
-          "device_type": "light",
           "device_specs": {
+            "rated_power": 11,
             "form_factor": "bulb",
+            "lumens": 1100,
             "socket": "E26",
-            "rated_power": 9,
-            "lumens": 800,
             "connectivity": [
               "wifi"
             ]
@@ -16026,8 +16223,8 @@
             "SLEEP_TIME": 2,
             "VERSION": "v0.19.12:docker"
           },
-          "name": "Mini Color",
-          "standby_power": 0.5,
+          "name": "Color A19 Night Vision 1100 lm",
+          "standby_power": 8.37,
           "authors": [
             {
               "name": "Jacob Donenfeld",
@@ -16035,174 +16232,97 @@
               "github": "jacobdonenfeld"
             }
           ],
-          "id": "LIFX Mini Color",
+          "id": "LHLA19E26IRUS",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:58:22",
-          "max_power": 8.88,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
+          "updated_at": "2026-08-30T14:00:45",
+          "max_power": 11.11,
+          "sub_profile_count": 4,
+          "measurement_updated_at": "2026-08-30T14:00:45",
           "power_range": {
-            "min": 0.28,
-            "max": 8.88
+            "min": 0.24,
+            "max": 11.11
           },
           "color_modes": [
             "color_temp",
             "hs"
           ],
           "lut_quality": {
-            "score": 95.4,
-            "color_temp": 95.4
+            "score": 25.5,
+            "color_temp": 25.5
           },
-          "hash": "6641c53faa51efe5ee6a2541a2478ea9"
+          "hash": "0077c30feab4bb1c30aad2895939ecb2"
         },
         {
+          "aliases": [
+            "LIFX A19 US",
+            "LIFX Color A19 1100lm"
+          ],
+          "legacy_ids": [
+            "LIFX A19 US"
+          ],
           "calculation_strategy": "lut",
-          "created_at": "2022-08-06T11:55:31Z",
+          "created_at": "2022-07-19T22:34:27Z",
           "device_type": "light",
+          "ean": [
+            "9347403002608"
+          ],
           "device_specs": {
             "form_factor": "bulb",
             "socket": "E26",
-            "rated_power": 9,
-            "lumens": 800,
+            "rated_power": 11,
+            "lumens": 1100,
             "connectivity": [
               "wifi"
             ]
           },
-          "measure_device": "TP-Link Tapo P110",
+          "measure_device": "Shelly Plug US",
           "measure_method": "script",
           "measure_settings": {
             "SAMPLE_COUNT": 2,
             "SLEEP_TIME": 3,
-            "VERSION": "v0.23.2:docker"
+            "VERSION": "master"
           },
-          "name": "Mini White",
-          "standby_power": 0.74,
+          "name": "Color A19 1100 lm",
+          "standby_power": 0.2,
           "authors": [
             {
-              "name": "Daniel O'Connor",
-              "email": "daniel.oconnor@gmail.com",
-              "github": "CloCkWeRX"
+              "name": "Chris",
+              "github": "darthsebulba04"
             }
           ],
-          "id": "LIFX Mini White",
+          "id": "LHLA19E26US",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:58:22",
-          "max_power": 9.16,
+          "updated_at": "2026-08-30T14:00:45",
+          "max_power": 10.9,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
+          "measurement_updated_at": "2026-08-30T14:00:45",
           "power_range": {
-            "min": 0.83,
-            "max": 9.16
+            "min": 0.2,
+            "max": 10.9
           },
           "color_modes": [
-            "brightness"
+            "color_temp",
+            "hs"
           ],
           "lut_quality": {
             "score": 98.3,
-            "brightness": 98.3
+            "color_temp": 98.3
           },
-          "hash": "60ebce9aba576d2557cf2a607ac9c51f"
+          "hash": "8f15d5177340ab0b397c3ca15a0b11d8"
         },
         {
-          "calculation_strategy": "lut",
-          "created_at": "2022-10-05T13:31:39Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "bulb",
-            "socket": "E26",
-            "rated_power": 9,
-            "lumens": 800,
-            "connectivity": [
-              "wifi"
-            ]
-          },
-          "measure_device": "TP-Link Tapo P110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v0.25.5:docker"
-          },
-          "name": "Mini White to Warm",
-          "standby_power": 0.54,
-          "authors": [
-            {
-              "name": "Joshua Rich",
-              "email": "joshua.rich@gmail.com",
-              "github": "joshuar"
-            }
+          "aliases": [
+            "LIFX Z"
           ],
-          "id": "LIFX Mini White to Warm",
-          "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:58:22",
-          "max_power": 8.56,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-06-13T14:19:28",
-          "power_range": {
-            "min": 0.44,
-            "max": 8.56
-          },
-          "color_modes": [
-            "color_temp"
+          "legacy_ids": [
+            "LIFX Z"
           ],
-          "lut_quality": {
-            "score": 92.0,
-            "color_temp": 92.0
-          },
-          "hash": "f48ba1297fea58cba1607633c6672505"
-        },
-        {
           "calculation_strategy": "lut",
           "created_at": "2022-02-19T20:16:46Z",
           "device_type": "light",
-          "device_specs": {
-            "form_factor": "bulb",
-            "socket": "E26",
-            "rated_power": 17,
-            "lumens": 1017,
-            "connectivity": [
-              "wifi"
-            ]
-          },
-          "measure_device": "TP-Link Kasa KP115",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 1,
-            "SLEEP_TIME": 1,
-            "VERSION": "v0.17.0:docker"
-          },
-          "name": "Original 1000",
-          "standby_power": 2.46,
-          "authors": [
-            {
-              "name": "Jamie De Vivo",
-              "github": "jamiedevivoo"
-            }
+          "ean": [
+            "9347403000857"
           ],
-          "id": "LIFX Original 1000",
-          "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:58:22",
-          "max_power": 17.73,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 2.38,
-            "max": 17.73
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 52.5,
-            "color_temp": 52.5
-          },
-          "hash": "aef95cf2b9ae5aeea1b18b2f75b9cd25"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2022-02-19T20:16:46Z",
-          "device_type": "light",
           "device_specs": {
             "form_factor": "strip",
             "socket": "integrated",
@@ -16219,7 +16339,7 @@
             "SLEEP_TIME": 2,
             "VERSION": "v0.17.0:docker"
           },
-          "name": "Z",
+          "name": "Z 2 m Starter Kit",
           "standby_power": 0.72,
           "authors": [
             {
@@ -16227,12 +16347,12 @@
               "github": "jamiedevivoo"
             }
           ],
-          "id": "LIFX Z",
+          "id": "LZHC2M4INUC07",
           "manufacturer": "lifx",
-          "updated_at": "2026-08-30T05:58:22",
+          "updated_at": "2026-08-30T14:00:45",
           "max_power": 37.48,
           "sub_profile_count": 10,
-          "measurement_updated_at": "2024-05-03T07:11:32",
+          "measurement_updated_at": "2026-08-30T14:00:45",
           "power_range": {
             "min": 0.71,
             "max": 37.48
@@ -16245,7 +16365,7 @@
             "score": 33.2,
             "color_temp": 33.2
           },
-          "hash": "ad7c226fde4ae8ee3ed97f3647f88a3f"
+          "hash": "c48460afcf67a4b4492849193a708e08"
         }
       ],
       "device_types": [
