@@ -5,6 +5,7 @@
   "device_specs": {
     "socket": "E14",
     "form_factor": "candle",
+    "lumens": 300,
     "rated_power": 4.0,
     "connectivity": [
       "zigbee"

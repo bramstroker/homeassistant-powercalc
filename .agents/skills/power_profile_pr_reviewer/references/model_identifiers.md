@@ -358,9 +358,9 @@ Use a concise display name that distinguishes capability, wattage, fitting or sh
 
 Confirm the reported color modes and hardware or firmware revision before reusing measurements. Gledopto has reused at least `GL-S-007Z` across revisions with different reported capabilities. Do not assume one LUT represents every revision sharing that model code, but do not split a profile or invent an alias unless a distinct stable identifier is available.
 
-For light metadata, accept a barcode only when the listing identifies the complete exact `GL-*` code, including a finish or revision suffix where one exists. A manufacturer lumen range must remain a range in the evidence; do not select one endpoint as an exact `lumens` value.
+For light metadata, accept a barcode only when the listing identifies the complete exact `GL-*` code, including a finish or revision suffix where one exists. When a manufacturer specifies a lumen range for the exact measured revision, use its upper endpoint as the profile's maximum nominal `lumens` value and preserve the full range in the review evidence.
 
-For `GL-B-001P`, the v1.9 manual was created in July 2022 and specifies 250–300 lm for the exact 4W E14 model, closely preceding the September 2022 measurement. Treat the current 200 lm page, which describes the product as the latest generation despite retaining the same GTIN, as a later optical revision. Keep `lumens` omitted for the measured profile because the contemporaneous source provides only a range.
+For `GL-B-001P`, the v1.9 manual was created in July 2022 and specifies 250–300 lm for the exact 4W E14 model, closely preceding the September 2022 measurement. Treat the current 200 lm page, which describes the product as the latest generation despite retaining the same GTIN, as a later optical revision. Record the contemporaneous range's 300 lm upper endpoint for the measured profile.
 
 ## Google
 
