@@ -13979,6 +13979,64 @@
           "hash": "78b8d9bacc0ec9b3f91974f479a806a5"
         },
         {
+          "ean": [
+            "4058075729025"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-08-30T18:42:19Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E27",
+            "lumens": 806,
+            "rated_power": 9.0,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.5.0:cli"
+          },
+          "name": "SMART+ Classic A60 E27 RGBW",
+          "standby_power": 0.42,
+          "voltage_range": {
+            "max": 236.3,
+            "min": 230.2
+          },
+          "authors": [
+            {
+              "name": "philscottydev",
+              "github": "philscottydev"
+            }
+          ],
+          "aliases": [
+            "A60 RGBW T"
+          ],
+          "id": "AC41283",
+          "manufacturer": "ledvance",
+          "updated_at": "2026-08-30T19:33:38",
+          "max_power": 8.99,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T19:33:38",
+          "power_range": {
+            "min": 0.51,
+            "max": 8.99
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 94.0,
+            "color_temp": 94.0
+          },
+          "hash": "7457d4679e3934767a07a5dd98dd80a1"
+        },
+        {
           "aliases": [
             "4058075729223"
           ],
