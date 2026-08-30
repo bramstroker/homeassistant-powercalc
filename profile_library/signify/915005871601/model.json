@@ -1,0 +1,40 @@
+{
+  "aliases": [
+    "4080248P9",
+    "9150058716"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2023-06-19T20:36:20Z",
+  "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated",
+    "lumens": 2500,
+    "rated_power": 32,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "ean": [
+    "8718696174524"
+  ],
+  "legacy_ids": [
+    "4080248P9"
+  ],
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus 1PM",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.6.6:docker"
+  },
+  "name": "Hue Signe Floor Light",
+  "standby_power": 0.6,
+  "authors": [
+    {
+      "name": "TyzzyT",
+      "github": "TyzzyT"
+    }
+  ]
+}

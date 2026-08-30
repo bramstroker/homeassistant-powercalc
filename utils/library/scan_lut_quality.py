@@ -45,9 +45,9 @@ MANUALLY_VERIFIED_MODELS = (
     "lifx/LIFX Candle",
     "linkind/LS0101911261",
     "osram/AA69697",
-    "signify/1742930P7",
-    "signify/5060730P7",
-    "signify/5060830P7",
+    "signify/915005730601",
+    "signify/915005928701",
+    "signify/915005928501",
     "signify/LTW001",  # not really clean, could have remeasure
     "signify/LCG008",  # plots missing, check later
     "signify/LCT012",
@@ -59,9 +59,9 @@ MANUALLY_VERIFIED_MODELS = (
     "signify/929003598001",
     "signify/929003526101",  # messy LUT, bumpy, needs remeasure
     "signify/915005997801",
-    "signify/1746230P7",
-    "signify/1743730P7",
-    "signify/1743530P7",
+    "signify/915005842601",
+    "signify/915005731801",
+    "signify/915005731401",
     "zipato/RGBWE2",
 )
 

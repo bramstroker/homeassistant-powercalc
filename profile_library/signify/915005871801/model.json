@@ -1,0 +1,42 @@
+{
+  "aliases": [
+    "4090131P9",
+    "9150058718",
+    "8718696174548"
+  ],
+  "ean": [
+    "8718696174548"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2024-07-21T11:13:03Z",
+  "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated",
+    "lumens": 1500,
+    "rated_power": 20.0,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "legacy_ids": [
+    "4090131P9"
+  ],
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus Plug S Gen2",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.11.6:docker"
+  },
+  "name": "Hue Sana Wall Light",
+  "standby_power": 0.31,
+  "authors": [
+    {
+      "name": "pwnagepeter",
+      "email": "hauke@pwnagepeter.net",
+      "github": "pwnagepeter"
+    }
+  ]
+}

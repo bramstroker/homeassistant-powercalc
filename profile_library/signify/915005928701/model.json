@@ -1,0 +1,45 @@
+{
+  "aliases": [
+    "5060730P7",
+    "5060730P7_01",
+    "5060731P7_01",
+    "5060731P7"
+  ],
+  "ean": [
+    "8718696176047"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2023-01-11T18:46:15Z",
+  "device_type": "light",
+  "device_specs": {
+    "socket": [
+      "GU10",
+      "integrated"
+    ],
+    "form_factor": "spot",
+    "lumens": 2800,
+    "rated_power": 40,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "legacy_ids": [
+    "5060730P7"
+  ],
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly 1PM",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "master"
+  },
+  "name": "Hue Centris 4-Spot Ceiling Light",
+  "standby_power": 0.4,
+  "authors": [
+    {
+      "name": "matteobreschig",
+      "github": "matteobreschig"
+    }
+  ]
+}
