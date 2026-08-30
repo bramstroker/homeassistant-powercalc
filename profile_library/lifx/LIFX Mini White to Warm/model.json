@@ -3,6 +3,8 @@
   "created_at": "2022-10-05T13:31:39Z",
   "device_type": "light",
   "device_specs": {
+    "rated_power": 9,
+    "lumens": 800,
     "connectivity": [
       "wifi"
     ]
