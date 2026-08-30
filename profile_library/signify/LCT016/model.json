@@ -9,7 +9,10 @@
   "device_specs": {
     "lumens": 800,
     "form_factor": "bulb",
-    "socket": "E27"
+    "socket": "E27",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Smart Wi-Fi Plug Mini",

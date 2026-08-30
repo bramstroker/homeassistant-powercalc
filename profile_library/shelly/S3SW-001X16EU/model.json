@@ -16,6 +16,12 @@
     "Shelly 1 Gen3"
   ],
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
+  },
   "calculation_strategy": "fixed",
   "description": "Smart Wi-Fi Relay Switch with Dry Contacts",
   "only_self_usage": false,

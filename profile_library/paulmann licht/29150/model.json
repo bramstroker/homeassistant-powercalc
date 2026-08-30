@@ -13,7 +13,10 @@
     "form_factor": "bulb",
     "socket": "E14",
     "lumens": 470,
-    "rated_power": 5.0
+    "rated_power": 5.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Re-measured 2026-08-18 by philscottydev. The lamp is sold both individually (29150) and as a three pack (29154); this run used three lamps of the 29154 set in parallel on one meter with MULTIPLE_LIGHTS and NUM_LIGHTS=3, so the reported values are per lamp. Measuring three at once lifts the signal above the meter's resolution floor, which matters at the bottom of the curve where a single 5 W lamp draws less than one meter step. Original data by 71820SM01, single lamp on a Shelly Plus Plug S with SAMPLE_COUNT=2, is kept in the git history.",
   "measure_device": "Shelly Plus 1PM",

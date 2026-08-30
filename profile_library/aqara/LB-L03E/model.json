@@ -10,7 +10,12 @@
     "socket": "GU10",
     "form_factor": "bulb",
     "lumens": 450,
-    "rated_power": 4.9
+    "rated_power": 4.9,
+    "connectivity": [
+      "zigbee",
+      "matter",
+      "thread"
+    ]
   },
   "ean": [
     "6975833357109"

@@ -45,9 +45,8 @@ Below is a comprehensive table of all fields that can be used in a `model.json` 
 | `composite_config`                | object/array     | No | Configuration for [composite](../strategies/composite.md) calculation strategy                                                          |
 | `config_flow_discovery_remarks`   | string           | No | Remarks to show in the GUI config flow on first step of discovery                                                                       |
 | `config_flow_sub_profile_remarks` | string           | No | Remarks to show in the GUI config flow on sub profile selection step                                                                    |
-| `connectivity`                    | array of strings | No | Protocols the device talks: `zigbee`, `wifi`, `zwave`, `matter`, `thread`, `bluetooth`, `ethernet`, `rf433`, `infrared`, `proprietary`   |
 | `description`                     | string           | No | A short description of the device                                                                                                       |
-| `device_specs`                    | object           | No | Physical attributes of the device, as printed on the box. Which keys are allowed depends on `device_type`, see [Device specs](#device-specs) |
+| `device_specs`                    | object           | No | Manufacturer specifications such as rated power and connectivity, plus type-specific attributes. See [Device specs](#device-specs)       |
 | `discovery_by`                    | string           | No | Whether to discover the profile by config entry, device, or entity                                                                       |
 | `ean`                             | array of strings | No | Barcode numbers on the packaging (EAN-8, UPC-12, EAN-13 or GTIN-14). A model often ships under several, one per region                  |
 | `fields`                          | array of objects | No | Custom fields for the profile, more about it explained in [Variables](variables.md)                                                     |
@@ -72,24 +71,33 @@ Below is a comprehensive table of all fields that can be used in a `model.json` 
 
 #### Device specs
 
-`device_specs` holds what the box says about the device, as opposed to what the measurements say.
-Which keys are allowed depends on `device_type`; only lights are described so far.
+`device_specs` holds what the box or manufacturer datasheet says about the device, as opposed to what the measurements say.
+Some keys apply to every device type; lights have additional light-specific keys.
 
 ```json
 "device_specs": {
   "socket": ["E26", "E27"],
   "form_factor": "bulb",
   "lumens": 806,
-  "rated_power": 9.5
+  "rated_power": 9.5,
+  "connectivity": ["zigbee"]
 }
 ```
 
-| Key           | Type   | Description                                                                                                    |
-|---------------|--------|----------------------------------------------------------------------------------------------------------------|
+Generic device specifications:
+
+| Key            | Type             | Description                                                                                                                       |
+|----------------|------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `rated_power`  | number           | Power draw claimed by the manufacturer, in watts. The library website shows it next to the measured maximum                      |
+| `connectivity` | array of strings | Protocols the device talks: `zigbee`, `wifi`, `zwave`, `matter`, `thread`, `bluetooth`, `ethernet`, `usb`, `rf433`, `infrared`, `proprietary` |
+
+Additional light specifications:
+
+| Key           | Type            | Description                                                                                                    |
+|---------------|-----------------|----------------------------------------------------------------------------------------------------------------|
 | `socket`      | string or array | Lamp base(s): `E27`, `E26`, `E14`, `E12`, `B22`, `GU10`, `GU5.3`, `GU24`, `GX53`, `G9`, `G4`, or `integrated` when the light source cannot be replaced |
 | `form_factor` | string | `bulb`, `spot`, `candle`, `globe`, `filament`, `strip`, `panel`, `downlight`, `tube`, `fixture` or `other`      |
 | `lumens`      | number | Nominal luminous flux at full brightness                                                                        |
-| `rated_power` | number | Power draw claimed by the manufacturer, in watts. The library website shows it next to the measured maximum     |
 
 Leave a key out rather than guessing. These are manufacturer claims, and the website presents
 them as such.

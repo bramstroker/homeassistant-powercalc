@@ -9,7 +9,10 @@
     "socket": "integrated",
     "lumens": 2250,
     "form_factor": "panel",
-    "rated_power": 16.6
+    "rated_power": 16.6,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with powercalc-measure Docker script using dummy load for accuracy",
   "measure_device": "Shelly 1PM Mini Gen4",

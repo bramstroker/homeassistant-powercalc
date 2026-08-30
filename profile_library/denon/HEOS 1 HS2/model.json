@@ -8,6 +8,14 @@
   "calculation_strategy": "linear",
   "created_at": "2022-10-05T10:14:54Z",
   "device_type": "smart_speaker",
+  "device_specs": {
+    "rated_power": 20,
+    "connectivity": [
+      "wifi",
+      "bluetooth",
+      "ethernet"
+    ]
+  },
   "linear_config": {
     "calibrate": [
       "0 -> 6.20",

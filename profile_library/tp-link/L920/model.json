@@ -6,7 +6,10 @@
     "socket": "integrated",
     "form_factor": "strip",
     "lumens": 500,
-    "rated_power": 20.5
+    "rated_power": 20.5,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "4897098682609"

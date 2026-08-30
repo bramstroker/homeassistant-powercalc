@@ -9,7 +9,10 @@
     "socket": "integrated",
     "form_factor": "panel",
     "lumens": 4200,
-    "rated_power": 55
+    "rated_power": 55,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8718696169377"

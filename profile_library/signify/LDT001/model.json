@@ -8,7 +8,10 @@
   "device_specs": {
     "form_factor": "downlight",
     "socket": "integrated",
-    "lumens": 600
+    "lumens": 600,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "6947830431380"

@@ -9,7 +9,10 @@
     "socket": "E26",
     "form_factor": "bulb",
     "lumens": 800,
-    "rated_power": 10
+    "rated_power": 10,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Eve Energy",

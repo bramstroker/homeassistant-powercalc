@@ -12,7 +12,10 @@
     "socket": "integrated",
     "lumens": 3750,
     "form_factor": "panel",
-    "rated_power": 39.0
+    "rated_power": 39.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini Gen4",

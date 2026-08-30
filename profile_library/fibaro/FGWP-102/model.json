@@ -5,6 +5,11 @@
   "calculation_strategy": "fixed",
   "created_at": "2022-09-06T08:26:19Z",
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "zwave"
+    ]
+  },
   "legacy_ids": [
     "FGWP102"
   ],

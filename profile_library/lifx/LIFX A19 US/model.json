@@ -2,6 +2,11 @@
   "calculation_strategy": "lut",
   "created_at": "2022-07-19T22:34:27Z",
   "device_type": "light",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug US",
   "measure_method": "script",

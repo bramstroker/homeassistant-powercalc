@@ -5,6 +5,11 @@
   "calculation_strategy": "fixed",
   "created_at": "2026-03-14T00:00:00Z",
   "device_type": "printer",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
   "fixed_config": {
     "states_power": {
       "idle": 2.2

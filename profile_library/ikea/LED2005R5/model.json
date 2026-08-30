@@ -10,7 +10,10 @@
     "socket": "GU10",
     "form_factor": "bulb",
     "lumens": 345,
-    "rated_power": 3.4
+    "rated_power": 3.4,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

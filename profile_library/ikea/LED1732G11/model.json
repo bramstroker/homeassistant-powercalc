@@ -9,7 +9,10 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 1000,
-    "rated_power": 11
+    "rated_power": 11,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with script made by bramstroker and partially verified manual",
   "measure_device": "Shelly Plug S",

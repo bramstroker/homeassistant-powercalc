@@ -4,7 +4,10 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "strip"
+    "form_factor": "strip",
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "6972391282317"

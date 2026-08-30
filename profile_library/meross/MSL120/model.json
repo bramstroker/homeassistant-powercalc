@@ -13,7 +13,10 @@
       "B22"
     ],
     "lumens": 810,
-    "rated_power": 9.0
+    "rated_power": 9.0,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "0680306683277"

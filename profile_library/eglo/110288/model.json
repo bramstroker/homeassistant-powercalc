@@ -9,7 +9,11 @@
     "socket": "E27",
     "form_factor": "filament",
     "lumens": 150,
-    "rated_power": 4.0
+    "rated_power": 4.0,
+    "connectivity": [
+      "bluetooth",
+      "zigbee"
+    ]
   },
   "ean": [
     "9008606277971"

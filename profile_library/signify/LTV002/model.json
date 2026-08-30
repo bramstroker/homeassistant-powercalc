@@ -14,7 +14,10 @@
     "socket": "E27",
     "lumens": 550,
     "rated_power": 7.0,
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "linked_profile": "signify/LTO001",
   "measure_description": "Measured with utils/measure script",

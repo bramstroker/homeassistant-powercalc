@@ -6,6 +6,11 @@
   "calculation_strategy": "linear",
   "created_at": "2025-02-12T13:05:00Z",
   "device_type": "smart_dimmer",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ]
+  },
   "measure_description": "Standby power measured with smart plug",
   "measure_device": "Nous A8T",
   "measure_device_firmware": "EspHome",

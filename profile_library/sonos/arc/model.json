@@ -6,6 +6,17 @@
   "calculation_strategy": "linear",
   "created_at": "2023-04-03T20:55:15Z",
   "device_type": "smart_speaker",
+  "ean": [
+    "8717755777195",
+    "8717755777201"
+  ],
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "ethernet",
+      "infrared"
+    ]
+  },
   "linear_config": {
     "calibrate": [
       "10 -> 13.51",

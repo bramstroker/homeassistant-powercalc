@@ -5,7 +5,11 @@
   "device_specs": {
     "form_factor": "fixture",
     "socket": "integrated",
-    "lumens": 1500
+    "lumens": 1500,
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
   },
   "ean": [
     "850030064738"

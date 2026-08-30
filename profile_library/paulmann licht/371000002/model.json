@@ -9,7 +9,10 @@
     "form_factor": "panel",
     "socket": "integrated",
     "lumens": 1800,
-    "rated_power": 22
+    "rated_power": 22,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

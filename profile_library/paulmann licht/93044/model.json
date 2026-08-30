@@ -12,7 +12,10 @@
     "socket": "integrated",
     "form_factor": "panel",
     "lumens": 1400,
-    "rated_power": 16.0
+    "rated_power": 16.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "legacy_ids": [
     "500.46"

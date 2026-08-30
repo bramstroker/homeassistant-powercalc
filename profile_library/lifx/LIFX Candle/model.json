@@ -3,7 +3,10 @@
   "created_at": "2022-02-19T20:16:46Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "candle"
+    "form_factor": "candle",
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",

@@ -2,6 +2,11 @@
   "calculation_strategy": "fixed",
   "created_at": "2023-08-12T11:19:44Z",
   "device_type": "camera",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
   "measure_description": "Measured each state for five minutes using Powercalc average mode",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

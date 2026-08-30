@@ -9,7 +9,10 @@
     "form_factor": "bulb",
     "socket": "E27",
     "lumens": 2600,
-    "rated_power": 30
+    "rated_power": 30,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",

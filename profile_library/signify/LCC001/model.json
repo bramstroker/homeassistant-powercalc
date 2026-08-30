@@ -8,7 +8,10 @@
   "device_specs": {
     "form_factor": "fixture",
     "socket": "integrated",
-    "lumens": 3000
+    "lumens": 3000,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8718696169711"

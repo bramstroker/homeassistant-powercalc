@@ -5,7 +5,10 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "filament",
-    "rated_power": 4.2
+    "rated_power": 4.2,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8718781552015",

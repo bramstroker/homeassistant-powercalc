@@ -2,6 +2,14 @@
   "calculation_strategy": "fixed",
   "created_at": "2026-02-12T15:06:00Z",
   "device_type": "generic_iot",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "ean": [
+    "0192784000830"
+  ],
   "discovery_by": "device",
   "fixed_config": {
     "power": 1.7

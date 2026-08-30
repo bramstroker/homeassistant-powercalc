@@ -16,7 +16,10 @@
     "form_factor": "bulb",
     "socket": "E27",
     "lumens": 800,
-    "rated_power": 9.0
+    "rated_power": 9.0,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

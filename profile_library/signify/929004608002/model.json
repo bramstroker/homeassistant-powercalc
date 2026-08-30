@@ -9,7 +9,10 @@
     "form_factor": "strip",
     "socket": "integrated",
     "lumens": 2700,
-    "rated_power": 40.0
+    "rated_power": 40.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa KP115",

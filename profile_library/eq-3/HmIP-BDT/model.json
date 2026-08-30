@@ -4,6 +4,14 @@
   "created_at": "2025-02-04T18:37:40Z",
   "description": "Homematic IP trailing-edge dimming actuator for brand switch systems. This profile only models the dimmer's self-consumption; configure the connected load separately.",
   "device_type": "smart_dimmer",
+  "device_specs": {
+    "connectivity": [
+      "proprietary"
+    ]
+  },
+  "ean": [
+    "4047976431663"
+  ],
   "measure_description": "Measured using Powercalc average mode for 300 seconds with a 7.61W dummy load.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",

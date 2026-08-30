@@ -9,7 +9,10 @@
     "socket": "E26",
     "form_factor": "spot",
     "lumens": 650,
-    "rated_power": 10
+    "rated_power": 10,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "840410102877"

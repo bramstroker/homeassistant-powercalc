@@ -9,7 +9,10 @@
     "socket": "E27",
     "lumens": 800,
     "form_factor": "bulb",
-    "rated_power": 9
+    "rated_power": 9,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8719514328204"

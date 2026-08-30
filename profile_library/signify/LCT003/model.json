@@ -12,7 +12,10 @@
     "socket": "GU10",
     "lumens": 250,
     "rated_power": 6.5,
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Used script utils/measure_shelly.py from repository",
   "measure_device": "Shelly Plug S",

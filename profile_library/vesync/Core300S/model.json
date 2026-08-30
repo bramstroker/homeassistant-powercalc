@@ -2,6 +2,12 @@
   "calculation_strategy": "fixed",
   "created_at": "2026-06-01T00:00:00Z",
   "device_type": "fan",
+  "device_specs": {
+    "rated_power": 39,
+    "connectivity": [
+      "wifi"
+    ]
+  },
   "measure_device": "SONOFF S60ZBTPF",
   "measure_method": "manual",
   "name": "Smart Air Purifier",

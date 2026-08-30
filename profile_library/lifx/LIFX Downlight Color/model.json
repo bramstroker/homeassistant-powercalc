@@ -6,7 +6,10 @@
   "created_at": "2022-10-05T13:31:39Z",
   "device_type": "light",
   "device_specs": {
-    "form_factor": "downlight"
+    "form_factor": "downlight",
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",

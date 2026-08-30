@@ -6,7 +6,10 @@
     "socket": "E27",
     "form_factor": "filament",
     "lumens": 350,
-    "rated_power": 4.9
+    "rated_power": 4.9,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug",

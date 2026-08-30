@@ -12,7 +12,10 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 2350,
-    "rated_power": 33.5
+    "rated_power": 33.5,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

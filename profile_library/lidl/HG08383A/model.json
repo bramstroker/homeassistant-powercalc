@@ -5,7 +5,10 @@
   "device_specs": {
     "form_factor": "fixture",
     "socket": "integrated",
-    "rated_power": 7.7
+    "rated_power": 7.7,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "4054599013275"

@@ -15,7 +15,10 @@
       "GU10",
       "integrated"
     ],
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

@@ -9,7 +9,11 @@
     "form_factor": "bulb",
     "socket": "E26",
     "lumens": 800,
-    "rated_power": 9.5
+    "rated_power": 9.5,
+    "connectivity": [
+      "zigbee",
+      "bluetooth"
+    ]
   },
   "ean": [
     "046677476861"

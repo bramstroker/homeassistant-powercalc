@@ -1,6 +1,12 @@
 {
   "name": "X40 Ultra Complete",
   "device_type": "vacuum_robot",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ],
+    "rated_power": 75
+  },
   "aliases": [
     "dreame.vacuum.r2449a",
     "X40 Ultra Complete"

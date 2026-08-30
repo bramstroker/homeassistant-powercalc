@@ -6,6 +6,13 @@
   "calculation_strategy": "linear",
   "created_at": "2024-03-17T20:29:31Z",
   "device_type": "smart_speaker",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "thread",
+      "bluetooth"
+    ]
+  },
   "linear_config": {
     "calibrate": [
       "10 -> 7.06",

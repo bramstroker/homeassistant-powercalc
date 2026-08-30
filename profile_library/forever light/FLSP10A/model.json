@@ -6,6 +6,11 @@
   "calculation_strategy": "fixed",
   "created_at": "2025-02-15T09:30:00Z",
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
   "ean": [
     "5900495064066"
   ],

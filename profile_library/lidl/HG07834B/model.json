@@ -4,7 +4,10 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E14",
-    "form_factor": "candle"
+    "form_factor": "candle",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

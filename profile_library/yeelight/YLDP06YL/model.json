@@ -12,7 +12,10 @@
     ],
     "lumens": 800,
     "form_factor": "bulb",
-    "rated_power": 10.0
+    "rated_power": 10.0,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "0608887786309"

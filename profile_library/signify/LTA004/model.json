@@ -13,7 +13,11 @@
     "socket": "E27",
     "lumens": 806,
     "rated_power": 9.0,
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "connectivity": [
+      "zigbee",
+      "bluetooth"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Fibaro FGWP102",

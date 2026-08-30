@@ -5,7 +5,10 @@
   "device_specs": {
     "socket": "E14",
     "form_factor": "candle",
-    "lumens": 470
+    "lumens": 470,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8718781551643",

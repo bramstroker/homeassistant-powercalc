@@ -10,7 +10,11 @@
     "socket": "B22",
     "form_factor": "bulb",
     "lumens": 1100,
-    "rated_power": 9.5
+    "rated_power": 9.5,
+    "connectivity": [
+      "zigbee",
+      "bluetooth"
+    ]
   },
   "ean": [
     "8719514288270",

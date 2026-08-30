@@ -2,7 +2,16 @@
   "calculation_strategy": "fixed",
   "created_at": "2026-04-17T10:48:22Z",
   "device_type": "network",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "ethernet"
+    ]
+  },
   "discovery_by": "device",
+  "ean": [
+    "4023125029653"
+  ],
   "fixed_config": {
     "power": 15.75
   },

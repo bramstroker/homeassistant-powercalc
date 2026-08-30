@@ -9,7 +9,10 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 806,
-    "rated_power": 9.4
+    "rated_power": 9.4,
+    "connectivity": [
+      "proprietary"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

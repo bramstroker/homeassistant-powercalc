@@ -12,7 +12,10 @@
     "socket": "E14",
     "lumens": 470,
     "rated_power": 5.1,
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM Mini Gen3",

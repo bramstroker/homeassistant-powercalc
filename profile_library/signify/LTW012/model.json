@@ -13,7 +13,10 @@
     "socket": "E14",
     "lumens": 470,
     "rated_power": 6.0,
-    "form_factor": "candle"
+    "form_factor": "candle",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Used script utils/measure_shelly.py from repository, standby_power estimated",
   "measure_device": "Shelly 1PM",

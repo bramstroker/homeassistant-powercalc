@@ -6,7 +6,10 @@
     "socket": "integrated",
     "form_factor": "panel",
     "lumens": 3720,
-    "rated_power": 36
+    "rated_power": 36,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "7392529148435"

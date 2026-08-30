@@ -6,7 +6,10 @@
     "socket": "E26",
     "form_factor": "bulb",
     "lumens": 1000,
-    "rated_power": 10.0
+    "rated_power": 10.0,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug",

@@ -4,7 +4,10 @@
   "device_type": "light",
   "device_specs": {
     "socket": "integrated",
-    "form_factor": "fixture"
+    "form_factor": "fixture",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with script made by smonesi (steps: bri 50/sat 60/hue 2000) and linearly interpolated to provide more data",
   "measure_device": "TP-Link Kasa HS110",

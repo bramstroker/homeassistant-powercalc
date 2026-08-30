@@ -13,7 +13,10 @@
     "socket": "integrated",
     "form_factor": "fixture",
     "lumens": 2450,
-    "rated_power": 19.2
+    "rated_power": 19.2,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script using 1 light and a 40W incandescent bulb as a dummy load, which was allowed to heat up for 1 hour before measuring",
   "measure_device": "Shelly 1PM",

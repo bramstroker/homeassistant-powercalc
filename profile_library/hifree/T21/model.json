@@ -8,7 +8,10 @@
   "device_specs": {
     "form_factor": "fixture",
     "socket": "integrated",
-    "rated_power": 8.0
+    "rated_power": 8.0,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "734598418113"

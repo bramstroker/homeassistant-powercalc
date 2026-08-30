@@ -9,7 +9,10 @@
     "socket": "integrated",
     "form_factor": "downlight",
     "lumens": 740,
-    "rated_power": 9.0
+    "rated_power": 9.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "9312699205484"

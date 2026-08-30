@@ -14,7 +14,11 @@
   "device_type": "light",
   "device_specs": {
     "form_factor": "strip",
-    "socket": "integrated"
+    "socket": "integrated",
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
   },
   "ean": [
     "6974316994220"

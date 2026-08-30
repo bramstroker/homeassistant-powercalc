@@ -12,7 +12,10 @@
     "socket": "integrated",
     "form_factor": "fixture",
     "lumens": 570,
-    "rated_power": 8.1
+    "rated_power": 8.1,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

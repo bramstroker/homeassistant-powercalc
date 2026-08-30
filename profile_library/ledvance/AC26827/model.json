@@ -15,7 +15,10 @@
     "socket": "integrated",
     "form_factor": "fixture",
     "lumens": 1050,
-    "rated_power": 26
+    "rated_power": 26,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

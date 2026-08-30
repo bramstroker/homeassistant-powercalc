@@ -5,6 +5,11 @@
   "calculation_strategy": "fixed",
   "created_at": "2026-04-08T10:46:42Z",
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ]
+  },
   "measure_description": "Manually measured (Japan model@110V)",
   "measure_device": "Ketotek KTEM02BL Electricity Monitor",
   "measure_method": "manual",

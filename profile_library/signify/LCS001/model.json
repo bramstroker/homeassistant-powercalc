@@ -12,7 +12,10 @@
     "socket": "integrated",
     "form_factor": "spot",
     "lumens": 640,
-    "rated_power": 8
+    "rated_power": 8,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8718696167960",

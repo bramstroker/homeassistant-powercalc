@@ -9,7 +9,10 @@
     "socket": "E27",
     "form_factor": "filament",
     "lumens": 806,
-    "rated_power": 6.2
+    "rated_power": 6.2,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "legacy_ids": [
     "ZBT-DIMLight-D0120"

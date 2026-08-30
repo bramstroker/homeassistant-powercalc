@@ -9,7 +9,10 @@
     "socket": "E14",
     "form_factor": "candle",
     "lumens": 470,
-    "rated_power": 3.2
+    "rated_power": 3.2,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script; 2.99 Watts dummy load",
   "measure_device": "Shelly Plus Plug S",

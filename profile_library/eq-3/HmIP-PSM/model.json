@@ -3,6 +3,14 @@
   "created_at": "2025-02-04T18:37:40Z",
   "description": "Homematic IP pluggable smart switch with integrated power measurement. This profile only models the switch's self-consumption because the connected load is measured by the device.",
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "proprietary"
+    ]
+  },
+  "ean": [
+    "4047976406661"
+  ],
   "measure_description": "Measured repeatedly using Powercalc average mode for 300 seconds with a 7.7W dummy load, then averaged.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",

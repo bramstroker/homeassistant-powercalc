@@ -6,7 +6,10 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 2000,
-    "rated_power": 20
+    "rated_power": 20,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",
