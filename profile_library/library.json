@@ -773,6 +773,71 @@
     },
     {
       "aliases": [
+        "Tuya"
+      ],
+      "name": "antela",
+      "full_name": "Antela",
+      "dir_name": "antela",
+      "website": "https://www.antelaglobal.com",
+      "country": "CN",
+      "description": "Smart-home brand offering app-connected lighting, plugs and other electrical products.",
+      "models": [
+        {
+          "aliases": [
+            "bf0f80ef7db65f56bfwkpm"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-11-17T08:44:45Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E14",
+            "form_factor": "bulb",
+            "lumens": 806,
+            "rated_power": 9.0
+          },
+          "measure_device": "PZEM-004T",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 3,
+            "VERSION": "master"
+          },
+          "name": "RGB+CCT Bulb 9W",
+          "standby_power": 0.46,
+          "authors": [
+            {
+              "name": "j0nixs",
+              "email": "jtschoche@gmail.com",
+              "github": "j0nxs"
+            }
+          ],
+          "id": "ANTELA-9W-RGB+CCT",
+          "manufacturer": "antela",
+          "updated_at": "2026-08-30T02:52:19",
+          "max_power": 8.9,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T02:52:19",
+          "power_range": {
+            "min": 0.43,
+            "max": 8.9
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "4a176e0108dcb5400bdbd5c510ffacc6"
+        }
+      ],
+      "device_types": [
+        "light"
+      ]
+    },
+    {
+      "aliases": [
         "American Power Conversion",
         "Schneider Electric"
       ],
@@ -4689,7 +4754,9 @@
       ]
     },
     {
-      "aliases": [],
+      "aliases": [
+        "Tuya"
+      ],
       "name": "ewelink",
       "full_name": "eWeLink",
       "dir_name": "ewelink",
@@ -4697,6 +4764,55 @@
       "country": "CN",
       "description": "App and cloud platform behind Sonoff and a long list of other Shenzhen brands.",
       "models": [
+        {
+          "aliases": [
+            "CK-BL702-AL-01",
+            "CK-BL702-AL-01(7009_Z102LG03-1)"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-01-23T13:08:49Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E14",
+            "form_factor": "bulb",
+            "rated_power": 5.0
+          },
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.2:docker"
+          },
+          "name": "RGB+CCT Bulb 5W",
+          "standby_power": 0.44,
+          "authors": [
+            {
+              "name": "Dr-Seltsam",
+              "email": "sebastian.jaekel@web.de",
+              "github": "Dr-Seltsam"
+            }
+          ],
+          "id": "EZ-E14",
+          "manufacturer": "ewelink",
+          "updated_at": "2026-08-30T02:52:19",
+          "max_power": 3.46,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T02:52:19",
+          "power_range": {
+            "min": 0.36,
+            "max": 3.46
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 95.1,
+            "color_temp": 95.1
+          },
+          "hash": "4f50cd6e2617c461ce32466f638c0ebf"
+        },
         {
           "calculation_strategy": "fixed",
           "created_at": "2024-12-01T20:44:00Z",
@@ -4727,6 +4843,7 @@
         }
       ],
       "device_types": [
+        "light",
         "smart_switch"
       ]
     },
@@ -4774,6 +4891,57 @@
             "max": 0.8
           },
           "hash": "2d6c21fb10aa74bb3bd86723edf2a7c1"
+        }
+      ],
+      "device_types": [
+        "smart_switch"
+      ]
+    },
+    {
+      "aliases": [
+        "Tuya"
+      ],
+      "name": "forever light",
+      "full_name": "Forever Light",
+      "dir_name": "forever light",
+      "website": "https://forever.eu",
+      "country": "PL",
+      "description": "Polish consumer-electronics brand offering lighting, smart plugs and related accessories.",
+      "models": [
+        {
+          "aliases": [
+            "Forever Light Smart Plug FLSP10A",
+            "iqkfza3hyqb8f9ui"
+          ],
+          "calculation_strategy": "fixed",
+          "created_at": "2025-02-15T09:30:00Z",
+          "device_type": "smart_switch",
+          "ean": [
+            "5900495064066"
+          ],
+          "measure_device": "Zhurui PR10",
+          "measure_method": "manual",
+          "name": "Smart Plug",
+          "only_self_usage": true,
+          "standby_power": 0.52,
+          "standby_power_on": 1.06,
+          "authors": [
+            {
+              "name": "Bram Gerritsen",
+              "email": "bgerritsen@gmail.com",
+              "github": "bramstroker"
+            }
+          ],
+          "id": "FLSP10A",
+          "manufacturer": "forever light",
+          "updated_at": "2026-08-30T02:52:19",
+          "max_power": 1.06,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 1.06,
+            "max": 1.06
+          },
+          "hash": "22d894df3c9061ff9f52eb6ed6c30fe1"
         }
       ],
       "device_types": [
@@ -6827,6 +6995,72 @@
       ],
       "device_types": [
         "smart_speaker"
+      ]
+    },
+    {
+      "aliases": [
+        "Tuya"
+      ],
+      "name": "hifree",
+      "full_name": "Hifree",
+      "dir_name": "hifree",
+      "website": "https://hifree-office.com",
+      "country": "CN",
+      "description": "Chinese smart-lighting brand offering app-connected lamps and ambient lights.",
+      "models": [
+        {
+          "aliases": [
+            "8jz6rasdn7xct1oq"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-01-10T23:41:45Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "rated_power": 8.0
+          },
+          "ean": [
+            "734598418113"
+          ],
+          "measure_device": "Shelly Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.20.2:docker"
+          },
+          "name": "Bedside RGB Lamp",
+          "standby_power": 0.45,
+          "authors": [
+            {
+              "name": "Pasquale Cuorpo",
+              "github": "maverick1982"
+            }
+          ],
+          "id": "T21",
+          "manufacturer": "hifree",
+          "updated_at": "2026-08-30T02:52:19",
+          "max_power": 8.05,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T02:52:19",
+          "power_range": {
+            "min": 0.35,
+            "max": 8.05
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 96.5,
+            "color_temp": 96.5
+          },
+          "hash": "6f1732d6633ade7334d872a311cb15d7"
+        }
+      ],
+      "device_types": [
+        "light"
       ]
     },
     {
@@ -11875,6 +12109,72 @@
       ]
     },
     {
+      "aliases": [
+        "Tuya"
+      ],
+      "name": "kobi",
+      "full_name": "Kobi",
+      "dir_name": "kobi",
+      "website": "https://kobi.pl",
+      "country": "PL",
+      "description": "Polish lighting brand offering residential, commercial and smart LED products.",
+      "models": [
+        {
+          "aliases": [],
+          "calculation_strategy": "lut",
+          "created_at": "2023-09-09T20:18:19Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E27",
+            "form_factor": "bulb",
+            "lumens": 1400,
+            "rated_power": 14.0
+          },
+          "ean": [
+            "5902201305425"
+          ],
+          "measure_device": "TP-Link Tapo P110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.9.3:docker"
+          },
+          "name": "A65 RGB+CCT Bulb 14W 1400 lm",
+          "standby_power": 0.46,
+          "authors": [
+            {
+              "name": "mariwing",
+              "email": "mariwing@gmail.com",
+              "github": "mariwing"
+            }
+          ],
+          "id": "KAGS14RGBCTW",
+          "manufacturer": "kobi",
+          "updated_at": "2026-08-30T02:52:19",
+          "max_power": 13.23,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T02:52:19",
+          "power_range": {
+            "min": 0.47,
+            "max": 13.23
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "9858bc2a0061844ed4142a860113cd25"
+        }
+      ],
+      "device_types": [
+        "light"
+      ]
+    },
+    {
       "aliases": [],
       "name": "kogan",
       "full_name": "Kogan",
@@ -14851,7 +15151,9 @@
       ]
     },
     {
-      "aliases": [],
+      "aliases": [
+        "Tuya"
+      ],
       "name": "lsc",
       "full_name": "LSC",
       "dir_name": "lsc",
@@ -14859,6 +15161,58 @@
       "country": "NL",
       "description": "LSC Smart Connect, the smart home house brand of the Dutch discount retailer Action.",
       "models": [
+        {
+          "aliases": [
+            "CS3S",
+            "Tuya CS3S/BK7231N"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-06-30T08:56:29Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 210,
+            "rated_power": 2.2
+          },
+          "ean": [
+            "8712879151074"
+          ],
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.6.6:docker"
+          },
+          "name": "Moodlight",
+          "standby_power": 0.5,
+          "authors": [
+            {
+              "name": "TyzzyT",
+              "github": "TyzzyT"
+            }
+          ],
+          "id": "3004154",
+          "manufacturer": "lsc",
+          "updated_at": "2026-08-30T02:52:19",
+          "max_power": 4.45,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T02:52:19",
+          "power_range": {
+            "min": 0.5,
+            "max": 4.45
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.0,
+            "color_temp": 97.0
+          },
+          "hash": "6792c0ffe3c7ca2b759d3066ad2c45d5"
+        },
         {
           "calculation_strategy": "lut",
           "created_at": "2026-04-07T11:55:06Z",
@@ -30349,6 +30703,136 @@
       ]
     },
     {
+      "aliases": [
+        "Tuya"
+      ],
+      "name": "sunco",
+      "full_name": "Sunco",
+      "dir_name": "sunco",
+      "website": "https://sunco.com",
+      "country": "US",
+      "description": "American lighting brand offering residential and commercial LED products.",
+      "models": [
+        {
+          "aliases": [
+            "SUNCO-5W_I2C_RGBCW"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2024-01-08T20:32:28Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E26",
+            "form_factor": "globe",
+            "lumens": 450,
+            "rated_power": 5.0
+          },
+          "measure_device": "TP-Link Kasa KP115",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.9.14:docker"
+          },
+          "name": "G25 WiFi Bulb",
+          "product_url": "https://www.sunco.com/products/g25-smart-bulb-wifi",
+          "standby_power": 0.7,
+          "authors": [
+            {
+              "name": "Emory Penney",
+              "email": "emory.j.penney@intel.com",
+              "github": "ejpenney"
+            }
+          ],
+          "id": "G25_S-5W-27K_5K-1PK",
+          "manufacturer": "sunco",
+          "updated_at": "2026-08-30T02:52:19",
+          "max_power": 5.43,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T02:52:19",
+          "power_range": {
+            "min": 0.41,
+            "max": 5.43
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.3,
+            "color_temp": 97.3
+          },
+          "hash": "6ec686bf2add98460da208e3c563c1dc"
+        }
+      ],
+      "device_types": [
+        "light"
+      ]
+    },
+    {
+      "aliases": [
+        "Tuya"
+      ],
+      "name": "sylstar",
+      "full_name": "Sylstar",
+      "dir_name": "sylstar",
+      "website": "https://www.sylstar-lighting.com",
+      "country": "CN",
+      "description": "Lighting manufacturer offering connected and conventional LED fixtures.",
+      "models": [
+        {
+          "aliases": [
+            "SYS-C24W-CW"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2023-09-09T20:18:19Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 1800,
+            "rated_power": 24.0
+          },
+          "measure_device": "TP-Link Tapo P110",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.9.3:docker"
+          },
+          "name": "LED Ceiling Light 24W",
+          "standby_power": 0.73,
+          "authors": [
+            {
+              "name": "mariwing",
+              "email": "mariwing@gmail.com",
+              "github": "mariwing"
+            }
+          ],
+          "id": "SL-CL-24",
+          "manufacturer": "sylstar",
+          "updated_at": "2026-08-30T02:52:19",
+          "max_power": 21.37,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T02:52:19",
+          "power_range": {
+            "min": 2.56,
+            "max": 21.37
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "6b97e31e64f1bd2d247b159d55b96bff"
+        }
+      ],
+      "device_types": [
+        "light"
+      ]
+    },
+    {
       "aliases": [],
       "name": "sylvania",
       "full_name": "Sylvania",
@@ -31457,6 +31941,53 @@
             "color_temp": 97.8
           },
           "hash": "119a2e406c3dfacdbb4f48293712e4ce"
+        },
+        {
+          "calculation_strategy": "lut",
+          "created_at": "2022-07-17T10:05:09Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E26",
+            "form_factor": "bulb",
+            "lumens": 800,
+            "rated_power": 9.0
+          },
+          "ean": [
+            "728458730453"
+          ],
+          "measure_device": "Sonoff S31",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 5,
+            "VERSION": "master"
+          },
+          "name": "Tunable White Bulb 9W",
+          "standby_power": 0.1,
+          "authors": [
+            {
+              "name": "Kendell R",
+              "github": "KTibow"
+            }
+          ],
+          "id": "SL20",
+          "manufacturer": "treatlife",
+          "updated_at": "2026-08-30T02:52:19",
+          "max_power": 8.7,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-08-30T02:52:19",
+          "power_range": {
+            "min": 1.66,
+            "max": 8.7
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 98.6,
+            "color_temp": 98.6
+          },
+          "hash": "a12cdd3572934b5ea813c860d75780cf"
         }
       ],
       "device_types": [
@@ -31594,262 +32125,6 @@
       "models": [
         {
           "calculation_strategy": "lut",
-          "created_at": "2026-01-10T23:41:45Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated"
-          },
-          "measure_device": "Shelly Plug S",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.20.2:docker"
-          },
-          "name": "Hifree Bedside RGB Lamp",
-          "standby_power": 0.45,
-          "authors": [
-            {
-              "name": "Pasquale Cuorpo",
-              "github": "maverick1982"
-            }
-          ],
-          "id": "8jz6rasdn7xct1oq",
-          "manufacturer": "tuya",
-          "updated_at": "2026-08-29T10:24:04",
-          "max_power": 8.05,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-01-11T10:22:38",
-          "power_range": {
-            "min": 0.35,
-            "max": 8.05
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 96.5,
-            "color_temp": 96.5
-          },
-          "hash": "b5fd536195e016dabdd5c722805d2dcf"
-        },
-        {
-          "aliases": [],
-          "calculation_strategy": "lut",
-          "created_at": "2023-11-17T08:44:45Z",
-          "device_type": "light",
-          "device_specs": {
-            "rated_power": 9.0
-          },
-          "measure_device": "PZEM-004T",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 3,
-            "SLEEP_TIME": 3,
-            "VERSION": "master"
-          },
-          "name": "ANTELA-9W-RGB+CCT",
-          "standby_power": 0.46,
-          "authors": [
-            {
-              "name": "j0nixs",
-              "email": "jtschoche@gmail.com",
-              "github": "j0nxs"
-            }
-          ],
-          "id": "ANTELA-9W-RGB+CCT",
-          "manufacturer": "tuya",
-          "updated_at": "2026-08-29T10:13:07",
-          "max_power": 8.9,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.43,
-            "max": 8.9
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.0,
-            "color_temp": 98.0
-          },
-          "hash": "4f3197941eb9ed5dd69fd8d1a3dd0ffe"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2025-01-23T13:08:49Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "E14",
-            "rated_power": 5.0
-          },
-          "measure_device": "TP-Link Kasa HS110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.2:docker"
-          },
-          "name": "CK-BL702-AL-01, E14, 5W",
-          "standby_power": 0.44,
-          "authors": [
-            {
-              "name": "Dr-Seltsam",
-              "email": "sebastian.jaekel@web.de",
-              "github": "Dr-Seltsam"
-            }
-          ],
-          "id": "CK-BL702-AL-01",
-          "manufacturer": "tuya",
-          "updated_at": "2026-08-29T10:13:07",
-          "max_power": 3.46,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2025-01-24T20:06:25",
-          "power_range": {
-            "min": 0.36,
-            "max": 3.46
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 95.1,
-            "color_temp": 95.1
-          },
-          "hash": "5ff85dc4b910d5e62f2b63bce5919dc2"
-        },
-        {
-          "aliases": [
-            "Tuya CS3S/BK7231N",
-            "3004154"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2023-06-30T08:56:29Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated"
-          },
-          "measure_device": "Shelly Plus 1PM",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.6.6:docker"
-          },
-          "name": "LSC Smart Connect moodlight",
-          "standby_power": 0.5,
-          "authors": [
-            {
-              "name": "TyzzyT",
-              "github": "TyzzyT"
-            }
-          ],
-          "id": "CS3S",
-          "manufacturer": "tuya",
-          "updated_at": "2026-08-29T10:24:04",
-          "max_power": 4.45,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.5,
-            "max": 4.45
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 97.0,
-            "color_temp": 97.0
-          },
-          "hash": "a02afacb0135497034e0b8c550d26557"
-        },
-        {
-          "aliases": [
-            "Forever Light Smart Plug FLSP10A",
-            "iqkfza3hyqb8f9ui"
-          ],
-          "calculation_strategy": "fixed",
-          "created_at": "2025-02-15T09:30:00Z",
-          "device_type": "smart_switch",
-          "measure_device": "Zhurui PR10",
-          "measure_method": "manual",
-          "name": "Forever Light Smart Plug",
-          "only_self_usage": true,
-          "standby_power": 0.52,
-          "standby_power_on": 1.06,
-          "authors": [
-            {
-              "name": "Bram Gerritsen",
-              "email": "bgerritsen@gmail.com",
-              "github": "bramstroker"
-            }
-          ],
-          "id": "FLSP10A",
-          "manufacturer": "tuya",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 1.06,
-          "sub_profile_count": 0,
-          "power_range": {
-            "min": 1.06,
-            "max": 1.06
-          },
-          "hash": "d62ac4ef518be3520d2a652f970593b9"
-        },
-        {
-          "aliases": [],
-          "calculation_strategy": "lut",
-          "created_at": "2023-09-09T20:18:19Z",
-          "device_type": "light",
-          "device_specs": {
-            "socket": "E27",
-            "lumens": 1400,
-            "rated_power": 14.0
-          },
-          "measure_device": "TP-Link Tapo P110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.9.3:docker"
-          },
-          "name": "Ekobi SMART LED E27 14W 1400Lm RGB CCT",
-          "standby_power": 0.46,
-          "authors": [
-            {
-              "name": "mariwing",
-              "email": "mariwing@gmail.com",
-              "github": "mariwing"
-            }
-          ],
-          "id": "KAGS14RGBCTW",
-          "manufacturer": "tuya",
-          "updated_at": "2026-08-29T10:13:07",
-          "max_power": 13.23,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.47,
-            "max": 13.23
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 98.7,
-            "color_temp": 98.7
-          },
-          "hash": "cfb54d1214c31886d1e917e0590e29a1"
-        },
-        {
-          "calculation_strategy": "lut",
           "created_at": "2022-06-05T17:55:15Z",
           "device_type": "light",
           "device_specs": {
@@ -31893,133 +32168,7 @@
           "hash": "278f4b7906ee055e145743eba1fd38dc"
         },
         {
-          "calculation_strategy": "lut",
-          "created_at": "2022-07-17T10:05:09Z",
-          "device_type": "light",
-          "measure_device": "Sonoff S31",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 3,
-            "SLEEP_TIME": 5,
-            "VERSION": "master"
-          },
-          "name": "Treatlife SL20",
-          "standby_power": 0.1,
-          "authors": [
-            {
-              "name": "Kendell R",
-              "github": "KTibow"
-            }
-          ],
-          "id": "SL20",
-          "manufacturer": "tuya",
-          "updated_at": "2026-08-21T10:30:36",
-          "max_power": 8.7,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 1.66,
-            "max": 8.7
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 98.6,
-            "color_temp": 98.6
-          },
-          "hash": "2dbd96431196bef4cc672f6e3ce8b33e"
-        },
-        {
-          "calculation_strategy": "lut",
-          "created_at": "2024-01-08T20:32:28Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "bulb"
-          },
-          "measure_device": "TP-Link Kasa KP115",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.9.14:docker"
-          },
-          "name": "Sunco G25 LED Smart Bulb, WiFi",
-          "standby_power": 0.7,
-          "authors": [
-            {
-              "name": "Emory Penney",
-              "email": "emory.j.penney@intel.com",
-              "github": "ejpenney"
-            }
-          ],
-          "id": "SUNCO-5W_I2C_RGBCW",
-          "manufacturer": "tuya",
-          "updated_at": "2026-08-29T10:13:07",
-          "max_power": 5.43,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 0.41,
-            "max": 5.43
-          },
-          "color_modes": [
-            "color_temp",
-            "hs"
-          ],
-          "lut_quality": {
-            "score": 97.3,
-            "color_temp": 97.3
-          },
-          "hash": "01d25c32343287dbd1975954b51e4502"
-        },
-        {
-          "aliases": [],
-          "calculation_strategy": "lut",
-          "created_at": "2023-09-09T20:18:19Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "fixture",
-            "socket": "integrated",
-            "rated_power": 24.0
-          },
-          "measure_device": "TP-Link Tapo P110",
-          "measure_method": "script",
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.9.3:docker"
-          },
-          "name": "SYLSTAR LED Ceiling Light 24W",
-          "standby_power": 0.73,
-          "authors": [
-            {
-              "name": "mariwing",
-              "email": "mariwing@gmail.com",
-              "github": "mariwing"
-            }
-          ],
-          "id": "SYS-C24W-CW",
-          "manufacturer": "tuya",
-          "updated_at": "2026-08-29T10:24:04",
-          "max_power": 21.37,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
-          "power_range": {
-            "min": 2.56,
-            "max": 21.37
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 99.1,
-            "color_temp": 99.1
-          },
-          "hash": "af47b9394bf3ef7fa7993d9d4feb09ee"
-        },
-        {
-          "name": "T17 infrared header",
+          "name": "Infrared Heater",
           "created_at": "2026-03-02T16:05:27Z",
           "aliases": [
             "jpiit02hwjtwjxnd"
@@ -32041,14 +32190,14 @@
           ],
           "id": "T17",
           "manufacturer": "tuya",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-30T02:52:19",
           "max_power": 3000.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 430.0,
             "max": 3000.0
           },
-          "hash": "07589c748c5b4ad6038fe9bc63ebefae"
+          "hash": "c98e691a157d83df95f03c24312582c0"
         },
         {
           "aliases": [
@@ -32061,7 +32210,7 @@
           "device_type": "smart_switch",
           "measure_device": "PeakTech P 4250 (1 mV/10 mA) with VOLTCRAFT VC270",
           "measure_method": "manual",
-          "name": "Smart plug (with power monitoring)",
+          "name": "Smart Plug with Power Monitoring",
           "only_self_usage": true,
           "standby_power": 0.13,
           "standby_power_on": 0.39,
@@ -32073,14 +32222,14 @@
           ],
           "id": "TS011F",
           "manufacturer": "tuya",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-30T02:52:19",
           "max_power": 0.39,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.39,
             "max": 0.39
           },
-          "hash": "c63b646cd7d7c174a15fd1a375db0c93"
+          "hash": "3d73df037602b7225cb760346a202099"
         },
         {
           "calculation_strategy": "fixed",
@@ -32088,7 +32237,7 @@
           "device_type": "smart_switch",
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "manual",
-          "name": "TS0121_plug",
+          "name": "Smart Plug with Power Monitoring",
           "only_self_usage": true,
           "standby_power": 0.404,
           "standby_power_on": 0.866,
@@ -32101,14 +32250,14 @@
           ],
           "id": "TS0121_plug",
           "manufacturer": "tuya",
-          "updated_at": "2026-08-21T10:30:36",
+          "updated_at": "2026-08-30T02:52:19",
           "max_power": 0.866,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.866,
             "max": 0.866
           },
-          "hash": "19b3c69f86e3be5686659b1d1001b709"
+          "hash": "836c41a05122d378d7942605ec95d634"
         },
         {
           "calculation_strategy": "lut",
@@ -32126,7 +32275,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.2:docker"
           },
-          "name": "Tuya Zigbee 3.0 Bulb E27 RGB+CW+WW 15W",
+          "name": "A60 RGB+CCT Bulb 15W",
           "standby_power": 0.52,
           "authors": [
             {
@@ -32137,7 +32286,7 @@
           ],
           "id": "TY-A60-15W",
           "manufacturer": "tuya",
-          "updated_at": "2026-08-29T10:13:07",
+          "updated_at": "2026-08-30T02:52:19",
           "max_power": 9.32,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-01-27T00:08:34",
@@ -32153,7 +32302,7 @@
             "score": 93.0,
             "color_temp": 93.0
           },
-          "hash": "2be4132ca8e905c1d1465332108236c4"
+          "hash": "5822656e9708700b7900680e30cf71bb"
         },
         {
           "calculation_strategy": "lut",
@@ -32171,7 +32320,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.17.2:docker"
           },
-          "name": "Tuya Zigbee 3.0 Ceiling Lamp RGB+CW+WW 24W",
+          "name": "RGB+CCT Ceiling Light 24W",
           "standby_power": 0.36,
           "authors": [
             {
@@ -32182,7 +32331,7 @@
           ],
           "id": "TYC-300mm-Z",
           "manufacturer": "tuya",
-          "updated_at": "2026-08-29T10:24:04",
+          "updated_at": "2026-08-30T02:52:19",
           "max_power": 20.73,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-01-30T20:00:06",
@@ -32198,13 +32347,13 @@
             "score": 92.6,
             "color_temp": 92.6
           },
-          "hash": "c1f0b2d16cf5720a32949f2938dfa43c"
+          "hash": "284494505a38313df81d373eafb9dbb6"
         }
       ],
       "device_types": [
         "light",
-        "smart_switch",
-        "heating"
+        "heating",
+        "smart_switch"
       ]
     },
     {
