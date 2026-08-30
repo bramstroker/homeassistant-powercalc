@@ -9,7 +9,11 @@
     "socket": "GU10",
     "form_factor": "bulb",
     "lumens": 400,
-    "rated_power": 5.0
+    "rated_power": 5.0,
+    "connectivity": [
+      "wifi",
+      "matter"
+    ]
   },
   "ean": [
     "5902135164174"

@@ -13,7 +13,10 @@
     "socket": "integrated",
     "lumens": 1800,
     "form_factor": "tube",
-    "rated_power": 20.0
+    "rated_power": 20.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S",

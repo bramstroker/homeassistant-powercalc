@@ -9,7 +9,11 @@
     "socket": "E26",
     "form_factor": "bulb",
     "lumens": 1100,
-    "rated_power": 8.1
+    "rated_power": 8.1,
+    "connectivity": [
+      "matter",
+      "thread"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

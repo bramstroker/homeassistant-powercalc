@@ -5,6 +5,11 @@
   "calculation_strategy": "fixed",
   "created_at": "2025-02-02T13:27:12Z",
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ]
+  },
   "legacy_ids": [
     "TRETAKT Smart plug",
     "E22x4"

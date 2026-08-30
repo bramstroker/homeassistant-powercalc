@@ -6,6 +6,11 @@
   "calculation_strategy": "fixed",
   "created_at": "2023-12-31T20:16:31Z",
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ]
+  },
   "legacy_ids": [
     "ASKVADER"
   ],

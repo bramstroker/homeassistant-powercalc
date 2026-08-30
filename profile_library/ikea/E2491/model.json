@@ -5,6 +5,12 @@
   "calculation_strategy": "fixed",
   "created_at": "2026-04-18T23:21:36Z",
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "matter",
+      "thread"
+    ]
+  },
   "measure_description": "Manually measured with a dummy load attached at 25W (average over 600s) and 4 devices, than calculated average of that.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "manual",

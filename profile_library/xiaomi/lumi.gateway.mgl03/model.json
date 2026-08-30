@@ -13,6 +13,16 @@
   ],
   "discovery_by": "device",
   "device_type": "network",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "zigbee",
+      "bluetooth"
+    ]
+  },
+  "ean": [
+    "6934177710872"
+  ],
   "calculation_strategy": "fixed",
   "fixed_config": {
     "power": 1.51

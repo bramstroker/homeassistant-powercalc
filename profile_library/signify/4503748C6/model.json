@@ -9,7 +9,10 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 2200,
-    "rated_power": 40
+    "rated_power": 40,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Hypertec Power-Mate Lite 10A",

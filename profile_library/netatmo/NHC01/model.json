@@ -15,6 +15,12 @@
     "indoor_air_quality_monitor"
   ],
   "device_type": "generic_iot",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
+  },
   "calculation_strategy": "fixed",
   "fixed_config": {
     "power": 0.43

@@ -10,7 +10,10 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 500,
-    "rated_power": 5.0
+    "rated_power": 5.0,
+    "connectivity": [
+      "bluetooth"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",

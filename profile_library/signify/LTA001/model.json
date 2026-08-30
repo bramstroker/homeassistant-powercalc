@@ -10,7 +10,10 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E27",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with script made by smonesi (steps: bri 30/mired 30) and linearly interpolated to provide more data",
   "measure_device": "TP-Link Kasa HS110",

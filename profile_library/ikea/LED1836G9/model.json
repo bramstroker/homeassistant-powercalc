@@ -9,7 +9,10 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 806,
-    "rated_power": 8.9
+    "rated_power": 8.9,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

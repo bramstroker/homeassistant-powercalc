@@ -13,7 +13,10 @@
     "socket": "E14",
     "lumens": 300,
     "rated_power": 4.5,
-    "form_factor": "candle"
+    "form_factor": "candle",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "max_voltage": 231.6,
   "measure_description": "Measured with utils/measure script on a single lamp, using a resistive dummy load (~8.4 W, calibrated warm at 6434.83 ohm) because the power meter drops to 0.0 W below ~0.8 W. Residual scatter around the smoothed curve is sigma 0.042 W. Note that below brightness ~30 the true increment per step (~0.017 W) is smaller than that scatter, so the lowest ~12 % of the table is noise-dominated and not strictly monotonic; the rest resolves cleanly (bri 60-120: +0.32 W = 7.7 sigma, bri 120-255: +1.50 W = 36 sigma).",

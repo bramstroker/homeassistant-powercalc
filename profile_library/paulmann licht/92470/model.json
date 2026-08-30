@@ -19,7 +19,10 @@
     "socket": "integrated",
     "form_factor": "downlight",
     "lumens": 420,
-    "rated_power": 4.9
+    "rated_power": 4.9,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Re-measured 2026-08-15 with utils/measure using 10 identical Base Coin modules from Paulmann article 92466 connected in parallel (MULTIPLE_LIGHTS=true, NUM_LIGHTS=10) on a Shelly 1PM Gen3, because a single module draws below the meter's resolution floor of ~0.8 W. Reported values are per module. color_temp was measured with SAMPLE_COUNT=3 and hs with SAMPLE_COUNT=2; measure_settings below reflects the hs run.",
   "measure_device": "Shelly 1PM Gen3",

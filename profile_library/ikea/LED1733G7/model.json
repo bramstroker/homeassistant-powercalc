@@ -9,7 +9,10 @@
     "socket": "E14",
     "form_factor": "bulb",
     "lumens": 600,
-    "rated_power": 6.6
+    "rated_power": 6.6,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

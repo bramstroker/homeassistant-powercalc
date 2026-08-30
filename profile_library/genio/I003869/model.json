@@ -6,7 +6,10 @@
     "socket": "E27",
     "form_factor": "spot",
     "lumens": 1400,
-    "rated_power": 15
+    "rated_power": 15,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",

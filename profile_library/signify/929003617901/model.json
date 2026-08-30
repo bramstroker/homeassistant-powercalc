@@ -12,7 +12,10 @@
     "socket": "integrated",
     "lumens": 510,
     "form_factor": "spot",
-    "rated_power": 5.3
+    "rated_power": 5.3,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

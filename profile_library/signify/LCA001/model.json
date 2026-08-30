@@ -14,7 +14,10 @@
       "E26",
       "E27"
     ],
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_device": "Shelly Plug S",
   "measure_method": "script",

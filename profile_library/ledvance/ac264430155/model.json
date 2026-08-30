@@ -9,7 +9,10 @@
     "form_factor": "panel",
     "socket": "integrated",
     "lumens": 1600,
-    "rated_power": 20
+    "rated_power": 20,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

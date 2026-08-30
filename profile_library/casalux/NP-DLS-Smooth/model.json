@@ -3,6 +3,9 @@
   "created_at": "2024-10-21T22:17:19Z",
   "device_type": "light",
   "device_specs": {
+    "connectivity": [
+      "infrared"
+    ],
     "socket": "integrated",
     "form_factor": "fixture",
     "lumens": 600,

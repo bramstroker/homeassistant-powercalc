@@ -12,7 +12,10 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 2452,
-    "rated_power": 18.5
+    "rated_power": 18.5,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

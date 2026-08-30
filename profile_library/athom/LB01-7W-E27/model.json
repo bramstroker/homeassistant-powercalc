@@ -10,7 +10,10 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 600,
-    "rated_power": 7.0
+    "rated_power": 7.0,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Athom Smart Plug v2",

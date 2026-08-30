@@ -9,7 +9,10 @@
     ],
     "lumens": 1100,
     "form_factor": "bulb",
-    "rated_power": 12.0
+    "rated_power": 12.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly 1PM",

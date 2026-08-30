@@ -11,7 +11,10 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 470,
-    "rated_power": 5.2
+    "rated_power": 5.2,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus 1PM",

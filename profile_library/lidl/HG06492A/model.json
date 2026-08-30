@@ -6,7 +6,10 @@
     "socket": "GU10",
     "form_factor": "spot",
     "lumens": 350,
-    "rated_power": 5
+    "rated_power": 5,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script with 3 bulbs",
   "measure_device": "Shelly Plus 1PM",

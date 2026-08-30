@@ -9,7 +9,10 @@
     "socket": "GU10",
     "form_factor": "bulb",
     "lumens": 345,
-    "rated_power": 3
+    "rated_power": 3,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script. Used 40W incandescent bulb as dummy load.",
   "measure_device": "Shelly 1PM Mini",

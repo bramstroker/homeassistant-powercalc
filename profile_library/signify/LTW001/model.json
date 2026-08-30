@@ -12,7 +12,10 @@
     "form_factor": "bulb",
     "socket": "E27",
     "lumens": 806,
-    "rated_power": 9.5
+    "rated_power": 9.5,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Used script utils/measure_shelly.py from repository. Standby power is guessed",
   "measure_device": "Shelly Plug S",

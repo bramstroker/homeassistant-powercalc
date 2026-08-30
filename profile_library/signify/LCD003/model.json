@@ -13,7 +13,10 @@
     "socket": "integrated",
     "lumens": 800,
     "rated_power": 8.5,
-    "form_factor": "downlight"
+    "form_factor": "downlight",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script, 2 lights",
   "measure_device": "Shelly 1PM",

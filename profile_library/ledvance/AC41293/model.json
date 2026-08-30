@@ -15,7 +15,10 @@
     "socket": "E27",
     "lumens": 680,
     "form_factor": "filament",
-    "rated_power": 6.0
+    "rated_power": 6.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Sonoff POWR2",

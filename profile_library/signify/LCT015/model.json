@@ -11,7 +11,10 @@
       "E26",
       "E27"
     ],
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "",
   "measure_device": "AVM Fritz!DECT 200",

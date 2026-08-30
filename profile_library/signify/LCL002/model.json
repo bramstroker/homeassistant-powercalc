@@ -10,7 +10,10 @@
     "socket": "integrated",
     "form_factor": "strip",
     "lumens": 850,
-    "rated_power": 19
+    "rated_power": 19,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8718699709839"

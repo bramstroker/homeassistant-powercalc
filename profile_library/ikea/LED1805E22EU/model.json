@@ -6,7 +6,10 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 1000,
-    "rated_power": 22
+    "rated_power": 22,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Nous A1T",

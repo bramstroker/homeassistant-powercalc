@@ -9,7 +9,10 @@
     "socket": "integrated",
     "form_factor": "downlight",
     "lumens": 800,
-    "rated_power": 12.0
+    "rated_power": 12.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "legacy_ids": [
     "LXT56-LS27LX1.7"

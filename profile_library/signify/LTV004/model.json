@@ -14,7 +14,10 @@
     "socket": "E26",
     "lumens": 550,
     "rated_power": 7.0,
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug",

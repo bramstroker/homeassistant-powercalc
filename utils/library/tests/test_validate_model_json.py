@@ -16,12 +16,27 @@ from utils.library.validate_model_json import (
 )
 
 NAME_SCHEMA = {"type": "object", "required": ["name"], "properties": {"name": {"type": "string"}}}
+MODEL_SCHEMA = Path(__file__).parents[3] / "profile_library" / "model_schema.json"
 
 
 def write_json(path: Path, data: object) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data), encoding="utf-8")
     return path
+
+
+def complete_model(device_type: str, **extra: object) -> dict[str, object]:
+    """Return the smallest complete profile for exercising the real model schema."""
+    return {
+        "name": "Example device",
+        "device_type": device_type,
+        "measure_method": "manual",
+        "measure_device": "Shelly PM Mini Gen3",
+        "calculation_strategy": "fixed",
+        "fixed_config": {"power": 5},
+        "created_at": "2026-08-30T00:00:00Z",
+        **extra,
+    }
 
 
 def test_load_json(tmp_path: Path) -> None:
@@ -53,6 +68,52 @@ def test_unreadable_file_is_reported(tmp_path: Path, capsys: pytest.CaptureFixtu
     validate_file(str(path), NAME_SCHEMA)
 
     assert capsys.readouterr().out.startswith(f"ERROR: {path}\nError: ")
+
+
+def test_generic_device_specs_allow_rated_power_and_connectivity(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = write_json(
+        tmp_path / "model.json",
+        complete_model(
+            "smart_speaker",
+            device_specs={"rated_power": 15, "connectivity": ["wifi", "ethernet"]},
+        ),
+    )
+
+    assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is True
+    assert capsys.readouterr().out == f"VALID: {path}\n"
+
+
+def test_connectivity_is_not_allowed_at_the_model_root(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = write_json(tmp_path / "model.json", complete_model("smart_speaker", connectivity=["wifi"]))
+
+    assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is False
+    assert "Additional properties are not allowed ('connectivity' was unexpected)" in capsys.readouterr().out
+
+
+def test_light_specs_extend_generic_device_specs(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    path = write_json(
+        tmp_path / "model.json",
+        complete_model(
+            "light",
+            standby_power=0.2,
+            device_specs={
+                "socket": "E27",
+                "form_factor": "bulb",
+                "lumens": 806,
+                "rated_power": 9.5,
+                "connectivity": ["zigbee"],
+            },
+        ),
+    )
+
+    assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is True
+    assert capsys.readouterr().out == f"VALID: {path}\n"
 
 
 def test_validate_files_with_glob_walks_matches_in_order(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:

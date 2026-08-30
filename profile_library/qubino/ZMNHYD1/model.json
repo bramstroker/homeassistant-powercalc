@@ -5,6 +5,14 @@
   "calculation_strategy": "fixed",
   "created_at": "2022-09-06T08:26:19Z",
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "zwave"
+    ]
+  },
+  "ean": [
+    "3830062071505"
+  ],
   "legacy_ids": [
     "Smart Plug 16A"
   ],

@@ -5,7 +5,10 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "strip",
-    "lumens": 1000
+    "lumens": 1000,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "9348641007943"

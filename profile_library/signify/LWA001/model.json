@@ -14,7 +14,10 @@
     "socket": "E27",
     "lumens": 806,
     "rated_power": 8.5,
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Used script utils/measure_shelly.py from repository, estimated standby",
   "measure_device": "Shelly 1PM",

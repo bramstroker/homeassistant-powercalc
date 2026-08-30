@@ -5,6 +5,15 @@
   "calculation_strategy": "fixed",
   "created_at": "2023-07-03T18:37:40Z",
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "ean": [
+    "5907772033517",
+    "5907772033524"
+  ],
   "measure_description": "Manually measured",
   "measure_device": "Brennenstuhl PM 231 E",
   "measure_method": "manual",

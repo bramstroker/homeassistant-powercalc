@@ -6,7 +6,10 @@
     "socket": "B22",
     "form_factor": "bulb",
     "lumens": 806,
-    "rated_power": 9.5
+    "rated_power": 9.5,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8718781552336"

@@ -6,7 +6,10 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 470,
-    "rated_power": 5.2
+    "rated_power": 5.2,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "linked_profile": "ikea/LED1937T5_E27",
   "measure_description": "Measured with utils/measure script",

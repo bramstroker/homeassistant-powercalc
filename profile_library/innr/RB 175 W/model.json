@@ -5,7 +5,10 @@
   "device_specs": {
     "socket": "E27",
     "form_factor": "bulb",
-    "lumens": 806
+    "lumens": 806,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8718781551254"

@@ -5,7 +5,10 @@
   "device_specs": {
     "socket": "GU10",
     "form_factor": "spot",
-    "lumens": 350
+    "lumens": 350,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured once with script made by bramstroker using 9 sec pauses and partially verified manual",
   "measure_device": "Shelly Plug S",

@@ -9,7 +9,10 @@
     "socket": "E26",
     "form_factor": "filament",
     "lumens": 530,
-    "rated_power": 7.0
+    "rated_power": 7.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "046677551773"

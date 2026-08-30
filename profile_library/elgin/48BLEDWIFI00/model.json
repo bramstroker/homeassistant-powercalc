@@ -9,7 +9,10 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 803,
-    "rated_power": 10
+    "rated_power": 10,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "7897013500022"

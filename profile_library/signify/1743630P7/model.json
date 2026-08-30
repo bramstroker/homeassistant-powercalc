@@ -10,7 +10,10 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 2300,
-    "rated_power": 15
+    "rated_power": 15,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8718696170540"

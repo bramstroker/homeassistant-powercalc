@@ -9,7 +9,11 @@
   "device_specs": {
     "socket": "E26",
     "form_factor": "bulb",
-    "lumens": 1600
+    "lumens": 1600,
+    "connectivity": [
+      "zigbee",
+      "bluetooth"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug",

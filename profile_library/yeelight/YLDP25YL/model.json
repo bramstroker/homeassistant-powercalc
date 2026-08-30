@@ -13,7 +13,10 @@
     ],
     "lumens": 450,
     "form_factor": "bulb",
-    "rated_power": 4.0
+    "rated_power": 4.0,
+    "connectivity": [
+      "bluetooth"
+    ]
   },
   "ean": [
     "6924922205180"

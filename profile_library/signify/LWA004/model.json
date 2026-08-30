@@ -13,7 +13,10 @@
     "socket": "E27",
     "lumens": 550,
     "rated_power": 7.0,
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Used script utils/measure_shelly.py from repository",
   "measure_device": "Shelly Plug S",

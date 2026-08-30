@@ -10,7 +10,10 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 1100,
-    "rated_power": 9
+    "rated_power": 9,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Used script in utils/measure from repository with SAMPLE_COUNT=10",
   "measure_device": "Nous A1",

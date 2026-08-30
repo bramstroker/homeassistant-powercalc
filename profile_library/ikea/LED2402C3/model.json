@@ -10,7 +10,11 @@
     "form_factor": "candle",
     "socket": "E14",
     "lumens": 470,
-    "rated_power": 3.4
+    "rated_power": 3.4,
+    "connectivity": [
+      "matter",
+      "thread"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini Gen3",

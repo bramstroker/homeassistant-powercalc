@@ -5,7 +5,10 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "strip",
-    "rated_power": 7.5
+    "rated_power": 7.5,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "6924922201809",

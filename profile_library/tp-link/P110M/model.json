@@ -6,6 +6,12 @@
   "calculation_strategy": "fixed",
   "created_at": "2026-01-21T16:14:00Z",
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "matter"
+    ]
+  },
   "measure_description": "Manually measured.",
   "measure_device": "Shelly EM Mini Gen4",
   "measure_method": "manual",

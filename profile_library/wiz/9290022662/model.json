@@ -9,7 +9,10 @@
     "socket": "E26",
     "form_factor": "filament",
     "lumens": 350,
-    "rated_power": 3.8
+    "rated_power": 3.8,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "8718699785079"

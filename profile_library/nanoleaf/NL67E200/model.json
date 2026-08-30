@@ -11,7 +11,11 @@
     "socket": "E27",
     "form_factor": "bulb",
     "lumens": 806,
-    "rated_power": 9.0
+    "rated_power": 9.0,
+    "connectivity": [
+      "matter",
+      "thread"
+    ]
   },
   "ean": [
     "4897105331346",

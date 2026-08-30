@@ -12,7 +12,10 @@
     "socket": "E26",
     "lumens": 1200,
     "rated_power": 12.5,
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Third Reality 3RSP02028BZ",

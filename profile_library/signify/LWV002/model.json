@@ -13,7 +13,10 @@
     "socket": "E26",
     "lumens": 530,
     "rated_power": 7.0,
-    "form_factor": "filament"
+    "form_factor": "filament",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "linked_profile": "signify/LWV001",
   "measure_description": "Measure Script for Tasmota",

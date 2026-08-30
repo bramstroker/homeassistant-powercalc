@@ -5,7 +5,10 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "strip",
-    "rated_power": 22
+    "rated_power": 22,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "4056233505214"

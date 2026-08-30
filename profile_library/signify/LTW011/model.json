@@ -8,7 +8,10 @@
   "device_specs": {
     "socket": "E26",
     "lumens": 680,
-    "form_factor": "spot"
+    "form_factor": "spot",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Sonoff S31",

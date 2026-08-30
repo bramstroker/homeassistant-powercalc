@@ -12,6 +12,12 @@
   "compatible_integrations": [
     "dreame_vacuum"
   ],
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ],
+    "rated_power": 75
+  },
   "composite_config": {
     "mode": "sum_all",
     "strategies": [

@@ -7,7 +7,10 @@
   "device_type": "light",
   "device_specs": {
     "socket": "E26",
-    "form_factor": "bulb"
+    "form_factor": "bulb",
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script.  Controller: hue, Bulbs: 3, Dummy Load: None",
   "measure_device": "TP-Link Kasa KP115",

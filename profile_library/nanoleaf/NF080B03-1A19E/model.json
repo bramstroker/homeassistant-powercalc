@@ -10,7 +10,11 @@
     "socket": "E26",
     "form_factor": "bulb",
     "lumens": 1100,
-    "rated_power": 9.0
+    "rated_power": 9.0,
+    "connectivity": [
+      "matter",
+      "thread"
+    ]
   },
   "ean": [
     "4897105331322",

@@ -9,7 +9,10 @@
     "socket": "GU10",
     "form_factor": "spot",
     "lumens": 1400,
-    "rated_power": 22.8
+    "rated_power": 22.8,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "8718696171554"

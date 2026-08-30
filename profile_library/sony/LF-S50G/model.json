@@ -3,6 +3,19 @@
   "calculation_strategy": "linear",
   "created_at": "2025-08-27T11:10:15Z",
   "device_type": "smart_speaker",
+  "ean": [
+    "027242908031",
+    "4548736066137",
+    "4548736066144",
+    "4548736066151"
+  ],
+  "device_specs": {
+    "rated_power": 8.0,
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
+  },
   "linear_config": {
     "calibrate": [
       "0 -> 3.79",

@@ -5,7 +5,10 @@
   "device_specs": {
     "socket": "integrated",
     "form_factor": "tube",
-    "rated_power": 7.0
+    "rated_power": 7.0,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Tapo P110",

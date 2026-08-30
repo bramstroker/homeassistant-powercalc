@@ -8,6 +8,11 @@
     "zigbee_switch_1_gang"
   ],
   "device_type": "smart_switch",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ]
+  },
   "calculation_strategy": "fixed",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",

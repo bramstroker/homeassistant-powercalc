@@ -9,7 +9,10 @@
     "form_factor": "candle",
     "socket": "E14",
     "lumens": 470,
-    "rated_power": 6.0
+    "rated_power": 6.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "4052899947214"

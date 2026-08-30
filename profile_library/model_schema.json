@@ -76,26 +76,6 @@
       },
       "description": "List of compatible integrations for this model"
     },
-    "connectivity": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "enum": [
-          "zigbee",
-          "wifi",
-          "zwave",
-          "matter",
-          "thread",
-          "bluetooth",
-          "ethernet",
-          "rf433",
-          "infrared",
-          "proprietary"
-        ]
-      },
-      "description": "Protocols the device communicates over"
-    },
     "ean": {
       "type": "array",
       "uniqueItems": true,
@@ -236,8 +216,7 @@
       "description": "Type of device"
     },
     "device_specs": {
-      "type": "object",
-      "description": "Physical attributes of the device itself, as printed on the box or datasheet. Which keys are allowed depends on device_type; see the definitions for the ones already described"
+      "$ref": "#/definitions/generic_specs"
     },
     "discovery_by": {
       "type": "string",
@@ -602,55 +581,88 @@
         "integrated"
       ]
     },
-    "light_specs": {
+    "generic_specs": {
       "type": "object",
-      "description": "device_specs of a light. Manufacturer claims, not measurements: rated_power is what the box says, max_power in the library index is what was measured",
+      "description": "Manufacturer specifications shared by all device types",
       "properties": {
-        "socket": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/light_socket"
-            },
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/light_socket"
-              },
-              "minItems": 2,
-              "uniqueItems": true
-            }
-          ],
-          "description": "Lamp base or bases the bulb fits, or integrated when the light source is not replaceable"
-        },
-        "form_factor": {
-          "type": "string",
-          "enum": [
-            "bulb",
-            "spot",
-            "candle",
-            "globe",
-            "filament",
-            "strip",
-            "panel",
-            "downlight",
-            "tube",
-            "fixture",
-            "other"
-          ],
-          "description": "Shape of the light"
-        },
-        "lumens": {
-          "type": "number",
-          "exclusiveMinimum": 0,
-          "description": "Nominal luminous flux at full brightness, in lumens"
-        },
         "rated_power": {
           "type": "number",
           "exclusiveMinimum": 0,
           "description": "Power draw claimed by the manufacturer, in watts"
+        },
+        "connectivity": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "zigbee",
+              "wifi",
+              "zwave",
+              "matter",
+              "thread",
+              "bluetooth",
+              "ethernet",
+              "rf433",
+              "infrared",
+              "proprietary"
+            ]
+          },
+          "description": "Protocols the device communicates over"
         }
-      },
-      "additionalProperties": false
+      }
+    },
+    "light_specs": {
+      "description": "device_specs of a light. Manufacturer claims, not measurements: rated_power is what the box says, max_power in the library index is what was measured",
+      "allOf": [
+        {
+          "$ref": "#/definitions/generic_specs"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "socket": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/light_socket"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/light_socket"
+                  },
+                  "minItems": 2,
+                  "uniqueItems": true
+                }
+              ],
+              "description": "Lamp base or bases the bulb fits, or integrated when the light source is not replaceable"
+            },
+            "form_factor": {
+              "type": "string",
+              "enum": [
+                "bulb",
+                "spot",
+                "candle",
+                "globe",
+                "filament",
+                "strip",
+                "panel",
+                "downlight",
+                "tube",
+                "fixture",
+                "other"
+              ],
+              "description": "Shape of the light"
+            },
+            "lumens": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Nominal luminous flux at full brightness, in lumens"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
     },
     "sensor_naming_option": {
       "description": "Naming options a profile must not set. Sensor naming is a user preference, configured globally or per sensor.",

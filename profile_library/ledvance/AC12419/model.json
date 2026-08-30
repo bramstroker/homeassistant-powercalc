@@ -16,7 +16,10 @@
     "form_factor": "other",
     "socket": "E27",
     "lumens": 2000,
-    "rated_power": 22.0
+    "rated_power": 22.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured twice with script made by bramstroker and partially verified manual",
   "measure_device": "Shelly Plug S",

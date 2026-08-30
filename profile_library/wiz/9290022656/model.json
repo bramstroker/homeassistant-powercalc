@@ -9,7 +9,10 @@
     "socket": "E26",
     "form_factor": "bulb",
     "lumens": 800,
-    "rated_power": 8.8
+    "rated_power": 8.8,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "046677556136"

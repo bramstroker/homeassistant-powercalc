@@ -10,7 +10,10 @@
       "B22"
     ],
     "lumens": 800,
-    "rated_power": 9.5
+    "rated_power": 9.5,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "ean": [
     "745883668373"

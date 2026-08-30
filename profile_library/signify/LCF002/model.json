@@ -14,7 +14,10 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 590,
-    "rated_power": 8.0
+    "rated_power": 8.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measure Script for Tasmota",
   "measure_device": "Gosund SP111",

@@ -9,7 +9,10 @@
     "socket": "integrated",
     "form_factor": "strip",
     "lumens": 640,
-    "rated_power": 5
+    "rated_power": 5,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "legacy_ids": [
     "ORMANAS LED Strip"

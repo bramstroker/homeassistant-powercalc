@@ -13,7 +13,10 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 1500,
-    "rated_power": 20.0
+    "rated_power": 20.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S Gen2",

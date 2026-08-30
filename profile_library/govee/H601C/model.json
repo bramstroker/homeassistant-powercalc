@@ -6,7 +6,11 @@
     "socket": "integrated",
     "form_factor": "downlight",
     "lumens": 1000,
-    "rated_power": 13
+    "rated_power": 13,
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
   },
   "ean": [
     "810088347191",

@@ -9,7 +9,10 @@
     "socket": "integrated",
     "form_factor": "downlight",
     "lumens": 900,
-    "rated_power": 10.0
+    "rated_power": 10.0,
+    "connectivity": [
+      "zigbee"
+    ]
   },
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Aziot 10A Smart Plug",
