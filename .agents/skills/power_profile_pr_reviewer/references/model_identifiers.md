@@ -710,7 +710,7 @@ Use `KLF 200`, including its space, for the gateway profile: Home Assistant regi
 
 Keep exact VeSync discovery models such as `Core200S`, `Core300S`, and `Core400S` as the canonical profile IDs. Official Levoit pages may format the same family with a space or a retail `-P` suffix; do not add those variants as aliases unless Home Assistant reports them. Use the concise product name `Smart Air Purifier` without repeating the model or either brand.
 
-The VeSync integration can expose preset modes without a usable percentage. Preserve a measured, device-specific fixed mapping for such a mode instead of deriving it from the manual fan-speed states; for example, a deliberately conservative auto-mode value may be appropriate when the device controls its own speed and HA reports no percentage.
+The VeSync integration can expose preset modes without a usable percentage. Preserve a measured, device-specific fixed mapping for such a mode instead of deriving it from the manual fan-speed states; for example, a deliberately conservative auto-mode value may be appropriate when the device controls its own speed and HA reports no percentage. Levoit can revise the rated power under the same `Core...S` family. When the measured maximum closely matches an official manual or regulatory rating, keep that measured revision's rating; a lower current store-page value establishes a later revision and does not by itself require contributor follow-up.
 
 ## Wyze
 
