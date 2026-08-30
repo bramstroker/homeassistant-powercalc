@@ -56,6 +56,7 @@ If no unique identifier can be established, request manual verification. If the 
 | Arlec | Printed individual-device codes such as `ALD295HA`, `GLD130HA`, and `PC191HA` | Official Arlec product page and specifications, product or packaging label, then HA Device Info and the original profile PR | Pack suffixes such as `P3` and `P5` normally identify a package SKU rather than the physical device, but retain them as aliases when HA can report them. Follow the detailed Arlec guidance below. |
 | Athom | Hardware article/model codes such as `LB01-7W-E27` and `PG05V2-AU10A` | Athom product page or label, official Athom firmware configuration, original profile PR, then ESPHome Devices as corroboration | ESPHome project names are split into manufacturer and model by Home Assistant. Preserve the exact resulting values rather than the full dotted project name. Follow the detailed Athom guidance below. |
 | Bang & Olufsen / Beoplay | Preserve the exact official product name, such as `Beoplay M5` or `Beosound Edge`, when no printed manufacturer model/type number has been verified | Product label/manual and official Bang & Olufsen support page; then exact HA Device Info and the originating integration | Older speakers can be exposed with values such as `2714 CA16` or `6661 S53`; preserve confirmed exact values as discovery aliases, not automatic canonical article numbers. Follow the detailed Bang & Olufsen guidance below. |
+| Belkin / Wemo | Exact printed Belkin model codes such as `F7C063` | Official Belkin product support and product label, then exact HA Device Info and the original profile PR | Keep Wemo marketing names descriptive and separate from the model code. Follow the concise Belkin guidance below. |
 | Bosch | Official device type designations such as `BSHC-1`, `BSP-EZ`, and `BSP-FZ` | Official Bosch product data and manuals; then HA Device Info and the Bosch local API | Values such as `SmartHomeController` and `PLUG_COMPACT` are discovery identifiers rather than preferable canonical type codes. Follow the concise Bosch guidance below. |
 | Bose | Official Bose type/model designations such as `416776` and `421650` | Bose owner guides and declarations; then HA Device Info and the SoundTouch device API | Regional product numbers such as `767520-2100` are not preferable canonical IDs. Preserve exact SoundTouch type names and `Bose Corporation` as discovery aliases. Follow the concise Bose guidance below. |
 | Calex | Official numeric product codes such as `5101002000` | Official Calex product page, declaration and product label; then exact HA Device Info | Calex publishes the product code and EAN separately. Do not treat the product code as a barcode. Follow the concise Calex guidance below. |
@@ -254,9 +255,15 @@ Apply these rules when reviewing or normalizing Bang & Olufsen speaker profiles:
 6. Because the model is already shown separately, keep `name` concise and descriptive without repeating the directory ID. Prefer a manufacturer-supported product category such as `Wireless Speaker`, `360° Speaker`, `Multiroom Speaker`, or `Bookshelf Speaker`, and avoid subjective slogans such as “powerful” or “premium”. For speaker calibration, investigate unexpected non-monotonic volume curves, but retain a contributor-verified behavior such as device protection reducing output at maximum volume when the original PR documents a repeat measurement and explanation.
 When the printed type code, official product name, and integration-reported model cannot be reconciled, keep the established profile available and ask for the product label, exact Home Assistant `manufacturer`, `model`, and `model_id`, the originating integration, and the product generation or variant.
 
+## Belkin / Wemo
+
+Prefer the exact printed Belkin model code as canonical and use the Wemo product wording for the descriptive name. For `F7C063`, Belkin states that both standby and active command handling consume below 3W. Record the documented upper bound as `rated_power: 3`; keep it distinct from the 1800W resistive-load limit.
+
 ## Bosch
 
 Prefer Bosch's official device type designation as the canonical ID. Preserve exact Home Assistant or Bosch API values such as `SmartHomeController` and `PLUG_COMPACT` in `aliases`. For the Smart Plug Compact profile, use `BSP-EZ` canonically and retain `BSP-FZ` and `PLUG_COMPACT` as aliases because Bosch documents both plug variants together with the same electrical specifications. Use concise display names without repeating `Bosch`.
+
+Bosch's combined `BSP-EZ`/`BSP-FZ` manual specifies standby consumption below 1W. Record that documented upper bound as `rated_power: 1`; keep it distinct from the 3680W maximum switchable load.
 
 ## Bose
 
@@ -325,6 +332,8 @@ Prefer a specific printed product code or exact integration model such as `SA-00
 Prefer the official FIBARO model family code and the exact Z-Wave JS label, such as `FGWP-102`, over a punctuation-stripped directory ID. Keep `Fibargroup` as a manufacturer alias when Z-Wave JS reports it. When migrating an established value such as `FGWP102`, retain it in both `legacy_ids` and `aliases` if it was historically used for profile selection or discovery. Do not infer regional suffixed product codes from the base family unless the product label or Z-Wave JS configuration confirms the variant and the measurements apply to it.
 
 For a Wall Plug with built-in power metering, use `only_self_usage: true`. Its own consumption may be included in Z-Wave meter reports when the device is configured accordingly; document that setup and retain the explicitly reported relay-off and relay-on values. Cite the exact measurement contribution rather than a discussion entry that says the device was not measured.
+
+An official family manual can establish shared electrical metadata for regional variants when its scope explicitly names that family. For example, the `FGWPx-102` operating manual applies to `FGWP-102` and specifies up to 0.8W own consumption; do not substitute a figure from another Wall Plug generation.
 
 ## Free
 
@@ -592,9 +601,13 @@ Use the exact printed Z-Wave product model as canonical and do not infer regiona
 
 Prefer the exact printed NodOn product code when the measured socket variant is known. When historical evidence establishes only the Z-Wave-certified family model, retain the exact discovery identifier such as `MSP-3-1-X1` rather than guessing a Type E or Schuko suffix. Preserve `ID-RF` as an exact Z-Wave manufacturer alias. A profile with `only_self_usage` represents the plug's own relay-off and relay-on consumption, not its metered downstream load.
 
+The official `MSP-3-1-x1` family user guide specifies self-consumption below 1W. Record that documented upper bound as `rated_power: 1`; it is separate from the 1800W continuous resistive-load limit.
+
 ## NOUS
 
 Use NOUS's official A-series product code as canonical and retain the uppercase brand styling. A Tasmota device may report a branded template name such as `NOUS A1T`; preserve that exact value as a model alias, but never add generic firmware name `Tasmota` as a manufacturer alias. For Tuya-based Zigbee products, a generic model such as `TS011F` is safe only in combination with the exact manufacturer signature confirmed for the measured product, such as `_TZ3000_2putqrmw` for A1Z. Physical similarity to another Tuya plug such as BSD29 does not establish identity or justify an alias. A metering-socket profile with `only_self_usage` records only the socket electronics and relay consumption, not the attached load.
+
+NOUS publishes 0.53W standby consumption for A1T and 0.5W for A1Z. Use those exact values as `rated_power`, including in historical duplicate manufacturer paths that contain the same product profile; do not substitute the 2500W switchable-load limit.
 
 ## Nuki
 
@@ -611,6 +624,8 @@ Use the exact regional model reported by the device and printed on its label, su
 ## Qubino
 
 Prefer the exact Qubino ordering/model code printed for the measured regional device, such as `ZMNHYD1`, over the product-family name. Qubino distinguishes sibling suffixes by Z-Wave frequency, so do not add `ZMNHYD4`, `ZMNHYDA`, `ZMNHYDB`, or `ZMNHYDE` without evidence for the measured hardware. Z-Wave JS exposes the shared fingerprint `0x0002:0x0054` as `Smart Plug 16A`; preserve that exact label as a discovery alias. Keep the official product-family wording as the descriptive profile `name`.
+
+For self-usage metadata, Qubino's exact Smart Plug 16A specifications publish power consumption below 1W. Record the documented upper bound as `rated_power: 1`; do not confuse it with the separate 16A switchable-load rating.
 
 ## Reolink
 
@@ -655,6 +670,8 @@ Signify can reuse a base 12NC for a later, lower-power optical revision. A dated
 Do not retain a sibling's raw model code or normalized article code merely because an older mapping grouped it: once a distinct measured profile exists and the source mapping identifies it separately, remove the stale values from the sibling profile. For example, `LCA005` and `9290022266A` belong to the measured `LCA005` profile and must not remain aliases of `LCA001`. Preserve former released directory IDs in `legacy_ids` independently of discovery aliases. Multi-endpoint suffixes such as `_01` and `_02` are aliases only when the integration reports them for that exact luminaire.
 
 Map light metadata through the exact Hue model, 12NC/article and region using Signify's official compatibility tables, product sheets, EPREL records, or product pages. Store verified single- and multipack barcodes when every pack contains that exact model. Do not add a newer revision's EAN merely because nominal specifications look equal, and resolve any existing article-alias collision before attaching metadata to either profile.
+
+The same exact-article rule applies to Hue accessories. Signify's own product sheets map Smart Plug 12NC `929002240401` to EAN `8718699689285` and 12NC `929003050601` to EAN `8719514342309`; these mappings support `LOM001` and `LOM007` respectively. A product-page power value of `2300` for these plugs is maximum switchable load, not the plug's own `rated_power`.
 
 Prefer an exact EAN/12NC product page over an unqualified family-level catalog value when they conflict. Compare like electrical quantities: a measured AC mains input may legitimately exceed a power supply's rated DC output because of conversion losses, so that comparison alone does not invalidate the exact product's published light or load wattage.
 
@@ -896,6 +913,7 @@ When the printed article number, S-code, product name, or generation cannot be r
 - [Home Assistant's Bang & Olufsen setup](https://github.com/home-assistant/core/blob/dev/homeassistant/components/bang_olufsen/__init__.py) registers the manufacturer as `Bang & Olufsen` and the selected model as device information.
 - [The original Beoplay M5 profile PR](https://github.com/bramstroker/homeassistant-powercalc/pull/3969) records `2714 CA16` as its Home Assistant Device Info model.
 - [The original Beosound Edge profile PR](https://github.com/bramstroker/homeassistant-powercalc/pull/3967) records `6661 S53` as its Home Assistant Device Info model.
+- [Belkin's official F7C063 support article](https://www.belkin.com/support-article?articleNum=226110) identifies the Wemo Mini Smart Plug and specifies less than 3W consumption in standby and while handling commands.
 - [Bosch's software and security update table](https://www.bosch-smarthome.com/nl/nl/software-securityupdates/) identifies `BSHC-1` as the first-generation controller's type designation.
 - [Bosch's Smart Plug Compact manual](https://www.bosch-smarthome.com/rom/plug-manual) documents `BSP-EZ` and `BSP-FZ` as device type designations with matching electrical specifications.
 - [Bose's SoundTouch 10 owner guide](https://assets.bose.com/content/dam/Bose_DAM/Web/consumer_electronics/global/products/speakers/soundtouch_10_wireless_music_system/pdf/785169_og_soundtouch-10-wireless-system_en.pdf) documents type designation `416776`.

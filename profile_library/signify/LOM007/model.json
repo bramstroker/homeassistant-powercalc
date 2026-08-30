@@ -10,6 +10,9 @@
       "zigbee"
     ]
   },
+  "ean": [
+    "8719514342309"
+  ],
   "measure_description": "Manually measured. Copied from LOM001",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",

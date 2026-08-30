@@ -9,7 +9,8 @@
   "device_specs": {
     "connectivity": [
       "zigbee"
-    ]
+    ],
+    "rated_power": 1
   },
   "legacy_ids": [
     "PLUG_COMPACT"

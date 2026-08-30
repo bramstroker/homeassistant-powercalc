@@ -8,7 +8,8 @@
   "device_specs": {
     "connectivity": [
       "zwave"
-    ]
+    ],
+    "rated_power": 1
   },
   "ean": [
     "3830062071505"

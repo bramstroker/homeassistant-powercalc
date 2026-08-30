@@ -8,7 +8,8 @@
   "device_specs": {
     "connectivity": [
       "wifi"
-    ]
+    ],
+    "rated_power": 0.53
   },
   "ean": [
     "5907772033722",

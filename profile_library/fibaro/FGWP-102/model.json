@@ -8,7 +8,8 @@
   "device_specs": {
     "connectivity": [
       "zwave"
-    ]
+    ],
+    "rated_power": 0.8
   },
   "legacy_ids": [
     "FGWP102"
