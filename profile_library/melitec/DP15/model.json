@@ -6,7 +6,10 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 1200,
-    "rated_power": 19.0
+    "rated_power": 19.0,
+    "connectivity": [
+      "wifi"
+    ]
   },
   "ean": [
     "4047247308793"
