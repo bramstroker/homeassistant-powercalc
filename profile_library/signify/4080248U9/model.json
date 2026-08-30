@@ -4,7 +4,8 @@
     "915005987101",
     "915005987201",
     "929003479701",
-    "915005987701"
+    "915005987701",
+    "915005987801"
   ],
   "calculation_strategy": "lut",
   "created_at": "2024-05-20T22:38:20Z",
@@ -12,10 +13,19 @@
   "device_specs": {
     "form_factor": "fixture",
     "socket": "integrated",
+    "lumens": 2550,
+    "rated_power": 29,
     "connectivity": [
       "zigbee"
     ]
   },
+  "ean": [
+    "8718696176252",
+    "8718696176269",
+    "8718696176276",
+    "8718696176283",
+    "8719514433526"
+  ],
   "measure_description": "Measured with utils/measure script",
   "measure_device": "GW Instek GPM-8213",
   "measure_method": "script",
