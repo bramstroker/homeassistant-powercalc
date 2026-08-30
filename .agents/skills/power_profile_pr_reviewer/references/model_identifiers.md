@@ -380,7 +380,7 @@ Prefer the exact printed regional PowerNode model when the measured hardware is 
 
 ## Hampton Bay
 
-Use the exact model from the product label, official Home Depot product data or Hampton Bay guide and Home Assistant Device Info. Preserve distinctions that affect consumption, including string length, bulb count and RGBW capability, in the display name. `Hubspace` is the control platform and an official product-name qualifier, not automatically a manufacturer alias; likewise, do not add an underlying supplier such as Novolink unless Home Assistant reports it. Treat finish suffixes and longer sibling strings as separate models until official specifications and measurements establish electrical equivalence. Keep a discovery remark when dynamic effects cannot be represented by the available LUT strategy.
+Use the exact model from the product label, official Home Depot product data or Hampton Bay guide and Home Assistant Device Info. Preserve distinctions that affect consumption, including string length, bulb count and RGBW capability, in the display name. `Hubspace` is the control platform and an official product-name qualifier, not automatically a manufacturer alias; likewise, do not add an underlying supplier such as Novolink unless Home Assistant reports it. Treat finish suffixes and longer sibling strings as separate models until official specifications and measurements establish electrical equivalence. Home Depot's unqualified `Lumens` field for these string-light products describes the complete string: verify this by comparing otherwise equivalent bulb-count/length variants rather than multiplying the value by the bulb count. Keep a discovery remark when dynamic effects cannot be represented by the available LUT strategy.
 
 ## Harman Kardon
 

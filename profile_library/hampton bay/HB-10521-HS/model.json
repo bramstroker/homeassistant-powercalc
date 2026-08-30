@@ -9,7 +9,8 @@
     "connectivity": [
       "wifi",
       "bluetooth"
-    ]
+    ],
+    "lumens": 85
   },
   "ean": [
     "850008271212"
