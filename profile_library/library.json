@@ -14462,11 +14462,15 @@
           "device_specs": {
             "form_factor": "fixture",
             "socket": "integrated",
+            "lumens": 1000,
             "rated_power": 14,
             "connectivity": [
               "zigbee"
             ]
           },
+          "ean": [
+            "4055334487290"
+          ],
           "measure_device": "Shelly Plug",
           "measure_method": "script",
           "measure_settings": {
@@ -14485,7 +14489,7 @@
           ],
           "id": "14158804L",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-30T14:18:28",
           "max_power": 10.54,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-06-13T14:19:28",
@@ -14501,7 +14505,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "a459e350343e863d89ac825b09d50594"
+          "hash": "e47f38ef04899fe6967f76d2578ae0aa"
         },
         {
           "calculation_strategy": "lut",
