@@ -70,8 +70,8 @@ jobs:
         run: >-
           uv run --locked --project ../base --only-group library --no-build
           python ../base/.github/scripts/profile_library/validate_model_json.py
-          --model-schema ../base/profile_library/model_schema.json
-          --manufacturer-schema ../base/profile_library/manufacturer_schema.json
+          --model-schema profile_library/model_schema.json
+          --manufacturer-schema profile_library/manufacturer_schema.json
           --changed-files changed_files.json
           --report ../validation-result/model_json_validation_report.md
           --status ../validation-result/model_json_validation_status.txt
