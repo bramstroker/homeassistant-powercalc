@@ -6,6 +6,9 @@
   "calculation_strategy": "lut",
   "created_at": "2024-06-28T05:13:51Z",
   "device_type": "light",
+  "ean": [
+    "046677555689"
+  ],
   "device_specs": {
     "socket": "E26",
     "form_factor": "bulb",

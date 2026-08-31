@@ -3,6 +3,7 @@
   "created_at": "2026-04-17T10:48:22Z",
   "device_type": "network",
   "device_specs": {
+    "form_factor": "router",
     "rated_power": 34,
     "connectivity": [
       "wifi",

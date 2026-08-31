@@ -16,6 +16,9 @@
       "bluetooth"
     ]
   },
+  "ean": [
+    "3800235261613"
+  ],
   "discovery_by": "device",
   "measure_description": "Manually measured. Transcribed from https://www.youtube.com/watch?v=ZXC4vft57gU",
   "measure_device": "GW Instek GPM-8310",

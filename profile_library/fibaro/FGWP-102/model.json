@@ -6,11 +6,16 @@
   "created_at": "2022-09-06T08:26:19Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
     "connectivity": [
       "zwave"
     ],
     "rated_power": 0.8
   },
+  "ean": [
+    "5902020528647"
+  ],
   "legacy_ids": [
     "FGWP102"
   ],

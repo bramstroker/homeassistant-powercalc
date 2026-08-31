@@ -10,10 +10,15 @@
   "created_at": "2024-01-09T21:22:00Z",
   "device_type": "smart_dimmer",
   "device_specs": {
+    "form_factor": "in_wall",
+    "power_monitoring": true,
     "connectivity": [
       "wifi"
     ]
   },
+  "ean": [
+    "3809511202166"
+  ],
   "discovery_by": "entity",
   "measure_description": "The measured device fw: 1.14.1-rc1, Eco Mode enabled, Wifi Client enabled, LED disabled. The result represents the average value of measurements collected from the measurement device API for the following scenarios: dumb device/baseline consumption (~4.9W), the device consumption (same regardless dimming level)",
   "measure_device": "Shelly PM Mini Gen3",

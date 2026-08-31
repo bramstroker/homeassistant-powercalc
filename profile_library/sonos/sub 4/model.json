@@ -8,6 +8,7 @@
     "8720862503717"
   ],
   "device_specs": {
+    "form_factor": "subwoofer",
     "connectivity": [
       "wifi",
       "ethernet"

@@ -6,10 +6,16 @@
   "created_at": "2025-07-16T04:50:00Z",
   "device_type": "smart_dimmer",
   "device_specs": {
+    "form_factor": "plug",
+    "max_load_watts": 300,
+    "power_monitoring": false,
     "connectivity": [
       "proprietary"
     ]
   },
+  "ean": [
+    "784276072069"
+  ],
   "discovery_by": "entity",
   "measure_description": "Measured no-load self-consumption using a Shelly Plus Plug. During a 120-second standby sample, three readings were 0.1 W and the remaining readings were 0 W.",
   "measure_device": "Shelly Plus Plug",

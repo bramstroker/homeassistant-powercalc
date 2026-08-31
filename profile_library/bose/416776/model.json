@@ -7,11 +7,15 @@
   "created_at": "2023-03-10T17:14:51Z",
   "device_type": "smart_speaker",
   "device_specs": {
+    "form_factor": "speaker",
     "connectivity": [
       "wifi",
       "bluetooth"
     ]
   },
+  "ean": [
+    "017817692342"
+  ],
   "linear_config": {
     "calibrate": [
       "10 -> 2.94",

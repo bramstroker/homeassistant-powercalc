@@ -11,12 +11,17 @@
   "created_at": "2024-01-09T19:21:00Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "in_wall",
+    "power_monitoring": true,
     "rated_power": 1.2,
     "connectivity": [
       "wifi",
       "bluetooth"
     ]
   },
+  "ean": [
+    "3800235265017"
+  ],
   "discovery_by": "entity",
   "measure_description": "Measured with 7.5W (average over 300s) dummy load over 300s and calculated average. Multiple combinations of settings were tested. Firmware version 1.44",
   "measure_device": "Shelly PM Mini Gen3",

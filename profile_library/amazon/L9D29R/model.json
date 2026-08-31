@@ -8,12 +8,22 @@
   "created_at": "2026-01-06T15:18:39Z",
   "device_type": "smart_speaker",
   "device_specs": {
+    "form_factor": "speaker",
     "connectivity": [
       "zigbee",
       "wifi",
       "bluetooth"
     ]
   },
+  "ean": [
+    "841667135090",
+    "841667139326",
+    "841667164304",
+    "841667166025",
+    "841667174600",
+    "841667191089",
+    "841667197616"
+  ],
   "linear_config": {
     "calibrate": [
       "10 -> 3.51",

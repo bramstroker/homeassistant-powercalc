@@ -18,6 +18,9 @@
     ],
     "rated_power": 75
   },
+  "ean": [
+    "6977328064615"
+  ],
   "composite_config": {
     "mode": "sum_all",
     "strategies": [

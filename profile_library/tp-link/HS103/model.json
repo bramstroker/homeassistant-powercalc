@@ -3,10 +3,15 @@
   "created_at": "2025-01-17T10:00:00Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": false,
     "connectivity": [
       "wifi"
     ]
   },
+  "ean": [
+    "845973084141"
+  ],
   "measure_description": "Manually measured.",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",

@@ -15,6 +15,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "6941377726510"
+  ],
   "composite_config": [
     {
       "condition": {

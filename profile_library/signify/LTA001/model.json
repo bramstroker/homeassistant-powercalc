@@ -9,6 +9,8 @@
   "created_at": "2021-08-21T14:47:39Z",
   "device_type": "light",
   "device_specs": {
+    "rated_power": 8.5,
+    "lumens": 806,
     "socket": "E27",
     "form_factor": "bulb",
     "connectivity": [

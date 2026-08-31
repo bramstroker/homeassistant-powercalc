@@ -5,6 +5,9 @@
   "description": "Homematic IP trailing-edge dimming actuator for brand switch systems. This profile only models the dimmer's self-consumption; configure the connected load separately.",
   "device_type": "smart_dimmer",
   "device_specs": {
+    "form_factor": "wall_switch",
+    "max_load_watts": 80,
+    "power_monitoring": false,
     "rated_power": 0.4,
     "connectivity": [
       "proprietary"

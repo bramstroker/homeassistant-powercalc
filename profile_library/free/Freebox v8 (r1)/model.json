@@ -6,6 +6,7 @@
   "created_at": "2025-10-12T09:03:14Z",
   "device_type": "network",
   "device_specs": {
+    "form_factor": "router",
     "connectivity": [
       "wifi"
     ]

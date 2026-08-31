@@ -7,6 +7,8 @@
   "created_at": "2025-07-14T23:55:00Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
     "connectivity": [
       "zwave"
     ]

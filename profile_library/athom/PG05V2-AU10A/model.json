@@ -8,6 +8,8 @@
   "created_at": "2024-01-09T21:37:04Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
     "connectivity": [
       "wifi"
     ]

@@ -3,11 +3,17 @@
   "created_at": "2022-10-04T18:58:32Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
     "connectivity": [
       "zwave"
     ],
     "rated_power": 1
   },
+  "ean": [
+    "3700313920596",
+    "3700313920602"
+  ],
   "measure_description": "Manually measured",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",

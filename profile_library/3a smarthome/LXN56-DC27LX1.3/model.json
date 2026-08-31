@@ -3,6 +3,8 @@
   "created_at": "2024-12-13T16:30:00Z",
   "device_type": "smart_dimmer",
   "device_specs": {
+    "form_factor": "inline",
+    "power_monitoring": false,
     "connectivity": [
       "zigbee"
     ]

@@ -3,6 +3,9 @@
   "created_at": "2023-06-19T08:02:31Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "max_load_watts": 2300,
+    "power_monitoring": true,
     "rated_power": 1.5,
     "connectivity": [
       "proprietary"

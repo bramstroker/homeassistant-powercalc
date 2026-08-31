@@ -3,6 +3,9 @@
   "created_at": "2024-05-07T20:30:00Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
+    "max_load_watts": 3680,
     "connectivity": [
       "zigbee"
     ]

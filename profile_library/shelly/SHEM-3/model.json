@@ -10,11 +10,16 @@
   "created_at": "2024-12-01T18:27:00Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "din_rail",
+    "power_monitoring": true,
     "rated_power": 1.0,
     "connectivity": [
       "wifi"
     ]
   },
+  "ean": [
+    "3800235262214"
+  ],
   "discovery_by": "entity",
   "measure_description": "Manually measured. Transcribed from https://www.youtube.com/watch?v=RlSCe9xaUPE",
   "measure_device": "GW Instek GPM-8310",

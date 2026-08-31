@@ -6,6 +6,8 @@
   "created_at": "2023-04-01T17:53:59Z",
   "device_type": "light",
   "device_specs": {
+    "rated_power": 8.5,
+    "lumens": 680,
     "socket": "E26",
     "form_factor": "spot",
     "connectivity": [

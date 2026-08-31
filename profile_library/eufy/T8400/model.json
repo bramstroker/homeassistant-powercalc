@@ -7,6 +7,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "194644181208"
+  ],
   "measure_description": "Measured each state for two hours using Powercalc average mode",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "script",

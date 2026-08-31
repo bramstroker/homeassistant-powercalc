@@ -10,6 +10,9 @@
       "usb"
     ]
   },
+  "ean": [
+    "731304285434"
+  ],
   "calculation_strategy": "fixed",
   "discovery_by": "device",
   "compatible_integrations": [

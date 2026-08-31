@@ -3,6 +3,7 @@
   "created_at": "2026-02-16T15:09:15Z",
   "device_type": "fan",
   "device_specs": {
+    "form_factor": "pedestal",
     "connectivity": [
       "wifi"
     ],

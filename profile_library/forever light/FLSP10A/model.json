@@ -7,6 +7,9 @@
   "created_at": "2025-02-15T09:30:00Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "max_load_watts": 2400,
+    "power_monitoring": true,
     "connectivity": [
       "wifi"
     ]

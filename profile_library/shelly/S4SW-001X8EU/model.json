@@ -11,6 +11,8 @@
   "created_at": "2025-05-10T00:00:00Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "in_wall",
+    "power_monitoring": false,
     "rated_power": 1.2,
     "connectivity": [
       "zigbee",
@@ -19,6 +21,9 @@
       "bluetooth"
     ]
   },
+  "ean": [
+    "3800238070786"
+  ],
   "discovery_by": "device",
   "measure_description": "Measured two units with identical settings over 300s and calculated average for single unit. Multiple combinations of settings were tested. Eco mode only has an effect when WLAN-AP (range extender) is disabled.",
   "measure_device": "Shelly Plug S",

@@ -10,6 +10,7 @@
     "4548736066151"
   ],
   "device_specs": {
+    "form_factor": "speaker",
     "rated_power": 8.0,
     "connectivity": [
       "wifi",

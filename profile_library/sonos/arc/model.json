@@ -11,6 +11,7 @@
     "8717755777201"
   ],
   "device_specs": {
+    "form_factor": "soundbar",
     "connectivity": [
       "wifi",
       "ethernet",

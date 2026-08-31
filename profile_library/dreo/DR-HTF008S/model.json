@@ -3,6 +3,7 @@
   "created_at": "2026-08-13T15:43:19Z",
   "device_type": "fan",
   "device_specs": {
+    "form_factor": "tower",
     "connectivity": [
       "wifi"
     ],

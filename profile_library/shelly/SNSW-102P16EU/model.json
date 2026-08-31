@@ -14,12 +14,17 @@
   "created_at": "2025-01-12T21:46:00Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "in_wall",
+    "power_monitoring": true,
     "connectivity": [
       "wifi",
       "bluetooth"
     ],
     "rated_power": 1.4
   },
+  "ean": [
+    "3800235265031"
+  ],
   "discovery_by": "device",
   "measure_description": "The measured device fw: 1.7.1. The result represents the average value of measurements collected from the measuring device API for the following scenarios: dumb device/baseline consumption (~3.8W) and several device configurations. See sub-profiles.",
   "config_flow_sub_profile_remarks": "Select a profile depending on your Shelly device configuration.",

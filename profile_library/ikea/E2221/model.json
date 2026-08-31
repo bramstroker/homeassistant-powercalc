@@ -6,6 +6,8 @@
   "created_at": "2026-04-08T10:46:42Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
     "connectivity": [
       "zigbee"
     ]

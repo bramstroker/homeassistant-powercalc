@@ -2,6 +2,9 @@
   "calculation_strategy": "lut",
   "created_at": "2022-04-13T17:59:05Z",
   "device_type": "light",
+  "ean": [
+    "4056233505276"
+  ],
   "device_specs": {
     "socket": "E14",
     "form_factor": "candle",
