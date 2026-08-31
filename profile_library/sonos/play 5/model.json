@@ -40,6 +40,7 @@
     "VERSION": "v1.11.3:docker"
   },
   "name": "Play:5",
+  "product_url": "https://support.sonos.com/en-us/products/play-5-gen-2",
   "standby_power": 2.15,
   "authors": [
     {

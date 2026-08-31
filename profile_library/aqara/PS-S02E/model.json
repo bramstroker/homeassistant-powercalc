@@ -21,6 +21,7 @@
   "measure_description": "Manually measured, took average values from 24 hours",
   "measure_method": "manual",
   "name": "Presence Sensor FP2",
+  "product_url": "https://www.aqara.com/en/product/presence-sensor-fp2/",
   "aliases": [
     "PS-S02D"
   ],

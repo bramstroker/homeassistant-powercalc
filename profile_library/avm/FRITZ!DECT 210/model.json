@@ -17,6 +17,7 @@
   "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",
   "measure_method": "manual",
   "name": "FRITZ!DECT 210",
+  "product_url": "https://fritz.com/en/products/fritz-dect-210-20002723",
   "only_self_usage": true,
   "standby_power": 0.35,
   "standby_power_on": 1.1,

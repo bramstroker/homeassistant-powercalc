@@ -35,6 +35,7 @@
   "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
   "measure_method": "script",
   "name": "Beam (Gen 2)",
+  "product_url": "https://www.sonos.com/en-us/shop/beam",
   "standby_power": 6.0,
   "authors": [
     {

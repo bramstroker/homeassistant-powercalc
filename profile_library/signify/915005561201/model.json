@@ -31,6 +31,7 @@
     "VERSION": "v1.6.6:docker"
   },
   "name": "Hue Lucca Outdoor Wall Light",
+  "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-lucca-outdoor-wall-light/1740193P0",
   "standby_power": 0.35,
   "authors": [
     {

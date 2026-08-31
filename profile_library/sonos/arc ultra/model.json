@@ -43,6 +43,7 @@
     "VERSION": "v1.17.19:docker"
   },
   "name": "Arc Ultra",
+  "product_url": "https://www.sonos.com/en-us/shop/arc-ultra",
   "standby_power": 4.45,
   "authors": [
     {

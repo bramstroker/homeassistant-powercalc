@@ -21,6 +21,7 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "FRITZ!Repeater 2700",
+  "product_url": "https://fritz.com/en/products/fritz-repeater-2700-20003195",
   "authors": [
     {
       "name": "hpuac",

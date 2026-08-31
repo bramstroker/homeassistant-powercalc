@@ -33,6 +33,7 @@
     "LB01D"
   ],
   "name": "LED Bulb T2 (E26, RGB CCT)",
+  "product_url": "https://us.aqara.com/products/led-bulb-t2-e26",
   "standby_power": 0.14,
   "authors": [
     {

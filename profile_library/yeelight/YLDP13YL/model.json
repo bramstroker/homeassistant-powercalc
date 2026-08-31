@@ -23,6 +23,7 @@
     "VERSION": "v0.20.3:docker"
   },
   "name": "LED Bulb 1S (Color)",
+  "product_url": "https://www.yeelight.com/en_us/product/lemon2-color",
   "standby_power": 1.22,
   "authors": [
     {

@@ -30,6 +30,7 @@
     "VERSION": "v1.9.6:docker"
   },
   "name": "Hue Nyro Outdoor Wall",
+  "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-nyro-outdoor-wall-light/1745630P7",
   "standby_power": 0.27,
   "authors": [
     {

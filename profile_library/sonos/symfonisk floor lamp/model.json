@@ -34,6 +34,7 @@
     "VERSION": "v1.10.0:docker"
   },
   "name": "SYMFONISK Floor Lamp",
+  "product_url": "https://www.ikea.com/gb/en/p/symfonisk-floor-lamp-with-wifi-speaker-bamboo-smart-20528289/",
   "standby_power": 2.75,
   "authors": [
     {

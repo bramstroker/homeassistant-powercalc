@@ -21,6 +21,7 @@
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "manual",
   "name": "FRITZ!Repeater 2400",
+  "product_url": "https://fritz.com/en/products/fritz-repeater-2400-20002855",
   "authors": [
     {
       "name": "ca-dmin",

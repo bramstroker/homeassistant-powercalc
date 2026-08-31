@@ -11,10 +11,118 @@
     ],
     "reason": "Epson blocks automated HTTP clients while this official model-specific product page remains available in browsers."
   },
+  "https://fritz.com/en/products/fritz-box-6670-cable-20003047": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-box-6690-cable-20002965": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-box-5690-pro-20003043": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-dect-210-20002723": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-repeater-1200-ax-20002974": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-repeater-2400-20002855": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-repeater-2700-20003195": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-repeater-6000-20002908": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
   "https://www.sony.com/electronics/support/speakers-wireless-speakers/lf-s50g/specifications": {
     "statuses": [
       403
     ],
     "reason": "Sony blocks automated HTTP clients while this official model-specific support page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/amp": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/arc": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/arc-ultra": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/beam": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/era-100": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/era-300": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/five": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/one-sl": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/ray": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/sub-4": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
   }
 }
