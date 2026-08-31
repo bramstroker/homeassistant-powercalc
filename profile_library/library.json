@@ -21577,6 +21577,62 @@
     },
     {
       "aliases": [],
+      "name": "sagemcom",
+      "full_name": "Sagemcom",
+      "dir_name": "sagemcom",
+      "website": "https://www.sagemcom.com",
+      "country": "FR",
+      "description": "French manufacturer of broadband, telecom and connected entertainment equipment.",
+      "models": [
+        {
+          "aliases": [
+            "KPN TV Box+",
+            "KPN DIW7022"
+          ],
+          "calculation_strategy": "fixed",
+          "compatible_integrations": [
+            "cast"
+          ],
+          "created_at": "2026-08-31T14:18:12Z",
+          "device_type": "set_top_box",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "ethernet"
+            ]
+          },
+          "measure_description": "Each state was measured for one hour. Average power was calculated by dividing the measured energy in kWh by the measurement duration.",
+          "measure_device": "Zhurui PR10",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "min_version": "v1.26.0",
+          "name": "KPN TV Box+",
+          "authors": [
+            {
+              "name": "Bram Gerritsen",
+              "email": "bgerritsen@gmail.com",
+              "github": "bramstroker"
+            }
+          ],
+          "id": "DIW7022",
+          "manufacturer": "sagemcom",
+          "updated_at": "1970-01-01T00:00:00",
+          "max_power": 3.22,
+          "sub_profile_count": 2,
+          "power_range": {
+            "min": 3.22,
+            "max": 3.22
+          },
+          "standby_power": 2.45,
+          "hash": "e95cd853b8e3a9128909393118e0a444"
+        }
+      ],
+      "device_types": [
+        "set_top_box"
+      ]
+    },
+    {
+      "aliases": [],
       "name": "sengled",
       "full_name": "Sengled",
       "dir_name": "sengled",

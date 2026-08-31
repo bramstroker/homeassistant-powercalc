@@ -1,0 +1,32 @@
+{
+  "aliases": [
+    "KPN TV Box+",
+    "KPN DIW7022"
+  ],
+  "calculation_strategy": "fixed",
+  "compatible_integrations": [
+    "cast"
+  ],
+  "config_flow_sub_profile_remarks": "Select the standby mode configured on the KPN TV Box+ under Settings > Energy saving. Both modes use 3.22 W while the box is on; only the standby consumption differs.",
+  "created_at": "2026-08-31T14:18:12Z",
+  "device_type": "set_top_box",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "ethernet"
+    ]
+  },
+  "measure_description": "Each state was measured for one hour. Average power was calculated by dividing the measured energy in kWh by the measurement duration.",
+  "measure_device": "Zhurui PR10",
+  "measure_method": "manual",
+  "mains_voltage": 230,
+  "min_version": "v1.26.0",
+  "name": "KPN TV Box+",
+  "authors": [
+    {
+      "name": "Bram Gerritsen",
+      "email": "bgerritsen@gmail.com",
+      "github": "bramstroker"
+    }
+  ]
+}
