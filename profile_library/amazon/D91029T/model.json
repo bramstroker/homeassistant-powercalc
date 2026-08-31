@@ -11,6 +11,7 @@
   "created_at": "2023-03-10T17:16:45Z",
   "device_type": "smart_speaker",
   "device_specs": {
+    "form_factor": "speaker",
     "connectivity": [
       "wifi",
       "bluetooth"

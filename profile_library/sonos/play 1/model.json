@@ -8,6 +8,7 @@
   "created_at": "2023-04-14T16:03:04Z",
   "device_type": "smart_speaker",
   "device_specs": {
+    "form_factor": "speaker",
     "connectivity": [
       "wifi",
       "ethernet"
@@ -15,7 +16,8 @@
   },
   "ean": [
     "878269000273",
-    "878269000327"
+    "878269000327",
+    "878269000280"
   ],
   "linear_config": {
     "calibrate": [

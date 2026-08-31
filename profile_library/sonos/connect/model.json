@@ -4,11 +4,17 @@
   "created_at": "2022-12-15T08:25:42Z",
   "device_type": "smart_speaker",
   "device_specs": {
+    "form_factor": "streamer",
     "connectivity": [
       "wifi",
       "ethernet"
     ]
   },
+  "ean": [
+    "8717755770691",
+    "180501001185",
+    "180501001208"
+  ],
   "fixed_config": {
     "power": 5.33
   },

@@ -10,6 +10,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "196786388347"
+  ],
   "fixed_config": {
     "states_power": {
       "idle": 2.2
