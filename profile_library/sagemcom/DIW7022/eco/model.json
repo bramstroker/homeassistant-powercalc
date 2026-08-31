@@ -1,0 +1,8 @@
+{
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": 3.22
+  },
+  "name": "Eco standby (0.3 W)",
+  "standby_power": 0.3
+}
