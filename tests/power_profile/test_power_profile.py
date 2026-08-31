@@ -29,6 +29,7 @@ from custom_components.powercalc.power_profile.library import ModelInfo, Profile
 from custom_components.powercalc.power_profile.power_profile import (
     DeviceType,
     PowerProfile,
+    is_device_type_supported_for_entity,
 )
 from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 
@@ -217,6 +218,17 @@ async def test_light_domain_supported_for_smart_switch_device_type(hass: HomeAss
     )
     assert power_profile.is_entity_domain_supported(
         SourceEntity("light.test", "test", "light"),
+    )
+
+
+def test_media_player_domain_supported_for_set_top_box_device_type() -> None:
+    assert is_device_type_supported_for_entity(
+        DeviceType.SET_TOP_BOX,
+        RegistryEntryWithDefaults(
+            entity_id="media_player.test",
+            unique_id="1234",
+            platform="cast",
+        ),
     )
 
 

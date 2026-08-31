@@ -318,6 +318,7 @@
         "light",
         "power_meter",
         "printer",
+        "set_top_box",
         "smart_dimmer",
         "smart_switch",
         "smart_speaker",

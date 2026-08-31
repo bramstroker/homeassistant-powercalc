@@ -54,6 +54,7 @@ class DeviceType(StrEnum):
     LIGHT = "light"
     POWER_METER = "power_meter"
     PRINTER = "printer"
+    SET_TOP_BOX = "set_top_box"
     SMART_DIMMER = "smart_dimmer"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
@@ -88,6 +89,7 @@ DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.GENERIC_IOT: {SENSOR_DOMAIN, MEDIA_PLAYER_DOMAIN},
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.POWER_METER: SENSOR_DOMAIN,
+    DeviceType.SET_TOP_BOX: MEDIA_PLAYER_DOMAIN,
     DeviceType.SMART_DIMMER: LIGHT_DOMAIN,
     DeviceType.SMART_SWITCH: {SWITCH_DOMAIN, LIGHT_DOMAIN},
     DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
