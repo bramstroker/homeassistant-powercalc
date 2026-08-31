@@ -1907,6 +1907,7 @@
         {
           "aliases": [
             "rgbww-light",
+            "athom.rgbww-light",
             "Athom RGBCW Bulb"
           ],
           "calculation_strategy": "lut",
@@ -1957,7 +1958,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "aba257547cacfbc7c214f2340d77a0e3"
+          "hash": "c32d86f60ae312a9f818b24ba28a8c9c"
         },
         {
           "aliases": [
@@ -5939,7 +5940,8 @@
         },
         {
           "aliases": [
-            "fbxgw8-r1"
+            "fbxgw8-r1",
+            "Freebox v8 (r1) (fbxgw8-r1)"
           ],
           "calculation_strategy": "fixed",
           "created_at": "2025-10-12T09:03:14Z",
@@ -5970,7 +5972,7 @@
             "min": 10.42,
             "max": 10.42
           },
-          "hash": "592f9bb6b8619e98a7109d8efaf0b532"
+          "hash": "e7296b1a3e9a932f99a128664c70b608"
         }
       ],
       "device_types": [
@@ -6957,7 +6959,8 @@
         },
         {
           "aliases": [
-            "Home Mini"
+            "Home Mini",
+            "Google Home Mini"
           ],
           "calculation_strategy": "linear",
           "created_at": "2022-10-05T10:14:54Z",
@@ -6995,7 +6998,7 @@
             "min": 1.8,
             "max": 2.49
           },
-          "hash": "f546e6593978d3e4ea80abd77e288168"
+          "hash": "621e46d7a3b49c81ae38efa8fe9e1c0b"
         },
         {
           "aliases": [
@@ -7095,7 +7098,8 @@
         },
         {
           "aliases": [
-            "Nest Mini"
+            "Nest Mini",
+            "Google Nest Mini"
           ],
           "calculation_strategy": "linear",
           "created_at": "2022-10-05T10:14:54Z",
@@ -7133,7 +7137,7 @@
             "min": 2.01,
             "max": 3.66
           },
-          "hash": "1a478851e3df9bca50ad74b32dff0654"
+          "hash": "960043e42b1a9656b4c5a445d3a34dcc"
         },
         {
           "aliases": [
@@ -8686,7 +8690,8 @@
         {
           "aliases": [
             "TRADFRI LED driver, 30 w",
-            "ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2"
+            "ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2",
+            "TRADFRI LED driver, 30 w (ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2"
           ],
           "calculation_strategy": "linear",
           "created_at": "2025-02-12T13:05:00Z",
@@ -8716,7 +8721,7 @@
           "updated_at": "2026-08-31T06:14:58",
           "max_power": 0.35,
           "sub_profile_count": 0,
-          "hash": "0bb04090fd4b93640dda4af7f5390c01"
+          "hash": "e13d379eb181b2e01b3525a195328da3"
         },
         {
           "aliases": [
@@ -15329,6 +15334,9 @@
           "hash": "09cb7f9f92ef7c27e91b73d36f5705bf"
         },
         {
+          "aliases": [
+            "TS0502A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2023-03-03T10:22:44Z",
           "device_type": "light",
@@ -15377,7 +15385,7 @@
             "score": 97.3,
             "color_temp": 97.3
           },
-          "hash": "6052644070476c34543450699bf323f0"
+          "hash": "0066bd6ca010054dc7c86a96ab34d562"
         },
         {
           "calculation_strategy": "lut",
@@ -15970,6 +15978,9 @@
           "hash": "74c995c44156d0ca00100ef438d0e254"
         },
         {
+          "aliases": [
+            "TS0505B"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2023-03-01T21:41:09Z",
           "device_type": "light",
@@ -16019,7 +16030,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "dec84ffe3b0582dda0c1bcc758a998df"
+          "hash": "1fc2414d976e81c78395bb9343bf6fe6"
         },
         {
           "calculation_strategy": "fixed",
@@ -17700,6 +17711,9 @@
       "description": "Chinese outdoor-robotics company known for wire-free robotic lawn mowers.",
       "models": [
         {
+          "aliases": [
+            "YUKA mini 600 (YUKA mini 600)"
+          ],
           "calculation_strategy": "composite",
           "created_at": "2025-10-13T17:19:21Z",
           "device_type": "lawn_mower_robot",
@@ -17733,7 +17747,7 @@
           "updated_at": "2026-08-30T04:13:40",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "c0c1d00beb49c31944a3fc73130fb28a"
+          "hash": "536457ee78561a1b3636f98ad636c345"
         }
       ],
       "device_types": [
@@ -18265,7 +18279,8 @@
         },
         {
           "aliases": [
-            "45727"
+            "45727",
+            "404094 (16W)"
           ],
           "calculation_strategy": "lut",
           "created_at": "2025-01-25T17:25:15Z",
@@ -18319,7 +18334,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "0a6c210c79e9f4e1dda53386028c0bc4"
+          "hash": "d0ee698cad7e40da10656e69582cfa3d"
         },
         {
           "aliases": [
@@ -26551,7 +26566,8 @@
         },
         {
           "aliases": [
-            "929003134501"
+            "929003134501",
+            "9290031346"
           ],
           "calculation_strategy": "lut",
           "created_at": "2024-01-08T20:35:44Z",
@@ -26602,7 +26618,7 @@
             "score": 96.5,
             "color_temp": 96.5
           },
-          "hash": "26d8cea5ec88c3b5fab54a1e681fad9b"
+          "hash": "32459ec5815445d70bce69905f4a3d79"
         },
         {
           "aliases": [
@@ -28965,6 +28981,10 @@
           "hash": "0f058eb2e2a7293b570a3b34aa249689"
         },
         {
+          "aliases": [
+            "LST003",
+            "9290018187B"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2021-08-29T21:30:20Z",
           "device_type": "light",
@@ -29009,7 +29029,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "7edd293dba515b436006662bf59e735e"
+          "hash": "52cbd2246742d42109aa70ff6e173e21"
         },
         {
           "aliases": [
@@ -29876,7 +29896,8 @@
         },
         {
           "aliases": [
-            "3216131P5"
+            "3216131P5",
+            "929003099201"
           ],
           "calculation_strategy": "lut",
           "created_at": "2023-06-05T11:09:22Z",
@@ -29925,7 +29946,7 @@
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "eaf76bac39525001e666560cc9248081"
+          "hash": "b6b176a371607a0f3c8c1fd29216e857"
         },
         {
           "aliases": [
@@ -29982,7 +30003,8 @@
         },
         {
           "aliases": [
-            "3216431P5"
+            "3216431P5",
+            "929003099301"
           ],
           "calculation_strategy": "lut",
           "created_at": "2023-08-20T07:30:32Z",
@@ -30031,7 +30053,7 @@
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "a6ab03a59f2be296bbf5407f43fb4829"
+          "hash": "f668f8036f41220eff16585653c5b032"
         },
         {
           "aliases": [

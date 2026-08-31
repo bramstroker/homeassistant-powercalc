@@ -1,6 +1,7 @@
 {
   "aliases": [
-    "Nest Mini"
+    "Nest Mini",
+    "Google Nest Mini"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",
