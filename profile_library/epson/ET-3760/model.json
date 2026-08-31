@@ -12,6 +12,9 @@
       "ethernet"
     ]
   },
+  "ean": [
+    "010343939950"
+  ],
   "fixed_config": {
     "states_power": {
       "idle": 6,

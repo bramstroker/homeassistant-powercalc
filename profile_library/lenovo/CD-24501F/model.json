@@ -10,11 +10,15 @@
   "created_at": "2022-10-05T10:14:54Z",
   "device_type": "smart_speaker",
   "device_specs": {
+    "form_factor": "clock",
     "connectivity": [
       "wifi",
       "bluetooth"
     ]
   },
+  "ean": [
+    "193268827455"
+  ],
   "linear_config": {
     "calibrate": [
       "10 -> 3.12",

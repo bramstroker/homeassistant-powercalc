@@ -21,6 +21,9 @@
       "bluetooth"
     ]
   },
+  "ean": [
+    "3700730502030"
+  ],
   "calculation_strategy": "fixed",
   "fixed_config": {
     "power": 0.43
