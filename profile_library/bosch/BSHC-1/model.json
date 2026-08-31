@@ -12,6 +12,9 @@
       "ethernet"
     ]
   },
+  "ean": [
+    "4057749314475"
+  ],
   "discovery_by": "device",
   "fixed_config": {
     "power": 1.78
