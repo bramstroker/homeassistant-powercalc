@@ -12,6 +12,9 @@
       "ethernet"
     ]
   },
+  "ean": [
+    "8717755773012"
+  ],
   "linear_config": {
     "calibrate": [
       "10 -> 7.5",

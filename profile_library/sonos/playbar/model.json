@@ -13,6 +13,9 @@
       "infrared"
     ]
   },
+  "ean": [
+    "8717755771681"
+  ],
   "linear_config": {
     "calibrate": [
       "0 -> 10.00",
