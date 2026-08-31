@@ -13,6 +13,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Z-Wave Smart Plug",
   "only_self_usage": true,
   "standby_power": 0.31,

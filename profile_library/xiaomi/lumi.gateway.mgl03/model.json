@@ -2,6 +2,7 @@
   "created_at": "2025-05-01T21:56:26Z",
   "measure_description": "Measured with avg caluclation during 600s with dummy load. Samsung USB power adapter used.",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "VERSION": "v1.17.11:docker"
   },

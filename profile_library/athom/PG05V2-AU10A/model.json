@@ -17,6 +17,7 @@
   "measure_description": "Measured with Power-Mate Lite.",
   "measure_device": "Hypertec Power-Mate Lite 10A",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Smart Plug AU V2 (10 A)",
   "legacy_ids": [
     "smart-plug-au"

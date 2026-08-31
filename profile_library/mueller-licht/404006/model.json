@@ -24,6 +24,7 @@
   "measure_description": "Measured with utils/measure script under former profile 43961.",
   "measure_device": "Shelly Plug",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,

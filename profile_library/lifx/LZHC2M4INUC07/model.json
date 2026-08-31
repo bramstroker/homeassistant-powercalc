@@ -23,6 +23,7 @@
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Wemo Insight F7C029uk",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 2,

@@ -15,6 +15,7 @@
   "measure_description": "Manually measured (Japan model@110V)",
   "measure_device": "Ketotek KTEM02BL Electricity Monitor",
   "measure_method": "manual",
+  "mains_voltage": 110,
   "name": "INSPELNING smart plug",
   "only_self_usage": true,
   "standby_power": 0.2,

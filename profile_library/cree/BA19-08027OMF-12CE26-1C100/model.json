@@ -22,6 +22,7 @@
   "measure_device": "Sonoff S31",
   "measure_device_firmware": "Tasmota",
   "measure_method": "script",
+  "mains_voltage": 120,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,

@@ -12,6 +12,7 @@
   "measure_description": "measure script recorder over 2 minutes",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Smart Plug with Power Monitoring",
   "only_self_usage": true,
   "standby_power": 0.404,

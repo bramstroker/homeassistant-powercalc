@@ -25,6 +25,7 @@
   "measure_device": "TP-Link Tapo P115",
   "measure_device_firmware": "1.3.4 Build 250403 Rel.150504",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Smart Home Controller I",
   "product_url": "https://www.bosch-smarthome.com/gb/en/support/help/product-help/smart-home-controller-help/",
   "authors": [

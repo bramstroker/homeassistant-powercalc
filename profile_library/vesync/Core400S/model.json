@@ -14,6 +14,7 @@
   ],
   "measure_device": "P3 International Kill A Watt EZ (Model P4460)",
   "measure_method": "manual",
+  "mains_voltage": 120,
   "name": "Smart Air Purifier",
   "product_url": "https://levoit.com/products/core-400s-p-smart-air-purifier",
   "standby_power": 1.2,

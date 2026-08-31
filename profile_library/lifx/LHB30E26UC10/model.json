@@ -24,6 +24,7 @@
   "measure_description": "Measured with utils/measure script",
   "measure_device": "TP-Link Kasa HS110",
   "measure_method": "script",
+  "mains_voltage": 120,
   "measure_settings": {
     "SAMPLE_COUNT": 3,
     "SLEEP_TIME": 3,

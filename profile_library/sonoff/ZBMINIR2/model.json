@@ -18,6 +18,7 @@
   "measure_description": "Measured manually",
   "measure_device": "PeakTech 4350",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Extreme Zigbee Smart Switch",
   "only_self_usage": false,
   "product_url": "https://sonoff.tech/en-uk/products/sonoff-zbmini-extreme-zigbee-smart-switch-zbminir2",

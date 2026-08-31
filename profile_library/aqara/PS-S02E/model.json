@@ -20,6 +20,7 @@
   "measure_device": "Shelly Plus 1PM Gen4",
   "measure_description": "Manually measured, took average values from 24 hours",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Presence Sensor FP2",
   "product_url": "https://www.aqara.com/en/product/presence-sensor-fp2/",
   "aliases": [

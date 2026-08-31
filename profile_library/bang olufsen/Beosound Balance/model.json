@@ -32,6 +32,7 @@
   "measure_description": "Measured with utils/measure script (full 100% volume) using standard settings (1 sample, 5s sleep).",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 5,

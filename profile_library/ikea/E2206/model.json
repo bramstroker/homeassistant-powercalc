@@ -18,6 +18,7 @@
   "measure_description": "Manually measured (Schuko/EU model@230V)",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "INSPELNING smart plug",
   "product_url": "https://www.ikea.com/se/en/p/inspelning-plug-smart-energy-monitor-00569836/",
   "only_self_usage": true,

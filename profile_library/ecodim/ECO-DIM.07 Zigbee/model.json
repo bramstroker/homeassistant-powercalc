@@ -20,6 +20,7 @@
   "measure_description": "Manually measured with light connected as bypass.",
   "measure_device": "Brennenstuhl EM 231-A",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "legacy_ids": [
     "ECO-DIM.07 Zigbee Basic"
   ],

@@ -15,6 +15,7 @@
   "measure_device": "Nous A1T",
   "measure_device_firmware": "ESPHome 2023.11.6",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,

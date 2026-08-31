@@ -16,6 +16,7 @@
   "measure_description": "Manually measured.",
   "measure_device": "Shelly EM Mini Gen4",
   "measure_method": "manual",
+  "mains_voltage": 120,
   "name": "Plug",
   "standby_power": 1.4,
   "standby_power_on": 1.6,

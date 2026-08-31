@@ -28,6 +28,7 @@
   "measure_device": "Shelly Plug S Gen3",
   "measure_device_firmware": "20251113-160645/1.7.3-gb71e9ac",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "measure_settings": {
     "VERSION": "Home Assistant Core 2025.12.5"
   },

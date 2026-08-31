@@ -12,6 +12,7 @@
   "measure_description": "Averaged with the measurement recorder over 2 minutes.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Zigbee Smart Plug",
   "only_self_usage": false,
   "standby_power": 0.378,

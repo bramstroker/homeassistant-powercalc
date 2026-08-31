@@ -15,6 +15,7 @@
   "measure_description": "Manually measured as an average over several weeks. Observed power fluctuated by approximately 2 W while normal camera activity and automatic day/night changes were active.",
   "measure_device": "Nous A1T",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "4K Wi-Fi 6 Surveillance Camera",
   "product_url": "https://reolink.com/us/product/rlc-810wa/",
   "authors": [

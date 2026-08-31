@@ -17,6 +17,7 @@
   "measure_description": "Measured with utils/measure script using 2 identical lamps in parallel (MULTIPLE_LIGHTS=true, NUM_LIGHTS=2), reported values are per lamp. A preheated resistive dummy load (~8.5 W, a thermally settled PTC element) was connected in parallel and its calibrated baseline subtracted, to keep the dimmest and most saturated points above the Shelly Plug S Gen3's 0.1 W resolution, where a single lamp's contribution is otherwise too coarse. The lamp is multicolor (supported_color_modes: color_temp, xy); both color_temp and hs were measured. Brightness starts at 2; brightness 1 was verified to be unmeasurable even with the dummy load. Zigbee device via the ZHA integration. After the run the full curve was cross-checked against the live Shelly reading: color_temp and hs both matched within about 2 percent across the range.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 3,
     "SLEEP_TIME": 3.0,

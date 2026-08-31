@@ -20,6 +20,7 @@
   "measure_description": "Took several readings on every 10% of the lamp and did a linear regression to estimate the correct consumptions. Standby power is assumed",
   "measure_device": "Sonoff DualR3",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Wi-Fi Smart LED Bulb",
   "legacy_ids": [
     "B02BA60"

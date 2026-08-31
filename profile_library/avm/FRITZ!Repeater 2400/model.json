@@ -20,6 +20,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "FRITZ!Repeater 2400",
   "product_url": "https://fritz.com/en/products/fritz-repeater-2400-20002855",
   "authors": [

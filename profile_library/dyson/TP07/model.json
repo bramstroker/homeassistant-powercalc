@@ -206,6 +206,7 @@
   "measure_description": "Four calibration curves measured with utils/measure script: forward and reverse direction, each with oscillation on and off",
   "measure_device": "TP-Link Tapo P316M",
   "measure_method": "script",
+  "mains_voltage": 120,
   "measure_settings": {
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 2,

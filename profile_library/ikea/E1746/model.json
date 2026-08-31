@@ -15,6 +15,7 @@
   "measure_device": "Nous A1T",
   "measure_device_firmware": "ESPHome 2023.12.5",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "TRADFRI signal repeater",
   "authors": [
     {

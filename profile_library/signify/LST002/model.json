@@ -20,6 +20,7 @@
   "measure_description": "Measured by custom script with all lightstrip extensions detached. Measured standby power with ELV Energy Master Profi 2",
   "measure_device": "AVM Fritz!DECT 200",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Hue LightStrip Plus (2m)",
   "standby_power": 0.18,
   "authors": [

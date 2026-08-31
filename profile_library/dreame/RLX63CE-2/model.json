@@ -26,6 +26,7 @@
   ],
   "created_at": "2026-08-18T19:21:10Z",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "measure_device": "Athom ESPHome Wifi plug",
   "measure_description": "Measured dynamically with a calibrated smart plug during multiple full cycles including washing (all water temperatures tested), drying (all durations tested), auto-emptying, charging, and station cleaning.",
   "standby_power": 5.47,

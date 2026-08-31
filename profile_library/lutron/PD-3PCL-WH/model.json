@@ -20,6 +20,7 @@
   "measure_description": "Measured no-load self-consumption using a Shelly Plus Plug. During a 120-second standby sample, three readings were 0.1 W and the remaining readings were 0 W.",
   "measure_device": "Shelly Plus Plug",
   "measure_method": "script",
+  "mains_voltage": 120,
   "name": "Plug-In Lamp Dimmer",
   "product_url": "https://www.casetawireless.com/us/en/products/smart-plugs/lamp-dimming-smart-plug",
   "standby_power": 0.1,

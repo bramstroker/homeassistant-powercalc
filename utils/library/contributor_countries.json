@@ -1,0 +1,382 @@
+{
+  "verified_at": "2026-08-31",
+  "source": "Country from the contributor's public GitHub profile; nominal mains voltage from the applicable regional electricity standard",
+  "contributors": {
+    "aetha": {
+      "country": "AU",
+      "nominal_mains_voltage": 230
+    },
+    "ajacques": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "alexz707": {
+      "country": "AT",
+      "nominal_mains_voltage": 230
+    },
+    "amjadsaadeh": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "andreasbrett": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "bartkummel": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "BeardedTinker": {
+      "country": "HR",
+      "nominal_mains_voltage": 230
+    },
+    "BenRoe": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "BlakeGarner": {
+      "country": "AU",
+      "nominal_mains_voltage": 230
+    },
+    "blixtdevelopment": {
+      "country": "DK",
+      "nominal_mains_voltage": 230
+    },
+    "bram96": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "BVollmerhaus": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "cammurray": {
+      "country": "AU",
+      "nominal_mains_voltage": 230
+    },
+    "chpego": {
+      "country": "FR",
+      "nominal_mains_voltage": 230
+    },
+    "davidski": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "DellanX": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "DerFlob": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "dsander": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "edouardkleinhans": {
+      "country": "FR",
+      "nominal_mains_voltage": 230
+    },
+    "el97": {
+      "country": "SE",
+      "nominal_mains_voltage": 230
+    },
+    "felipemarinho97": {
+      "country": "BR",
+      "nominal_mains_voltage": 230
+    },
+    "florianmulatz": {
+      "country": "AT",
+      "nominal_mains_voltage": 230
+    },
+    "franzbischoff": {
+      "country": "PT",
+      "nominal_mains_voltage": 230
+    },
+    "frenck": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "ganehag": {
+      "country": "SE",
+      "nominal_mains_voltage": 230
+    },
+    "GerdRuetten": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "hadleyrich": {
+      "country": "NZ",
+      "nominal_mains_voltage": 230
+    },
+    "htlemos": {
+      "country": "PT",
+      "nominal_mains_voltage": 230
+    },
+    "hwalker928": {
+      "country": "GB",
+      "nominal_mains_voltage": 230
+    },
+    "jdambacher": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "joewashear007": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "JonasJoKuJonas": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "justinh998": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "KrzysztofHajdamowicz": {
+      "country": "PL",
+      "nominal_mains_voltage": 230
+    },
+    "leedsdata": {
+      "country": "GB",
+      "nominal_mains_voltage": 230
+    },
+    "LewisSpring": {
+      "country": "GB",
+      "nominal_mains_voltage": 230
+    },
+    "manuelkasper": {
+      "country": "CH",
+      "nominal_mains_voltage": 230
+    },
+    "martinemde": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "MayuCat": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "MaZZly": {
+      "country": "FI",
+      "nominal_mains_voltage": 230
+    },
+    "Miicroo": {
+      "country": "SE",
+      "nominal_mains_voltage": 230
+    },
+    "pauln": {
+      "country": "NZ",
+      "nominal_mains_voltage": 230
+    },
+    "pdemonaco": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "piitaya": {
+      "country": "FR",
+      "nominal_mains_voltage": 230
+    },
+    "pranjal-joshi": {
+      "country": "IN",
+      "nominal_mains_voltage": 230
+    },
+    "Roeland54": {
+      "country": "BE",
+      "nominal_mains_voltage": 230
+    },
+    "rogierlommers": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "roschi02": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "rosstroha": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "ryan-ronnander": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "samdunne": {
+      "country": "IE",
+      "nominal_mains_voltage": 230
+    },
+    "Sandolution": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "stijnbernards": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "stuartmackintosh": {
+      "country": "AU",
+      "nominal_mains_voltage": 230
+    },
+    "SuperTux88": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "tomfrenzel": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "tr4nt0r": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "tvwerkhoven": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "Ulrar": {
+      "country": "IE",
+      "nominal_mains_voltage": 230
+    },
+    "vyruz1986": {
+      "country": "BE",
+      "nominal_mains_voltage": 230
+    },
+    "wouterrutgers": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "barndawgie": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "bcpearce": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "bragra": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "bramstroker": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "brooksben11": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "challgren": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "CloCkWeRX": {
+      "country": "AU",
+      "nominal_mains_voltage": 230
+    },
+    "CM000n": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "EinRainerZufall": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "ejpenney": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "folfy": {
+      "country": "AT",
+      "nominal_mains_voltage": 230
+    },
+    "fribse": {
+      "country": "DK",
+      "nominal_mains_voltage": 230
+    },
+    "gribber": {
+      "country": "SE",
+      "nominal_mains_voltage": 230
+    },
+    "hpuac": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "jacobdonenfeld": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "jamiedevivoo": {
+      "country": "GB",
+      "nominal_mains_voltage": 230
+    },
+    "Jarod2801": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "joshuar": {
+      "country": "AU",
+      "nominal_mains_voltage": 230
+    },
+    "Largelos": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "Loustik": {
+      "country": "FR",
+      "nominal_mains_voltage": 230
+    },
+    "Mariusthvdb": {
+      "country": "NL",
+      "nominal_mains_voltage": 230
+    },
+    "maverick1982": {
+      "country": "IT",
+      "nominal_mains_voltage": 230
+    },
+    "miggi92": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "MTrab": {
+      "country": "DK",
+      "nominal_mains_voltage": 230
+    },
+    "nepozs": {
+      "country": "PL",
+      "nominal_mains_voltage": 230
+    },
+    "OzGav": {
+      "country": "AU",
+      "nominal_mains_voltage": 230
+    },
+    "Pantastisch": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "philscottydev": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "RubenKelevra": {
+      "country": "DE",
+      "nominal_mains_voltage": 230
+    },
+    "sbrandsborg": {
+      "country": "DK",
+      "nominal_mains_voltage": 230
+    },
+    "scottrhoyt": {
+      "country": "US",
+      "nominal_mains_voltage": 120
+    },
+    "theundefined": {
+      "country": "PL",
+      "nominal_mains_voltage": 230
+    },
+    "trandbert37": {
+      "country": "FR",
+      "nominal_mains_voltage": 230
+    }
+  }
+}

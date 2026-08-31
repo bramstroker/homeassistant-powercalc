@@ -16,6 +16,7 @@
   "measure_device": "Nous A1T",
   "measure_device_firmware": "ESPHome 2023.10.3",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Wi-Fi Smart Socket",
   "only_self_usage": false,
   "standby_power": 0.29,

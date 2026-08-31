@@ -17,6 +17,7 @@
   "measure_description": "Bulbs was measured twice at each dim setting (100 points) and mean value was used when there were differences",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Dimmable White Spot GU10 Bulb 350lm",
   "standby_power": 0.38,
   "authors": [

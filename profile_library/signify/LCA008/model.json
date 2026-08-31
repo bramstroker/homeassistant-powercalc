@@ -21,6 +21,7 @@
   "measure_description": "Measured 1 bulb with utils/measure script using an additional dummy load (IKEA LED1457C3 E14 bulb measured at 2.61 W)",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,

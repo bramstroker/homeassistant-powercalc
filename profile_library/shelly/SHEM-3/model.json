@@ -24,6 +24,7 @@
   "measure_description": "Manually measured. Transcribed from https://www.youtube.com/watch?v=RlSCe9xaUPE",
   "measure_device": "GW Instek GPM-8310",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "3EM",
   "only_self_usage": true,
   "product_url": "https://us.shelly.com/products/shelly-3em",

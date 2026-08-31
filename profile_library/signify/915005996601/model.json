@@ -21,6 +21,7 @@
   "measure_description": "Measured with utils/measure script using 1 light and a 40W incandescent bulb as a dummy load, which was allowed to heat up for 1 hour before measuring",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,

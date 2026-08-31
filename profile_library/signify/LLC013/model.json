@@ -20,6 +20,7 @@
   "linked_profile": "signify/LLC012",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Hue Disney Story Light",
   "standby_power": 0.3,
   "authors": [

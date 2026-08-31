@@ -20,6 +20,7 @@
   "measure_description": "Eyeballed from the smartplug screen. Figures were steady",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Smart Plug",
   "only_self_usage": true,
   "standby_power": 0.52,

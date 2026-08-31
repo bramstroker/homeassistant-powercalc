@@ -17,6 +17,7 @@
   "measure_description": "Manually measured average of 2 plugs",
   "measure_device": "Brennenstuhl PM 231 E",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Smart Plug",
   "product_url": "https://innr.com/products/innr-smart-plug",
   "only_self_usage": true,

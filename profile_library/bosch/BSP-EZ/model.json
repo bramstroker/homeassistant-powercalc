@@ -25,6 +25,7 @@
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/files/11778846/measurements.xlsx",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Smart Plug Compact",
   "product_url": "https://www.bosch-smarthome.com/rom/plug-manual",
   "only_self_usage": true,

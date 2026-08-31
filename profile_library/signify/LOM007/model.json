@@ -18,6 +18,7 @@
   "measure_description": "Manually measured. Copied from LOM001",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Hue Smart Plug",
   "only_self_usage": false,
   "standby_power": 0.15,

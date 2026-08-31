@@ -21,6 +21,7 @@
   "measure_description": "Measured with Powercalc measure tool in Average mode (600 seconds)",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "FRITZ!Box 6670 Cable",
   "product_url": "https://fritz.com/en/products/fritz-box-6670-cable-20003047",
   "authors": [

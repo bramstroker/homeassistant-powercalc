@@ -26,6 +26,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Cruiser Pro T1S Smart Tower Fan",
   "product_url": "https://www.dreo.com/products/tower-fan-518",
   "standby_power": 0.87,

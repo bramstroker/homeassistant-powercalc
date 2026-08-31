@@ -16,6 +16,7 @@
   },
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "TRADFRI bulb E27 WW 806lm",
   "standby_power": 0.4,
   "authors": [

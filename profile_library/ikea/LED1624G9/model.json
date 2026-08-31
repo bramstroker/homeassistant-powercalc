@@ -19,6 +19,7 @@
   "measure_description": "Measured with utils/measure script, manually added values approximately corresponding with xy_color: [0.458, 0.41]",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 2,

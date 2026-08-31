@@ -15,6 +15,7 @@
   "measure_description": "Measure average for 10 minutes",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "min_version": "v1.24.0",
   "name": "P1 Energy Monitor",
   "product_url": "https://www.youless.nl/winkel/ls120.html",

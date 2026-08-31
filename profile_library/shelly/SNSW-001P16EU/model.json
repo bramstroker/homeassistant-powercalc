@@ -27,6 +27,7 @@
   "measure_device": "Shelly PM Mini Gen3",
   "measure_device_firmware": "20241011-114503/1.4.4-g6d2a586",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 200,
     "SLEEP_TIME": 0.5

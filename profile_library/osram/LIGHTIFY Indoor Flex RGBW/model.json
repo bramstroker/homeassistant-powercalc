@@ -23,6 +23,7 @@
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "LIGHTIFY Indoor Flex RGBW (1.8 m)",
   "standby_power": 0.3,
   "authors": [

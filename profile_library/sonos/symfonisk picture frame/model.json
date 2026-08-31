@@ -28,6 +28,7 @@
   "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals, and took average measurements over 60s using the docker container",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "SYMFONISK Picture Frame",
   "standby_power": 2.4,
   "authors": [

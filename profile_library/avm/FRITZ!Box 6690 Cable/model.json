@@ -20,6 +20,7 @@
   "measure_description": "Measured with Powercalc measure tool in Average mode (600 seconds)",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "VERSION": "v1.20.12:docker"
   },

@@ -15,6 +15,7 @@
   "measure_device": "Nous A1",
   "measure_device_firmware": "TASMOTA 9.5.0",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 10,
     "SLEEP_TIME": 2,

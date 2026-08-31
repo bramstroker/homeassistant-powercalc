@@ -18,6 +18,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Wi-Fi Bridge",
   "product_url": "https://nuki.io/en-gb/products/bridge",
   "discovery_by": "device",
