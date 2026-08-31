@@ -13,6 +13,9 @@
       "thread"
     ]
   },
+  "ean": [
+    "193575007557"
+  ],
   "linear_config": {
     "calibrate": [
       "10 -> 2.83",

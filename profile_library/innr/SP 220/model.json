@@ -10,6 +10,9 @@
       "zigbee"
     ]
   },
+  "ean": [
+    "8718781552657"
+  ],
   "measure_description": "Manually measured",
   "measure_device": "Shelly Plus Plug S / AVM FRITZ!DECT 200",
   "measure_method": "manual",
