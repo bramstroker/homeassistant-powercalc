@@ -23,7 +23,7 @@
   "only_self_usage": true,
   "standby_power": 0.5,
   "standby_power_on": 0.9,
-  "product_url": "https://www.tp-link.com/au/home-networking/smart-plug/kp115/v1/",
+  "product_url": "https://www.tp-link.com/en/home-networking/smart-plug/kp115/v1/",
   "authors": [
     {
       "name": "Daniel O'Connor",

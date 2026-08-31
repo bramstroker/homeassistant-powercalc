@@ -27,7 +27,7 @@
     "VERSION": "v1.15.5:docker"
   },
   "name": "Twinkly Strings Multicolor (600 LEDs)",
-  "product_url": "https://help.twinkly.com/hc/en-gb/articles/18277826963741-what-s-twinkly-strings",
+  "product_url": "https://twinkly.com/en-row/products/strings-multicolor",
   "standby_power": 2.2,
   "authors": [
     {

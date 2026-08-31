@@ -42,6 +42,7 @@
     "VERSION": "master"
   },
   "name": "Multiroom Speaker",
+  "product_url": "https://www.bang-olufsen.com/en/gb/speakers/beosound-edge",
   "standby_power": 2.4,
   "authors": [
     {

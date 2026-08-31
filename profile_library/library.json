@@ -1088,10 +1088,10 @@
           ],
           "id": "BE650G1",
           "manufacturer": "apc",
-          "updated_at": "2026-08-31T05:34:33",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "0c4e62df2bac2d311ec94bca200fa6d1"
+          "hash": "d13312485a89cb1652a7b1b24a89848c"
         }
       ],
       "device_types": [
@@ -1143,14 +1143,14 @@
           ],
           "id": "A2374",
           "manufacturer": "apple",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 4.22,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.99,
             "max": 4.22
           },
-          "hash": "6418675151431491b65ff8b923b4e76e"
+          "hash": "8dd5fb3a8cd24451db4ba760d9bf909e"
         },
         {
           "aliases": [
@@ -1187,14 +1187,14 @@
           ],
           "id": "A2825",
           "manufacturer": "apple",
-          "updated_at": "2026-08-31T06:05:00",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 27.08,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.01,
             "max": 27.08
           },
-          "hash": "00af4774258cd9f81cadfe33dfd4d23b"
+          "hash": "d5f6b0cf6d02c45094e2dfbcbe9bbf87"
         }
       ],
       "device_types": [
@@ -1644,7 +1644,7 @@
           ],
           "id": "ALD295HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 8.3,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T10:03:02",
@@ -1660,7 +1660,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "da4418db58b6161d0df82b31ef4024c2"
+          "hash": "da2a7cabf1d82795401fa1b80912e453"
         },
         {
           "calculation_strategy": "lut",
@@ -1695,7 +1695,7 @@
           ],
           "id": "GLD115HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 9.34,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -1710,7 +1710,7 @@
             "score": 95.7,
             "color_temp": 95.7
           },
-          "hash": "fe98e854148e822b570932d860c58507"
+          "hash": "cb44c0132f2c79ff91761adc4effa75d"
         },
         {
           "calculation_strategy": "lut",
@@ -2548,6 +2548,7 @@
             "VERSION": "master"
           },
           "name": "Wireless Speaker",
+          "product_url": "https://www.bang-olufsen.com/en/gb/speakers/beoplay-m5",
           "standby_power": 3.2,
           "authors": [
             {
@@ -2564,7 +2565,7 @@
             "min": 3.2,
             "max": 20.3
           },
-          "hash": "d11f77b31fa036a87bd3f7bb4243c826"
+          "hash": "2f3ba8268aeab65be65c73c07629f51d"
         },
         {
           "calculation_strategy": "linear",
@@ -2590,6 +2591,7 @@
             "VERSION": "master"
           },
           "name": "360\u00b0 Speaker",
+          "product_url": "https://www.bang-olufsen.com/en/gb/speakers/beosound-balance",
           "standby_power": 3.8,
           "authors": [
             {
@@ -2606,7 +2608,7 @@
             "min": 3.8,
             "max": 97.95
           },
-          "hash": "b4e2513a20aac9ed87a55bf400801fa9"
+          "hash": "7f03c94ac800316ce2e051c7fb114b27"
         },
         {
           "aliases": [
@@ -2636,6 +2638,7 @@
             "VERSION": "master"
           },
           "name": "Multiroom Speaker",
+          "product_url": "https://www.bang-olufsen.com/en/gb/speakers/beosound-edge",
           "standby_power": 2.4,
           "authors": [
             {
@@ -2652,7 +2655,7 @@
             "min": 2.4,
             "max": 36.6
           },
-          "hash": "3604854dbc4860d55d277c48f8ea9af3"
+          "hash": "5b9ed6548b782c5c23f319c070e88bb3"
         },
         {
           "calculation_strategy": "linear",
@@ -2678,6 +2681,7 @@
             "VERSION": "master"
           },
           "name": "Bookshelf Speaker",
+          "product_url": "https://www.bang-olufsen.com/en/gb/speakers/beosound-emerge",
           "standby_power": 5.0,
           "authors": [
             {
@@ -2694,7 +2698,7 @@
             "min": 5.0,
             "max": 24.55
           },
-          "hash": "675f5f8c2ef41e33bb0393bacc2db5f1"
+          "hash": "af10ce14240d996c675e363e0125f7fd"
         }
       ],
       "device_types": [
@@ -3039,6 +3043,7 @@
             "VERSION": "master"
           },
           "name": "SoundTouch 10 Wireless Speaker",
+          "product_url": "https://www.bose.com/p/soundtouch-10-wireless-speaker/ST10-SPEAKERWIRELESS-WHT-120V-US.html",
           "standby_power": 1.5,
           "authors": [
             {
@@ -3055,7 +3060,7 @@
             "min": 2.6,
             "max": 8.54
           },
-          "hash": "486ba53d9d0959e4feb6d41f5683a22f"
+          "hash": "f247c8f55120a5a4e0786f957a7d4833"
         },
         {
           "aliases": [
@@ -3088,6 +3093,7 @@
             "767520-2100"
           ],
           "name": "SoundTouch 300 Soundbar",
+          "product_url": "https://www.bose.com/p/soundtouch-300-soundbar/STSB300-SOUNDBAR-BLK-120V-AST.html",
           "standby_power": 1.5,
           "authors": [
             {
@@ -3104,7 +3110,7 @@
             "min": 8.2,
             "max": 37.56
           },
-          "hash": "1b573511cd2ba607d6cb570e59c2a2e2"
+          "hash": "fd52d0ced5b95020910bb34bb3db48a8"
         }
       ],
       "device_types": [
@@ -3527,14 +3533,14 @@
           ],
           "id": "HEOS 1 HS2",
           "manufacturer": "denon",
-          "updated_at": "2026-08-31T06:10:16",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 12.55,
           "sub_profile_count": 0,
           "power_range": {
             "min": 6.2,
             "max": 12.55
           },
-          "hash": "1e37d4c6f2f0e800a211766fc2f203e3"
+          "hash": "01dc89a6184e24e6722728ed151178b3"
         }
       ],
       "device_types": [
@@ -3992,10 +3998,10 @@
           ],
           "id": "TP07",
           "manufacturer": "dyson",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "34c4d4f70da0fd0b34e8841f857afddd"
+          "hash": "50b6537049206d9fe937538368a8dbcb"
         }
       ],
       "device_types": [
@@ -4990,6 +4996,7 @@
           "measure_device": "Shelly Plus Plug",
           "measure_method": "manual",
           "name": "EcoTank All-in-One Cartridge-Free Supertank Printer",
+          "product_url": "https://epson.com/en/For-Work/Printers/Inkjet/EcoTank-ET-3760-All-in-One-Cartridge-Free-Supertank-Printer/p/C11CG20203",
           "authors": [
             {
               "name": "Brian Egge",
@@ -5009,7 +5016,7 @@
             "min": 6.0,
             "max": 14.0
           },
-          "hash": "25038bfaed774a49522d381e80c47eea"
+          "hash": "d542ed64ca8c175a150ae25f38d7bf3a"
         },
         {
           "aliases": [
@@ -5029,6 +5036,7 @@
           "measure_device": "Shelly Plus Plug S",
           "measure_method": "manual",
           "name": "EcoTank Multifunction Wi-Fi Ink Tank A4 Printer",
+          "product_url": "https://epson.com.br/Para-empresas/Impressoras/Impressoras-a-Jato-de-Tinta/Impressora-Multifuncional-3-em-1-Epson-EcoTank%C2%AE-L6270/p/C11CJ61302",
           "authors": [
             {
               "name": "Andrzej Dopiera\u0142a",
@@ -5048,7 +5056,7 @@
             "min": 1.52,
             "max": 12.0
           },
-          "hash": "6ff221a90a4d9ec524b76aba81f6be69"
+          "hash": "516ea8ed5e13fc1c079cbbc27b3490bd"
         }
       ],
       "device_types": [
@@ -5564,14 +5572,14 @@
           ],
           "id": "T8400",
           "manufacturer": "eufy",
-          "updated_at": "2026-08-31T05:37:37",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 2.75,
           "sub_profile_count": 2,
           "power_range": {
             "min": 1.45,
             "max": 2.75
           },
-          "hash": "bdbb2335c208e1343a2dff089c5767ba"
+          "hash": "09d3eb8d60468f24410aa68826286b43"
         },
         {
           "calculation_strategy": "fixed",
@@ -5589,7 +5597,7 @@
           "measure_device": "Shelly Plug S",
           "measure_method": "script",
           "name": "Indoor Cam E220",
-          "product_url": "https://service.eufy.com/article-description/eufy-Security-Complete-HomeBase-Compatibility-Guide",
+          "product_url": "https://www.eufy.com/eu-en/products/t8410",
           "authors": [
             {
               "name": "Bram Gerritsen",
@@ -5599,14 +5607,14 @@
           ],
           "id": "T8410",
           "manufacturer": "eufy",
-          "updated_at": "2026-08-31T05:37:37",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 2.35,
           "sub_profile_count": 2,
           "power_range": {
             "min": 1.32,
             "max": 2.35
           },
-          "hash": "bce71fe9dcdec593bd39891ef77b93bf"
+          "hash": "263e14431dc4d4f3617113c68807f45d"
         }
       ],
       "device_types": [
@@ -5651,7 +5659,7 @@
           "measure_method": "manual",
           "name": "Energy (Matter) Smart Plug",
           "only_self_usage": true,
-          "product_url": "https://www.evehome.com/en-us/identify-your-eve-accessory",
+          "product_url": "https://www.evehome.com/en-us/eve-energy",
           "standby_power": 0.4,
           "standby_power_on": 0.9,
           "authors": [
@@ -5662,14 +5670,14 @@
           ],
           "id": "20EBU4101",
           "manufacturer": "eve",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.9,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.9,
             "max": 0.9
           },
-          "hash": "62dc9736766a9d903125ebfa0ab70e0e"
+          "hash": "6fdeb61d35b5aae0b465ac99706ada1a"
         }
       ],
       "device_types": [
@@ -7458,7 +7466,7 @@
           ],
           "id": "H14C0",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 5.25,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-13T08:03:22",
@@ -7474,7 +7482,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "85d9fe21fdb531abff2af965a5fff8b8"
+          "hash": "bf9fda5f28b4aa4f3afc9ca2ae085c12"
         },
         {
           "calculation_strategy": "lut",
@@ -7503,7 +7511,7 @@
           },
           "name": "RGBWW Smart Light Bulb GU10",
           "standby_power": 0.27,
-          "product_url": "https://eu.govee.com/de-de/products/govee-rgbww-smart-light-bulbs",
+          "product_url": "https://uk.govee.com/products/govee-rgbww-smart-light-bulbs",
           "authors": [
             {
               "name": "Benjamin Neff",
@@ -7513,7 +7521,7 @@
           ],
           "id": "H600D",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 4.47,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-12-21T03:04:34",
@@ -7529,7 +7537,7 @@
             "score": 98.4,
             "color_temp": 98.4
           },
-          "hash": "6f801ccd393e4739b335af96d31d7474"
+          "hash": "e443df571cf23f717493e8f7f044315b"
         },
         {
           "calculation_strategy": "lut",
@@ -7569,7 +7577,7 @@
           ],
           "id": "H601C",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 13.15,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-09-29T17:42:57",
@@ -7585,7 +7593,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "72685629673a8fc62b56955cf27be0a9"
+          "hash": "802d59b599a9e61a151bb3979b071ff1"
         },
         {
           "calculation_strategy": "lut",
@@ -7624,7 +7632,7 @@
           ],
           "id": "H6061",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 23.75,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-12-20T08:11:39",
@@ -7640,7 +7648,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "21af1e89279d61a20e0d962c6bb88614"
+          "hash": "6bcb8690230be72beec1bf4740b60c23"
         },
         {
           "calculation_strategy": "lut",
@@ -7669,7 +7677,7 @@
           },
           "name": "Lyra RGBICWW Corner Floor Lamp",
           "standby_power": 1.78,
-          "product_url": "https://ca.govee.com/products/refurbished-govee-lyra-rgbicww-corner-floor-lamp",
+          "product_url": "https://uk.govee.com/products/refurbished-govee-lyra-rgbicww-corner-floor-lamp",
           "authors": [
             {
               "name": "sockmonkey0223",
@@ -7679,7 +7687,7 @@
           ],
           "id": "H6072",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 28.07,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -7695,7 +7703,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "5914a957a6309301810f1de9d4bd9601"
+          "hash": "10fdd32b68f12edc85b8b08fc2a7a382"
         },
         {
           "calculation_strategy": "lut",
@@ -7733,7 +7741,7 @@
           ],
           "id": "H6076",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 23.14,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -7751,7 +7759,7 @@
             "brightness": 98.9,
             "color_temp": 84.6
           },
-          "hash": "5d5a3551716c8c26ff7a73f346239ea2"
+          "hash": "89ceaa188807d689b57dd2d788a2c595"
         },
         {
           "calculation_strategy": "lut",
@@ -7780,7 +7788,7 @@
           },
           "name": "Floor Lamp 2",
           "standby_power": 0.7,
-          "product_url": "https://store.govee.com/products/govee-floor-lamp-2",
+          "product_url": "https://us.govee.com/products/govee-floor-lamp-2",
           "authors": [
             {
               "name": "Udo Ha\u00df",
@@ -7790,7 +7798,7 @@
           ],
           "id": "H607C",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 39.0,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-09T15:57:14",
@@ -7807,7 +7815,7 @@
             "score": 99.0,
             "color_temp": 99.0
           },
-          "hash": "cea8a42264fa6c1c1aaf31c1a29d827e"
+          "hash": "6c58d846569d9f81c84ebd2e63b6fc5f"
         },
         {
           "calculation_strategy": "lut",
@@ -7845,7 +7853,7 @@
           ],
           "id": "H60A1",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 23.35,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-02-13T20:33:43",
@@ -7862,7 +7870,7 @@
             "score": 98.4,
             "color_temp": 98.4
           },
-          "hash": "55d0233faafab57e51443b3938f5d437"
+          "hash": "e9e2f19e56762da016e275438191219c"
         },
         {
           "calculation_strategy": "lut",
@@ -7899,7 +7907,7 @@
           ],
           "id": "H61A1",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 24.11,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-12-12T08:06:55",
@@ -7911,7 +7919,7 @@
             "effect",
             "hs"
           ],
-          "hash": "2038624e8d2e38b73f94ccb1fe5bc138"
+          "hash": "985eae63c2dfcfbc0b3bbea06760b46b"
         },
         {
           "calculation_strategy": "lut",
@@ -7942,7 +7950,7 @@
           },
           "name": "Strip Light with Skyline Kit",
           "standby_power": 1.2,
-          "product_url": "https://eu.govee.com/products/govee-strip-light-with-skyline-kit",
+          "product_url": "https://us.govee.com/products/govee-strip-light-with-skyline-kit",
           "authors": [
             {
               "name": "Jonas Dambacher",
@@ -7952,7 +7960,7 @@
           ],
           "id": "H61B8",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 35.15,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-12T17:20:31",
@@ -7968,7 +7976,7 @@
             "score": 60.7,
             "color_temp": 60.7
           },
-          "hash": "36e9a60d27d1dc6e511b2eba91ae634a"
+          "hash": "05c5429edf9de07e25e554aec30582fe"
         },
         {
           "calculation_strategy": "lut",
@@ -7996,7 +8004,7 @@
             "VERSION": "v1.20.2:docker"
           },
           "name": "Strip Light 2 Pro (5m)",
-          "product_url": "https://uk.govee.com/products/govee-strip-light-2-pro",
+          "product_url": "https://us.govee.com/products/govee-led-strip-light-2-pro",
           "standby_power": 1.2,
           "authors": [
             {
@@ -8007,7 +8015,7 @@
           ],
           "id": "H61F5",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 36.45,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-08T08:11:08",
@@ -8024,7 +8032,7 @@
             "score": 67.4,
             "color_temp": 67.4
           },
-          "hash": "620d306abb63273792ed56b00c523640"
+          "hash": "2265b6362e865b39a8933e5f36ff9b16"
         },
         {
           "calculation_strategy": "lut",
@@ -8063,7 +8071,7 @@
           ],
           "id": "H7020",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T08:14:38",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 6.65,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-02-11T20:31:49",
@@ -8079,7 +8087,7 @@
             "score": 24.3,
             "color_temp": 24.3
           },
-          "hash": "1a0c4140566430c1e323caab965f4ad3"
+          "hash": "b9075d60037fddd45a4656aab2791ba2"
         },
         {
           "calculation_strategy": "lut",
@@ -8118,7 +8126,7 @@
           ],
           "id": "H7021",
           "manufacturer": "govee",
-          "updated_at": "2026-08-30T08:14:38",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 20.4,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-12-20T10:42:32",
@@ -8135,7 +8143,7 @@
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "04714f7dbf459a83d0ef7e6d474ea371"
+          "hash": "063a7eb23f6fd4a6c6635393e330e71f"
         }
       ],
       "device_types": [
@@ -8480,7 +8488,7 @@
           ],
           "id": "10454469",
           "manufacturer": "hornbach",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 8.6,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T16:28:11",
@@ -8495,7 +8503,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "c37c00bef62b3121f6884f194c08ae76"
+          "hash": "fbf6011f8d66716880402c7d9d803eec"
         }
       ],
       "device_types": [
@@ -8542,14 +8550,14 @@
           ],
           "id": "MFP 3301",
           "manufacturer": "hp",
-          "updated_at": "2026-08-31T06:10:16",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 2.2,
           "sub_profile_count": 0,
           "power_range": {
             "min": 2.2,
             "max": 2.2
           },
-          "hash": "1e121c859ace2faa1dd5e686889f2236"
+          "hash": "ec0a6f671d9a592b61395add0959a5cf"
         }
       ],
       "device_types": [
@@ -13995,7 +14003,7 @@
           ],
           "id": "BLF10",
           "manufacturer": "kauf",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 9.57,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-09-03T09:57:52",
@@ -14013,7 +14021,7 @@
             "brightness": 98.9,
             "color_temp": 33.4
           },
-          "hash": "a87b8c3ab4a20c761f3e9aabd206b32e"
+          "hash": "8d8cd6a9c8b3f8b383cf8e2f4d8f7259"
         }
       ],
       "device_types": [
@@ -14926,7 +14934,7 @@
             "VERSION": "v1.15.5:docker"
           },
           "name": "Twinkly Strings Multicolor (600 LEDs)",
-          "product_url": "https://help.twinkly.com/hc/en-gb/articles/18277826963741-what-s-twinkly-strings",
+          "product_url": "https://twinkly.com/en-row/products/strings-multicolor",
           "standby_power": 2.2,
           "authors": [
             {
@@ -14937,14 +14945,14 @@
           ],
           "id": "TWS600STP",
           "manufacturer": "ledworks",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 37.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 37.0,
             "max": 37.0
           },
-          "hash": "999936585ec9158829d0d9bfedd5194f"
+          "hash": "da99904f642376e4207d311d4a62c8ac"
         }
       ],
       "device_types": [
@@ -14995,14 +15003,14 @@
           ],
           "id": "CD-24501F",
           "manufacturer": "lenovo",
-          "updated_at": "2026-08-31T06:05:00",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 4.41,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.12,
             "max": 4.41
           },
-          "hash": "aa5bd15623f818c8d856b47e9bb7e86f"
+          "hash": "bfbc358317ff30d4e2371a733dbb2ede"
         }
       ],
       "device_types": [
@@ -17993,10 +18001,10 @@
           ],
           "id": "PD-3PCL-WH",
           "manufacturer": "lutron",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.56,
           "sub_profile_count": 0,
-          "hash": "4897a979e2d75aded239a41375f826f1"
+          "hash": "6ae7d44202ecdec80ce413b46fad3d0c"
         }
       ],
       "device_types": [
@@ -18048,7 +18056,7 @@
           ],
           "id": "9970020",
           "manufacturer": "malmbergs",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 36.12,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -18063,7 +18071,7 @@
             "score": 99.2,
             "color_temp": 99.2
           },
-          "hash": "c96cda223ea6812c8ff41f80fff4c771"
+          "hash": "df7803266a091afa6943a7c5bccf8024"
         }
       ],
       "device_types": [
@@ -18115,10 +18123,10 @@
           ],
           "id": "YUKA mini 600",
           "manufacturer": "mammotion",
-          "updated_at": "2026-08-31T07:14:47",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "034a32b31c16eeb46bce4384e161a82d"
+          "hash": "2b9d5df27a0f1f0246d6b16d6f1f6808"
         }
       ],
       "device_types": [
@@ -18246,7 +18254,7 @@
           ],
           "id": "SMD4109W-RGB-ZB",
           "manufacturer": "mercator ikuu",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 8.09,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T07:54:28",
@@ -18262,7 +18270,7 @@
             "score": 97.7,
             "color_temp": 97.7
           },
-          "hash": "4076467dbc2184c8b14f91cc84c416f6"
+          "hash": "e9ef939a5142ece6635cf023f5c2d6fd"
         }
       ],
       "device_types": [
@@ -18324,7 +18332,7 @@
           ],
           "id": "MSL120",
           "manufacturer": "meross",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 10.1,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T08:00:00",
@@ -18340,7 +18348,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "30853d821067eb4e8b1369629fc6a0ac"
+          "hash": "721736dfd7c36985cd7cb75d232c8652"
         }
       ],
       "device_types": [
@@ -18399,7 +18407,7 @@
           ],
           "id": "MWB-TD5-RCW-GU10-MS",
           "manufacturer": "moes",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 5.08,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T08:05:39",
@@ -18415,7 +18423,7 @@
             "score": 99.6,
             "color_temp": 99.6
           },
-          "hash": "4045a90697e12cba052d1c2220cac449"
+          "hash": "11837a8de25a4c4caeff0f76ada0a260"
         },
         {
           "aliases": [
@@ -18703,7 +18711,7 @@
           ],
           "id": "404094",
           "manufacturer": "mueller-licht",
-          "updated_at": "2026-08-31T07:14:47",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 18.53,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T08:13:10",
@@ -18718,7 +18726,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "adee397d7f2866e6ba42b3089187549b"
+          "hash": "c20bb406d1fffa7459e4354da566d7d2"
         },
         {
           "aliases": [
@@ -19032,7 +19040,7 @@
           ],
           "id": "NF080B03-1A19E",
           "manufacturer": "nanoleaf",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 9.02,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T08:29:42",
@@ -19048,7 +19056,7 @@
             "score": 95.0,
             "color_temp": 95.0
           },
-          "hash": "00c0962a56b0fa4251fe5c9725c82c9a"
+          "hash": "18dea16c4eb4cbff1824f2a4017fe163"
         },
         {
           "aliases": [
@@ -19213,14 +19221,14 @@
           ],
           "id": "NHC01",
           "manufacturer": "netatmo",
-          "updated_at": "2026-08-31T06:05:00",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.43,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.43,
             "max": 0.43
           },
-          "hash": "153cb497698e266d56c0a2745f1792b1"
+          "hash": "309b0123cae12100668482f81dcac518"
         }
       ],
       "device_types": [
@@ -19264,14 +19272,14 @@
           ],
           "id": "GS110MX",
           "manufacturer": "netgear",
-          "updated_at": "2026-08-31T06:10:16",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 8.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 8.0,
             "max": 8.0
           },
-          "hash": "0f7cac4b61e5ef933cc7072f0d8f4994"
+          "hash": "a4254a1c11a6902bdf574738aa82d1ab"
         }
       ],
       "device_types": [
@@ -19386,14 +19394,14 @@
           ],
           "id": "A1T",
           "manufacturer": "nous",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.54,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.54,
             "max": 0.54
           },
-          "hash": "551612e193816587e2f1ef644e74cd49"
+          "hash": "759447a9fbc6996fce9a741dbcb20f57"
         },
         {
           "aliases": [
@@ -19431,14 +19439,14 @@
           ],
           "id": "A1Z",
           "manufacturer": "nous",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.4,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.4,
             "max": 0.4
           },
-          "hash": "077dfd1b61c7fa4cdf7f6132e507a335"
+          "hash": "4da7833ba40801015bfc514ee3a9c71c"
         }
       ],
       "device_types": [
@@ -19475,7 +19483,7 @@
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "manual",
           "name": "Wi-Fi Bridge",
-          "product_url": "https://nuki.io/en-gb/products/bridge?chooser=true&sku=220694",
+          "product_url": "https://nuki.io/en-gb/products/bridge",
           "discovery_by": "device",
           "authors": [
             {
@@ -19485,14 +19493,14 @@
           ],
           "id": "220694",
           "manufacturer": "nuki",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.51,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.51,
             "max": 0.51
           },
-          "hash": "0749be0bae3b421ddf65ed8c1bf23992"
+          "hash": "eb7b45f572ebab7bcf035d85c0f49407"
         }
       ],
       "device_types": [
@@ -20590,14 +20598,14 @@
           ],
           "id": "ZMNHYD1",
           "manufacturer": "qubino",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.5,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.5,
             "max": 0.5
           },
-          "hash": "d568018110c9016b56940d13468535f9"
+          "hash": "26faafd67be1f4e24075a49ed04a2084"
         }
       ],
       "device_types": [
@@ -20650,14 +20658,14 @@
           ],
           "id": "E330",
           "manufacturer": "reolink",
-          "updated_at": "2026-08-31T06:10:16",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 4.08,
           "sub_profile_count": 2,
           "power_range": {
             "min": 2.51,
             "max": 4.08
           },
-          "hash": "6f113b113e7174fb1bd778701c3ba4fb"
+          "hash": "ac0c8e0579a786212d5ba36e9d27e748"
         },
         {
           "calculation_strategy": "fixed",
@@ -20684,14 +20692,14 @@
           ],
           "id": "RLC-810WA",
           "manufacturer": "reolink",
-          "updated_at": "2026-08-30T05:50:07",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 8.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 8.0,
             "max": 8.0
           },
-          "hash": "f9587aa3e04d27274c03fb83e72279a8"
+          "hash": "76147b428dec64867babd1319c8ae92f"
         }
       ],
       "device_types": [
@@ -20979,11 +20987,11 @@
           ],
           "id": "SDJQR01RR",
           "manufacturer": "roborock",
-          "updated_at": "2026-08-31T06:10:16",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": null,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:02:50",
-          "hash": "b377958f78f4bbebf7ca419dcf5854da"
+          "hash": "72b9acc63b464f18e6676fef939d0b16"
         }
       ],
       "device_types": [
@@ -21288,7 +21296,7 @@
           ],
           "id": "S3PL-00112EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.69,
           "sub_profile_count": 2,
           "power_range": {
@@ -21296,7 +21304,7 @@
             "max": 0.69
           },
           "standby_power": 0.4,
-          "hash": "97be1e29a331acdd782613af6433c0a6"
+          "hash": "7cb14eb1ffa8c80a9ca2358749b837a9"
         },
         {
           "aliases": [
@@ -21336,10 +21344,10 @@
           ],
           "id": "S3PM-001PCEU16",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T05:28:16",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.0,
           "sub_profile_count": 0,
-          "hash": "e84c9e8a4179a4055ab4553ac1a73898"
+          "hash": "2a135e54f3e29525bf94f56d06bf1586"
         },
         {
           "aliases": [
@@ -21379,14 +21387,14 @@
           ],
           "id": "S3SN-0024X",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T05:28:16",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.52,
           "sub_profile_count": 3,
           "power_range": {
             "min": 0.15,
             "max": 0.52
           },
-          "hash": "5f556f3db157d1d5a7cd2c19882c86bb"
+          "hash": "cfc53d8eb32d9e3fb4d31ad485348ec7"
         },
         {
           "aliases": [
@@ -21429,7 +21437,7 @@
           ],
           "id": "S3SW-001P8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.86,
           "sub_profile_count": 3,
           "power_range": {
@@ -21437,7 +21445,7 @@
             "max": 0.86
           },
           "standby_power": 0.58,
-          "hash": "6b20e9c37833ad3098eb5a35d9c732bf"
+          "hash": "8eb5db828e397fcd4ce508a04516276b"
         },
         {
           "measure_description": "The measured device fw: 1.7.1. The result represents the average value of measurements collected from the measuring device API for the following scenarios: dumb device/baseline consumption (~3.8W) and several device configurations. See sub-profiles.",
@@ -21483,7 +21491,7 @@
           ],
           "id": "S3SW-001X16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.332,
           "sub_profile_count": 16,
           "power_range": {
@@ -21491,7 +21499,7 @@
             "max": 1.332
           },
           "standby_power": 1.087,
-          "hash": "b2953a8203a45679f60b459bea0e28b2"
+          "hash": "8f18bdf7539908272e0eced1791f6cee"
         },
         {
           "aliases": [
@@ -21532,7 +21540,7 @@
           ],
           "id": "S3SW-001X8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.81,
           "sub_profile_count": 3,
           "power_range": {
@@ -21540,7 +21548,7 @@
             "max": 0.81
           },
           "standby_power": 0.53,
-          "hash": "2dbb5f55fc430280b1d2d05a583c2adb"
+          "hash": "a0406a9d1e5021a9acc9d7c207cd6475"
         },
         {
           "aliases": [
@@ -21586,7 +21594,7 @@
           ],
           "id": "S3SW-0A1X1EUL",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 2.366,
           "sub_profile_count": 5,
           "power_range": {
@@ -21594,7 +21602,7 @@
             "max": 2.366
           },
           "standby_power": 0.15,
-          "hash": "2387e3ba929778f3f0816fde9e325c5b"
+          "hash": "2e57664e9e54ebf3ce988ec3d4e4b0a0"
         },
         {
           "aliases": [
@@ -21641,7 +21649,7 @@
           ],
           "id": "S4SW-001P8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.996,
           "sub_profile_count": 4,
           "power_range": {
@@ -21649,7 +21657,7 @@
             "max": 0.996
           },
           "standby_power": 0.732,
-          "hash": "800ed2445f13f316ceebf1b001f40b7b"
+          "hash": "3eb4046a1e56edd47cdefae0dcc2c452"
         },
         {
           "aliases": [
@@ -21695,7 +21703,7 @@
           ],
           "id": "S4SW-001X8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.94,
           "sub_profile_count": 4,
           "power_range": {
@@ -21703,7 +21711,7 @@
             "max": 0.94
           },
           "standby_power": 0.655,
-          "hash": "c0baec53cf4e3613fcd8e84995ded945"
+          "hash": "083701f257881e269bdf9887253b29bb"
         },
         {
           "aliases": [
@@ -21748,7 +21756,7 @@
           ],
           "id": "SHCB-1",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 4.9,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-23T07:39:01",
@@ -21764,7 +21772,7 @@
             "score": 74.8,
             "color_temp": 74.8
           },
-          "hash": "62e434b2f2c3c5e3468f5416a25c59b5"
+          "hash": "e26dbf3bff432395150dd6ccc7b7df9d"
         },
         {
           "aliases": [
@@ -21858,14 +21866,14 @@
           ],
           "id": "SHEM",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.923,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.923,
             "max": 0.923
           },
-          "hash": "984062977671c6a693c085ca52b89b4f"
+          "hash": "5457b43069f1ca6c8e404cd22d3e34c1"
         },
         {
           "aliases": [
@@ -21907,14 +21915,14 @@
           ],
           "id": "SHEM-3",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.22,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.22,
             "max": 1.22
           },
-          "hash": "3e59d8fe973705ca4dd6cd37b94a16cf"
+          "hash": "f9ec9d478593a6d21527f344d01f8483"
         },
         {
           "aliases": [
@@ -21957,14 +21965,14 @@
           ],
           "id": "SHIX3-1",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T05:28:16",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.587,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.587,
             "max": 0.587
           },
-          "hash": "3236ff925dca965506c3ad3804a1c0fb"
+          "hash": "ccbb46cf4493a361cc6b30bcbb61172e"
         },
         {
           "aliases": [
@@ -22004,7 +22012,7 @@
           ],
           "id": "SHPLG-S",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.8,
           "sub_profile_count": 2,
           "power_range": {
@@ -22012,7 +22020,7 @@
             "max": 0.8
           },
           "standby_power": 0.5,
-          "hash": "b7780b44249de665fe769b6b01569cd5"
+          "hash": "e237be29467e7163fab144f7ed6a2e81"
         },
         {
           "aliases": [
@@ -22059,14 +22067,14 @@
           ],
           "id": "SHSW-1",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.618,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.618,
             "max": 0.618
           },
-          "hash": "45402c41fb2891c55f950daeb99b31cb"
+          "hash": "4b242d75d62bb1cc3c66d64a6023d27b"
         },
         {
           "aliases": [
@@ -22105,7 +22113,7 @@
           },
           "name": "2.5",
           "only_self_usage": true,
-          "product_url": "https://www.shelly.com/de/products/shelly-2-5-ce-ul",
+          "product_url": "https://www.shelly.com/products/shelly-2-5-ce-ul",
           "standby_power": 0.676,
           "authors": [
             {
@@ -22116,10 +22124,10 @@
           ],
           "id": "SHSW-25",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "8385c931980e38567e20e3c9b3d78a21"
+          "hash": "539937d578723ff3cf13a5fea4f494eb"
         },
         {
           "aliases": [
@@ -22166,14 +22174,14 @@
           ],
           "id": "SHSW-PM",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.85,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.85,
             "max": 0.85
           },
-          "hash": "2ed3fd433a51b6a4dfbf109da50e4fd4"
+          "hash": "83ffd132d5c15d47f44288e74c35e530"
         },
         {
           "aliases": [
@@ -22218,14 +22226,14 @@
           ],
           "id": "SNPL-00112EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.01,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.01,
             "max": 1.01
           },
-          "hash": "6fa02f5e84c130365aa18baef9d798b0"
+          "hash": "200a7ea22bbc3d09688e00eb2f54cb61"
         },
         {
           "aliases": [
@@ -22266,10 +22274,10 @@
           ],
           "id": "SNPL-00116US",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0,
           "sub_profile_count": 0,
-          "hash": "bda9008990365bfe45ecfbeea2056415"
+          "hash": "fc2e359da74c63fcd3c731e5bb425d2c"
         },
         {
           "aliases": [
@@ -22314,7 +22322,7 @@
           ],
           "id": "SNSW-001P16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.0,
           "sub_profile_count": 3,
           "power_range": {
@@ -22322,7 +22330,7 @@
             "max": 1.0
           },
           "standby_power": 0.78,
-          "hash": "5d8f7895b42318e199ad0eb4404902c7"
+          "hash": "332fe224bc77b73dfd2bea7feed57b7c"
         },
         {
           "name": "Plus 2PM",
@@ -22375,10 +22383,10 @@
           ],
           "id": "SNSW-102P16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": null,
           "sub_profile_count": 16,
-          "hash": "fd62fc25c5dbe58cda6a8ae600820132"
+          "hash": "eeafb754c8c7060adf436b0b4417ebe9"
         },
         {
           "aliases": [
@@ -22413,7 +22421,7 @@
           },
           "name": "Pro 3EM",
           "only_self_usage": true,
-          "product_url": "https://www.shelly.com/de/products/shelly-pro-3em-3ct63",
+          "product_url": "https://www.shelly.com/products/shelly-pro-3em-3ct63",
           "authors": [
             {
               "name": "Michal Bartak",
@@ -22423,11 +22431,11 @@
           ],
           "id": "SPEM-003CEBEU63",
           "manufacturer": "shelly",
-          "updated_at": "2026-08-31T05:28:16",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.0,
           "sub_profile_count": 6,
           "standby_power": 1.379,
-          "hash": "4c96e512cc923f1ae1133b0b1a69a2a8"
+          "hash": "018850e3899dce782d7ac4ee9a3b9f69"
         }
       ],
       "device_types": [
@@ -33974,14 +33982,14 @@
           ],
           "id": "SNOOZ-US-2",
           "manufacturer": "snooz",
-          "updated_at": "2026-08-31T06:12:13",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 4.95,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.06,
             "max": 4.95
           },
-          "hash": "727a4d4464f50e5be2c3633a218a9d29"
+          "hash": "0001e32a7eee925f4172ea275a1d5ea7"
         }
       ],
       "device_types": [
@@ -34222,14 +34230,14 @@
           ],
           "id": "ZBMINIR2",
           "manufacturer": "sonoff",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.56,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.56,
             "max": 1.56
           },
-          "hash": "11adf9b54358128a9807bcb75b5ba315"
+          "hash": "8e0b11528fc5c1823a3e6b29e65dfdf0"
         }
       ],
       "device_types": [
@@ -35210,14 +35218,14 @@
           ],
           "id": "LF-S50G",
           "manufacturer": "sony",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 6.9,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.79,
             "max": 6.9
           },
-          "hash": "6f7e5a6fbf626b6bd47a2bdfee2da3d7"
+          "hash": "1e70459447f87d1df28d05cbdd55e0b4"
         }
       ],
       "device_types": [
@@ -35271,7 +35279,7 @@
           ],
           "id": "G25_S-5W-27K_5K-1PK",
           "manufacturer": "sunco",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 5.43,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T02:52:19",
@@ -35287,7 +35295,7 @@
             "score": 97.3,
             "color_temp": 97.3
           },
-          "hash": "e28f46fc419fd7eb2a346d8bd3b8c57b"
+          "hash": "44208a1538be29b831be6beb4e1d42f5"
         }
       ],
       "device_types": [
@@ -35928,14 +35936,14 @@
           ],
           "id": "EP10",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.09,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.09,
             "max": 1.09
           },
-          "hash": "ab1b4448f08cbb2798ef32cb169d3a63"
+          "hash": "e02dddde2258a0b2cb72693b2e8ef750"
         },
         {
           "aliases": [
@@ -35962,7 +35970,7 @@
           "only_self_usage": false,
           "standby_power": 0.89,
           "standby_power_on": 1.461,
-          "product_url": "https://www.tp-link.com/nl/home-networking/smart-plug/hs100/",
+          "product_url": "https://www.tp-link.com/en/home-networking/smart-plug/hs100/",
           "authors": [
             {
               "name": "roschi02",
@@ -35972,14 +35980,14 @@
           ],
           "id": "HS100",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.461,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.461,
             "max": 1.461
           },
-          "hash": "4f204e5bcb01bc47c0b77028cc2089a4"
+          "hash": "7f1333c11733750025596868d03292db"
         },
         {
           "calculation_strategy": "fixed",
@@ -36012,14 +36020,14 @@
           ],
           "id": "HS103",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.07,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.07,
             "max": 1.07
           },
-          "hash": "3b0abcca6c4f6d517d8b3073653ba221"
+          "hash": "d03cbeb444e449ee75810ac97a13ca6c"
         },
         {
           "calculation_strategy": "fixed",
@@ -36052,14 +36060,14 @@
           ],
           "id": "HS105",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.72,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.72,
             "max": 0.72
           },
-          "hash": "68141b523f3db910af243f4a0b64e9e0"
+          "hash": "eb059c2f1fd973f9f1eb57f0fc041fab"
         },
         {
           "aliases": [
@@ -36086,7 +36094,7 @@
           "only_self_usage": true,
           "standby_power": 1.54,
           "standby_power_on": 2.19,
-          "product_url": "https://www.tp-link.com/es/home-networking/smart-plug/hs110/",
+          "product_url": "https://www.tp-link.com/en/home-networking/smart-plug/hs110/",
           "authors": [
             {
               "name": "roschi02",
@@ -36096,14 +36104,14 @@
           ],
           "id": "HS110",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 2.19,
           "sub_profile_count": 0,
           "power_range": {
             "min": 2.19,
             "max": 2.19
           },
-          "hash": "c2e241aaa0c326d5ac244b936a5ceb81"
+          "hash": "0fe35bed130fd99ea91554d8cc39317a"
         },
         {
           "aliases": [
@@ -36141,10 +36149,10 @@
           ],
           "id": "HS300",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "52bb8075cc74482dd210da91aaa84ef9"
+          "hash": "1d98aac8dbd7a0f290dd32bd825495d8"
         },
         {
           "aliases": [
@@ -36184,7 +36192,7 @@
           ],
           "id": "KL135",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 10.65,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-13T08:03:22",
@@ -36202,7 +36210,7 @@
             "brightness": 98.8,
             "color_temp": 93.8
           },
-          "hash": "3fb2d2421c9777c9d7a251fad5ea87a9"
+          "hash": "cb658f5dc60bdc64621ad192c6f6ca60"
         },
         {
           "aliases": [
@@ -36229,7 +36237,7 @@
           "only_self_usage": true,
           "standby_power": 0.5,
           "standby_power_on": 0.9,
-          "product_url": "https://www.tp-link.com/au/home-networking/smart-plug/kp115/v1/",
+          "product_url": "https://www.tp-link.com/en/home-networking/smart-plug/kp115/v1/",
           "authors": [
             {
               "name": "Daniel O'Connor",
@@ -36239,14 +36247,14 @@
           ],
           "id": "KP115",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.9,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.9,
             "max": 0.9
           },
-          "hash": "bf9b4da344908952adf213173442368a"
+          "hash": "eba0a80367b9b689c0a121b5c3fd01a5"
         },
         {
           "calculation_strategy": "fixed",
@@ -36276,14 +36284,14 @@
           ],
           "id": "KP125M",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 0.92,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.92,
             "max": 0.92
           },
-          "hash": "42edc6dab13d888d861e37d1c6c4a9e9"
+          "hash": "08dd0e4cc1451647fe68fce4c46cec28"
         },
         {
           "calculation_strategy": "lut",
@@ -36360,7 +36368,7 @@
           },
           "name": "Tapo Smart Wi-Fi Light Bulb, Multicolor",
           "standby_power": 0.4,
-          "product_url": "https://www.tp-link.com/nl/home-networking/smart-bulb/tapo-l530e/",
+          "product_url": "https://www.tp-link.com/en/home-networking/smart-bulb/tapo-l530e/",
           "authors": [
             {
               "name": "naamah75",
@@ -36370,7 +36378,7 @@
           ],
           "id": "L530",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 9.15,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -36386,7 +36394,7 @@
             "score": 96.5,
             "color_temp": 96.5
           },
-          "hash": "19c5572dbc2e972a8d0e748fa07706ff"
+          "hash": "e06218f90760a33b8770f9794dd452b2"
         },
         {
           "calculation_strategy": "lut",
@@ -36414,7 +36422,7 @@
           },
           "name": "Tapo Smart Wi-Fi Light Strip",
           "standby_power": 0.24,
-          "product_url": "https://www.tp-link.com/nl/smart-home/tapo/tapo-l900-5/",
+          "product_url": "https://www.tp-link.com/en/home-networking/smart-bulb/tapo-l900-5/",
           "authors": [
             {
               "name": "Harry W",
@@ -36424,7 +36432,7 @@
           ],
           "id": "L900",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 12.91,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -36440,7 +36448,7 @@
             "score": 99.4,
             "brightness": 99.4
           },
-          "hash": "1016adc2237c4b0c2bc7439b2da907c2"
+          "hash": "0f63a0b0ba393daadded8b7c774dae3d"
         },
         {
           "calculation_strategy": "lut",
@@ -36468,7 +36476,7 @@
           },
           "name": "Tapo Smart Wi-Fi Light Strip, Multicolor",
           "standby_power": 0.53,
-          "product_url": "https://www.tp-link.com/nl/home-networking/smart-bulb/tapo-l920-5/",
+          "product_url": "https://www.tp-link.com/en/home-networking/smart-bulb/tapo-l920-5/",
           "authors": [
             {
               "name": "Ed Kutuev",
@@ -36478,7 +36486,7 @@
           ],
           "id": "L920",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 18.9,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-10-09T16:34:26",
@@ -36489,7 +36497,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "ed86f82cb844d5c145df80d4b570eb47"
+          "hash": "2636278dd44dfeee5d943bff0c3faa54"
         },
         {
           "calculation_strategy": "fixed",
@@ -36556,7 +36564,7 @@
           "only_self_usage": true,
           "standby_power": 0.6,
           "standby_power_on": 1.0,
-          "product_url": "https://www.tp-link.com/es/home-networking/smart-plug/tapo-p110/",
+          "product_url": "https://www.tp-link.com/en/home-networking/smart-plug/tapo-p110/",
           "authors": [
             {
               "name": "Al3x Zamponi",
@@ -36565,14 +36573,14 @@
           ],
           "id": "P110",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.0,
             "max": 1.0
           },
-          "hash": "c3619b3978f4c8fc5df7dae8e0ad98b0"
+          "hash": "7172e7485874e7213b2994576b018ea5"
         },
         {
           "aliases": [
@@ -36600,7 +36608,7 @@
           "only_self_usage": true,
           "standby_power": 0.3,
           "standby_power_on": 1.2,
-          "product_url": "https://www.tp-link.com/es/home-networking/smart-plug/tapo-p110m/",
+          "product_url": "https://www.tp-link.com/en/home-networking/smart-plug/tapo-p110m/",
           "authors": [
             {
               "name": "Bob Shaker",
@@ -36610,14 +36618,14 @@
           ],
           "id": "P110M",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.2,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.2,
             "max": 1.2
           },
-          "hash": "c28d3cabe3bd6cb31875f316047d1231"
+          "hash": "f2c4f3f399b85513a33560d596644baa"
         },
         {
           "calculation_strategy": "fixed",
@@ -36640,7 +36648,7 @@
           "only_self_usage": true,
           "standby_power": 0.6,
           "standby_power_on": 1.0,
-          "product_url": "https://www.tp-link.com/nl/home-networking/smart-plug/tapo-p115/",
+          "product_url": "https://www.tp-link.com/en/home-networking/smart-plug/tapo-p115/",
           "authors": [
             {
               "name": "belleDESiRE",
@@ -36650,14 +36658,14 @@
           ],
           "id": "P115",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.0,
             "max": 1.0
           },
-          "hash": "a5978582cd35a8987a0d106a5931d00a"
+          "hash": "aa2cc839534ffd2c82921a8891fe3dda"
         }
       ],
       "device_types": [
@@ -37232,14 +37240,14 @@
           ],
           "id": "KLF 200",
           "manufacturer": "velux",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.65,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.65,
             "max": 1.65
           },
-          "hash": "b8681e7bdb2cde0a57bc8e6557c444c8"
+          "hash": "79bf534c6ae66c017191db5f544c131d"
         }
       ],
       "device_types": [
@@ -37283,14 +37291,14 @@
           ],
           "id": "Core200S",
           "manufacturer": "vesync",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 39.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 17.0,
             "max": 39.0
           },
-          "hash": "6b148d797a9c6135a88e7904839a217b"
+          "hash": "61de8d0f63d29d9d2c30587a418e605a"
         },
         {
           "calculation_strategy": "fixed",
@@ -37355,14 +37363,14 @@
           ],
           "id": "Core400S",
           "manufacturer": "vesync",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 37.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.3,
             "max": 37.0
           },
-          "hash": "59e48404176f288795a85c80287957d2"
+          "hash": "5ddac7f1e2fa79bca8bbc510e3b65419"
         }
       ],
       "device_types": [
@@ -39569,14 +39577,14 @@
           ],
           "id": "LS120",
           "manufacturer": "youless",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T09:22:51",
           "max_power": 1.18,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.18,
             "max": 1.18
           },
-          "hash": "ad404fe72c44d12df5c6395de262921f"
+          "hash": "8bb209b6bb9cd330c7c572671e57a60f"
         }
       ],
       "device_types": [

@@ -38,6 +38,7 @@
     "VERSION": "master"
   },
   "name": "360° Speaker",
+  "product_url": "https://www.bang-olufsen.com/en/gb/speakers/beosound-balance",
   "standby_power": 3.8,
   "authors": [
     {

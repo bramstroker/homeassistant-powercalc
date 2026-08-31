@@ -25,7 +25,7 @@
   "measure_method": "manual",
   "name": "Energy (Matter) Smart Plug",
   "only_self_usage": true,
-  "product_url": "https://www.evehome.com/en-us/identify-your-eve-accessory",
+  "product_url": "https://www.evehome.com/en-us/eve-energy",
   "standby_power": 0.4,
   "standby_power_on": 0.9,
   "authors": [

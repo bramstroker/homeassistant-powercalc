@@ -1,4 +1,16 @@
 {
+  "https://epson.com.br/Para-empresas/Impressoras/Impressoras-a-Jato-de-Tinta/Impressora-Multifuncional-3-em-1-Epson-EcoTank%C2%AE-L6270/p/C11CJ61302": {
+    "statuses": [
+      403
+    ],
+    "reason": "Epson blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://epson.com/en/For-Work/Printers/Inkjet/EcoTank-ET-3760-All-in-One-Cartridge-Free-Supertank-Printer/p/C11CG20203": {
+    "statuses": [
+      403
+    ],
+    "reason": "Epson blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
   "https://www.sony.com/electronics/support/speakers-wireless-speakers/lf-s50g/specifications": {
     "statuses": [
       403
