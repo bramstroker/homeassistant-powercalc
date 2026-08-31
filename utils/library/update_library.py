@@ -106,7 +106,6 @@ async def generate_library_json(model_listing: list[dict[str, Any]]) -> None:
             "fixed_config",
             "full_path",
             "linear_config",
-            "measure_description",
             "playbook_config",
             "sensor_config",
             "sub_profile_select",
