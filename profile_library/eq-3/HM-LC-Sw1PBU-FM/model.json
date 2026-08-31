@@ -4,6 +4,8 @@
   "description": "Homematic flush-mounted smart switch actuator for brand switch systems. This profile only models the switch's self-consumption; configure the connected load separately.",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "wall_switch",
+    "power_monitoring": false,
     "rated_power": 1,
     "connectivity": [
       "proprietary"

@@ -11,7 +11,8 @@
     "lumens": 1700,
     "rated_power": 20,
     "connectivity": [
-      "zigbee"
+      "zigbee",
+      "bluetooth"
     ]
   },
   "ean": [

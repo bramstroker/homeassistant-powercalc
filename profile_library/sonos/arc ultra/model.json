@@ -11,6 +11,7 @@
     "8720862502857"
   ],
   "device_specs": {
+    "form_factor": "soundbar",
     "connectivity": [
       "wifi",
       "bluetooth",

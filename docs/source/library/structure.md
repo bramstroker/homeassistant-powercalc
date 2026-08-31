@@ -101,10 +101,16 @@ Additional light specifications:
 
 Additional smart switch and smart dimmer specifications:
 
-| Key              | Type   | Description                                                                                         |
-|------------------|--------|-----------------------------------------------------------------------------------------------------|
-| `form_factor`    | string | `plug`, `wall_switch`, `in_wall`, `din_rail`, `power_strip`, `led_driver` or `other`               |
-| `max_load_watts` | number | Maximum connected load supported by the device, in watts; this is not the device's own power draw |
+| Key                | Type    | Description                                                                                         |
+|--------------------|---------|-----------------------------------------------------------------------------------------------------|
+| `form_factor`      | string  | `plug`, `wall_switch`, `in_wall`, `inline`, `din_rail`, `power_strip`, `led_driver` or `other`     |
+| `max_load_watts`   | number  | Maximum connected load supported by the device, in watts; this is not the device's own power draw |
+| `power_monitoring` | boolean | Whether the device can monitor the connected load's power consumption                              |
+
+For a smart switch or dimmer, `only_self_usage: true` implies `power_monitoring: true`: the profile
+models only the device's own consumption because the connected load is already measured by the device.
+The reverse is not required; a monitoring-capable device can still have a profile that models more than
+its own consumption.
 
 Additional network device specifications:
 
@@ -122,7 +128,7 @@ Additional smart speaker specifications:
 
 | Key           | Type   | Description                                                                                               |
 |---------------|--------|-----------------------------------------------------------------------------------------------------------|
-| `form_factor` | string | `speaker`, `smart_display`, `soundbar`, `subwoofer`, `amplifier`, `streamer`, `clock` or `other`         |
+| `form_factor` | string | `speaker`, `smart_display`, `soundbar`, `soundbase`, `subwoofer`, `amplifier`, `streamer`, `clock`, `speaker_lamp`, `picture_frame` or `other` |
 
 Leave a key out rather than guessing. These are manufacturer claims, and the website presents
 them as such.

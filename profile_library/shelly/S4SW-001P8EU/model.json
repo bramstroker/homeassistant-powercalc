@@ -12,6 +12,8 @@
   "created_at": "2025-11-29T09:48:00Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "in_wall",
+    "power_monitoring": true,
     "connectivity": [
       "zigbee",
       "wifi",

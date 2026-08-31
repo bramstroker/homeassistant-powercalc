@@ -7,6 +7,7 @@
   "created_at": "2025-08-30T16:35:25Z",
   "device_type": "smart_speaker",
   "device_specs": {
+    "form_factor": "speaker",
     "connectivity": [
       "wifi",
       "ethernet"

@@ -10,18 +10,24 @@
   "created_at": "2025-07-15T04:34:00Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
     "rated_power": 1,
     "connectivity": [
       "wifi",
       "bluetooth"
     ]
   },
+  "ean": [
+    "3800235265086"
+  ],
   "discovery_by": "entity",
   "linked_profile": "shelly/SNPL-00112EU",
   "measure_description": "Measured with an Aeotec ZWA023 and seems to align with (more precise) measurements from Shelly Plus Plug S.",
   "measure_device": "Aeotec ZWA023",
   "measure_method": "script",
   "name": "Plus Plug US",
+  "only_self_usage": true,
   "authors": [
     {
       "name": "Josh Barnard",

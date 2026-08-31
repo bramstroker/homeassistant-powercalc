@@ -5,6 +5,8 @@
   ],
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "wall_switch",
+    "power_monitoring": false,
     "connectivity": [
       "zigbee"
     ]

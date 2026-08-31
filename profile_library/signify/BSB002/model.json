@@ -3,6 +3,7 @@
   "created_at": "2026-01-25T11:34:00Z",
   "device_type": "network",
   "device_specs": {
+    "form_factor": "bridge",
     "connectivity": [
       "zigbee",
       "ethernet"

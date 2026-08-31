@@ -6,6 +6,8 @@
   "created_at": "2026-04-18T23:21:36Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
     "connectivity": [
       "matter",
       "thread"

@@ -8,6 +8,8 @@
   "created_at": "2023-03-16T17:16:38Z",
   "device_type": "smart_switch",
   "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
     "connectivity": [
       "zigbee"
     ]

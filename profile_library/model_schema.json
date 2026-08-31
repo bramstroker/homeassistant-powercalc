@@ -130,6 +130,42 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "device_type": {
+            "enum": [
+              "smart_switch",
+              "smart_dimmer"
+            ]
+          },
+          "only_self_usage": {
+            "const": true
+          }
+        },
+        "required": [
+          "device_type",
+          "only_self_usage"
+        ]
+      },
+      "then": {
+        "properties": {
+          "device_specs": {
+            "properties": {
+              "power_monitoring": {
+                "const": true
+              }
+            },
+            "required": [
+              "power_monitoring"
+            ]
+          }
+        },
+        "required": [
+          "device_specs"
+        ]
+      }
     }
   ],
   "additionalProperties": false,
@@ -759,6 +795,7 @@
                 "plug",
                 "wall_switch",
                 "in_wall",
+                "inline",
                 "din_rail",
                 "power_strip",
                 "led_driver",
@@ -770,6 +807,10 @@
               "type": "number",
               "exclusiveMinimum": 0,
               "description": "Maximum connected load supported by the device, in watts"
+            },
+            "power_monitoring": {
+              "type": "boolean",
+              "description": "Whether the device can monitor the connected load's power consumption"
             }
           }
         }
@@ -848,10 +889,13 @@
                 "speaker",
                 "smart_display",
                 "soundbar",
+                "soundbase",
                 "subwoofer",
                 "amplifier",
                 "streamer",
                 "clock",
+                "speaker_lamp",
+                "picture_frame",
                 "other"
               ],
               "description": "Physical form of the speaker or networked audio device"

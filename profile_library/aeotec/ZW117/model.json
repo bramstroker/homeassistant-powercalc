@@ -3,6 +3,7 @@
   "created_at": "2026-01-25T14:45:00Z",
   "device_type": "network",
   "device_specs": {
+    "form_factor": "repeater",
     "connectivity": [
       "zwave"
     ]

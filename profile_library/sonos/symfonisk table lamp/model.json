@@ -4,6 +4,7 @@
   "created_at": "2024-03-30T12:45:23Z",
   "device_type": "smart_speaker",
   "device_specs": {
+    "form_factor": "speaker_lamp",
     "connectivity": [
       "wifi",
       "ethernet"

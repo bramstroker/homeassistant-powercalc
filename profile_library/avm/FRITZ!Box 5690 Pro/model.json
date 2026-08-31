@@ -3,6 +3,7 @@
   "created_at": "2025-12-14T07:22:00Z",
   "device_type": "network",
   "device_specs": {
+    "form_factor": "router",
     "rated_power": 38,
     "connectivity": [
       "zigbee",

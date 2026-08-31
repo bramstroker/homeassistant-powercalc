@@ -11,6 +11,7 @@
     "8717755779656"
   ],
   "device_specs": {
+    "form_factor": "speaker",
     "connectivity": [
       "wifi",
       "bluetooth",

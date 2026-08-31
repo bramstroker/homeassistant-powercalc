@@ -10,6 +10,8 @@
   "created_at": "2024-01-09T21:22:00Z",
   "device_type": "smart_dimmer",
   "device_specs": {
+    "form_factor": "in_wall",
+    "power_monitoring": true,
     "connectivity": [
       "wifi"
     ]

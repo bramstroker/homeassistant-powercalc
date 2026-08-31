@@ -119,8 +119,8 @@ def test_light_specs_extend_generic_device_specs(tmp_path: Path, capsys: pytest.
 @pytest.mark.parametrize(
     "device_type,device_specs",
     [
-        ("smart_switch", {"form_factor": "plug", "max_load_watts": 3680}),
-        ("smart_dimmer", {"form_factor": "in_wall", "max_load_watts": 200}),
+        ("smart_switch", {"form_factor": "plug", "max_load_watts": 3680, "power_monitoring": True}),
+        ("smart_dimmer", {"form_factor": "in_wall", "max_load_watts": 200, "power_monitoring": False}),
         ("network", {"form_factor": "router"}),
         ("fan", {"form_factor": "air_purifier"}),
         ("smart_speaker", {"form_factor": "soundbar"}),
@@ -147,11 +147,28 @@ def test_type_specific_device_specs_are_rejected_for_other_device_types(
 ) -> None:
     path = write_json(
         tmp_path / "model.json",
-        complete_model("network", device_specs={"form_factor": "router", "max_load_watts": 100}),
+        complete_model("network", device_specs={"form_factor": "router", "power_monitoring": True}),
     )
 
     assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is False
-    assert "Unevaluated properties are not allowed ('max_load_watts' was unexpected)" in capsys.readouterr().out
+    assert "Unevaluated properties are not allowed ('power_monitoring' was unexpected)" in capsys.readouterr().out
+
+
+def test_only_self_usage_requires_power_monitoring_for_switches(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = write_json(
+        tmp_path / "model.json",
+        complete_model(
+            "smart_switch",
+            only_self_usage=True,
+            device_specs={"form_factor": "plug", "power_monitoring": False},
+        ),
+    )
+
+    assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is False
+    assert "True was expected" in capsys.readouterr().out
 
 
 def test_validate_files_with_glob_walks_matches_in_order(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
