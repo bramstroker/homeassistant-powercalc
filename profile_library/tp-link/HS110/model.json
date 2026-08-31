@@ -23,6 +23,7 @@
   "only_self_usage": true,
   "standby_power": 1.54,
   "standby_power_on": 2.19,
+  "product_url": "https://www.tp-link.com/es/home-networking/smart-plug/hs110/",
   "authors": [
     {
       "name": "roschi02",

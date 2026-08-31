@@ -29,6 +29,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "1 Mini Gen3",
+  "product_url": "https://www.shelly.com/products/shelly-1-mini-gen3",
   "authors": [
     {
       "name": "CV",

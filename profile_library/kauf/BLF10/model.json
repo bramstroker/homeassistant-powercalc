@@ -20,6 +20,7 @@
     "VERSION": "v1.14.4:docker"
   },
   "name": "RGBWW Smart LED Bulb A21 (10W)",
+  "product_url": "https://kaufha.com/blf10/",
   "standby_power": 0.5,
   "authors": [
     {

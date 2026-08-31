@@ -25,6 +25,7 @@
   "measure_method": "manual",
   "name": "PM Mini Gen3",
   "only_self_usage": true,
+  "product_url": "https://www.shelly.com/products/shelly-pm-mini-gen3",
   "standby_power": 0.642,
   "authors": [
     {

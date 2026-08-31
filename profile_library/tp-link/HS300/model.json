@@ -24,6 +24,7 @@
   },
   "name": "Kasa Smart Wi-Fi Power Strip",
   "only_self_usage": true,
+  "product_url": "https://www.tp-link.com/us/home-networking/smart-plug/hs300/v1/",
   "authors": [
     {
       "name": "Bram Gerritsen",

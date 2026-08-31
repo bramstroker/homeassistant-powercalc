@@ -31,6 +31,7 @@
   },
   "name": "Duo RGBW",
   "standby_power": 0.65,
+  "product_url": "https://kb.shelly.cloud/knowledge-base/shelly-bulb-duo-rgbw",
   "authors": [
     {
       "name": "Michal Bartak",

@@ -32,6 +32,7 @@
   "fixed_config": {
     "power": 0.587
   },
+  "product_url": "https://kb.shelly.cloud/knowledge-base/shelly-i3",
   "authors": [
     {
       "name": "Michal Bartak",

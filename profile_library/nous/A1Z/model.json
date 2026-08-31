@@ -23,6 +23,7 @@
   "measure_method": "manual",
   "name": "Smart Zigbee Socket with Power Meter",
   "only_self_usage": true,
+  "product_url": "https://nous.technology/product/a1z-1.html",
   "standby_power": 0.1,
   "standby_power_on": 0.4,
   "authors": [

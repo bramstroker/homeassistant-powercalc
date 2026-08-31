@@ -28,6 +28,7 @@
   "measure_method": "script",
   "name": "Plus Plug US",
   "only_self_usage": true,
+  "product_url": "https://us.shelly.com/blogs/documentation/shelly-plus-plug-us",
   "authors": [
     {
       "name": "Josh Barnard",

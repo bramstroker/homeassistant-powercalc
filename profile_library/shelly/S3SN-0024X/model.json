@@ -29,6 +29,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "i4 Gen3",
+  "product_url": "https://www.shelly.com/products/shelly-i4-gen3",
   "authors": [
     {
       "name": "CV",

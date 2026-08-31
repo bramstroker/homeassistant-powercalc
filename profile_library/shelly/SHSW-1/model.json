@@ -33,6 +33,7 @@
   "only_self_usage": false,
   "standby_power": 0.376,
   "standby_power_on": 0.618,
+  "product_url": "https://kb.shelly.cloud/knowledge-base/shelly-1",
   "authors": [
     {
       "name": "Michal Bartak",

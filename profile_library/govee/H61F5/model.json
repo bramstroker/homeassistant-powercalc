@@ -24,6 +24,7 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "Strip Light 2 Pro (5m)",
+  "product_url": "https://uk.govee.com/products/govee-strip-light-2-pro",
   "standby_power": 1.2,
   "authors": [
     {

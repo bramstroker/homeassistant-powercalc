@@ -14,6 +14,7 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
   "name": "Indoor Cam E220",
+  "product_url": "https://service.eufy.com/article-description/eufy-Security-Complete-HomeBase-Compatibility-Guide",
   "authors": [
     {
       "name": "Bram Gerritsen",

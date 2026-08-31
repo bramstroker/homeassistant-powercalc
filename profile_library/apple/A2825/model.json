@@ -39,6 +39,7 @@
   "measure_device": "Shelly Plus Plug",
   "measure_method": "manual",
   "name": "HomePod (Gen 2)",
+  "product_url": "https://www.apple.com/nl/homepod-2nd-generation/specs/",
   "standby_power": 1.01,
   "authors": [
     {

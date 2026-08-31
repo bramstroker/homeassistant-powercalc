@@ -33,6 +33,7 @@
   },
   "name": "Plug S Gen3",
   "only_self_usage": true,
+  "product_url": "https://www.shelly.com/products/shelly-plug-s-gen3",
   "authors": [
     {
       "name": "Largelos",

@@ -26,6 +26,7 @@
   "measure_method": "manual",
   "name": "3EM",
   "only_self_usage": true,
+  "product_url": "https://us.shelly.com/products/shelly-3em",
   "standby_power": 1.22,
   "standby_power_on": 1.22,
   "authors": [

@@ -27,6 +27,7 @@
     "VERSION": "v1.17.3:docker"
   },
   "name": "Matter Wi-Fi RGB+CCT LED Bulb (GU10, 5W)",
+  "product_url": "https://moeshouse.com/products/tuya-gu10-matter-wifi-smart-led-bulb-with-voice-control-dimmable-5w-light-2700-6500k-rgb-colors",
   "standby_power": 0.57,
   "authors": [
     {

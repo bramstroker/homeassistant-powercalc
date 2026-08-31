@@ -19,6 +19,7 @@
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "manual",
   "name": "Wi-Fi Bridge",
+  "product_url": "https://nuki.io/en-gb/products/bridge?chooser=true&sku=220694",
   "discovery_by": "device",
   "fixed_config": {
     "power": 0.51

@@ -31,6 +31,7 @@
   },
   "name": "Pro 3EM",
   "only_self_usage": true,
+  "product_url": "https://www.shelly.com/de/products/shelly-pro-3em-3ct63",
   "authors": [
     {
       "name": "Michal Bartak",

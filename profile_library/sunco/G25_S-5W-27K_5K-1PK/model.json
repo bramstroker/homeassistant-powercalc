@@ -23,7 +23,7 @@
     "VERSION": "v1.9.14:docker"
   },
   "name": "G25 WiFi Bulb",
-  "product_url": "https://www.sunco.com/products/g25-smart-bulb-wifi",
+  "product_url": "https://sunco.com/products/g25-smart-bulb-wifi",
   "standby_power": 0.7,
   "authors": [
     {

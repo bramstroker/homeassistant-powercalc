@@ -130,6 +130,7 @@
     "VERSION": "master"
   },
   "name": "Robot Lawn Mower",
+  "product_url": "https://eu.mammotion.com/products/yuka-mini-robot-lawn-mower",
   "standby_power": 2.15,
   "authors": [
     {

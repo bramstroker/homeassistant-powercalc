@@ -35,6 +35,7 @@
   },
   "name": "2.5",
   "only_self_usage": true,
+  "product_url": "https://www.shelly.com/de/products/shelly-2-5-ce-ul",
   "standby_power": 0.676,
   "authors": [
     {

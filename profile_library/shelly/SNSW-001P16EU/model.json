@@ -33,6 +33,7 @@
   },
   "name": "Plus 1PM",
   "only_self_usage": true,
+  "product_url": "https://www.shelly.com/products/shelly-plus-1pm",
   "sub_profile_select": {
     "default": "default"
   },

@@ -25,6 +25,7 @@
   },
   "name": "ST19 Edison Bulb, E26 (5.5W, 500 lm)",
   "standby_power": 0.5,
+  "product_url": "https://us.govee.com/products/led-edison-bulb",
   "authors": [
     {
       "name": "Benjamin Pearce",
