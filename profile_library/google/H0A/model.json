@@ -1,6 +1,7 @@
 {
   "aliases": [
-    "Home Mini"
+    "Home Mini",
+    "Google Home Mini"
   ],
   "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
   "calculation_strategy": "linear",

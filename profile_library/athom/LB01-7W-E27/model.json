@@ -1,6 +1,7 @@
 {
   "aliases": [
     "rgbww-light",
+    "athom.rgbww-light",
     "Athom RGBCW Bulb"
   ],
   "calculation_strategy": "lut",
