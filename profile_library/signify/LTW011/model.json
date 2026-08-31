@@ -1,13 +1,18 @@
 {
   "aliases": [
-    "464800"
+    "464800",
+    "9290012596"
   ],
   "calculation_strategy": "lut",
   "created_at": "2023-04-01T15:31:41Z",
   "device_type": "light",
+  "ean": [
+    "046677530167"
+  ],
   "device_specs": {
     "socket": "E26",
     "lumens": 680,
+    "rated_power": 8,
     "form_factor": "spot",
     "connectivity": [
       "zigbee"
