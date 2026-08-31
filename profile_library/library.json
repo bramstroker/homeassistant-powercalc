@@ -4692,6 +4692,56 @@
     },
     {
       "aliases": [],
+      "name": "elro",
+      "full_name": "ELRO",
+      "dir_name": "elro",
+      "website": "https://www.elro.eu/",
+      "country": "NL",
+      "description": "ELRO is a Dutch brand offering safety, security, and smart home products.",
+      "models": [
+        {
+          "authors": [
+            {
+              "name": "Bram Gerritsen",
+              "email": "bgerritsen@gmail.com",
+              "github": "bramstroker"
+            }
+          ],
+          "calculation_strategy": "fixed",
+          "created_at": "2026-08-31T06:36:24Z",
+          "description": "Smart home gateway with a built-in siren for connecting ELRO Connects devices to the ELRO Connects app.",
+          "device_type": "generic_iot",
+          "device_specs": {
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "discovery_by": "device",
+          "ean": [
+            "8719699342361"
+          ],
+          "measure_device": "Zhurui PR10",
+          "measure_method": "manual",
+          "name": "Connects K1 Connector",
+          "product_url": "https://www.elrob2b.eu/nl/elro-connects-k1-connector-sf40ga",
+          "id": "SF40GA",
+          "manufacturer": "elro",
+          "updated_at": "2026-08-31T06:38:37",
+          "max_power": 1.06,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 1.06,
+            "max": 1.06
+          },
+          "hash": "b15b7d993f1a298eeafcbb8dd5bc719f"
+        }
+      ],
+      "device_types": [
+        "generic_iot"
+      ]
+    },
+    {
+      "aliases": [],
       "name": "emos",
       "full_name": "Emos",
       "dir_name": "emos",
