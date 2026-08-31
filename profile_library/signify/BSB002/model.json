@@ -8,6 +8,10 @@
       "ethernet"
     ]
   },
+  "ean": [
+    "8718696511800",
+    "0046677458478"
+  ],
   "discovery_by": "device",
   "measure_description": "Measured manually taking average power over 1 day",
   "measure_device": "Zhurui PR10",

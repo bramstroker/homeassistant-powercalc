@@ -23,6 +23,9 @@
       "bluetooth"
     ]
   },
+  "ean": [
+    "3800235261767"
+  ],
   "calculation_strategy": "fixed",
   "description": "Smart Wi-Fi Relay Switch with Dry Contacts",
   "only_self_usage": false,

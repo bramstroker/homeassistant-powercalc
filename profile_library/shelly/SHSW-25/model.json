@@ -15,6 +15,10 @@
       "wifi"
     ]
   },
+  "ean": [
+    "3809511202234",
+    "3800235262023"
+  ],
   "discovery_by": "device",
   "measure_description": "The measured device fw: 1.14.1-rc1, Eco Mode enabled, Wifi Client enabled, LED disabled. The result represents the average value of measurements collected from the measurement device API for the following scenarios: dumb device/baseline consumption (~4.9W), all relays turned off, one relay turned on",
   "measure_device": "Shelly PM Mini Gen3",

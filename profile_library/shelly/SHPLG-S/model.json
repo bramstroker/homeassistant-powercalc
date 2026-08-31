@@ -16,6 +16,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "3800235262061"
+  ],
   "discovery_by": "entity",
   "measure_description": "Manual measurement of single smart plug. Measured values",
   "measure_device": "Brennenstuhl EM 231-A",

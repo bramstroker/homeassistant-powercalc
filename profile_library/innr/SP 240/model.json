@@ -7,6 +7,11 @@
       "zigbee"
     ]
   },
+  "ean": [
+    "8718781554767",
+    "8718781554774",
+    "8718781554781"
+  ],
   "measure_description": "Manually measured average of 2 plugs",
   "measure_device": "Brennenstuhl PM 231 E",
   "measure_method": "manual",

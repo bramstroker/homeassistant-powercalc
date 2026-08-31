@@ -17,6 +17,9 @@
       "bluetooth"
     ]
   },
+  "ean": [
+    "3800235261576"
+  ],
   "measure_description": "Measured with 7.5W (average over 300s) dummy load over 300s and calculated average. Multiple combinations of settings were tested. Firmware version 1.44",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",

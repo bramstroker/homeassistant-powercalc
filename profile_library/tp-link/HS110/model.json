@@ -10,6 +10,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "6935364094270"
+  ],
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",

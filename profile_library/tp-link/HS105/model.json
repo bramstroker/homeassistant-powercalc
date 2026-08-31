@@ -7,6 +7,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "0845973098278"
+  ],
   "measure_description": "Manually measured and used a dummy load of 0.5W since the KP125M doesn't detect loads of less than 0.5W.",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",
