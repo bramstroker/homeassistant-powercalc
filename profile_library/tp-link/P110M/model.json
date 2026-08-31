@@ -12,6 +12,9 @@
       "matter"
     ]
   },
+  "ean": [
+    "810142821834"
+  ],
   "measure_description": "Manually measured.",
   "measure_device": "Shelly EM Mini Gen4",
   "measure_method": "manual",

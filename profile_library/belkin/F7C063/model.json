@@ -11,6 +11,9 @@
     ],
     "rated_power": 3
   },
+  "ean": [
+    "745883731886"
+  ],
   "measure_description": "Manually measured",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",

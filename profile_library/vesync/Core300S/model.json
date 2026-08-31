@@ -8,6 +8,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "810043373814"
+  ],
   "measure_device": "SONOFF S60ZBTPF",
   "measure_method": "manual",
   "name": "Smart Air Purifier",

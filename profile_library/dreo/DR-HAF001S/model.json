@@ -8,6 +8,9 @@
     ],
     "rated_power": 52
   },
+  "ean": [
+    "850043889854"
+  ],
   "linear_config": {
     "attribute": "percentage",
     "calibrate": [

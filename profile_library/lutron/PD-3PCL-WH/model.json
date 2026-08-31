@@ -10,6 +10,9 @@
       "proprietary"
     ]
   },
+  "ean": [
+    "784276072069"
+  ],
   "discovery_by": "entity",
   "measure_description": "Measured no-load self-consumption using a Shelly Plus Plug. During a 120-second standby sample, three readings were 0.1 W and the remaining readings were 0 W.",
   "measure_device": "Shelly Plus Plug",

@@ -11,6 +11,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "840030701856"
+  ],
   "measure_description": "Manually measured.",
   "measure_device": "P3 P4400 Kill A Watt Usage Monitor",
   "measure_method": "manual",

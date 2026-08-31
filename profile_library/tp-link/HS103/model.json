@@ -7,6 +7,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "845973084141"
+  ],
   "measure_description": "Manually measured.",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",
