@@ -22,6 +22,7 @@
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Fluke 87",
   "measure_method": "script",
+  "mains_voltage": 120,
   "measure_settings": {
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 3,

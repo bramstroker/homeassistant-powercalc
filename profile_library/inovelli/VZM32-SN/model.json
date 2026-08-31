@@ -13,6 +13,7 @@
   "measure_description": "Measured device standby power with a smart plug. 1.54 W off, 1.59 W on; mmWave radar keeps the device drawing power continuously. The device meters its own load energy, so this profile reports only the device's own consumption.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
+  "mains_voltage": 120,
   "name": "Blue Series mmWave Presence Dimmer Switch",
   "product_url": "https://help.inovelli.com/en/articles/8807172-blue-series-mmwave-presence-dimmer-switch-manual",
   "only_self_usage": true,

@@ -19,6 +19,7 @@
   "measure_description": "Measured 2 bulbs simultaneously with utils/measure script",
   "measure_device": "Nous A1T",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,

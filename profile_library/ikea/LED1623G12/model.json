@@ -18,6 +18,7 @@
   "measure_description": "Bulbs was measured twice at each dim setting (100 points) and mean value was used when there were differences",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "TRADFRI bulb E27 opal 1000lm",
   "standby_power": 0.36,
   "authors": [

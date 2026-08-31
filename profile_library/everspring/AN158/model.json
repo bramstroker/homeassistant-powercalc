@@ -12,6 +12,7 @@
   "measure_description": "Transcribed from the manually measured configuration contributed in https://github.com/bramstroker/homeassistant-powercalc/pull/1006. The reported 0.2W relay-off reading was conservatively recorded as 0.3W because very low readings were considered unreliable.",
   "measure_device": "Fibaro FGWP102",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Z-Wave On/Off Plug with Power Metering",
   "only_self_usage": true,
   "standby_power": 0.3,

@@ -21,6 +21,7 @@
   "measure_description": "Manually measured.",
   "measure_device": "Nous A1Z",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "FRITZ!Box 5690 Pro",
   "product_url": "https://fritz.com/en/products/fritz-box-5690-pro-20003043",
   "authors": [

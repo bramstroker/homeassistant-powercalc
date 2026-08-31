@@ -36,6 +36,7 @@
   "measure_description": "Measured with utils/measure script using manual streaming (Pink Noise) due to API limitations with automated playback.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 5,

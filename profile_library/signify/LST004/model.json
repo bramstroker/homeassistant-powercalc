@@ -22,6 +22,7 @@
   "measure_device": "Gosund SP111",
   "measure_device_firmware": "Tasmota 9.5.0",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Hue White and Color Ambiance LED Outdoor Lightstrip (5m)",
   "standby_power": 0.4,
   "authors": [

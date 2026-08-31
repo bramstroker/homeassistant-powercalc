@@ -14,6 +14,7 @@
   "measure_description": "Measured with utils/measure script",
   "measure_device": "IKEA INSPELNING smart plug",
   "measure_method": "script",
+  "mains_voltage": 100,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 5,

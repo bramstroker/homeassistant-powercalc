@@ -35,6 +35,7 @@
   "measure_description": "Measured with utils/measure script. Used Sonance Ceiling Speakers",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 1,

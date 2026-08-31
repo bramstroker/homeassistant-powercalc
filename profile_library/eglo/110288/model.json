@@ -21,6 +21,7 @@
   "measure_description": "Measured two identical bulbs simultaneously with utils/measure; values were divided per bulb",
   "measure_device": "TP-Link Kasa KP115",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 5,
     "SLEEP_TIME": 3,

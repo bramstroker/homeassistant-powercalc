@@ -25,6 +25,7 @@
   "measure_description": "Manual measurement of single smart plug. Measured values",
   "measure_device": "Brennenstuhl EM 231-A",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Plug S",
   "only_self_usage": true,
   "product_url": "https://us.shelly.com/blogs/documentation/shelly-plug-s",

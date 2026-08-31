@@ -20,6 +20,7 @@
   "measure_description": "No comments",
   "measure_device": "RRPM02 (Model); 4897037690801 (Barcode); Reduction Revolution Plug-in Power Meter",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "LED Bulb (White, 600 lm, 4000 K, 8W)",
   "standby_power": 1.1,
   "authors": [

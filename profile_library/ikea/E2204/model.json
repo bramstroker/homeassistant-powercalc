@@ -19,6 +19,7 @@
   "measure_description": "Manually measured (Schuko/EU model@230V)",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "TRETAKT smart plug",
   "product_url": "https://www.ikea.com/nl/en/p/tretakt-plug-smart-80540349/",
   "only_self_usage": false,

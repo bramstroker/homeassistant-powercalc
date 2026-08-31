@@ -24,6 +24,7 @@
   "measure_description": "LUT measured with utils/measure script using a resistive dummy load under former profile 548727. Standby power measured separately for LCB001 using a TP-Link Kasa KP115.",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
+  "mains_voltage": 120,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 2,

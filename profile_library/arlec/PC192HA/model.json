@@ -12,6 +12,7 @@
   "measure_description": "Manually measured.",
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Grid Connect Smart 2.1 A USB Charger with Power Socket",
   "product_url": "https://www.arlec.com.au/products/arlec-white-grid-connect-smart-2-1a-usb-charger-with-power-socket",
   "only_self_usage": false,

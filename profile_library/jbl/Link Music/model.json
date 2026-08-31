@@ -35,6 +35,7 @@
   "measure_device": "Nous A8T",
   "measure_device_firmware": "EspHome",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,

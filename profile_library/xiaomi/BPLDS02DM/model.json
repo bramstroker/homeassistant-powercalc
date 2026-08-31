@@ -20,6 +20,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Meross mss310",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Mi Smart Standing Fan 2",
   "product_url": "https://www.mi.com/global/product/mi-smart-standing-fan-2/",
   "standby_power": 1,

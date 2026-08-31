@@ -15,6 +15,7 @@
   "measure_description": "Manually measured.",
   "measure_device": "TP-Link Kasa KP125M",
   "measure_method": "manual",
+  "mains_voltage": 120,
   "name": "Kasa Smart WiFi Plug Mini",
   "only_self_usage": false,
   "standby_power": 0.58,

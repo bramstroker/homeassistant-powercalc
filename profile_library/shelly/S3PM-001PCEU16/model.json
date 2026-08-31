@@ -23,6 +23,7 @@
   "measure_description": "Manually measured. Transcribed from https://www.youtube.com/watch?v=ZXC4vft57gU",
   "measure_device": "GW Instek GPM-8310",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "PM Mini Gen3",
   "only_self_usage": true,
   "product_url": "https://www.shelly.com/products/shelly-pm-mini-gen3",

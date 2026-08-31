@@ -29,6 +29,7 @@
   },
   "measure_description": "Measured with homewizard energy socket, measured each preset separately for 10 seconds.",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "authors": [
     {
       "name": "Rogier Lommers",

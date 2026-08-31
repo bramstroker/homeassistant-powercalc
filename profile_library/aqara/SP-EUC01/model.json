@@ -19,6 +19,7 @@
   "measure_description": "Manually measured. Pictures in the Pull Request comments.",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "legacy_ids": [
     "lumi.plug.maeu01"
   ],

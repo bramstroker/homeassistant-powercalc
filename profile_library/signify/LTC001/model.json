@@ -26,6 +26,7 @@
   "measure_description": "Used script utils/measure_shelly.py from repository. standby_power is guessed",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Hue Being Ceiling Light",
   "standby_power": 0.35,
   "authors": [

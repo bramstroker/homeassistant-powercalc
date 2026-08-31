@@ -14,6 +14,7 @@
   ],
   "measure_device": "SONOFF S60ZBTPF",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Smart Air Purifier",
   "product_url": "https://levoit.com/products/core-300s-p-smart-air-purifier",
   "standby_power": 0.5,

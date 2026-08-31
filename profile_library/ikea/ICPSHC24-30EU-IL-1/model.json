@@ -19,6 +19,7 @@
   "measure_device": "Nous A8T",
   "measure_device_firmware": "EspHome",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "TRADFRI LED Driver (30W)",
   "standby_power": 0.31,
   "standby_power_on": 0.35,

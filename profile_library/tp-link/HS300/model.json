@@ -18,6 +18,7 @@
   "discovery_by": "device",
   "measure_device": "P3 P4400 Kill A Watt Usage Monitor",
   "measure_method": "manual",
+  "mains_voltage": 120,
   "multi_switch_config": {
     "power": 0.725,
     "power_off": 0.225

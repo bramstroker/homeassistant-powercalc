@@ -23,6 +23,7 @@
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207",
   "measure_device": "Fibaro FGWP102",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Smart Plug 16A",
   "only_self_usage": true,
   "product_url": "https://qubino.com/products/smart-plug-16a/smart-plug-16a-tech/",

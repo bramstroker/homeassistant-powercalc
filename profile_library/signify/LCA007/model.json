@@ -22,6 +22,7 @@
   "measure_device": "Nous A1",
   "measure_device_firmware": "TASMOTA 9.5.0",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Hue White and Color Ambiance A19 E26 1100lm",
   "standby_power": 0.4,
   "authors": [

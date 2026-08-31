@@ -17,6 +17,7 @@
   "measure_description": "Measured repeatedly using Powercalc average mode for 300 seconds with a 7.7W dummy load, then averaged.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "VERSION": "v1.17.1:docker"
   },

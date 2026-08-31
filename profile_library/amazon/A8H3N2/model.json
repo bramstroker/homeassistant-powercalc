@@ -37,6 +37,7 @@
   "measure_description": "Measured by playing pink noise and increasing volume in 10% steps.",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Echo Show 8 (Gen2)",
   "standby_power": 4.28,
   "authors": [

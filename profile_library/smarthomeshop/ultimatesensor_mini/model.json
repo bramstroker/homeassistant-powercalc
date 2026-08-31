@@ -11,6 +11,7 @@
   "measure_description": "Measured manually taking average power over 1 hour",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "UltimateSensor Mini V1",
   "fixed_config": {
     "power": 1.25

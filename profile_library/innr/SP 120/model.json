@@ -15,6 +15,7 @@
   "measure_description": "Manually measured, copied from SP 224.",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Smart Plug",
   "only_self_usage": true,
   "standby_power": 0.41,

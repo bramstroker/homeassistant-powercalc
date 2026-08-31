@@ -24,6 +24,7 @@
   "measure_description": "Printer was measured while idle and while printing",
   "measure_device": "Shelly Plus Plug",
   "measure_method": "manual",
+  "mains_voltage": 120,
   "name": "EcoTank All-in-One Cartridge-Free Supertank Printer",
   "product_url": "https://epson.com/en/For-Work/Printers/Inkjet/EcoTank-ET-3760-All-in-One-Cartridge-Free-Supertank-Printer/p/C11CG20203",
   "authors": [

@@ -21,6 +21,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Brennenstuhl PM 231 E",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Smart Zigbee Socket with Power Meter",
   "only_self_usage": true,
   "product_url": "https://nous.technology/product/a1z-1.html",

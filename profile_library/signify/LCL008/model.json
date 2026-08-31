@@ -21,6 +21,7 @@
   "measure_description": "Measured with utils/measure script with 10kOM dummy load",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 3,
     "SLEEP_TIME": 1,

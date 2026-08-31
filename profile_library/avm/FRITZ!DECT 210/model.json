@@ -16,6 +16,7 @@
   "measure_description": "Manually measured.",
   "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "FRITZ!DECT 210",
   "product_url": "https://fritz.com/en/products/fritz-dect-210-20002723",
   "only_self_usage": true,

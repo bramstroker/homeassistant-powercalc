@@ -21,6 +21,7 @@
   "measure_description": "Used script utils/measure_shelly.py from repository, standby_power estimated",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Hue White Ambiance Candle E14",
   "standby_power": 0.3,
   "authors": [

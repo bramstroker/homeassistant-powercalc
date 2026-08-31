@@ -38,6 +38,7 @@
   "measure_description": "Streamed 'Radiohead - National Anthem' using spotify, and took average measurements using the measure.py tool on different volume levels",
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Nest Mini",
   "standby_power": 1.65,
   "authors": [

@@ -25,6 +25,7 @@
   "measure_description": "Measured with 6.85W (average over 300s) dummy load over 300s and calculated average. Multiple combinations of settings were tested. Only eco mode only has an effect when WLAN-AP (range extender) is disabled.",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "VERSION": "v1.17.1:docker"
   },

@@ -17,6 +17,7 @@
   "measure_description": "Measured with utils/measure script, manual correction of values measured as 0.0",
   "measure_device": "Shelly 1PM",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 2,

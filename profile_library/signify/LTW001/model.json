@@ -20,6 +20,7 @@
   "measure_description": "Used script utils/measure_shelly.py from repository. Standby power is guessed",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
+  "mains_voltage": 230,
   "name": "Hue White Ambiance A19",
   "standby_power": 0.4,
   "standby_power_estimated": true,

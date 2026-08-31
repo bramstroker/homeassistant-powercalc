@@ -22,6 +22,7 @@
   "measure_description": "Manually transcribed from a Fibaro Wall Plug configured to include its own consumption in Z-Wave meter reports: https://github.com/bramstroker/homeassistant-powercalc/pull/1006#issuecomment-1219487713",
   "measure_device": "Fibaro FGWP102",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Wall Plug (Z-Wave Plus)",
   "product_url": "https://www.fibaro.com/en/products/wall-plug/",
   "only_self_usage": true,

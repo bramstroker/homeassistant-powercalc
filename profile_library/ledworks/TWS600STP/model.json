@@ -21,6 +21,7 @@
   "measure_description": "Measured with the utils/measure script; power usage remained approximately constant across effects and brightness levels when on",
   "measure_device": "Shelly 3",
   "measure_method": "script",
+  "mains_voltage": 120,
   "measure_settings": {
     "SAMPLE_COUNT": 2,
     "SLEEP_TIME": 3,

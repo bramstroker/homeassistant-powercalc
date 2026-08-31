@@ -17,6 +17,7 @@
   "measure_description": "Manually measured",
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Micro Smart Plug",
   "legacy_ids": [
     "Micro Smart Plug"

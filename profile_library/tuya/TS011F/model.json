@@ -17,6 +17,7 @@
   "measure_description": "Measured manually",
   "measure_device": "PeakTech P 4250 (1 mV/10 mA) with VOLTCRAFT VC270",
   "measure_method": "manual",
+  "mains_voltage": 230,
   "name": "Smart Plug with Power Monitoring",
   "only_self_usage": true,
   "standby_power": 0.13,

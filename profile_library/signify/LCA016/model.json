@@ -21,6 +21,7 @@
   "measure_description": "Measured with utils/measure script (2 bulbs, with dummy load)",
   "measure_device": "Shelly 1PM Gen4",
   "measure_method": "script",
+  "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 3,
