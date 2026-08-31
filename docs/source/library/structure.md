@@ -72,7 +72,7 @@ Below is a comprehensive table of all fields that can be used in a `model.json` 
 #### Device specs
 
 `device_specs` holds what the box or manufacturer datasheet says about the device, as opposed to what the measurements say.
-Some keys apply to every device type; lights have additional light-specific keys.
+Some keys apply to every device type; selected device types have additional type-specific keys.
 
 ```json
 "device_specs": {
@@ -98,6 +98,31 @@ Additional light specifications:
 | `socket`      | string or array | Lamp base(s): `E27`, `E26`, `E14`, `E12`, `B22`, `GU10`, `GU5.3`, `GU24`, `GX53`, `G9`, `G4`, or `integrated` when the light source cannot be replaced |
 | `form_factor` | string | `bulb`, `spot`, `candle`, `globe`, `filament`, `strip`, `panel`, `downlight`, `tube`, `fixture` or `other`      |
 | `lumens`      | number | Nominal luminous flux at full brightness                                                                        |
+
+Additional smart switch and smart dimmer specifications:
+
+| Key              | Type   | Description                                                                                         |
+|------------------|--------|-----------------------------------------------------------------------------------------------------|
+| `form_factor`    | string | `plug`, `wall_switch`, `in_wall`, `din_rail`, `power_strip`, `led_driver` or `other`               |
+| `max_load_watts` | number | Maximum connected load supported by the device, in watts; this is not the device's own power draw |
+
+Additional network device specifications:
+
+| Key           | Type   | Description                                                                                               |
+|---------------|--------|-----------------------------------------------------------------------------------------------------------|
+| `form_factor` | string | `router`, `modem`, `access_point`, `repeater`, `switch`, `gateway`, `bridge` or `other`                  |
+
+Additional fan specifications:
+
+| Key           | Type   | Description                                                                                                                |
+|---------------|--------|----------------------------------------------------------------------------------------------------------------------------|
+| `form_factor` | string | `table`, `tower`, `pedestal`, `ceiling`, `floor`, `air_purifier`, `purifier_fan`, `white_noise_machine` or `other`        |
+
+Additional smart speaker specifications:
+
+| Key           | Type   | Description                                                                                               |
+|---------------|--------|-----------------------------------------------------------------------------------------------------------|
+| `form_factor` | string | `speaker`, `smart_display`, `soundbar`, `subwoofer`, `amplifier`, `streamer`, `clock` or `other`         |
 
 Leave a key out rather than guessing. These are manufacturer claims, and the website presents
 them as such.

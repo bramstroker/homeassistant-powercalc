@@ -116,6 +116,44 @@ def test_light_specs_extend_generic_device_specs(tmp_path: Path, capsys: pytest.
     assert capsys.readouterr().out == f"VALID: {path}\n"
 
 
+@pytest.mark.parametrize(
+    "device_type,device_specs",
+    [
+        ("smart_switch", {"form_factor": "plug", "max_load_watts": 3680}),
+        ("smart_dimmer", {"form_factor": "in_wall", "max_load_watts": 200}),
+        ("network", {"form_factor": "router"}),
+        ("fan", {"form_factor": "air_purifier"}),
+        ("smart_speaker", {"form_factor": "soundbar"}),
+    ],
+)
+def test_type_specific_device_specs(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    device_type: str,
+    device_specs: dict[str, object],
+) -> None:
+    path = write_json(
+        tmp_path / device_type / "model.json",
+        complete_model(device_type, device_specs={**device_specs, "connectivity": ["wifi"]}),
+    )
+
+    assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is True
+    assert capsys.readouterr().out == f"VALID: {path}\n"
+
+
+def test_type_specific_device_specs_are_rejected_for_other_device_types(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = write_json(
+        tmp_path / "model.json",
+        complete_model("network", device_specs={"form_factor": "router", "max_load_watts": 100}),
+    )
+
+    assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is False
+    assert "Unevaluated properties are not allowed ('max_load_watts' was unexpected)" in capsys.readouterr().out
+
+
 def test_validate_files_with_glob_walks_matches_in_order(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     schema = write_json(tmp_path / "schema.json", NAME_SCHEMA)
     write_json(tmp_path / "signify" / "manufacturer.json", {"name": "signify"})

@@ -6,6 +6,7 @@
     "socket": "integrated",
     "form_factor": "strip",
     "rated_power": 7.5,
+    "lumens": 180,
     "connectivity": [
       "wifi"
     ]

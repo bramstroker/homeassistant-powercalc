@@ -1,11 +1,12 @@
 {
-  "aliases": [
-    "9290012573A"
-  ],
   "calculation_strategy": "lut",
   "created_at": "2021-06-11T22:01:53Z",
   "device_type": "light",
+  "ean": [
+    "046677468903"
+  ],
   "device_specs": {
+    "rated_power": 6,
     "lumens": 450,
     "socket": "E12",
     "form_factor": "candle",

@@ -51,6 +51,85 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "device_type": {
+            "enum": [
+              "smart_switch",
+              "smart_dimmer"
+            ]
+          }
+        },
+        "required": [
+          "device_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "device_specs": {
+            "$ref": "#/definitions/switch_specs"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "device_type": {
+            "const": "network"
+          }
+        },
+        "required": [
+          "device_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "device_specs": {
+            "$ref": "#/definitions/network_specs"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "device_type": {
+            "const": "fan"
+          }
+        },
+        "required": [
+          "device_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "device_specs": {
+            "$ref": "#/definitions/fan_specs"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "device_type": {
+            "const": "smart_speaker"
+          }
+        },
+        "required": [
+          "device_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "device_specs": {
+            "$ref": "#/definitions/smart_speaker_specs"
+          }
+        }
+      }
     }
   ],
   "additionalProperties": false,
@@ -659,6 +738,123 @@
               "type": "number",
               "exclusiveMinimum": 0,
               "description": "Nominal luminous flux at full brightness, in lumens"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "switch_specs": {
+      "description": "device_specs of a smart switch or smart dimmer",
+      "allOf": [
+        {
+          "$ref": "#/definitions/generic_specs"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "form_factor": {
+              "type": "string",
+              "enum": [
+                "plug",
+                "wall_switch",
+                "in_wall",
+                "din_rail",
+                "power_strip",
+                "led_driver",
+                "other"
+              ],
+              "description": "Physical form of the switch or dimmer"
+            },
+            "max_load_watts": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Maximum connected load supported by the device, in watts"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "network_specs": {
+      "description": "device_specs of network equipment",
+      "allOf": [
+        {
+          "$ref": "#/definitions/generic_specs"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "form_factor": {
+              "type": "string",
+              "enum": [
+                "router",
+                "modem",
+                "access_point",
+                "repeater",
+                "switch",
+                "gateway",
+                "bridge",
+                "other"
+              ],
+              "description": "Role or physical form of the network device"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "fan_specs": {
+      "description": "device_specs of a fan or fan-like appliance",
+      "allOf": [
+        {
+          "$ref": "#/definitions/generic_specs"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "form_factor": {
+              "type": "string",
+              "enum": [
+                "table",
+                "tower",
+                "pedestal",
+                "ceiling",
+                "floor",
+                "air_purifier",
+                "purifier_fan",
+                "white_noise_machine",
+                "other"
+              ],
+              "description": "Physical form of the fan or fan-like appliance"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "smart_speaker_specs": {
+      "description": "device_specs of a smart speaker or networked audio device",
+      "allOf": [
+        {
+          "$ref": "#/definitions/generic_specs"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "form_factor": {
+              "type": "string",
+              "enum": [
+                "speaker",
+                "smart_display",
+                "soundbar",
+                "subwoofer",
+                "amplifier",
+                "streamer",
+                "clock",
+                "other"
+              ],
+              "description": "Physical form of the speaker or networked audio device"
             }
           }
         }
