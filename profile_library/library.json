@@ -237,14 +237,14 @@
           ],
           "id": "ZW117",
           "manufacturer": "aeotec",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.64,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.64,
             "max": 0.64
           },
-          "hash": "f34b72bae2e1782b16b1741dd5c8acdf"
+          "hash": "2bdb7c4b37dca661764fec4f64c675dc"
         },
         {
           "aliases": [
@@ -281,14 +281,14 @@
           ],
           "id": "ZWA023",
           "manufacturer": "aeotec",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.8,
             "max": 0.8
           },
-          "hash": "873351ba2871aaa4086d401a89e3446f"
+          "hash": "dc20ce6416380bd39014d382118117ca"
         }
       ],
       "device_types": [
@@ -1812,7 +1812,7 @@
           ],
           "id": "GLD312HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 11.0,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-03-20T07:22:26",
@@ -1827,7 +1827,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "20d67edffc5e310ed66a0463860c4148"
+          "hash": "3af7add19d871e351cff56cdd32130fb"
         },
         {
           "calculation_strategy": "fixed",
@@ -1857,14 +1857,14 @@
           ],
           "id": "PC191HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 1.144,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.144,
             "max": 1.144
           },
-          "hash": "810138295fb10419f4ea93db75682cf8"
+          "hash": "53126d3af16493700254197919e2ccb2"
         },
         {
           "calculation_strategy": "fixed",
@@ -1894,14 +1894,14 @@
           ],
           "id": "PC192HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 1.596,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.596,
             "max": 1.596
           },
-          "hash": "1a402b3b54fe641adab1e0b8606b9ed8"
+          "hash": "69b137073f076f461efcdac8f9778557"
         },
         {
           "calculation_strategy": "fixed",
@@ -1931,14 +1931,14 @@
           ],
           "id": "PC287HA",
           "manufacturer": "arlec",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 2.565,
           "sub_profile_count": 0,
           "power_range": {
             "min": 2.565,
             "max": 2.565
           },
-          "hash": "ede5641c32e939de619e4f2907201960"
+          "hash": "3df914cb3ca8f0a074064ed66961e030"
         }
       ],
       "device_types": [
@@ -2965,14 +2965,14 @@
           ],
           "id": "BSHC-1",
           "manufacturer": "bosch",
-          "updated_at": "2026-08-31T05:43:31",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 1.78,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.78,
             "max": 1.78
           },
-          "hash": "29d575ea7519e3b86af9776797dd7028"
+          "hash": "979b95b4ce6cd555d08fae71a0f5d392"
         },
         {
           "aliases": [
@@ -3014,14 +3014,14 @@
           ],
           "id": "BSP-EZ",
           "manufacturer": "bosch",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.6,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.6,
             "max": 0.6
           },
-          "hash": "5695bf5c5ce556ab15d9c763490ba10d"
+          "hash": "85580e756515d5c22c2f9862362fe692"
         }
       ],
       "device_types": [
@@ -3219,14 +3219,14 @@
           ],
           "id": "SL-GL86ZTS11B",
           "manufacturer": "bseed",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.3,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.3,
             "max": 0.3
           },
-          "hash": "3251e5b62fbab146c4780ca1f346cf8e"
+          "hash": "fb44dc097f30af278a06f6d23d19b9cd"
         }
       ],
       "device_types": [
@@ -3285,7 +3285,7 @@
           ],
           "id": "5101002000",
           "manufacturer": "calex",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 6.48,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T11:11:31",
@@ -3300,7 +3300,7 @@
             "score": 96.8,
             "color_temp": 96.8
           },
-          "hash": "6c748afaa3db0f30a8ffeb8fb794b278"
+          "hash": "2c02363f8e2e21fb1855149f7280aae9"
         }
       ],
       "device_types": [
@@ -3626,10 +3626,10 @@
           ],
           "id": "RLS3D",
           "manufacturer": "dreame",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "4766c8d6f91114e150625487e1f0ed7e"
+          "hash": "9697e3a21dccda960609cb74a39cd84d"
         },
         {
           "name": "X40 Ultra Complete",
@@ -3715,10 +3715,10 @@
           "measure_description": "Measured on an X50 Ultra Complete robot (RLX85CE-5) with base station RCXE0109, using a Shelly Plus 1PM in the socket feeding the base station, so every number covers the whole station rather than battery charging alone. Station settings during the runs: smart mop washing on, self clean on, mop washing with detergent on, UV sterilization on, auto drying on, silent drying off, drying time 3h. With smart mop washing on the machine selects water temperature and washing program itself and both selects read unavailable; the stored manual values are hot and standard. The heater does run under this configuration, 937 W for about 14 s during the end of job wash. Measuring the four manual settings separately gives 27.7 W on normal, where the heater never fires, 92.9 W on mild, 106.6 W on warm and 110.3 W on hot; smart washing sits between warm and hot. The washing branch carries the smart washing figure since that is the default. Fixed values are time averages over the window in which each condition holds, not peaks.",
           "id": "RLX85CE-5",
           "manufacturer": "dreame",
-          "updated_at": "2026-08-31T06:10:16",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "469e6ede58a618ee61d4d69e917b3a9f"
+          "hash": "b44ddd18c799bac8ff164436a4468a5b"
         }
       ],
       "device_types": [
@@ -3762,14 +3762,14 @@
           ],
           "id": "DR-HAF001S",
           "manufacturer": "dreo",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 39.62,
           "sub_profile_count": 0,
           "power_range": {
             "min": 24.52,
             "max": 39.62
           },
-          "hash": "657a67f161d20732ab5934c38438d6ab"
+          "hash": "0f052b3d337cca688224e56e6cdacae2"
         },
         {
           "calculation_strategy": "linear",
@@ -3802,14 +3802,14 @@
           ],
           "id": "DR-HPF005S",
           "manufacturer": "dreo",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 25.33,
           "sub_profile_count": 0,
           "power_range": {
             "min": 2.13,
             "max": 25.33
           },
-          "hash": "00e30be02bdb293282e2735b4e027e68"
+          "hash": "5717f03e384021da0bb88fac2ec4ef76"
         },
         {
           "calculation_strategy": "linear",
@@ -3839,14 +3839,14 @@
           ],
           "id": "DR-HTF001S",
           "manufacturer": "dreo",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 46.82,
           "sub_profile_count": 0,
           "power_range": {
             "min": 21.46,
             "max": 46.82
           },
-          "hash": "523c1b9aa2b6c40f8d58183200598f9c"
+          "hash": "74dc3a6372b9c5f161af56f9873ad6f7"
         },
         {
           "calculation_strategy": "linear",
@@ -3873,14 +3873,14 @@
           ],
           "id": "DR-HTF002S",
           "manufacturer": "dreo",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 39.62,
           "sub_profile_count": 0,
           "power_range": {
             "min": 17.76,
             "max": 39.62
           },
-          "hash": "9ec137c05d8da46881233080f005e3a9"
+          "hash": "7fab3fced5bae345062ef156e7b3e730"
         },
         {
           "calculation_strategy": "linear",
@@ -3916,14 +3916,14 @@
           ],
           "id": "DR-HTF008S",
           "manufacturer": "dreo",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 36.03,
           "sub_profile_count": 0,
           "power_range": {
             "min": 16.65,
             "max": 36.03
           },
-          "hash": "4d417471507d56125068bd7eab6a080a"
+          "hash": "5f77c591e9b88b670a455d3574104801"
         }
       ],
       "device_types": [
@@ -4088,10 +4088,10 @@
           ],
           "id": "ECO-DIM.07 Zigbee",
           "manufacturer": "ecodim",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.3,
           "sub_profile_count": 0,
-          "hash": "330819d78acd507a7f2778c3d2202349"
+          "hash": "d7a9063c21fcffd1644201d9ac89a31d"
         }
       ],
       "device_types": [
@@ -4206,7 +4206,7 @@
           ],
           "id": "900053",
           "manufacturer": "eglo",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 38.77,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T13:32:59",
@@ -4221,7 +4221,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "3f2b681c486288eb9ead2f369a20885e"
+          "hash": "86980e06d368eb623b6d5fc5623b1e47"
         },
         {
           "aliases": [
@@ -4265,7 +4265,7 @@
           ],
           "id": "900084",
           "manufacturer": "eglo",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 19.54,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T13:32:59",
@@ -4280,7 +4280,7 @@
             "score": 99.5,
             "color_temp": 99.5
           },
-          "hash": "0c631a0c901164229eca18664a67a202"
+          "hash": "7a32d3f2e7012b913de6219e668d27b0"
         },
         {
           "aliases": [
@@ -4325,7 +4325,7 @@
           ],
           "id": "98847",
           "manufacturer": "eglo",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 22.14,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T13:32:59",
@@ -4340,7 +4340,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "ebbae9fbf2924420db8d5eb8c37b267e"
+          "hash": "e2cad3dd0c4536d9a573ee89b87a8578"
         }
       ],
       "device_types": [
@@ -4397,7 +4397,7 @@
           ],
           "id": "20GAK9901",
           "manufacturer": "elgato",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 39.61,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T13:42:42",
@@ -4412,7 +4412,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "9b44cb7d258ac498a606991901df9fd5"
+          "hash": "7190f030ee74f01f30068365f8ecef9a"
         },
         {
           "aliases": [
@@ -4456,7 +4456,7 @@
           ],
           "id": "20LAA9901",
           "manufacturer": "elgato",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 19.4,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T13:42:42",
@@ -4472,7 +4472,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "e78488a217109237b211c083c7d5a90e"
+          "hash": "a6c74b2ca35fb50bb565c5deadbcbb68"
         },
         {
           "aliases": [
@@ -4515,7 +4515,7 @@
           ],
           "id": "20LAB9901",
           "manufacturer": "elgato",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 24.02,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T13:42:42",
@@ -4530,7 +4530,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "153500111ca95f21dedd88631532f868"
+          "hash": "90da24663bd1f1ccb285355069d9066d"
         },
         {
           "aliases": [
@@ -4574,7 +4574,7 @@
           ],
           "id": "20LAC9901",
           "manufacturer": "elgato",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 48.31,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T13:42:42",
@@ -4589,7 +4589,7 @@
             "score": 89.1,
             "color_temp": 89.1
           },
-          "hash": "e8a93a0657193fdd86c5dd5486ee950b"
+          "hash": "7b9a952b6f74a17df04dd540b56f4cf1"
         },
         {
           "aliases": [
@@ -4632,7 +4632,7 @@
           ],
           "id": "20LAG9901",
           "manufacturer": "elgato",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 15.86,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T13:42:42",
@@ -4648,7 +4648,7 @@
             "score": 97.9,
             "color_temp": 97.9
           },
-          "hash": "f04b17927e124aa40cfca156aae54078"
+          "hash": "4ca76d50948e3dbbcedfb566adb0087a"
         }
       ],
       "device_types": [
@@ -5187,14 +5187,14 @@
           ],
           "id": "HM-LC-Sw1-DR",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.52,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.52,
             "max": 0.52
           },
-          "hash": "3ee7141f990cde979425ba1456dc9357"
+          "hash": "089b3ce1759fa1414cbce75025444be3"
         },
         {
           "calculation_strategy": "fixed",
@@ -5231,14 +5231,14 @@
           ],
           "id": "HM-LC-Sw1PBU-FM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 1.42,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.42,
             "max": 1.42
           },
-          "hash": "3a16c43cab6f4ea75f748fed69d5b474"
+          "hash": "6950a693b7dbd31ee63984015dec6240"
         },
         {
           "calculation_strategy": "linear",
@@ -5275,10 +5275,10 @@
           ],
           "id": "HmIP-BDT",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.41,
           "sub_profile_count": 0,
-          "hash": "7cd150536c8dbfcc58b23cf8185fac74"
+          "hash": "03709a5837b4ae36ae4d8517bf3de1be"
         },
         {
           "calculation_strategy": "fixed",
@@ -5316,14 +5316,14 @@
           ],
           "id": "HmIP-BSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.2,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.2,
             "max": 0.2
           },
-          "hash": "0a77a936e8b46724a01ca36ad7308ce2"
+          "hash": "1634031b1d9039d1ab71711a2961b2e2"
         },
         {
           "calculation_strategy": "fixed",
@@ -5359,14 +5359,14 @@
           ],
           "id": "HmIP-DRSI1",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.3,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.3,
             "max": 0.3
           },
-          "hash": "c3b595ebb318c79aae3d086fc7d5992c"
+          "hash": "6ce5409dded2ea8e49be2aef4a70e12d"
         },
         {
           "calculation_strategy": "linear",
@@ -5400,10 +5400,10 @@
           ],
           "id": "HmIP-FDT",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.4,
           "sub_profile_count": 0,
-          "hash": "d03929c0b4a499c921a044fc77012202"
+          "hash": "a43048e9ba6eafa3c2de66695c7e8803"
         },
         {
           "calculation_strategy": "fixed",
@@ -5436,14 +5436,14 @@
           ],
           "id": "HmIP-FROLL",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.68,
           "sub_profile_count": 3,
           "power_range": {
             "min": 0.2,
             "max": 0.68
           },
-          "hash": "d9b557db8b42838c65417c190e677058"
+          "hash": "4d197108daef5168468c006f57a1c569"
         },
         {
           "calculation_strategy": "fixed",
@@ -5481,14 +5481,14 @@
           ],
           "id": "HmIP-FSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.74,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.74,
             "max": 0.74
           },
-          "hash": "a3de9e1bf6e9cfda309735238280c0a1"
+          "hash": "1d475aca7db8a905ae3c005e28df5b12"
         },
         {
           "calculation_strategy": "fixed",
@@ -5526,14 +5526,14 @@
           ],
           "id": "HmIP-FSM16",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.2,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.2,
             "max": 0.2
           },
-          "hash": "8a674805e09913f8f129b849e5541b51"
+          "hash": "783e88d0e445ef73ea5f957d0242a194"
         },
         {
           "calculation_strategy": "fixed",
@@ -5571,14 +5571,14 @@
           ],
           "id": "HmIP-PSM",
           "manufacturer": "eq-3",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.78,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.78,
             "max": 0.78
           },
-          "hash": "39f1ae0bf4c86eb88aea29c99373b7de"
+          "hash": "68d903832e454fc5022d05e332d682cf"
         }
       ],
       "device_types": [
@@ -6002,14 +6002,14 @@
           ],
           "id": "FGWP-102",
           "manufacturer": "fibaro",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.8,
             "max": 0.8
           },
-          "hash": "aaf72d83d6c4f58b7eef5866198e7a97"
+          "hash": "3872b6069dc1061f986376e8f347434f"
         }
       ],
       "device_types": [
@@ -6435,7 +6435,7 @@
           ],
           "id": "I002579",
           "manufacturer": "genio",
-          "updated_at": "2026-08-30T07:43:29",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 14.01,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -6446,7 +6446,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "c53b63c4639b16d8b389cb9d048f74fb"
+          "hash": "47a797a36fbd0ad59f33afc6f1e2811b"
         },
         {
           "calculation_strategy": "lut",
@@ -6481,7 +6481,7 @@
           ],
           "id": "I002741",
           "manufacturer": "genio",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 13.4,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -6497,7 +6497,7 @@
             "score": 95.6,
             "color_temp": 95.6
           },
-          "hash": "396bb554a1045fd2f50a22485bef266a"
+          "hash": "638ba128d07dc3c43dee466d3459c85f"
         },
         {
           "calculation_strategy": "lut",
@@ -6532,7 +6532,7 @@
           ],
           "id": "I002747",
           "manufacturer": "genio",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 1.91,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -6547,7 +6547,7 @@
             "score": 89.9,
             "color_temp": 89.9
           },
-          "hash": "c1bcdce4330c84a7b989574ae6871871"
+          "hash": "c9ff1b65cd8f185d939a78665f3ead68"
         },
         {
           "calculation_strategy": "lut",
@@ -6582,7 +6582,7 @@
           ],
           "id": "I002926",
           "manufacturer": "genio",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 5.5,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -6593,7 +6593,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "4e38da7bb814370ca307143ac2fff372"
+          "hash": "0d733034cb806604daa901598acb0556"
         },
         {
           "calculation_strategy": "lut",
@@ -6627,7 +6627,7 @@
           ],
           "id": "I003028",
           "manufacturer": "genio",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 3.87,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -6638,7 +6638,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "3862e280df0e632d5c0c9a609e91f80c"
+          "hash": "41f5a8fb07ec59eed6683a9e46285fbb"
         },
         {
           "calculation_strategy": "lut",
@@ -6720,7 +6720,7 @@
           ],
           "id": "I004544",
           "manufacturer": "genio",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 5.22,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -6735,7 +6735,7 @@
             "score": 96.2,
             "color_temp": 96.2
           },
-          "hash": "0c171552661393572b03d9cdc7b24873"
+          "hash": "c8d4b59d9e86fdf1b3c766fa8aa3de75"
         }
       ],
       "device_types": [
@@ -6840,7 +6840,7 @@
           ],
           "id": "GL-B-003P",
           "manufacturer": "gledopto",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 6.36,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-10-15T19:16:12",
@@ -6855,7 +6855,7 @@
             "score": 97.3,
             "color_temp": 97.3
           },
-          "hash": "cc8ddf673aedda17f5aeba25e50cdb49"
+          "hash": "307ceecc0c48e08b9193cbb78bcec202"
         },
         {
           "calculation_strategy": "lut",
@@ -6892,7 +6892,7 @@
           ],
           "id": "GL-B-004P",
           "manufacturer": "gledopto",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 6.7,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-10-10T11:48:03",
@@ -6907,7 +6907,7 @@
             "score": 96.8,
             "color_temp": 96.8
           },
-          "hash": "73dcfa440922663dd3f917138d64fb10"
+          "hash": "297e2577355ca2e99ad44cd5a2eb959e"
         },
         {
           "calculation_strategy": "lut",
@@ -6943,7 +6943,7 @@
           ],
           "id": "GL-D-004P",
           "manufacturer": "gledopto",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 8.15,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-11-02T15:46:04",
@@ -6959,7 +6959,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "65560278b63bf7d338ffcdeed561db02"
+          "hash": "63666e598a5cdd121676bd1e0c13a5ee"
         },
         {
           "calculation_strategy": "lut",
@@ -7117,14 +7117,14 @@
           ],
           "id": "GUIK2",
           "manufacturer": "google",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 4.8,
           "sub_profile_count": 0,
           "power_range": {
             "min": 2.11,
             "max": 4.8
           },
-          "hash": "b1cf2c0499edf05d228b5a0e284dd411"
+          "hash": "992d943442f19389452eaf6d077cd8e3"
         },
         {
           "aliases": [
@@ -7307,14 +7307,14 @@
           ],
           "id": "H2A",
           "manufacturer": "google",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 10.2,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.2,
             "max": 10.2
           },
-          "hash": "0c50ddf3e1f465d47a4ffffeee828ba6"
+          "hash": "ac0c37cdd5df9caa1f3ab8ee6a0e0b52"
         },
         {
           "aliases": [
@@ -8310,7 +8310,7 @@
           ],
           "id": "HB-10521-HS",
           "manufacturer": "hampton bay",
-          "updated_at": "2026-08-30T05:46:56",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 4.85,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-01-30T17:09:03",
@@ -8326,7 +8326,7 @@
             "score": 92.2,
             "color_temp": 92.2
           },
-          "hash": "f307b67508a4559a6f211c5d0223a5f3"
+          "hash": "27cf139e7c88f89d793113f080f2e62a"
         }
       ],
       "device_types": [
@@ -8371,14 +8371,14 @@
           ],
           "id": "HK Citation MultiBeam 700",
           "manufacturer": "harman kardon",
-          "updated_at": "2026-08-31T06:05:00",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 25.33,
           "sub_profile_count": 0,
           "power_range": {
             "min": 7.68,
             "max": 25.33
           },
-          "hash": "761e7aab4c4befd46daadf2e3c153567"
+          "hash": "185db10fda06e2ea6d5794bbbcf610e7"
         },
         {
           "aliases": [
@@ -8413,14 +8413,14 @@
           ],
           "id": "HK Citation One MKII",
           "manufacturer": "harman kardon",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 6.71,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.07,
             "max": 6.71
           },
-          "hash": "8f1474c7858016b38e6cff6cf2289a29"
+          "hash": "49e30c3dd562db190d3b75b5e5233ad0"
         }
       ],
       "device_types": [
@@ -8750,14 +8750,14 @@
           ],
           "id": "E1836",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.78,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.78,
             "max": 0.78
           },
-          "hash": "14fdda2598c24e9d26a63b54085b073f"
+          "hash": "e5aa6b3e2e946f81b7db8cc7fc36b4ce"
         },
         {
           "aliases": [
@@ -8789,14 +8789,14 @@
           ],
           "id": "E2007",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 24.8,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.6,
             "max": 24.8
           },
-          "hash": "6ce01262078617f7c2ab2fdfa2e72362"
+          "hash": "17bb2753c50373cec63cccf0c36a1106"
         },
         {
           "aliases": [
@@ -8832,14 +8832,14 @@
           ],
           "id": "E2204",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.73,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.73,
             "max": 0.73
           },
-          "hash": "184f793f031266465961e63b7d50431d"
+          "hash": "43856992dc44f66888344e698c0f2532"
         },
         {
           "aliases": [
@@ -8952,14 +8952,14 @@
           ],
           "id": "E2491",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.47,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.47,
             "max": 0.47
           },
-          "hash": "b8ca561463ae58e6929af1681995a66d"
+          "hash": "a81248693b65cb998b6b6534b1aaa530"
         },
         {
           "aliases": [
@@ -11417,7 +11417,7 @@
           ],
           "id": "LED2401G5",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 5.24,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-18T14:11:56",
@@ -11432,7 +11432,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "530a94ec9c1cbe4a1a6fa7230e13c266"
+          "hash": "021aa7008f6fe97120c0ec7be3237d9e"
         },
         {
           "aliases": [
@@ -11475,7 +11475,7 @@
           ],
           "id": "LED2402C3",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 3.57,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-06-19T06:13:16",
@@ -11491,7 +11491,7 @@
             "score": 99.0,
             "color_temp": 99.0
           },
-          "hash": "0b5ff5efde9e22f4a2c9b8861ed459f5"
+          "hash": "c6d73ade49ae69c9b46291a4bca77c01"
         },
         {
           "aliases": [
@@ -11531,7 +11531,7 @@
           ],
           "id": "LED2403R5",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 5.2,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-25T07:50:46",
@@ -11547,7 +11547,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "002f69f8344698f3640d0884549c0f93"
+          "hash": "425713244a42b9164027004d5f40849c"
         },
         {
           "aliases": [
@@ -11587,7 +11587,7 @@
           ],
           "id": "LED2404G6",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 6.29,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-23T19:15:26",
@@ -11603,7 +11603,7 @@
             "score": 97.4,
             "color_temp": 97.4
           },
-          "hash": "270f229633e947b2a76380589a86701d"
+          "hash": "0ec238ce807ac7c868f250e92708d706"
         },
         {
           "aliases": [
@@ -11643,7 +11643,7 @@
           ],
           "id": "LED2405G8",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 7.78,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-30T18:32:06",
@@ -11659,7 +11659,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "45a825c201fec7ba883b91cea2f878fe"
+          "hash": "e945edc5175c534c5363dd9235235fa9"
         },
         {
           "aliases": [
@@ -11697,7 +11697,7 @@
           ],
           "id": "LED2405G8NA",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 7.65,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-06-12T12:47:48",
@@ -11713,7 +11713,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "6d30c5b55286c07f106cd817061e0f4b"
+          "hash": "49135c34c835c6e57f6decaf7172d980"
         },
         {
           "aliases": [
@@ -11753,7 +11753,7 @@
           ],
           "id": "LED2406G4",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 4.3,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-23T19:15:04",
@@ -11769,7 +11769,7 @@
             "score": 97.6,
             "color_temp": 97.6
           },
-          "hash": "2aa6838639c0b888d5336d031215f4fa"
+          "hash": "c15cac17175fc40bdf866e0fc9f031e2"
         },
         {
           "aliases": [
@@ -11809,7 +11809,7 @@
           ],
           "id": "LED2407G8",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 8.47,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-23T19:15:52",
@@ -11825,7 +11825,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "316f66afbb20cbc9085b669650afdc2a"
+          "hash": "95d5a019431dbefb2caef338d16d30fb"
         },
         {
           "aliases": [
@@ -11863,7 +11863,7 @@
           ],
           "id": "LED2407G8NA",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 7.53,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-06-12T12:51:02",
@@ -11878,7 +11878,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "bd77141a9ba6e4935fa971d55ba32f31"
+          "hash": "80bd747ce5078346d7508952eace7b54"
         },
         {
           "aliases": [
@@ -11918,7 +11918,7 @@
           ],
           "id": "LED2408G10",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 10.25,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-17T19:07:57",
@@ -11934,7 +11934,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "2ca6df63ce6c62f7bb31aebca1e9986e"
+          "hash": "ef16ce65dfd3d23e3e49dbc47cc41a98"
         },
         {
           "aliases": [
@@ -11974,7 +11974,7 @@
           ],
           "id": "LED2409G6",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 10.44,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-19T19:20:56",
@@ -11990,7 +11990,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "f0be598b3db33ec01d5279cc1b99586b"
+          "hash": "5373a909232b94e3662c0a0295296ead"
         },
         {
           "aliases": [
@@ -12030,7 +12030,7 @@
           ],
           "id": "LED2410R5",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 4.93,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-28T19:48:33",
@@ -12046,7 +12046,7 @@
             "score": 97.1,
             "color_temp": 97.1
           },
-          "hash": "506f5614a399c494614b65f431f99d71"
+          "hash": "2ae39fc26c34000425c4e21a08d45797"
         },
         {
           "aliases": [
@@ -12086,7 +12086,7 @@
           ],
           "id": "LED2411G3",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 3.12,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-23T19:14:33",
@@ -12101,7 +12101,7 @@
             "score": 97.1,
             "color_temp": 97.1
           },
-          "hash": "558e1776329c306b2471363fb0c2a59f"
+          "hash": "fd55b0e1068ad09629c125651fdedfdf"
         },
         {
           "aliases": [
@@ -12241,7 +12241,7 @@
           ],
           "id": "T2035",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 8.98,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -12256,7 +12256,7 @@
             "score": 98.5,
             "brightness": 98.5
           },
-          "hash": "3c71074ac3f057474fe5154646684997"
+          "hash": "9097e07a7f7a6f5a520f1fd75e609a44"
         },
         {
           "aliases": [
@@ -12293,7 +12293,7 @@
           ],
           "id": "T2037",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 19.95,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -12308,7 +12308,7 @@
             "score": 98.9,
             "brightness": 98.9
           },
-          "hash": "e34fe03d8ccc16a9a3ace1879be19e19"
+          "hash": "5112fb1350abc35770a20bd53ecb2387"
         }
       ],
       "device_types": [
@@ -13404,7 +13404,7 @@
           ],
           "id": "RF 273 T",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 6.84,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-01-21T18:31:00",
@@ -13419,7 +13419,7 @@
             "score": 97.5,
             "color_temp": 97.5
           },
-          "hash": "416b1785e487b31153c0ca040ebc88d2"
+          "hash": "87ccce6a5c0f4230a6d2e83ef425a753"
         },
         {
           "calculation_strategy": "lut",
@@ -13458,7 +13458,7 @@
           ],
           "id": "RF 274 T",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 6.82,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-12-03T21:12:25",
@@ -13473,7 +13473,7 @@
             "score": 97.9,
             "color_temp": 97.9
           },
-          "hash": "96d1d50ef6dd49ebe44a1511e3038741"
+          "hash": "ae708f67475e69285a77114d989a5f39"
         },
         {
           "calculation_strategy": "lut",
@@ -13828,14 +13828,14 @@
           ],
           "id": "SP 240",
           "manufacturer": "innr",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.75,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.75,
             "max": 0.75
           },
-          "hash": "bd27e8da36d67384fdd4d982e3740f72"
+          "hash": "24322a97faa512cb4fc97039cb040416"
         }
       ],
       "device_types": [
@@ -13881,14 +13881,14 @@
           ],
           "id": "VZM31-SN",
           "manufacturer": "inovelli",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 0.29,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.29,
             "max": 0.29
           },
-          "hash": "1f3d8c0f1de7ca82eb03c2c264d933bc"
+          "hash": "782ca6243d08f22f0dcf377239b86bd4"
         },
         {
           "calculation_strategy": "fixed",
@@ -13919,14 +13919,14 @@
           ],
           "id": "VZM32-SN",
           "manufacturer": "inovelli",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 1.59,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.59,
             "max": 1.59
           },
-          "hash": "113ce03ae13d48edb9c2da78308e3e97"
+          "hash": "bf1ec9c380d9e01f21f1a22d4112bc27"
         }
       ],
       "device_types": [
@@ -13981,7 +13981,7 @@
           ],
           "id": "EWS 410",
           "manufacturer": "intelbras",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 10.06,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T16:57:26",
@@ -13997,7 +13997,7 @@
             "score": 95.9,
             "color_temp": 95.9
           },
-          "hash": "04196c7ca9c26aea8f4a9b1c32055a79"
+          "hash": "3035f8be3b4ae7702e360475b3320304"
         }
       ],
       "device_types": [
@@ -14052,14 +14052,14 @@
           ],
           "id": "Link Music",
           "manufacturer": "jbl",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 8.56,
           "sub_profile_count": 0,
           "power_range": {
             "min": 2.71,
             "max": 8.56
           },
-          "hash": "08d40d91503adb885bd4709633b8084c"
+          "hash": "2dc661927028e990c40529b12b086623"
         }
       ],
       "device_types": [
@@ -14243,7 +14243,7 @@
           ],
           "id": "KASB10WB22HA",
           "manufacturer": "kogan",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 9.75,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-07-05T10:17:37",
@@ -14258,7 +14258,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "387286bd8e05acc71704c12513e0c284"
+          "hash": "9b3704ebc03bb670e348dbc890df8297"
         }
       ],
       "device_types": [
@@ -14313,7 +14313,7 @@
           ],
           "id": "4058075208339",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 8.73,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-10-21T15:46:28",
@@ -14329,7 +14329,7 @@
             "score": 45.0,
             "color_temp": 45.0
           },
-          "hash": "f162d4c140112800456ba2703bebb9e5"
+          "hash": "5e4466e3286e30591065b7cf946774aa"
         },
         {
           "calculation_strategy": "lut",
@@ -14471,7 +14471,7 @@
           ],
           "id": "AC12419",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 20.49,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T14:36:06",
@@ -14486,7 +14486,7 @@
             "score": 97.5,
             "color_temp": 97.5
           },
-          "hash": "bf52a5ce718217829960637863797556"
+          "hash": "826af98175071d2f2412e0c86204ff2e"
         },
         {
           "ean": [
@@ -14523,7 +14523,7 @@
           ],
           "id": "AC25697",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 8.18,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -14539,7 +14539,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "7849094e9f084f4b7d42ae9bedcba3c6"
+          "hash": "19bd0d1ab2640d64f824e4576f1eba99"
         },
         {
           "ean": [
@@ -14577,7 +14577,7 @@
           ],
           "id": "ac264430155",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 19.35,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -14592,7 +14592,7 @@
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "3e695dc173ef543165e23b01fa6a8bcc"
+          "hash": "d5be6cd5bbcb9d7062127f227905c333"
         },
         {
           "aliases": [
@@ -14636,7 +14636,7 @@
           ],
           "id": "AC26447",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 34.65,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T05:25:06",
@@ -14652,7 +14652,7 @@
             "score": 99.7,
             "color_temp": 99.7
           },
-          "hash": "1f4b73be55c07492a0d843f4a2a23994"
+          "hash": "e8b08333486d82f371d0a56b12ccfd99"
         },
         {
           "aliases": [
@@ -14699,7 +14699,7 @@
           ],
           "id": "AC26827",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 24.0,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T05:32:11",
@@ -14714,7 +14714,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "58d913e23796744da88fb6b2222211e9"
+          "hash": "74fe4ea92426c285ae7b11cb7d3bd655"
         },
         {
           "aliases": [
@@ -15180,7 +15180,7 @@
           ],
           "id": "IG-CDZOTAAG014RA-MAN",
           "manufacturer": "lexman",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 13.4,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -15196,7 +15196,7 @@
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "256555518154cd4b6a60edeb175ac7e3"
+          "hash": "e7f044776380c7ea62aeeaec0abbc4a5"
         }
       ],
       "device_types": [
@@ -21010,14 +21010,14 @@
           ],
           "id": "S5E02-00",
           "manufacturer": "roborock",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 20.43,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.7,
             "max": 20.43
           },
-          "hash": "b15fa99e1df3d188fb1b80e6895f003c"
+          "hash": "50ecd40e076f2bdb21681bc6f96cf99f"
         },
         {
           "aliases": [
@@ -21058,14 +21058,14 @@
           ],
           "id": "S6V52-00",
           "manufacturer": "roborock",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 19.89,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.66,
             "max": 19.89
           },
-          "hash": "724fdbafc6567fd9978827225a6fb93a"
+          "hash": "0f6fa9215201d3793844fb795c4110c8"
         },
         {
           "aliases": [
@@ -36674,14 +36674,14 @@
           ],
           "id": "P100",
           "manufacturer": "tp-link",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 1.39,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.39,
             "max": 1.39
           },
-          "hash": "4e8116cb576e599caf9acc0dd1ffed5f"
+          "hash": "9571e9ea5213b06935cceb5a0ac0925b"
         },
         {
           "aliases": [
@@ -37473,14 +37473,14 @@
           ],
           "id": "Core300S",
           "manufacturer": "vesync",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 37.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.0,
             "max": 37.0
           },
-          "hash": "60e5144420861c6ba9edb2fceb342d6a"
+          "hash": "c94a3e8e5fe7c992b68a76085270cb01"
         },
         {
           "calculation_strategy": "fixed",
@@ -38713,14 +38713,14 @@
           ],
           "id": "BPLDS02DM",
           "manufacturer": "xiaomi",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 34.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 24.0,
             "max": 34.0
           },
-          "hash": "e9eaa8dd28053f0919133e24a9f16e16"
+          "hash": "7b430a74c039b8564fa25cfd83e029d8"
         },
         {
           "created_at": "2025-05-01T21:56:26Z",
@@ -38805,7 +38805,7 @@
           ],
           "id": "MJDPL01YL",
           "manufacturer": "xiaomi",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:47:24",
           "max_power": 9.6,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:03:13",
@@ -38821,7 +38821,7 @@
             "score": 93.2,
             "color_temp": 93.2
           },
-          "hash": "5b3adf141244b2863c3059676ce8a8db"
+          "hash": "4c17e4b3fa4f88ef22615eb061510f4c"
         }
       ],
       "device_types": [
