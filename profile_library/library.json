@@ -21616,7 +21616,7 @@
           ],
           "id": "DIW7022",
           "manufacturer": "sagemcom",
-          "updated_at": "1970-01-01T00:00:00",
+          "updated_at": "2026-08-31T14:35:22",
           "max_power": 3.22,
           "sub_profile_count": 2,
           "power_range": {
@@ -21624,7 +21624,7 @@
             "max": 3.22
           },
           "standby_power": 2.45,
-          "hash": "e95cd853b8e3a9128909393118e0a444"
+          "hash": "e1fdd46395cf0b540e99d5b24c238b09"
         }
       ],
       "device_types": [
