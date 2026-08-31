@@ -12,6 +12,9 @@
       "bluetooth"
     ]
   },
+  "ean": [
+    "193575004754"
+  ],
   "linear_config": {
     "calibrate": [
       "10 -> 2.3",

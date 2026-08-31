@@ -7,6 +7,9 @@
       "wifi"
     ]
   },
+  "ean": [
+    "194644181178"
+  ],
   "measure_description": "Measured each state for five minutes using Powercalc average mode",
   "measure_device": "Shelly Plug S",
   "measure_method": "script",
