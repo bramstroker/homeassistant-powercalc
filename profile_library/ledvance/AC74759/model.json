@@ -24,6 +24,7 @@
     "VERSION": "v0.4.1:cli"
   },
   "name": "SMART+ Classic B40 E14 RGBW",
+  "product_url": "https://www.ledvance.com/gtin/4099854461330",
   "standby_power": 0.14,
   "voltage_range": {
     "max": 237.1,

@@ -25,6 +25,7 @@
     "VERSION": "v1.20.13:docker"
   },
   "name": "Smart Filament Bulb E27 Tunable Globe",
+  "product_url": "https://innr.com/products/innr-smart-filament-bulb-e27-tunable-globe",
   "standby_power": 0.21,
   "authors": [
     {

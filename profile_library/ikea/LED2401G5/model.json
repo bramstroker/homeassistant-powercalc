@@ -25,6 +25,7 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "KAJPLATS E27 WS G95 clear 806lm",
+  "product_url": "https://www.ikea.com/nl/en/p/kajplats-led-bulb-e27-806-lumen-smart-white-spectrum-clear-globe-30611481/",
   "standby_power": 0.23,
   "authors": [
     {

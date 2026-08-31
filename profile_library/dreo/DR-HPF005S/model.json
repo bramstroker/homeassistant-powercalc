@@ -42,6 +42,7 @@
     "VERSION": "v1.20.5:docker"
   },
   "name": "TurboPoly Fan 715S",
+  "product_url": "https://www.dreo.com/products/turbopoly-fan-715s",
   "standby_power": 0.98,
   "authors": [
     {

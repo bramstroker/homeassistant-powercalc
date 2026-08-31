@@ -28,6 +28,7 @@
   "fixed_config": {
     "power": 0.43
   },
+  "product_url": "https://www.netatmo.com/smart-indoor-air-quality-monitor",
   "authors": [
     {
       "name": "Largelos",

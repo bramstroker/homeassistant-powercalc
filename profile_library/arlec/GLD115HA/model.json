@@ -20,6 +20,7 @@
     "VERSION": "v0.23.2:docker"
   },
   "name": "Grid Connect Smart R80 CCT E27 Globe (9.5 W, 806 lm)",
+  "product_url": "https://www.arlec.com.au/products/arlec-white-grid-connect-smart-r80-led-806lm-9w-es-cct-globe",
   "standby_power": 0.58,
   "authors": [
     {

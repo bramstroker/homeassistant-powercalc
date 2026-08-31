@@ -41,6 +41,7 @@
     "VERSION": "v1.17.19:docker"
   },
   "name": "Five",
+  "product_url": "https://www.sonos.com/en-us/shop/five",
   "standby_power": 3.05,
   "authors": [
     {

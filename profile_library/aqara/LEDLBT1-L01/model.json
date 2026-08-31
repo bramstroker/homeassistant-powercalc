@@ -30,6 +30,7 @@
     "AL039"
   ],
   "name": "LED Bulb T1",
+  "product_url": "https://www.aqara.com/en/product/led-bulb-t1",
   "standby_power": 0.4,
   "authors": [
     {

@@ -25,6 +25,7 @@
     "VERSION": "v0.10.4"
   },
   "name": "LED Light Bulb (Tunable White)",
+  "product_url": "https://www.aqara.com/en/product/smart-light-bulb/",
   "standby_power": 0.41,
   "authors": [
     {

@@ -36,6 +36,7 @@
   "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
   "measure_method": "script",
   "name": "Playbar",
+  "product_url": "https://support.sonos.com/en-us/article/set-up-your-sonos-playbar",
   "standby_power": 5.2,
   "authors": [
     {

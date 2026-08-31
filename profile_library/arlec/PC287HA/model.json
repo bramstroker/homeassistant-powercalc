@@ -13,6 +13,7 @@
   "measure_device": "TP-Link Tapo P110",
   "measure_method": "manual",
   "name": "Twin Grid Connect Smart Power Adaptor with Energy Meter and Surge Protection",
+  "product_url": "https://www.arlec.com.au/products/arlec-white-twin-grid-connect-smart-power-adaptor",
   "only_self_usage": true,
   "standby_power": 0.29,
   "standby_power_on": 2.565,

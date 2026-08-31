@@ -23,6 +23,7 @@
     "VERSION": "v1.17.22:docker"
   },
   "name": "CCT 7W E27 G95 Zigbee Filament Bulb",
+  "product_url": "https://gledopto.com/h-pd-128.html",
   "standby_power": 0.36,
   "authors": [
     {

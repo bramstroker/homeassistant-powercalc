@@ -31,6 +31,7 @@
   },
   "name": "1PM",
   "only_self_usage": true,
+  "product_url": "https://www.shelly.com/products/shelly-1pm",
   "standby_power": 0.589,
   "standby_power_on": 0.85,
   "authors": [

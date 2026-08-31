@@ -212,6 +212,7 @@
     "VERSION": "v1.22.0:docker"
   },
   "name": "Purifier Cool TP07",
+  "product_url": "https://www.dyson.com/air-treatment/air-purifiers/purifier-cool-tp07",
   "standby_power": 1.13,
   "voltage_range": {
     "min": 116.6,

@@ -20,6 +20,7 @@
   "measure_method": "manual",
   "name": "Extreme Zigbee Smart Switch",
   "only_self_usage": false,
+  "product_url": "https://sonoff.tech/en-uk/products/sonoff-zbmini-extreme-zigbee-smart-switch-zbminir2",
   "standby_power": 0.8,
   "standby_power_on": 1.56,
   "authors": [

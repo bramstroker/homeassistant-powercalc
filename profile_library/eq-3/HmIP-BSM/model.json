@@ -22,6 +22,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "Switching Actuator and Meter for Brand Switches",
+  "product_url": "https://homematic-ip.com/en/product/switch-actuator-and-meter-brand-switches",
   "only_self_usage": true,
   "standby_power": 0.2,
   "standby_power_on": 0.2,

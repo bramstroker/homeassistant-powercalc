@@ -24,6 +24,7 @@
     "VERSION": "v0.18.4:docker"
   },
   "name": "ENKI RGBW E27 Globe Bulb 14W",
+  "product_url": "https://www.leroymerlin.pt/produtos/lampada-led-e27-filamentos-g95-1521lm-6500k-lexman-enki-84372273.html",
   "standby_power": 0.4,
   "authors": [
     {

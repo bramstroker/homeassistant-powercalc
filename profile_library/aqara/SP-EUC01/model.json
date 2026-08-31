@@ -24,6 +24,7 @@
   ],
   "name": "Smart Plug EU",
   "only_self_usage": true,
+  "product_url": "https://www.aqara.com/eu/product/smart-plug-eu/",
   "standby_power": 0.17,
   "standby_power_on": 0.46,
   "authors": [

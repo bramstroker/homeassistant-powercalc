@@ -44,6 +44,7 @@
     "VERSION": "v1.16.7:docker"
   },
   "name": "Nest Hub Max",
+  "product_url": "https://store.google.com/product/google_nest_hub_max",
   "standby_power": 2.0,
   "authors": [
     {

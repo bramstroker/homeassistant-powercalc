@@ -19,6 +19,7 @@
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
   "name": "INSPELNING smart plug",
+  "product_url": "https://www.ikea.com/se/en/p/inspelning-plug-smart-energy-monitor-00569836/",
   "only_self_usage": true,
   "standby_power": 0.23,
   "standby_power_on": 0.8,

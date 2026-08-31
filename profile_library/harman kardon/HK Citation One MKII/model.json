@@ -37,6 +37,7 @@
     "VERSION": "v1.9.6:docker"
   },
   "name": "Citation One MKII",
+  "product_url": "https://www.harmankardon.com/HKCITAONEMKIIBLKAS.html",
   "standby_power": 2.01,
   "authors": [
     {

@@ -126,6 +126,7 @@
     "VERSION": "master"
   },
   "name": "S6 MaxV Robot Vacuum and Mop with ReactiveAI",
+  "product_url": "https://global.roborock.com/pages/roborock-s6-maxv",
   "standby_power": 0.1,
   "authors": [
     {

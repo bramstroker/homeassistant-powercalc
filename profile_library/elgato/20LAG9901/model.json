@@ -28,6 +28,7 @@
     "VERSION": "master"
   },
   "name": "Light Strip Pro",
+  "product_url": "https://help.elgato.com/hc/en-us/articles/27138926547085-Elgato-Light-Strip-Pro-Technical-Specifications",
   "standby_power": 1.2,
   "authors": [
     {

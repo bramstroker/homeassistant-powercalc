@@ -46,6 +46,7 @@
     "VERSION": "v1.17.12:docker"
   },
   "name": "Original White Noise Machine",
+  "product_url": "https://getsnooz.com/products/snooz-white-noise-machine",
   "standby_power": 0.31,
   "authors": [
     {

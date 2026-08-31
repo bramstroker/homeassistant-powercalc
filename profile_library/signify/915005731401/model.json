@@ -31,6 +31,7 @@
     "VERSION": "master"
   },
   "name": "Hue Discover White and Color Ambiance Flood Light",
+  "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-discover-outdoor-floodlight/1743530P7",
   "standby_power": 0.5,
   "authors": [
     {

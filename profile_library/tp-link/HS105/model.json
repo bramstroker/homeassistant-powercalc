@@ -19,6 +19,7 @@
   "only_self_usage": false,
   "standby_power": 0.23,
   "standby_power_on": 0.72,
+  "product_url": "https://www.tp-link.com/us/home-networking/smart-plug/hs105/v2/",
   "authors": [
     {
       "name": "Thiago Oliveira",

@@ -24,6 +24,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "Ceiling Light T1M",
+  "product_url": "https://www.aqara.com/us/product/ceiling-light-t1m/",
   "standby_power": 0.18,
   "authors": [
     {

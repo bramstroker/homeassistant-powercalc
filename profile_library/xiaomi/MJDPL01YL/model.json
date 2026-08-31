@@ -23,6 +23,7 @@
     "VERSION": "v1.17.19:docker"
   },
   "name": "Mi Smart LED Bulb Essential",
+  "product_url": "https://www.mi.com/global/product/mi-led-smart-bulb-essential-white-and-color/",
   "standby_power": 1.2,
   "authors": [
     {

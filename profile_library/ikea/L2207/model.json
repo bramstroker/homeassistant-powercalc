@@ -20,6 +20,7 @@
     "VERSION": "v1.14.3:docker"
   },
   "name": "JETSTROM ceiling light panel, white spectrum, 60x60 cm",
+  "product_url": "https://www.ikea.com/de/en/p/jetstroem-led-ceiling-light-panel-smart-dimmable-white-spectrum-60536008/",
   "standby_power": 0.3,
   "authors": [
     {

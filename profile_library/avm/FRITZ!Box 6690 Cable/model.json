@@ -24,6 +24,7 @@
     "VERSION": "v1.20.12:docker"
   },
   "name": "FRITZ!Box 6690 Cable",
+  "product_url": "https://fritz.com/en/products/fritz-box-6690-cable-20002965",
   "authors": [
     {
       "name": "Tim",

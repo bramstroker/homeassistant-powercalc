@@ -21,6 +21,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "Switching Actuator for DIN Rail Mount, 1-Channel",
+  "product_url": "https://homematic-ip.com/en/product/switching-actuator-din-rail-mounting-1-channel",
   "standby_power": 0.25,
   "standby_power_on": 0.3,
   "authors": [

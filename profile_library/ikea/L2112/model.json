@@ -26,6 +26,7 @@
     "VERSION": "v1.15.2:docker"
   },
   "name": "ORMANAS LED lighting strip (4 m)",
+  "product_url": "https://www.ikea.com/nl/en/p/ormanas-led-lighting-strip-smart-wireless-dimmable-colour-and-white-spectrum-40497395/",
   "standby_power": 0.1,
   "authors": [
     {

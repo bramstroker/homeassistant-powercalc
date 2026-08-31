@@ -23,6 +23,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "Dimming Actuator for Brand Switches",
+  "product_url": "https://homematic-ip.com/en/product/dimming-actuator-brand-switches-trailing-edge",
   "standby_power": 0.36,
   "standby_power_on": 0.41,
   "authors": [

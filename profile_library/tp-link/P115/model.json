@@ -19,6 +19,7 @@
   "only_self_usage": true,
   "standby_power": 0.6,
   "standby_power_on": 1.0,
+  "product_url": "https://www.tp-link.com/en/home-networking/smart-plug/tapo-p115/",
   "authors": [
     {
       "name": "belleDESiRE",

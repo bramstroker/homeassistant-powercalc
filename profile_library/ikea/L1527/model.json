@@ -23,6 +23,7 @@
     "VERSION": "master"
   },
   "name": "FLOALT panel WS 30x30",
+  "product_url": "https://www.ikea.com/kr/en/p/floalt-led-light-panel-dimmable-white-spectrum-30332215/",
   "standby_power": 0.08,
   "authors": [
     {

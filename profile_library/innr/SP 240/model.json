@@ -18,6 +18,7 @@
   "measure_device": "Brennenstuhl PM 231 E",
   "measure_method": "manual",
   "name": "Smart Plug",
+  "product_url": "https://innr.com/products/innr-smart-plug",
   "only_self_usage": true,
   "standby_power": 0.2,
   "standby_power_on": 0.75,

@@ -23,6 +23,7 @@
     "VERSION": "v1.0.3:docker"
   },
   "name": "SMART+ ZB CLA60 60 9W E27",
+  "product_url": "https://www.ledvance.com/gtin/4058075208391",
   "standby_power": 0.31,
   "authors": [
     {

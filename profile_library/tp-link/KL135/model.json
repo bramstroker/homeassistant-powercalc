@@ -27,6 +27,7 @@
   },
   "name": "Kasa Smart Wi-Fi Light Bulb, Multicolour",
   "standby_power": 0.2,
+  "product_url": "https://www.tp-link.com/us/home-networking/smart-bulb/kl135/v1/",
   "authors": [
     {
       "name": "xags",

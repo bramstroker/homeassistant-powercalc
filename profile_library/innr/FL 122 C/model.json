@@ -23,6 +23,7 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Strip Light Colour",
+  "product_url": "https://innr.com/products/innr-strip-light-colour",
   "standby_power": 0.3,
   "authors": [
     {

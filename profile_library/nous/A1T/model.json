@@ -24,6 +24,7 @@
   "measure_method": "manual",
   "name": "Smart Wi-Fi Socket with Power Meter",
   "only_self_usage": true,
+  "product_url": "https://nous.technology/product/a1t.html",
   "standby_power": 0.29,
   "standby_power_on": 0.54,
   "authors": [

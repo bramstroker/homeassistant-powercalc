@@ -27,6 +27,7 @@
     "VERSION": "v1.3.1:docker"
   },
   "name": "Smart LED Ceiling Light",
+  "product_url": "https://www.yeelight.com/en_us/product/luna",
   "standby_power": 0.9,
   "sub_profile_select": {
     "default": "default",

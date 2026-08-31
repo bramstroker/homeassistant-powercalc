@@ -23,6 +23,7 @@
     "VERSION": "v0.5.0:cli"
   },
   "name": "SMART+ Classic A60 E27 RGBW",
+  "product_url": "https://www.ledvance.com/gtin/4099854460333",
   "standby_power": 0.42,
   "voltage_range": {
     "max": 236.3,

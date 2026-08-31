@@ -24,6 +24,7 @@
     "VERSION": "master"
   },
   "name": "Smart Filament Bulb E27 Tunable Edison",
+  "product_url": "https://innr.com/products/innr-smart-filament-bulb-e27-tunable-edison",
   "standby_power": 0.21,
   "authors": [
     {

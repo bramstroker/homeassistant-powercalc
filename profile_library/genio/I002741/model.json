@@ -20,6 +20,7 @@
     "VERSION": "v1.10.5:docker"
   },
   "name": "Wi-Fi Dimmable RGB+CCT 9W LED Downlight",
+  "product_url": "https://www.mirabella.com.au/products/i002741",
   "standby_power": 1.2,
   "authors": [
     {

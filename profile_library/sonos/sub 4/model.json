@@ -38,6 +38,7 @@
     "VERSION": "v1.17.19:docker"
   },
   "name": "Sub 4",
+  "product_url": "https://www.sonos.com/en-us/shop/sub-4",
   "standby_power": 1.9,
   "authors": [
     {

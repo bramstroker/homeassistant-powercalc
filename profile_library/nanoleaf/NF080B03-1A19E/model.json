@@ -29,6 +29,7 @@
     "VERSION": "v1.11.6:docker"
   },
   "name": "Essentials Matter over Thread Smart Bulb (A19/E26)",
+  "product_url": "https://nanoleaf.me/en-ca/products/nanoleaf-led-smart-bulbs",
   "standby_power": 0.13,
   "authors": [
     {

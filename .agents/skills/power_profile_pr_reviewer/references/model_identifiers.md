@@ -314,9 +314,13 @@ Prefer Epson's product model designation, such as `ET-3760` or `L6270`, as the c
 
 Prefer Eufy's short product code, such as `T8400` or `T8410`, as the canonical directory ID when an official product or support page maps it to the measured camera and Home Assistant reports the same value. A longer store code such as `T84001W1` can identify a regional or packaged retail variant; do not add it as an alias unless the product label or integration actually reports it as the device model. Use the current official camera name, such as `Indoor Cam C120` or `Indoor Cam E220`, instead of an older generic capability name. Preserve `Eufy Security` in manufacturer aliases when exact Home Assistant Device Info reports that value. For fixed camera profiles, keep materially different modes such as normal operation and infrared night vision as explicit subprofiles. When Powercalc average mode collected readings for each state, use `measure_method: script` and state the averaging duration clearly.
 
+For `product_url`, use Eufy's clean model-specific product route, such as `https://www.eufy.com/eu-en/products/t8410`, instead of a compatibility or support article when that route exists.
+
 ## Eve
 
 Prefer the `20...` model number from Eve's official accessory-identification page or device label as the canonical ID; Eve lists a separate `10...` product number for ordering. Regional Eve Energy variants have distinct model numbers and plug formats, so share one measured profile through aliases only when measurements or equivalent electrical evidence support it. Preserve an exact numeric Matter product ID such as `80` as a discovery alias when Home Assistant reports it separately from the descriptive model and combines it with the manufacturer; do not infer numeric IDs from the Matter device class. Add `Eve Systems` as a manufacturer alias when that is the exact Home Assistant value. Use a concise product description that omits the manufacturer name, and retain `only_self_usage` for Eve Energy profiles because the device has built-in energy metering.
+
+Use Eve's accessory-identification page as evidence for model and product numbers, but use the exact product-family page for `product_url`, such as `/en-us/eve-energy`; the identification page is too generic as a profile link.
 
 ## Everspring
 
@@ -395,6 +399,8 @@ Use the official product description without the `Govee` manufacturer prefix. Pr
 Govee retail suffixes can encode region, finish, or pack configuration around the same base `H...` hardware model. A single- or multipack barcode may be stored only after the complete SKU is mapped back to the exact base model and every item in the pack is that same device. Prefer regulated product sheets and model-specific manuals for light output and rated power; an adapter's maximum output is not the fixture's rated consumption. An EPREL value for an internal strip section may be scaled to the complete fixture only when the exact sold length is an integer count of identical documented sections and the resulting total is consistent with the measured LUT.
 
 An explicit wattage field in an exact-model product specification may be used as `rated_power` even when a separate adapter rating is also present; record the product value and do not calculate it from adapter voltage and current. This distinction allows the published 12W and 24W ratings for `H7020` and `H7021` while keeping adapter-only cases unresolved.
+
+Govee has regional storefronts rather than one complete global product catalog. Prefer an English exact-product page and reuse the same storefront where the model exists, normally the US storefront; use UK, EU, or CA only when the exact regional or retired model is unavailable there. An exact archived or refurbished product page is preferable to a live category redirect. Strip locale and storefront query parameters that do not select the measured variant.
 
 ## GreenWave
 
@@ -475,6 +481,8 @@ When the official code and the measured variant still cannot be reconciled, ask 
 ## Ledworks / Twinkly
 
 Prefer the exact Twinkly base product SKU exposed by Home Assistant, such as `TWS600STP`. Preserve the capability suffix: `STP` identifies the Multicolor/RGB Strings while `SPP` identifies Multicolor + White and must remain a separate profile. Do not add plug-, wire-color-, or region-specific suffixes such as `-BEU` unless Home Assistant reports that complete value. A regional packaging EAN is safe only when the original profile evidence identifies the exact regional suffix and compatible power supply; keep the base SKU canonical and do not add sibling-region barcodes. Use Twinkly's product-family wording in `name`, including the LED count and color capability where they distinguish variants. A fixed profile can be credible for an effect light when extended measurement shows that effects and brightness settings produce approximately the same input draw; retain that evidence in `measure_description` rather than assuming a LUT is required. Do not treat an adapter output rating alone as complete-device `rated_power`; accept the same value when Twinkly independently lists it as product `Power` or `Power rating ... MAX`, especially when the measured on-state draw corroborates it.
+
+For `product_url`, prefer Twinkly's current product-family page when its variant selector and specifications explicitly include the measured SKU's LED count and color capability. Use the SKU-specific knowledgebase article only when no qualifying product page exists.
 
 ## Lenovo
 
@@ -588,6 +596,8 @@ Prefer the complete single-device SKU in MOES' official webshop metadata, preser
 
 Prefer the exact article number printed on the measured lamp or published as `Artikel-Nr.` on Müller Licht's official product-information page. Treat generic Zigbee identifiers such as `ZBT-ColorTemperature`, `ZBT-ExtendedColor`, and `tint-ExtendedColor` as controller or capability families: they can be shared by different fittings, shapes, wattages, and article numbers, so do not use them as aliases without evidence that presenting multiple candidates is safe and sufficiently complete. Keep Home Assistant's separate `model` and parenthesized `model_id` as separate discovery values; never construct a combined alias. When Home Assistant reports a related catalog ID for the measured product, preserve only the exact ID as an alias and keep the official measured article number canonical. Müller Licht can reuse an article number and consumer EAN for a lower-power hardware revision; match dated specifications to the LUT peak and omit an ambiguous EAN. Do not store inner- or shipping-carton GTINs as multipack EANs. Use the official `tint` styling and a concise English product description in `name`, translating terms such as `Kerzenform`, `Reflektor`, and `Deckenleuchte` instead of mixing German and English.
 
+Müller Licht's model-specific product-information route uses the article number in `?q=<article>` and redirects path-style attempts back to that form. Treat this functional query as the canonical product URL rather than removing it or linking the generic product-information page.
+
 The legacy `ZBT-ColorTemperature` GU10/350 lm measurement and retail code `43961` map to official article `404006`: the three-way converter mapping distinguishes it from E14 article `404008` and E27 article `404004` through the measured fitting and output, while Müller Licht's declaration groups `43961` and `404006` as the same 5.1W/350 lm GU10 variant. Keep `43961` as an exact alias and both former directory IDs in `legacy_ids`, but do not retain shared `ZBT-ColorTemperature` as a discovery alias.
 
 For the legacy `45311` profile, retain the contributor's exact measured article and its 4.9W/350 lm globe specifications. Home Assistant's reported description ending in `404037` identifies a separate 5.5W Edison bulb, so do not add `404037` or its EAN as discovery metadata for `45311`. For the measured `45317` starter kit, keep the starter-kit article canonical. `45326` is the related standalone-bulb article, but a declaration that groups the two is not enough to establish revision-level electrical equivalence or justify an alias.
@@ -625,6 +635,8 @@ NOUS publishes 0.53W standby consumption for A1T and 0.5W for A1Z. Use those exa
 ## Nuki
 
 Use the exact Nuki manufacturer SKU as canonical when it is exposed by an official shop link or printed on the product or packaging. Preserve the exact Home Assistant model string, such as `Hardware Bridge`, as a discovery alias when the original Device Info confirms it. Keep the device serial number out of aliases. Use the official product category as the basis for a concise descriptive `name` without repeating the SKU or manufacturer; for the Bridge, a fixed profile represents the device's full draw and does not use `only_self_usage`.
+
+Use Nuki's clean product page for `product_url`; remove shop chooser and SKU query parameters when the base route still resolves to the same exact product.
 
 ## Oz Smart Things
 
@@ -673,6 +685,8 @@ For no-neutral switches that require a bypass, distinguish the manufacturer's de
 More generally, keep Shelly's published device-consumption limit separate from empirical profile values. Store a claim such as `< 1 W` numerically as `rated_power: 1.0`, while preserving a credible higher measurement; do not invent an accessory, tolerance, or measurement-error explanation when the available evidence only establishes that the values differ.
 
 Shelly family pages may document one consumption limit across multiple exact API hardware codes. Preserve the reported code rather than replacing it with the first code on the product page: `SNSW-102P16EU` is a Plus 2PM variant alongside `SNSW-002P16EU`, and `SPEM-003CEBEU63` is the Pro 3EM package with 63A current transformers alongside the base `SPEM-003CEBEU`. A family rating may be used when a maintained device mapping confirms the variant and the profile measurements are compatible. Exclude separately powered or optional Add-On consumption when comparing the bare-device limit.
+
+For `product_url`, prefer Shelly's clean exact product page without a language segment when it exists. For discontinued Gen1 products whose former product route now redirects to the all-products collection, retain the exact official knowledgebase or documentation page instead; it is more specific than the category redirect. Regional storefront pages remain appropriate for regional electrical variants.
 
 ## Signify / Philips Hue
 
@@ -747,6 +761,8 @@ The fitting suffix can distinguish otherwise electrically identical bulbs. One f
 Keep exact region-qualified integration values such as `HS100(EU)`, `HS300(US)`, or `KP115(AU)` as aliases after confirming the same power behavior. Matter may expose a numeric product ID instead of the Kasa/Tapo model; retain a confirmed ID such as `261` or `262` as an alias and `Tapo` as a manufacturer alias. Use the official product title for `name` after removing redundant manufacturer and model text. TP-Link's own titles vary between `WiFi` and `Wi-Fi`, so verify the individual product page instead of applying a global spelling rewrite.
 
 For light strips, confirm the measured length behind a family model such as `L900` or `L920` before copying specifications from retail variants such as `L900-5` or `L920-5`. An exact originating commit or Device Info mapping may establish the length; without it, do not assume the base family always means 5 m.
+
+Prefer TP-Link's `/en/` exact-product route for `product_url` when it exists. Do not remove the locale segment entirely because the site can geolocate and redirect to a non-English catalog. Retain a regional English route such as `/us/` or `/au/` for models or revisions absent from the global English catalog.
 
 ## Third Reality
 

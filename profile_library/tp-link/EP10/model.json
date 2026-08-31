@@ -19,6 +19,7 @@
   "only_self_usage": false,
   "standby_power": 0.58,
   "standby_power_on": 1.09,
+  "product_url": "https://www.tp-link.com/us/home-networking/smart-plug/ep10/v1/",
   "authors": [
     {
       "name": "Thiago Oliveira",

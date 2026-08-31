@@ -29,6 +29,7 @@
     "VERSION": "v0.3.0:cli"
   },
   "name": "FLAIR Viyu A60 E27 CCT Bulb (8.5W, 806 lm)",
+  "product_url": "https://www.hornbach.de/p/flair-viyu-led-lampe-dimmbar-e27-8-5w60w-806-lm-2200-5000-k-kompatibel-mit-smart-home-by-hornbach/10454469/",
   "standby_power": 0.3,
   "voltage_range": {
     "min": 228.3,

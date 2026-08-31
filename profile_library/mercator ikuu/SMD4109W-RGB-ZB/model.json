@@ -26,6 +26,7 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Walter RGB+CCT Zigbee 9W LED Downlight (92 mm)",
+  "product_url": "https://mercator.com.au/products/walter-9w-90mm-ikuu-smart-zigbee-rgb-and-cct-led-downlight",
   "standby_power": 0.43,
   "authors": [
     {

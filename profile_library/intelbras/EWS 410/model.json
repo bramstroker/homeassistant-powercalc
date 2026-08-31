@@ -26,6 +26,7 @@
     "VERSION": "v1.17.19:docker"
   },
   "name": "Smart Wi-Fi RGB LED Light Bulb (10W, E27)",
+  "product_url": "https://www.intelbras.com/en/smart-wi-fi-led-light-bulb-ews-410",
   "standby_power": 0.62,
   "authors": [
     {

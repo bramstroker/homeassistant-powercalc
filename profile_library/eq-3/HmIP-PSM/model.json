@@ -22,6 +22,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "Pluggable Switch and Meter",
+  "product_url": "https://homematic-ip.com/en/product/pluggable-switch-and-meter",
   "only_self_usage": true,
   "standby_power": 0.21,
   "standby_power_on": 0.78,

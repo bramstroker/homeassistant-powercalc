@@ -41,6 +41,7 @@
     "VERSION": "v1.3.13:docker"
   },
   "name": "Amp",
+  "product_url": "https://www.sonos.com/en-us/shop/amp",
   "standby_power": 6.42,
   "authors": [
     {

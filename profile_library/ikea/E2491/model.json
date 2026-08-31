@@ -17,6 +17,7 @@
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "manual",
   "name": "GRILLPLATS smart plug",
+  "product_url": "https://www.ikea.com/se/en/p/grillplats-plug-smart-60604238/",
   "only_self_usage": true,
   "standby_power": 0.22,
   "standby_power_on": 0.47,

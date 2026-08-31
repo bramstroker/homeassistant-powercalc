@@ -33,6 +33,7 @@
   },
   "name": "1L Gen3",
   "only_self_usage": false,
+  "product_url": "https://www.shelly.com/products/shelly-1l-gen3",
   "authors": [
     {
       "name": "Victor Burlacu-Zane",

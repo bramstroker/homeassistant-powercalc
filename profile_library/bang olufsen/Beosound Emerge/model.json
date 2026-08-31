@@ -38,6 +38,7 @@
     "VERSION": "master"
   },
   "name": "Bookshelf Speaker",
+  "product_url": "https://www.bang-olufsen.com/en/gb/speakers/beosound-emerge",
   "standby_power": 5.0,
   "authors": [
     {

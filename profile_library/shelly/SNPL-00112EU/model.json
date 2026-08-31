@@ -31,6 +31,7 @@
   "only_self_usage": true,
   "standby_power": 0.74,
   "standby_power_on": 1.01,
+  "product_url": "https://www.shelly.com/products/shelly-plus-plug-s-black-x1-2",
   "authors": [
     {
       "name": "RubenKelevra",

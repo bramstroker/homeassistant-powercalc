@@ -144,6 +144,7 @@
     "VERSION": "v0.2.1:app"
   },
   "name": "D10 Plus Robot Vacuum Cleaner",
+  "product_url": "https://global.dreametech.com/products/dreame-d10-plus",
   "standby_power": 2.6,
   "voltage_range": {
     "min": 227.5,

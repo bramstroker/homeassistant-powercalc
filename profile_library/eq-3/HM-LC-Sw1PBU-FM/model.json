@@ -21,6 +21,7 @@
     "VERSION": "v1.17.11:docker"
   },
   "name": "Wireless Switch Actuator for Brand Switch Systems, Flush-Mount",
+  "product_url": "https://www.eq-3.com/products/homematic/detail/homematic-wireless-switch-actuator-1-channel-for-brand-switch-systems-flush-mount.html",
   "standby_power": 0.83,
   "standby_power_on": 1.42,
   "authors": [

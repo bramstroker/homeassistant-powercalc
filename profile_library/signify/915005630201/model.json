@@ -30,6 +30,7 @@
     "VERSION": "v1.17.7:docker"
   },
   "name": "Hue Calla Outdoor Bollard",
+  "product_url": "https://www.philips-hue.com/en-us/p/hue-white-and-color-ambiance-calla-outdoor-bollard/1741930V7",
   "standby_power": 0.25,
   "authors": [
     {

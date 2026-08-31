@@ -30,6 +30,7 @@
     "VERSION": "v0.4.1:app"
   },
   "name": "Smart Bulb Colour E27 800lm",
+  "product_url": "https://innr.com/products/innr-smart-bulb-colour-e27-2025",
   "standby_power": 0.34,
   "voltage_range": {
     "max": 245.17,

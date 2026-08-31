@@ -24,6 +24,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "Shutter Actuator, Flush-Mount",
+  "product_url": "https://homematic-ip.com/en/product/shutter-actuator-flush-mounted",
   "standby_power": 0.12,
   "standby_power_on": 0.2,
   "sub_profile_select": {

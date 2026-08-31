@@ -42,6 +42,7 @@
     "VERSION": "v1.20.12:docker"
   },
   "name": "Ray",
+  "product_url": "https://www.sonos.com/en-us/shop/ray",
   "standby_power": 2.92,
   "authors": [
     {

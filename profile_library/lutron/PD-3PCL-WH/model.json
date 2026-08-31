@@ -21,6 +21,7 @@
   "measure_device": "Shelly Plus Plug",
   "measure_method": "script",
   "name": "Plug-In Lamp Dimmer",
+  "product_url": "https://www.casetawireless.com/us/en/products/smart-plugs/lamp-dimming-smart-plug",
   "standby_power": 0.1,
   "standby_power_on": 0.56,
   "authors": [

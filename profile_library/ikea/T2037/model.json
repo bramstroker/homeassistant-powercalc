@@ -23,6 +23,7 @@
     "VERSION": "v1.9.4:docker"
   },
   "name": "STOFTMOLN LED Ceiling/Wall Lamp (37 cm)",
+  "product_url": "https://www.ikea.com/nl/nl/p/stoftmoln-led-plafond-wandlamp-smart-draadloos-dimbaar-warm-wit-wit-20510779/",
   "standby_power": 0.11,
   "authors": [
     {

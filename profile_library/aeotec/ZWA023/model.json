@@ -21,6 +21,7 @@
   "measure_device": "Shelly Plus Plug",
   "measure_method": "script",
   "name": "Smart Switch 7 B plug",
+  "product_url": "https://aeotec.com/products/aeotec-smart-switch-7/",
   "only_self_usage": true,
   "standby_power": 0.7,
   "standby_power_on": 0.8,

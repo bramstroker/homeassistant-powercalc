@@ -25,6 +25,7 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "KAJPLATS E27 WS globe 470lm",
+  "product_url": "https://www.ikea.com/de/de/p/kajplats-led-leuchtmittel-e27-470-lm-smart-weissspektrum-rund-opalweiss-00611307/",
   "standby_power": 0.08,
   "authors": [
     {

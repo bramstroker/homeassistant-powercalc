@@ -23,6 +23,7 @@
     "VERSION": "v1.17.2:docker"
   },
   "name": "Hue White Ambiance E14 Luster Bulb",
+  "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-ambiance-lustre-e14-smart-bulb/8719514491106",
   "standby_power": 0.2,
   "authors": [
     {

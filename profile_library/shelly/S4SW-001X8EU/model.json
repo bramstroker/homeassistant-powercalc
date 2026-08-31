@@ -33,6 +33,7 @@
   },
   "name": "1 Mini Gen4",
   "only_self_usage": false,
+  "product_url": "https://www.shelly.com/products/shelly-1-mini-gen4",
   "authors": [
     {
       "name": "Jasper",

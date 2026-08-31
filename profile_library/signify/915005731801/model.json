@@ -30,6 +30,7 @@
     "VERSION": "v1.17.9:docker"
   },
   "name": "Hue Calla Large Outdoor Pedestal",
+  "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-calla-outdoor-pedestal/1743730P7",
   "standby_power": 0.32,
   "authors": [
     {

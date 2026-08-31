@@ -34,6 +34,7 @@
   "measure_device": "Shelly Plug US",
   "measure_method": "script",
   "name": "One SL",
+  "product_url": "https://www.sonos.com/en-us/shop/one-sl",
   "standby_power": 2.83,
   "authors": [
     {

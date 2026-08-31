@@ -30,6 +30,7 @@
     "VERSION": "v0.25.5:docker"
   },
   "name": "Smart Wi-Fi LED Bulb",
+  "product_url": "https://www.meross.com/en-gc/smart-light/light-bulb-that-changes-color/28",
   "standby_power": 0.56,
   "authors": [
     {

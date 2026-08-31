@@ -115,6 +115,7 @@
     "VERSION": "v0.3.0:app"
   },
   "name": "S5 Max Robot Vacuum and Mop",
+  "product_url": "https://us.roborock.com/pages/roborock-s5-max",
   "voltage_range": {
     "min": 240.08,
     "max": 244.58

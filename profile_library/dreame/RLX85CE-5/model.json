@@ -266,6 +266,7 @@
     "VERSION": "v0.3.0:cli"
   },
   "name": "X50 Ultra Complete",
+  "product_url": "https://global.dreametech.com/products/dreame-x50-ultra-complete",
   "standby_power": 5.55,
   "voltage_range": {
     "min": 225.9,

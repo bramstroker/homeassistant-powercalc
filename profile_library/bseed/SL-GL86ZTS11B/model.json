@@ -16,6 +16,7 @@
   "measure_method": "manual",
   "measure_description": "Measured with purely resistive series and parallel dummy loads to bring the total draw into the meter's accurate range. Switch self-consumption is 0.1 W in standby and 0.3 W while operating; the connected lamp must be configured separately.",
   "created_at": "2026-07-28T15:06:00Z",
+  "product_url": "https://www.bseed.com/en-pt/products/bseed-zigbee-switch-wall-smart-light-switch-1gang-2-way-single-live-line",
   "standby_power": 0.1,
   "standby_power_on": 0.3,
   "authors": [

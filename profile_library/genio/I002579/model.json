@@ -23,6 +23,7 @@
     "VERSION": "v0.23.2:docker"
   },
   "name": "Smart Wi-Fi LED Strip Light (3 m)",
+  "product_url": "https://www.mirabella.com.au/products/i002579",
   "standby_power": 0.7,
   "authors": [
     {

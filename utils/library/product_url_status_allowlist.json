@@ -1,0 +1,176 @@
+{
+  "https://epson.com.br/Para-empresas/Impressoras/Impressoras-a-Jato-de-Tinta/Impressora-Multifuncional-3-em-1-Epson-EcoTank%C2%AE-L6270/p/C11CJ61302": {
+    "statuses": [
+      403
+    ],
+    "reason": "Epson blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://epson.com/en/For-Work/Printers/Inkjet/EcoTank-ET-3760-All-in-One-Cartridge-Free-Supertank-Printer/p/C11CG20203": {
+    "statuses": [
+      403
+    ],
+    "reason": "Epson blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-box-6670-cable-20003047": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-box-6690-cable-20002965": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-box-5690-pro-20003043": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-dect-210-20002723": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-repeater-1200-ax-20002974": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-repeater-2400-20002855": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-repeater-2700-20003195": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://fritz.com/en/products/fritz-repeater-6000-20002908": {
+    "statuses": [
+      500
+    ],
+    "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
+  },
+  "https://help.elgato.com/hc/en-us/articles/20935383021965-Elgato-Key-Light-How-to-Identify-if-You-Have-a-Key-Light-or-Key-Light-MK-2": {
+    "statuses": [
+      403
+    ],
+    "reason": "Elgato intermittently blocks automated HTTP clients while this official model-specific support page remains available in browsers."
+  },
+  "https://help.elgato.com/hc/en-us/articles/360038093012-Key-Light-Air-Technical-Specifications": {
+    "statuses": [
+      403
+    ],
+    "reason": "Elgato intermittently blocks automated HTTP clients while this official model-specific support page remains available in browsers."
+  },
+  "https://help.elgato.com/hc/en-us/articles/360049987711-Elgato-Ring-Light-Technical-Specifications": {
+    "statuses": [
+      403
+    ],
+    "reason": "Elgato intermittently blocks automated HTTP clients while this official model-specific support page remains available in browsers."
+  },
+  "https://support.harmankardon.com/us/en/howto/citation-multibeam-700-software-update-release-notes-us/000037032.html": {
+    "statuses": [
+      403
+    ],
+    "reason": "Harman Kardon blocks automated HTTP clients while this official model-specific support page remains available in browsers."
+  },
+  "https://www.harmankardon.com/HKCITAONEMKIIBLKAS.html": {
+    "statuses": [
+      403
+    ],
+    "reason": "Harman Kardon blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.homedepot.com/p/Hampton-Bay-Indoor-Outdoor-12-Light-24-ft-Smart-Plug-in-Edison-Bulb-RGBW-Color-Changing-LED-String-Light-Powered-by-Hubspace-HB-10521-HS/318145796": {
+    "statuses": [
+      403
+    ],
+    "reason": "Home Depot blocks automated HTTP clients while this brand-owner model-specific product page remains available in browsers."
+  },
+  "https://www.jbl.com/JBLLINKMUSICBLKAM.html": {
+    "statuses": [
+      403
+    ],
+    "reason": "JBL blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.leroymerlin.pt/produtos/lampada-led-e27-filamentos-g95-1521lm-6500k-lexman-enki-84372273.html": {
+    "statuses": [
+      403
+    ],
+    "reason": "Leroy Merlin blocks automated HTTP clients while this brand-owner model-specific product page remains available in browsers."
+  },
+  "https://www.sony.com/electronics/support/speakers-wireless-speakers/lf-s50g/specifications": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sony blocks automated HTTP clients while this official model-specific support page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/amp": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/arc": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/arc-ultra": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/beam": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/era-100": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/era-300": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/five": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/one-sl": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/ray": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.sonos.com/en-us/shop/sub-4": {
+    "statuses": [
+      403
+    ],
+    "reason": "Sonos blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  }
+}

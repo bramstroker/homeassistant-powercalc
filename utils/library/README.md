@@ -54,6 +54,26 @@ uv run --group library python -m utils.library.validate_lut_files
 uv run --group library python -m utils.library.validate_lut_files profile_library/signify
 ```
 
+### `validate_product_urls.py`
+
+Validate that every `product_url` in the selected profiles follows redirects and ends
+in an HTTP 200 response. Official pages which block automated clients may list narrowly
+accepted status codes, together with a reason, in
+`product_url_status_allowlist.json`. The whole profile library is checked by default;
+pass one or more model files or directories to limit the scope.
+
+```bash
+uv run --group library python -m utils.library.validate_product_urls
+
+# validate one manufacturer
+uv run --group library python -m utils.library.validate_product_urls profile_library/signify
+```
+
+The weekly GitHub Actions check stores a small per-URL state artifact and only fails
+after the same URL has failed three consecutive checks. A successful check resets that
+URL immediately. Local runs remain strict and fail on the first error unless
+`--failure-threshold`, `--failure-state`, and `--failure-state-output` are supplied.
+
 ### `scan_lut_quality.py`
 
 Scan LUT (`*.csv.gz`) files for rough curves and outliers. Accepts an optional

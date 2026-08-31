@@ -34,6 +34,7 @@
   },
   "name": "1PM Mini Gen4",
   "only_self_usage": true,
+  "product_url": "https://www.shelly.com/products/shelly-1pm-mini-gen4",
   "authors": [
     {
       "name": "Michal Bartak",

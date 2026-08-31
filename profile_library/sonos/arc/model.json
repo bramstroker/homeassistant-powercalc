@@ -42,6 +42,7 @@
     "VERSION": "v1.3.13:docker"
   },
   "name": "Arc",
+  "product_url": "https://www.sonos.com/en-us/shop/arc",
   "standby_power": 4.4,
   "authors": [
     {

@@ -141,6 +141,7 @@
     "VERSION": "v1.19.5:docker"
   },
   "name": "Mi Robot Vacuum Cleaner",
+  "product_url": "https://www.mi.com/global/support/article/KA-07583/",
   "authors": [
     {
       "name": "Alexandre Bertrand",

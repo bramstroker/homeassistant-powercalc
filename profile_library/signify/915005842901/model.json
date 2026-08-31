@@ -30,6 +30,7 @@
     "VERSION": "v1.19.2:docker"
   },
   "name": "Hue Resonate",
+  "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-resonate-outdoor-wall-light/1746430P7",
   "standby_power": 0.05,
   "authors": [
     {

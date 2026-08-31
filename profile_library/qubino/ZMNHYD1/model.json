@@ -25,6 +25,7 @@
   "measure_method": "manual",
   "name": "Smart Plug 16A",
   "only_self_usage": true,
+  "product_url": "https://qubino.com/products/smart-plug-16a/smart-plug-16a-tech/",
   "standby_power": 0.3,
   "standby_power_on": 0.5,
   "authors": [

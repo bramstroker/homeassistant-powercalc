@@ -20,6 +20,7 @@
     "VERSION": "v1.15.4:docker"
   },
   "name": "JETSTROM ceiling light panel, color/white spectrum, 30x30 cm",
+  "product_url": "https://www.ikea.com/de/en/p/jetstroem-led-wall-light-panel-smart-dimmable-wired-in-colour-and-white-spectrum-80536074/",
   "standby_power": 0.32,
   "authors": [
     {

@@ -23,6 +23,7 @@
     "VERSION": "v0.24.3:docker"
   },
   "name": "Sirius III",
+  "product_url": "https://www.malmbergs.com/Products/9970020",
   "standby_power": 0.89,
   "authors": [
     {

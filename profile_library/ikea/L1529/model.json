@@ -23,6 +23,7 @@
     "VERSION": "master"
   },
   "name": "FLOALT panel WS 60x60",
+  "product_url": "https://www.ikea.com/kr/en/p/floalt-led-light-panel-dimmable-white-spectrum-20303020/",
   "standby_power": 0.12,
   "authors": [
     {

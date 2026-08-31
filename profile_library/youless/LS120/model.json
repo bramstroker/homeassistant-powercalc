@@ -17,6 +17,7 @@
   "measure_method": "manual",
   "min_version": "v1.24.0",
   "name": "P1 Energy Monitor",
+  "product_url": "https://www.youless.nl/winkel/ls120.html",
   "fixed_config": {
     "power": 1.18
   },

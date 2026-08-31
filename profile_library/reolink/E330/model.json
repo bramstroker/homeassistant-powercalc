@@ -25,6 +25,7 @@
   "measure_device": "Shelly 1PM Mini Gen3",
   "measure_method": "manual",
   "name": "Smart 5MP Wi-Fi PT Indoor Security Camera",
+  "product_url": "https://reolink.com/us/product/e-series-e330/",
   "sub_profile_select": {
     "matchers": [
       {

@@ -41,6 +41,7 @@
     "VERSION": "v1.17.6:docker"
   },
   "name": "Wi-Fi Speaker",
+  "product_url": "https://www.jbl.com/JBLLINKMUSICBLKAM.html",
   "standby_power": 1.7,
   "authors": [
     {

@@ -24,6 +24,7 @@
     "VERSION": "v1.17.3:docker"
   },
   "name": "12-Light 24ft RGBW LED Smart Hubspace Cafe String Light",
+  "product_url": "https://www.homedepot.com/p/Hampton-Bay-Indoor-Outdoor-12-Light-24-ft-Smart-Plug-in-Edison-Bulb-RGBW-Color-Changing-LED-String-Light-Powered-by-Hubspace-HB-10521-HS/318145796",
   "standby_power": 1.45,
   "authors": [
     {

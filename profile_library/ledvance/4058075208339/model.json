@@ -26,6 +26,7 @@
     "VERSION": "master"
   },
   "name": "SMART+ ZB Flex 3P RGB + TW",
+  "product_url": "https://www.ledvance.com/gtin/4058075208339",
   "standby_power": 0.26,
   "authors": [
     {

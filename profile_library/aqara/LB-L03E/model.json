@@ -32,6 +32,7 @@
     "lumi.light.agl006"
   ],
   "name": "LED Bulb T2 (GU10, CCT)",
+  "product_url": "https://us.aqara.com/products/led-bulb-t2-gu10",
   "standby_power": 0.39,
   "authors": [
     {

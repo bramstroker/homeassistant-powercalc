@@ -25,6 +25,7 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "KAJPLATS E14 CWS globe 806lm",
+  "product_url": "https://www.ikea.com/es/es/p/kajplats-bombilla-led-e14-806-lm-inteligente-color-espectro-blanco-globo-blanco-opalo-40608572/",
   "standby_power": 0.22,
   "authors": [
     {

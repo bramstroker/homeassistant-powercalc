@@ -42,6 +42,7 @@
     "VERSION": "v0.3.0:app"
   },
   "name": "Cruiser Pro T3S Smart Tower Fan",
+  "product_url": "https://www.dreo.com/products/cruiser-pro-t3s-tower-fan",
   "standby_power": 1.57,
   "voltage_range": {
     "min": 234.4,
