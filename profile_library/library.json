@@ -1942,7 +1942,7 @@
           ],
           "id": "LB01-7W-E27",
           "manufacturer": "athom",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 8.83,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T10:17:10",
@@ -1958,7 +1958,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "c32d86f60ae312a9f818b24ba28a8c9c"
+          "hash": "0581fefa413ad7761b4720fe981a1d87"
         },
         {
           "aliases": [
@@ -5965,14 +5965,14 @@
           ],
           "id": "Freebox v8 (r1)",
           "manufacturer": "free",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 10.42,
           "sub_profile_count": 0,
           "power_range": {
             "min": 10.42,
             "max": 10.42
           },
-          "hash": "e7296b1a3e9a932f99a128664c70b608"
+          "hash": "bbca4500e4abfaf21603bb6427c30de3"
         }
       ],
       "device_types": [
@@ -6991,14 +6991,14 @@
           ],
           "id": "H0A",
           "manufacturer": "google",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 2.49,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.8,
             "max": 2.49
           },
-          "hash": "621e46d7a3b49c81ae38efa8fe9e1c0b"
+          "hash": "2c8778f5903527651576991430f7f38b"
         },
         {
           "aliases": [
@@ -7130,14 +7130,14 @@
           ],
           "id": "H2C",
           "manufacturer": "google",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 3.66,
           "sub_profile_count": 0,
           "power_range": {
             "min": 2.01,
             "max": 3.66
           },
-          "hash": "960043e42b1a9656b4c5a445d3a34dcc"
+          "hash": "645ae50207c89e45165628179593feaf"
         },
         {
           "aliases": [
@@ -8718,10 +8718,10 @@
           ],
           "id": "ICPSHC24-30EU-IL-1",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 0.35,
           "sub_profile_count": 0,
-          "hash": "e13d379eb181b2e01b3525a195328da3"
+          "hash": "5fdadf889e98df1fece9bd8ea8ff5a68"
         },
         {
           "aliases": [
@@ -15370,7 +15370,7 @@
           ],
           "id": "HG06492A",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-31T05:33:33",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 5.02,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -15385,7 +15385,7 @@
             "score": 97.3,
             "color_temp": 97.3
           },
-          "hash": "0066bd6ca010054dc7c86a96ab34d562"
+          "hash": "343606b18d6662e7290dadab966210d3"
         },
         {
           "calculation_strategy": "lut",
@@ -16014,7 +16014,7 @@
           ],
           "id": "HG08383A",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-30T06:03:43",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 7.11,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -16030,7 +16030,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "1fc2414d976e81c78395bb9343bf6fe6"
+          "hash": "e116466ac6d4d63377cdec347ddcb4aa"
         },
         {
           "calculation_strategy": "fixed",
@@ -17744,10 +17744,10 @@
           ],
           "id": "YUKA mini 600",
           "manufacturer": "mammotion",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "536457ee78561a1b3636f98ad636c345"
+          "hash": "2e856fb6c419aea3df89d8fe00be4047"
         }
       ],
       "device_types": [
@@ -18319,7 +18319,7 @@
           ],
           "id": "404094",
           "manufacturer": "mueller-licht",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 18.53,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T08:13:10",
@@ -18334,7 +18334,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "d0ee698cad7e40da10656e69582cfa3d"
+          "hash": "0ed2d4e1462c436f5ddee1a185de575f"
         },
         {
           "aliases": [
@@ -26602,7 +26602,7 @@
           ],
           "id": "LCD006",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:50:47",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 10.31,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -26618,7 +26618,7 @@
             "score": 96.5,
             "color_temp": 96.5
           },
-          "hash": "32459ec5815445d70bce69905f4a3d79"
+          "hash": "fb6ea6694cf0bfc859f3b2dcad0e0295"
         },
         {
           "aliases": [
@@ -29013,7 +29013,7 @@
           ],
           "id": "LST004",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T07:19:58",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 46.16,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29029,7 +29029,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "52cbd2246742d42109aa70ff6e173e21"
+          "hash": "397d51b9ac3c23f580332e49ca8f4a0f"
         },
         {
           "aliases": [
@@ -29931,7 +29931,7 @@
           ],
           "id": "LTC013",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T05:15:58",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 24.37,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29946,7 +29946,7 @@
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "b6b176a371607a0f3c8c1fd29216e857"
+          "hash": "8f55b097d83db2a69b51f7d2a2bdc932"
         },
         {
           "aliases": [
@@ -30038,7 +30038,7 @@
           ],
           "id": "LTC016",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T05:15:58",
+          "updated_at": "2026-08-31T07:14:47",
           "max_power": 28.46,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -30053,7 +30053,7 @@
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "f668f8036f41220eff16585653c5b032"
+          "hash": "4d25ff5a5d2af3b82932b022b7121887"
         },
         {
           "aliases": [
