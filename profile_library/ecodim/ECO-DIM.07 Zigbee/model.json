@@ -24,6 +24,7 @@
     "ECO-DIM.07 Zigbee Basic"
   ],
   "name": "LED Dimmer Zigbee Basic (0-200W)",
+  "product_url": "https://www.ecodim.nl/de/eco-dim07-zigbee.html",
   "only_self_usage": false,
   "standby_power": 0.3,
   "standby_power_on": 0.3,

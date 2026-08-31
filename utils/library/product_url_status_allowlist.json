@@ -59,6 +59,54 @@
     ],
     "reason": "FRITZ returns an HTTP 500 to the validator while this official model-specific product page remains available in browsers."
   },
+  "https://help.elgato.com/hc/en-us/articles/20935383021965-Elgato-Key-Light-How-to-Identify-if-You-Have-a-Key-Light-or-Key-Light-MK-2": {
+    "statuses": [
+      403
+    ],
+    "reason": "Elgato intermittently blocks automated HTTP clients while this official model-specific support page remains available in browsers."
+  },
+  "https://help.elgato.com/hc/en-us/articles/360038093012-Key-Light-Air-Technical-Specifications": {
+    "statuses": [
+      403
+    ],
+    "reason": "Elgato intermittently blocks automated HTTP clients while this official model-specific support page remains available in browsers."
+  },
+  "https://help.elgato.com/hc/en-us/articles/360049987711-Elgato-Ring-Light-Technical-Specifications": {
+    "statuses": [
+      403
+    ],
+    "reason": "Elgato intermittently blocks automated HTTP clients while this official model-specific support page remains available in browsers."
+  },
+  "https://support.harmankardon.com/us/en/howto/citation-multibeam-700-software-update-release-notes-us/000037032.html": {
+    "statuses": [
+      403
+    ],
+    "reason": "Harman Kardon blocks automated HTTP clients while this official model-specific support page remains available in browsers."
+  },
+  "https://www.harmankardon.com/HKCITAONEMKIIBLKAS.html": {
+    "statuses": [
+      403
+    ],
+    "reason": "Harman Kardon blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.homedepot.com/p/Hampton-Bay-Indoor-Outdoor-12-Light-24-ft-Smart-Plug-in-Edison-Bulb-RGBW-Color-Changing-LED-String-Light-Powered-by-Hubspace-HB-10521-HS/318145796": {
+    "statuses": [
+      403
+    ],
+    "reason": "Home Depot blocks automated HTTP clients while this brand-owner model-specific product page remains available in browsers."
+  },
+  "https://www.jbl.com/JBLLINKMUSICBLKAM.html": {
+    "statuses": [
+      403
+    ],
+    "reason": "JBL blocks automated HTTP clients while this official model-specific product page remains available in browsers."
+  },
+  "https://www.leroymerlin.pt/produtos/lampada-led-e27-filamentos-g95-1521lm-6500k-lexman-enki-84372273.html": {
+    "statuses": [
+      403
+    ],
+    "reason": "Leroy Merlin blocks automated HTTP clients while this brand-owner model-specific product page remains available in browsers."
+  },
   "https://www.sony.com/electronics/support/speakers-wireless-speakers/lf-s50g/specifications": {
     "statuses": [
       403

@@ -23,6 +23,7 @@
   "measure_device": "Fibaro FGWP102",
   "measure_method": "manual",
   "name": "Wall Plug (Z-Wave Plus)",
+  "product_url": "https://www.fibaro.com/en/products/wall-plug/",
   "only_self_usage": true,
   "standby_power": 0.5,
   "standby_power_on": 0.8,

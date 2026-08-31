@@ -29,6 +29,7 @@
     "VERSION": "master"
   },
   "name": "Key Light Air",
+  "product_url": "https://help.elgato.com/hc/en-us/articles/360038093012-Key-Light-Air-Technical-Specifications",
   "standby_power": 0.41,
   "authors": [
     {

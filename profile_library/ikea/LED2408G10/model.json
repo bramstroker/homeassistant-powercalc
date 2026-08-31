@@ -25,6 +25,7 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "KAJPLATS E27 WS globe 1521lm",
+  "product_url": "https://www.ikea.com/se/en/p/kajplats-led-bulb-e27-1521-lumen-smart-white-spectrum-globe-opal-white-10611302/",
   "standby_power": 0.38,
   "authors": [
     {

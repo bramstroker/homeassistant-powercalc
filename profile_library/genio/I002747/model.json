@@ -20,6 +20,7 @@
     "VERSION": "v0.23.2:docker"
   },
   "name": "Wi-Fi Dimmable CCT ES 5W LED G95 Filament Bulb",
+  "product_url": "https://www.mirabella.com.au/products/i002747",
   "standby_power": 0.7,
   "authors": [
     {

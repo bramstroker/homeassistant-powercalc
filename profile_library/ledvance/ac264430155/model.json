@@ -23,6 +23,7 @@
     "VERSION": "v1.1.1:docker"
   },
   "name": "SMART+ WiFi Planon Frameless 300x300mm TW",
+  "product_url": "https://www.ledvance.com/gtin/4058075484313",
   "standby_power": 0.9,
   "authors": [
     {

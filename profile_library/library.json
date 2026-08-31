@@ -227,6 +227,7 @@
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
           "name": "Range Extender 6",
+          "product_url": "https://store.aeotec.com/products/range-extender-6-zw117",
           "authors": [
             {
               "name": "Bram Gerritsen",
@@ -243,7 +244,7 @@
             "min": 0.64,
             "max": 0.64
           },
-          "hash": "a749af8783ef2ffd5104948b31cac144"
+          "hash": "f34b72bae2e1782b16b1741dd5c8acdf"
         },
         {
           "aliases": [
@@ -268,6 +269,7 @@
           "measure_device": "Shelly Plus Plug",
           "measure_method": "script",
           "name": "Smart Switch 7 B plug",
+          "product_url": "https://aeotec.com/products/aeotec-smart-switch-7/",
           "only_self_usage": true,
           "standby_power": 0.7,
           "standby_power_on": 0.8,
@@ -286,7 +288,7 @@
             "min": 0.8,
             "max": 0.8
           },
-          "hash": "c696937c16457f826f7a627600e52ac9"
+          "hash": "873351ba2871aaa4086d401a89e3446f"
         }
       ],
       "device_types": [
@@ -1248,7 +1250,7 @@
           ],
           "id": "CL-L02D",
           "manufacturer": "aqara",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 30.1,
           "sub_profile_count": 2,
           "measurement_updated_at": "2026-08-28T09:48:25",
@@ -1264,7 +1266,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "fe44d59e916294d61f73530f779c6dd7"
+          "hash": "83ad5a28167162b5813d53e9e6b68d1e"
         },
         {
           "aliases": [
@@ -1312,7 +1314,7 @@
           ],
           "id": "LB-L01D",
           "manufacturer": "aqara",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 10.54,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T09:48:25",
@@ -1328,7 +1330,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "fa62ff1970c131ea78dac77ad00a4d01"
+          "hash": "55aa61c3d1b9e329efe89bbb6cf80173"
         },
         {
           "aliases": [
@@ -1374,7 +1376,7 @@
           ],
           "id": "LB-L03E",
           "manufacturer": "aqara",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 5.14,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T09:48:25",
@@ -1389,7 +1391,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "1eba2c8a344a551782db6ab8874e13c5"
+          "hash": "594c414c0e32f2172e9c6ce61c0118d3"
         },
         {
           "aliases": [
@@ -1434,7 +1436,7 @@
           ],
           "id": "LEDLBT1-L01",
           "manufacturer": "aqara",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 8.5,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T09:48:25",
@@ -1449,7 +1451,7 @@
             "score": 98.1,
             "color_temp": 98.1
           },
-          "hash": "bc8feabb2cf4dc0265174f64b4ea0797"
+          "hash": "57bda0b6c0da3614b152e8f9466726bc"
         },
         {
           "calculation_strategy": "fixed",
@@ -1484,14 +1486,14 @@
           ],
           "id": "PS-S02E",
           "manufacturer": "aqara",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 1.7,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.7,
             "max": 1.7
           },
-          "hash": "e5512a85ddd5d643696be6287ea650b9"
+          "hash": "bc1d7d2e4b7b77e2dcb2c0be153caed3"
         },
         {
           "aliases": [
@@ -1530,14 +1532,14 @@
           ],
           "id": "SP-EUC01",
           "manufacturer": "aqara",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 0.46,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.46,
             "max": 0.46
           },
-          "hash": "862425745e3d451871c0713600ed1d16"
+          "hash": "4632370a0f5d28bf594b0ba9e19ea5b5"
         },
         {
           "calculation_strategy": "lut",
@@ -1577,7 +1579,7 @@
           ],
           "id": "ZNLDP12LM",
           "manufacturer": "aqara",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 8.9,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T09:48:25",
@@ -1592,7 +1594,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "507fe1bf34cacf6e6c20db410fa0e502"
+          "hash": "7fbcc1f0c8e486b40926156039e3d040"
         }
       ],
       "device_types": [
@@ -1800,6 +1802,7 @@
             "VERSION": "v1.20.9:docker"
           },
           "name": "Grid Connect Smart CCT E27 Globe (12 W, 1050 lm)",
+          "product_url": "https://www.arlec.com.au/products/arlec-white-grid-connect-smart-e27-led-1050lm-12w-cct-colour-mode-globe",
           "standby_power": 0.3,
           "authors": [
             {
@@ -1824,7 +1827,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "6395c675169f537d7c4d25ca9c08893d"
+          "hash": "20d67edffc5e310ed66a0463860c4148"
         },
         {
           "calculation_strategy": "fixed",
@@ -1841,6 +1844,7 @@
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "manual",
           "name": "Grid Connect Smart Power Adaptor with Energy Meter",
+          "product_url": "https://www.arlec.com.au/products/arlec-white-grid-connect-smart-power-adaptor",
           "only_self_usage": true,
           "standby_power": 0.267,
           "standby_power_on": 1.144,
@@ -1860,7 +1864,7 @@
             "min": 1.144,
             "max": 1.144
           },
-          "hash": "b6b052f821dbfe477fd3ac7a9c61f75c"
+          "hash": "810138295fb10419f4ea93db75682cf8"
         },
         {
           "calculation_strategy": "fixed",
@@ -1877,6 +1881,7 @@
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "manual",
           "name": "Grid Connect Smart 2.1 A USB Charger with Power Socket",
+          "product_url": "https://www.arlec.com.au/products/arlec-white-grid-connect-smart-2-1a-usb-charger-with-power-socket",
           "only_self_usage": false,
           "standby_power": 0.66,
           "standby_power_on": 1.596,
@@ -1896,7 +1901,7 @@
             "min": 1.596,
             "max": 1.596
           },
-          "hash": "62ce21a456e5ec4481cb0d18b09081a6"
+          "hash": "1a402b3b54fe641adab1e0b8606b9ed8"
         },
         {
           "calculation_strategy": "fixed",
@@ -1913,6 +1918,7 @@
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "manual",
           "name": "Twin Grid Connect Smart Power Adaptor with Energy Meter and Surge Protection",
+          "product_url": "https://www.arlec.com.au/products/arlec-white-twin-grid-connect-smart-power-adaptor",
           "only_self_usage": true,
           "standby_power": 0.29,
           "standby_power_on": 2.565,
@@ -1932,7 +1938,7 @@
             "min": 2.565,
             "max": 2.565
           },
-          "hash": "b1bb9f636739345d5acb1d8afa5073df"
+          "hash": "ede5641c32e939de619e4f2907201960"
         }
       ],
       "device_types": [
@@ -2101,14 +2107,14 @@
           ],
           "id": "FRITZ!Box 5690 Pro",
           "manufacturer": "avm",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 14.5,
           "sub_profile_count": 0,
           "power_range": {
             "min": 14.5,
             "max": 14.5
           },
-          "hash": "b6a5f523ab2de6a553a0490a6b4130be"
+          "hash": "e20a87a4fdf1621585de87537d8ff0b0"
         },
         {
           "calculation_strategy": "fixed",
@@ -2140,14 +2146,14 @@
           ],
           "id": "FRITZ!Box 6670 Cable",
           "manufacturer": "avm",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 12.14,
           "sub_profile_count": 0,
           "power_range": {
             "min": 12.14,
             "max": 12.14
           },
-          "hash": "ed15956a79c6c0f2542d8de3a8a2b6da"
+          "hash": "6c3b4c9342dbf5edd216c6c927f11c9b"
         },
         {
           "calculation_strategy": "fixed",
@@ -2181,14 +2187,14 @@
           ],
           "id": "FRITZ!Box 6690 Cable",
           "manufacturer": "avm",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 15.75,
           "sub_profile_count": 0,
           "power_range": {
             "min": 15.75,
             "max": 15.75
           },
-          "hash": "2f77359ef358e24d44ffc38357b2c78b"
+          "hash": "505ce6660af2e090ff8c19c0e7c289ae"
         },
         {
           "calculation_strategy": "fixed",
@@ -2261,14 +2267,14 @@
           ],
           "id": "FRITZ!DECT 210",
           "manufacturer": "avm",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 1.1,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.1,
             "max": 1.1
           },
-          "hash": "043a88cc4f22536322e92207131ea10e"
+          "hash": "dd94098a8b3d1132b519db0b1415260c"
         },
         {
           "ean": [
@@ -2352,14 +2358,14 @@
           ],
           "id": "FRITZ!Repeater 1200 AX",
           "manufacturer": "avm",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 3.0,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.0,
             "max": 3.0
           },
-          "hash": "195b6e5207d7ddab37560af4c06cb17d"
+          "hash": "f74b164a9f03065f86f7cf9dbf977bdb"
         },
         {
           "calculation_strategy": "fixed",
@@ -2428,14 +2434,14 @@
           ],
           "id": "FRITZ!Repeater 2400",
           "manufacturer": "avm",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 3.15,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.15,
             "max": 3.15
           },
-          "hash": "fa90a63f557f97d188f23d13286faa94"
+          "hash": "330efaabf9d91451c555ebe42b0078ae"
         },
         {
           "calculation_strategy": "fixed",
@@ -2466,14 +2472,14 @@
           ],
           "id": "FRITZ!Repeater 2700",
           "manufacturer": "avm",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 4.79,
           "sub_profile_count": 0,
           "power_range": {
             "min": 4.79,
             "max": 4.79
           },
-          "hash": "d532d025747d1dfc977a5b37cd5bb78e"
+          "hash": "67886519dc23e224058d03089c34bb2d"
         },
         {
           "calculation_strategy": "fixed",
@@ -2504,14 +2510,14 @@
           ],
           "id": "FRITZ!Repeater 6000",
           "manufacturer": "avm",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 9.73,
           "sub_profile_count": 0,
           "power_range": {
             "min": 9.73,
             "max": 9.73
           },
-          "hash": "12251715998dd2e425fa2809c523f7f7"
+          "hash": "0c4bb47827319ca2015b9b45bc981018"
         }
       ],
       "device_types": [
@@ -2949,6 +2955,7 @@
           "measure_device_firmware": "1.3.4 Build 250403 Rel.150504",
           "measure_method": "script",
           "name": "Smart Home Controller I",
+          "product_url": "https://www.bosch-smarthome.com/gb/en/support/help/product-help/smart-home-controller-help/",
           "authors": [
             {
               "name": "Justin Hahn",
@@ -2965,7 +2972,7 @@
             "min": 1.78,
             "max": 1.78
           },
-          "hash": "2e601b95efc9b2d74dbb626c6616b3b3"
+          "hash": "29d575ea7519e3b86af9776797dd7028"
         },
         {
           "aliases": [
@@ -2995,6 +3002,7 @@
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
           "name": "Smart Plug Compact",
+          "product_url": "https://www.bosch-smarthome.com/rom/plug-manual",
           "only_self_usage": true,
           "standby_power": 0.24,
           "standby_power_on": 0.6,
@@ -3013,7 +3021,7 @@
             "min": 0.6,
             "max": 0.6
           },
-          "hash": "82ea05db6f08f8d6a4f4c8549b1c4185"
+          "hash": "5695bf5c5ce556ab15d9c763490ba10d"
         }
       ],
       "device_types": [
@@ -3200,6 +3208,7 @@
           "measure_method": "manual",
           "measure_description": "Measured with purely resistive series and parallel dummy loads to bring the total draw into the meter's accurate range. Switch self-consumption is 0.1 W in standby and 0.3 W while operating; the connected lamp must be configured separately.",
           "created_at": "2026-07-28T15:06:00Z",
+          "product_url": "https://www.bseed.com/en-pt/products/bseed-zigbee-switch-wall-smart-light-switch-1gang-2-way-single-live-line",
           "standby_power": 0.1,
           "standby_power_on": 0.3,
           "authors": [
@@ -3217,7 +3226,7 @@
             "min": 0.3,
             "max": 0.3
           },
-          "hash": "4e093055a3cb6de7b3def3292d5b5f38"
+          "hash": "3251e5b62fbab146c4780ca1f346cf8e"
         }
       ],
       "device_types": [
@@ -3266,6 +3275,7 @@
             "G95 Gold"
           ],
           "name": "Smart LED Filament Lamp E27 G95 CCT Gold (7W)",
+          "product_url": "https://www.calex.eu/products/calex-smart-led-bulb-e27-filament-g95-cct-gold",
           "standby_power": 0.61,
           "authors": [
             {
@@ -3290,7 +3300,7 @@
             "score": 96.8,
             "color_temp": 96.8
           },
-          "hash": "97bc855b39198508896caf966b84c0a3"
+          "hash": "6c748afaa3db0f30a8ffeb8fb794b278"
         }
       ],
       "device_types": [
@@ -3596,6 +3606,7 @@
             "VERSION": "v0.2.1:app"
           },
           "name": "D10 Plus Robot Vacuum Cleaner",
+          "product_url": "https://global.dreametech.com/products/dreame-d10-plus",
           "standby_power": 2.6,
           "voltage_range": {
             "min": 227.5,
@@ -3618,7 +3629,7 @@
           "updated_at": "2026-08-30T04:13:40",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "5051461e32cc13d08b4887aaf0efec4d"
+          "hash": "4766c8d6f91114e150625487e1f0ed7e"
         },
         {
           "name": "X40 Ultra Complete",
@@ -3695,6 +3706,7 @@
             "VERSION": "v0.3.0:cli"
           },
           "name": "X50 Ultra Complete",
+          "product_url": "https://global.dreametech.com/products/dreame-x50-ultra-complete",
           "standby_power": 5.55,
           "voltage_range": {
             "min": 225.9,
@@ -3706,7 +3718,7 @@
           "updated_at": "2026-08-31T06:10:16",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "ed8cf2f13f61227eab78f30478581c6f"
+          "hash": "469e6ede58a618ee61d4d69e917b3a9f"
         }
       ],
       "device_types": [
@@ -3740,6 +3752,7 @@
           "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
           "measure_method": "manual",
           "name": "TurboPoly Table Fan 511S",
+          "product_url": "https://www.dreo.com/products/turbopoly-table-fan-511s",
           "standby_power": 0.87,
           "authors": [
             {
@@ -3756,7 +3769,7 @@
             "min": 24.52,
             "max": 39.62
           },
-          "hash": "db95aecc0852f70c053f4f787e91c553"
+          "hash": "657a67f161d20732ab5934c38438d6ab"
         },
         {
           "calculation_strategy": "linear",
@@ -3778,6 +3791,7 @@
             "VERSION": "v1.20.5:docker"
           },
           "name": "TurboPoly Fan 715S",
+          "product_url": "https://www.dreo.com/products/turbopoly-fan-715s",
           "standby_power": 0.98,
           "authors": [
             {
@@ -3795,7 +3809,7 @@
             "min": 2.13,
             "max": 25.33
           },
-          "hash": "38d005f846d42b4f94dc757c7ede5b2c"
+          "hash": "00e30be02bdb293282e2735b4e027e68"
         },
         {
           "calculation_strategy": "linear",
@@ -3815,6 +3829,7 @@
           "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
           "measure_method": "manual",
           "name": "Cruiser Pro T1S Smart Tower Fan",
+          "product_url": "https://www.dreo.com/products/tower-fan-518",
           "standby_power": 0.87,
           "authors": [
             {
@@ -3831,7 +3846,7 @@
             "min": 21.46,
             "max": 46.82
           },
-          "hash": "2fa51475e2e4fec8ccdfa7a6e287b929"
+          "hash": "523c1b9aa2b6c40f8d58183200598f9c"
         },
         {
           "calculation_strategy": "linear",
@@ -3848,6 +3863,7 @@
           "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
           "measure_method": "manual",
           "name": "Cruiser Pro T2S Smart Tower Fan",
+          "product_url": "https://www.dreo.com/products/smart-tower-fan-519s",
           "standby_power": 1.04,
           "authors": [
             {
@@ -3864,7 +3880,7 @@
             "min": 17.76,
             "max": 39.62
           },
-          "hash": "48d3df3917768e415dbfde968c2d0c76"
+          "hash": "9ec137c05d8da46881233080f005e3a9"
         },
         {
           "calculation_strategy": "linear",
@@ -3886,6 +3902,7 @@
             "VERSION": "v0.3.0:app"
           },
           "name": "Cruiser Pro T3S Smart Tower Fan",
+          "product_url": "https://www.dreo.com/products/cruiser-pro-t3s-tower-fan",
           "standby_power": 1.57,
           "voltage_range": {
             "min": 234.4,
@@ -3906,7 +3923,7 @@
             "min": 16.65,
             "max": 36.03
           },
-          "hash": "9c31fa9a691e1712551bb5173e9d465e"
+          "hash": "4d417471507d56125068bd7eab6a080a"
         }
       ],
       "device_types": [
@@ -4058,6 +4075,7 @@
             "ECO-DIM.07 Zigbee Basic"
           ],
           "name": "LED Dimmer Zigbee Basic (0-200W)",
+          "product_url": "https://www.ecodim.nl/de/eco-dim07-zigbee.html",
           "only_self_usage": false,
           "standby_power": 0.3,
           "standby_power_on": 0.3,
@@ -4073,7 +4091,7 @@
           "updated_at": "2026-08-31T06:14:58",
           "max_power": 0.3,
           "sub_profile_count": 0,
-          "hash": "3fd9f4667b7cd8375755ca0423ad5396"
+          "hash": "330819d78acd507a7f2778c3d2202349"
         }
       ],
       "device_types": [
@@ -4178,6 +4196,7 @@
             "33955"
           ],
           "name": "SALOBRENA-Z Ceiling Light (1200x300mm)",
+          "product_url": "https://www.eglo.com/it_ch/plafoniera-salobrena-z-900053.html",
           "standby_power": 0.05,
           "authors": [
             {
@@ -4202,7 +4221,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "21d26fd386ef8e1faef07439d21968fc"
+          "hash": "3f2b681c486288eb9ead2f369a20885e"
         },
         {
           "aliases": [
@@ -4236,6 +4255,7 @@
             "Totari-Z 380"
           ],
           "name": "TOTARI-Z Ceiling Light (380mm)",
+          "product_url": "https://www.eglo.com/fr_be/plafonnier-totari-z-900084.html",
           "standby_power": 0.22,
           "authors": [
             {
@@ -4260,7 +4280,7 @@
             "score": 99.5,
             "color_temp": 99.5
           },
-          "hash": "b471be17c881ee59b6750ffac94e9086"
+          "hash": "0c631a0c901164229eca18664a67a202"
         },
         {
           "aliases": [
@@ -4294,6 +4314,7 @@
             "FUEVA-Z"
           ],
           "name": "FUEVA-Z Surface-Mounted Light (285mm)",
+          "product_url": "https://www.eglo.com/lv/uz-virsmas-uzstadams-gais-fueva-z-98847.html",
           "standby_power": 0.13,
           "authors": [
             {
@@ -4319,7 +4340,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "53aa5627e66585427ffbacb36cae1985"
+          "hash": "ebbae9fbf2924420db8d5eb8c37b267e"
         }
       ],
       "device_types": [
@@ -4366,6 +4387,7 @@
             "VERSION": "v0.24.7:docker"
           },
           "name": "Key Light",
+          "product_url": "https://help.elgato.com/hc/en-us/articles/20935383021965-Elgato-Key-Light-How-to-Identify-if-You-Have-a-Key-Light-or-Key-Light-MK-2",
           "standby_power": 0.86,
           "authors": [
             {
@@ -4390,7 +4412,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "677233bb7d6ba4be0fb63ab58df20292"
+          "hash": "9b44cb7d258ac498a606991901df9fd5"
         },
         {
           "aliases": [
@@ -4423,6 +4445,7 @@
             "VERSION": "master"
           },
           "name": "Light Strip",
+          "product_url": "https://help.elgato.com/hc/en-us/articles/360057812551-Elgato-Light-Strip-Technical-Specifications",
           "standby_power": 0.55,
           "authors": [
             {
@@ -4449,7 +4472,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "0381c210813b67e2644f050b52e271e8"
+          "hash": "e78488a217109237b211c083c7d5a90e"
         },
         {
           "aliases": [
@@ -4482,6 +4505,7 @@
             "VERSION": "master"
           },
           "name": "Key Light Air",
+          "product_url": "https://help.elgato.com/hc/en-us/articles/360038093012-Key-Light-Air-Technical-Specifications",
           "standby_power": 0.41,
           "authors": [
             {
@@ -4506,7 +4530,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "3b4d83bb2c9ac62cdd31306a28b03b21"
+          "hash": "153500111ca95f21dedd88631532f868"
         },
         {
           "aliases": [
@@ -4539,6 +4563,7 @@
             "VERSION": "master"
           },
           "name": "Ring Light",
+          "product_url": "https://help.elgato.com/hc/en-us/articles/360049987711-Elgato-Ring-Light-Technical-Specifications",
           "standby_power": 0.45,
           "authors": [
             {
@@ -4564,7 +4589,7 @@
             "score": 89.1,
             "color_temp": 89.1
           },
-          "hash": "587643109f892928e6e0c257c3e4b2fd"
+          "hash": "e8a93a0657193fdd86c5dd5486ee950b"
         },
         {
           "aliases": [
@@ -4596,6 +4621,7 @@
             "VERSION": "master"
           },
           "name": "Light Strip Pro",
+          "product_url": "https://help.elgato.com/hc/en-us/articles/27138926547085-Elgato-Light-Strip-Pro-Technical-Specifications",
           "standby_power": 1.2,
           "authors": [
             {
@@ -4622,7 +4648,7 @@
             "score": 97.9,
             "color_temp": 97.9
           },
-          "hash": "6275745f1bafe5d79934c52dcf8aeebf"
+          "hash": "f04b17927e124aa40cfca156aae54078"
         }
       ],
       "device_types": [
@@ -5150,6 +5176,7 @@
             "VERSION": "v1.17.1:docker"
           },
           "name": "Wireless Switch Actuator, DIN Rail Mount",
+          "product_url": "https://www.eq-3.com/products/homematic/detail/wireless-switch-actuator-1-channel-din-rail-mount.html",
           "standby_power": 0.32,
           "standby_power_on": 0.52,
           "authors": [
@@ -5167,7 +5194,7 @@
             "min": 0.52,
             "max": 0.52
           },
-          "hash": "353bb79286c78fe30ec0a15265d83e45"
+          "hash": "3ee7141f990cde979425ba1456dc9357"
         },
         {
           "calculation_strategy": "fixed",
@@ -5192,6 +5219,7 @@
             "VERSION": "v1.17.11:docker"
           },
           "name": "Wireless Switch Actuator for Brand Switch Systems, Flush-Mount",
+          "product_url": "https://www.eq-3.com/products/homematic/detail/homematic-wireless-switch-actuator-1-channel-for-brand-switch-systems-flush-mount.html",
           "standby_power": 0.83,
           "standby_power_on": 1.42,
           "authors": [
@@ -5210,7 +5238,7 @@
             "min": 1.42,
             "max": 1.42
           },
-          "hash": "e23882218a65e3788b75568f124325c9"
+          "hash": "3a16c43cab6f4ea75f748fed69d5b474"
         },
         {
           "calculation_strategy": "linear",
@@ -5236,6 +5264,7 @@
             "VERSION": "v1.17.1:docker"
           },
           "name": "Dimming Actuator for Brand Switches",
+          "product_url": "https://homematic-ip.com/en/product/dimming-actuator-brand-switches-trailing-edge",
           "standby_power": 0.36,
           "standby_power_on": 0.41,
           "authors": [
@@ -5249,7 +5278,7 @@
           "updated_at": "2026-08-31T06:14:58",
           "max_power": 0.41,
           "sub_profile_count": 0,
-          "hash": "1e28e3533d49cc566809ba0b2e10f187"
+          "hash": "7cd150536c8dbfcc58b23cf8185fac74"
         },
         {
           "calculation_strategy": "fixed",
@@ -5275,6 +5304,7 @@
             "VERSION": "v1.17.1:docker"
           },
           "name": "Switching Actuator and Meter for Brand Switches",
+          "product_url": "https://homematic-ip.com/en/product/switch-actuator-and-meter-brand-switches",
           "only_self_usage": true,
           "standby_power": 0.2,
           "standby_power_on": 0.2,
@@ -5293,7 +5323,7 @@
             "min": 0.2,
             "max": 0.2
           },
-          "hash": "a8ea780fccbdb0fbd21a236305114643"
+          "hash": "0a77a936e8b46724a01ca36ad7308ce2"
         },
         {
           "calculation_strategy": "fixed",
@@ -5318,6 +5348,7 @@
             "VERSION": "v1.17.1:docker"
           },
           "name": "Switching Actuator for DIN Rail Mount, 1-Channel",
+          "product_url": "https://homematic-ip.com/en/product/switching-actuator-din-rail-mounting-1-channel",
           "standby_power": 0.25,
           "standby_power_on": 0.3,
           "authors": [
@@ -5335,7 +5366,7 @@
             "min": 0.3,
             "max": 0.3
           },
-          "hash": "088cb2eed876d42bc8cc299ec9207d62"
+          "hash": "c3b595ebb318c79aae3d086fc7d5992c"
         },
         {
           "calculation_strategy": "linear",
@@ -5358,6 +5389,7 @@
           "measure_device": "From manufacturer specifications",
           "measure_method": "manual",
           "name": "Dimming Actuator, Flush-Mount",
+          "product_url": "https://homematic-ip.com/en/product/dimming-actuator-flush-mount-trailing-edge",
           "standby_power": 0.4,
           "standby_power_on": 0.4,
           "authors": [
@@ -5371,7 +5403,7 @@
           "updated_at": "2026-08-31T06:14:58",
           "max_power": 0.4,
           "sub_profile_count": 0,
-          "hash": "d8250039d6e49dc03a38148fd1ef23a4"
+          "hash": "d03929c0b4a499c921a044fc77012202"
         },
         {
           "calculation_strategy": "fixed",
@@ -5393,6 +5425,7 @@
             "VERSION": "v1.17.1:docker"
           },
           "name": "Shutter Actuator, Flush-Mount",
+          "product_url": "https://homematic-ip.com/en/product/shutter-actuator-flush-mounted",
           "standby_power": 0.12,
           "standby_power_on": 0.2,
           "authors": [
@@ -5410,7 +5443,7 @@
             "min": 0.2,
             "max": 0.68
           },
-          "hash": "f61701ab9bd0bb4105e7739d81a0b572"
+          "hash": "d9b557db8b42838c65417c190e677058"
         },
         {
           "calculation_strategy": "fixed",
@@ -5436,6 +5469,7 @@
             "VERSION": "v1.17.1:docker"
           },
           "name": "Switching Actuator and Meter, Flush-Mount",
+          "product_url": "https://homematic-ip.com/en/product/switching-actuator-and-meter-flush-mounted",
           "only_self_usage": true,
           "standby_power": 0.2,
           "standby_power_on": 0.74,
@@ -5454,7 +5488,7 @@
             "min": 0.74,
             "max": 0.74
           },
-          "hash": "0b1e1d7de9fd881ff8cb8b68b8541f25"
+          "hash": "a3de9e1bf6e9cfda309735238280c0a1"
         },
         {
           "calculation_strategy": "fixed",
@@ -5480,6 +5514,7 @@
             "VERSION": "v1.17.1:docker"
           },
           "name": "Switching Actuator and Meter (16A), Flush-Mount",
+          "product_url": "https://homematic-ip.com/en/product/switching-actuator-and-meter-16-flush-mounted",
           "only_self_usage": true,
           "standby_power": 0.2,
           "standby_power_on": 0.2,
@@ -5498,7 +5533,7 @@
             "min": 0.2,
             "max": 0.2
           },
-          "hash": "9ccf81a1b2c04cecf9bf976b9b9bd9dc"
+          "hash": "8a674805e09913f8f129b849e5541b51"
         },
         {
           "calculation_strategy": "fixed",
@@ -5524,6 +5559,7 @@
             "VERSION": "v1.17.1:docker"
           },
           "name": "Pluggable Switch and Meter",
+          "product_url": "https://homematic-ip.com/en/product/pluggable-switch-and-meter",
           "only_self_usage": true,
           "standby_power": 0.21,
           "standby_power_on": 0.78,
@@ -5542,7 +5578,7 @@
             "min": 0.78,
             "max": 0.78
           },
-          "hash": "181ffdbf887f3c24ec44e1a1bfc42d26"
+          "hash": "39f1ae0bf4c86eb88aea29c99373b7de"
         }
       ],
       "device_types": [
@@ -5953,6 +5989,7 @@
           "measure_device": "Fibaro FGWP102",
           "measure_method": "manual",
           "name": "Wall Plug (Z-Wave Plus)",
+          "product_url": "https://www.fibaro.com/en/products/wall-plug/",
           "only_self_usage": true,
           "standby_power": 0.5,
           "standby_power_on": 0.8,
@@ -5972,7 +6009,7 @@
             "min": 0.8,
             "max": 0.8
           },
-          "hash": "3e05a37d17c6be3198a9eeaab8f6af80"
+          "hash": "aaf72d83d6c4f58b7eef5866198e7a97"
         }
       ],
       "device_types": [
@@ -6387,6 +6424,7 @@
             "VERSION": "v0.23.2:docker"
           },
           "name": "Smart Wi-Fi LED Strip Light (3 m)",
+          "product_url": "https://www.mirabella.com.au/products/i002579",
           "standby_power": 0.7,
           "authors": [
             {
@@ -6408,7 +6446,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "e18e96e7fbb0f5f88d2cd1e4688f3f22"
+          "hash": "c53b63c4639b16d8b389cb9d048f74fb"
         },
         {
           "calculation_strategy": "lut",
@@ -6432,6 +6470,7 @@
             "VERSION": "v1.10.5:docker"
           },
           "name": "Wi-Fi Dimmable RGB+CCT 9W LED Downlight",
+          "product_url": "https://www.mirabella.com.au/products/i002741",
           "standby_power": 1.2,
           "authors": [
             {
@@ -6458,7 +6497,7 @@
             "score": 95.6,
             "color_temp": 95.6
           },
-          "hash": "5bdea2b597fc01e7ed2ce8d39eafde03"
+          "hash": "396bb554a1045fd2f50a22485bef266a"
         },
         {
           "calculation_strategy": "lut",
@@ -6482,6 +6521,7 @@
             "VERSION": "v0.23.2:docker"
           },
           "name": "Wi-Fi Dimmable CCT ES 5W LED G95 Filament Bulb",
+          "product_url": "https://www.mirabella.com.au/products/i002747",
           "standby_power": 0.7,
           "authors": [
             {
@@ -6507,7 +6547,7 @@
             "score": 89.9,
             "color_temp": 89.9
           },
-          "hash": "339dac848461992d56e7f1728dee83eb"
+          "hash": "c1bcdce4330c84a7b989574ae6871871"
         },
         {
           "calculation_strategy": "lut",
@@ -6531,6 +6571,7 @@
             "VERSION": "v0.23.2:docker"
           },
           "name": "Wi-Fi Dimmable RGBW ES 5.5W LED ST64 Filament Bulb",
+          "product_url": "https://www.mirabella.com.au/products/i002926",
           "standby_power": 0.7,
           "authors": [
             {
@@ -6552,7 +6593,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "9d23590a0ab2a0f8256e58e8d87cd348"
+          "hash": "4e38da7bb814370ca307143ac2fff372"
         },
         {
           "calculation_strategy": "lut",
@@ -6575,6 +6616,7 @@
             "VERSION": "v0.22.1:docker"
           },
           "name": "Wi-Fi 7W LED Tube Lamp",
+          "product_url": "https://www.mirabella.com.au/products/i003028",
           "standby_power": 0.7,
           "authors": [
             {
@@ -6596,7 +6638,7 @@
           "color_modes": [
             "hs"
           ],
-          "hash": "2a8a31c95774a0991ac96cc19bf5afe8"
+          "hash": "3862e280df0e632d5c0c9a609e91f80c"
         },
         {
           "calculation_strategy": "lut",
@@ -6668,6 +6710,7 @@
             "VERSION": "master"
           },
           "name": "Wi-Fi Dimmable RGB+CCT 9W LED Downlight (750lm)",
+          "product_url": "https://www.mirabella.com.au/products/i004544",
           "standby_power": 0.24,
           "authors": [
             {
@@ -6692,7 +6735,7 @@
             "score": 96.2,
             "color_temp": 96.2
           },
-          "hash": "f22654d8c3e2a4c0f305f1c2ac6768b3"
+          "hash": "0c171552661393572b03d9cdc7b24873"
         }
       ],
       "device_types": [
@@ -6787,6 +6830,7 @@
             "VERSION": "v1.17.23:docker"
           },
           "name": "CCT 7W E27 A60 Zigbee Filament Bulb",
+          "product_url": "https://gledopto.com/h-pd-127.html",
           "standby_power": 0.12,
           "authors": [
             {
@@ -6811,7 +6855,7 @@
             "score": 97.3,
             "color_temp": 97.3
           },
-          "hash": "a5065482f87c35bac9cee35fae6c8ea6"
+          "hash": "cc8ddf673aedda17f5aeba25e50cdb49"
         },
         {
           "calculation_strategy": "lut",
@@ -6838,6 +6882,7 @@
             "VERSION": "v1.17.22:docker"
           },
           "name": "CCT 7W E27 G95 Zigbee Filament Bulb",
+          "product_url": "https://gledopto.com/h-pd-128.html",
           "standby_power": 0.36,
           "authors": [
             {
@@ -6862,7 +6907,7 @@
             "score": 96.8,
             "color_temp": 96.8
           },
-          "hash": "52f5f80a348aebc7a4c69994ca428be4"
+          "hash": "73dcfa440922663dd3f917138d64fb10"
         },
         {
           "calculation_strategy": "lut",
@@ -6888,6 +6933,7 @@
             "VERSION": "v1.17.24:docker"
           },
           "name": "RGB+CCT 9W Zigbee Downlight",
+          "product_url": "https://www.gledopto.cn/product-detail/smart-down-light-rgb.html",
           "standby_power": 0.22,
           "authors": [
             {
@@ -6913,7 +6959,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "790e505eecf4a6147c1ac42a998b44ab"
+          "hash": "65560278b63bf7d338ffcdeed561db02"
         },
         {
           "calculation_strategy": "lut",
@@ -7061,6 +7107,7 @@
             "VERSION": "v1.3.12:docker"
           },
           "name": "Nest Hub (2nd Gen)",
+          "product_url": "https://store.google.com/product/nest_hub_2nd_gen",
           "standby_power": 0.39,
           "authors": [
             {
@@ -7077,7 +7124,7 @@
             "min": 2.11,
             "max": 4.8
           },
-          "hash": "baeba97ab6a8ef7e0b007e563865766f"
+          "hash": "b1cf2c0499edf05d228b5a0e284dd411"
         },
         {
           "aliases": [
@@ -7249,6 +7296,7 @@
             "VERSION": "v1.16.7:docker"
           },
           "name": "Nest Hub Max",
+          "product_url": "https://store.google.com/product/google_nest_hub_max",
           "standby_power": 2.0,
           "authors": [
             {
@@ -7266,7 +7314,7 @@
             "min": 3.2,
             "max": 10.2
           },
-          "hash": "e5c8155611e090e4af58368efa5b2855"
+          "hash": "0c50ddf3e1f465d47a4ffffeee828ba6"
         },
         {
           "aliases": [
@@ -8251,6 +8299,7 @@
             "VERSION": "v1.17.3:docker"
           },
           "name": "12-Light 24ft RGBW LED Smart Hubspace Cafe String Light",
+          "product_url": "https://www.homedepot.com/p/Hampton-Bay-Indoor-Outdoor-12-Light-24-ft-Smart-Plug-in-Edison-Bulb-RGBW-Color-Changing-LED-String-Light-Powered-by-Hubspace-HB-10521-HS/318145796",
           "standby_power": 1.45,
           "authors": [
             {
@@ -8277,7 +8326,7 @@
             "score": 92.2,
             "color_temp": 92.2
           },
-          "hash": "2d962e92378a6f5e8aa89954ba28e06a"
+          "hash": "f307b67508a4559a6f211c5d0223a5f3"
         }
       ],
       "device_types": [
@@ -8311,6 +8360,7 @@
           "measure_device": "Shelly Plug S",
           "measure_method": "manual",
           "name": "Citation MultiBeam 700",
+          "product_url": "https://support.harmankardon.com/us/en/howto/citation-multibeam-700-software-update-release-notes-us/000037032.html",
           "standby_power": 7.58,
           "authors": [
             {
@@ -8328,7 +8378,7 @@
             "min": 7.68,
             "max": 25.33
           },
-          "hash": "b050b3836071de2168b6fae2bf7cd57d"
+          "hash": "761e7aab4c4befd46daadf2e3c153567"
         },
         {
           "aliases": [
@@ -8353,6 +8403,7 @@
             "VERSION": "v1.9.6:docker"
           },
           "name": "Citation One MKII",
+          "product_url": "https://www.harmankardon.com/HKCITAONEMKIIBLKAS.html",
           "standby_power": 2.01,
           "authors": [
             {
@@ -8369,7 +8420,7 @@
             "min": 3.07,
             "max": 6.71
           },
-          "hash": "5717604e4d3773fb7541e2b7389dcc5e"
+          "hash": "8f1474c7858016b38e6cff6cf2289a29"
         }
       ],
       "device_types": [
@@ -8686,6 +8737,7 @@
           "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",
           "measure_method": "manual",
           "name": "ASKVADER on/off switch",
+          "product_url": "https://www.ikea.com/de/en/p/askvaeder-on-off-switch-50463880/",
           "only_self_usage": false,
           "standby_power": 0.21,
           "standby_power_on": 0.78,
@@ -8705,7 +8757,7 @@
             "min": 0.78,
             "max": 0.78
           },
-          "hash": "d9738633715f061e0814b8f5d340001d"
+          "hash": "14fdda2598c24e9d26a63b54085b073f"
         },
         {
           "aliases": [
@@ -8727,6 +8779,7 @@
           "measure_device": "GreenWave GWPN1",
           "measure_method": "manual",
           "name": "STARKVIND air purifier table",
+          "product_url": "https://www.ikea.com/us/en/p/starkvind-table-with-air-purifier-stained-oak-veneer-white-smart-80461974/",
           "standby_power": 0.2,
           "authors": [
             {
@@ -8743,7 +8796,7 @@
             "min": 1.6,
             "max": 24.8
           },
-          "hash": "8fa0828cbffe3b10b7aae91564968113"
+          "hash": "6ce01262078617f7c2ab2fdfa2e72362"
         },
         {
           "aliases": [
@@ -8767,6 +8820,7 @@
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
           "name": "TRETAKT smart plug",
+          "product_url": "https://www.ikea.com/nl/en/p/tretakt-plug-smart-80540349/",
           "only_self_usage": false,
           "standby_power": 0.13,
           "standby_power_on": 0.73,
@@ -8785,7 +8839,7 @@
             "min": 0.73,
             "max": 0.73
           },
-          "hash": "cd9d191b2fd1624b209ac5e0c1f16108"
+          "hash": "184f793f031266465961e63b7d50431d"
         },
         {
           "aliases": [
@@ -8820,14 +8874,14 @@
           ],
           "id": "E2206",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.8,
             "max": 0.8
           },
-          "hash": "316141ec92cc355131a5b0cc4c8dd52d"
+          "hash": "a62286575d7507b554656296970ef832"
         },
         {
           "aliases": [
@@ -8886,6 +8940,7 @@
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "manual",
           "name": "GRILLPLATS smart plug",
+          "product_url": "https://www.ikea.com/se/en/p/grillplats-plug-smart-60604238/",
           "only_self_usage": true,
           "standby_power": 0.22,
           "standby_power_on": 0.47,
@@ -8904,7 +8959,7 @@
             "min": 0.47,
             "max": 0.47
           },
-          "hash": "d34ede875f0ec7530dd819ca07e7741b"
+          "hash": "b8ca561463ae58e6929af1681995a66d"
         },
         {
           "aliases": [
@@ -8979,7 +9034,7 @@
           ],
           "id": "L1527",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 11.49,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -8994,7 +9049,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "f81bd5420cc0e818825248949cc348d3"
+          "hash": "a0cafc1255e6f67ecc4df205cbc3f7e9"
         },
         {
           "aliases": [
@@ -9031,7 +9086,7 @@
           ],
           "id": "L1528",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 28.05,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -9046,7 +9101,7 @@
             "score": 95.6,
             "color_temp": 95.6
           },
-          "hash": "12fb59056022f7ee883d82908f1dd1dd"
+          "hash": "baff57a503e5f0141ebccec59746971f"
         },
         {
           "aliases": [
@@ -9084,7 +9139,7 @@
           ],
           "id": "L1529",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 32.48,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -9099,7 +9154,7 @@
             "score": 99.6,
             "color_temp": 99.6
           },
-          "hash": "396d16b8a3ac769dcc49d40930045366"
+          "hash": "eb1aa484030967bb90647873000dd786"
         },
         {
           "aliases": [
@@ -9191,7 +9246,7 @@
           ],
           "id": "L2112",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 6.3,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T16:48:36",
@@ -9207,7 +9262,7 @@
             "score": 98.1,
             "color_temp": 98.1
           },
-          "hash": "6d0c917c1d11844b2021d456d275401a"
+          "hash": "88df20d6803de5dbc3c6bc64e3badbb9"
         },
         {
           "calculation_strategy": "lut",
@@ -9242,7 +9297,7 @@
           ],
           "id": "L2206",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 9.8,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-11-25T17:36:29",
@@ -9258,7 +9313,7 @@
             "score": 99.3,
             "color_temp": 99.3
           },
-          "hash": "f3402285751b9e85323b09beb7b1114e"
+          "hash": "ba7530243cb06ffbbff1852a6bccf4f0"
         },
         {
           "calculation_strategy": "lut",
@@ -9293,7 +9348,7 @@
           ],
           "id": "L2207",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 42.46,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-09-13T13:30:21",
@@ -9308,7 +9363,7 @@
             "score": 99.5,
             "color_temp": 99.5
           },
-          "hash": "a0bd933d0cf2cb5025fb393cf6f4fd03"
+          "hash": "e2ff2702a8ffee6aa95c71dfec5de3eb"
         },
         {
           "aliases": [
@@ -11351,6 +11406,7 @@
             "VERSION": "v1.20.2:docker"
           },
           "name": "KAJPLATS E27 WS G95 clear 806lm",
+          "product_url": "https://www.ikea.com/nl/en/p/kajplats-led-bulb-e27-806-lumen-smart-white-spectrum-clear-globe-30611481/",
           "standby_power": 0.23,
           "authors": [
             {
@@ -11376,7 +11432,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "b145c54b0f52ebddef367a0cb7f83e83"
+          "hash": "530a94ec9c1cbe4a1a6fa7230e13c266"
         },
         {
           "aliases": [
@@ -11405,6 +11461,7 @@
             "VERSION": "v1.21.0:docker"
           },
           "name": "KAJPLATS E14 WS B38 CL 470lm",
+          "product_url": "https://www.ikea.com/qa/en/p/kajplats-led-bulb-e14-470-lumen-smart-white-spectrum-clear-glass-60611494/",
           "standby_power": 0.2,
           "voltage_range": {
             "min": 231.3,
@@ -11434,7 +11491,7 @@
             "score": 99.0,
             "color_temp": 99.0
           },
-          "hash": "8b5c1969729f4dd873ca3736142d9410"
+          "hash": "0b5ff5efde9e22f4a2c9b8861ed459f5"
         },
         {
           "aliases": [
@@ -11463,6 +11520,7 @@
             "VERSION": "v1.20.3:docker"
           },
           "name": "KAJPLATS GU10 WS 575lm",
+          "product_url": "https://www.ikea.com/es/es/p/kajplats-bombilla-led-gu10-575-lumenes-inteligente-espectro-blanco-50611442/",
           "standby_power": 0.22,
           "authors": [
             {
@@ -11489,7 +11547,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "3192f9c5f34518264dba17706867cbb9"
+          "hash": "002f69f8344698f3640d0884549c0f93"
         },
         {
           "aliases": [
@@ -11518,6 +11576,7 @@
             "VERSION": "v1.20.2:docker"
           },
           "name": "KAJPLATS E14 WS globe 806lm",
+          "product_url": "https://www.ikea.com/de/de/p/kajplats-led-leuchtmittel-e14-806-lm-smart-weissspektrum-rund-opalweiss-00611312/",
           "standby_power": 0.21,
           "authors": [
             {
@@ -11544,7 +11603,7 @@
             "score": 97.4,
             "color_temp": 97.4
           },
-          "hash": "f1ad6280764768405d563fae71a1cee9"
+          "hash": "270f229633e947b2a76380589a86701d"
         },
         {
           "aliases": [
@@ -11573,6 +11632,7 @@
             "VERSION": "v1.20.3:docker"
           },
           "name": "KAJPLATS E27 CWS globe 1055lm",
+          "product_url": "https://www.ikea.com/se/en/p/kajplats-led-bulb-e27-1055-lumen-smart-colour-and-white-spectrum-globe-opal-white-70608575/",
           "standby_power": 0.17,
           "authors": [
             {
@@ -11599,7 +11659,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "af7d7ed91700d8415878455c406663c8"
+          "hash": "45a825c201fec7ba883b91cea2f878fe"
         },
         {
           "aliases": [
@@ -11627,6 +11687,7 @@
             "VERSION": "v1.20.14:docker"
           },
           "name": "KAJPLATS E26 CWS globe 1100lm",
+          "product_url": "https://www.ikea.com/ca/en/p/kajplats-led-bulb-e26-1100-lumen-smart-color-and-white-spectrum-globe-opal-white-10611463/",
           "standby_power": 0.05,
           "authors": [
             {
@@ -11652,7 +11713,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "3d679295c81f70f3a41c560c58bf5668"
+          "hash": "6d30c5b55286c07f106cd817061e0f4b"
         },
         {
           "aliases": [
@@ -11681,6 +11742,7 @@
             "VERSION": "v1.20.2:docker"
           },
           "name": "KAJPLATS E27 WS globe 470lm",
+          "product_url": "https://www.ikea.com/de/de/p/kajplats-led-leuchtmittel-e27-470-lm-smart-weissspektrum-rund-opalweiss-00611307/",
           "standby_power": 0.08,
           "authors": [
             {
@@ -11707,7 +11769,7 @@
             "score": 97.6,
             "color_temp": 97.6
           },
-          "hash": "8fecc5e5b7e5dabedaef8938685d2d97"
+          "hash": "2aa6838639c0b888d5336d031215f4fa"
         },
         {
           "aliases": [
@@ -11736,6 +11798,7 @@
             "VERSION": "v1.20.2:docker"
           },
           "name": "KAJPLATS E27 WS globe 1055lm",
+          "product_url": "https://www.ikea.com/es/es/p/kajplats-bombilla-led-e27-1055-lumenes-inteligente-espectro-blanco-globo-blanco-opalo-20608592/",
           "standby_power": 0.2,
           "authors": [
             {
@@ -11762,7 +11825,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "2be00d5ccbcea7007bf42e21706d3fd0"
+          "hash": "316f66afbb20cbc9085b669650afdc2a"
         },
         {
           "aliases": [
@@ -11790,6 +11853,7 @@
             "VERSION": "v1.20.14:docker"
           },
           "name": "KAJPLATS E26 WS 1100lm",
+          "product_url": "https://www.ikea.com/ca/en/p/kajplats-led-bulb-e26-1100-lumen-smart-white-spectrum-globe-opal-white-90611299/",
           "standby_power": 0.07,
           "authors": [
             {
@@ -11814,7 +11878,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "f60ad1cbd7456d01fd1bd288d469fc86"
+          "hash": "bd77141a9ba6e4935fa971d55ba32f31"
         },
         {
           "aliases": [
@@ -11843,6 +11907,7 @@
             "VERSION": "v1.20.2:docker"
           },
           "name": "KAJPLATS E27 WS globe 1521lm",
+          "product_url": "https://www.ikea.com/se/en/p/kajplats-led-bulb-e27-1521-lumen-smart-white-spectrum-globe-opal-white-10611302/",
           "standby_power": 0.38,
           "authors": [
             {
@@ -11869,7 +11934,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "ef2354c929296953dc774c1fe621e4c3"
+          "hash": "2ca6df63ce6c62f7bb31aebca1e9986e"
         },
         {
           "aliases": [
@@ -11898,6 +11963,7 @@
             "VERSION": "v1.20.2:docker"
           },
           "name": "KAJPLATS E14 CWS globe 806lm",
+          "product_url": "https://www.ikea.com/es/es/p/kajplats-bombilla-led-e14-806-lm-inteligente-color-espectro-blanco-globo-blanco-opalo-40608572/",
           "standby_power": 0.22,
           "authors": [
             {
@@ -11924,7 +11990,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "daedb5557dda3b66a6454ad79fa4f5f6"
+          "hash": "f0be598b3db33ec01d5279cc1b99586b"
         },
         {
           "aliases": [
@@ -11953,6 +12019,7 @@
             "VERSION": "v1.20.3:docker"
           },
           "name": "KAJPLATS GU10 CWS 470lm",
+          "product_url": "https://www.ikea.com/es/es/p/kajplats-bombilla-led-gu10-470-lm-inteligente-color-espectro-blanco-10608578/",
           "standby_power": 0.2,
           "authors": [
             {
@@ -11979,7 +12046,7 @@
             "score": 97.1,
             "color_temp": 97.1
           },
-          "hash": "86f660d2f83d55237587bf92d98256a2"
+          "hash": "506f5614a399c494614b65f431f99d71"
         },
         {
           "aliases": [
@@ -12008,6 +12075,7 @@
             "VERSION": "v1.20.2:docker"
           },
           "name": "KAJPLATS E27 WS G60 clear 470lm",
+          "product_url": "https://www.ikea.com/gb/en/p/kajplats-led-bulb-e27-470-lumen-smart-white-spectrum-clear-globe-60611489/",
           "standby_power": 0.07,
           "authors": [
             {
@@ -12033,7 +12101,7 @@
             "score": 97.1,
             "color_temp": 97.1
           },
-          "hash": "1789ce9c3736b06bfe2e1d40cc0e555f"
+          "hash": "558e1776329c306b2471363fb0c2a59f"
         },
         {
           "aliases": [
@@ -12162,6 +12230,7 @@
             "VERSION": "v1.3.5:docker"
           },
           "name": "STOFTMOLN LED Ceiling/Wall Lamp (24 cm)",
+          "product_url": "https://www.ikea.com/fi/fi/p/stoftmoln-led-katto-seinaevalaisin-aelylaite-langaton-himmennettaevae-laemmin-valkoinen-valkoinen-30497490/",
           "standby_power": 0.25,
           "authors": [
             {
@@ -12187,7 +12256,7 @@
             "score": 98.5,
             "brightness": 98.5
           },
-          "hash": "11399a8dd3a33492a212e2d24a450b83"
+          "hash": "3c71074ac3f057474fe5154646684997"
         },
         {
           "aliases": [
@@ -12214,6 +12283,7 @@
             "VERSION": "v1.9.4:docker"
           },
           "name": "STOFTMOLN LED Ceiling/Wall Lamp (37 cm)",
+          "product_url": "https://www.ikea.com/nl/nl/p/stoftmoln-led-plafond-wandlamp-smart-draadloos-dimbaar-warm-wit-wit-20510779/",
           "standby_power": 0.11,
           "authors": [
             {
@@ -12238,7 +12308,7 @@
             "score": 98.9,
             "brightness": 98.9
           },
-          "hash": "b1fdc2e75e0e64c7cef215f01c9713b3"
+          "hash": "e34fe03d8ccc16a9a3ace1879be19e19"
         }
       ],
       "device_types": [
@@ -12447,7 +12517,7 @@
           ],
           "id": "FL 122 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 16.3,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-10-12T08:30:11",
@@ -12463,7 +12533,7 @@
             "score": 86.6,
             "color_temp": 86.6
           },
-          "hash": "0d46dcdcb84fab15352ab1e7757361fc"
+          "hash": "fc930a22a8987aed82159c056add6b46"
         },
         {
           "calculation_strategy": "fixed",
@@ -12692,7 +12762,7 @@
           ],
           "id": "RB 247 T",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 4.81,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-11-30T17:13:50",
@@ -12707,7 +12777,7 @@
             "score": 97.5,
             "color_temp": 97.5
           },
-          "hash": "d76f48c165b9a60c25764722282b3983"
+          "hash": "f426b6f48749c8943cf16eb80e2cf5bf"
         },
         {
           "calculation_strategy": "lut",
@@ -13011,7 +13081,7 @@
           },
           "id": "RB 282 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 9.11,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-21T13:18:29",
@@ -13028,7 +13098,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "08f202f2ca0d13d8dd8446ba84f6da8c"
+          "hash": "7f93c2d2327b936b815ae115db496dec"
         },
         {
           "calculation_strategy": "lut",
@@ -13120,7 +13190,7 @@
           ],
           "id": "RB 287 C",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 10.77,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-12-03T21:14:26",
@@ -13136,7 +13206,7 @@
             "score": 99.0,
             "color_temp": 99.0
           },
-          "hash": "68a4e2ca0c33fd9eb34b82a181b24043"
+          "hash": "b46b9556b6560e807233f6c94412d308"
         },
         {
           "calculation_strategy": "lut",
@@ -13280,7 +13350,7 @@
           ],
           "id": "RF 271 T",
           "manufacturer": "innr",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 7.36,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-04-24T18:03:48",
@@ -13295,7 +13365,7 @@
             "score": 80.0,
             "color_temp": 80.0
           },
-          "hash": "8f4f63640d99b81ebefe96b3537f85a3"
+          "hash": "18ad57298b24932609ee4000ea81ce57"
         },
         {
           "calculation_strategy": "lut",
@@ -13323,6 +13393,7 @@
             "VERSION": "v1.20.2:docker"
           },
           "name": "Smart Filament Bulb E27 Tunable",
+          "product_url": "https://innr.com/products/innr-smart-filament-bulb-e27-tunable",
           "standby_power": 0.18,
           "authors": [
             {
@@ -13348,7 +13419,7 @@
             "score": 97.5,
             "color_temp": 97.5
           },
-          "hash": "e91a0db32085de364664dbb205175fcd"
+          "hash": "416b1785e487b31153c0ca040ebc88d2"
         },
         {
           "calculation_strategy": "lut",
@@ -13376,6 +13447,7 @@
             "VERSION": "master"
           },
           "name": "Smart Filament Bulb E27 Tunable Edison",
+          "product_url": "https://innr.com/products/innr-smart-filament-bulb-e27-tunable-edison",
           "standby_power": 0.21,
           "authors": [
             {
@@ -13401,7 +13473,7 @@
             "score": 97.9,
             "color_temp": 97.9
           },
-          "hash": "f76497b00162a1ccc252c5c8cebc386a"
+          "hash": "96d1d50ef6dd49ebe44a1511e3038741"
         },
         {
           "calculation_strategy": "lut",
@@ -13743,6 +13815,7 @@
           "measure_device": "Brennenstuhl PM 231 E",
           "measure_method": "manual",
           "name": "Smart Plug",
+          "product_url": "https://innr.com/products/innr-smart-plug",
           "only_self_usage": true,
           "standby_power": 0.2,
           "standby_power_on": 0.75,
@@ -13762,7 +13835,7 @@
             "min": 0.75,
             "max": 0.75
           },
-          "hash": "9c4c67517f35bb331a92d3f8996b3c2c"
+          "hash": "bd27e8da36d67384fdd4d982e3740f72"
         }
       ],
       "device_types": [
@@ -13795,6 +13868,7 @@
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "manual",
           "name": "Blue Series Dimmer Switch",
+          "product_url": "https://help.inovelli.com/en/articles/8266282-blue-series-dimmer-switch-manual",
           "only_self_usage": true,
           "standby_power": 0.26,
           "standby_power_on": 0.29,
@@ -13814,7 +13888,7 @@
             "min": 0.29,
             "max": 0.29
           },
-          "hash": "520c4c08dd3e24ec4fb4c39808db6774"
+          "hash": "1f3d8c0f1de7ca82eb03c2c264d933bc"
         },
         {
           "calculation_strategy": "fixed",
@@ -13832,6 +13906,7 @@
           "measure_device": "Shelly PM Mini Gen3",
           "measure_method": "script",
           "name": "Blue Series mmWave Presence Dimmer Switch",
+          "product_url": "https://help.inovelli.com/en/articles/8807172-blue-series-mmwave-presence-dimmer-switch-manual",
           "only_self_usage": true,
           "standby_power": 1.54,
           "standby_power_on": 1.59,
@@ -13851,7 +13926,7 @@
             "min": 1.59,
             "max": 1.59
           },
-          "hash": "bfa935fd5b0e4bd4fd0c26b9eda2fdd4"
+          "hash": "113ce03ae13d48edb9c2da78308e3e97"
         }
       ],
       "device_types": [
@@ -13895,6 +13970,7 @@
             "VERSION": "v1.17.19:docker"
           },
           "name": "Smart Wi-Fi RGB LED Light Bulb (10W, E27)",
+          "product_url": "https://www.intelbras.com/en/smart-wi-fi-led-light-bulb-ews-410",
           "standby_power": 0.62,
           "authors": [
             {
@@ -13921,7 +13997,7 @@
             "score": 95.9,
             "color_temp": 95.9
           },
-          "hash": "ef3a39681e4d419f0806f29b2260d48d"
+          "hash": "04196c7ca9c26aea8f4a9b1c32055a79"
         }
       ],
       "device_types": [
@@ -13966,6 +14042,7 @@
             "VERSION": "v1.17.6:docker"
           },
           "name": "Wi-Fi Speaker",
+          "product_url": "https://www.jbl.com/JBLLINKMUSICBLKAM.html",
           "standby_power": 1.7,
           "authors": [
             {
@@ -13982,7 +14059,7 @@
             "min": 2.71,
             "max": 8.56
           },
-          "hash": "a6fbab52bc1067d8ff8062c42530f21d"
+          "hash": "08d40d91503adb885bd4709633b8084c"
         }
       ],
       "device_types": [
@@ -14156,6 +14233,7 @@
             "VERSION": "v1.17.14:docker"
           },
           "name": "SmarterHome 10W White Smart Bulb (B22)",
+          "product_url": "https://help.kogan.com/articles/Knowledge/FactoryResettingYourKoganSmarterHomeSmartLightsBulbs",
           "standby_power": 1.0,
           "authors": [
             {
@@ -14180,7 +14258,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "766a951e294db492eebc52cb4a2994e4"
+          "hash": "387286bd8e05acc71704c12513e0c284"
         }
       ],
       "device_types": [
@@ -14224,6 +14302,7 @@
             "VERSION": "master"
           },
           "name": "SMART+ ZB Flex 3P RGB + TW",
+          "product_url": "https://www.ledvance.com/gtin/4058075208339",
           "standby_power": 0.26,
           "authors": [
             {
@@ -14250,7 +14329,7 @@
             "score": 45.0,
             "color_temp": 45.0
           },
-          "hash": "5661f75eefc0e0224dafafd93ddb9308"
+          "hash": "f162d4c140112800456ba2703bebb9e5"
         },
         {
           "calculation_strategy": "lut",
@@ -14381,6 +14460,7 @@
           "measure_device": "Shelly Plug S",
           "measure_method": "script",
           "name": "SMART+ ZB Tibea TW 22W Gold E27",
+          "product_url": "https://www.ledvance.com/gtin/4058075168572",
           "standby_power": 0.51,
           "authors": [
             {
@@ -14406,7 +14486,7 @@
             "score": 97.5,
             "color_temp": 97.5
           },
-          "hash": "3f5a73665183065748477afc06f36127"
+          "hash": "bf52a5ce718217829960637863797556"
         },
         {
           "ean": [
@@ -14433,6 +14513,7 @@
             "VERSION": "v1.0.3:docker"
           },
           "name": "SMART+ ZB CLA60 60 9W E27",
+          "product_url": "https://www.ledvance.com/gtin/4058075208391",
           "standby_power": 0.31,
           "authors": [
             {
@@ -14458,7 +14539,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "600e31b6c760cba28c49b8de0378a88f"
+          "hash": "7849094e9f084f4b7d42ae9bedcba3c6"
         },
         {
           "ean": [
@@ -14485,6 +14566,7 @@
             "VERSION": "v1.1.1:docker"
           },
           "name": "SMART+ WiFi Planon Frameless 300x300mm TW",
+          "product_url": "https://www.ledvance.com/gtin/4058075484313",
           "standby_power": 0.9,
           "authors": [
             {
@@ -14510,7 +14592,7 @@
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "081fce1c63fba4d0d681c988e875dc31"
+          "hash": "3e695dc173ef543165e23b01fa6a8bcc"
         },
         {
           "aliases": [
@@ -14543,6 +14625,7 @@
             "VERSION": "v1.1.1:docker"
           },
           "name": "SMART+ WiFi Planon Frameless 600x600mm RGB + TW",
+          "product_url": "https://www.ledvance.com/gtin/4058075484474",
           "standby_power": 1.0,
           "authors": [
             {
@@ -14569,7 +14652,7 @@
             "score": 99.7,
             "color_temp": 99.7
           },
-          "hash": "08ff709ed7efe73c15346f36e383daa7"
+          "hash": "1f4b73be55c07492a0d843f4a2a23994"
         },
         {
           "aliases": [
@@ -14605,6 +14688,7 @@
             "orbis_cylinder"
           ],
           "name": "SMART+ WiFi Orbis Cylinder 450 TW",
+          "product_url": "https://www.ledvance.com/gtin/4058075486560",
           "standby_power": 0.75,
           "authors": [
             {
@@ -14630,7 +14714,7 @@
             "score": 98.6,
             "color_temp": 98.6
           },
-          "hash": "3ade5d242629a8bf349abc8d70c56976"
+          "hash": "58d913e23796744da88fb6b2222211e9"
         },
         {
           "aliases": [
@@ -14674,7 +14758,7 @@
           ],
           "id": "AC32960",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 4.65,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T05:25:06",
@@ -14690,7 +14774,7 @@
             "score": 96.1,
             "color_temp": 96.1
           },
-          "hash": "2ddf055a5e40886045733dc821d01fdd"
+          "hash": "47c754ef8cc264f64a5e1f1a160c92a4"
         },
         {
           "ean": [
@@ -14734,7 +14818,7 @@
           ],
           "id": "AC41283",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T20:09:59",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 8.99,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T19:33:38",
@@ -14750,7 +14834,7 @@
             "score": 94.0,
             "color_temp": 94.0
           },
-          "hash": "2970a76d2032f83d2f57166a8db4559f"
+          "hash": "31e310948c8b393c27e33445a2e1b8b2"
         },
         {
           "aliases": [
@@ -14793,7 +14877,7 @@
           ],
           "id": "AC41293",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 5.57,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T05:25:06",
@@ -14808,7 +14892,7 @@
             "score": 99.2,
             "brightness": 99.2
           },
-          "hash": "2066bebb05f0e3e6aebdb3139e88c86e"
+          "hash": "9aed5bcf5b6fcc8d87dc73c3f071a45a"
         },
         {
           "ean": [
@@ -14854,7 +14938,7 @@
           ],
           "id": "AC74759",
           "manufacturer": "ledvance",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 4.68,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-28T08:14:25",
@@ -14870,7 +14954,7 @@
             "score": 98.2,
             "color_temp": 98.2
           },
-          "hash": "632dba50ea5a097f2ecd356c09332ebe"
+          "hash": "c0e74514fe479bf86e485926024a06bb"
         },
         {
           "calculation_strategy": "lut",
@@ -15085,6 +15169,7 @@
             "VERSION": "v0.18.4:docker"
           },
           "name": "ENKI RGBW E27 Globe Bulb 14W",
+          "product_url": "https://www.leroymerlin.pt/produtos/lampada-led-e27-filamentos-g95-1521lm-6500k-lexman-enki-84372273.html",
           "standby_power": 0.4,
           "authors": [
             {
@@ -15111,7 +15196,7 @@
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "b35b818f04a42220c7971e0b100ca76d"
+          "hash": "256555518154cd4b6a60edeb175ac7e3"
         }
       ],
       "device_types": [
@@ -20912,6 +20997,7 @@
             "VERSION": "v0.3.0:app"
           },
           "name": "S5 Max Robot Vacuum and Mop",
+          "product_url": "https://us.roborock.com/pages/roborock-s5-max",
           "voltage_range": {
             "min": 240.08,
             "max": 244.58
@@ -20931,7 +21017,7 @@
             "min": 0.7,
             "max": 20.43
           },
-          "hash": "15481b7a374ef42eb3b7d40ee26f37c4"
+          "hash": "b15fa99e1df3d188fb1b80e6895f003c"
         },
         {
           "aliases": [
@@ -20961,6 +21047,7 @@
             "VERSION": "master"
           },
           "name": "S6 MaxV Robot Vacuum and Mop with ReactiveAI",
+          "product_url": "https://global.roborock.com/pages/roborock-s6-maxv",
           "standby_power": 0.1,
           "authors": [
             {
@@ -20978,7 +21065,7 @@
             "min": 1.66,
             "max": 19.89
           },
-          "hash": "0b128f3263b91d3fd9ffe165e4ff26b3"
+          "hash": "724fdbafc6567fd9978827225a6fb93a"
         },
         {
           "aliases": [
@@ -22524,7 +22611,7 @@
           ],
           "id": "8719514491106",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 4.8,
           "sub_profile_count": 0,
           "measurement_updated_at": "2025-11-25T12:12:37",
@@ -22539,7 +22626,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "700655f96b7367e8b75f96959825c4b3"
+          "hash": "06a47c5c96f3ee1f8c9144f5e63206fe"
         },
         {
           "aliases": [
@@ -22584,7 +22671,7 @@
           ],
           "id": "915005561201",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T13:03:09",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 9.35,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T13:03:09",
@@ -22599,7 +22686,7 @@
             "score": 97.4,
             "brightness": 97.4
           },
-          "hash": "3329fb501c7f13f88da910d0b6cf2139"
+          "hash": "d33416c2401f42d196fd3ec65d652bbd"
         },
         {
           "aliases": [
@@ -22644,7 +22731,7 @@
           ],
           "id": "915005630201",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T13:03:09",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 9.55,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T13:03:09",
@@ -22660,7 +22747,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "68c1ea47bf6e5272ba22e8d7b6d26e4a"
+          "hash": "03cdd517efd856304dd99d62029babac"
         },
         {
           "aliases": [
@@ -22705,7 +22792,7 @@
           ],
           "id": "915005730601",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T13:03:09",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 49.0,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T13:03:09",
@@ -22721,7 +22808,7 @@
             "score": 36.1,
             "color_temp": 36.1
           },
-          "hash": "a257f4c2bda1bb442311aa6582e7b61c"
+          "hash": "b6a9c3b830ff6c68861e19b712553cc5"
         },
         {
           "aliases": [
@@ -22763,7 +22850,7 @@
           ],
           "id": "915005731001",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T13:03:09",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 49.0,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T13:03:09",
@@ -22779,7 +22866,7 @@
             "score": 36.1,
             "color_temp": 36.1
           },
-          "hash": "d8620d5dfa4d011222d50610cebb2c1c"
+          "hash": "399befc6f17b89357a4ff67401aa43a5"
         },
         {
           "aliases": [
@@ -22825,7 +22912,7 @@
           ],
           "id": "915005731401",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T13:03:09",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 33.5,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T13:03:09",
@@ -22841,7 +22928,7 @@
             "score": 33.6,
             "color_temp": 33.6
           },
-          "hash": "4554058849bef95776ca95ee70666697"
+          "hash": "dd7703d9f7d2b3a7dd15bee4fca1d904"
         },
         {
           "aliases": [
@@ -22946,7 +23033,7 @@
           ],
           "id": "915005731801",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T13:03:09",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 9.82,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T13:03:09",
@@ -22962,7 +23049,7 @@
             "score": 24.0,
             "color_temp": 24.0
           },
-          "hash": "417ef6ce8735a66f3e6d9b2a5176caff"
+          "hash": "7541c3c772451338ef91ea2ce44c6b84"
         },
         {
           "aliases": [
@@ -23139,7 +23226,7 @@
           ],
           "id": "915005841701",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T13:03:09",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 13.76,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T13:03:09",
@@ -23155,7 +23242,7 @@
             "score": 98.1,
             "color_temp": 98.1
           },
-          "hash": "e03f47b774bae504a8819622356e2cd7"
+          "hash": "1b5418dafd768e47971982312f37b413"
         },
         {
           "aliases": [
@@ -23201,7 +23288,7 @@
           ],
           "id": "915005842601",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T13:03:09",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 17.96,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T13:03:09",
@@ -23217,7 +23304,7 @@
             "score": 21.3,
             "color_temp": 21.3
           },
-          "hash": "ca35394e745d97bcd6ce2d14784b518f"
+          "hash": "50bbb8ed521122e03fdd19ea8e89b38d"
         },
         {
           "aliases": [
@@ -23262,7 +23349,7 @@
           ],
           "id": "915005842901",
           "manufacturer": "signify",
-          "updated_at": "2026-08-30T13:03:09",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 17.5,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-30T13:03:09",
@@ -23278,7 +23365,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "9e60c7f9a74beb8511098657cc480e9c"
+          "hash": "84d5e2a544687bd49f153e748ffaa77b"
         },
         {
           "aliases": [
@@ -34335,14 +34422,14 @@
           ],
           "id": "amp",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 77.12,
           "sub_profile_count": 0,
           "power_range": {
             "min": 14.82,
             "max": 77.12
           },
-          "hash": "be045ad4b7546b07a3610e4c75d83543"
+          "hash": "a8cd8fd69c6e172d994a78fb8c76501f"
         },
         {
           "aliases": [
@@ -34383,14 +34470,14 @@
           ],
           "id": "arc",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 45.34,
           "sub_profile_count": 0,
           "power_range": {
             "min": 13.5,
             "max": 45.34
           },
-          "hash": "a9b690eaba947f8098c1b4541df10f33"
+          "hash": "180964a42cead08a09412cd82a041627"
         },
         {
           "aliases": [
@@ -34431,14 +34518,14 @@
           ],
           "id": "arc ultra",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 28.14,
           "sub_profile_count": 0,
           "power_range": {
             "min": 4.62,
             "max": 28.14
           },
-          "hash": "83e0f9ae7b7556e2e453e164053670df"
+          "hash": "159f082f2e50edc6a652e00740850c04"
         },
         {
           "calculation_strategy": "linear",
@@ -34470,14 +34557,14 @@
           ],
           "id": "beam",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 23.6,
           "sub_profile_count": 0,
           "power_range": {
             "min": 7.3,
             "max": 23.6
           },
-          "hash": "affebe7cb511add83e0227b8e4a49086"
+          "hash": "acef7c2e5847928c387ed404122c5838"
         },
         {
           "calculation_strategy": "fixed",
@@ -34557,14 +34644,14 @@
           ],
           "id": "era 100",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 22.71,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.0,
             "max": 22.71
           },
-          "hash": "6529e2e17d8be79c4bd697d12966a76f"
+          "hash": "52c50aaa2f6d04e147d6f12207def30f"
         },
         {
           "aliases": [
@@ -34604,14 +34691,14 @@
           ],
           "id": "Era 300",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 49.17,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.9,
             "max": 49.17
           },
-          "hash": "d7bcf700e5b0e51f13fe72a7849917b1"
+          "hash": "03b513d49c0ac36c361de22ff0b959f3"
         },
         {
           "aliases": [
@@ -34650,14 +34737,14 @@
           ],
           "id": "five",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 76.31,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.05,
             "max": 76.31
           },
-          "hash": "2fd74e15837c303cf1a8fa319cc19fa2"
+          "hash": "268b2e351d9e9281dd94fa8fca7708fd"
         },
         {
           "aliases": [
@@ -34728,14 +34815,14 @@
           ],
           "id": "one sl",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 15.53,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.48,
             "max": 15.53
           },
-          "hash": "854e83923d851ccc9439e501642fa8c6"
+          "hash": "0abc3f848cce29b7a67b1b520de5ef15"
         },
         {
           "aliases": [
@@ -34771,14 +34858,14 @@
           ],
           "id": "play 1",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:10:16",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 11.4,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.4,
             "max": 11.4
           },
-          "hash": "b4ce9025de3b1536503454e14369d2af"
+          "hash": "cb6a6b24da914566709d5492da56ad60"
         },
         {
           "aliases": [
@@ -34814,14 +34901,14 @@
           ],
           "id": "play 3",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:10:16",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 13.27,
           "sub_profile_count": 0,
           "power_range": {
             "min": 5.08,
             "max": 13.27
           },
-          "hash": "2e6e6794f63689775b598383f0f87531"
+          "hash": "9223401ff0433c55a6e04bff12b2b53e"
         },
         {
           "aliases": [
@@ -34860,14 +34947,14 @@
           ],
           "id": "play 5",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 51.73,
           "sub_profile_count": 0,
           "power_range": {
             "min": 7.5,
             "max": 51.73
           },
-          "hash": "b627a3c3bd7b70e2e123d9b6b1f57edc"
+          "hash": "c503f8788c5a11f0151e38746538f81b"
         },
         {
           "aliases": [
@@ -34901,14 +34988,14 @@
           ],
           "id": "playbar",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 26.9,
           "sub_profile_count": 0,
           "power_range": {
             "min": 10.0,
             "max": 26.9
           },
-          "hash": "224afe31b3fa366d13f40bcb7c16ef84"
+          "hash": "646d6bb15f26f31d86c997af1ef40d6e"
         },
         {
           "aliases": [
@@ -34944,14 +35031,14 @@
           ],
           "id": "playbase",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 34.5,
           "sub_profile_count": 0,
           "power_range": {
             "min": 3.7,
             "max": 34.5
           },
-          "hash": "4ef8687be5c21b31d15ccbf796456205"
+          "hash": "f2903628700563f1f4bcd10d0b918859"
         },
         {
           "aliases": [
@@ -34991,14 +35078,14 @@
           ],
           "id": "ray",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 8.74,
           "sub_profile_count": 0,
           "power_range": {
             "min": 2.95,
             "max": 8.74
           },
-          "hash": "a6472f7ac4f1a9b7816e00cb03b1d7bd"
+          "hash": "bdda8639e38d851824e83c21433ec375"
         },
         {
           "calculation_strategy": "linear",
@@ -35071,14 +35158,14 @@
           ],
           "id": "sub 4",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 17.06,
           "sub_profile_count": 0,
           "power_range": {
             "min": 2.13,
             "max": 17.06
           },
-          "hash": "eaaadea0b9b1861ce735ec780166d791"
+          "hash": "1c952bb4ff3f0da124a35f4bd9442c8f"
         },
         {
           "aliases": [
@@ -35147,14 +35234,14 @@
           ],
           "id": "symfonisk floor lamp",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T06:14:58",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 9.5,
           "sub_profile_count": 0,
           "power_range": {
             "min": 4.6,
             "max": 9.5
           },
-          "hash": "81a994472b0ea2056a027bad8a36ab68"
+          "hash": "9b78ae2296f3ec5cb0913db05a51f7c4"
         },
         {
           "calculation_strategy": "linear",
@@ -36574,6 +36661,7 @@
           "measure_device": "TP-Link Tapo P110",
           "measure_method": "manual",
           "name": "Tapo Mini Smart Wi-Fi Socket",
+          "product_url": "https://www.tapo.com/en/product/smart-plug/tapo-p100/",
           "only_self_usage": false,
           "standby_power": 0.633,
           "standby_power_on": 1.39,
@@ -36593,7 +36681,7 @@
             "min": 1.39,
             "max": 1.39
           },
-          "hash": "9b703161d5142b6e5d841de6be6a01e0"
+          "hash": "4e8116cb576e599caf9acc0dd1ffed5f"
         },
         {
           "aliases": [
@@ -37374,6 +37462,7 @@
           "measure_device": "SONOFF S60ZBTPF",
           "measure_method": "manual",
           "name": "Smart Air Purifier",
+          "product_url": "https://levoit.com/products/core-300s-p-smart-air-purifier",
           "standby_power": 0.5,
           "authors": [
             {
@@ -37391,7 +37480,7 @@
             "min": 3.0,
             "max": 37.0
           },
-          "hash": "fcee9713c993ef0cb21528cb35c94a41"
+          "hash": "60e5144420861c6ba9edb2fceb342d6a"
         },
         {
           "calculation_strategy": "fixed",
@@ -38610,6 +38699,7 @@
           "measure_device": "Meross mss310",
           "measure_method": "manual",
           "name": "Mi Smart Standing Fan 2",
+          "product_url": "https://www.mi.com/global/product/mi-smart-standing-fan-2/",
           "standby_power": 1.0,
           "authors": [
             {
@@ -38630,7 +38720,7 @@
             "min": 24.0,
             "max": 34.0
           },
-          "hash": "0fb04e6291cc7920188fcb0fa83eaa98"
+          "hash": "e9eaa8dd28053f0919133e24a9f16e16"
         },
         {
           "created_at": "2025-05-01T21:56:26Z",
@@ -38701,6 +38791,7 @@
             "VERSION": "v1.17.19:docker"
           },
           "name": "Mi Smart LED Bulb Essential",
+          "product_url": "https://www.mi.com/global/product/mi-led-smart-bulb-essential-white-and-color/",
           "standby_power": 1.2,
           "authors": [
             {
@@ -38730,7 +38821,7 @@
             "score": 93.2,
             "color_temp": 93.2
           },
-          "hash": "172a93505bcc5b3100c06b3739b5188b"
+          "hash": "5b3adf141244b2863c3059676ce8a8db"
         }
       ],
       "device_types": [
@@ -39274,7 +39365,7 @@
           ],
           "id": "YLDP13YL",
           "manufacturer": "yeelight",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 9.13,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -39290,7 +39381,7 @@
             "score": 96.7,
             "color_temp": 96.7
           },
-          "hash": "8e36f7ddfdf050481d8d03b3714bea84"
+          "hash": "a95c4ffaf73b11563b06a8710a004d71"
         },
         {
           "aliases": [
@@ -39448,7 +39539,7 @@
           ],
           "id": "YLXD01YL",
           "manufacturer": "yeelight",
-          "updated_at": "2026-08-30T04:13:40",
+          "updated_at": "2026-08-31T10:23:28",
           "max_power": 26.1,
           "sub_profile_count": 2,
           "measurement_updated_at": "2026-06-13T14:19:28",
@@ -39465,7 +39556,7 @@
             "brightness": 87.0,
             "color_temp": 97.8
           },
-          "hash": "9683cb7dbfc6e28a817177a7b62f0950"
+          "hash": "5bee82ba112e806cd34e0d4dd73ede88"
         },
         {
           "calculation_strategy": "lut",

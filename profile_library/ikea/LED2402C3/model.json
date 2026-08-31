@@ -25,6 +25,7 @@
     "VERSION": "v1.21.0:docker"
   },
   "name": "KAJPLATS E14 WS B38 CL 470lm",
+  "product_url": "https://www.ikea.com/qa/en/p/kajplats-led-bulb-e14-470-lumen-smart-white-spectrum-clear-glass-60611494/",
   "standby_power": 0.2,
   "voltage_range": {
     "min": 231.3,

@@ -24,6 +24,7 @@
     "VERSION": "v1.20.14:docker"
   },
   "name": "KAJPLATS E26 WS 1100lm",
+  "product_url": "https://www.ikea.com/ca/en/p/kajplats-led-bulb-e26-1100-lumen-smart-white-spectrum-globe-opal-white-90611299/",
   "standby_power": 0.07,
   "authors": [
     {

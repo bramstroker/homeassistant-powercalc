@@ -22,6 +22,7 @@
     "VERSION": "v1.17.24:docker"
   },
   "name": "RGB+CCT 9W Zigbee Downlight",
+  "product_url": "https://www.gledopto.cn/product-detail/smart-down-light-rgb.html",
   "standby_power": 0.22,
   "authors": [
     {

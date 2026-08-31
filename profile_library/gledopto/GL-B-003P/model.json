@@ -24,6 +24,7 @@
     "VERSION": "v1.17.23:docker"
   },
   "name": "CCT 7W E27 A60 Zigbee Filament Bulb",
+  "product_url": "https://gledopto.com/h-pd-127.html",
   "standby_power": 0.12,
   "authors": [
     {

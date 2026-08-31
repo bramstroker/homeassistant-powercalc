@@ -20,6 +20,7 @@
     "VERSION": "v0.23.2:docker"
   },
   "name": "Wi-Fi Dimmable RGBW ES 5.5W LED ST64 Filament Bulb",
+  "product_url": "https://www.mirabella.com.au/products/i002926",
   "standby_power": 0.7,
   "authors": [
     {

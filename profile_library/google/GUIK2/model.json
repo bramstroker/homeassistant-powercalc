@@ -44,6 +44,7 @@
     "VERSION": "v1.3.12:docker"
   },
   "name": "Nest Hub (2nd Gen)",
+  "product_url": "https://store.google.com/product/nest_hub_2nd_gen",
   "standby_power": 0.39,
   "authors": [
     {

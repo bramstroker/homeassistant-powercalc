@@ -25,6 +25,7 @@
     "VERSION": "v1.20.3:docker"
   },
   "name": "KAJPLATS E27 CWS globe 1055lm",
+  "product_url": "https://www.ikea.com/se/en/p/kajplats-led-bulb-e27-1055-lumen-smart-colour-and-white-spectrum-globe-opal-white-70608575/",
   "standby_power": 0.17,
   "authors": [
     {

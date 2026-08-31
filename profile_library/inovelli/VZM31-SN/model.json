@@ -14,6 +14,7 @@
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "manual",
   "name": "Blue Series Dimmer Switch",
+  "product_url": "https://help.inovelli.com/en/articles/8266282-blue-series-dimmer-switch-manual",
   "only_self_usage": true,
   "standby_power": 0.26,
   "standby_power_on": 0.29,

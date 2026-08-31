@@ -20,6 +20,7 @@
     "VERSION": "v1.17.14:docker"
   },
   "name": "SmarterHome 10W White Smart Bulb (B22)",
+  "product_url": "https://help.kogan.com/articles/Knowledge/FactoryResettingYourKoganSmarterHomeSmartLightsBulbs",
   "standby_power": 1.0,
   "authors": [
     {

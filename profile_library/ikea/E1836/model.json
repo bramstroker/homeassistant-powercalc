@@ -20,6 +20,7 @@
   "measure_device": "Shelly Plus Plug S / AVM Fritz!DECT 200",
   "measure_method": "manual",
   "name": "ASKVADER on/off switch",
+  "product_url": "https://www.ikea.com/de/en/p/askvaeder-on-off-switch-50463880/",
   "only_self_usage": false,
   "standby_power": 0.21,
   "standby_power_on": 0.78,

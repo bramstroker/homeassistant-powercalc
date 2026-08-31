@@ -25,6 +25,7 @@
     "VERSION": "v1.20.3:docker"
   },
   "name": "KAJPLATS GU10 CWS 470lm",
+  "product_url": "https://www.ikea.com/es/es/p/kajplats-bombilla-led-gu10-470-lm-inteligente-color-espectro-blanco-10608578/",
   "standby_power": 0.2,
   "authors": [
     {

@@ -19,6 +19,7 @@
     "VERSION": "v0.22.1:docker"
   },
   "name": "Wi-Fi 7W LED Tube Lamp",
+  "product_url": "https://www.mirabella.com.au/products/i003028",
   "standby_power": 0.7,
   "authors": [
     {

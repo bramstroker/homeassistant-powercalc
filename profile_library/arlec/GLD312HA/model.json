@@ -23,6 +23,7 @@
     "VERSION": "v1.20.9:docker"
   },
   "name": "Grid Connect Smart CCT E27 Globe (12 W, 1050 lm)",
+  "product_url": "https://www.arlec.com.au/products/arlec-white-grid-connect-smart-e27-led-1050lm-12w-cct-colour-mode-globe",
   "standby_power": 0.3,
   "authors": [
     {

@@ -25,6 +25,7 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "KAJPLATS E27 WS G60 clear 470lm",
+  "product_url": "https://www.ikea.com/gb/en/p/kajplats-led-bulb-e27-470-lumen-smart-white-spectrum-clear-globe-60611489/",
   "standby_power": 0.07,
   "authors": [
     {

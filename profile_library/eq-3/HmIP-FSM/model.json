@@ -22,6 +22,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "Switching Actuator and Meter, Flush-Mount",
+  "product_url": "https://homematic-ip.com/en/product/switching-actuator-and-meter-flush-mounted",
   "only_self_usage": true,
   "standby_power": 0.2,
   "standby_power_on": 0.74,

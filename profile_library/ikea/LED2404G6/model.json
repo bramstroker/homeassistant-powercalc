@@ -25,6 +25,7 @@
     "VERSION": "v1.20.2:docker"
   },
   "name": "KAJPLATS E14 WS globe 806lm",
+  "product_url": "https://www.ikea.com/de/de/p/kajplats-led-leuchtmittel-e14-806-lm-smart-weissspektrum-rund-opalweiss-00611312/",
   "standby_power": 0.21,
   "authors": [
     {

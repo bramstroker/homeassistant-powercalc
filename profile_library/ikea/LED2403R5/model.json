@@ -25,6 +25,7 @@
     "VERSION": "v1.20.3:docker"
   },
   "name": "KAJPLATS GU10 WS 575lm",
+  "product_url": "https://www.ikea.com/es/es/p/kajplats-bombilla-led-gu10-575-lumenes-inteligente-espectro-blanco-50611442/",
   "standby_power": 0.22,
   "authors": [
     {

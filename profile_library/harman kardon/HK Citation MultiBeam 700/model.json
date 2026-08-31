@@ -33,6 +33,7 @@
   "measure_device": "Shelly Plug S",
   "measure_method": "manual",
   "name": "Citation MultiBeam 700",
+  "product_url": "https://support.harmankardon.com/us/en/howto/citation-multibeam-700-software-update-release-notes-us/000037032.html",
   "sensor_config": {
     "sleep_power": {
       "delay": 1080,

@@ -29,6 +29,7 @@
     "VERSION": "v0.24.7:docker"
   },
   "name": "Key Light",
+  "product_url": "https://help.elgato.com/hc/en-us/articles/20935383021965-Elgato-Key-Light-How-to-Identify-if-You-Have-a-Key-Light-or-Key-Light-MK-2",
   "standby_power": 0.86,
   "authors": [
     {

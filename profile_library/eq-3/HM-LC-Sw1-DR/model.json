@@ -21,6 +21,7 @@
     "VERSION": "v1.17.1:docker"
   },
   "name": "Wireless Switch Actuator, DIN Rail Mount",
+  "product_url": "https://www.eq-3.com/products/homematic/detail/wireless-switch-actuator-1-channel-din-rail-mount.html",
   "standby_power": 0.32,
   "standby_power_on": 0.52,
   "authors": [

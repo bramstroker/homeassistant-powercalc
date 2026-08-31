@@ -25,6 +25,7 @@
   "measure_device": "Aqara Smart Plug EU (SP-EUC01)",
   "measure_method": "manual",
   "name": "TurboPoly Table Fan 511S",
+  "product_url": "https://www.dreo.com/products/turbopoly-table-fan-511s",
   "standby_power": 0.87,
   "authors": [
     {
