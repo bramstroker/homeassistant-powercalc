@@ -207,9 +207,10 @@ export interface LightMeasurementRequest extends BaseMeasurementRequest {
   multiple_light_count: number;
 }
 
-export interface AverageMeasurementRequest extends BaseMeasurementRequest { measure_type: "average"; duration: number; }
+export interface AverageMeasurementRequest extends BaseMeasurementRequest { measure_type: "average"; controller?: null; duration: number; }
 export interface RecorderMeasurementRequest extends BaseMeasurementRequest {
   measure_type: "recorder";
+  controller?: null;
   recorder_purpose: "playbook" | "complex_profile";
   profile_recipe?: "generic" | "vacuum_robot" | null;
   tracked_entity_ids?: string[];

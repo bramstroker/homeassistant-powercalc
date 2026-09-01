@@ -184,11 +184,12 @@ export class SetupView extends LitElement {
       this.selectedType = this.initialType;
     }
     if (changed.has("initialRequest")) {
+      const controller = this.initialRequest && "controller" in this.initialRequest
+        ? this.initialRequest.controller
+        : undefined;
       this.dummyLoadEnabled = Boolean(this.initialRequest?.dummy_load);
       this.dummyLoadMode = this.initialRequest?.dummy_load?.mode ?? defaultDummyLoadMode(this.dummyLoadCalibration);
-      this.dummyController = Boolean(
-        this.initialRequest && "controller" in this.initialRequest && this.initialRequest.controller.type === "dummy",
-      );
+      this.dummyController = controller?.type === "dummy";
       this.multipleLights = Boolean(
         this.initialRequest?.measure_type === "light"
         && (this.initialRequest.controller.type === "hass_multi" || this.initialRequest.multiple_light_count > 1),

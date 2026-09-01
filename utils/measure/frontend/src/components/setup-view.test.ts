@@ -798,6 +798,40 @@ describe("setup type picker", () => {
 });
 
 describe("setup view defaults", () => {
+  it("restores a duplicated recorder request with its persisted null controller", async () => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.definitions = [recorderDefinition];
+    element.deviceEntities = {
+      "*": [{ entity_id: "climate.room", name: "Room", domain: "climate", state: "heat" }],
+    };
+    element.selectedType = "recorder";
+    element.initialRequest = {
+      measure_type: "recorder",
+      controller: null,
+      model_id: "measurement",
+      product_name: "Recorder",
+      measure_device: "",
+      power_meter: { type: "dummy" },
+      generate_model: false,
+      parameters: capabilities.defaults,
+      resume_policy: "new",
+      recorder_purpose: "complex_profile",
+      profile_recipe: "generic",
+      tracked_entity_ids: ["climate.room"],
+      export_filename: "record.jsonl",
+    };
+    element.meter = { type: "dummy" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector('[name="recorder_purpose"]')).toBeTruthy();
+    expect(element.shadowRoot.querySelector('[name="profile_recipe"]')).toBeTruthy();
+    const trackedEntity = entityCombobox(element, "tracked_entity_ids");
+    expect(trackedEntity).toBeTruthy();
+    expect((trackedEntity.querySelector('input[slot="value"]') as HTMLInputElement).value).toBe("climate.room");
+  });
+
   it("starts the recorder with a purpose choice and reveals the generic recipe conditionally", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
