@@ -31,5 +31,16 @@
   "voltage_range": {
     "max": 238.49,
     "min": 227.8
-  }
+  },
+  "authors": [
+    {
+      "name": "Linus Nordin",
+      "github": "gribber",
+      "email": "linus.nordin@gmail.com"
+    },
+    {
+      "name": "MartinJM",
+      "github": "MartinJM"
+    }
+  ]
 }
