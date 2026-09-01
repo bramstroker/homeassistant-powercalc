@@ -1,6 +1,7 @@
 from pathlib import Path
 from threading import Event
 import time
+from unittest.mock import MagicMock
 
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.execution import LightOperatingPoint
@@ -10,14 +11,18 @@ from measure.ha_app.coordinator import (
     SessionExecutionContext,
     SessionMeasurementService,
 )
+from measure.ha_app.interaction import SessionInteraction
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import (
     LightMeasurementRequest,
     MeasurementRequest,
+    RecorderMeasurementRequest,
 )
+from measure.runner.recorder import RecorderRunner
 from measure.runner.runner import RunnerResult
+from measure.util.measure_util import MeasurementResult, MeasureUtil
 import pytest
 
 
@@ -67,6 +72,31 @@ class BlockingService(SessionMeasurementService):
         self.started.set()
         control.wait(60)
         raise AssertionError("Cancelled wait returned")
+
+
+class RecorderService(SessionMeasurementService):
+    def __init__(self, sample_recorded: Event) -> None:
+        self.sample_recorded = sample_recorded
+
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        assert isinstance(request, RecorderMeasurementRequest)
+        context.artifact_directory.mkdir(parents=True)
+        measure_util = MagicMock(spec=MeasureUtil)
+
+        def take_measurement(_: float) -> MeasurementResult:
+            self.sample_recorded.set()
+            return MeasurementResult(power=4.2, voltages=[])
+
+        measure_util.take_measurement.side_effect = take_measurement
+        return RecorderRunner(measure_util, SessionInteraction(control)).run(
+            request,
+            str(context.artifact_directory),
+        )
 
 
 class SamplingService(SessionMeasurementService):
@@ -172,6 +202,24 @@ def test_coordinator_notifies_session_state_listeners(tmp_path: Path) -> None:
     coordinator.delete(session.id)
 
     assert notifications == [SessionState.RUNNING, SessionState.CANCELLING, SessionState.CANCELLED]
+
+
+def test_stopping_recorder_marks_session_completed(tmp_path: Path) -> None:
+    sample_recorded = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: RecorderService(sample_recorded))
+
+    session = coordinator.start(RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec()))
+    wait_for_state(coordinator, SessionState.AWAITING_CONFIRMATION)
+    coordinator.confirm(session.id)
+    assert sample_recorded.wait(1)
+
+    coordinator.cancel(session.id)
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    assert coordinator.current is not None
+    assert coordinator.current.summary is not None
+    assert coordinator.current.summary["Samples recorded"] == "1"
+    assert coordinator.current.files == ("measurement/record.csv",)
 
 
 def test_coordinator_isolates_session_state_listener_failures(

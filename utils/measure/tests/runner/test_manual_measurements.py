@@ -24,7 +24,7 @@ def test_average_reports_start_phase_after_confirmation() -> None:
     interaction.phase.assert_called_once_with("Starting averaging")
 
 
-def test_recorder_reports_start_phase_after_confirmation(tmp_path: Path) -> None:
+def test_recorder_treats_app_stop_as_successful_completion(tmp_path: Path) -> None:
     measure_util = MagicMock(spec=MeasureUtil)
     measure_util.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
@@ -33,11 +33,13 @@ def test_recorder_reports_start_phase_after_confirmation(tmp_path: Path) -> None
 
     request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
     export_directory = str(tmp_path)
-    with pytest.raises(MeasurementCancelledError):
-        runner.run(request, export_directory)
+    result = runner.run(request, export_directory)
 
     interaction.confirm.assert_called_once_with("Ready to start recording. Stop the measurement when you are finished.")
     interaction.phase.assert_called_once_with("Starting recording")
+    assert result.summary is not None
+    assert result.summary["Samples recorded"] == "1"
+    assert next(csv.reader((tmp_path / "record.csv").read_text().splitlines()))[1] == "4.2"
 
 
 def test_recorder_treats_cli_interrupt_as_successful_stop(tmp_path: Path) -> None:
