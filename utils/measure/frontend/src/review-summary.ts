@@ -44,32 +44,59 @@ export function reviewSummary(
   definition: MeasureDefinition | undefined,
 ): LabelledValue[] {
   if (!request) return [];
-  const rows: LabelledValue[] = [{ label: "Type", value: definition?.label ?? request.measure_type }];
+  const battery = batterySource(request, preflight);
+  return [
+    { label: "Type", value: definition?.label ?? request.measure_type },
+    ...profileRows(request, definition),
+    ...controllerRows(request, definition),
+    ...reviewFieldRows(request, definition),
+    { label: "Power", value: summarize(request.power_meter) },
+    ...multiSelectionRows(request, definition),
+    ...(battery ? [{ label: "Battery", value: battery }] : []),
+    ...(request.dummy_load ? [{ label: "Dummy load", value: dummyLoadSummary(request.dummy_load) }] : []),
+  ];
+}
+
+function profileRows(request: MeasurementRequest, definition?: MeasureDefinition): LabelledValue[] {
+  const rows: LabelledValue[] = [];
   if (definition?.supports_profile) rows.push({ label: "Model", value: `${request.product_name} (${request.model_id})` });
   if (request.measure_device) rows.push({ label: "Device", value: request.measure_device });
-
-  // Name the controller with the label the server gave its field — "Light", "Media player", …
-  const controller = definition?.fields.find((field) => field.role === "controller");
-  if (controller) {
-    const entity = requestFieldValue(request, controller);
-    const value = Array.isArray(entity) ? entity.join(", ") : entity;
-    rows.push({ label: controller.label, value: typeof value === "string" && value ? value : "Virtual device" });
-  }
-
-  rows.push({ label: "Power", value: summarize(request.power_meter) });
-  for (const [field, values] of multiSelections(request, definition)) {
-    rows.push({ label: field.label, value: values.join(", ") });
-  }
-  const battery = batterySource(request, preflight);
-  if (battery) rows.push({ label: "Battery", value: battery });
-  if (request.dummy_load) rows.push({ label: "Dummy load", value: dummyLoadSummary(request.dummy_load) });
   return rows;
 }
 
-/** Multi-select fields of the pending request, paired with what it selected. */
+/** Name the controller with the label the server gave its field — "Light", "Media player", … */
+function controllerRows(request: MeasurementRequest, definition?: MeasureDefinition): LabelledValue[] {
+  const controller = definition?.fields.find((field) => field.role === "controller");
+  if (!controller) return [];
+  const entity = requestFieldValue(request, controller);
+  const value = Array.isArray(entity) ? entity.join(", ") : entity;
+  return [{ label: controller.label, value: typeof value === "string" && value ? value : "Virtual device" }];
+}
+
+function reviewFieldRows(request: MeasurementRequest, definition?: MeasureDefinition): LabelledValue[] {
+  return (definition?.fields.filter((field) => field.review) ?? []).flatMap((field) => {
+    const value = requestFieldValue(request, field);
+    if (value === undefined || value === "" || (Array.isArray(value) && value.length === 0)) return [];
+    const values = Array.isArray(value) ? value : [String(value)];
+    const formatted = values.map((item) => field.options.find((option) => option.value === item)?.label ?? item);
+    const label = field.plural_label && formatted.length > 1 ? field.plural_label : field.label;
+    return [{ label, value: formatted.join(", ") }];
+  });
+}
+
+function multiSelectionRows(request: MeasurementRequest, definition?: MeasureDefinition): LabelledValue[] {
+  return multiSelections(request, definition).map(([field, values]) => ({ label: field.label, value: values.join(", ") }));
+}
+
+/**
+ * Multi-select fields of the pending request, paired with what it selected. Controller
+ * fields (a multi-light `light_entity_id`) and `review` fields are left out: both are
+ * already restated by `controllerRows` and `reviewFieldRows`, under their own label.
+ */
 function multiSelections(request: MeasurementRequest, definition?: MeasureDefinition): [FormField, string[]][] {
   return (definition?.fields ?? [])
-    .filter((field) => field.control === "multi_select")
+    .filter((field) => field.control === "multi_select" || (field.control === "entity" && field.multiple))
+    .filter((field) => field.role !== "controller" && !field.review)
     .flatMap((field) => {
       const values = requestFieldValue(request, field);
       return Array.isArray(values) ? [[field, values] as [FormField, string[]]] : [];

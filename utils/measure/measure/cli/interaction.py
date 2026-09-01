@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 import time
 
 from measure.execution import OperatingPoint, RunInteraction
@@ -41,4 +42,7 @@ class ConsoleInteraction(RunInteraction):
         return
 
     def operating_point(self, point: OperatingPoint) -> None:
+        return
+
+    def entity_states(self, states: Mapping[str, str]) -> None:
         return

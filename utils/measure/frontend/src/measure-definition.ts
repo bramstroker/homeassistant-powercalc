@@ -80,17 +80,46 @@ export function entityDomain(definition: MeasureDefinition, field: FormField, se
 }
 
 export function entityDomains(definition: MeasureDefinition, values?: FormData): string[] {
-  return definition.fields
+  const domains = definition.fields
     .filter((field) => field.role === "controller")
     .flatMap((field) => {
       const source = narrowingField(definition, field);
       if (!source) return field.entity_domains ?? [];
       // Without a submitted value every option is still reachable, so offer all their domains.
-      if (values) return [entityDomain(definition, field, formText(values, source.name))];
+      const submitted = values ? formText(values, source.name) : "";
+      if (submitted) return [entityDomain(definition, field, submitted)];
       return source.options.map((option) => option.entity_domain);
     })
     // Lights already arrive with the startup catalog, so they are never fetched on demand.
     .filter((domain): domain is string => Boolean(domain) && domain !== "light");
+  const visibleValue = (name: string): string => {
+    const submitted = values ? formText(values, name) : "";
+    if (submitted) return submitted;
+    const field = definition.fields.find((candidate) => candidate.name === name);
+    return String(field?.default ?? field?.options[0]?.value ?? "");
+  };
+  if (definition.fields.some((field) => field.all_entities && fieldVisible(field, visibleValue))) domains.push("*");
+  return domains;
+}
+
+/**
+ * A stored request seen as submitted form values, so domain resolution reads the values it
+ * was started with. Without this a restored request resolves against field defaults, and a
+ * field only its own purpose makes visible never has its entities fetched.
+ */
+export function requestFormData(definition: MeasureDefinition, request: MeasurementRequest): FormData {
+  const values = new FormData();
+  for (const field of definition.fields) {
+    const value = requestFieldValue(request, field);
+    if (value === undefined || value === "") continue;
+    for (const item of Array.isArray(value) ? value : [value]) values.append(field.name, String(item));
+  }
+  return values;
+}
+
+/** Whether the server-declared dependencies currently make a field relevant. */
+export function fieldVisible(field: FormField, value: (name: string) => string): boolean {
+  return Object.entries(field.visible_when ?? {}).every(([name, accepted]) => accepted.includes(value(name)));
 }
 
 /**
@@ -123,6 +152,7 @@ export function buildMeasurementRequest(
   const declared: Record<string, unknown> = {};
   for (const field of definition.fields) {
     if (field.role === "power_meter") continue;
+    if (!fieldVisible(field, (name) => formText(form, name))) continue;
     if (field.role === "controller") {
       declared.controller = controllerSpec(form, field, dummyController);
       continue;
@@ -158,6 +188,8 @@ function submittedParameters(definition: MeasureDefinition, form: FormData, capa
 /** Read one submitted field, coerced to the type its declared control produces. */
 function formValue(form: FormData, field: FormField): FieldValue {
   if (field.control === "boolean") return formChecked(form, field.name);
-  if (field.control === "multi_select") return formList(form, field.name);
+  if (field.control === "multi_select" || (field.control === "entity" && field.multiple)) {
+    return formList(form, field.name).filter(Boolean);
+  }
   return field.control === "number" ? formNumber(form, field.name) : formText(form, field.name);
 }

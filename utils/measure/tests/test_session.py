@@ -75,6 +75,17 @@ def test_operating_point_emits_typed_device_state() -> None:
     assert events[0].data == point
 
 
+def test_entity_states_emits_latest_recorder_states() -> None:
+    control = SessionControl()
+    events = []
+    control.subscribe(events.append)
+
+    control.entity_states({"vacuum.robot": "cleaning", "sensor.robot_battery": "42"})
+
+    assert events[0].type == SessionEventType.ENTITY_STATES
+    assert events[0].data == {"states": {"vacuum.robot": "cleaning", "sensor.robot_battery": "42"}}
+
+
 def test_confirmation_emits_checkpoint_and_continues() -> None:
     control = SessionControl()
     events = []

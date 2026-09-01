@@ -236,6 +236,27 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector("button.danger")).toBeNull();
   });
 
+  it("shows the latest tracked entity states during a complex recording", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "running",
+      mode: "Recording",
+      progress: { completed: 8, total: 0 },
+      entity_states: { "vacuum.robot": "cleaning", "sensor.robot_battery": "42" },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const states = element.shadowRoot.querySelector(".entity-states");
+    expect(states?.textContent).toContain("Tracked entities");
+    expect(states?.textContent).toContain("vacuum.robot");
+    expect(states?.textContent).toContain("cleaning");
+    expect(states?.textContent).toContain("sensor.robot_battery");
+    expect(states?.textContent).toContain("42");
+  });
+
   it("labels average progress in seconds", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;

@@ -11,6 +11,7 @@ from measure.controller.light.spec import (
 )
 from measure.controller.media.spec import HassMediaControllerSpec
 from measure.ha_app.preflight import ActiveSessionError, EntityRecord, MeasurementPreflight, PreflightError
+from measure.home_assistant_entities import DeviceClass
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec
 from measure.request import (
@@ -19,6 +20,7 @@ from measure.request import (
     DummyLoadCalibrationRequest,
     FanMeasurementRequest,
     LightMeasurementRequest,
+    RecorderMeasurementRequest,
     SpeakerMeasurementRequest,
 )
 import pytest
@@ -36,6 +38,8 @@ class Entity(EntityRecord):
     device_id: str | None = None
     model_id: str | None = None
     member_entity_ids: list[str] = field(default_factory=list)
+    domain: str = ""
+    device_class: DeviceClass | None = None
 
 
 def preflight(
@@ -54,6 +58,9 @@ def preflight(
         has_active_session=lambda: active,
         verify_storage=verify,
         load_entities=lambda domain, device_class: entities.get((domain, device_class), []),
+        load_all_entities=lambda: list(
+            {entity.entity_id: entity for group in entities.values() for entity in group}.values(),
+        ),
         diagnose_power_meter=lambda _: PowerMeterDiagnostic(
             success=voltage_supported is not None,
             status=DiagnosticStatus.GOOD if voltage_supported is not None else DiagnosticStatus.POOR,
@@ -107,6 +114,143 @@ def test_preflight_rejects_missing_hass_power_entity_for_non_light_kind() -> Non
     checker = preflight(base_entities())
 
     with pytest.raises(PreflightError, match="power entity"):
+        checker.validate(request)
+
+
+def test_preflight_accepts_vacuum_recorder_with_same_device_battery() -> None:
+    entities = base_entities()
+    vacuum = Entity("vacuum.test", device_id="robot-device", domain="vacuum")
+    battery = Entity(
+        "sensor.robot_battery",
+        state="42",
+        device_id="robot-device",
+        domain="sensor",
+        device_class=DeviceClass.BATTERY,
+    )
+    entities[("vacuum", None)] = [vacuum]
+    entities[(None, "battery")] = [battery]
+    request = RecorderMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id=vacuum.entity_id,
+        battery_entity_id=battery.entity_id,
+    )
+
+    assert preflight(entities).validate(request).warnings == ()
+
+
+def test_preflight_accepts_playbook_recorder_without_entity_catalog() -> None:
+    checker = MeasurementPreflight(
+        has_active_session=lambda: False,
+        verify_storage=lambda: None,
+        load_entities=lambda domain, device_class: base_entities().get((domain, device_class), []),
+        diagnose_power_meter=lambda _: PowerMeterDiagnostic(
+            success=True,
+            status=DiagnosticStatus.GOOD,
+            precision_status=DiagnosticStatus.UNSUPPORTED,
+            update_interval_status=DiagnosticStatus.UNSUPPORTED,
+        ),
+        developer_mode=True,
+    )
+
+    result = checker.validate(RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec()))
+
+    assert result.warnings == ()
+
+
+def test_preflight_requires_entity_catalog_for_complex_recorder() -> None:
+    checker = MeasurementPreflight(
+        has_active_session=lambda: False,
+        verify_storage=lambda: None,
+        load_entities=lambda domain, device_class: base_entities().get((domain, device_class), []),
+        diagnose_power_meter=lambda _: PowerMeterDiagnostic(
+            success=True,
+            status=DiagnosticStatus.GOOD,
+            precision_status=DiagnosticStatus.UNSUPPORTED,
+            update_interval_status=DiagnosticStatus.UNSUPPORTED,
+        ),
+        developer_mode=True,
+    )
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("switch.plug",),
+    )
+
+    with pytest.raises(PreflightError, match="entity metadata is unavailable"):
+        checker.validate(request)
+
+
+def test_preflight_accepts_generic_recorder_entity_from_complete_catalog() -> None:
+    entities = base_entities()
+    entities[("switch", None)] = [Entity("switch.plug", domain="switch")]
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("switch.plug",),
+    )
+
+    assert preflight(entities).validate(request).warnings == ()
+
+
+def test_preflight_rejects_missing_complex_recorder_entity() -> None:
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("switch.missing",),
+    )
+
+    checker = preflight(base_entities())
+    with pytest.raises(PreflightError, match="does not exist"):
+        checker.validate(request)
+
+
+def test_preflight_rejects_unavailable_vacuum() -> None:
+    entities = base_entities()
+    # Keep the selected entity in the complete catalog while omitting it from the available vacuum choices.
+    entities[(None, None)] = [Entity("vacuum.missing", domain="vacuum")]
+    entities[("sensor", None)] = [Entity("sensor.robot_battery", state="42")]
+    entities[(None, "battery")] = [Entity("sensor.robot_battery", state="42")]
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id="vacuum.missing",
+        battery_entity_id="sensor.robot_battery",
+    )
+
+    checker = preflight(entities)
+    with pytest.raises(PreflightError, match="vacuum is unavailable"):
+        checker.validate(request)
+
+
+@pytest.mark.parametrize(
+    "battery_group, message",
+    [
+        ([], "battery sensor is unavailable"),
+        ([Entity("sensor.robot_battery", device_id="other-device", state="42")], "same Home Assistant device"),
+    ],
+)
+def test_preflight_rejects_unusable_vacuum_battery(battery_group: list[Entity], message: str) -> None:
+    entities = base_entities()
+    entities[("vacuum", None)] = [Entity("vacuum.test", device_id="robot-device")]
+    entities[(None, "battery")] = battery_group
+    # Retain the selection in the complete catalog so this exercises availability or relationship validation.
+    entities[("sensor", None)] = battery_group or [Entity("sensor.robot_battery", state="unavailable")]
+    request = RecorderMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id="vacuum.test",
+        battery_entity_id="sensor.robot_battery",
+    )
+
+    checker = preflight(entities)
+    with pytest.raises(PreflightError, match=message):
         checker.validate(request)
 
 

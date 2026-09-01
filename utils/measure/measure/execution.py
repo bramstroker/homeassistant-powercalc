@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from statistics import mean
@@ -82,6 +83,9 @@ class RunInteraction(Protocol):
     def operating_point(self, point: OperatingPoint) -> None:
         """Report the device state currently being measured."""
 
+    def entity_states(self, states: Mapping[str, str]) -> None:
+        """Report the latest states captured by a recorder session."""
+
 
 class MeasurementCancelledError(Exception):
     """Raised when an active measurement is cancelled cooperatively."""
@@ -120,6 +124,9 @@ class ImmediateInteraction(RunInteraction):
         return
 
     def operating_point(self, point: OperatingPoint) -> None:
+        return
+
+    def entity_states(self, states: Mapping[str, str]) -> None:
         return
 
 

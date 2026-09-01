@@ -414,6 +414,7 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
     capabilities = test_client.get("/api/capabilities")
     powers = test_client.get("/api/entities?device_class=power")
     lights = test_client.get("/api/entities?domain=light")
+    all_entities = test_client.get("/api/entities?all=true")
 
     assert capabilities.status_code == 200
     defaults = MeasurementParameters()
@@ -445,6 +446,11 @@ def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
     assert capabilities.json()["developer_mode"] is False
     assert client(tmp_path, developer_mode=True).get("/api/capabilities").json()["developer_mode"] is True
     assert [item["entity_id"] for item in powers.json()] == ["sensor.test_power"]
+    assert all_entities.status_code == 200
+    temperature = next(item for item in all_entities.json() if item["entity_id"] == "sensor.temperature")
+    assert temperature["domain"] == "sensor"
+    assert temperature["device_class"] is None
+    assert test_client.get("/api/entities?all=true&domain=vacuum").status_code == 400
     assert powers.json()[0]["device_id"] == "meter-device"
     assert powers.json()[0]["model_id"] == "PM-001"
     assert powers.json()[0]["related_voltage_entity_id"] == "sensor.test_voltage"
@@ -683,10 +689,19 @@ def test_measure_definitions_and_average_request(tmp_path: Path) -> None:
     charging = next(item for item in definitions.json() if item["measure_type"] == MeasureType.CHARGING)
     fields = {field["name"]: field for field in charging["fields"]}
     assert "entity_domain" not in fields["charging_entity_id"]
-    assert fields["charging_device_type"]["options"] == [
-        {"value": "vacuum_robot", "label": "Vacuum robot", "entity_domain": "vacuum", "enables": []},
-        {"value": "lawn_mower_robot", "label": "Lawn mower robot", "entity_domain": "lawn_mower", "enables": []},
+    assert [
+        (option["value"], option["label"], option["entity_domain"])
+        for option in fields["charging_device_type"]["options"]
+    ] == [
+        ("vacuum_robot", "Vacuum robot", "vacuum"),
+        ("lawn_mower_robot", "Lawn mower robot", "lawn_mower"),
     ]
+    recorder = next(item for item in definitions.json() if item["measure_type"] == MeasureType.RECORDER)
+    recorder_fields = {field["name"]: field for field in recorder["fields"]}
+    assert recorder_fields["recorder_purpose"]["options"][0]["value"] == "playbook"
+    assert recorder_fields["profile_recipe"]["visible_when"] == {"recorder_purpose": ["complex_profile"]}
+    assert recorder_fields["tracked_entity_ids"]["all_entities"] is True
+    assert recorder_fields["battery_entity_id"]["same_device_only"] is True
 
     payload = {
         "measure_type": MeasureType.AVERAGE,

@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 from measure.controller.charging.controller import ChargingController
@@ -71,7 +71,7 @@ from measure.runner.average import AverageRunner
 from measure.runner.charging import ChargingRunner
 from measure.runner.fan import FanRunner
 from measure.runner.light import LightRunner
-from measure.runner.recorder import RecorderRunner
+from measure.runner.recorder import EntityStateReader, RecorderEntityState, RecorderRunner
 from measure.runner.runner import MeasurementRunner
 from measure.runner.speaker import SpeakerRunner
 from measure.tuning import MeasurementParameters
@@ -199,7 +199,8 @@ class MeasurementAssembler:
             media_controller = self._media_controller(request.controller)
             return SpeakerRunner(measure_util, parameters, media_controller, interaction)
         if isinstance(request, RecorderMeasurementRequest):
-            return RecorderRunner(measure_util, interaction)
+            state_reader = self._recorder_state_reader() if request.recorded_entity_ids else None
+            return RecorderRunner(measure_util, interaction, state_reader)
         if isinstance(request, AverageMeasurementRequest):
             return AverageRunner(measure_util, interaction=interaction)
         if isinstance(request, ChargingMeasurementRequest):
@@ -214,6 +215,24 @@ class MeasurementAssembler:
             fan_controller = self._fan_controller(request.controller)
             return FanRunner(measure_util, parameters, fan_controller, interaction)
         raise ValueError(f"Unsupported measurement request: {type(request).__name__}")
+
+    def _recorder_state_reader(self) -> EntityStateReader:
+        home_assistant = self._home_assistant()
+
+        def read(entity_ids: Sequence[str]) -> Mapping[str, RecorderEntityState]:
+            # One dump per sample. `get_state` has no single-entity WebSocket command
+            # behind it, so asking per entity refetches every state in Home Assistant.
+            wanted = set(entity_ids)
+            states = {
+                state.entity_id: RecorderEntityState(state=str(state.state), attributes=state.attributes)
+                for state in home_assistant.get_states()
+                if state.entity_id in wanted
+            }
+            if missing := sorted(wanted - states.keys()):
+                raise ValueError(f"Entities not found in Home Assistant: {', '.join(missing)}")
+            return states
+
+        return read
 
     def build_light_controller(self, spec: LightControllerSpec) -> LightController:
         """Build a configured light controller for execution or active preflight checks."""

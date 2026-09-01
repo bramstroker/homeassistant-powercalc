@@ -118,17 +118,20 @@ describe("MeasureApiClient", () => {
     );
   });
 
-  it("loads entities by Home Assistant domain or device class", async () => {
+  it("loads entities by Home Assistant domain, device class, or the complete catalog", async () => {
     const fetcher = vi.fn<typeof fetch>().mockImplementation(async () => response([{ entity_id: "light.desk", name: "Desk" }]));
     const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
 
     const lights = await client.getEntitiesByDomain("light");
     const powers = await client.getEntitiesByDeviceClass("power");
+    const allEntities = await client.getAllEntities();
 
     expect(fetcher).toHaveBeenNthCalledWith(1, new URL("http://ha.local/prefix/api/entities?domain=light"), expect.anything());
     expect(fetcher).toHaveBeenNthCalledWith(2, new URL("http://ha.local/prefix/api/entities?device_class=power"), expect.anything());
+    expect(fetcher).toHaveBeenNthCalledWith(3, new URL("http://ha.local/prefix/api/entities?all=true"), expect.anything());
     expect(lights).toEqual([{ entity_id: "light.desk", name: "Desk" }]);
     expect(powers).toEqual([{ entity_id: "light.desk", name: "Desk" }]);
+    expect(allEntities).toEqual([{ entity_id: "light.desk", name: "Desk" }]);
   });
 
   it("loads the entity catalog with one request", async () => {
@@ -223,11 +226,22 @@ describe("SessionEventStream", () => {
     listeners.get("progress")?.(new MessageEvent("progress", {
       data: JSON.stringify({ sequence: 2, type: "progress", data: { completed: 2, total: 4 } }),
     }));
+    listeners.get("entity_states")?.(new MessageEvent("entity_states", {
+      data: JSON.stringify({
+        sequence: 3,
+        type: "entity_states",
+        data: { states: { "vacuum.robot": "cleaning", "sensor.robot_battery": "42" } },
+      }),
+    }));
 
     expect(onConnection).toHaveBeenCalledWith(true);
     expect(onReconnect).toHaveBeenCalledOnce();
     expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: "phase" }));
     expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: "progress" }));
+    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({
+      type: "entity_states",
+      data: { states: { "vacuum.robot": "cleaning", "sensor.robot_battery": "42" } },
+    }));
     stream.close();
     expect(fake.close).toHaveBeenCalledOnce();
   });

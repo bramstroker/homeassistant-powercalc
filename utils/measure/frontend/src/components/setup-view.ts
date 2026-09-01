@@ -25,6 +25,7 @@ import {
   entityDomain,
   gatedParameters,
   entityDomains,
+  fieldVisible,
   fieldOptions,
   narrowingField,
   requestFieldValue,
@@ -32,7 +33,7 @@ import {
 import { emit } from "../events";
 import { formText } from "../form";
 import { sharedStyles } from "../styles";
-import { entitySelect, numberField, textField } from "./fields";
+import { entitySelect, fieldHint, numberField, textField } from "./fields";
 import { defaultDummyLoadMode, dummyLoadSpec, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
 import { entityListStyles, renderEntityList } from "./entity-list-field";
 import {
@@ -140,11 +141,6 @@ export class SetupView extends LitElement {
     fieldset.section { border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem 1.2rem; margin: 0; display: grid; gap: 1rem; }
     fieldset.section > legend { padding: 0 0.4rem; color: var(--signal-strong); font-size: 0.85rem; font-weight: 700; }
     .checks { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-    .entity-list { display: grid; gap: 0.4rem; }
-    .entity-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; align-items: center; }
-    .entity-row button, .add-entity { min-height: 40px; }
-    .remove-entity { display: grid; place-items: center; width: 44px; padding: 0; }
-    .remove-entity svg { width: 20px; height: 20px; }
     .check { min-height: 42px; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 999px; }
     /* A checkbox pill has no caption above it, so pin it to the input line of its row. */
     .profile-grid > .check { align-self: end; }
@@ -172,6 +168,10 @@ export class SetupView extends LitElement {
     .choice-list { display: grid; gap: 0.5rem; }
     .choice { display: flex; grid-template-columns: none; align-items: flex-start; gap: 0.55rem; color: var(--ink); }
     .choice input { width: auto; min-height: auto; margin-top: 0.2rem; accent-color: var(--signal); }
+    .field-block { display: grid; gap: 0.45rem; }
+    .field-block .field-hint, .select-guidance p { margin: 0; }
+    .select-guidance { display: grid; gap: 0.35rem; }
+    .select-guidance ul { margin: 0.1rem 0 0; padding-left: 1.2rem; color: var(--muted); font-size: 0.82rem; }
 
     @media (max-width: 640px) {
       .context { display: block; }
@@ -184,11 +184,12 @@ export class SetupView extends LitElement {
       this.selectedType = this.initialType;
     }
     if (changed.has("initialRequest")) {
+      const controller = this.initialRequest && "controller" in this.initialRequest
+        ? this.initialRequest.controller
+        : undefined;
       this.dummyLoadEnabled = Boolean(this.initialRequest?.dummy_load);
       this.dummyLoadMode = this.initialRequest?.dummy_load?.mode ?? defaultDummyLoadMode(this.dummyLoadCalibration);
-      this.dummyController = Boolean(
-        this.initialRequest && "controller" in this.initialRequest && this.initialRequest.controller.type === "dummy",
-      );
+      this.dummyController = controller?.type === "dummy";
       this.multipleLights = Boolean(
         this.initialRequest?.measure_type === "light"
         && (this.initialRequest.controller.type === "hass_multi" || this.initialRequest.multiple_light_count > 1),
@@ -239,7 +240,7 @@ export class SetupView extends LitElement {
     const fields = deviceFields(definition);
     const multipleController = this.multiControllerField();
     // A multi-select needs the room of its own fieldset; the rest are grid cells.
-    const blocks = fields.filter((field) => field.control === "multi_select");
+    const blocks = fields.filter((field) => field.control === "multi_select" && this.isFieldVisible(field, run));
     const activeLightCheck = type === "light" && !this.dummyController && !this.dummyLoadEnabled;
     return html`
       <form @submit=${this.submitMeasurement}>
@@ -429,6 +430,7 @@ export class SetupView extends LitElement {
     if (!this.selectedType) return nothing;
     const definition = this.definition(this.selectedType);
     if (!definition) return nothing;
+    if (!this.isFieldVisible(field, run)) return nothing;
     const name = field.name;
     if (this.dummyController && field.role === "controller") return nothing;
     if (field.derived_from) return this.derivedCountField(field, run);
@@ -442,24 +444,71 @@ export class SetupView extends LitElement {
       const domains = source
         ? [entityDomain(definition, field, this.selectValue(source, run))].filter((domain): domain is string => Boolean(domain))
         : this.fieldDomains(field);
-      const failed = domains.find((domain) => this.deviceEntityErrors[domain]);
+      // An all-entities field reads the "*" catalog; its declared domains only filter that
+      // catalog client-side, so a stale error from another measure type must not surface here.
+      const failed = field.all_entities
+        ? (this.deviceEntityErrors["*"] ? "*" : undefined)
+        : domains.find((domain) => this.deviceEntityErrors[domain]);
       if (failed) {
         return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
       }
-      const entities = this.entitiesIn(domains);
-      if (field.multiple && this.multipleLights) return this.multiEntityField(field, entities, run);
-      const selected = field.multiple ? this.selectedEntityId(field, run) || value : value;
-      return entitySelect(name, field.label, entities, { selected, required: field.required, onChange: this.entityChanged });
+      const entities = this.entityChoices(field, domains, run);
+      if (field.multiple && (field.role !== "controller" || this.multipleLights)) {
+        return this.multiEntityField(field, entities, run);
+      }
+      let selected = field.multiple ? this.selectedEntityId(field, run) || value : value;
+      if (!selected && field.same_device_only && entities.length === 1) selected = entities[0]?.entity_id ?? "";
+      const relatedMissing = Boolean(field.same_device_only && this.relatedEntity(field, run) && entities.length === 0);
+      const selector = entitySelect(name, field.label, entities, { selected, required: field.required, onChange: this.entityChanged });
+      if (!field.hint && !relatedMissing) return selector;
+      return html`<div class="field-block">
+        ${selector}
+        ${fieldHint(field.hint ?? "")}
+        ${relatedMissing ? html`<p class="notice error" role="alert">No usable battery percentage sensor was found on the same Home Assistant device. PowerCalc vacuum profiles require one; expose or add that sensor before recording.</p>` : nothing}
+      </div>`;
     }
     if (field.control === "select") {
-      const value = (stored ?? field.default ?? "").toString();
+      const value = this.selectValue(field, run) ?? (stored ?? field.default ?? "").toString();
       // Re-render when this select narrows another field, so that field's entities follow.
-      const narrows = definition.fields.some((candidate) => candidate.narrowed_by === name);
-      return html`<label><span>${field.label}</span><select name=${name} ?required=${field.required} @change=${narrows ? this.selectChanged : null}>
+      const affectsAnother = definition.fields.some(
+        (candidate) => candidate.narrowed_by === name || Object.hasOwn(candidate.visible_when ?? {}, name),
+      );
+      const selectedOption = field.options.find((option) => option.value === value);
+      return html`<div class="field-block"><label><span>${field.label}</span><select name=${name} ?required=${field.required} @change=${affectsAnother ? this.selectChanged : null}>
         ${field.options.map((option) => html`<option value=${option.value} ?selected=${option.value === value}>${option.label}</option>`)}
-      </select></label>`;
+      </select></label>${this.optionGuidance(selectedOption)}</div>`;
+    }
+    if (name === "export_filename" && this.selectedType === "recorder") {
+      return this.valueField(field, recorderExportFilename(this.recorderPurpose(run), (stored ?? field.default ?? "").toString()));
     }
     return this.valueField(field, (stored ?? field.default ?? "").toString());
+  }
+
+  private recorderPurpose(request?: MeasurementRequest): string | undefined {
+    if (this.selectedType !== "recorder") return undefined;
+    if (this.selectValues.recorder_purpose) return this.selectValues.recorder_purpose;
+    if (request?.measure_type === "recorder") return request.recorder_purpose;
+    return this.definition("recorder")?.fields.find((field) => field.name === "recorder_purpose")?.default?.toString();
+  }
+
+  private isFieldVisible(field: FormField, request?: MeasurementRequest): boolean {
+    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
+    return fieldVisible(field, (name) => {
+      const source = definition?.fields.find((candidate) => candidate.name === name);
+      if (!source) return "";
+      if (source.control === "select") return this.selectValue(source, request) ?? "";
+      const stored = request && requestFieldValue(request, source);
+      return this.selectedEntityId(source, request) || (typeof stored === "string" ? stored : "");
+    });
+  }
+
+  private optionGuidance(option?: FormFieldOption) {
+    if (!option?.description && !option?.guidance?.length) return nothing;
+    const guidanceItems = option.guidance?.map((item) => html`<li>${item}</li>`);
+    return html`<div class="select-guidance">
+      ${option.description ? html`<p class="muted">${option.description}</p>` : nothing}
+      ${guidanceItems?.length ? html`<ul>${guidanceItems}</ul>` : nothing}
+    </div>`;
   }
 
   /** A plain text or number input, rendered from what the field declares about itself. */
@@ -592,8 +641,35 @@ export class SetupView extends LitElement {
   }
 
   /** Entities offered for a controller field. Lights arrive with the startup catalog, other domains on demand. */
-  private entityChoices(field: FormField): EntityDescriptor[] {
-    return this.entitiesIn(this.fieldDomains(field));
+  private entityChoices(field: FormField, domains = this.fieldDomains(field), request?: MeasurementRequest): EntityDescriptor[] {
+    let entities = field.all_entities ? [...(this.deviceEntities["*"] ?? [])] : this.entitiesIn(domains);
+    if (field.all_entities && domains.length) {
+      entities = entities.filter((entity) => entity.domain && domains.includes(entity.domain));
+    }
+    if (field.entity_device_classes?.length) {
+      entities = entities.filter((entity) => this.matchesDeviceClass(entity, field.entity_device_classes ?? []));
+    }
+    const related = this.relatedEntity(field, request);
+    if (!related?.device_id) return field.same_device_only ? [] : entities;
+    if (field.same_device_only) return entities.filter((entity) => entity.device_id === related.device_id);
+    return entities.sort((left, right) => Number(right.device_id === related.device_id) - Number(left.device_id === related.device_id));
+  }
+
+  private matchesDeviceClass(entity: EntityDescriptor, deviceClasses: readonly string[]): boolean {
+    if (!entity.device_class || !deviceClasses.includes(entity.device_class)) return false;
+    if (entity.device_class !== "battery") return true;
+    return entity.domain === "sensor"
+      && entity.unit === "%"
+      && !["unavailable", "unknown", "none"].includes((entity.state ?? "").toLowerCase())
+      && Number.isFinite(Number(entity.state));
+  }
+
+  private relatedEntity(field: FormField, request?: MeasurementRequest): EntityDescriptor | undefined {
+    if (!field.related_to || !this.selectedType) return undefined;
+    const source = this.definition(this.selectedType)?.fields.find((candidate) => candidate.name === field.related_to);
+    if (!source) return undefined;
+    const entityId = this.selectedEntityId(source, request);
+    return (this.deviceEntities["*"] ?? []).find((entity) => entity.entity_id === entityId);
   }
 
   private entitiesIn(domains: string[]): EntityDescriptor[] {
@@ -638,6 +714,10 @@ export class SetupView extends LitElement {
   private entityChanged(event: Event): void {
     const select = event.currentTarget as HTMLSelectElement;
     this.selectEntities(select.name, [select.value]);
+    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
+    for (const dependent of definition?.fields.filter((field) => field.related_to === select.name) ?? []) {
+      this.selectEntities(dependent.name, []);
+    }
   }
 
   /** Rows as the form currently shows them, so an edit starts from what the user can see. */
@@ -688,7 +768,8 @@ export class SetupView extends LitElement {
     const select = event.currentTarget as HTMLSelectElement;
     this.selectValues = { ...this.selectValues, [select.name]: select.value };
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
-    if (definition) emit<string[]>(this, "entity-domains-requested", entityDomains(definition));
+    const form = select.closest("form");
+    if (definition) emit<string[]>(this, "entity-domains-requested", entityDomains(definition, form ? new FormData(form) : undefined));
   }
 
   /** Value a narrowing select currently holds: the user's choice, else the previous run's, else its first option. */
@@ -763,4 +844,18 @@ export class SetupView extends LitElement {
   }
 
 
+}
+
+/**
+ * The export filename a recorder purpose implies. Both the server and the result plotter
+ * pick the format by extension, so the name follows the purpose rather than whatever a
+ * duplicated session left behind. An unrecognised extension is the user's own, and stays.
+ */
+export function recorderExportFilename(purpose: string | undefined, name: string): string {
+  const wanted = purpose === "complex_profile" ? "jsonl" : "csv";
+  if (!name) return `record.${wanted}`;
+  const dot = name.lastIndexOf(".");
+  const current = dot === -1 ? "" : name.slice(dot + 1).toLowerCase();
+  if (current !== "csv" && current !== "jsonl") return name;
+  return current === wanted ? name : `${name.slice(0, dot)}.${wanted}`;
 }

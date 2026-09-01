@@ -119,6 +119,10 @@ export class MeasureApiClient {
     return this.request<EntityDescriptor[]>(`api/entities?domain=${encodeURIComponent(domain)}`);
   }
 
+  getAllEntities(): Promise<EntityDescriptor[]> {
+    return this.request<EntityDescriptor[]>("api/entities?all=true");
+  }
+
   getEntitiesByDeviceClass(deviceClass: DeviceClass): Promise<EntityDescriptor[]> {
     return this.request<EntityDescriptor[]>(`api/entities?device_class=${encodeURIComponent(deviceClass)}`);
   }
