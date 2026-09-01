@@ -44,17 +44,17 @@ export function reviewSummary(
   definition: MeasureDefinition | undefined,
 ): LabelledValue[] {
   if (!request) return [];
-  const rows: LabelledValue[] = [{ label: "Type", value: definition?.label ?? request.measure_type }];
-  rows.push(...profileRows(request, definition));
-  rows.push(...controllerRows(request, definition));
-  rows.push(...reviewFieldRows(request, definition));
-
-  rows.push({ label: "Power", value: summarize(request.power_meter) });
-  rows.push(...multiSelectionRows(request, definition));
   const battery = batterySource(request, preflight);
-  if (battery) rows.push({ label: "Battery", value: battery });
-  if (request.dummy_load) rows.push({ label: "Dummy load", value: dummyLoadSummary(request.dummy_load) });
-  return rows;
+  return [
+    { label: "Type", value: definition?.label ?? request.measure_type },
+    ...profileRows(request, definition),
+    ...controllerRows(request, definition),
+    ...reviewFieldRows(request, definition),
+    { label: "Power", value: summarize(request.power_meter) },
+    ...multiSelectionRows(request, definition),
+    ...(battery ? [{ label: "Battery", value: battery }] : []),
+    ...(request.dummy_load ? [{ label: "Dummy load", value: dummyLoadSummary(request.dummy_load) }] : []),
+  ];
 }
 
 function profileRows(request: MeasurementRequest, definition?: MeasureDefinition): LabelledValue[] {
