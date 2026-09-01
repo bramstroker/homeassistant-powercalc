@@ -27,7 +27,7 @@ export const entityListStyles = css`
 `;
 
 export function renderEntityList({ field, entities, rows, onChange }: EntityListOptions) {
-  const values = rows.length ? rows : field.required ? [""] : [];
+  const values = rows.length || !field.required ? rows : [""];
   const rowChanged = (index: number, event: Event) => {
     const updated = [...values];
     updated[index] = (event.currentTarget as HTMLInputElement).value;

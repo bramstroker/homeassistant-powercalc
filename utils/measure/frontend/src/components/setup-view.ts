@@ -504,9 +504,10 @@ export class SetupView extends LitElement {
 
   private optionGuidance(option?: FormFieldOption) {
     if (!option?.description && !option?.guidance?.length) return nothing;
+    const guidanceItems = option.guidance?.map((item) => html`<li>${item}</li>`);
     return html`<div class="select-guidance">
       ${option.description ? html`<p class="muted">${option.description}</p>` : nothing}
-      ${option.guidance?.length ? html`<ul>${option.guidance.map((item) => html`<li>${item}</li>`)}</ul>` : nothing}
+      ${guidanceItems?.length ? html`<ul>${guidanceItems}</ul>` : nothing}
     </div>`;
   }
 

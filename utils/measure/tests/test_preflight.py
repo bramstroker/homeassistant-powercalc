@@ -204,8 +204,9 @@ def test_preflight_rejects_missing_complex_recorder_entity() -> None:
         tracked_entity_ids=("switch.missing",),
     )
 
+    checker = preflight(base_entities())
     with pytest.raises(PreflightError, match="does not exist"):
-        preflight(base_entities()).validate(request)
+        checker.validate(request)
 
 
 def test_preflight_rejects_unavailable_vacuum() -> None:
@@ -222,8 +223,9 @@ def test_preflight_rejects_unavailable_vacuum() -> None:
         battery_entity_id="sensor.robot_battery",
     )
 
+    checker = preflight(entities)
     with pytest.raises(PreflightError, match="vacuum is unavailable"):
-        preflight(entities).validate(request)
+        checker.validate(request)
 
 
 @pytest.mark.parametrize(
@@ -247,8 +249,9 @@ def test_preflight_rejects_unusable_vacuum_battery(battery_group: list[Entity], 
         battery_entity_id="sensor.robot_battery",
     )
 
+    checker = preflight(entities)
     with pytest.raises(PreflightError, match=message):
-        preflight(entities).validate(request)
+        checker.validate(request)
 
 
 def test_preflight_requires_voltage_sensor_for_dummy_load() -> None:

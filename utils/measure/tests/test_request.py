@@ -233,9 +233,10 @@ def test_generic_recorder_preserves_tracked_entity_order() -> None:
 
 
 def test_complex_recorder_rejects_non_json_lines_filename() -> None:
+    power_meter = DummyPowerMeterSpec()
     with pytest.raises(ValidationError, match=r"must use a \.jsonl"):
         RecorderMeasurementRequest(
-            power_meter=DummyPowerMeterSpec(),
+            power_meter=power_meter,
             recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
             profile_recipe=RecorderProfileRecipe.GENERIC,
             tracked_entity_ids=("switch.plug",),
@@ -303,16 +304,18 @@ def test_vacuum_recorder_orders_required_roles_before_additional_entities() -> N
     ],
 )
 def test_recorder_rejects_inconsistent_profile_selections(values: dict[str, object]) -> None:
+    payload = {"power_meter": DummyPowerMeterSpec(), **values}
     with pytest.raises(ValidationError):
-        RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec(), **values)
+        RecorderMeasurementRequest.model_validate(payload)
 
 
 def test_recorder_rejects_more_than_one_hundred_combined_entities() -> None:
     additional_entities = tuple(f"sensor.extra_{index}" for index in range(99))
+    power_meter = DummyPowerMeterSpec()
 
     with pytest.raises(ValidationError, match="at most 100 entities"):
         RecorderMeasurementRequest(
-            power_meter=DummyPowerMeterSpec(),
+            power_meter=power_meter,
             recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
             profile_recipe=RecorderProfileRecipe.VACUUM_ROBOT,
             vacuum_entity_id="vacuum.robot",
