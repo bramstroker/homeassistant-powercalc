@@ -1,4 +1,7 @@
+from collections.abc import Callable, Mapping
 import csv
+from dataclasses import dataclass
+import json
 import logging
 from pathlib import Path
 import time
@@ -14,15 +17,28 @@ INTERVAL = 2
 _LOGGER = logging.getLogger("measure")
 
 
+@dataclass(frozen=True)
+class RecorderEntityState:
+    """Transport-neutral Home Assistant state captured beside one power reading."""
+
+    state: str
+    attributes: Mapping[str, object]
+
+
+type EntityStateReader = Callable[[str], RecorderEntityState]
+
+
 class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
     def __init__(
         self,
         measure_util: MeasureUtil,
         interaction: RunInteraction | None = None,
+        entity_state_reader: EntityStateReader | None = None,
     ) -> None:
         self.measure_util = measure_util
         self.filename = DEFAULT_EXPORT_FILENAME
         self.interaction = interaction or ImmediateInteraction()
+        self.entity_state_reader = entity_state_reader
 
     def writes_export_files(self) -> bool:
         return True
@@ -36,9 +52,13 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         self.interaction.confirm("Ready to start recording. Stop the measurement when you are finished.")
         self.interaction.phase("Starting recording")
 
+        entity_ids = request.recorded_entity_ids
+        if entity_ids and self.entity_state_reader is None:
+            raise ValueError("A Home Assistant state reader is required when recorder entities are selected")
+
         output_directory = Path(export_directory).resolve()
-        csv_filepath = (output_directory / self.filename).resolve()
-        if not csv_filepath.is_relative_to(output_directory):
+        output_filepath = (output_directory / self.filename).resolve()
+        if not output_filepath.is_relative_to(output_directory):
             raise ValueError("Recorder export path escapes its output directory")
         start_time = time.time()
         voltages: list[float] = []
@@ -46,14 +66,40 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         # Ctrl-C is the CLI's normal recorder stop action. App cancellation remains a
         # cancellation so its session state reflects the command the user issued.
         try:
-            with csv_filepath.open("w", newline="") as csv_file:
-                writer = csv.writer(csv_file)
+            with output_filepath.open("w", encoding="utf-8", newline="") as output_file:
+                writer = csv.writer(output_file) if not entity_ids else None
                 while True:
                     timestamp = time.time()
                     self.interaction.notify("Measurement")
                     measurement = self.measure_util.take_measurement(timestamp)
                     _LOGGER.info("Measurement %.2f", measurement.power)
-                    writer.writerow([timestamp - start_time, measurement.power])
+                    elapsed_seconds = timestamp - start_time
+                    if entity_ids and self.entity_state_reader is not None:
+                        entities: dict[str, object] = {}
+                        live_states: dict[str, str] = {}
+                        for entity_id in entity_ids:
+                            entity_state = self.entity_state_reader(entity_id)
+                            live_states[entity_id] = entity_state.state
+                            entities[entity_id] = {
+                                "state": entity_state.state,
+                                "attributes": dict(entity_state.attributes),
+                            }
+                        output_file.write(
+                            json.dumps(
+                                {
+                                    "elapsed_seconds": elapsed_seconds,
+                                    "power": measurement.power,
+                                    "entities": entities,
+                                },
+                                ensure_ascii=False,
+                                separators=(",", ":"),
+                                sort_keys=True,
+                            ),
+                        )
+                        output_file.write("\n")
+                        self.interaction.entity_states(live_states)
+                    elif writer is not None:
+                        writer.writerow([elapsed_seconds, measurement.power])
                     voltages.extend(measurement.voltages)
                     recorded += 1
                     # Open-ended recording: report the running sample count (total 0 = indeterminate).

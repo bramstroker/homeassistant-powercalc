@@ -16,7 +16,7 @@ The result page shows the measured summary, available plots, and generated files
 Some measurement types only produce a value or a recording:
 
 - **Average** shows the measured average power. Use this value when creating a fixed-power profile or configuring Powercalc manually.
-- **Recorder** produces the selected time-series CSV, commonly used as input for a Playbook profile.
+- **Recorder** produces either a headerless two-column Playbook CSV or a complex-profile JSON Lines (`.jsonl`) recording. Each JSON object contains one power sample and the state and attributes of every selected entity. Complex recordings are source data and are not converted into a profile automatically.
 
 ## Find CLI output
 

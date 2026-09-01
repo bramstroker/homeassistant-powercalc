@@ -17,7 +17,7 @@ Use this guide when you want to create a new power profile for the library or wh
 | Fan | Fans with percentage control | Linear calibration and optional `model.json` |
 | Charging device | Vacuum robots and lawn mower robots while charging | Linear calibration and optional `model.json` |
 | Average | Any device where you only need an average power value | Average power reading |
-| Recorder | Capturing power patterns for the [Playbook strategy](../../strategies/playbook.md) | Time series CSV |
+| Recorder | Playbook patterns or source data for a complex multi-entity profile | Power-only CSV or power plus entity-state JSON Lines |
 
 The light mode is the most common contribution path. Other modes are useful when a device has a predictable relation between an entity attribute and power consumption.
 

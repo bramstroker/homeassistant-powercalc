@@ -13,7 +13,7 @@ export type SessionState =
   | "resumable";
 
 export type LutMode = "brightness" | "color_temp" | "hs" | "effect";
-export type DeviceClass = "power" | "voltage";
+export type DeviceClass = "power" | "voltage" | "battery";
 export type ChargingDeviceType = "vacuum_robot" | "lawn_mower_robot";
 export type ResumePolicy = "new" | "resume";
 /** Derived from the spec union so a new meter variant automatically widens it. */
@@ -28,6 +28,8 @@ export type OperatingPoint =
 export interface EntityDescriptor {
   entity_id: string;
   name: string;
+  domain?: string;
+  device_class?: DeviceClass | null;
   device_id?: string;
   model_id?: string;
   state?: string;
@@ -93,6 +95,8 @@ export interface FormFieldOption {
   entity_domain?: string | null;
   /** Measurement parameters that only apply while this option is selected. */
   enables?: string[];
+  description?: string;
+  guidance?: string[];
 }
 
 export interface FormField {
@@ -115,6 +119,12 @@ export interface FormField {
   /** Entity field whose number of selected entities this count follows by default. */
   derived_from?: string | null;
   hint?: string;
+  visible_when?: Record<string, string[]>;
+  all_entities?: boolean;
+  entity_device_classes?: DeviceClass[];
+  related_to?: string | null;
+  same_device_only?: boolean;
+  review?: boolean;
 }
 
 /** A tuning parameter as one measure type presents it. Bounds come from `Capabilities.limits`. */
@@ -198,7 +208,16 @@ export interface LightMeasurementRequest extends BaseMeasurementRequest {
 }
 
 export interface AverageMeasurementRequest extends BaseMeasurementRequest { measure_type: "average"; duration: number; }
-export interface RecorderMeasurementRequest extends BaseMeasurementRequest { measure_type: "recorder"; export_filename: string; }
+export interface RecorderMeasurementRequest extends BaseMeasurementRequest {
+  measure_type: "recorder";
+  recorder_purpose: "playbook" | "complex_profile";
+  profile_recipe?: "generic" | "vacuum_robot" | null;
+  tracked_entity_ids?: string[];
+  vacuum_entity_id?: string | null;
+  battery_entity_id?: string | null;
+  additional_entity_ids?: string[];
+  export_filename: string;
+}
 export interface SpeakerMeasurementRequest extends BaseMeasurementRequest { measure_type: "speaker"; controller: MediaControllerSpec; disable_streaming: boolean; }
 export interface ChargingMeasurementRequest extends BaseMeasurementRequest { measure_type: "charging"; controller: ChargingControllerSpec; charging_device_type: ChargingDeviceType; }
 export interface FanMeasurementRequest extends BaseMeasurementRequest { measure_type: "fan"; controller: FanControllerSpec; }
@@ -259,6 +278,7 @@ export interface SessionSnapshot {
     resistance: number;
     voltage: number;
   } | null;
+  entity_states?: Record<string, string>;
 }
 
 export interface SessionSummary {
@@ -327,6 +347,7 @@ export interface SessionEventData {
   power?: number;
   resistance?: number;
   voltage?: number;
+  states?: Record<string, string>;
 }
 
 /** Event types the stream subscribes to. The server sends each one as its own SSE event name. */
@@ -340,6 +361,7 @@ export const REGULAR_SESSION_EVENT_TYPES = [
   "heartbeat",
   "sample",
   "calibration_sample",
+  "entity_states",
 ] as const;
 
 export const SESSION_EVENT_TYPES = [...REGULAR_SESSION_EVENT_TYPES, "operating_point"] as const;

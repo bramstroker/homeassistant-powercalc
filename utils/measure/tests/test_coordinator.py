@@ -80,6 +80,17 @@ class SamplingService(SessionMeasurementService):
         return RunnerResult(model_json_data={})
 
 
+class EntityStateService(SessionMeasurementService):
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        control.entity_states({"vacuum.robot": "cleaning", "sensor.robot_battery": "42"})
+        return RunnerResult(model_json_data={})
+
+
 class OperatingPointService(SessionMeasurementService):
     def run(
         self,
@@ -123,6 +134,19 @@ def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:
     assert [(event.sequence, event.data["state"]) for event in coordinator.events_since(1, session.id)] == [
         (2, SessionState.COMPLETED),
     ]
+
+
+def test_coordinator_projects_latest_recorder_entity_states(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), EntityStateService)
+
+    coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    assert coordinator.current is not None
+    assert coordinator.current.entity_states == {
+        "vacuum.robot": "cleaning",
+        "sensor.robot_battery": "42",
+    }
 
 
 def test_coordinator_notifies_session_state_listeners(tmp_path: Path) -> None:

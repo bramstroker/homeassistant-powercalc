@@ -133,6 +133,21 @@ def test_catalog_loads_entity_data_once_per_instance() -> None:
     assert fresh[0].state == "2.0"
 
 
+def test_catalog_all_includes_arbitrary_domains_and_unavailable_entities() -> None:
+    data = _entity_data()
+    data.entities["climate"] = SimpleNamespace(
+        entities={"room": _entity("climate.room", "unavailable", friendly_name="Room thermostat")},
+    )
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+
+    entities = HomeAssistantEntityCatalog(home_assistant).load_snapshot().all()
+    thermostat = next(entity for entity in entities if entity.entity_id == "climate.room")
+
+    assert thermostat.domain == "climate"
+    assert thermostat.state == "unavailable"
+
+
 def test_catalog_handles_light_with_null_effect_list() -> None:
     data = _entity_data()
     data.entities["light"].entities["desk"].state.attributes["effect_list"] = None

@@ -56,8 +56,16 @@ export function reviewSummary(
     rows.push({ label: controller.label, value: typeof value === "string" && value ? value : "Virtual device" });
   }
 
+  for (const field of definition?.fields.filter((candidate) => candidate.review) ?? []) {
+    const value = requestFieldValue(request, field);
+    if (value === undefined || value === "" || (Array.isArray(value) && value.length === 0)) continue;
+    const values = Array.isArray(value) ? value : [String(value)];
+    const formatted = values.map((item) => field.options.find((option) => option.value === item)?.label ?? item);
+    rows.push({ label: field.plural_label && formatted.length > 1 ? field.plural_label : field.label, value: formatted.join(", ") });
+  }
+
   rows.push({ label: "Power", value: summarize(request.power_meter) });
-  for (const [field, values] of multiSelections(request, definition)) {
+  for (const [field, values] of multiSelections(request, definition).filter(([field]) => !field.review)) {
     rows.push({ label: field.label, value: values.join(", ") });
   }
   const battery = batterySource(request, preflight);
@@ -69,7 +77,7 @@ export function reviewSummary(
 /** Multi-select fields of the pending request, paired with what it selected. */
 function multiSelections(request: MeasurementRequest, definition?: MeasureDefinition): [FormField, string[]][] {
   return (definition?.fields ?? [])
-    .filter((field) => field.control === "multi_select")
+    .filter((field) => field.control === "multi_select" || (field.control === "entity" && field.multiple))
     .flatMap((field) => {
       const values = requestFieldValue(request, field);
       return Array.isArray(values) ? [[field, values] as [FormField, string[]]] : [];

@@ -71,7 +71,7 @@ from measure.runner.average import AverageRunner
 from measure.runner.charging import ChargingRunner
 from measure.runner.fan import FanRunner
 from measure.runner.light import LightRunner
-from measure.runner.recorder import RecorderRunner
+from measure.runner.recorder import EntityStateReader, RecorderEntityState, RecorderRunner
 from measure.runner.runner import MeasurementRunner
 from measure.runner.speaker import SpeakerRunner
 from measure.tuning import MeasurementParameters
@@ -199,7 +199,8 @@ class MeasurementAssembler:
             media_controller = self._media_controller(request.controller)
             return SpeakerRunner(measure_util, parameters, media_controller, interaction)
         if isinstance(request, RecorderMeasurementRequest):
-            return RecorderRunner(measure_util, interaction)
+            state_reader = self._recorder_state_reader() if request.recorded_entity_ids else None
+            return RecorderRunner(measure_util, interaction, state_reader)
         if isinstance(request, AverageMeasurementRequest):
             return AverageRunner(measure_util, interaction=interaction)
         if isinstance(request, ChargingMeasurementRequest):
@@ -214,6 +215,15 @@ class MeasurementAssembler:
             fan_controller = self._fan_controller(request.controller)
             return FanRunner(measure_util, parameters, fan_controller, interaction)
         raise ValueError(f"Unsupported measurement request: {type(request).__name__}")
+
+    def _recorder_state_reader(self) -> EntityStateReader:
+        home_assistant = self._home_assistant()
+
+        def read(entity_id: str) -> RecorderEntityState:
+            state = home_assistant.get_state(entity_id=entity_id)
+            return RecorderEntityState(state=str(state.state), attributes=state.attributes)
+
+        return read
 
     def build_light_controller(self, spec: LightControllerSpec) -> LightController:
         """Build a configured light controller for execution or active preflight checks."""

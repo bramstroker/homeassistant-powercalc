@@ -33,6 +33,8 @@ from measure.request import (
     FanMeasurementRequest,
     LightMeasurementRequest,
     MeasurementRequest,
+    RecorderMeasurementRequest,
+    RecorderProfileRecipe,
     SpeakerMeasurementRequest,
 )
 from measure.runner.light_plan import build_light_plan, estimate_light_time_left
@@ -48,6 +50,8 @@ class ActiveSessionError(PreflightError):
 
 class EntityRecord(Protocol):
     entity_id: str
+    domain: str
+    device_class: DeviceClass | None
     device_id: str | None
     state: str
     attribute_names: list[str]
@@ -60,6 +64,7 @@ class EntityRecord(Protocol):
 
 
 EntityLoader = Callable[[EntityDomain | None, DeviceClass | None], Sequence[EntityRecord]]
+AllEntityLoader = Callable[[], Sequence[EntityRecord]]
 
 
 @dataclass(frozen=True)
@@ -158,12 +163,14 @@ class MeasurementPreflight:
         has_active_session: Callable[[], bool],
         verify_storage: Callable[[], None],
         load_entities: EntityLoader,
+        load_all_entities: AllEntityLoader | None = None,
         diagnose_power_meter: Callable[[PowerMeterSpec], PowerMeterDiagnostic] | None = None,
         developer_mode: bool = False,
     ) -> None:
         self._has_active_session = has_active_session
         self._verify_storage = verify_storage
         self._load_entities = load_entities
+        self._load_all_entities = load_all_entities
         self._diagnose_power_meter = diagnose_power_meter
         self._developer_mode = developer_mode
 
@@ -297,9 +304,36 @@ class MeasurementPreflight:
             SpeakerMeasurementRequest: self._validate_speaker,
             FanMeasurementRequest: self._validate_fan,
             ChargingMeasurementRequest: self._validate_charging,
+            RecorderMeasurementRequest: self._validate_recorder,
         }
         check = checks.get(type(request))
         return PreflightResult() if check is None else check(request)
+
+    def _validate_recorder(self, request: RecorderMeasurementRequest) -> PreflightResult:
+        if not request.recorded_entity_ids:
+            return PreflightResult()
+        if self._load_all_entities is None:
+            raise PreflightError("Home Assistant entity metadata is unavailable")
+
+        all_entities = {entity.entity_id: entity for entity in self._load_all_entities()}
+        if missing := [entity_id for entity_id in request.recorded_entity_ids if entity_id not in all_entities]:
+            raise PreflightError(f"Selected recorder entity does not exist: {missing[0]}")
+
+        if request.profile_recipe != RecorderProfileRecipe.VACUUM_ROBOT:
+            return PreflightResult()
+
+        vacuums = {entity.entity_id: entity for entity in self._load_entities(EntityDomain.VACUUM, None)}
+        vacuum = vacuums.get(request.vacuum_entity_id or "")
+        if vacuum is None:
+            raise PreflightError("Selected vacuum is unavailable")
+
+        batteries = {entity.entity_id: entity for entity in self._load_entities(None, DeviceClass.BATTERY)}
+        battery = batteries.get(request.battery_entity_id or "")
+        if battery is None:
+            raise PreflightError("Selected battery sensor is unavailable or not a numeric percentage")
+        if vacuum.device_id is None or battery.device_id != vacuum.device_id:
+            raise PreflightError("Battery sensor must belong to the same Home Assistant device as the vacuum")
+        return PreflightResult()
 
     def _validate_speaker(self, request: SpeakerMeasurementRequest) -> PreflightResult:
         if isinstance(request.controller, HassMediaControllerSpec):

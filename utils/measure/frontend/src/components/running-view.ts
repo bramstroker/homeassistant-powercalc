@@ -94,6 +94,12 @@ export class RunningView extends LitElement {
     .spark .area { fill: color-mix(in srgb, var(--signal) 14%, transparent); stroke: none; }
     .spark .line { fill: none; stroke: var(--signal); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
     .chart-scale { display: flex; justify-content: space-between; margin-top: 0.3rem; color: var(--muted); font: 0.68rem/1 ui-monospace, monospace; }
+    .entity-states { position: relative; margin-top: 1.35rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+    .entity-states > span { display: block; margin-bottom: 0.65rem; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .entity-state-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 0.55rem; }
+    .entity-state { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; min-width: 0; padding: 0.65rem 0.75rem; border: 1px solid var(--line); border-radius: 9px; background: color-mix(in srgb, var(--signal) 5%, var(--well)); }
+    .entity-state code { overflow: hidden; color: var(--muted); font-size: 0.75rem; text-overflow: ellipsis; white-space: nowrap; }
+    .entity-state strong { flex: none; font: 650 0.82rem/1.2 ui-monospace, monospace; color: var(--ink); }
     .preparation { position: relative; display: grid; justify-items: center; gap: 0.8rem; padding: clamp(2rem, 8vw, 4rem) 1rem; text-align: center; }
     .preparation h3, .preparation p { margin: 0; }
     .preparation-spinner { width: 42px; height: 42px; border: 3px solid var(--track); border-top-color: var(--signal); border-radius: 50%; animation: spin 850ms linear infinite; }
@@ -202,6 +208,7 @@ export class RunningView extends LitElement {
       ${this.snapshot.operating_point ? this.renderOperatingPoint(this.snapshot.operating_point) : nothing}
       ${this.renderMetrics(openEnded, progress)}
       ${this.samples.length ? this.renderChart() : nothing}
+      ${this.renderEntityStates()}
     `;
   }
 
@@ -216,6 +223,22 @@ export class RunningView extends LitElement {
       </div>
       ${this.snapshot.operating_point ? this.renderOperatingPoint(this.snapshot.operating_point) : nothing}
       ${this.samples.length ? this.renderChart() : nothing}
+      ${this.renderEntityStates()}
+    `;
+  }
+
+  private renderEntityStates() {
+    const states = Object.entries(this.snapshot.entity_states ?? {});
+    if (!states.length) return nothing;
+    return html`
+      <div class="entity-states" aria-live="polite">
+        <span>Tracked entities</span>
+        <div class="entity-state-grid">
+          ${states.map(([entityId, state]) => html`
+            <div class="entity-state"><code title=${entityId}>${entityId}</code><strong>${state}</strong></div>
+          `)}
+        </div>
+      </div>
     `;
   }
 

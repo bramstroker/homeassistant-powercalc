@@ -1,5 +1,5 @@
-import type { MeasurementRequest, PreflightResponse } from "./types";
-import { reviewMetrics } from "./review-summary";
+import type { MeasureDefinition, MeasurementRequest, PreflightResponse } from "./types";
+import { reviewMetrics, reviewSummary } from "./review-summary";
 import { capabilities, lightDefinition } from "./components/test-fixtures";
 
 const request: MeasurementRequest = {
@@ -43,5 +43,45 @@ describe("review metrics", () => {
     const metrics = reviewMetrics(request, { valid: true, warnings: [] }, lightDefinition);
 
     expect(metrics.map((metric) => metric.label)).not.toContain("Low-load checks");
+  });
+});
+
+describe("review summary", () => {
+  it("restates the recorder purpose, recipe, entity roles, and optional entities", () => {
+    const recorder: MeasurementRequest = {
+      measure_type: "recorder",
+      model_id: "measurement",
+      product_name: "Recorder",
+      measure_device: "Wall plug",
+      generate_model: false,
+      parameters: capabilities.defaults,
+      power_meter: { type: "hass", entity_id: "sensor.plug_power" },
+      resume_policy: "new",
+      recorder_purpose: "complex_profile",
+      profile_recipe: "vacuum_robot",
+      vacuum_entity_id: "vacuum.robot",
+      battery_entity_id: "sensor.robot_battery",
+      additional_entity_ids: ["sensor.dock_state"],
+      export_filename: "record.jsonl",
+    };
+    const definition: MeasureDefinition = {
+      measure_type: "recorder", label: "Recorder", description: "Record states.", icon: "⏺",
+      model_id_example: "", product_name_example: "", parameters: [], supports_profile: false, supports_resume: false,
+      fields: [
+        { name: "recorder_purpose", label: "Purpose", role: "attribute", control: "select", required: true, review: true, options: [{ value: "complex_profile", label: "Data for a complex power profile" }] },
+        { name: "profile_recipe", label: "Device type", role: "attribute", control: "select", required: true, review: true, options: [{ value: "vacuum_robot", label: "Robot vacuum" }] },
+        { name: "vacuum_entity_id", label: "Vacuum", role: "attribute", control: "entity", required: true, review: true, options: [] },
+        { name: "battery_entity_id", label: "Battery level sensor", role: "attribute", control: "entity", required: true, review: true, options: [] },
+        { name: "additional_entity_ids", label: "Additional entity", plural_label: "Additional entities", role: "attribute", control: "entity", required: false, multiple: true, review: true, options: [] },
+      ],
+    };
+
+    expect(reviewSummary(recorder, { valid: true, warnings: [] }, definition)).toEqual(expect.arrayContaining([
+      { label: "Purpose", value: "Data for a complex power profile" },
+      { label: "Device type", value: "Robot vacuum" },
+      { label: "Vacuum", value: "vacuum.robot" },
+      { label: "Battery level sensor", value: "sensor.robot_battery" },
+      { label: "Additional entity", value: "sensor.dock_state" },
+    ]));
   });
 });

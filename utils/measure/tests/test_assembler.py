@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from unittest.mock import ANY, MagicMock, patch
 
 from measure.assembler import MeasurementAssembler
@@ -15,10 +16,12 @@ from measure.request import (
     DummyLoadReuseRequest,
     FanMeasurementRequest,
     LightMeasurementRequest,
+    RecorderMeasurementRequest,
 )
 from measure.runner.average import AverageRunner
 from measure.runner.fan import FanRunner
 from measure.runner.light import LightRunner
+from measure.runner.recorder import RecorderEntityState, RecorderRunner
 from pydantic import ValidationError
 import pytest
 
@@ -65,6 +68,30 @@ def test_assembler_builds_runner_from_request(measurement_request, runner_type) 
 
     assert isinstance(prepared.runner, runner_type)
     assert prepared.request is measurement_request
+
+
+def test_assembler_builds_recorder_state_reader_from_home_assistant() -> None:
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_state.return_value = SimpleNamespace(
+        state="cleaning",
+        attributes={"battery_level": 42},
+    )
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("vacuum.robot",),
+    )
+
+    prepared = _assembler(home_assistant=home_assistant).assemble(request)
+
+    assert isinstance(prepared.runner, RecorderRunner)
+    assert prepared.runner.entity_state_reader is not None
+    assert prepared.runner.entity_state_reader("vacuum.robot") == RecorderEntityState(
+        state="cleaning",
+        attributes={"battery_level": 42},
+    )
+    home_assistant.get_state.assert_called_once_with(entity_id="vacuum.robot")
 
 
 def test_assembler_applies_typed_home_assistant_configuration_at_construction() -> None:

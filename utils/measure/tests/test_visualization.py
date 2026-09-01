@@ -296,6 +296,34 @@ def test_builds_recorder_time_series_and_ignores_invalid_rows(tmp_path: Path) ->
     assert [(point.x, point.y) for point in result.plots[0].series[0].points] == [(0.0, 1.2), (2.0, 3.4)]
 
 
+def test_builds_complex_recorder_time_series_from_json_lines(tmp_path: Path) -> None:
+    recording = tmp_path / "record.jsonl"
+    recording.write_text(
+        """{"elapsed_seconds":0.0,"power":1.2,"entities":{"switch.plug":{"state":"on","attributes":{}}}}
+incomplete
+{"elapsed_seconds":2.0,"power":3.4,"entities":{}}
+{"elapsed_seconds":3.0,"power":"nan","entities":{}}
+""",
+        encoding="utf-8",
+    )
+    request = parse_measurement_request(
+        {
+            "measure_type": "recorder",
+            "model_id": "measurement",
+            "power_meter": {"type": "dummy"},
+            "recorder_purpose": "complex_profile",
+            "profile_recipe": "generic",
+            "tracked_entity_ids": ["switch.plug"],
+            "export_filename": "record.jsonl",
+        },
+    )
+
+    result = build_session_plots(request, {"measurement/record.jsonl": recording})
+
+    assert result.warnings == ()
+    assert [(point.x, point.y) for point in result.plots[0].series[0].points] == [(0.0, 1.2), (2.0, 3.4)]
+
+
 def test_downsamples_large_recorder_files_while_streaming(tmp_path: Path) -> None:
     recording = tmp_path / "record.csv"
     recording.write_text(

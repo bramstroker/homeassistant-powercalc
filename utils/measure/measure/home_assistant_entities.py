@@ -47,7 +47,7 @@ class EntityDescriptor(BaseModel):
 
     entity_id: str
     name: str
-    domain: EntityDomain
+    domain: str
     device_class: DeviceClass | None = None
     device_id: str | None = None
     #: Home Assistant integration providing the entity, as shown on the device page.
@@ -74,7 +74,7 @@ class EntityCatalogSnapshot:
     def select(
         self,
         *,
-        domain: EntityDomain | None = None,
+        domain: EntityDomain | str | None = None,
         device_class: DeviceClass | None = None,
     ) -> list[EntityDescriptor]:
         if (domain is None) == (device_class is None):
@@ -97,6 +97,11 @@ class EntityCatalogSnapshot:
                 for entity in selected
             ]
         return selected
+
+    def all(self) -> list[EntityDescriptor]:
+        """Return every registry entity, including unsupported domains and unavailable states."""
+
+        return sorted(self._entities, key=lambda entity: (entity.name.casefold(), entity.entity_id))
 
     def attribute_names(self, entity_id: str) -> list[str]:
         entity = self._by_id.get(entity_id)
@@ -175,12 +180,8 @@ class HomeAssistantEntityCatalog:
         }
         descriptors: list[EntityDescriptor] = []
         for domain_value, group in data.entities.items():
-            try:
-                domain = EntityDomain(domain_value)
-            except ValueError:
-                continue
             descriptors.extend(
-                _describe_entity(entity, domain, registry.get(entity.entity_id), devices)
+                _describe_entity(entity, domain_value, registry.get(entity.entity_id), devices)
                 for entity in group.entities.values()
             )
         by_id = {descriptor.entity_id: descriptor for descriptor in descriptors}
@@ -217,7 +218,7 @@ def _group_model(descriptor: EntityDescriptor, by_id: dict[str, EntityDescriptor
 
 def _describe_entity(
     entity: Any,  # noqa: ANN401
-    domain: EntityDomain,
+    domain: str,
     registry_entry: Any | None,  # noqa: ANN401
     device_registry: dict[str, dict[str, object]],
 ) -> EntityDescriptor:

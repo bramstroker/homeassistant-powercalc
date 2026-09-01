@@ -91,7 +91,12 @@ Examples:
 
 ## Recorder
 
-Use `Recorder` to capture a power pattern for the [Playbook strategy](../../strategies/playbook.md). The runner writes a CSV file with elapsed time and measured power until you stop it with `CTRL+C`.
+Use `Recorder` to capture an open-ended power time series. In the Home Assistant app, first choose what the recording is for:
+
+- **A Playbook CSV** writes the existing headerless `elapsed time,power` format used by the [Playbook strategy](../../strategies/playbook.md).
+- **Data for a complex power profile** records power together with the state and complete attributes of selected Home Assistant entities. This produces source data for later profile development; it does not analyze the recording or generate a profile.
+
+The CLI always creates a Playbook CSV and stops when you press `CTRL+C`. The app stops the recorder from the running-session screen.
 
 This is useful for:
 
@@ -100,4 +105,21 @@ This is useful for:
 - Comparing different programs before configuring multiple playbooks.
 - Checking whether a measurement duration is long enough.
 
-Move the resulting CSV into the Home Assistant playbook directory and configure it as described in the [Playbook strategy documentation](../../strategies/playbook.md).
+### Complex-profile recordings
+
+Choose **Generic device** to track one or more entities from any Home Assistant domain.
+
+Choose **Robot vacuum** for a guided recording. Select the `vacuum` entity and its battery percentage sensor. The battery sensor must belong to the same Home Assistant device; the app selects it automatically when exactly one usable sensor is available. You can add other entities, including dock controls or status sensors, without having them selected automatically.
+
+Measure the complete dock or base station at the wall outlet. Start with a low battery and capture charging, idle, and cleaning. Also capture washing, drying, and dust-emptying when the dock supports those operations.
+
+Complex recordings use JSON Lines (`.jsonl`): every sample is stored as one complete JSON object containing the power reading and an entity map. This lets the recorder stream samples safely without holding the complete recording in memory:
+
+```json
+{"elapsed_seconds":0.0,"power":4.2,"entities":{"vacuum.robot":{"state":"cleaning","attributes":{"battery_level":42}},"sensor.robot_battery":{"state":"42","attributes":{"unit_of_measurement":"%"}}}}
+```
+
+Because this includes complete entity attributes, inspect the file for installation-specific or sensitive values before sharing it.
+While recording, the measurement screen shows the latest state of every tracked entity beneath the live power chart. Complete attributes remain in the JSON Lines file rather than the live view.
+
+For a Playbook recording, move the resulting CSV into the Home Assistant playbook directory and configure it as described in the [Playbook strategy documentation](../../strategies/playbook.md).

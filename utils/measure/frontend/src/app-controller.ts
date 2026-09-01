@@ -591,7 +591,9 @@ export class MeasureAppController {
   private async ensureEntityDomains(domains: string[]): Promise<void> {
     const pending = [...new Set(domains)].filter((domain) => !(domain in this.state.deviceEntities));
     if (!pending.length) return;
-    const results = await Promise.allSettled(pending.map((domain) => this.api().getEntitiesByDomain(domain)));
+    const results = await Promise.allSettled(
+      pending.map((domain) => domain === "*" ? this.api().getAllEntities() : this.api().getEntitiesByDomain(domain)),
+    );
     results.forEach((result, index) => {
       const domain = pending[index];
       if (!domain) return;

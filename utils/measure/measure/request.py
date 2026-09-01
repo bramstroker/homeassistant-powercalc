@@ -14,13 +14,23 @@ from measure.controller.light.spec import LightControllerSpec
 from measure.controller.media.spec import MediaControllerSpec
 from measure.controller.spec import BaseControllerSpec
 from measure.powermeter.spec import DummyPowerMeterSpec, ManualPowerMeterSpec, PowerMeterSpec
-from measure.runner.const import DEFAULT_EXPORT_FILENAME
+from measure.runner.const import COMPLEX_PROFILE_EXPORT_FILENAME, DEFAULT_EXPORT_FILENAME
 from measure.tuning import MeasurementParameters
 
 
 class ResumePolicy(StrEnum):
     NEW = "new"
     RESUME = "resume"
+
+
+class RecorderPurpose(StrEnum):
+    PLAYBOOK = "playbook"
+    COMPLEX_PROFILE = "complex_profile"
+
+
+class RecorderProfileRecipe(StrEnum):
+    GENERIC = "generic"
+    VACUUM_ROBOT = "vacuum_robot"
 
 
 class DummyLoadCalibrationRequest(BaseModel):
@@ -199,12 +209,107 @@ class AverageMeasurementRequest(BaseMeasurementRequest):
 class RecorderMeasurementRequest(BaseMeasurementRequest):
     measure_type: Literal[MeasureType.RECORDER] = MeasureType.RECORDER
     controller: None = None
+    recorder_purpose: RecorderPurpose = RecorderPurpose.PLAYBOOK
+    profile_recipe: RecorderProfileRecipe | None = None
+    tracked_entity_ids: tuple[str, ...] = Field(default=(), max_length=100)
+    vacuum_entity_id: str | None = None
+    battery_entity_id: str | None = None
+    additional_entity_ids: tuple[str, ...] = Field(default=(), max_length=100)
     export_filename: str = Field(default=DEFAULT_EXPORT_FILENAME, min_length=1, max_length=200)
+
+    @model_validator(mode="before")
+    @classmethod
+    def select_default_export_filename(cls, data: object) -> object:
+        if not isinstance(data, dict) or data.get("recorder_purpose") != RecorderPurpose.COMPLEX_PROFILE:
+            return data
+        if data.get("export_filename", DEFAULT_EXPORT_FILENAME) != DEFAULT_EXPORT_FILENAME:
+            return data
+        return data | {"export_filename": COMPLEX_PROFILE_EXPORT_FILENAME}
 
     @field_validator("export_filename")
     @classmethod
     def validate_export_filename(cls, value: str) -> str:
         return validate_export_filename(value)
+
+    @field_validator(
+        "tracked_entity_ids",
+        "additional_entity_ids",
+        mode="after",
+    )
+    @classmethod
+    def validate_entity_ids(cls, values: tuple[str, ...]) -> tuple[str, ...]:
+        for value in values:
+            _validate_entity_id(value)
+        return values
+
+    @field_validator("vacuum_entity_id", "battery_entity_id", mode="after")
+    @classmethod
+    def validate_optional_entity_id(cls, value: str | None) -> str | None:
+        if value is not None:
+            _validate_entity_id(value)
+        return value
+
+    @model_validator(mode="after")
+    def validate_recorder_selection(self) -> RecorderMeasurementRequest:
+        if self.recorder_purpose == RecorderPurpose.PLAYBOOK:
+            if self._has_profile_selection():
+                raise ValueError("Playbook recordings cannot include complex-profile entity selections")
+            return self
+
+        if self.profile_recipe is None:
+            raise ValueError("profile_recipe is required for a complex-profile recording")
+        if not self.export_filename.lower().endswith(".jsonl"):
+            raise ValueError("Complex-profile recordings must use a .jsonl export filename")
+        if self.profile_recipe == RecorderProfileRecipe.GENERIC:
+            self._validate_generic_selection()
+        else:
+            self._validate_vacuum_selection()
+
+        entity_ids = self.recorded_entity_ids
+        if len(entity_ids) > 100:
+            raise ValueError("A recorder session can track at most 100 entities")
+        if len(set(entity_ids)) != len(entity_ids):
+            raise ValueError("Recorder entity selections must be unique")
+        return self
+
+    def _has_profile_selection(self) -> bool:
+        return bool(
+            self.profile_recipe
+            or self.tracked_entity_ids
+            or self.vacuum_entity_id
+            or self.battery_entity_id
+            or self.additional_entity_ids
+        )
+
+    def _validate_generic_selection(self) -> None:
+        if not self.tracked_entity_ids:
+            raise ValueError("Select at least one entity for a generic complex-profile recording")
+        if self.vacuum_entity_id or self.battery_entity_id or self.additional_entity_ids:
+            raise ValueError("Generic recordings cannot include vacuum-recipe entity selections")
+
+    def _validate_vacuum_selection(self) -> None:
+        if self.tracked_entity_ids:
+            raise ValueError("Vacuum recordings cannot include generic tracked entities")
+        if self.vacuum_entity_id is None or self.battery_entity_id is None:
+            raise ValueError("A vacuum and battery entity are required for a vacuum recording")
+        if not self.vacuum_entity_id.startswith("vacuum."):
+            raise ValueError("vacuum_entity_id must be a vacuum entity")
+        if not self.battery_entity_id.startswith("sensor."):
+            raise ValueError("battery_entity_id must be a sensor entity")
+
+    @property
+    def recorded_entity_ids(self) -> tuple[str, ...]:
+        """Entities recorded in deterministic capture order."""
+
+        if self.recorder_purpose == RecorderPurpose.PLAYBOOK:
+            return ()
+        if self.profile_recipe == RecorderProfileRecipe.GENERIC:
+            return self.tracked_entity_ids
+        return tuple(
+            entity_id
+            for entity_id in (self.vacuum_entity_id, self.battery_entity_id, *self.additional_entity_ids)
+            if entity_id is not None
+        )
 
 
 class SpeakerMeasurementRequest(BaseMeasurementRequest):
@@ -253,3 +358,8 @@ def validate_export_filename(value: str) -> str:
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", value):
         raise ValueError("export_filename contains unsafe characters")
     return value
+
+
+def _validate_entity_id(value: str) -> None:
+    if not re.fullmatch(r"[a-z0-9_]+\.[a-z0-9_]+", value):
+        raise ValueError(f"Invalid Home Assistant entity ID: {value}")

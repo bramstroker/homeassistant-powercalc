@@ -88,6 +88,7 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
       messages: [],
     }),
     getShellyDevices: async () => ({ available: true, message: null, devices: [] }),
+    getAllEntities: async () => [],
     getEntityCatalog: async () => ({ lights: [], powers: [], voltages: [] }),
     getEntitiesByDomain: async () => [],
     getEntitiesByDeviceClass: async () => [],
@@ -507,6 +508,29 @@ describe("measure app controller", () => {
     expect(appState.selectedMeasureType).toBe("fan");
     await vi.waitFor(() => expect(appState.deviceEntities.fan?.[0]?.entity_id).toBe("fan.bedroom"));
     expect(requestedDomains).toEqual(["fan"]);
+  });
+
+  it("loads the complete entity catalog for a recorder definition that requests it", async () => {
+    let allCalls = 0;
+    const appState = state();
+    const appApi = api({
+      getMeasureDefinitions: async () => [{
+        measure_type: "recorder", icon: "⏺", model_id_example: "", product_name_example: "", parameters: [],
+        label: "Recorder", description: "Record entity states.", supports_profile: false, supports_resume: false,
+        fields: [{ name: "tracked_entity_ids", role: "attribute", label: "Tracked entities", control: "entity", required: true, multiple: true, all_entities: true, options: [] }],
+      }],
+      getAllEntities: async () => {
+        allCalls += 1;
+        return [{ entity_id: "climate.room", name: "Room", domain: "climate" }];
+      },
+    });
+    const controller = new MeasureAppController(appState, () => appApi, () => connection(), () => undefined);
+
+    await controller.boot();
+    controller.selectMeasureType("recorder");
+
+    await vi.waitFor(() => expect(appState.deviceEntities["*"]?.[0]?.entity_id).toBe("climate.room"));
+    expect(allCalls).toBe(1);
   });
 
   it("retains entity discovery errors and updates session state from the event port", async () => {
