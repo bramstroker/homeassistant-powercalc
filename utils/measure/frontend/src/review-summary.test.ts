@@ -77,6 +77,7 @@ describe("review summary", () => {
     };
 
     expect(reviewSummary(recorder, { valid: true, warnings: [] }, definition)).toEqual(expect.arrayContaining([
+      { label: "Model", value: "Recorder (measurement)" },
       { label: "Purpose", value: "Data for a complex power profile (experimental)" },
       { label: "Device type", value: "Robot vacuum" },
       { label: "Vacuum", value: "vacuum.robot" },

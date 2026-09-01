@@ -138,12 +138,14 @@ export function buildMeasurementRequest(
   measureDevice: string,
   dummyController = false,
 ): MeasurementRequest {
+  const createsProfile = definition.supports_profile
+    || (definition.measure_type === "recorder" && formText(form, "recorder_purpose") === "complex_profile");
   const base: BaseMeasurementRequest = {
     model_id: formText(form, "model_id") || "measurement",
     product_name: formText(form, "product_name") || definition.label,
     measure_device: measureDevice,
     power_meter: powerMeter,
-    generate_model: definition.supports_profile,
+    generate_model: createsProfile,
     parameters: submittedParameters(definition, form, capabilities),
     // Only a resumable type offers the choice; the rest fall through to a fresh session.
     resume_policy: (formText(form, "resume_policy") || "new") as BaseMeasurementRequest["resume_policy"],

@@ -1,5 +1,4 @@
 from datetime import UTC, datetime
-import json
 from pathlib import Path
 from typing import Any
 
@@ -8,6 +7,7 @@ from measure.const import (
     MODEL_JSON_VOLTAGE_RANGE_MAX,
     MODEL_JSON_VOLTAGE_RANGE_MIN,
 )
+from measure.files import write_json_atomic
 from measure.tuning import MeasurementParameters
 from measure.version import measure_version
 
@@ -15,7 +15,7 @@ from measure.version import measure_version
 def write_model_json(
     directory: Path,
     *,
-    standby_power: float,
+    standby_power: float | None,
     name: str,
     measure_device: str,
     parameters: MeasurementParameters,
@@ -34,8 +34,9 @@ def write_model_json(
             "SLEEP_TIME": parameters.sleep_time,
         },
         "name": name,
-        "standby_power": standby_power,
     }
+    if standby_power is not None:
+        json_data["standby_power"] = standby_power
     if voltages:
         json_data[MODEL_JSON_VOLTAGE_RANGE] = {
             MODEL_JSON_VOLTAGE_RANGE_MIN: round(min(voltages), 2),
@@ -45,5 +46,5 @@ def write_model_json(
         json_data.update(extra_json_data)
 
     path = directory / "model.json"
-    path.write_text(json.dumps(json_data, indent=2, sort_keys=True), encoding="utf-8")
+    write_json_atomic(path, json_data)
     return path

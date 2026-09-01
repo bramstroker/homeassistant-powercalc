@@ -217,6 +217,12 @@ class RecorderMeasurementRequest(BaseMeasurementRequest):
     additional_entity_ids: tuple[str, ...] = Field(default=(), max_length=100)
     export_filename: str = Field(default=DEFAULT_EXPORT_FILENAME, min_length=1, max_length=200)
 
+    @property
+    def generate_model_json(self) -> bool:
+        """Recorder model generation is handled by the analyser after capture."""
+
+        return False
+
     @model_validator(mode="before")
     @classmethod
     def select_default_export_filename(cls, data: object) -> object:

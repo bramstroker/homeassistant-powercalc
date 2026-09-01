@@ -197,6 +197,7 @@ export class ResultView extends LitElement {
         </div>
         ${error ? html`<p class="notice error" role="alert">${this.renderError(error)}</p>` : nothing}
         ${showArtifacts ? this.renderSummary() : nothing}
+        ${showArtifacts ? this.renderWarnings() : nothing}
         ${showArtifacts ? this.renderPlots() : nothing}
         ${showArtifacts ? this.renderFiles() : nothing}
         ${showArtifacts ? this.renderContributionSection(state) : nothing}
@@ -479,6 +480,11 @@ ${preview.pr_body}</pre>
     return html`<div class="readout" aria-label="Measurement result">
       ${entries.map(([label, value]) => html`<div class="metric"><span>${label}</span><strong>${value}</strong></div>`)}
     </div>`;
+  }
+
+  private renderWarnings() {
+    const warnings = this.snapshot.warnings ?? [];
+    return warnings.map((warning) => html`<p class="notice" role="status">${warning}</p>`);
   }
 
   private renderResume(state: SessionState) {

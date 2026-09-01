@@ -239,6 +239,8 @@ export class SetupView extends LitElement {
     const run = this.initialRequest?.measure_type === type ? this.initialRequest : undefined;
     const fields = deviceFields(definition);
     const multipleController = this.multiControllerField();
+    const showProfileFields = definition.supports_profile
+      || (type === "recorder" && this.recorderPurpose(run) === "complex_profile");
     // A multi-select needs the room of its own fieldset; the rest are grid cells.
     const blocks = fields.filter((field) => field.control === "multi_select" && this.isFieldVisible(field, run));
     const activeLightCheck = type === "light" && !this.dummyController && !this.dummyLoadEnabled;
@@ -261,7 +263,7 @@ export class SetupView extends LitElement {
           ${multipleController && !this.dummyController ? this.renderMultipleLightsToggle(multipleController) : nothing}
           <div class="grid profile-grid">
             ${fields.filter((field) => field.control !== "multi_select").map((field) => this.genericField(field, run))}
-            ${definition.supports_profile ? html`<div class="profile-fields">
+            ${showProfileFields ? html`<div class="profile-fields">
               ${textField("model_id", "Model ID", {
                 value: this.modelId(run),
                 placeholder: definition.model_id_example && `e.g. ${definition.model_id_example}`,

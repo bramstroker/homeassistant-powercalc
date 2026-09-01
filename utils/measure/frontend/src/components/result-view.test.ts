@@ -50,6 +50,24 @@ describe("result view", () => {
     expect(element.shadowRoot.querySelector(".diagnostics-download a")).toBeTruthy();
   });
 
+  it("shows completed-session analysis warnings", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "completed",
+      summary: { "Profile analysis": "More data needed" },
+      warnings: ["Profile model was not created: record more device states"],
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const warning = element.shadowRoot.querySelector('.notice[role="status"]');
+    expect(warning?.textContent).toContain("record more device states");
+  });
+
   it("shows a download-all action for generated files", async () => {
     const element = document.createElement("measure-result-view") as HTMLElement & {
       snapshot: SessionSnapshot;

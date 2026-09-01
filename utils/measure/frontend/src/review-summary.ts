@@ -59,7 +59,9 @@ export function reviewSummary(
 
 function profileRows(request: MeasurementRequest, definition?: MeasureDefinition): LabelledValue[] {
   const rows: LabelledValue[] = [];
-  if (definition?.supports_profile) rows.push({ label: "Model", value: `${request.product_name} (${request.model_id})` });
+  const createsProfile = definition?.supports_profile
+    || (request.measure_type === "recorder" && request.recorder_purpose === "complex_profile");
+  if (createsProfile) rows.push({ label: "Model", value: `${request.product_name} (${request.model_id})` });
   if (request.measure_device) rows.push({ label: "Device", value: request.measure_device });
   return rows;
 }

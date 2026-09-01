@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 import time
 
+from measure.analyser.service import analysis_context_for
 from measure.execution import ImmediateInteraction, MeasurementCancelledError, RunInteraction
 from measure.request import RecorderMeasurementRequest, validate_export_filename
 from measure.runner.const import DEFAULT_EXPORT_FILENAME
@@ -71,6 +72,16 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         try:
             with output_filepath.open("w", encoding="utf-8", newline="") as output_file:
                 writer = csv.writer(output_file) if not entity_ids else None
+                if entity_ids:
+                    output_file.write(
+                        json.dumps(
+                            analysis_context_for(request).metadata_record(),
+                            ensure_ascii=False,
+                            separators=(",", ":"),
+                            sort_keys=True,
+                        ),
+                    )
+                    output_file.write("\n")
                 while True:
                     timestamp = time.time()
                     self.interaction.notify("Measurement")
@@ -94,6 +105,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
                         output_file.write(
                             json.dumps(
                                 {
+                                    "record_type": "sample",
                                     "elapsed_seconds": elapsed_seconds,
                                     "power": measurement.power,
                                     "entities": entities,
