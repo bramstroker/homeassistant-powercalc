@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 from measure.controller.charging.controller import ChargingController
@@ -219,9 +219,18 @@ class MeasurementAssembler:
     def _recorder_state_reader(self) -> EntityStateReader:
         home_assistant = self._home_assistant()
 
-        def read(entity_id: str) -> RecorderEntityState:
-            state = home_assistant.get_state(entity_id=entity_id)
-            return RecorderEntityState(state=str(state.state), attributes=state.attributes)
+        def read(entity_ids: Sequence[str]) -> Mapping[str, RecorderEntityState]:
+            # One dump per sample. `get_state` has no single-entity WebSocket command
+            # behind it, so asking per entity refetches every state in Home Assistant.
+            wanted = set(entity_ids)
+            states = {
+                state.entity_id: RecorderEntityState(state=str(state.state), attributes=state.attributes)
+                for state in home_assistant.get_states()
+                if state.entity_id in wanted
+            }
+            if missing := sorted(wanted - states.keys()):
+                raise ValueError(f"Entities not found in Home Assistant: {', '.join(missing)}")
+            return states
 
         return read
 

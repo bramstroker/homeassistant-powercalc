@@ -1,4 +1,4 @@
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 import csv
 from dataclasses import dataclass
 import json
@@ -25,7 +25,10 @@ class RecorderEntityState:
     attributes: Mapping[str, object]
 
 
-type EntityStateReader = Callable[[str], RecorderEntityState]
+# Reads every requested entity in one go: the Home Assistant WebSocket API has no
+# single-entity state command, so a per-entity reader refetches the whole state
+# machine for each entity of each sample.
+type EntityStateReader = Callable[[Sequence[str]], Mapping[str, RecorderEntityState]]
 
 
 class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
@@ -75,10 +78,11 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
                     _LOGGER.info("Measurement %.2f", measurement.power)
                     elapsed_seconds = timestamp - start_time
                     if entity_ids and self.entity_state_reader is not None:
+                        entity_states = self.entity_state_reader(entity_ids)
                         entities: dict[str, object] = {}
                         live_states: dict[str, str] = {}
                         for entity_id in entity_ids:
-                            entity_state = self.entity_state_reader(entity_id)
+                            entity_state = entity_states[entity_id]
                             live_states[entity_id] = entity_state.state
                             entities[entity_id] = {
                                 "state": entity_state.state,

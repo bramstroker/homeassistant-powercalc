@@ -62,10 +62,10 @@ def test_recorder_writes_entity_states_as_json_lines(tmp_path: Path) -> None:
     interaction = MagicMock(spec=RunInteraction)
     interaction.wait.side_effect = KeyboardInterrupt
     state_reader = MagicMock(
-        side_effect=[
-            RecorderEntityState("cleaning", {"status": "Cleaning", "battery_level": 42}),
-            RecorderEntityState("42", {"unit_of_measurement": "%"}),
-        ],
+        return_value={
+            "vacuum.robot": RecorderEntityState("cleaning", {"status": "Cleaning", "battery_level": 42}),
+            "sensor.robot_battery": RecorderEntityState("42", {"unit_of_measurement": "%"}),
+        },
     )
     runner = RecorderRunner(measure_util, interaction, state_reader)
     request = RecorderMeasurementRequest(
@@ -102,7 +102,7 @@ def test_recorder_state_failure_keeps_only_complete_rows(tmp_path: Path) -> None
     interaction = MagicMock(spec=RunInteraction)
     state_reader = MagicMock(
         side_effect=[
-            RecorderEntityState("on", {}),
+            {"switch.plug": RecorderEntityState("on", {})},
             RuntimeError("state unavailable"),
         ],
     )

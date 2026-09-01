@@ -319,6 +319,9 @@ class HomeAssistantManager:
     def get_entities(self) -> dict[str, Group]:
         return self._execute(lambda client: client.get_entities())
 
+    def get_states(self) -> tuple[State, ...]:
+        return self._execute(lambda client: client.get_states())
+
     def get_state(
         self,
         *,
