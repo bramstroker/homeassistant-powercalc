@@ -17749,7 +17749,7 @@
           ],
           "id": "LI-E12-B11-6W-MT",
           "manufacturer": "lightinginside",
-          "updated_at": "2026-09-01T12:53:09",
+          "updated_at": "2026-09-01T13:04:20",
           "max_power": 4.98,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-01T00:14:47",
@@ -17765,7 +17765,7 @@
             "score": 97.2,
             "color_temp": 97.2
           },
-          "hash": "d539f10de112aa1d487340d28f7092ee"
+          "hash": "fe47cc24e7f11602bec21afbc80e6e71"
         },
         {
           "calculation_strategy": "lut",
@@ -18645,6 +18645,62 @@
       ],
       "device_types": [
         "lawn_mower_robot"
+      ]
+    },
+    {
+      "aliases": [
+        "Aldi"
+      ],
+      "name": "megos",
+      "full_name": "Megos",
+      "dir_name": "megos",
+      "models": [
+        {
+          "author_info": {
+            "github": "rugk",
+            "name": "rugk"
+          },
+          "calculation_strategy": "lut",
+          "created_at": "2026-08-09T18:41:44Z",
+          "device_type": "light",
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Shelly Plug M Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.3.0:app"
+          },
+          "name": "LIGHTWAY smart home LED-lamp - candle",
+          "standby_power": 0.35,
+          "id": "L122AA63H11A6.5W",
+          "manufacturer": "megos",
+          "updated_at": "2026-09-01T13:11:06",
+          "max_power": 6.73,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-01T13:11:06",
+          "power_range": {
+            "min": 0.39,
+            "max": 6.73
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "voltage_range": {
+            "min": 233.9,
+            "max": 237.0
+          },
+          "hash": "7833f7703b85e8a6befb56974259df4d"
+        }
+      ],
+      "device_types": [
+        "light"
       ]
     },
     {
