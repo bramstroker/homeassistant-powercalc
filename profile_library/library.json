@@ -11872,7 +11872,7 @@
           ],
           "id": "LED2405G8",
           "manufacturer": "ikea",
-          "updated_at": "2026-09-01T17:22:51",
+          "updated_at": "2026-09-01T17:36:37",
           "max_power": 7.75,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-01T16:10:31",
@@ -11888,7 +11888,7 @@
             "score": 99.4,
             "color_temp": 99.4
           },
-          "hash": "fc5bea0f3af17233d5c575729eeabe74"
+          "hash": "c43845c3c1a897d6cacbd6daef26222e"
         },
         {
           "aliases": [
