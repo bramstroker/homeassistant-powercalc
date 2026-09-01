@@ -18659,9 +18659,22 @@
           "calculation_strategy": "lut",
           "created_at": "2026-08-09T18:41:44Z",
           "device_type": "light",
+          "device_specs": {
+            "socket": "E14",
+            "form_factor": "candle",
+            "lumens": 470,
+            "rated_power": 6.5,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "4280012239193"
+          ],
           "measure_description": "Measured with utils/measure script",
           "measure_device": "Shelly Plug M Gen3",
           "measure_method": "script",
+          "mains_voltage": 230,
           "measure_settings": {
             "SAMPLE_COUNT": 1,
             "SLEEP_TIME": 2.0,
@@ -18669,6 +18682,10 @@
           },
           "name": "LIGHTWAY smart home LED-lamp - candle",
           "standby_power": 0.35,
+          "voltage_range": {
+            "min": 233.9,
+            "max": 237.0
+          },
           "authors": [
             {
               "github": "rugk",
@@ -18677,7 +18694,7 @@
           ],
           "id": "L122AA63H11A6.5W",
           "manufacturer": "megos",
-          "updated_at": "2026-09-01T13:18:14",
+          "updated_at": "2026-09-01T16:27:46",
           "max_power": 6.73,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-01T13:11:06",
@@ -18694,11 +18711,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "voltage_range": {
-            "min": 233.9,
-            "max": 237.0
-          },
-          "hash": "23c8ef96a904e2234bc8163ecaeed853"
+          "hash": "0fb21d04c7c28b96ff7aaa760c6eae4a"
         }
       ],
       "device_types": [
