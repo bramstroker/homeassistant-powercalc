@@ -8,7 +8,7 @@
   "device_type": "light",
   "max_voltage": 237.0,
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Basalt direct Shelly",
+  "measure_device": "Shelly Plug M Gen3",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 1,
