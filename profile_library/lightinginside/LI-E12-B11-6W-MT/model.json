@@ -10,8 +10,8 @@
   "device_specs": {
     "socket": "E12",
     "form_factor": "bulb",
-    "lumens": 550,
-    "rated_power": 5.0,
+    "lumens": 500,
+    "rated_power": 6.0,
     "connectivity": [
       "matter",
       "wifi"
@@ -27,7 +27,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.4.1:app"
   },
-  "name": "Matter Candelabra Smart Light 5W 550LM E12 RGBCW",
+  "name": "Matter Candelabra Smart Light 6W 500LM E12 RGBCW",
   "standby_power": 0.27,
   "voltage_range": {
     "max": 122.09,
