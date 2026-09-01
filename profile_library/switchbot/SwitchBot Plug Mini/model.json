@@ -7,7 +7,7 @@
       "bluetooth"
     ],
     "form_factor": "plug",
-    "power_metering": true
+    "power_monitoring": true
   },
   "measure_description": "Manually measured standby and relay-on power for SwitchBot Plug Mini (EU).",
   "measure_device": "Shelly Plug S Gen3",
