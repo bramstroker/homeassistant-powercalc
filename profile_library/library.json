@@ -11831,7 +11831,7 @@
             "36869"
           ],
           "calculation_strategy": "lut",
-          "created_at": "2026-01-29T22:14:00Z",
+          "created_at": "2026-09-01T12:01:22Z",
           "device_type": "light",
           "device_specs": {
             "socket": "E27",
@@ -11844,43 +11844,51 @@
             ]
           },
           "measure_description": "Measured with utils/measure script",
-          "measure_device": "Shelly PM Mini Gen3",
+          "measure_device": "OWON OWH9811",
           "measure_method": "script",
           "mains_voltage": 230,
           "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.20.3:docker"
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "master"
           },
           "name": "KAJPLATS E27 CWS globe 1055lm",
           "product_url": "https://www.ikea.com/se/en/p/kajplats-led-bulb-e27-1055-lumen-smart-colour-and-white-spectrum-globe-opal-white-70608575/",
-          "standby_power": 0.17,
+          "standby_power": 0.21,
+          "voltage_range": {
+            "max": 238.49,
+            "min": 227.8
+          },
           "authors": [
             {
               "name": "Linus Nordin",
               "github": "gribber",
               "email": "linus.nordin@gmail.com"
+            },
+            {
+              "name": "MartinJM",
+              "github": "MartinJM"
             }
           ],
           "id": "LED2405G8",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T12:33:32",
-          "max_power": 7.78,
+          "updated_at": "2026-09-01T17:22:51",
+          "max_power": 7.75,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2026-01-30T18:32:06",
+          "measurement_updated_at": "2026-09-01T16:10:31",
           "power_range": {
-            "min": 0.14,
-            "max": 7.78
+            "min": 0.2,
+            "max": 7.75
           },
           "color_modes": [
             "color_temp",
             "hs"
           ],
           "lut_quality": {
-            "score": 98.9,
-            "color_temp": 98.9
+            "score": 99.4,
+            "color_temp": 99.4
           },
-          "hash": "287536ee3490f0186c9e3de304b99d05"
+          "hash": "fc5bea0f3af17233d5c575729eeabe74"
         },
         {
           "aliases": [
@@ -17710,6 +17718,64 @@
           "hash": "c30444238b07ed13743e6091d73d1e6e"
         },
         {
+          "authors": [
+            {
+              "github": "nathanzm",
+              "name": "nathanzm"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-08-25T23:53:59Z",
+          "device_specs": {
+            "socket": "E12",
+            "form_factor": "bulb",
+            "lumens": 500,
+            "rated_power": 6.0,
+            "connectivity": [
+              "matter",
+              "wifi"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Tapo P110M",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.4.1:app"
+          },
+          "name": "Matter Candelabra Smart Light 6W 500LM E12 RGBCW",
+          "standby_power": 0.27,
+          "voltage_range": {
+            "max": 122.09,
+            "min": 120.06
+          },
+          "aliases": [
+            "4100"
+          ],
+          "id": "LI-E12-B11-6W-MT",
+          "manufacturer": "lightinginside",
+          "updated_at": "2026-09-01T13:04:20",
+          "max_power": 4.98,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-01T00:14:47",
+          "power_range": {
+            "min": 0.2,
+            "max": 4.98
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
+          "hash": "fe47cc24e7f11602bec21afbc80e6e71"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2026-08-05T22:43:13Z",
           "device_type": "light",
@@ -18587,6 +18653,77 @@
       ],
       "device_types": [
         "lawn_mower_robot"
+      ]
+    },
+    {
+      "aliases": [
+        "Aldi"
+      ],
+      "name": "megos",
+      "full_name": "Megos",
+      "dir_name": "megos",
+      "models": [
+        {
+          "calculation_strategy": "lut",
+          "created_at": "2026-08-09T18:41:44Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E14",
+            "form_factor": "candle",
+            "lumens": 470,
+            "rated_power": 6.5,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "4280012239193"
+          ],
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Shelly Plug M Gen3",
+          "measure_method": "script",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.3.0:app"
+          },
+          "name": "LIGHTWAY smart home LED-lamp - candle",
+          "standby_power": 0.35,
+          "voltage_range": {
+            "min": 233.9,
+            "max": 237.0
+          },
+          "authors": [
+            {
+              "github": "rugk",
+              "name": "rugk"
+            }
+          ],
+          "id": "L122AA63H11A6.5W",
+          "manufacturer": "megos",
+          "updated_at": "2026-09-01T16:27:46",
+          "max_power": 6.73,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-01T13:11:06",
+          "power_range": {
+            "min": 0.39,
+            "max": 6.73
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "hash": "0fb21d04c7c28b96ff7aaa760c6eae4a"
+        }
+      ],
+      "device_types": [
+        "light"
       ]
     },
     {
