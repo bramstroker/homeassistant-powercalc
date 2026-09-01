@@ -23,4 +23,11 @@
   "standby_power_on": 1.11,
   "only_self_usage": true,
   "device_type": "smart_switch"
-}
+},
+ "authors": [
+    {
+      "github": "Maxik933",
+      "name": "Maxik933"
+    }
+  ]
+} 
