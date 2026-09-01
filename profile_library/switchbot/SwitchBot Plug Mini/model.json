@@ -3,7 +3,8 @@
   "created_at":"2026-09-01T01:00:25Z",
   "device_specs": {
     "connectivity": [
-      "zigbee"
+      "Matter",
+      "Bluetooth"
     ],
     "form_factor": "plug",
     "power_metering": true
