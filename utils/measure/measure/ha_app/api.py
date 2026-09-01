@@ -185,6 +185,8 @@ class FormFieldOption(BaseModel):
     label: str
     entity_domain: str | None = None
     enables: list[str] = Field(default_factory=list)
+    description: str = ""
+    guidance: list[str] = Field(default_factory=list)
 
 
 class FormField(BaseModel):
@@ -203,6 +205,12 @@ class FormField(BaseModel):
     plural_label: str = ""
     derived_from: str | None = None
     hint: str = ""
+    visible_when: dict[str, list[str]] = Field(default_factory=dict)
+    all_entities: bool = False
+    entity_device_classes: list[str] = Field(default_factory=list)
+    related_to: str | None = None
+    same_device_only: bool = False
+    review: bool = False
 
 
 class MeasureParameter(BaseModel):
@@ -495,13 +503,14 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
         request: Request,
         domain: Annotated[EntityDomain | None, Query()] = None,
         device_class: Annotated[DeviceClass | None, Query()] = None,
+        all_entities: Annotated[bool, Query(alias="all")] = False,
     ) -> list[EntityDescriptor]:
-        if (domain is None) == (device_class is None):
+        if sum((domain is not None, device_class is not None, all_entities)) != 1:
             raise HTTPException(status_code=400, detail="Specify exactly one entity filter")
         snapshot = await run_in_threadpool(
             HomeAssistantEntityCatalog(_context(request).home_assistant).load_snapshot,
         )
-        return snapshot.select(domain=domain, device_class=device_class)
+        return snapshot.all() if all_entities else snapshot.select(domain=domain, device_class=device_class)
 
     @router.post("/preflight", responses={409: _ERROR, 422: _ERROR})
     async def preflight(payload: MeasurementRequestPayload, request: Request) -> PreflightResponse:
@@ -765,6 +774,8 @@ def _measure_definitions() -> list[MeasureDefinition]:
                             label=option.label,
                             entity_domain=option.entity_domain,
                             enables=list(option.enables),
+                            description=option.description,
+                            guidance=list(option.guidance),
                         )
                         for option in field.options
                     ],
@@ -775,6 +786,12 @@ def _measure_definitions() -> list[MeasureDefinition]:
                     plural_label=field.plural_label,
                     derived_from=field.derived_from,
                     hint=field.hint,
+                    visible_when={name: list(values) for name, values in field.visible_when},
+                    all_entities=field.all_entities,
+                    entity_device_classes=list(field.entity_device_classes),
+                    related_to=field.related_to,
+                    same_device_only=field.same_device_only,
+                    review=field.review,
                 )
                 for field in definition.fields
             ],
@@ -879,6 +896,7 @@ def _preflight(context: AppContext, payload: MeasurementRequest) -> PreflightRes
             has_active_session=lambda: _is_active(context.coordinator.current),
             verify_storage=context.storage.verify_writable,
             load_entities=load_entities,
+            load_all_entities=lambda: catalog.load_snapshot().all(),
             diagnose_power_meter=context.power_meter_diagnostics.evaluate,
             developer_mode=context.developer_mode,
         ).validate(payload)
@@ -974,6 +992,7 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[s
         "summary": snapshot.summary,
         "operating_point": snapshot.operating_point,
         "calibration_sample": snapshot.calibration_sample,
+        "entity_states": snapshot.entity_states,
         "request": request,
     }
 

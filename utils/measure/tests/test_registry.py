@@ -40,3 +40,17 @@ def test_light_definition_allows_multiple_entities_and_explains_the_physical_cou
 
 def test_light_product_name_example_does_not_repeat_the_manufacturer() -> None:
     assert MEASUREMENT_REGISTRY[MeasureType.LIGHT].product_name_example == "Hue White Ambiance A60 E27"
+
+
+def test_recorder_definition_starts_with_purpose_and_declares_vacuum_relationships() -> None:
+    fields = {field.name: field for field in MEASUREMENT_REGISTRY[MeasureType.RECORDER].fields}
+
+    assert [option.value for option in fields["recorder_purpose"].options] == ["playbook", "complex_profile"]
+    complex_profile = fields["recorder_purpose"].options[1]
+    assert "experimental" in complex_profile.label
+    assert "not feature complete" in (complex_profile.description or "")
+    assert "does not create a profile model.json yet" in (complex_profile.description or "")
+    assert [option.value for option in fields["profile_recipe"].options] == ["generic", "vacuum_robot"]
+    assert fields["tracked_entity_ids"].multiple is True
+    assert fields["battery_entity_id"].related_to == "vacuum_entity_id"
+    assert fields["battery_entity_id"].same_device_only is True

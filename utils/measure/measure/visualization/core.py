@@ -435,12 +435,30 @@ def _recorder_plot(path: Path, *, source: str, max_points: int | None) -> PlotSp
 
 
 def _iter_recorder_points(path: Path) -> Iterable[PlotPoint]:
+    if path.name.lower().endswith(".jsonl"):
+        yield from _iter_jsonl_recorder_points(path)
+        return
     with _open_csv(path) as file:
         for row in csv.reader(file):
             if len(row) < 2:
                 continue
             elapsed = _finite_float(row[0])
             power = _finite_float(row[1])
+            if elapsed is not None and power is not None:
+                yield PlotPoint(x=elapsed, y=power)
+
+
+def _iter_jsonl_recorder_points(path: Path) -> Iterable[PlotPoint]:
+    with path.open(encoding="utf-8-sig") as file:
+        for line in file:
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(row, dict):
+                continue
+            elapsed = _finite_float(row.get("elapsed_seconds"))
+            power = _finite_float(row.get("power"))
             if elapsed is not None and power is not None:
                 yield PlotPoint(x=elapsed, y=power)
 

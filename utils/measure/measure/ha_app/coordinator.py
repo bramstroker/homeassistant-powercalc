@@ -384,6 +384,13 @@ class MeasurementCoordinator:
                 updated_at=event.created_at,
                 calibration_sample=cast(CalibrationSample, event.data),
             )
+        elif event.type == SessionEventType.ENTITY_STATES:
+            self._snapshot = replace(
+                self._snapshot,
+                event_sequence=event.sequence,
+                updated_at=event.created_at,
+                entity_states={str(key): str(value) for key, value in event.data.get("states", {}).items()},
+            )
         else:
             return False
         return True

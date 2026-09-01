@@ -1,5 +1,6 @@
 import type { MeasureDefinition, MeasureParameter, MeasurementRequest } from "../types";
 import "./setup-view";
+import { recorderExportFilename } from "./setup-view";
 import { SetupViewElement, capabilities, definitions, lightDefinition, lights } from "./test-fixtures";
 
 interface TestCombobox extends HTMLElement {
@@ -18,6 +19,63 @@ function selectEntity(picker: TestCombobox, value: string): void {
   input.value = value;
   input.dispatchEvent(new Event("change", { bubbles: true }));
 }
+
+const recorderDefinition: MeasureDefinition = {
+  measure_type: "recorder",
+  label: "Recorder",
+  description: "Record power and entity states.",
+  icon: "⏺",
+  model_id_example: "",
+  product_name_example: "",
+  parameters: [],
+  supports_profile: false,
+  supports_resume: false,
+  fields: [
+    { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, options: [] },
+    {
+      name: "recorder_purpose", role: "attribute", label: "What do you want to create?", control: "select", required: true,
+      default: "playbook", review: true,
+      options: [
+        { value: "playbook", label: "A Playbook CSV", description: "Record the playbook format." },
+        {
+          value: "complex_profile",
+          label: "Data for a complex power profile (experimental)",
+          description: "This workflow is not feature complete and does not create a profile model.json yet.",
+        },
+      ],
+    },
+    {
+      name: "profile_recipe", role: "attribute", label: "Device type", control: "select", required: true,
+      default: "generic", visible_when: { recorder_purpose: ["complex_profile"] }, review: true,
+      options: [
+        { value: "generic", label: "Generic device", description: "Choose relevant entities." },
+        { value: "vacuum_robot", label: "Robot vacuum", description: "Capture the vacuum and battery.", guidance: ["Measure the complete dock at the wall outlet."] },
+      ],
+    },
+    {
+      name: "tracked_entity_ids", role: "attribute", label: "Tracked entity", plural_label: "Tracked entities",
+      control: "entity", required: true, multiple: true, all_entities: true,
+      visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["generic"] }, options: [], review: true,
+    },
+    {
+      name: "vacuum_entity_id", role: "attribute", label: "Vacuum", control: "entity", required: true,
+      all_entities: true, entity_domains: ["vacuum"],
+      visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["vacuum_robot"] }, options: [], review: true,
+    },
+    {
+      name: "battery_entity_id", role: "attribute", label: "Battery level sensor", control: "entity", required: true,
+      all_entities: true, entity_device_classes: ["battery"], related_to: "vacuum_entity_id", same_device_only: true,
+      visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["vacuum_robot"] }, options: [],
+      hint: "PowerCalc vacuum profiles require a battery sensor.", review: true,
+    },
+    {
+      name: "additional_entity_ids", role: "attribute", label: "Additional entity", plural_label: "Additional entities (optional)",
+      control: "entity", required: false, multiple: true, all_entities: true, related_to: "vacuum_entity_id",
+      visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["vacuum_robot"] }, options: [], review: true,
+    },
+    { name: "export_filename", role: "attribute", label: "Export filename", control: "text", required: true, default: "record.csv", options: [] },
+  ],
+};
 
 describe("setup view", () => {
   it("renders dynamic entities, mode choices, and collapsed advanced settings", async () => {
@@ -169,7 +227,7 @@ describe("setup view", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.querySelectorAll('select[name="light_entity_id"]')).toHaveLength(2);
+    expect(element.shadowRoot.querySelectorAll('measure-combobox[name="light_entity_id"]')).toHaveLength(2);
     const removeButton = element.shadowRoot.querySelector<HTMLButtonElement>("button.remove-entity");
     expect(removeButton?.getAttribute("aria-label")).toBe("Remove Light");
     expect(removeButton?.querySelector("svg")).toBeTruthy();
@@ -741,6 +799,159 @@ describe("setup type picker", () => {
 });
 
 describe("setup view defaults", () => {
+  it("restores a duplicated recorder request with its persisted null controller", async () => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.definitions = [recorderDefinition];
+    element.deviceEntities = {
+      "*": [{ entity_id: "climate.room", name: "Room", domain: "climate", state: "heat" }],
+    };
+    element.selectedType = "recorder";
+    element.initialRequest = {
+      measure_type: "recorder",
+      controller: null,
+      model_id: "measurement",
+      product_name: "Recorder",
+      measure_device: "",
+      power_meter: { type: "dummy" },
+      generate_model: false,
+      parameters: capabilities.defaults,
+      resume_policy: "new",
+      recorder_purpose: "complex_profile",
+      profile_recipe: "generic",
+      tracked_entity_ids: ["climate.room"],
+      export_filename: "record.jsonl",
+    };
+    element.meter = { type: "dummy" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector('[name="recorder_purpose"]')).toBeTruthy();
+    expect(element.shadowRoot.querySelector('[name="profile_recipe"]')).toBeTruthy();
+    const trackedEntity = entityCombobox(element, "tracked_entity_ids");
+    expect(trackedEntity).toBeTruthy();
+    expect((trackedEntity.querySelector('input[slot="value"]') as HTMLInputElement).value).toBe("climate.room");
+  });
+
+  it("starts the recorder with a purpose choice and reveals the generic recipe conditionally", async () => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.definitions = [recorderDefinition];
+    element.deviceEntities = { "*": [] };
+    element.selectedType = "recorder";
+    element.meter = { type: "dummy" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector('[name="recorder_purpose"]')).toBeTruthy();
+    expect(element.shadowRoot.querySelector('[name="profile_recipe"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[name="tracked_entity_ids"]')).toBeNull();
+    expect(element.shadowRoot.textContent).toContain("Record the playbook format");
+
+    const requestedDomains = new Promise<string[]>((resolve) => {
+      element.addEventListener("entity-domains-requested", (event) => resolve((event as CustomEvent<string[]>).detail));
+    });
+    const purpose = element.shadowRoot.querySelector('[name="recorder_purpose"]') as HTMLSelectElement;
+    purpose.value = "complex_profile";
+    purpose.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+
+    expect(await requestedDomains).toContain("*");
+    expect(element.shadowRoot.querySelector('[name="profile_recipe"]')).toBeTruthy();
+    expect(element.shadowRoot.querySelector('[name="tracked_entity_ids"]')).toBeTruthy();
+    expect(element.shadowRoot.textContent).toContain("not feature complete");
+    expect(element.shadowRoot.textContent).toContain("does not create a profile model.json yet");
+    expect((element.shadowRoot.querySelector('[name="export_filename"]') as HTMLInputElement).value).toBe("record.jsonl");
+  });
+
+  it("guides a vacuum selection and prefills its single same-device battery sensor", async () => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.definitions = [recorderDefinition];
+    element.deviceEntities = { "*": [
+      { entity_id: "vacuum.robot", name: "Robot", domain: "vacuum", device_id: "robot-device", state: "docked" },
+      { entity_id: "sensor.robot_battery", name: "Robot battery", domain: "sensor", device_id: "robot-device", device_class: "battery", state: "42", unit: "%" },
+      { entity_id: "sensor.other_battery", name: "Other battery", domain: "sensor", device_id: "other-device", device_class: "battery", state: "80", unit: "%" },
+      { entity_id: "sensor.dock_state", name: "Dock state", domain: "sensor", device_id: "robot-device", state: "idle" },
+    ] };
+    element.selectedType = "recorder";
+    element.meter = { type: "dummy" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const purpose = element.shadowRoot.querySelector('[name="recorder_purpose"]') as HTMLSelectElement;
+    purpose.value = "complex_profile";
+    purpose.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+    const recipe = element.shadowRoot.querySelector('[name="profile_recipe"]') as HTMLSelectElement;
+    recipe.value = "vacuum_robot";
+    recipe.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+    selectEntity(entityCombobox(element, "vacuum_entity_id"), "vacuum.robot");
+    await element.updateComplete;
+
+    const battery = entityCombobox(element, "battery_entity_id");
+    expect(battery.options.map((option) => option.value)).toEqual(["sensor.robot_battery"]);
+    expect((battery.querySelector('input[slot="value"]') as HTMLInputElement).value).toBe("sensor.robot_battery");
+    expect(element.shadowRoot.textContent).toContain("Measure the complete dock at the wall outlet");
+    expect(element.shadowRoot.querySelectorAll('select[name="additional_entity_ids"]')).toHaveLength(0);
+    expect(element.shadowRoot.textContent).toContain("Additional entities (optional)");
+  });
+
+  it("explains when a vacuum has no usable same-device battery sensor", async () => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.definitions = [recorderDefinition];
+    element.deviceEntities = { "*": [
+      { entity_id: "vacuum.robot", name: "Robot", domain: "vacuum", device_id: "robot-device", state: "docked" },
+      { entity_id: "sensor.robot_battery", name: "Robot battery", domain: "sensor", device_id: "robot-device", device_class: "battery", state: "unavailable", unit: "%" },
+    ] };
+    element.selectedType = "recorder";
+    element.meter = { type: "dummy" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    for (const [name, value] of [["recorder_purpose", "complex_profile"], ["profile_recipe", "vacuum_robot"]] as const) {
+      const select = element.shadowRoot.querySelector(`[name="${name}"]`) as HTMLSelectElement;
+      select.value = value;
+      select.dispatchEvent(new Event("change"));
+      await element.updateComplete;
+    }
+    selectEntity(entityCombobox(element, "vacuum_entity_id"), "vacuum.robot");
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector('[role="alert"]')?.textContent).toContain("PowerCalc vacuum profiles require one");
+  });
+
+  it("submits a generic recorder entity list without hidden vacuum fields", async () => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.definitions = [recorderDefinition];
+    element.deviceEntities = { "*": [{ entity_id: "climate.room", name: "Room", domain: "climate", state: "heat" }] };
+    element.selectedType = "recorder";
+    element.meter = { type: "dummy" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const purpose = element.shadowRoot.querySelector('[name="recorder_purpose"]') as HTMLSelectElement;
+    purpose.value = "complex_profile";
+    purpose.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+    selectEntity(entityCombobox(element, "tracked_entity_ids"), "climate.room");
+    const submitted = new Promise<MeasurementRequest>((resolve) => element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail)));
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+
+    const request = await submitted;
+    expect(request).toMatchObject({
+      measure_type: "recorder",
+      recorder_purpose: "complex_profile",
+      profile_recipe: "generic",
+      tracked_entity_ids: ["climate.room"],
+    });
+    expect(request).not.toHaveProperty("vacuum_entity_id");
+    expect(request).not.toHaveProperty("battery_entity_id");
+  });
+
   it("shows the configured power sensor as read-only measurement context", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
@@ -835,5 +1046,23 @@ describe("setup view defaults", () => {
     expect((element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).placeholder)
       .toBe("Hue White Ambiance A60 E27");
     expect(element.shadowRoot.querySelector(".field-hint")?.textContent).toContain("complete marketed name");
+  });
+});
+
+describe("recorderExportFilename", () => {
+  it("follows the recorder purpose rather than the name a duplicated session left behind", () => {
+    expect(recorderExportFilename("complex_profile", "kitchen.csv")).toBe("kitchen.jsonl");
+    expect(recorderExportFilename("playbook", "kitchen.jsonl")).toBe("kitchen.csv");
+  });
+
+  it("shows the name the server will actually write for the default", () => {
+    expect(recorderExportFilename("complex_profile", "record.csv")).toBe("record.jsonl");
+    expect(recorderExportFilename("playbook", "record.csv")).toBe("record.csv");
+    expect(recorderExportFilename("complex_profile", "")).toBe("record.jsonl");
+  });
+
+  it("leaves an extension it does not manage alone", () => {
+    expect(recorderExportFilename("complex_profile", "kitchen.txt")).toBe("kitchen.txt");
+    expect(recorderExportFilename("playbook", "kitchen")).toBe("kitchen");
   });
 });
