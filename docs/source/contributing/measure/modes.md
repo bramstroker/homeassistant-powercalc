@@ -94,7 +94,7 @@ Examples:
 Use `Recorder` to capture an open-ended power time series. In the Home Assistant app, first choose what the recording is for:
 
 - **A Playbook CSV** writes the existing headerless `elapsed time,power` format used by the [Playbook strategy](../../strategies/playbook.md).
-- **Data for a complex power profile** records power together with the state and complete attributes of selected Home Assistant entities. This produces source data for later profile development; it does not analyze the recording or generate a profile.
+- **Data for a complex power profile (experimental)** records power together with the state and complete attributes of selected Home Assistant entities. This workflow is not feature complete: it produces source data for later profile development, but does not analyze the recording or generate a profile `model.json` yet.
 
 The CLI always creates a Playbook CSV and stops when you press `CTRL+C`. The app stops the recorder from the running-session screen.
 

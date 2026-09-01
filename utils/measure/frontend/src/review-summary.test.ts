@@ -68,7 +68,7 @@ describe("review summary", () => {
       measure_type: "recorder", label: "Recorder", description: "Record states.", icon: "⏺",
       model_id_example: "", product_name_example: "", parameters: [], supports_profile: false, supports_resume: false,
       fields: [
-        { name: "recorder_purpose", label: "Purpose", role: "attribute", control: "select", required: true, review: true, options: [{ value: "complex_profile", label: "Data for a complex power profile" }] },
+        { name: "recorder_purpose", label: "Purpose", role: "attribute", control: "select", required: true, review: true, options: [{ value: "complex_profile", label: "Data for a complex power profile (experimental)" }] },
         { name: "profile_recipe", label: "Device type", role: "attribute", control: "select", required: true, review: true, options: [{ value: "vacuum_robot", label: "Robot vacuum" }] },
         { name: "vacuum_entity_id", label: "Vacuum", role: "attribute", control: "entity", required: true, review: true, options: [] },
         { name: "battery_entity_id", label: "Battery level sensor", role: "attribute", control: "entity", required: true, review: true, options: [] },
@@ -77,7 +77,7 @@ describe("review summary", () => {
     };
 
     expect(reviewSummary(recorder, { valid: true, warnings: [] }, definition)).toEqual(expect.arrayContaining([
-      { label: "Purpose", value: "Data for a complex power profile" },
+      { label: "Purpose", value: "Data for a complex power profile (experimental)" },
       { label: "Device type", value: "Robot vacuum" },
       { label: "Vacuum", value: "vacuum.robot" },
       { label: "Battery level sensor", value: "sensor.robot_battery" },

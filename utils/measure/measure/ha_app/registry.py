@@ -338,9 +338,10 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                     ),
                     FieldOption(
                         value=RecorderPurpose.COMPLEX_PROFILE,
-                        label="Data for a complex power profile",
+                        label="Data for a complex power profile (experimental)",
                         description=(
-                            "Record power together with entity states and attributes for later profile development."
+                            "This workflow is not feature complete. It records power with entity states and attributes "
+                            "as JSON Lines source data, but does not create a profile model.json yet."
                         ),
                     ),
                 ),

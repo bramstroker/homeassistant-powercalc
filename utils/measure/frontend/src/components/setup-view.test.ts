@@ -36,7 +36,11 @@ const recorderDefinition: MeasureDefinition = {
       default: "playbook", review: true,
       options: [
         { value: "playbook", label: "A Playbook CSV", description: "Record the playbook format." },
-        { value: "complex_profile", label: "Data for a complex power profile", description: "Record entity context." },
+        {
+          value: "complex_profile",
+          label: "Data for a complex power profile (experimental)",
+          description: "This workflow is not feature complete and does not create a profile model.json yet.",
+        },
       ],
     },
     {
@@ -820,6 +824,8 @@ describe("setup view defaults", () => {
     expect(await requestedDomains).toContain("*");
     expect(element.shadowRoot.querySelector('[name="profile_recipe"]')).toBeTruthy();
     expect(element.shadowRoot.querySelector('[name="tracked_entity_ids"]')).toBeTruthy();
+    expect(element.shadowRoot.textContent).toContain("not feature complete");
+    expect(element.shadowRoot.textContent).toContain("does not create a profile model.json yet");
     expect((element.shadowRoot.querySelector('[name="export_filename"]') as HTMLInputElement).value).toBe("record.jsonl");
   });
 
