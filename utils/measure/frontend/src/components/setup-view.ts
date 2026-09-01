@@ -444,8 +444,10 @@ export class SetupView extends LitElement {
       const domains = source
         ? [entityDomain(definition, field, this.selectValue(source, run))].filter((domain): domain is string => Boolean(domain))
         : this.fieldDomains(field);
-      const failed = field.all_entities && this.deviceEntityErrors["*"]
-        ? "*"
+      // An all-entities field reads the "*" catalog; its declared domains only filter that
+      // catalog client-side, so a stale error from another measure type must not surface here.
+      const failed = field.all_entities
+        ? (this.deviceEntityErrors["*"] ? "*" : undefined)
         : domains.find((domain) => this.deviceEntityErrors[domain]);
       if (failed) {
         return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
@@ -476,12 +478,10 @@ export class SetupView extends LitElement {
         ${field.options.map((option) => html`<option value=${option.value} ?selected=${option.value === value}>${option.label}</option>`)}
       </select></label>${this.optionGuidance(selectedOption)}</div>`;
     }
-    const defaultValue = name === "export_filename"
-      && this.selectedType === "recorder"
-      && this.recorderPurpose(run) === "complex_profile"
-      ? "record.jsonl"
-      : field.default;
-    return this.valueField(field, (stored ?? defaultValue ?? "").toString());
+    if (name === "export_filename" && this.selectedType === "recorder") {
+      return this.valueField(field, recorderExportFilename(this.recorderPurpose(run), (stored ?? field.default ?? "").toString()));
+    }
+    return this.valueField(field, (stored ?? field.default ?? "").toString());
   }
 
   private recorderPurpose(request?: MeasurementRequest): string | undefined {
@@ -844,4 +844,18 @@ export class SetupView extends LitElement {
   }
 
 
+}
+
+/**
+ * The export filename a recorder purpose implies. Both the server and the result plotter
+ * pick the format by extension, so the name follows the purpose rather than whatever a
+ * duplicated session left behind. An unrecognised extension is the user's own, and stays.
+ */
+export function recorderExportFilename(purpose: string | undefined, name: string): string {
+  const wanted = purpose === "complex_profile" ? "jsonl" : "csv";
+  if (!name) return `record.${wanted}`;
+  const dot = name.lastIndexOf(".");
+  const current = dot === -1 ? "" : name.slice(dot + 1).toLowerCase();
+  if (current !== "csv" && current !== "jsonl") return name;
+  return current === wanted ? name : `${name.slice(0, dot)}.${wanted}`;
 }

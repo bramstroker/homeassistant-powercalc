@@ -96,14 +96,18 @@ def test_recorder_writes_entity_states_as_json_lines(tmp_path: Path) -> None:
     )
 
 
-def test_recorder_state_failure_keeps_only_complete_rows(tmp_path: Path) -> None:
+def test_recorder_skips_unreadable_samples_and_keeps_recording(tmp_path: Path) -> None:
+    """A reloading integration costs one sample, not the whole recording."""
+
     measure_util = MagicMock(spec=MeasureUtil)
     measure_util.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
+    interaction.wait.side_effect = [None, None, KeyboardInterrupt]
     state_reader = MagicMock(
         side_effect=[
             {"switch.plug": RecorderEntityState("on", {})},
             RuntimeError("state unavailable"),
+            {"switch.plug": RecorderEntityState("off", {})},
         ],
     )
     runner = RecorderRunner(measure_util, interaction, state_reader)
@@ -114,13 +118,33 @@ def test_recorder_state_failure_keeps_only_complete_rows(tmp_path: Path) -> None
         tracked_entity_ids=("switch.plug",),
     )
 
-    with pytest.raises(RuntimeError, match="state unavailable"):
-        runner.run(request, str(tmp_path))
+    result = runner.run(request, str(tmp_path))
 
     samples = [json.loads(line) for line in (tmp_path / "record.jsonl").read_text().splitlines()]
-    assert len(samples) == 1
-    assert samples[0]["power"] == 4.2
-    assert samples[0]["entities"] == {"switch.plug": {"state": "on", "attributes": {}}}
+    assert [sample["entities"]["switch.plug"]["state"] for sample in samples] == ["on", "off"]
+    assert result.summary is not None
+    assert result.summary["Samples recorded"] == "2"
+
+
+def test_recorder_stops_when_cancelled_while_reading_states(tmp_path: Path) -> None:
+    """Cancellation raised by the state read still ends the run, unlike a read failure."""
+
+    measure_util = MagicMock(spec=MeasureUtil)
+    measure_util.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
+    interaction = MagicMock(spec=RunInteraction)
+    state_reader = MagicMock(side_effect=MeasurementCancelledError("stopped"))
+    runner = RecorderRunner(measure_util, interaction, state_reader)
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("switch.plug",),
+    )
+
+    result = runner.run(request, str(tmp_path))
+
+    assert result.summary is not None
+    assert result.summary["Samples recorded"] == "0"
 
 
 def test_recorder_requires_state_reader_for_complex_recording(tmp_path: Path) -> None:

@@ -86,7 +86,8 @@ export function entityDomains(definition: MeasureDefinition, values?: FormData):
       const source = narrowingField(definition, field);
       if (!source) return field.entity_domains ?? [];
       // Without a submitted value every option is still reachable, so offer all their domains.
-      if (values) return [entityDomain(definition, field, formText(values, source.name))];
+      const submitted = values ? formText(values, source.name) : "";
+      if (submitted) return [entityDomain(definition, field, submitted)];
       return source.options.map((option) => option.entity_domain);
     })
     // Lights already arrive with the startup catalog, so they are never fetched on demand.
@@ -99,6 +100,21 @@ export function entityDomains(definition: MeasureDefinition, values?: FormData):
   };
   if (definition.fields.some((field) => field.all_entities && fieldVisible(field, visibleValue))) domains.push("*");
   return domains;
+}
+
+/**
+ * A stored request seen as submitted form values, so domain resolution reads the values it
+ * was started with. Without this a restored request resolves against field defaults, and a
+ * field only its own purpose makes visible never has its entities fetched.
+ */
+export function requestFormData(definition: MeasureDefinition, request: MeasurementRequest): FormData {
+  const values = new FormData();
+  for (const field of definition.fields) {
+    const value = requestFieldValue(request, field);
+    if (value === undefined || value === "") continue;
+    for (const item of Array.isArray(value) ? value : [value]) values.append(field.name, String(item));
+  }
+  return values;
 }
 
 /** Whether the server-declared dependencies currently make a field relevant. */

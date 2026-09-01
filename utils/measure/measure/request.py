@@ -254,6 +254,9 @@ class RecorderMeasurementRequest(BaseMeasurementRequest):
         if self.recorder_purpose == RecorderPurpose.PLAYBOOK:
             if self._has_profile_selection():
                 raise ValueError("Playbook recordings cannot include complex-profile entity selections")
+            # Plotting picks the reader by extension, so a CSV under a .jsonl name reads as empty.
+            if self.export_filename.lower().endswith(".jsonl"):
+                raise ValueError("Playbook recordings must use a .csv export filename")
             return self
 
         if self.profile_recipe is None:

@@ -1,6 +1,6 @@
 import { ApiError } from "./api-client";
 import type { MeasureApiClient } from "./api-client";
-import { entityDomains } from "./measure-definition";
+import { entityDomains, requestFormData } from "./measure-definition";
 import { meterFor } from "./power-meter";
 import { emptyPlots } from "./types";
 import type {
@@ -281,7 +281,7 @@ export class MeasureAppController {
       if (!snapshot.request) throw new Error("The stored session has no reusable configuration.");
       const draft = { ...snapshot.request, resume_policy: "new" as const };
       this.resetDraft(draft);
-      await this.loadTypeEntities(draft.measure_type);
+      await this.loadTypeEntities(draft.measure_type, draft);
       this.state.view = "setup";
     });
   }
@@ -583,9 +583,12 @@ export class MeasureAppController {
     }
   }
 
-  private async loadTypeEntities(type: MeasureType): Promise<void> {
+  private async loadTypeEntities(type: MeasureType, request?: MeasurementRequest): Promise<void> {
     const definition = this.state.definitions.find((candidate) => candidate.measure_type === type);
-    if (definition) await this.ensureEntityDomains(entityDomains(definition));
+    if (!definition) return;
+    // A restored request may make fields visible that the type's defaults do not.
+    const values = request ? requestFormData(definition, request) : undefined;
+    await this.ensureEntityDomains(entityDomains(definition, values));
   }
 
   private async ensureEntityDomains(domains: string[]): Promise<void> {
@@ -732,7 +735,7 @@ export class MeasureAppController {
   /** Adopt the configuration a stored session was started with, so the draft and forms match it. */
   private async adoptRequest(request?: MeasurementRequest): Promise<void> {
     this.state.request = request;
-    if (request) await this.loadTypeEntities(request.measure_type);
+    if (request) await this.loadTypeEntities(request.measure_type, request);
   }
 
   private async enterRunning(): Promise<void> {

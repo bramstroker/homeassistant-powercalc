@@ -1,5 +1,6 @@
 import type { MeasureDefinition, MeasureParameter, MeasurementRequest } from "../types";
 import "./setup-view";
+import { recorderExportFilename } from "./setup-view";
 import { SetupViewElement, capabilities, definitions, lightDefinition, lights } from "./test-fixtures";
 
 interface TestCombobox extends HTMLElement {
@@ -1045,5 +1046,23 @@ describe("setup view defaults", () => {
     expect((element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).placeholder)
       .toBe("Hue White Ambiance A60 E27");
     expect(element.shadowRoot.querySelector(".field-hint")?.textContent).toContain("complete marketed name");
+  });
+});
+
+describe("recorderExportFilename", () => {
+  it("follows the recorder purpose rather than the name a duplicated session left behind", () => {
+    expect(recorderExportFilename("complex_profile", "kitchen.csv")).toBe("kitchen.jsonl");
+    expect(recorderExportFilename("playbook", "kitchen.jsonl")).toBe("kitchen.csv");
+  });
+
+  it("shows the name the server will actually write for the default", () => {
+    expect(recorderExportFilename("complex_profile", "record.csv")).toBe("record.jsonl");
+    expect(recorderExportFilename("playbook", "record.csv")).toBe("record.csv");
+    expect(recorderExportFilename("complex_profile", "")).toBe("record.jsonl");
+  });
+
+  it("leaves an extension it does not manage alone", () => {
+    expect(recorderExportFilename("complex_profile", "kitchen.txt")).toBe("kitchen.txt");
+    expect(recorderExportFilename("playbook", "kitchen")).toBe("kitchen");
   });
 });

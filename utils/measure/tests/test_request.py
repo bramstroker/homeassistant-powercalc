@@ -213,6 +213,13 @@ def test_recorder_request_rejects_unsafe_export_filename(export_filename: str) -
         )
 
 
+def test_playbook_recorder_rejects_a_jsonl_export_filename() -> None:
+    """Plotting picks its reader by extension, so a CSV under a .jsonl name reads as empty."""
+
+    with pytest.raises(ValidationError, match=r"must use a \.csv export filename"):
+        RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec(), export_filename="record.jsonl")
+
+
 def test_recorder_defaults_to_legacy_playbook_recording() -> None:
     request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
 

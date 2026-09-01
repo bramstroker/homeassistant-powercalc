@@ -148,6 +148,35 @@ def test_catalog_all_includes_arbitrary_domains_and_unavailable_entities() -> No
     assert thermostat.state == "unavailable"
 
 
+def test_catalog_omits_attribute_detail_for_unmeasurable_domains() -> None:
+    """Every Home Assistant entity reaches the "any entity" pickers, so the rows stay small."""
+
+    data = _entity_data()
+    data.entities["climate"] = SimpleNamespace(
+        entities={
+            "room": _entity(
+                "climate.room",
+                "heat",
+                friendly_name="Room thermostat",
+                temperature=21,
+                hvac_modes=["heat", "cool"],
+            ),
+        },
+    )
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+
+    entities = HomeAssistantEntityCatalog(home_assistant).load_snapshot().all()
+    thermostat = next(entity for entity in entities if entity.entity_id == "climate.room")
+    light = next(entity for entity in entities if entity.domain == "light")
+
+    assert thermostat.name == "Room thermostat"
+    assert thermostat.state == "heat"
+    assert thermostat.attribute_names == []
+    # A measurable domain still carries the detail preflight and the selectors read.
+    assert light.attribute_names
+
+
 def test_catalog_handles_light_with_null_effect_list() -> None:
     data = _entity_data()
     data.entities["light"].entities["desk"].state.attributes["effect_list"] = None

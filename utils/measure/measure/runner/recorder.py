@@ -78,7 +78,10 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
                     _LOGGER.info("Measurement %.2f", measurement.power)
                     elapsed_seconds = timestamp - start_time
                     if entity_ids and self.entity_state_reader is not None:
-                        entity_states = self.entity_state_reader(entity_ids)
+                        entity_states = self._read_entity_states(entity_ids)
+                        if entity_states is None:
+                            self.interaction.wait(INTERVAL)
+                            continue
                         entities: dict[str, object] = {}
                         live_states: dict[str, str] = {}
                         for entity_id in entity_ids:
@@ -117,6 +120,23 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
             "Duration": f"{round(time.time() - start_time)} s",
         }
         return RunnerResult(model_json_data={}, voltages=voltages, summary=summary)
+
+    def _read_entity_states(self, entity_ids: Sequence[str]) -> Mapping[str, RecorderEntityState] | None:
+        """Entity states for one sample, or None when Home Assistant could not answer.
+
+        A reloading integration or a dropped WebSocket makes a single read fail; an
+        open-ended recording that may run for hours skips that sample instead of ending.
+        """
+
+        if self.entity_state_reader is None:  # pragma: no cover - guarded by the caller
+            return None
+        try:
+            return self.entity_state_reader(entity_ids)
+        except MeasurementCancelledError:
+            raise
+        except Exception as error:  # noqa: BLE001
+            _LOGGER.warning("Skipping sample, could not read entity states: %s", error)
+            return None
 
     def measure_standby_power(self) -> MeasurementResult:
         return MeasurementResult(power=0, voltages=[])

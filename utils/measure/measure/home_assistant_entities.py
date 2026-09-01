@@ -26,6 +26,10 @@ class EntityDomain(StrEnum):
     SENSOR = "sensor"
 
 
+#: Domains PowerCalc can measure, and the only ones whose attribute detail is described.
+_MEASURABLE_DOMAINS = frozenset(EntityDomain)
+
+
 class DeviceClass(StrEnum):
     POWER = "power"
     VOLTAGE = "voltage"
@@ -222,7 +226,16 @@ def _describe_entity(
     registry_entry: Any | None,  # noqa: ANN401
     device_registry: dict[str, dict[str, object]],
 ) -> EntityDescriptor:
+    """Describe one entity.
+
+    Entities outside the measurable domains only ever populate the "any entity" pickers,
+    which show a name, a domain, a device and a state. Their per-entity attribute detail
+    is neither read nor rendered, so it is left out rather than built and sent for every
+    entity in Home Assistant.
+    """
+
     attributes = entity.state.attributes
+    detailed = domain in _MEASURABLE_DOMAINS
     device_id = str(registry_entry.device_id) if registry_entry is not None and registry_entry.device_id else None
     device = device_registry.get(device_id, {}) if device_id is not None else {}
     model_id = device.get(HASS_DEVICE_REGISTRY_MODEL_ID) or device.get(HASS_DEVICE_REGISTRY_MODEL)
@@ -241,12 +254,12 @@ def _describe_entity(
         model_id=str(model_id) if model_id else None,
         state=str(entity.state.state),
         unit=str(unit) if unit else None,
-        attribute_names=sorted(attributes),
+        attribute_names=sorted(attributes) if detailed else [],
         supported_modes=supported_modes,
-        effect_list=[str(effect) for effect in (attributes.get("effect_list") or [])] or None,
+        effect_list=[str(effect) for effect in (attributes.get("effect_list") or [])] or None if detailed else None,
         min_mired=light_info.get_min_mired() if light_info is not None else None,
         max_mired=light_info.get_max_mired() if light_info is not None else None,
-        member_entity_ids=[str(member) for member in members] if isinstance(members, list) else [],
+        member_entity_ids=[str(member) for member in members] if detailed and isinstance(members, list) else [],
     )
 
 
