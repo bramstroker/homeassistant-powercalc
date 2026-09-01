@@ -9,9 +9,6 @@
   "fixed_config": {
     "power": 1.11
   },
-  "sensor_config": {
-    "power_factor_lut": []
-  },
   "device_type": "smart_switch",
   "manufacturer": "switchbot",
   "model": "plug-mini-eu"
