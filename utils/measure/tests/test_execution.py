@@ -177,7 +177,7 @@ def test_execution_analyses_complex_recording_and_writes_schema_valid_model(
     assert model["fixed_config"]["states_power"] == {"off": 0.2, "on": 5.2}
     assert model["standby_power"] == pytest.approx(0.2)
     assert result.summary is not None
-    assert result.summary["Profile analysis"] == "Fixed states_power model created"
+    assert result.summary["Recording analysis"] == "Fixed states_power profile created"
     interaction.phase.assert_called_once_with("Analysing recording")
     runner.measure_standby_power.assert_not_called()
 
@@ -210,10 +210,10 @@ def test_execution_preserves_recording_when_analysis_fails(tmp_path: Path, caplo
     assert not (tmp_path / "model.json").exists()
     assert result.summary == {
         "Samples recorded": "1",
-        "Profile analysis": "Failed",
-        "Profile analysis reason": "Profile analysis failed: broken analyser",
+        "Recording analysis": "Failed",
+        "Recording analysis reason": "Recording analysis failed: broken analyser",
     }
-    assert "Profile analysis failed: broken analyser" in caplog.text
+    assert "Recording analysis failed: broken analyser" in caplog.text
 
 
 def test_execution_completes_without_model_when_recording_is_insufficient(
@@ -257,12 +257,12 @@ def test_execution_completes_without_model_when_recording_is_insufficient(
     assert not (tmp_path / "model.json").exists()
     assert result.summary == {
         "Samples recorded": "10",
-        "Profile analysis": "More data needed",
-        "Profile analysis reason": (
+        "Recording analysis": "More data needed",
+        "Recording analysis reason": (
             "No state or scalar attribute had 2-20 usable values with at least 4 training samples per value"
         ),
     }
-    assert "Profile model was not created" in caplog.text
+    assert "Profile was not created" in caplog.text
     assert "Skipped 1 invalid recorder line(s)" in caplog.text
 
 

@@ -330,16 +330,16 @@ class MeasurementExecution:
                     voltages=result.voltages,
                 )
             elif analysis.reason:
-                _LOGGER.warning("Profile model was not created: %s", analysis.reason)
+                _LOGGER.warning("Profile was not created: %s", analysis.reason)
             for warning in analysis.warnings:
-                _LOGGER.warning("Profile analysis: %s", warning)
+                _LOGGER.warning("Recording analysis: %s", warning)
             return RunnerResult(
                 model_json_data=result.model_json_data,
                 voltages=result.voltages,
                 summary={**(result.summary or {}), **analysis.summary()},
             )
         except Exception as error:  # noqa: BLE001 - raw recording must survive optional analysis failures
-            reason = f"Profile analysis failed: {error}"
+            reason = f"Recording analysis failed: {error}"
             _LOGGER.warning(reason)
             write_json_atomic(
                 output_directory / "analysis.json",
@@ -355,7 +355,7 @@ class MeasurementExecution:
                 voltages=result.voltages,
                 summary={
                     **(result.summary or {}),
-                    "Profile analysis": "Failed",
-                    "Profile analysis reason": reason,
+                    "Recording analysis": "Failed",
+                    "Recording analysis reason": reason,
                 },
             )

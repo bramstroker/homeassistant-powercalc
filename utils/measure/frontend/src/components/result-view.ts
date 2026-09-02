@@ -12,6 +12,9 @@ const CONTRIBUTION_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/o
 const TROUBLESHOOTING_URL = "https://docs.powercalc.nl/contributing/measure/troubleshooting/";
 const PROFILE_LIBRARY_PATH = "profile_library/<manufacturer>/<model>/";
 const ANALYSIS_SUMMARY_LABELS = new Set([
+  "Recording analysis",
+  "Recording analysis reason",
+  // Older sessions used these labels in their persisted summary.
   "Profile analysis",
   "Profile analysis reason",
   "Analysed feature",
@@ -510,21 +513,23 @@ ${preview.pr_body}</pre>
   private renderAnalysis() {
     const entries = this.summaryEntries().filter(([label]) => ANALYSIS_SUMMARY_LABELS.has(label));
     if (!entries.length) return nothing;
-    const result = entries.find(([label]) => label === "Profile analysis")?.[1];
-    const reason = entries.find(([label]) => label === "Profile analysis reason")?.[1];
+    const result = entries.find(([label]) => label === "Recording analysis")?.[1]
+      ?? entries.find(([label]) => label === "Profile analysis")?.[1];
+    const reason = entries.find(([label]) => label === "Recording analysis reason")?.[1]
+      ?? entries.find(([label]) => label === "Profile analysis reason")?.[1];
     const feature = entries.find(([label]) => label === "Analysed feature")?.[1];
-    const details = entries.filter(([label]) => !label.startsWith("Profile analysis"));
+    const details = entries.filter(([label]) => !label.endsWith("analysis") && !label.endsWith("analysis reason"));
     return html`
-      <section class="analysis-panel" aria-labelledby="profile-analysis-title">
-        <h3 id="profile-analysis-title">Profile analysis</h3>
+      <section class="analysis-panel" aria-labelledby="recording-analysis-title">
+        <h3 id="recording-analysis-title">Recording analysis</h3>
         <p class="analysis-explanation">
           ${feature
-            ? html`PowerCalc analysed how the measured power changed for each value of <code>${this.analysisFeature(feature)}</code>. This creates a model that can estimate power from that entity data.`
-            : "PowerCalc compared the measured power with changes in the recorded entity states to find a suitable power model."}
+            ? html`PowerCalc analysed how the measured power changed for each value of <code>${this.analysisFeature(feature)}</code>. This creates a profile that can estimate power from that entity data.`
+            : "PowerCalc compared the measured power with changes in the recorded entity states to create a suitable power profile."}
         </p>
         ${result ? html`<p class="analysis-outcome"><span>Result</span><strong>${this.analysisResult(result)}</strong></p>` : nothing}
         ${reason ? html`<p class="analysis-reason"><strong>Why:</strong> ${reason}</p>` : nothing}
-        ${details.length ? html`<dl class="analysis-details" aria-label="Profile analysis details">
+        ${details.length ? html`<dl class="analysis-details" aria-label="Recording analysis details">
           ${details.map(([label, value]) => html`
             <div><dt>${this.analysisDetailLabel(label)}</dt><dd>${label === "Analysed feature" ? this.analysisFeature(value) : value}</dd></div>
           `)}
@@ -534,7 +539,9 @@ ${preview.pr_body}</pre>
   }
 
   private analysisResult(result: string): string {
-    return result === "Fixed states_power model created" ? "A state-based power model was created." : result;
+    return result === "Fixed states_power model created" || result === "Fixed states_power profile created"
+      ? "A state-based power profile was created."
+      : result;
   }
 
   private analysisDetailLabel(label: string): string {

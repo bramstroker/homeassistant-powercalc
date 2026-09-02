@@ -75,14 +75,14 @@ describe("result view", () => {
     expect(measurement?.textContent).toContain("Samples recorded");
     expect(measurement?.textContent).not.toContain("More data needed");
     const analysis = element.shadowRoot.querySelector(".analysis-panel");
-    expect(analysis?.querySelector("h3")?.textContent).toBe("Profile analysis");
+    expect(analysis?.querySelector("h3")?.textContent).toBe("Recording analysis");
     expect(analysis?.textContent).toContain("More data needed");
     expect(analysis?.textContent).toContain("compared the measured power");
     const reason = analysis?.querySelector(".analysis-reason");
     expect(reason?.textContent).toContain("Every state needs at least five samples");
   });
 
-  it("groups successful profile analysis details in a separate panel", async () => {
+  it("groups successful recording analysis details in a separate panel", async () => {
     const element = document.createElement("measure-result-view") as HTMLElement & {
       snapshot: SessionSnapshot;
       updateComplete: Promise<boolean>;
@@ -93,7 +93,7 @@ describe("result view", () => {
       summary: {
         "Samples recorded": "39",
         Duration: "160 s",
-        "Profile analysis": "Fixed states_power model created",
+        "Recording analysis": "Fixed states_power profile created",
         "Analysed feature": "input_select.powercalc_test_state.state",
         "Validation MAE": "0.02 W",
         "Validation coverage": "100%",
@@ -105,13 +105,13 @@ describe("result view", () => {
     const measurement = element.shadowRoot.querySelector('[aria-label="Measurement result"]');
     expect(measurement?.textContent).toContain("39");
     expect(measurement?.textContent).toContain("160 s");
-    expect(measurement?.textContent).not.toContain("Fixed states_power model created");
+    expect(measurement?.textContent).not.toContain("Fixed states_power profile created");
 
     const analysis = element.shadowRoot.querySelector(".analysis-panel");
-    expect(analysis?.textContent).toContain("A state-based power model was created.");
+    expect(analysis?.textContent).toContain("A state-based power profile was created.");
     expect(analysis?.textContent).toContain("analysed how the measured power changed");
     expect(analysis?.textContent).toContain("input_select.powercalc_test_state");
-    const details = analysis?.querySelector('[aria-label="Profile analysis details"]');
+    const details = analysis?.querySelector('[aria-label="Recording analysis details"]');
     expect(details?.querySelector("dt")?.textContent).toBe("Model input");
     expect(details?.querySelector("dd")?.textContent).toBe("input_select.powercalc_test_state");
     expect(details?.textContent).toContain("Typical difference");

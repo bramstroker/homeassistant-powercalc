@@ -207,14 +207,14 @@ class RecorderAnalysisResult:
 
     def summary(self) -> dict[str, str]:
         if not self.model_ready:
-            summary = {"Profile analysis": "More data needed"}
+            summary = {"Recording analysis": "More data needed"}
             if self.reason is not None:
-                summary["Profile analysis reason"] = self.reason
+                summary["Recording analysis reason"] = self.reason
             return summary
         assert self.feature is not None
         assert self.metrics is not None
         return {
-            "Profile analysis": "Fixed states_power model created",
+            "Recording analysis": "Fixed states_power profile created",
             "Analysed feature": self.feature.identifier,
             "Validation MAE": f"{self.metrics.mae_w:.2f} W",
             "Validation coverage": f"{self.metrics.coverage:.0%}",
