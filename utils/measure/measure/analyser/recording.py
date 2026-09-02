@@ -23,7 +23,7 @@ def load_recording(path: Path) -> LoadedRecording:
                 if record.get("record_type") not in (None, "sample"):
                     continue
                 sample = _parse_sample(record)
-            except (KeyError, ValueError, TypeError, json.JSONDecodeError) as error:
+            except (KeyError, ValueError, TypeError) as error:
                 invalid_records.append((line_number, str(error)))
                 continue
             samples.append(sample)

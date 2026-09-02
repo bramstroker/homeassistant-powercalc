@@ -1,5 +1,6 @@
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+import math
 from typing import Literal, Protocol
 
 type ScalarStateValue = str | bool | int | float
@@ -90,7 +91,7 @@ class FeatureReference:
         value: object = entity.state if self.source == "state" else entity.attributes.get(str(self.attribute))
         if isinstance(value, bool | int | str):
             return value
-        if isinstance(value, float) and value == value and abs(value) != float("inf"):
+        if isinstance(value, float) and math.isfinite(value):
             return value
         return None
 
