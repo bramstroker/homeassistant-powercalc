@@ -5,7 +5,7 @@
   ],
   "calculation_strategy": "fixed",
   "compatible_integrations": [
-    "cast"
+    "androidtv"
   ],
   "config_flow_sub_profile_remarks": "Select the standby mode configured on the KPN TV Box+ under Settings > Energy saving. Both modes use 3.22 W while the box is on; only the standby consumption differs.",
   "created_at": "2026-08-31T14:18:12Z",
@@ -20,7 +20,7 @@
   "measure_device": "Zhurui PR10",
   "measure_method": "manual",
   "mains_voltage": 230,
-  "min_version": "v1.26.0",
+  "min_version": "v1.25.3",
   "name": "KPN TV Box+",
   "authors": [
     {
