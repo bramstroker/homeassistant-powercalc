@@ -310,6 +310,22 @@ async def test_download_rejects_invalid_resource_manifest(
         await remote_loader.download_profile("test", "model", str(tmp_path / "profiles"), "test_download")
 
 
+async def test_download_rejects_a_manifest_that_is_not_json(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    """A manifest that is not JSON must surface as a download error rather than a decoding crash."""
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        body=b"<html>gateway error</html>",
+    )
+
+    with pytest.raises(ProfileDownloadError, match="not valid JSON"):
+        await remote_loader.download_profile("test", "model", str(tmp_path / "profiles"), "test_download")
+
+
 async def test_download_rejects_absolute_resource_path(
     remote_loader: RemoteLoader,
     mock_aioresponse: aioresponses,
