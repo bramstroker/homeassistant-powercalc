@@ -112,7 +112,7 @@ describe("result view", () => {
     expect(analysis?.textContent).toContain("The best match was");
     expect(analysis?.textContent).toContain("input_select.powercalc_test_state");
     const details = analysis?.querySelector('[aria-label="Profile analysis details"]');
-    expect(details?.textContent).toContain("Average error");
+    expect(details?.textContent).toContain("Typical difference");
     expect(details?.textContent).toContain("0.02 W");
     expect(details?.textContent).toContain("Data coverage");
     expect(details?.textContent).toContain("100%");

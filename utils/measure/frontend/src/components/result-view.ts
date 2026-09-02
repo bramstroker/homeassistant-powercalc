@@ -538,7 +538,7 @@ ${preview.pr_body}</pre>
 
   private analysisDetailLabel(label: string): string {
     if (label === "Analysed feature") return "Best matching state";
-    if (label === "Validation MAE") return "Average error";
+    if (label === "Validation MAE") return "Typical difference";
     if (label === "Validation coverage") return "Data coverage";
     return label;
   }
