@@ -3,7 +3,8 @@
     "source_entity": "Zdrojová entita",
     "source_device": "Zdrojové zariadenie",
     "remarks_smart_switch": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n Keď máte spotrebič, ktorý po zapnutí spotrebúva pevné množstvo energie, môžete túto hodnotu zadať v ďalšom kroku konfiguračného postupu",
-    "remarks_smart_dimmer": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n V ďalšom kroku môžete voliteľne zadať hodnoty pripojeného svetla"
+    "remarks_smart_dimmer": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n V ďalšom kroku môžete voliteľne zadať hodnoty pripojeného svetla",
+    "view_measurement_details": "Zobraziť podrobnosti merania"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Ak sa rozhodnete nepotvrdiť, môžete zadať výrobcu a model sami"
         },
-        "description": "{source}\n\nVýrobca \"{manufacturer}\" a model \"{model}\" boli automaticky detekované pre vaše zariadenie.{remarks}",
+        "description": "{source}\n\nVýrobca \"{manufacturer}\" a model \"{model}\" boli automaticky detekované pre vaše zariadenie.{remarks}{profile_details}",
         "title": "Knižnica"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Možnosti knižnice",
-        "description": "Momentálne je vybratý nasledujúci profil knižnice: \n výrobca: {manufacturer}\n model: {model}\n\nAk chcete profil zmeniť, kliknite na tlačidlo Ďalej."
+        "description": "Momentálne je vybratý nasledujúci profil knižnice: \n výrobca: {manufacturer}\n model: {model}\n\nAk chcete profil zmeniť, kliknite na tlačidlo Ďalej.{profile_details}"
       },
       "select_device": {
         "data": {

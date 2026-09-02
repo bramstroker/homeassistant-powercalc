@@ -3,7 +3,8 @@
     "source_entity": "Kildeentitet",
     "source_device": "Kildeenhet",
     "remarks_smart_switch": "Denne profilen inneholder bare effektverdier for standby. \n Hvis du har et apparat med fast effekt når det er slått på, kan du angi denne verdien i neste trinn i konfigurasjonen",
-    "remarks_smart_dimmer": "Denne profilen inneholder bare effektverdier for standby. \n I neste trinn kan du valgfritt oppgi verdiene for det tilkoblede lyset"
+    "remarks_smart_dimmer": "Denne profilen inneholder bare effektverdier for standby. \n I neste trinn kan du valgfritt oppgi verdiene for det tilkoblede lyset",
+    "view_measurement_details": "Vis måledetaljer"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Hvis du velger å ikke bekrefte, kan du selv angi produsenten og modellen"
         },
-        "description": "{source}\n\nProdusent \"{manufacturer}\" og modell \"{model}\" ble automatisk oppdaget for enheten din.{remarks}",
+        "description": "{source}\n\nProdusent \"{manufacturer}\" og modell \"{model}\" ble automatisk oppdaget for enheten din.{remarks}{profile_details}",
         "title": "Bibliotek"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Alternativer for bibliotek",
-        "description": "For øyeblikket er følgende bibliotekprofil valgt: \n produsent: {manufacturer}\n modell: {model}\n\nHvis du vil endre profilen, klikker du på neste."
+        "description": "For øyeblikket er følgende bibliotekprofil valgt: \n produsent: {manufacturer}\n modell: {model}\n\nHvis du vil endre profilen, klikker du på neste.{profile_details}"
       },
       "select_device": {
         "data": {

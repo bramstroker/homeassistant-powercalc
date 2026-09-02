@@ -3,7 +3,8 @@
     "source_entity": "Entitatea sursă",
     "source_device": "Dispozitiv sursă",
     "remarks_smart_switch": "Acest profil furnizează doar valorile puterii de așteptare. \n Când aveți un aparat care consumă o cantitate fixă ​​de energie atunci când este pornit, puteți furniza acea valoare în următorul pas al fluxului de configurare",
-    "remarks_smart_dimmer": "Acest profil furnizează doar valorile puterii de așteptare. \n În pasul următor puteți furniza opțional valorile luminii conectate"
+    "remarks_smart_dimmer": "Acest profil furnizează doar valorile puterii de așteptare. \n În pasul următor puteți furniza opțional valorile luminii conectate",
+    "view_measurement_details": "Vedeți detaliile măsurătorii"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Dacă alegeți să nu confirmați, puteți introduce singur producătorul și modelul"
         },
-        "description": "{source}\n\nProducătorul \"{manufacturer}\" și modelul \"{model}\" au fost detectate automat pentru dispozitivul dvs.{remarks}",
+        "description": "{source}\n\nProducătorul \"{manufacturer}\" și modelul \"{model}\" au fost detectate automat pentru dispozitivul dvs.{remarks}{profile_details}",
         "title": "Bibliotecă"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Opțiuni de bibliotecă",
-        "description": "În prezent este selectat următorul profil de bibliotecă: \n producator: {manufacturer}\n model: {model}\n\nDacă doriți să schimbați profilul, faceți clic pe următorul."
+        "description": "În prezent este selectat următorul profil de bibliotecă: \n producator: {manufacturer}\n model: {model}\n\nDacă doriți să schimbați profilul, faceți clic pe următorul.{profile_details}"
       },
       "select_device": {
         "data": {
