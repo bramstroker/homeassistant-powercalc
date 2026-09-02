@@ -518,14 +518,15 @@ ${preview.pr_body}</pre>
       <section class="analysis-panel" aria-labelledby="profile-analysis-title">
         <h3 id="profile-analysis-title">Profile analysis</h3>
         <p class="analysis-explanation">
-          PowerCalc compared the measured power with changes in the recorded entity states to find a suitable power model.
-          ${feature ? html`The best match was <code>${feature}</code>.` : nothing}
+          ${feature
+            ? html`PowerCalc analysed how the measured power changed for each value of <code>${this.analysisFeature(feature)}</code>. This creates a model that can estimate power from that entity data.`
+            : "PowerCalc compared the measured power with changes in the recorded entity states to find a suitable power model."}
         </p>
         ${result ? html`<p class="analysis-outcome"><span>Result</span><strong>${this.analysisResult(result)}</strong></p>` : nothing}
         ${reason ? html`<p class="analysis-reason"><strong>Why:</strong> ${reason}</p>` : nothing}
         ${details.length ? html`<dl class="analysis-details" aria-label="Profile analysis details">
           ${details.map(([label, value]) => html`
-            <div><dt>${this.analysisDetailLabel(label)}</dt><dd>${value}</dd></div>
+            <div><dt>${this.analysisDetailLabel(label)}</dt><dd>${label === "Analysed feature" ? this.analysisFeature(value) : value}</dd></div>
           `)}
         </dl>` : nothing}
       </section>
@@ -537,10 +538,14 @@ ${preview.pr_body}</pre>
   }
 
   private analysisDetailLabel(label: string): string {
-    if (label === "Analysed feature") return "Best matching state";
+    if (label === "Analysed feature") return "Model input";
     if (label === "Validation MAE") return "Typical difference";
     if (label === "Validation coverage") return "Data coverage";
     return label;
+  }
+
+  private analysisFeature(feature: string): string {
+    return feature.endsWith(".state") ? feature.slice(0, -".state".length) : feature;
   }
 
   private renderWarnings() {

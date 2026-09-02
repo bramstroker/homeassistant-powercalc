@@ -94,7 +94,7 @@ describe("result view", () => {
         "Samples recorded": "39",
         Duration: "160 s",
         "Profile analysis": "Fixed states_power model created",
-        "Analysed feature": "input_select.powercalc_test_state",
+        "Analysed feature": "input_select.powercalc_test_state.state",
         "Validation MAE": "0.02 W",
         "Validation coverage": "100%",
       },
@@ -109,9 +109,11 @@ describe("result view", () => {
 
     const analysis = element.shadowRoot.querySelector(".analysis-panel");
     expect(analysis?.textContent).toContain("A state-based power model was created.");
-    expect(analysis?.textContent).toContain("The best match was");
+    expect(analysis?.textContent).toContain("analysed how the measured power changed");
     expect(analysis?.textContent).toContain("input_select.powercalc_test_state");
     const details = analysis?.querySelector('[aria-label="Profile analysis details"]');
+    expect(details?.querySelector("dt")?.textContent).toBe("Model input");
+    expect(details?.querySelector("dd")?.textContent).toBe("input_select.powercalc_test_state");
     expect(details?.textContent).toContain("Typical difference");
     expect(details?.textContent).toContain("0.02 W");
     expect(details?.textContent).toContain("Data coverage");
