@@ -77,7 +77,8 @@ describe("result view", () => {
     const analysis = element.shadowRoot.querySelector(".analysis-panel");
     expect(analysis?.querySelector("h3")?.textContent).toBe("Profile analysis");
     expect(analysis?.textContent).toContain("More data needed");
-    const reason = analysis?.querySelector(".metric.analysis-reason");
+    expect(analysis?.textContent).toContain("compared the measured power");
+    const reason = analysis?.querySelector(".analysis-reason");
     expect(reason?.textContent).toContain("Every state needs at least five samples");
   });
 
@@ -106,11 +107,15 @@ describe("result view", () => {
     expect(measurement?.textContent).toContain("160 s");
     expect(measurement?.textContent).not.toContain("Fixed states_power model created");
 
-    const analysis = element.shadowRoot.querySelector('[aria-label="Profile analysis result"]');
-    expect(analysis?.textContent).toContain("Fixed states_power model created");
+    const analysis = element.shadowRoot.querySelector(".analysis-panel");
+    expect(analysis?.textContent).toContain("A state-based power model was created.");
+    expect(analysis?.textContent).toContain("The best match was");
     expect(analysis?.textContent).toContain("input_select.powercalc_test_state");
-    expect(analysis?.textContent).toContain("0.02 W");
-    expect(analysis?.textContent).toContain("100%");
+    const details = analysis?.querySelector('[aria-label="Profile analysis details"]');
+    expect(details?.textContent).toContain("Average error");
+    expect(details?.textContent).toContain("0.02 W");
+    expect(details?.textContent).toContain("Data coverage");
+    expect(details?.textContent).toContain("100%");
   });
 
   it("shows a download-all action for generated files", async () => {

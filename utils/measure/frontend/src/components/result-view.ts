@@ -140,11 +140,17 @@ export class ResultView extends LitElement {
     .metric strong { display: block; margin-top: 0.35rem; font: 700 1.4rem/1.1 "DIN Alternate", sans-serif; color: var(--signal-strong); }
     .analysis-panel { margin-top: 1.5rem; padding: clamp(1rem, 3vw, 1.35rem); border: 1px solid var(--line); border-radius: 14px; background: var(--well); }
     .analysis-panel h3 { margin: 0; font-size: 1.05rem; }
-    .analysis-panel > .muted { margin: 0.3rem 0 0; }
-    .analysis-readout { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 1rem; }
-    .metric.analysis-feature strong { overflow-wrap: anywhere; font-size: 1.05rem; }
-    .metric.analysis-reason { grid-column: 1 / -1; }
-    .metric.analysis-reason strong { font: 600 0.95rem/1.4 Inter, sans-serif; color: var(--ink); }
+    .analysis-explanation { max-width: 80ch; margin: 0.55rem 0 0; color: var(--muted); line-height: 1.55; }
+    .analysis-explanation code { color: var(--ink); overflow-wrap: anywhere; }
+    .analysis-outcome { display: flex; flex-wrap: wrap; gap: 0.4rem 0.75rem; align-items: baseline; margin: 1rem 0 0; }
+    .analysis-outcome span { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .analysis-outcome strong { color: var(--signal-strong); font-size: 1.05rem; }
+    .analysis-reason { margin: 0.7rem 0 0; color: var(--ink); line-height: 1.45; }
+    .analysis-reason strong { color: var(--muted); }
+    .analysis-details { display: flex; flex-wrap: wrap; gap: 0.65rem 1.5rem; margin: 1rem 0 0; padding-top: 0.85rem; border-top: 1px solid var(--line); }
+    .analysis-details div { display: flex; flex-wrap: wrap; gap: 0.3rem 0.5rem; min-width: 0; align-items: baseline; }
+    .analysis-details dt { color: var(--muted); font-size: 0.75rem; }
+    .analysis-details dd { margin: 0; color: var(--ink); font-weight: 700; overflow-wrap: anywhere; }
     .files-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1.5rem; }
     .files-header h3 { margin: 0; font-size: 1rem; }
     .download-all { min-height: 36px; padding: 0.45rem 0.75rem; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
@@ -504,24 +510,36 @@ ${preview.pr_body}</pre>
   private renderAnalysis() {
     const entries = this.summaryEntries().filter(([label]) => ANALYSIS_SUMMARY_LABELS.has(label));
     if (!entries.length) return nothing;
+    const result = entries.find(([label]) => label === "Profile analysis")?.[1];
+    const reason = entries.find(([label]) => label === "Profile analysis reason")?.[1];
+    const feature = entries.find(([label]) => label === "Analysed feature")?.[1];
+    const details = entries.filter(([label]) => !label.startsWith("Profile analysis"));
     return html`
       <section class="analysis-panel" aria-labelledby="profile-analysis-title">
         <h3 id="profile-analysis-title">Profile analysis</h3>
-        <p class="muted">Automatic model selection and validation</p>
-        <div class="readout analysis-readout" aria-label="Profile analysis result">
-          ${entries.map(([label, value]) => html`
-            <div class="metric ${label === "Profile analysis reason" ? "analysis-reason" : ""} ${label === "Analysed feature" ? "analysis-feature" : ""}">
-              <span>${this.analysisMetricLabel(label)}</span><strong>${value}</strong>
-            </div>
+        <p class="analysis-explanation">
+          PowerCalc compared the measured power with changes in the recorded entity states to find a suitable power model.
+          ${feature ? html`The best match was <code>${feature}</code>.` : nothing}
+        </p>
+        ${result ? html`<p class="analysis-outcome"><span>Result</span><strong>${this.analysisResult(result)}</strong></p>` : nothing}
+        ${reason ? html`<p class="analysis-reason"><strong>Why:</strong> ${reason}</p>` : nothing}
+        ${details.length ? html`<dl class="analysis-details" aria-label="Profile analysis details">
+          ${details.map(([label, value]) => html`
+            <div><dt>${this.analysisDetailLabel(label)}</dt><dd>${value}</dd></div>
           `)}
-        </div>
+        </dl>` : nothing}
       </section>
     `;
   }
 
-  private analysisMetricLabel(label: string): string {
-    if (label === "Profile analysis") return "Result";
-    if (label === "Profile analysis reason") return "Reason";
+  private analysisResult(result: string): string {
+    return result === "Fixed states_power model created" ? "A state-based power model was created." : result;
+  }
+
+  private analysisDetailLabel(label: string): string {
+    if (label === "Analysed feature") return "Best matching state";
+    if (label === "Validation MAE") return "Average error";
+    if (label === "Validation coverage") return "Data coverage";
     return label;
   }
 
