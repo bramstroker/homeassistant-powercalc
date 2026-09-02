@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.6.0 - 2026-09-02
+
+### 🚀 Features
+
+- #4667 Add entity state capture to recorder. 1st prep for complex profile creation @bramstroker
+
 ## 0.5.0 - 2026-08-29
 
 - #4556 Add support for the OWON OWH98xx series power meters @MartinJM
