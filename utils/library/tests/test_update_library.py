@@ -174,6 +174,43 @@ def test_process_model_file_spans_the_power_range_over_sub_profiles(tmp_path: Pa
     assert model["power_range"] == {"min": 2, "max": 9}
 
 
+def test_process_model_file_includes_standby_power_in_fixed_power_range(tmp_path: Path) -> None:
+    model_directory = create_model_directory(tmp_path, calculation_strategy="fixed")
+    (model_directory / "model.json").write_text(
+        json.dumps(
+            {
+                "name": "Plug Mini (EU)",
+                "calculation_strategy": "fixed",
+                "standby_power": 0.72,
+                "standby_power_on": 1.11,
+                "only_self_usage": True,
+            },
+        ),
+    )
+
+    model = asyncio.run(process_model_file(str(model_directory / "model.json")))
+
+    assert model["power_range"] == {"min": 0.72, "max": 1.11}
+
+
+def test_process_model_file_includes_standby_power_with_fixed_state_powers(tmp_path: Path) -> None:
+    model_directory = create_model_directory(tmp_path, calculation_strategy="fixed")
+    (model_directory / "model.json").write_text(
+        json.dumps(
+            {
+                "name": "Stateful appliance",
+                "calculation_strategy": "fixed",
+                "fixed_config": {"states_power": {"idle": 2.5, "active": 5}},
+                "standby_power": 0.72,
+            },
+        ),
+    )
+
+    model = asyncio.run(process_model_file(str(model_directory / "model.json")))
+
+    assert model["power_range"] == {"min": 0.72, "max": 5}
+
+
 def test_process_model_file_takes_the_power_range_from_linear_calibration(tmp_path: Path) -> None:
     model_directory = create_model_directory(tmp_path, calculation_strategy="linear")
     (model_directory / "model.json").write_text(
@@ -182,6 +219,7 @@ def test_process_model_file_takes_the_power_range_from_linear_calibration(tmp_pa
                 "name": "Dimmer",
                 "calculation_strategy": "linear",
                 "linear_config": {"calibrate": ["1 -> 1.214", "128 -> 1.484", "255 -> 1.659"]},
+                "standby_power": 0.2,
             },
         ),
     )

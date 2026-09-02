@@ -291,7 +291,7 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
+            "min": 0.7,
             "max": 0.8
           },
           "hash": "219c27a60105b2524ae8eb524a71f417"
@@ -1564,7 +1564,7 @@
           "max_power": 0.46,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.46,
+            "min": 0.17,
             "max": 0.46
           },
           "hash": "19a0539e50a4e970608aac5b27668677"
@@ -1895,7 +1895,7 @@
           "max_power": 1.144,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.144,
+            "min": 0.267,
             "max": 1.144
           },
           "hash": "535e27771bcef16465a59e3ce6c1dc0a"
@@ -1933,7 +1933,7 @@
           "max_power": 1.596,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.596,
+            "min": 0.66,
             "max": 1.596
           },
           "hash": "43a522c384d5644fc6ae32f3f3f79317"
@@ -1971,7 +1971,7 @@
           "max_power": 2.565,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 2.565,
+            "min": 0.29,
             "max": 2.565
           },
           "hash": "e8ce0994e9152855750f4afd376eb01b"
@@ -2092,7 +2092,7 @@
           "max_power": 1.03,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.03,
+            "min": 0.66,
             "max": 1.03
           },
           "hash": "053a69df3904ea84d50568c0cdacfbfc"
@@ -2273,7 +2273,7 @@
           "max_power": 1.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.0,
+            "min": 0.45,
             "max": 1.0
           },
           "hash": "868e1a737f5c3404a3f2550cc9005595"
@@ -2314,7 +2314,7 @@
           "max_power": 1.1,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.1,
+            "min": 0.35,
             "max": 1.1
           },
           "hash": "8d5d54f6cbaeb7ed9bf3fbe39d00b17d"
@@ -2879,7 +2879,7 @@
           "max_power": 1.3,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.3,
+            "min": 0.75,
             "max": 1.3
           },
           "hash": "4145980b5d26f3a4435790e3e34706e8"
@@ -2931,7 +2931,7 @@
           "max_power": 0.85,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.85,
+            "min": 0.5,
             "max": 0.85
           },
           "hash": "2ad8454c5b7fca7c696236cbadea3ee7"
@@ -2968,7 +2968,7 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
+            "min": 0.4,
             "max": 0.8
           },
           "hash": "09d2f775afe441d03422426e040bf0a8"
@@ -3077,7 +3077,7 @@
           "max_power": 0.6,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.6,
+            "min": 0.24,
             "max": 0.6
           },
           "hash": "7d3c07dc39927f0397778dbe48031ade"
@@ -3247,7 +3247,7 @@
           "max_power": 0.89,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.89,
+            "min": 0.59,
             "max": 0.89
           },
           "hash": "b6a95be9cdbdf2e8fb1de695ac39ca76"
@@ -3286,7 +3286,7 @@
           "max_power": 0.3,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.3,
+            "min": 0.1,
             "max": 0.3
           },
           "hash": "0ef37de239590db59addd37a382edc4d"
@@ -5243,7 +5243,7 @@
           "max_power": 0.73,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.73,
+            "min": 0.37,
             "max": 0.73
           },
           "hash": "35f4723081003cbdbdcb775a62677b58"
@@ -5287,7 +5287,7 @@
           "max_power": 0.52,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.52,
+            "min": 0.32,
             "max": 0.52
           },
           "hash": "ca1591d878ee0940b2e176bdc6ee42d0"
@@ -5332,7 +5332,7 @@
           "max_power": 1.42,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.42,
+            "min": 0.83,
             "max": 1.42
           },
           "hash": "0fe8638a45fd8ee6d4c04d2ba5283fae"
@@ -5463,7 +5463,7 @@
           "max_power": 0.3,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.3,
+            "min": 0.25,
             "max": 0.3
           },
           "hash": "053a20577e501f51eb38eddacac9332e"
@@ -5541,7 +5541,7 @@
           "max_power": 0.68,
           "sub_profile_count": 3,
           "power_range": {
-            "min": 0.2,
+            "min": 0.12,
             "max": 0.68
           },
           "hash": "4d760d07f5ab8e59490bd27e886f1194"
@@ -5587,7 +5587,7 @@
           "max_power": 0.74,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.74,
+            "min": 0.2,
             "max": 0.74
           },
           "hash": "ada302385d944a2d32791374749773e2"
@@ -5679,7 +5679,7 @@
           "max_power": 0.78,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.78,
+            "min": 0.21,
             "max": 0.78
           },
           "hash": "c9f81bd32b894947eb7c651e430e9f21"
@@ -5832,7 +5832,7 @@
           "max_power": 0.9,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.9,
+            "min": 0.4,
             "max": 0.9
           },
           "hash": "c6953f80ffe9da9900e83f8cea1369ff"
@@ -5883,7 +5883,7 @@
           "max_power": 0.5,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.5,
+            "min": 0.3,
             "max": 0.5
           },
           "hash": "03da2b790810a233a05adc43c6d94f73"
@@ -6053,7 +6053,7 @@
           "max_power": 1.191,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.191,
+            "min": 0.378,
             "max": 1.191
           },
           "hash": "ded3f054768118c1e430b363d57e29a7"
@@ -6118,7 +6118,7 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
+            "min": 0.5,
             "max": 0.8
           },
           "hash": "74433429c24f3f07228617ce70ff24d1"
@@ -6179,7 +6179,7 @@
           "max_power": 1.06,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.06,
+            "min": 0.52,
             "max": 1.06
           },
           "hash": "b0aa1785dff9c9f40f8ef4a847bf44c1"
@@ -8409,7 +8409,7 @@
           "max_power": 1.1,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.1,
+            "min": 0.3,
             "max": 1.1
           },
           "hash": "89f1a598df1434f3d0e6c8441350b3b9"
@@ -8838,7 +8838,7 @@
           "max_power": 0.98,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.98,
+            "min": 0.23,
             "max": 0.98
           },
           "hash": "79abde60f4474ee44402e86b27c3b600"
@@ -8917,7 +8917,7 @@
           "max_power": 0.78,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.78,
+            "min": 0.21,
             "max": 0.78
           },
           "hash": "f836cec792a5bf5326a33dbf7e956396"
@@ -9001,7 +9001,7 @@
           "max_power": 0.73,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.73,
+            "min": 0.13,
             "max": 0.73
           },
           "hash": "0098da10db5b9660d899554a841bf0d7"
@@ -9044,7 +9044,7 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
+            "min": 0.23,
             "max": 0.8
           },
           "hash": "f896c41066c1fb678d4ef2f6a7f259ad"
@@ -9083,7 +9083,7 @@
           "max_power": 0.7,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.7,
+            "min": 0.2,
             "max": 0.7
           },
           "hash": "7c1fa311c7cda8c4441e966753a831c9"
@@ -9124,7 +9124,7 @@
           "max_power": 0.47,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.47,
+            "min": 0.22,
             "max": 0.47
           },
           "hash": "d7e6fcdf5ce51a546c082396eb5ed960"
@@ -12815,7 +12815,7 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
+            "min": 0.3,
             "max": 0.8
           },
           "hash": "e214ebd303d74f826e3c32c6d5c8a8ef"
@@ -13981,7 +13981,7 @@
           "max_power": 0.61,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.61,
+            "min": 0.41,
             "max": 0.61
           },
           "hash": "0c85f601afb1acbd284bf1967deb5902"
@@ -14023,7 +14023,7 @@
           "max_power": 1.25,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.25,
+            "min": 0.5,
             "max": 1.25
           },
           "hash": "35f8716106bb6c3d9208274387f708de"
@@ -14060,7 +14060,7 @@
           "max_power": 0.83,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.83,
+            "min": 0.18,
             "max": 0.83
           },
           "hash": "1864ed4bfd2b0dc3d466d13664f269bf"
@@ -14103,7 +14103,7 @@
           "max_power": 0.75,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.75,
+            "min": 0.2,
             "max": 0.75
           },
           "hash": "6c7bbcb2a9ee0ab04e21362bc41fc616"
@@ -14157,7 +14157,7 @@
           "max_power": 0.29,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.29,
+            "min": 0.26,
             "max": 0.29
           },
           "hash": "b0a654e180a277a0084e70655ba998f6"
@@ -14196,7 +14196,7 @@
           "max_power": 1.59,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.59,
+            "min": 1.54,
             "max": 1.59
           },
           "hash": "33a25c2d4bef85bc70d3c4b406be7f66"
@@ -15356,7 +15356,7 @@
           "max_power": 37.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 37.0,
+            "min": 2.2,
             "max": 37.0
           },
           "hash": "76f4c59cb80a27e68e3d740dbd3e4030"
@@ -16845,7 +16845,7 @@
           "max_power": 1.071,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.071,
+            "min": 0.595,
             "max": 1.071
           },
           "hash": "9b44685a72aff90f5c1591b3644e37ee"
@@ -19776,7 +19776,7 @@
           "max_power": 0.58,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.58,
+            "min": 0.31,
             "max": 0.58
           },
           "hash": "c62f17e265350e65d1ae4149a6575bf1"
@@ -19949,7 +19949,7 @@
           "max_power": 0.96,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.96,
+            "min": 0.67,
             "max": 0.96
           },
           "hash": "9ee743b926b023658d90e369e9ee1b7b"
@@ -20012,7 +20012,7 @@
           "max_power": 0.54,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.54,
+            "min": 0.29,
             "max": 0.54
           },
           "hash": "aa444be20148a84ccbdea2b1597ca51f"
@@ -20058,7 +20058,7 @@
           "max_power": 0.4,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.4,
+            "min": 0.1,
             "max": 0.4
           },
           "hash": "4791f1e6d48ff24e74ce597a999590ff"
@@ -20293,7 +20293,7 @@
           "max_power": 1.04,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.04,
+            "min": 0.44,
             "max": 1.04
           },
           "hash": "6244dde663e0b86f70597a2ec8edfeaf"
@@ -21237,7 +21237,7 @@
           "max_power": 0.5,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.5,
+            "min": 0.3,
             "max": 0.5
           },
           "hash": "982d1e567cd5588b7af53e777a021c84"
@@ -21469,7 +21469,7 @@
           "max_power": 0.65,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.65,
+            "min": 0.2,
             "max": 0.65
           },
           "hash": "4db6abaebb6e1386c77b1921c9196266"
@@ -21757,7 +21757,7 @@
           "max_power": 3.22,
           "sub_profile_count": 2,
           "power_range": {
-            "min": 3.22,
+            "min": 0.3,
             "max": 3.22
           },
           "standby_power": 2.45,
@@ -22005,7 +22005,7 @@
           "max_power": 0.69,
           "sub_profile_count": 2,
           "power_range": {
-            "min": 0.51,
+            "min": 0.22,
             "max": 0.69
           },
           "standby_power": 0.4,
@@ -22149,7 +22149,7 @@
           "max_power": 0.86,
           "sub_profile_count": 3,
           "power_range": {
-            "min": 0.51,
+            "min": 0.19,
             "max": 0.86
           },
           "standby_power": 0.58,
@@ -22204,7 +22204,7 @@
           "max_power": 1.332,
           "sub_profile_count": 16,
           "power_range": {
-            "min": 0.5845,
+            "min": 0.3045,
             "max": 1.332
           },
           "standby_power": 1.087,
@@ -22254,7 +22254,7 @@
           "max_power": 0.81,
           "sub_profile_count": 3,
           "power_range": {
-            "min": 0.46,
+            "min": 0.16,
             "max": 0.81
           },
           "standby_power": 0.53,
@@ -22309,7 +22309,7 @@
           "max_power": 2.366,
           "sub_profile_count": 5,
           "power_range": {
-            "min": 2.008,
+            "min": 0.1,
             "max": 2.366
           },
           "standby_power": 0.15,
@@ -22365,7 +22365,7 @@
           "max_power": 0.996,
           "sub_profile_count": 4,
           "power_range": {
-            "min": 0.5815,
+            "min": 0.294,
             "max": 0.996
           },
           "standby_power": 0.732,
@@ -22420,7 +22420,7 @@
           "max_power": 0.94,
           "sub_profile_count": 4,
           "power_range": {
-            "min": 0.585,
+            "min": 0.23,
             "max": 0.94
           },
           "standby_power": 0.655,
@@ -22586,7 +22586,7 @@
           "max_power": 0.923,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.923,
+            "min": 0.598,
             "max": 0.923
           },
           "hash": "4eab15da6244cabc9e0f76d85b3e2e43"
@@ -22735,7 +22735,7 @@
           "max_power": 0.8,
           "sub_profile_count": 2,
           "power_range": {
-            "min": 0.55,
+            "min": 0.25,
             "max": 0.8
           },
           "standby_power": 0.5,
@@ -22791,7 +22791,7 @@
           "max_power": 0.618,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.618,
+            "min": 0.376,
             "max": 0.618
           },
           "hash": "20fa6f936d86771eb78d514ee8b688da"
@@ -22900,7 +22900,7 @@
           "max_power": 0.85,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.85,
+            "min": 0.589,
             "max": 0.85
           },
           "hash": "1ba62c398a72b8744bcc863d8a7616c1"
@@ -22953,7 +22953,7 @@
           "max_power": 1.01,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.01,
+            "min": 0.74,
             "max": 1.01
           },
           "hash": "63b8a9b53e68f4bd74b47d087a330d63"
@@ -23051,7 +23051,7 @@
           "max_power": 1.0,
           "sub_profile_count": 3,
           "power_range": {
-            "min": 0.54,
+            "min": 0.31,
             "max": 1.0
           },
           "standby_power": 0.78,
@@ -30230,7 +30230,7 @@
           "max_power": 0.91,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.91,
+            "min": 0.23,
             "max": 0.91
           },
           "hash": "6dba11a669e5242b1709eebeb1cb887a"
@@ -30274,7 +30274,7 @@
           "max_power": 0.91,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.91,
+            "min": 0.23,
             "max": 0.91
           },
           "hash": "7d782ded237883395edc9a1663ef1e88"
@@ -30316,7 +30316,7 @@
           "max_power": 0.85,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.85,
+            "min": 0.15,
             "max": 0.85
           },
           "hash": "2997ed64e2542ff36bd99dfbe03758a7"
@@ -30355,7 +30355,7 @@
           "max_power": 0.5,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.5,
+            "min": 0.2,
             "max": 0.5
           },
           "hash": "3fcc43dd2518e1339c1c25695c8de695"
@@ -35099,7 +35099,7 @@
           "max_power": 1.14,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.14,
+            "min": 0.29,
             "max": 1.14
           },
           "hash": "5016dc2f5e6915d20de792eeea86a47a"
@@ -35142,7 +35142,7 @@
           "max_power": 0.49,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.49,
+            "min": 0.33,
             "max": 0.49
           },
           "hash": "df205088c812a2c8a6fe7c537553e8f1"
@@ -35185,7 +35185,7 @@
           "max_power": 1.56,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.56,
+            "min": 0.8,
             "max": 1.56
           },
           "hash": "91816698fa868263d898cb6a555922ab"
@@ -35427,7 +35427,7 @@
           "max_power": 5.33,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 5.33,
+            "min": 5.0,
             "max": 5.33
           },
           "hash": "972778ad946b9625c47841922cad5c60"
@@ -36336,7 +36336,7 @@
           "max_power": 1.11,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.11,
+            "min": 0.72,
             "max": 1.11
           },
           "hash": "62f531bb9458ae625e56983b51cf5e7f"
@@ -36594,7 +36594,7 @@
           "max_power": 0.54,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.54,
+            "min": 0.29,
             "max": 0.54
           },
           "hash": "a8ea5748781706652a3af4fa996fc96f"
@@ -36640,7 +36640,7 @@
           "max_power": 0.4,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.4,
+            "min": 0.1,
             "max": 0.4
           },
           "hash": "5635a18de9b5768bc7cbcd6189856832"
@@ -36688,7 +36688,7 @@
           "max_power": 0.8,
           "sub_profile_count": 2,
           "power_range": {
-            "min": 0.55,
+            "min": 0.25,
             "max": 0.8
           },
           "standby_power": 0.5,
@@ -36742,7 +36742,7 @@
           "max_power": 1.01,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.01,
+            "min": 0.74,
             "max": 1.01
           },
           "hash": "b517985339d9acfbcd3ce7670812cfe1"
@@ -36995,7 +36995,7 @@
           "max_power": 1.09,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.09,
+            "min": 0.58,
             "max": 1.09
           },
           "hash": "08c99fe4e492af093fa4e047c80d5062"
@@ -37040,7 +37040,7 @@
           "max_power": 1.461,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.461,
+            "min": 0.89,
             "max": 1.461
           },
           "hash": "7c37c4b7e9828d067fc66b69be5338a8"
@@ -37081,7 +37081,7 @@
           "max_power": 1.07,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.07,
+            "min": 0.5,
             "max": 1.07
           },
           "hash": "a40a26ec0bff8c9b58a437b8f79119e7"
@@ -37122,7 +37122,7 @@
           "max_power": 0.72,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.72,
+            "min": 0.23,
             "max": 0.72
           },
           "hash": "529034f03abcef6c700c688efecae7b0"
@@ -37167,7 +37167,7 @@
           "max_power": 2.19,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 2.19,
+            "min": 1.54,
             "max": 2.19
           },
           "hash": "7736e858e8770405dba70fb0add3a81c"
@@ -37313,7 +37313,7 @@
           "max_power": 0.9,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.9,
+            "min": 0.5,
             "max": 0.9
           },
           "hash": "2638b901dfb5b130301e803434e85006"
@@ -37351,7 +37351,7 @@
           "max_power": 0.92,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.92,
+            "min": 0.475,
             "max": 0.92
           },
           "hash": "38f1f3aae5af42cb8a282e52238a49f6"
@@ -37602,7 +37602,7 @@
           "max_power": 1.39,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.39,
+            "min": 0.633,
             "max": 1.39
           },
           "hash": "7370c8884b605b200377e94b1b7ea214"
@@ -37647,7 +37647,7 @@
           "max_power": 1.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.0,
+            "min": 0.6,
             "max": 1.0
           },
           "hash": "acb15cc0874993081d09068d40d67a03"
@@ -37693,7 +37693,7 @@
           "max_power": 1.2,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.2,
+            "min": 0.3,
             "max": 1.2
           },
           "hash": "bcf90892579c272a081c95b6c66335d2"
@@ -37734,7 +37734,7 @@
           "max_power": 1.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.0,
+            "min": 0.6,
             "max": 1.0
           },
           "hash": "19affd9437b772e17cd28f48a93118d9"
@@ -38093,7 +38093,7 @@
           "max_power": 3000.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 430.0,
+            "min": 0.1,
             "max": 3000.0
           },
           "hash": "dcb827af3217fa0795cf59dd1b097e48"
@@ -38134,7 +38134,7 @@
           "max_power": 0.39,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.39,
+            "min": 0.13,
             "max": 0.39
           },
           "hash": "0f2c2c495a7988ec812cc50a7433ef7a"
@@ -38171,7 +38171,7 @@
           "max_power": 0.866,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.866,
+            "min": 0.404,
             "max": 0.866
           },
           "hash": "e1adf98c2f6288c82181a2526e128860"
@@ -38378,7 +38378,7 @@
           "max_power": 39.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 17.0,
+            "min": 0.6,
             "max": 39.0
           },
           "hash": "5af7261c6b178995689ff49bdd7c9ff4"
@@ -38416,7 +38416,7 @@
           "max_power": 37.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 3.0,
+            "min": 0.5,
             "max": 37.0
           },
           "hash": "96901a0acde0760328e5f76c7c31f2d9"
@@ -38453,7 +38453,7 @@
           "max_power": 37.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 3.3,
+            "min": 1.2,
             "max": 37.0
           },
           "hash": "11ba9bbb98a847e0638505fb4673d253"
@@ -39565,7 +39565,7 @@
           "max_power": 1.6,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.6,
+            "min": 1.4,
             "max": 1.6
           },
           "hash": "dbe5620e1da3abb2d3a1471e14d59160"
