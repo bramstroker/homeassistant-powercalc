@@ -1,0 +1,42 @@
+{
+  "aliases": [
+    "Shelly 1PM Gen3"
+  ],
+  "legacy_ids": [
+    "Shelly 1PM Gen3"
+  ],
+  "calculation_strategy": "fixed",
+  "description": "Compact Smart Wi-Fi Relay with Power Monitoring",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n"WLAN + BT + ECO": All three turned on, repeater turned off!\n"WLAN + ECO": Both turned on, repeater turned off.\n"WLAN + BT": Both turned on, ECO and repeater turned off.\n"WLAN": Only WLAN turned on, ECO and repeater turned off.",
+  "created_at": "2026-09-02T022:00:25Z",
+  "device_type": "smart_switch",
+  "device_specs": {
+    "form_factor": "in_wall",
+    "max_load_watts": 3680,
+    "power_monitoring": true,
+    "rated_power": 1.2,
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
+  },
+  "ean": [
+    "3800235261798"
+  ],
+  "measure_description": "Measured with 33.7WW (average over 600s) dummy load over 60s and calculated average. Multiple combinations of settings were tested. Firmware version 2.0.0",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "manual",
+  "mains_voltage": 230,
+  "measure_settings": {
+    "VERSION": "v0.6.0:app"
+  },
+  "name": "1PM Gen3",
+  "only_self_usage": true,
+  "product_url": "https://www.shelly.com/de/products/shelly-1pm-gen3",
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
+  ]
+}
