@@ -1,6 +1,5 @@
 import type { MeasureDefinition, MeasureParameter, MeasurementRequest } from "../types";
 import "./setup-view";
-import { recorderExportFilename } from "./setup-view";
 import { SetupViewElement, capabilities, definitions, lightDefinition, lights } from "./test-fixtures";
 
 interface TestCombobox extends HTMLElement {
@@ -73,7 +72,6 @@ const recorderDefinition: MeasureDefinition = {
       control: "entity", required: false, multiple: true, all_entities: true, related_to: "vacuum_entity_id",
       visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["vacuum_robot"] }, options: [], review: true,
     },
-    { name: "export_filename", role: "attribute", label: "Export filename", control: "text", required: true, default: "record.csv", options: [] },
   ],
 };
 
@@ -820,7 +818,6 @@ describe("setup view defaults", () => {
       recorder_purpose: "complex_profile",
       profile_recipe: "generic",
       tracked_entity_ids: ["climate.room"],
-      export_filename: "record.jsonl",
     };
     element.meter = { type: "dummy" };
     document.body.append(element);
@@ -864,7 +861,7 @@ describe("setup view defaults", () => {
     expect(element.shadowRoot.querySelector('[name="product_name"]')).toBeTruthy();
     expect(element.shadowRoot.textContent).toContain("not feature complete");
     expect(element.shadowRoot.textContent).toContain("only creates fixed states_power models");
-    expect((element.shadowRoot.querySelector('[name="export_filename"]') as HTMLInputElement).value).toBe("record.jsonl");
+    expect(element.shadowRoot.querySelector('[name="export_filename"]')).toBeNull();
   });
 
   it("guides a vacuum selection and prefills its single same-device battery sensor", async () => {
@@ -1054,23 +1051,5 @@ describe("setup view defaults", () => {
     expect((element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).placeholder)
       .toBe("Hue White Ambiance A60 E27");
     expect(element.shadowRoot.querySelector(".field-hint")?.textContent).toContain("complete marketed name");
-  });
-});
-
-describe("recorderExportFilename", () => {
-  it("follows the recorder purpose rather than the name a duplicated session left behind", () => {
-    expect(recorderExportFilename("complex_profile", "kitchen.csv")).toBe("kitchen.jsonl");
-    expect(recorderExportFilename("playbook", "kitchen.jsonl")).toBe("kitchen.csv");
-  });
-
-  it("shows the name the server will actually write for the default", () => {
-    expect(recorderExportFilename("complex_profile", "record.csv")).toBe("record.jsonl");
-    expect(recorderExportFilename("playbook", "record.csv")).toBe("record.csv");
-    expect(recorderExportFilename("complex_profile", "")).toBe("record.jsonl");
-  });
-
-  it("leaves an extension it does not manage alone", () => {
-    expect(recorderExportFilename("complex_profile", "kitchen.txt")).toBe("kitchen.txt");
-    expect(recorderExportFilename("playbook", "kitchen")).toBe("kitchen");
   });
 });

@@ -16,11 +16,9 @@ from measure.home_assistant_entities import (
 )
 from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID
 from measure.runner.const import (
-    DEFAULT_EXPORT_FILENAME,
     QUESTION_CHARGING_DEVICE_TYPE,
     QUESTION_DISABLE_STREAMING,
     QUESTION_DURATION,
-    QUESTION_EXPORT_FILENAME,
     QUESTION_GZIP,
     QUESTION_MODE,
     QUESTION_MULTIPLE_LIGHTS,
@@ -51,13 +49,7 @@ def average_questions() -> list[Question]:
 
 
 def recorder_questions() -> list[Question]:
-    return [
-        inquirer.Text(
-            name=QUESTION_EXPORT_FILENAME,
-            message="To which file do you want to export?",
-            default=DEFAULT_EXPORT_FILENAME,
-        ),
-    ]
+    return []
 
 
 def charging_questions() -> list[Question]:

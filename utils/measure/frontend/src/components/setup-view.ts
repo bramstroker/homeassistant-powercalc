@@ -480,9 +480,6 @@ export class SetupView extends LitElement {
         ${field.options.map((option) => html`<option value=${option.value} ?selected=${option.value === value}>${option.label}</option>`)}
       </select></label>${this.optionGuidance(selectedOption)}</div>`;
     }
-    if (name === "export_filename" && this.selectedType === "recorder") {
-      return this.valueField(field, recorderExportFilename(this.recorderPurpose(run), (stored ?? field.default ?? "").toString()));
-    }
     return this.valueField(field, (stored ?? field.default ?? "").toString());
   }
 
@@ -846,18 +843,4 @@ export class SetupView extends LitElement {
   }
 
 
-}
-
-/**
- * The export filename a recorder purpose implies. Both the server and the result plotter
- * pick the format by extension, so the name follows the purpose rather than whatever a
- * duplicated session left behind. An unrecognised extension is the user's own, and stays.
- */
-export function recorderExportFilename(purpose: string | undefined, name: string): string {
-  const wanted = purpose === "complex_profile" ? "jsonl" : "csv";
-  if (!name) return `record.${wanted}`;
-  const dot = name.lastIndexOf(".");
-  const current = dot === -1 ? "" : name.slice(dot + 1).toLowerCase();
-  if (current !== "csv" && current !== "jsonl") return name;
-  return current === wanted ? name : `${name.slice(0, dot)}.${wanted}`;
 }

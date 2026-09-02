@@ -45,6 +45,7 @@ def test_light_product_name_example_does_not_repeat_the_manufacturer() -> None:
 def test_recorder_definition_starts_with_purpose_and_declares_vacuum_relationships() -> None:
     fields = {field.name: field for field in MEASUREMENT_REGISTRY[MeasureType.RECORDER].fields}
 
+    assert "export_filename" not in fields
     assert [option.value for option in fields["recorder_purpose"].options] == ["playbook", "complex_profile"]
     complex_profile = fields["recorder_purpose"].options[1]
     assert "experimental" in complex_profile.label

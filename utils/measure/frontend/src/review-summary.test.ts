@@ -62,7 +62,6 @@ describe("review summary", () => {
       vacuum_entity_id: "vacuum.robot",
       battery_entity_id: "sensor.robot_battery",
       additional_entity_ids: ["sensor.dock_state"],
-      export_filename: "record.jsonl",
     };
     const definition: MeasureDefinition = {
       measure_type: "recorder", label: "Recorder", description: "Record states.", icon: "⏺",

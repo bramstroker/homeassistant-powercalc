@@ -29,7 +29,6 @@ from measure.runner.const import (
     QUESTION_COLOR_MODE,
     QUESTION_DISABLE_STREAMING,
     QUESTION_DURATION,
-    QUESTION_EXPORT_FILENAME,
     QUESTION_GZIP,
     QUESTION_MODE,
 )
@@ -230,7 +229,6 @@ def test_run_recorder(mock_config_factory: MockConfigFactory) -> None:
     mock_config = mock_config_factory(
         question_defaults={
             QUESTION_SELECTED_MEASURE_TYPE: MeasureType.RECORDER,
-            QUESTION_EXPORT_FILENAME: "test.csv",
         },
     )
 
@@ -247,7 +245,7 @@ def test_run_recorder(mock_config_factory: MockConfigFactory) -> None:
         measure = _create_measure_instance(config=mock_config)
         measure.start()
 
-    csv_filepath = os.path.join(PROJECT_DIR, "export/generic/test.csv")
+    csv_filepath = os.path.join(PROJECT_DIR, "export/generic/record.csv")
     assert os.path.exists(csv_filepath)
 
     with open(csv_filepath, newline="") as csv_file:

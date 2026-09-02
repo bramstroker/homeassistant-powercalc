@@ -437,13 +437,6 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                 ),
                 review=True,
             ),
-            FormFieldDefinition(
-                name="export_filename",
-                label="Export filename",
-                control=FieldControl.TEXT,
-                default="record.csv",
-                hint="Playbook recordings use CSV; complex-profile recordings use JSON Lines (.jsonl).",
-            ),
         ),
         supports_profile=False,
     ),
