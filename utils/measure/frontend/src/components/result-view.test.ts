@@ -59,6 +59,8 @@ describe("result view", () => {
     element.snapshot = {
       state: "completed",
       summary: {
+        "Samples recorded": "10",
+        Duration: "40 s",
         "Profile analysis": "More data needed",
         "Profile analysis reason": "Every state needs at least five samples",
       },
@@ -69,8 +71,46 @@ describe("result view", () => {
 
     const warning = element.shadowRoot.querySelector('.notice[role="status"]');
     expect(warning?.textContent).toContain("record more device states");
-    const reason = element.shadowRoot.querySelector(".metric.analysis-reason");
+    const measurement = element.shadowRoot.querySelector('[aria-label="Measurement result"]');
+    expect(measurement?.textContent).toContain("Samples recorded");
+    expect(measurement?.textContent).not.toContain("More data needed");
+    const analysis = element.shadowRoot.querySelector(".analysis-panel");
+    expect(analysis?.querySelector("h3")?.textContent).toBe("Profile analysis");
+    expect(analysis?.textContent).toContain("More data needed");
+    const reason = analysis?.querySelector(".metric.analysis-reason");
     expect(reason?.textContent).toContain("Every state needs at least five samples");
+  });
+
+  it("groups successful profile analysis details in a separate panel", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "completed",
+      summary: {
+        "Samples recorded": "39",
+        Duration: "160 s",
+        "Profile analysis": "Fixed states_power model created",
+        "Analysed feature": "input_select.powercalc_test_state",
+        "Validation MAE": "0.02 W",
+        "Validation coverage": "100%",
+      },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const measurement = element.shadowRoot.querySelector('[aria-label="Measurement result"]');
+    expect(measurement?.textContent).toContain("39");
+    expect(measurement?.textContent).toContain("160 s");
+    expect(measurement?.textContent).not.toContain("Fixed states_power model created");
+
+    const analysis = element.shadowRoot.querySelector('[aria-label="Profile analysis result"]');
+    expect(analysis?.textContent).toContain("Fixed states_power model created");
+    expect(analysis?.textContent).toContain("input_select.powercalc_test_state");
+    expect(analysis?.textContent).toContain("0.02 W");
+    expect(analysis?.textContent).toContain("100%");
   });
 
   it("shows a download-all action for generated files", async () => {

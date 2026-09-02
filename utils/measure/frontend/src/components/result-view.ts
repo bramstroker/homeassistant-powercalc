@@ -11,6 +11,13 @@ import "./result-plot";
 const CONTRIBUTION_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/output/";
 const TROUBLESHOOTING_URL = "https://docs.powercalc.nl/contributing/measure/troubleshooting/";
 const PROFILE_LIBRARY_PATH = "profile_library/<manufacturer>/<model>/";
+const ANALYSIS_SUMMARY_LABELS = new Set([
+  "Profile analysis",
+  "Profile analysis reason",
+  "Analysed feature",
+  "Validation MAE",
+  "Validation coverage",
+]);
 
 // Contribution methods. Add a new entry here (e.g. "local") to expose another way to
 // contribute; renderMethodPanel routes the selected id to its panel renderer.
@@ -131,6 +138,11 @@ export class ResultView extends LitElement {
     .metric { padding: 1rem; background: var(--field); }
     .metric span { display: block; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
     .metric strong { display: block; margin-top: 0.35rem; font: 700 1.4rem/1.1 "DIN Alternate", sans-serif; color: var(--signal-strong); }
+    .analysis-panel { margin-top: 1.5rem; padding: clamp(1rem, 3vw, 1.35rem); border: 1px solid var(--line); border-radius: 14px; background: var(--well); }
+    .analysis-panel h3 { margin: 0; font-size: 1.05rem; }
+    .analysis-panel > .muted { margin: 0.3rem 0 0; }
+    .analysis-readout { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 1rem; }
+    .metric.analysis-feature strong { overflow-wrap: anywhere; font-size: 1.05rem; }
     .metric.analysis-reason { grid-column: 1 / -1; }
     .metric.analysis-reason strong { font: 600 0.95rem/1.4 Inter, sans-serif; color: var(--ink); }
     .files-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1.5rem; }
@@ -199,6 +211,7 @@ export class ResultView extends LitElement {
         </div>
         ${error ? html`<p class="notice error" role="alert">${this.renderError(error)}</p>` : nothing}
         ${showArtifacts ? this.renderSummary() : nothing}
+        ${showArtifacts ? this.renderAnalysis() : nothing}
         ${showArtifacts ? this.renderWarnings() : nothing}
         ${showArtifacts ? this.renderPlots() : nothing}
         ${showArtifacts ? this.renderFiles() : nothing}
@@ -477,15 +490,39 @@ ${preview.pr_body}</pre>
   }
 
   private renderSummary() {
-    const entries = this.summaryEntries();
+    const entries = this.summaryEntries().filter(([label]) => !ANALYSIS_SUMMARY_LABELS.has(label));
     if (!entries.length) return nothing;
     return html`<div class="readout" aria-label="Measurement result">
       ${entries.map(([label, value]) => html`
-        <div class="metric ${label === "Profile analysis reason" ? "analysis-reason" : ""}">
+        <div class="metric">
           <span>${label}</span><strong>${value}</strong>
         </div>
       `)}
     </div>`;
+  }
+
+  private renderAnalysis() {
+    const entries = this.summaryEntries().filter(([label]) => ANALYSIS_SUMMARY_LABELS.has(label));
+    if (!entries.length) return nothing;
+    return html`
+      <section class="analysis-panel" aria-labelledby="profile-analysis-title">
+        <h3 id="profile-analysis-title">Profile analysis</h3>
+        <p class="muted">Automatic model selection and validation</p>
+        <div class="readout analysis-readout" aria-label="Profile analysis result">
+          ${entries.map(([label, value]) => html`
+            <div class="metric ${label === "Profile analysis reason" ? "analysis-reason" : ""} ${label === "Analysed feature" ? "analysis-feature" : ""}">
+              <span>${this.analysisMetricLabel(label)}</span><strong>${value}</strong>
+            </div>
+          `)}
+        </div>
+      </section>
+    `;
+  }
+
+  private analysisMetricLabel(label: string): string {
+    if (label === "Profile analysis") return "Result";
+    if (label === "Profile analysis reason") return "Reason";
+    return label;
   }
 
   private renderWarnings() {
