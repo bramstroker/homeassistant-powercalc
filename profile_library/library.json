@@ -15633,7 +15633,7 @@
           "device_specs": {
             "form_factor": "fixture",
             "socket": "integrated",
-            "lumens": 1000,
+            "lumens": 900,
             "rated_power": 14,
             "connectivity": [
               "zigbee"
@@ -15662,7 +15662,7 @@
           ],
           "id": "14158804L",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-02T14:34:55",
           "max_power": 10.54,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-06-13T14:19:28",
@@ -15678,7 +15678,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "3c18aeec385fcdac5d11971e25c926fb"
+          "hash": "e5026cac4a9fe31459570c3567a31a18"
         },
         {
           "calculation_strategy": "lut",
