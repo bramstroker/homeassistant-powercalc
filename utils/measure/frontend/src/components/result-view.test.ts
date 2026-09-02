@@ -58,7 +58,10 @@ describe("result view", () => {
     };
     element.snapshot = {
       state: "completed",
-      summary: { "Profile analysis": "More data needed" },
+      summary: {
+        "Profile analysis": "More data needed",
+        "Profile analysis reason": "Every state needs at least five samples",
+      },
       warnings: ["Profile model was not created: record more device states"],
     };
     document.body.append(element);
@@ -66,6 +69,8 @@ describe("result view", () => {
 
     const warning = element.shadowRoot.querySelector('.notice[role="status"]');
     expect(warning?.textContent).toContain("record more device states");
+    const reason = element.shadowRoot.querySelector(".metric.analysis-reason");
+    expect(reason?.textContent).toContain("Every state needs at least five samples");
   });
 
   it("shows a download-all action for generated files", async () => {

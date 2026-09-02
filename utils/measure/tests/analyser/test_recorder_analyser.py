@@ -203,7 +203,10 @@ def test_analyser_rejects_recordings_without_a_credible_fixed_model(
     assert not result.model_ready
     assert result.status == "insufficient_data"
     assert reason in str(result.reason)
-    assert result.summary() == {"Profile analysis": "More data needed"}
+    assert result.summary() == {
+        "Profile analysis": "More data needed",
+        "Profile analysis reason": result.reason,
+    }
 
 
 def test_analyser_requires_enough_samples(tmp_path: Path) -> None:

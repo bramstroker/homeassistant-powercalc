@@ -131,6 +131,8 @@ export class ResultView extends LitElement {
     .metric { padding: 1rem; background: var(--field); }
     .metric span { display: block; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
     .metric strong { display: block; margin-top: 0.35rem; font: 700 1.4rem/1.1 "DIN Alternate", sans-serif; color: var(--signal-strong); }
+    .metric.analysis-reason { grid-column: 1 / -1; }
+    .metric.analysis-reason strong { font: 600 0.95rem/1.4 Inter, sans-serif; color: var(--ink); }
     .files-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1.5rem; }
     .files-header h3 { margin: 0; font-size: 1rem; }
     .download-all { min-height: 36px; padding: 0.45rem 0.75rem; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
@@ -478,7 +480,11 @@ ${preview.pr_body}</pre>
     const entries = this.summaryEntries();
     if (!entries.length) return nothing;
     return html`<div class="readout" aria-label="Measurement result">
-      ${entries.map(([label, value]) => html`<div class="metric"><span>${label}</span><strong>${value}</strong></div>`)}
+      ${entries.map(([label, value]) => html`
+        <div class="metric ${label === "Profile analysis reason" ? "analysis-reason" : ""}">
+          <span>${label}</span><strong>${value}</strong>
+        </div>
+      `)}
     </div>`;
   }
 

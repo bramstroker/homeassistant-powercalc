@@ -353,5 +353,9 @@ class MeasurementExecution:
             return RunnerResult(
                 model_json_data=result.model_json_data,
                 voltages=result.voltages,
-                summary={**(result.summary or {}), "Profile analysis": "Failed"},
+                summary={
+                    **(result.summary or {}),
+                    "Profile analysis": "Failed",
+                    "Profile analysis reason": reason,
+                },
             )

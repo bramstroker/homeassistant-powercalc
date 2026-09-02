@@ -207,7 +207,10 @@ class RecorderAnalysisResult:
 
     def summary(self) -> dict[str, str]:
         if not self.model_ready:
-            return {"Profile analysis": "More data needed"}
+            summary = {"Profile analysis": "More data needed"}
+            if self.reason is not None:
+                summary["Profile analysis reason"] = self.reason
+            return summary
         assert self.feature is not None
         assert self.metrics is not None
         return {

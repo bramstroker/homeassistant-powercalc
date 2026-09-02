@@ -208,7 +208,11 @@ def test_execution_preserves_recording_when_analysis_fails(tmp_path: Path, caplo
     assert analysis["status"] == "insufficient_data"
     assert "broken analyser" in analysis["reason"]
     assert not (tmp_path / "model.json").exists()
-    assert result.summary == {"Samples recorded": "1", "Profile analysis": "Failed"}
+    assert result.summary == {
+        "Samples recorded": "1",
+        "Profile analysis": "Failed",
+        "Profile analysis reason": "Profile analysis failed: broken analyser",
+    }
     assert "Profile analysis failed: broken analyser" in caplog.text
 
 
@@ -251,7 +255,13 @@ def test_execution_completes_without_model_when_recording_is_insufficient(
         "Skipped 1 invalid recorder line(s); first was line 1: Expecting value: line 1 column 1 (char 0)",
     ]
     assert not (tmp_path / "model.json").exists()
-    assert result.summary == {"Samples recorded": "10", "Profile analysis": "More data needed"}
+    assert result.summary == {
+        "Samples recorded": "10",
+        "Profile analysis": "More data needed",
+        "Profile analysis reason": (
+            "No state or scalar attribute had 2-20 usable values with at least 4 training samples per value"
+        ),
+    }
     assert "Profile model was not created" in caplog.text
     assert "Skipped 1 invalid recorder line(s)" in caplog.text
 
