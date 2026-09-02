@@ -232,6 +232,26 @@ def test_media_player_domain_supported_for_set_top_box_device_type() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "device_type,entity_id",
+    [
+        (DeviceType.AIR_CONDITIONER, "climate.test"),
+        (DeviceType.AIR_PURIFIER, "fan.test"),
+        (DeviceType.HUMIDIFIER, "humidifier.test"),
+        (DeviceType.WATER_HEATER, "water_heater.test"),
+    ],
+)
+def test_entity_domain_supported_for_device_type(device_type: DeviceType, entity_id: str) -> None:
+    assert is_device_type_supported_for_entity(
+        device_type,
+        RegistryEntryWithDefaults(
+            entity_id=entity_id,
+            unique_id="1234",
+            platform="test",
+        ),
+    )
+
+
 async def test_discovery_does_not_break_when_unknown_device_type(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(

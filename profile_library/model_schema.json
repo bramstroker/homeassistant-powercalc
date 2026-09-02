@@ -97,7 +97,10 @@
       "if": {
         "properties": {
           "device_type": {
-            "const": "fan"
+            "enum": [
+              "air_purifier",
+              "fan"
+            ]
           }
         },
         "required": [
@@ -311,10 +314,13 @@
     "device_type": {
       "type": "string",
       "enum": [
+        "air_conditioner",
+        "air_purifier",
         "camera",
         "cover",
         "fan",
         "generic_iot",
+        "humidifier",
         "light",
         "power_meter",
         "printer",
@@ -327,7 +333,8 @@
         "vacuum_robot",
         "lawn_mower_robot",
         "heating",
-        "ups"
+        "ups",
+        "water_heater"
       ],
       "description": "Type of device"
     },
