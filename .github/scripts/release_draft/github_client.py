@@ -65,8 +65,12 @@ class GitHubClient:
         return [pull_requests[number] for number in sorted(pull_requests)]
 
     def pull_request_files(self, number: int) -> list[str]:
-        files = self._paginate(f"/repos/{self.repository}/pulls/{number}/files")
+        files = self.pull_request_file_details(number)
         return [changed_file["filename"] for changed_file in files]
+
+    def pull_request_file_details(self, number: int) -> list[dict[str, Any]]:
+        """Return changed files including their GitHub status metadata."""
+        return self._paginate(f"/repos/{self.repository}/pulls/{number}/files")
 
     def commit_sha(self, ref: str) -> str:
         """Resolve a tag, branch or sha to its commit sha."""

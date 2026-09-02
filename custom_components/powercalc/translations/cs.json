@@ -3,7 +3,8 @@
     "source_entity": "Zdrojová entita",
     "source_device": "Zdrojové zařízení",
     "remarks_smart_switch": "Tento profil poskytuje pouze hodnoty napájení v pohotovostním režimu. \n Pokud máte spotřebič, který zapnutí spotřebovává pevně dané množství energie, můžete zadat tuto hodnotu v dalším kroku v nastavení",
-    "remarks_smart_dimmer": "Tento profil poskytuje pouze hodnoty spotřeby energie v pohotovostním režimu. \n V dalším kroku můžete volitelně zadat hodnoty připojeného světla"
+    "remarks_smart_dimmer": "Tento profil poskytuje pouze hodnoty spotřeby energie v pohotovostním režimu. \n V dalším kroku můžete volitelně zadat hodnoty připojeného světla",
+    "view_measurement_details": "Zobrazit podrobnosti měření"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Pokud se rozhodnete nepotvrzovat, pak můžete zadat výrobce a model manuálně"
         },
-        "description": "{source}\n\nVýrobce \"{manufacturer}\" a model \"{model}\" byl automaticky detekován pro vaše zařízení.{remarks}",
+        "description": "{source}\n\nVýrobce \"{manufacturer}\" a model \"{model}\" byl automaticky detekován pro vaše zařízení.{remarks}{profile_details}",
         "title": "Knihovna"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Možnosti knihovny",
-        "description": "Aktuálně je vybrán následující profil knihovny: \n výrobce: {manufacturer}\n model: {model}\n\nPokud chcete profil změnit, klikněte na Další."
+        "description": "Aktuálně je vybrán následující profil knihovny: \n výrobce: {manufacturer}\n model: {model}\n\nPokud chcete profil změnit, klikněte na Další.{profile_details}"
       },
       "select_device": {
         "data": {

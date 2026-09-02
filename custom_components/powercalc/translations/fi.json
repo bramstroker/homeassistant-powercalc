@@ -3,7 +3,8 @@
     "source_entity": "Lähde-entiteetti",
     "source_device": "Lähdelaite",
     "remarks_smart_switch": "Tämä profiili sisältää vain valmiustilan tehoarvot. \n Jos laite kuluttaa käynnissä ollessaan kiinteän määrän tehoa, voit antaa arvon määrityksen seuraavassa vaiheessa",
-    "remarks_smart_dimmer": "Tämä profiili sisältää vain valmiustilan tehoarvot. \n Seuraavassa vaiheessa voit halutessasi antaa liitetyn valon arvot"
+    "remarks_smart_dimmer": "Tämä profiili sisältää vain valmiustilan tehoarvot. \n Seuraavassa vaiheessa voit halutessasi antaa liitetyn valon arvot",
+    "view_measurement_details": "Näytä mittaustiedot"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Jos et halua vahvistaa, voit syöttää valmistajan ja mallin itse"
         },
-        "description": "{source}\n\nValmistaja \"{manufacturer}\" ja malli \"{model}\" tunnistettiin automaattisesti laitteellesi.{remarks}",
+        "description": "{source}\n\nValmistaja \"{manufacturer}\" ja malli \"{model}\" tunnistettiin automaattisesti laitteellesi.{remarks}{profile_details}",
         "title": "Kirjasto"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Kirjaston vaihtoehdot",
-        "description": "Tällä hetkellä on valittuna seuraava kirjastoprofiili: \n valmistaja: {manufacturer}\n malli: {model}\n\nJos haluat vaihtaa profiilia, napsauta Seuraava."
+        "description": "Tällä hetkellä on valittuna seuraava kirjastoprofiili: \n valmistaja: {manufacturer}\n malli: {model}\n\nJos haluat vaihtaa profiilia, napsauta Seuraava.{profile_details}"
       },
       "select_device": {
         "data": {

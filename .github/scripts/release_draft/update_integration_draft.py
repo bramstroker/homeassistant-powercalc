@@ -68,8 +68,12 @@ CATEGORIES = [
     ),
 ]
 SECTION_ORDER = [UNCATEGORIZED, *[category.title for category in CATEGORIES]]
+POWER_PROFILE_CATEGORY = CATEGORIES[0].title
+POWER_PROFILE_LABEL = "powerprofile"
+WHATS_NEW_URL = "https://library.powercalc.nl/whats-new"
 
 STABLE_TAG = re.compile(r"^v(\d+)\.(\d+)\.(\d+)$")
+PROFILE_MODEL_PATH = re.compile(r"^profile_library/([^/]+)/([^/]+)/model\.json$")
 
 
 def _labels(pull_request: dict[str, Any]) -> set[str]:
@@ -134,10 +138,51 @@ def _supporters_footer() -> str:
         return ""
 
 
-def _build_body(pull_requests: list[dict[str, Any]], footer: str) -> str:
+def _new_profile_count(changed_files: list[dict[str, Any]]) -> int:
+    """Count distinct profile roots added by a pull request."""
+    profiles = {
+        match.groups()
+        for changed_file in changed_files
+        if changed_file.get("status") == "added"
+        and (match := PROFILE_MODEL_PATH.fullmatch(str(changed_file.get("filename", "")))) is not None
+    }
+    return len(profiles)
+
+
+def _format_authors(authors: list[str]) -> str:
+    """Format unique GitHub mentions as a natural-language list."""
+    mentions = [f"@{author}" for author in dict.fromkeys(authors)]
+    if len(mentions) == 1:
+        return mentions[0]
+    return f"{', '.join(mentions[:-1])} and {mentions[-1]}"
+
+
+def _format_new_profiles(count: int, authors: list[str]) -> str:
+    profile_label = "power profile" if count == 1 else "power profiles"
+    return f"- {count} new {profile_label} by {_format_authors(authors)} — [See what's new]({WHATS_NEW_URL})"
+
+
+def _build_body(
+    pull_requests: list[dict[str, Any]],
+    footer: str,
+    new_profile_counts: dict[int, int] | None = None,
+) -> str:
     sections: dict[str, list[str]] = {UNCATEGORIZED: []}
+    new_profile_counts = new_profile_counts or {}
+    new_profile_total = 0
+    new_profile_authors: list[str] = []
     for pull_request in sorted(pull_requests, key=lambda pull_request: pull_request["number"]):
+        count = new_profile_counts.get(pull_request["number"], 0)
+        if count:
+            new_profile_total += count
+            new_profile_authors.append(pull_request["user"]["login"])
+            continue
         sections.setdefault(category_title(pull_request, CATEGORIES), []).append(format_entry(pull_request))
+    if new_profile_total:
+        sections.setdefault(POWER_PROFILE_CATEGORY, []).insert(
+            0,
+            _format_new_profiles(new_profile_total, new_profile_authors),
+        )
     body = "## Changes\n\n" + render_sections(sections, SECTION_ORDER)
     if footer.strip():
         body = f"{body}\n{footer.strip()}\n"
@@ -166,7 +211,12 @@ def main() -> None:
 
     level = max(bump_level(pull_request, CATEGORIES) for pull_request in pull_requests)
     next_core = bump(base_version, level)
-    body = _build_body(pull_requests, _supporters_footer())
+    new_profile_counts = {
+        pull_request["number"]: _new_profile_count(client.pull_request_file_details(pull_request["number"]))
+        for pull_request in pull_requests
+        if POWER_PROFILE_LABEL in _labels(pull_request)
+    }
+    body = _build_body(pull_requests, _supporters_footer(), new_profile_counts)
 
     if channel == "beta":
         version = f"{format_version(next_core)}-beta.{_next_beta_number(client, next_core)}"
