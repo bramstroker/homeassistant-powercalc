@@ -1,9 +1,7 @@
 {
-  "name": "Shelly",
-  "aliases": [
-    "Shelly Europe Ltd."
-  ],
-  "website": "https://www.shelly.com",
-  "country": "BG",
-  "description": "Smart home brand of Allterco, based in Sofia. Its relays and plugs are made for retrofitting existing wiring."
+  "name": "Switchbot",
+  "website": "https://www.switch-bot.com",
+  "country": "CN",
+  "description": "Smart-home brand known for retrofit devices that automate existing switches, curtains and
+  door locks."
 }
