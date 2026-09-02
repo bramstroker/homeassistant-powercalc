@@ -493,9 +493,13 @@ async def get_power_range(model_directory: str, model_data: dict[str, Any]) -> t
         # maximum down, but they would happily claim to be the low end of the range.
         declared_powers = [power for power in fixed_powers if power > 0]
 
-        if fixed_powers:
-            return (min(declared_powers) if declared_powers else None), max(fixed_powers)
-        return None, 0
+        if declared_powers:
+            standby_power = model_data.get("standby_power")
+            standby_power_value = float(standby_power) if standby_power is not None and is_number(standby_power) else 0
+            if standby_power_value > 0:
+                declared_powers.append(standby_power_value)
+            return min(declared_powers), max(fixed_powers)
+        return None, max(fixed_powers) if fixed_powers else 0
 
     return None, None
 
