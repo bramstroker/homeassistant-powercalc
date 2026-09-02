@@ -12,6 +12,7 @@ import json
 import math
 import os
 from pathlib import Path
+import shlex
 import subprocess
 from typing import Any
 
@@ -492,9 +493,13 @@ async def get_power_range(model_directory: str, model_data: dict[str, Any]) -> t
         # maximum down, but they would happily claim to be the low end of the range.
         declared_powers = [power for power in fixed_powers if power > 0]
 
-        if fixed_powers:
-            return (min(declared_powers) if declared_powers else None), max(fixed_powers)
-        return None, 0
+        if declared_powers:
+            standby_power = model_data.get("standby_power")
+            standby_power_value = float(standby_power) if standby_power is not None and is_number(standby_power) else 0
+            if standby_power_value > 0:
+                declared_powers.append(standby_power_value)
+            return min(declared_powers), max(fixed_powers)
+        return None, max(fixed_powers) if fixed_powers else 0
 
     return None, None
 
@@ -590,23 +595,26 @@ async def get_last_commit_time(directory: str) -> datetime:
         return datetime.fromtimestamp(0)
 
 
-async def run_git_command(command: str) -> str:
-    """Run a git command asynchronously and return the output."""
-    proc = await asyncio.create_subprocess_shell(
-        command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+async def run_git_command(command: list[str]) -> str:
+    """Run a git command asynchronously and return the output.
+
+    The command is passed as an argument list and executed without a shell, so profile
+    directory names reach git as literal arguments rather than as shell syntax.
+    """
+    proc = await asyncio.create_subprocess_exec(
+        *command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await proc.communicate()
 
     if proc.returncode != 0:
-        raise subprocess.SubprocessError(f"Command failed: {command}, error: {stderr.decode()}")
+        raise subprocess.SubprocessError(f"Command failed: {shlex.join(command)}, error: {stderr.decode()}")
 
     return stdout.decode().strip()
 
 
 async def get_commits_affected_directory(directory: str) -> list[str]:
     """Get a list of commits that affected the given directory, including renames."""
-    command = f"git log --follow --format='%H' -- '{directory}'"
-    commits = await run_git_command(command)
+    commits = await run_git_command(["git", "log", "--follow", "--format=%H", "--", directory])
     return commits.splitlines()
 
 
@@ -668,7 +676,7 @@ async def find_first_commit_author(file: str, check_paths: bool = True) -> Autho
     commits = await get_commits_affected_directory(file)
     relative_file = str(Path(file).relative_to(PROJECT_ROOT))
     for commit in reversed(commits):  # Process commits from the oldest to newest
-        command = f"git diff-tree --no-commit-id --name-only -r {commit}"
+        command = ["git", "diff-tree", "--no-commit-id", "--name-only", "-r", commit]
         if not check_paths:
             return await get_commit_author(commit)
 

@@ -21,7 +21,7 @@ PLUGIN_URL = "https://pypi.org/pypi/pytest-homeassistant-custom-component/json"
 CONST_FILE = "custom_components/powercalc/const.py"
 STABLE_VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 PYTHON_FLOOR = re.compile(r">=\s*(\d+)\.(\d+)")
-PLUGIN_HA_PIN = re.compile(r"^homeassistant\s*==\s*(\d+)\.(\d+)\.(\d+)")
+PLUGIN_HA_PIN = re.compile(r"^homeassistant\s*==\s*(\d+)\.(\d+)\.(\d+)([^\s;]*)\s*(?:;.*)?$")
 
 
 def read_min_version() -> tuple[int, int]:
@@ -65,17 +65,18 @@ def fetch_releases() -> dict[str, str]:
 def fetch_max_supported_version() -> tuple[int, int, int]:
     """Return the newest Home Assistant release the test plugin can be installed against.
 
-    pytest-homeassistant-custom-component pins one exact Home Assistant release, so its newest
-    release names the newest one that has a matching plugin. A Home Assistant release published
-    before the plugin catches up has none, and asking for both together does not fail: the
-    resolver walks back to a plugin old enough to pin no Home Assistant at all, quietly bringing
-    a pytest that predates the Python we run on. Leave those releases out until the plugin lands.
+    pytest-homeassistant-custom-component pins one exact Home Assistant release. During a beta,
+    its newest release may pin a prerelease such as 2026.9.0b6. In that case, cap the matrix below
+    that patch so the stable release is not tested until a plugin that supports it is published.
     """
     info = fetch_pypi_json(PLUGIN_URL)["info"]
     for requirement in info.get("requires_dist") or []:
         pin = PLUGIN_HA_PIN.match(requirement)
         if pin:
-            return int(pin.group(1)), int(pin.group(2)), int(pin.group(3))
+            patch = int(pin.group(3))
+            if pin.group(4):
+                patch -= 1
+            return int(pin.group(1)), int(pin.group(2)), patch
 
     raise RuntimeError(f"pytest-homeassistant-custom-component {info['version']} does not pin a Home Assistant release")
 

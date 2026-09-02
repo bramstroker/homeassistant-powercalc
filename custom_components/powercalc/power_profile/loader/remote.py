@@ -9,7 +9,7 @@ from pathlib import Path
 import shutil
 import tempfile
 from typing import Any, NotRequired, TypedDict, cast
-from urllib.parse import urlsplit
+from urllib.parse import SplitResult, unquote, urlsplit
 
 import aiohttp
 from aiohttp import ClientError
@@ -39,10 +39,30 @@ TIMEOUT_SECONDS = 30
 MODEL_JSON_RETRY_LIMIT = 2
 
 ALLOWED_RESOURCE_HOSTS = frozenset({"github.com", "raw.githubusercontent.com"})
+# Profile resources are only ever served from the profile library of the Powercalc repository.
+# The download API names the URL for every file, so without this the API could point an install
+# at any repository on GitHub. The model hash cannot stand in for this check: it is a digest of
+# the library.json metadata entry, not of the files that get downloaded.
+LIBRARY_REPOSITORY_SEGMENTS = ("bramstroker", "homeassistant-powercalc")
+LIBRARY_RESOURCE_DIRECTORY = "profile_library"
+MAX_RESOURCE_SIZE = 10 * 1024 * 1024
+MAX_MANIFEST_SIZE = 1024 * 1024
+DOWNLOAD_CHUNK_SIZE = 64 * 1024
+
+
+def _is_library_repository_url(parsed_url: SplitResult) -> bool:
+    """Check that a resource URL addresses the profile library of the Powercalc repository."""
+    segments = [segment for segment in unquote(parsed_url.path).split("/") if segment]
+    if any(segment in {".", ".."} for segment in segments):
+        return False
+    repository_depth = len(LIBRARY_REPOSITORY_SEGMENTS)
+    if tuple(segments[:repository_depth]) != LIBRARY_REPOSITORY_SEGMENTS:
+        return False
+    return LIBRARY_RESOURCE_DIRECTORY in segments[repository_depth:]
 
 
 def _validate_resource_url(url: object) -> str:
-    """Validate that a resource URL points to an allowed HTTPS host."""
+    """Validate that a resource URL points to the profile library on an allowed HTTPS host."""
     if not isinstance(url, str):
         raise ProfileDownloadError("Remote profile resource has an invalid URL")
 
@@ -54,6 +74,7 @@ def _validate_resource_url(url: object) -> str:
             and parsed_url.username is None
             and parsed_url.password is None
             and parsed_url.port in (None, 443)
+            and _is_library_repository_url(parsed_url)
         )
     except ValueError as err:
         raise ProfileDownloadError(f"Remote profile resource has an invalid URL: {url}") from err
@@ -61,6 +82,26 @@ def _validate_resource_url(url: object) -> str:
     if not is_allowed:
         raise ProfileDownloadError(f"Remote profile resource URL is not allowed: {url}")
     return url
+
+
+async def _read_capped(response: aiohttp.ClientResponse, limit: int, description: str) -> bytes:
+    """Read a response body, refusing anything larger than `limit` bytes.
+
+    Downloads land in memory before they are written, so an oversized response would otherwise
+    be able to exhaust the memory of the Home Assistant instance.
+    """
+    too_large = ProfileDownloadError(f"{description} is larger than the maximum of {limit} bytes")
+    if response.content_length is not None and response.content_length > limit:
+        raise too_large
+
+    chunks: list[bytes] = []
+    size = 0
+    async for chunk in response.content.iter_chunked(DOWNLOAD_CHUNK_SIZE):
+        size += len(chunk)
+        if size > limit:
+            raise too_large
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 def _resolve_resource_path(storage_path: str, resource_path: object) -> Path:
@@ -612,7 +653,14 @@ class RemoteLoader(Loader):
                 async with session.get(endpoint, params={"hash": model_hash}) as resp:
                     if resp.status != 200:
                         raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
-                    resources = await resp.json()
+                    manifest = await _read_capped(resp, MAX_MANIFEST_SIZE, "Remote profile resource manifest")
+
+                try:
+                    resources = json.loads(manifest)
+                except JSONDecodeError as err:
+                    raise ProfileDownloadError(
+                        f"Remote profile response is not valid JSON: {manufacturer}/{model}",
+                    ) from err
 
                 validated_resources = await self.hass.async_add_executor_job(
                     _validate_resources,
@@ -629,7 +677,7 @@ class RemoteLoader(Loader):
                         if resp.status != 200:
                             raise ProfileDownloadError(f"Failed to download github URL: {url}")
 
-                        contents = await resp.read()
+                        contents = await _read_capped(resp, MAX_RESOURCE_SIZE, f"Remote profile resource {url}")
                         downloaded_resources.append((contents, destination))
 
                 await self.hass.async_add_executor_job(_save_resources, downloaded_resources)

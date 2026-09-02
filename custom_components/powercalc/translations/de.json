@@ -3,7 +3,8 @@
     "source_entity": "Quell-Entität",
     "source_device": "Quell-Gerät",
     "remarks_smart_switch": "Dieses Profil liefert nur Werte für die Standby-Leistung. \n Wenn Sie ein Gerät haben, das beim Einschalten eine bestimmte Menge an Strom verbraucht, können Sie diesen Wert im nächsten Schritt des Konfigurationsablaufs angeben",
-    "remarks_smart_dimmer": "Dieses Profil bietet nur Standby-Leistungswerte. \n Im nächsten Schritt können Sie optional die Werte der angeschlossenen Lampe angeben"
+    "remarks_smart_dimmer": "Dieses Profil bietet nur Standby-Leistungswerte. \n Im nächsten Schritt können Sie optional die Werte der angeschlossenen Lampe angeben",
+    "view_measurement_details": "Messdetails anzeigen"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Wenn Sie nicht bestätigen möchten, können Sie den Hersteller und das Modell selbst eingeben"
         },
-        "description": "{source}\n\nHersteller \"{manufacturer}\" und Modell \"{model}\" wurden für Ihre Gerät automatisch erkannt.{remarks}",
+        "description": "{source}\n\nHersteller \"{manufacturer}\" und Modell \"{model}\" wurden für Ihre Gerät automatisch erkannt.{remarks}{profile_details}",
         "title": "Bibliothek"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Bibliotheksoptionen",
-        "description": "Derzeit ist folgendes Bibliotheksprofil ausgewählt: \n Hersteller: {manufacturer}\n Modell: {model}\n\nWenn du das Profil ändern möchtest, klicke auf Weiter."
+        "description": "Derzeit ist folgendes Bibliotheksprofil ausgewählt: \n Hersteller: {manufacturer}\n Modell: {model}\n\nWenn du das Profil ändern möchtest, klicke auf Weiter.{profile_details}"
       },
       "select_device": {
         "data": {

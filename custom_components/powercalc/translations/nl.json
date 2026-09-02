@@ -3,7 +3,8 @@
     "source_entity": "Bron entiteit",
     "source_device": "Bron apparaat",
     "remarks_smart_switch": "Dit profiel biedt alleen stand-by stroomwaarden. \n Wanneer je een apparaat hebt dat een vaste hoeveelheid stroom verbruikt wanneer het is ingeschakeld, kunt u die waarde opgeven in de volgende stap van de configuratie flow",
-    "remarks_smart_dimmer": "Dit profiel biedt alleen waarden voor standby vermogen. \n In de volgende stap kunt u optioneel de waarden van het aangesloten licht opgeven"
+    "remarks_smart_dimmer": "Dit profiel biedt alleen waarden voor standby vermogen. \n In de volgende stap kunt u optioneel de waarden van het aangesloten licht opgeven",
+    "view_measurement_details": "Meetdetails bekijken"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Wanneer je niet bevestigd kan je in het volgende scherm zelf de fabrikant en het model kiezen."
         },
-        "description": "{source}\n\nFabrikant \"{manufacturer}\" en model \"{model}\" zijn automatisch gedecteerd voor het apparaat.{remarks}",
+        "description": "{source}\n\nFabrikant \"{manufacturer}\" en model \"{model}\" zijn automatisch gedecteerd voor het apparaat.{remarks}{profile_details}",
         "title": "Bibliotheek"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Bibliotheek opties",
-        "description": "Momenteel is het huidige profiel geselecteerd: \nfabrikant: {manufacturer}\nmodel: {model}\n\nAls u het profiel wilt wijzigen, klikt u op volgende."
+        "description": "Momenteel is het huidige profiel geselecteerd: \nfabrikant: {manufacturer}\nmodel: {model}\n\nAls u het profiel wilt wijzigen, klikt u op volgende.{profile_details}"
       },
       "select_device": {
         "data": {

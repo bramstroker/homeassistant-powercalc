@@ -3,7 +3,8 @@
     "source_entity": "源实体",
     "source_device": "源设备",
     "remarks_smart_switch": "此配置文件仅提供待机功率值。\n 如果设备开启时消耗固定功率，可以在配置流程的下一步提供该值",
-    "remarks_smart_dimmer": "此配置文件仅提供待机功率值。\n 下一步可以选择提供连接灯具的功率值"
+    "remarks_smart_dimmer": "此配置文件仅提供待机功率值。\n 下一步可以选择提供连接灯具的功率值",
+    "view_measurement_details": "查看测量详情"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "如果不确认，可以自行输入制造商和型号"
         },
-        "description": "{source}\n\n已自动检测到设备的制造商“{manufacturer}”和型号“{model}”。{remarks}",
+        "description": "{source}\n\n已自动检测到设备的制造商“{manufacturer}”和型号“{model}”。{remarks}{profile_details}",
         "title": "配置文件库"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "配置文件库选项",
-        "description": "当前选择了以下配置文件库中的配置文件：\n 制造商：{manufacturer}\n 型号：{model}\n\n如需更改配置文件，请点击“下一步”。"
+        "description": "当前选择了以下配置文件库中的配置文件：\n 制造商：{manufacturer}\n 型号：{model}\n\n如需更改配置文件，请点击“下一步”。{profile_details}"
       },
       "select_device": {
         "data": {

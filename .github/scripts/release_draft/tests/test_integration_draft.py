@@ -13,9 +13,16 @@ import update_integration_draft as entry
 
 
 class FakeClient:
-    def __init__(self, releases: list[dict[str, Any]], pull_requests: list[dict[str, Any]]) -> None:
+    def __init__(
+        self,
+        releases: list[dict[str, Any]],
+        pull_requests: list[dict[str, Any]],
+        *,
+        files_by_pull_request: dict[int, list[dict[str, Any]]] | None = None,
+    ) -> None:
         self._releases = releases
         self._pull_requests = pull_requests
+        self._files_by_pull_request = files_by_pull_request or {}
         self.created: list[dict[str, Any]] = []
         self.updated: list[tuple[int, dict[str, Any]]] = []
 
@@ -30,6 +37,9 @@ class FakeClient:
 
     def merged_pull_requests(self, commit_shas: list[str]) -> list[dict[str, Any]]:
         return self._pull_requests
+
+    def pull_request_file_details(self, number: int) -> list[dict[str, Any]]:
+        return self._files_by_pull_request.get(number, [])
 
     def create_release(self, payload: dict[str, Any]) -> dict[str, Any]:
         self.created.append(payload)
@@ -154,6 +164,73 @@ def test_generated_supporters_footer_is_appended(monkeypatch: pytest.MonkeyPatch
     entry.main()
 
     assert client.created[0]["body"].endswith("## Supporters\n\nAlice\n")
+
+
+def test_new_power_profiles_are_grouped_with_unique_authors(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = FakeClient(
+        releases=[release("v1.22.0")],
+        pull_requests=[
+            pr(10, "Add one", labels=["powerprofile"], author="alice"),
+            pr(11, "Add two", labels=["powerprofile"], author="bob"),
+            pr(12, "Add another", labels=["powerprofile"], author="alice"),
+            pr(13, "fix: ordinary change", labels=["bugfix"], author="carol"),
+        ],
+        files_by_pull_request={
+            10: [{"filename": "profile_library/acme/one/model.json", "status": "added"}],
+            11: [
+                {"filename": "profile_library/acme/two/model.json", "status": "added"},
+                {"filename": "profile_library/acme/three/model.json", "status": "added"},
+                {"filename": "profile_library/library.json", "status": "modified"},
+            ],
+            12: [{"filename": "profile_library/acme/four/model.json", "status": "added"}],
+        },
+    )
+
+    run(monkeypatch, client, channel="stable", head_ref="master")
+
+    body = client.created[0]["body"]
+    assert (
+        "- 4 new power profiles by @alice and @bob — [See what's new](https://library.powercalc.nl/whats-new)"
+    ) in body
+    assert "#10 Add one" not in body
+    assert "#11 Add two" not in body
+    assert "#12 Add another" not in body
+    assert "- #13 fix: ordinary change @carol" in body
+
+
+def test_single_new_profile_uses_singular_wording(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = FakeClient(
+        releases=[release("v1.22.0")],
+        pull_requests=[pr(10, "Add profile", labels=["powerprofile"], author="alice")],
+        files_by_pull_request={
+            10: [{"filename": "profile_library/acme/one/model.json", "status": "added"}],
+        },
+    )
+
+    run(monkeypatch, client, channel="stable", head_ref="master")
+
+    assert "- 1 new power profile by @alice — [See what's new]" in client.created[0]["body"]
+
+
+def test_updated_and_removed_profiles_keep_existing_entries(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = FakeClient(
+        releases=[release("v1.22.0")],
+        pull_requests=[
+            pr(10, "Update profile", labels=["powerprofile"], author="alice"),
+            pr(11, "Remove profile", labels=["powerprofile"], author="bob"),
+        ],
+        files_by_pull_request={
+            10: [{"filename": "profile_library/acme/one/model.json", "status": "modified"}],
+            11: [{"filename": "profile_library/acme/two/model.json", "status": "removed"}],
+        },
+    )
+
+    run(monkeypatch, client, channel="stable", head_ref="master")
+
+    body = client.created[0]["body"]
+    assert "- #10 Update profile @alice" in body
+    assert "- #11 Remove profile @bob" in body
+    assert "new power profile" not in body
 
 
 def test_supporters_failure_does_not_block_drafting(monkeypatch: pytest.MonkeyPatch) -> None:

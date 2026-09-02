@@ -3,7 +3,8 @@
     "source_entity": "Entità sorgente",
     "source_device": "Dispositivo sorgente",
     "remarks_smart_switch": "Questo profilo fornisce solo valori di potenza in standby. Quando hai un dispositivo che consuma una quantità fissa di potenza quando è acceso, puoi fornire quel valore nel passaggio successivo del flusso di configurazione",
-    "remarks_smart_dimmer": "Questo profilo fornisce solo valori di potenza in standby. \n Nel passo successivo è possibile fornire facoltativamente i valori della luce collegata"
+    "remarks_smart_dimmer": "Questo profilo fornisce solo valori di potenza in standby. \n Nel passo successivo è possibile fornire facoltativamente i valori della luce collegata",
+    "view_measurement_details": "Visualizza i dettagli della misurazione"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Se si sceglie di non confermare, è possibile immettere il produttore e modellare da soli"
         },
-        "description": "Source entity: {source}\n\nProduttore \"{manufacturer}\" e modello \"{model}\" sono stati rilevati automaticamente per il tuo dispositivo.{remarks}",
+        "description": "Source entity: {source}\n\nProduttore \"{manufacturer}\" e modello \"{model}\" sono stati rilevati automaticamente per il tuo dispositivo.{remarks}{profile_details}",
         "title": "Libreria"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Opzioni della libreria",
-        "description": "Attualmente è selezionato il seguente profilo libreria: \n produttore: {manufacturer}\n modello: {model}\n\nSe desideri modificare il profilo, fai clic su Avanti."
+        "description": "Attualmente è selezionato il seguente profilo libreria: \n produttore: {manufacturer}\n modello: {model}\n\nSe desideri modificare il profilo, fai clic su Avanti.{profile_details}"
       },
       "select_device": {
         "data": {

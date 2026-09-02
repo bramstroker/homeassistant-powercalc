@@ -3,7 +3,8 @@
     "source_entity": "Entidad de origen",
     "source_device": "Dispositivo de origen",
     "remarks_smart_switch": "Este perfil solo provee valores de potencia en espera. \nCuando tienes un aparato que encendido consume una cantidad fija de potencia, puedes proveer ese valor en el siguiente paso de la configuración",
-    "remarks_smart_dimmer": "Este perfil solo proporciona valores de energía en espera.\nEn el siguiente paso puedes proporcionar opcionalmente los valores de la luz conectada"
+    "remarks_smart_dimmer": "Este perfil solo proporciona valores de energía en espera.\nEn el siguiente paso puedes proporcionar opcionalmente los valores de la luz conectada",
+    "view_measurement_details": "Ver detalles de la medición"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Si eliges no confirmar, puedes introducir el fabricante y el modelo tú mismo"
         },
-        "description": "{source}\n\nEl fabricante \"{manufacturer}\" y el modelo \"{model}\" fueron detectados automáticamente en su dispositivo.{remarks}",
+        "description": "{source}\n\nEl fabricante \"{manufacturer}\" y el modelo \"{model}\" fueron detectados automáticamente en su dispositivo.{remarks}{profile_details}",
         "title": "Biblioteca"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Opciones de biblioteca",
-        "description": "Actualmente se ha seleccionado el siguiente perfil de biblioteca: \n fabricante: {manufacturer}\n modelo: {model}\n\nSi quieres cambiar el perfil, haz clic a continuación."
+        "description": "Actualmente se ha seleccionado el siguiente perfil de biblioteca: \n fabricante: {manufacturer}\n modelo: {model}\n\nSi quieres cambiar el perfil, haz clic a continuación.{profile_details}"
       },
       "select_device": {
         "data": {

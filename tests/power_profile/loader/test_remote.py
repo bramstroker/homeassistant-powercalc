@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import AsyncIterator
 import contextlib
 from functools import partial
 import json
@@ -7,10 +8,11 @@ import os
 from pathlib import Path
 import re
 import shutil
+from types import SimpleNamespace
 from typing import cast
 from unittest.mock import AsyncMock, Mock, patch
 
-from aiohttp import ClientError
+from aiohttp import ClientError, ClientResponse
 from aioresponses import aioresponses
 from awesomeversion import AwesomeVersion
 from homeassistant.core import HomeAssistant
@@ -26,12 +28,17 @@ from custom_components.powercalc.power_profile.loader.remote import (
     ENDPOINT_LIBRARY,
     LibraryModel,
     RemoteLoader,
+    _read_capped,
     _save_resource,
 )
 from custom_components.powercalc.power_profile.power_profile import DeviceType, DiscoveryBy
 from tests.common import get_test_config_dir, get_test_profile_dir
 
 pytestmark = pytest.mark.skip_remote_loader_mocking
+
+LIBRARY_URL_PREFIX = "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library"
+LIBRARY_RESOURCE_URL = f"{LIBRARY_URL_PREFIX}/test/model/model.json"
+LIBRARY_CSV_RESOURCE_URL = f"{LIBRARY_URL_PREFIX}/test/model/data.csv.gz"
 
 
 @pytest.fixture
@@ -127,11 +134,11 @@ async def test_download_keeps_existing_resources_when_a_later_download_fails(
     resources = [
         {
             "path": "model.json",
-            "url": "https://raw.githubusercontent.com/example/profile/model.json",
+            "url": LIBRARY_RESOURCE_URL,
         },
         {
             "path": "data.csv.gz",
-            "url": "https://raw.githubusercontent.com/example/profile/data.csv.gz",
+            "url": LIBRARY_CSV_RESOURCE_URL,
         },
     ]
     mock_aioresponse.get(
@@ -221,6 +228,11 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
         "https://github.com@127.0.0.1/profile/model.json",
         "https://github.com:444/profile/model.json",
         "https://github.com:invalid/profile/model.json",
+        # Allowed host, but outside the profile library of the Powercalc repository.
+        "https://raw.githubusercontent.com/attacker/evil/master/profile_library/test/model/model.json",
+        "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/README.md",
+        "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/../../a/b/c.json",
+        "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/%2e%2e/%2e%2e/a/b.json",
         None,
     ],
 )
@@ -253,7 +265,7 @@ async def test_download_rejects_invalid_resource_path(
         payload=[
             {
                 "path": resource_path,
-                "url": "https://raw.githubusercontent.com/example/profile/model.json",
+                "url": LIBRARY_RESOURCE_URL,
             },
         ],
     )
@@ -272,7 +284,7 @@ async def test_download_rejects_invalid_storage_path(
         payload=[
             {
                 "path": "model.json",
-                "url": "https://raw.githubusercontent.com/example/profile/model.json",
+                "url": LIBRARY_RESOURCE_URL,
             },
         ],
     )
@@ -298,6 +310,22 @@ async def test_download_rejects_invalid_resource_manifest(
         await remote_loader.download_profile("test", "model", str(tmp_path / "profiles"), "test_download")
 
 
+async def test_download_rejects_a_manifest_that_is_not_json(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    """A manifest that is not JSON must surface as a download error rather than a decoding crash."""
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        body=b"<html>gateway error</html>",
+    )
+
+    with pytest.raises(ProfileDownloadError, match="not valid JSON"):
+        await remote_loader.download_profile("test", "model", str(tmp_path / "profiles"), "test_download")
+
+
 async def test_download_rejects_absolute_resource_path(
     remote_loader: RemoteLoader,
     mock_aioresponse: aioresponses,
@@ -309,7 +337,7 @@ async def test_download_rejects_absolute_resource_path(
         payload=[
             {
                 "path": str(tmp_path / "outside.json"),
-                "url": "https://raw.githubusercontent.com/example/profile/model.json",
+                "url": LIBRARY_RESOURCE_URL,
             },
         ],
     )
@@ -336,7 +364,7 @@ async def test_download_rejects_resource_path_through_symlink(
         payload=[
             {
                 "path": "linked/model.json",
-                "url": "https://raw.githubusercontent.com/example/profile/model.json",
+                "url": LIBRARY_RESOURCE_URL,
             },
         ],
     )
@@ -352,7 +380,7 @@ async def test_download_does_not_follow_resource_redirects(
     mock_aioresponse: aioresponses,
     tmp_path: Path,
 ) -> None:
-    resource_url = "https://raw.githubusercontent.com/example/profile/model.json"
+    resource_url = LIBRARY_RESOURCE_URL
     redirected_url = "http://192.168.1.1/model.json"
     mock_aioresponse.get(
         f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
@@ -367,6 +395,60 @@ async def test_download_does_not_follow_resource_redirects(
         await remote_loader.download_profile("test", "model", str(storage_path), "test_download")
 
     assert not (storage_path / "model.json").exists()
+
+
+async def test_download_rejects_oversized_resource(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    """A resource larger than the cap must be refused instead of buffered and written."""
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=[{"path": "model.json", "url": LIBRARY_RESOURCE_URL}],
+    )
+    mock_aioresponse.get(LIBRARY_RESOURCE_URL, status=200, body=b"x" * 64)
+    storage_path = tmp_path / "profiles"
+
+    with (
+        patch("custom_components.powercalc.power_profile.loader.remote.MAX_RESOURCE_SIZE", 16),
+        pytest.raises(ProfileDownloadError, match="larger than the maximum"),
+    ):
+        await remote_loader.download_profile("test", "model", str(storage_path), "test_download")
+
+    assert not (storage_path / "model.json").exists()
+
+
+async def _async_chunks(chunks: list[bytes]) -> AsyncIterator[bytes]:
+    for chunk in chunks:
+        yield chunk
+
+
+def _streamed_response(chunks: list[bytes], content_length: int | None) -> ClientResponse:
+    """Build a minimal stand-in for a streamed aiohttp response."""
+    response = SimpleNamespace(
+        content_length=content_length,
+        content=SimpleNamespace(iter_chunked=lambda _size: _async_chunks(chunks)),
+    )
+    return cast(ClientResponse, response)
+
+
+async def test_read_capped_returns_a_body_within_the_limit() -> None:
+    assert await _read_capped(_streamed_response([b"abc", b"def"], 6), 16, "resource") == b"abcdef"
+
+
+@pytest.mark.parametrize(
+    "chunks, content_length",
+    [
+        ([b"x" * 32], 32),  # the server declares an oversized body up front
+        ([b"x" * 32], None),  # the server declares no length and streams an oversized body
+        ([b"x" * 8] * 4, 4),  # the server understates the body it then streams
+    ],
+)
+async def test_read_capped_rejects_an_oversized_body(chunks: list[bytes], content_length: int | None) -> None:
+    with pytest.raises(ProfileDownloadError, match="larger than the maximum"):
+        await _read_capped(_streamed_response(chunks, content_length), 16, "resource")
 
 
 async def test_get_manufacturer_listing(remote_loader: RemoteLoader) -> None:

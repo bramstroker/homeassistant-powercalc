@@ -7,7 +7,7 @@ Imported directly by `update_integration_draft.py`, so it stays standard
 library only and needs no dependency install on the runner.
 
 Requires:
-- Python 3.13+ (standard library only)
+- Python 3.14+ (standard library only)
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ import urllib.request
 
 SUPPORTERS_API = "https://api.powercalc.nl/supporters/one-time"
 SUBSCRIPTIONS_API = "https://api.powercalc.nl/supporters/subscriptions"
+USER_AGENT = "Powercalc release drafter (+https://github.com/bramstroker/homeassistant-powercalc)"
 
 # Beer tiers: exact coffees count → label
 TIERS: list[dict[str, Any]] = [
@@ -40,7 +41,10 @@ def _get(url: str) -> list[dict[str, Any]]:
     """
     Simple GET request helper.
     """
-    request = urllib.request.Request(url, headers={"Accept": "application/json"})  # noqa: S310 - fixed https API
+    request = urllib.request.Request(  # noqa: S310 - fixed https API
+        url,
+        headers={"Accept": "application/json", "User-Agent": USER_AGENT},
+    )
     with urllib.request.urlopen(request, timeout=10) as response:  # noqa: S310
         data = json.loads(response.read())
     if not isinstance(data, list):

@@ -107,6 +107,7 @@ async def test_lut_autodiscover_flow(
     assert result["description_placeholders"] == {
         "manufacturer": "ikea",
         "model": "LED1545G12",
+        "profile_details": ("\n\n[View measurement details](https://library.powercalc.nl/profiles/ikea/led1545g12)"),
         "remarks": None,
         "source": "Source entity: light.test",
     }

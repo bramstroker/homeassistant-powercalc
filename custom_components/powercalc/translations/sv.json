@@ -3,7 +3,8 @@
     "source_entity": "Källentitet",
     "source_device": "Källenhet",
     "remarks_smart_switch": "Denna profil visar endast effekt i standby-läge. \n Har du apparater som förbrukar ett fast effekt-värde när de är påslagna, kan du ange detta värde i nästa steg",
-    "remarks_smart_dimmer": "Den här profilen ger endast standby-effektvärden. \n I nästa steg kan du ange värden för det anslutna ljuset som tillval"
+    "remarks_smart_dimmer": "Den här profilen ger endast standby-effektvärden. \n I nästa steg kan du ange värden för det anslutna ljuset som tillval",
+    "view_measurement_details": "Visa mätdetaljer"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Om du väljer att inte bekräfta kan du ange tillverkare och modell själv"
         },
-        "description": "{source}\n\nTillverkare \"{manufacturer}\" och modell \"{model}\" var automatiskt detekterade för din lampa.{remarks}",
+        "description": "{source}\n\nTillverkare \"{manufacturer}\" och modell \"{model}\" var automatiskt detekterade för din lampa.{remarks}{profile_details}",
         "title": "Bibliotek"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Biblioteksalternativ",
-        "description": "För närvarande är följande biblioteksprofil vald: \n tillverkare: {manufacturer}\n modell: {model}\n\nOm du vill ändra profilen klickar du på nästa."
+        "description": "För närvarande är följande biblioteksprofil vald: \n tillverkare: {manufacturer}\n modell: {model}\n\nOm du vill ändra profilen klickar du på nästa.{profile_details}"
       },
       "select_device": {
         "data": {
