@@ -22108,6 +22108,56 @@
         },
         {
           "aliases": [
+            "Shelly 1PM Gen3"
+          ],
+          "calculation_strategy": "fixed",
+          "description": "Compact Smart Wi-Fi Relay with Power Monitoring",
+          "created_at": "2026-09-02T22:00:25Z",
+          "device_type": "smart_switch",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 3680,
+            "power_monitoring": true,
+            "rated_power": 1.2,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "matter"
+            ]
+          },
+          "ean": [
+            "3800235261798"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 60 seconds. Multiple combinations of settings were tested. Firmware version 2.0.0.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.6.0:app"
+          },
+          "name": "1PM Gen3",
+          "only_self_usage": true,
+          "product_url": "https://www.shelly.com/products/shelly-1pm-gen3",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S3SW-001P16EU",
+          "manufacturer": "shelly",
+          "updated_at": "2026-09-03T18:00:19",
+          "max_power": 0.87,
+          "sub_profile_count": 4,
+          "power_range": {
+            "min": 0.29,
+            "max": 0.87
+          },
+          "standby_power": 0.62,
+          "hash": "2ba5a8f18e50cfbcc581d638129d6c9f"
+        },
+        {
+          "aliases": [
             "Shelly 1PM Mini Gen3"
           ],
           "legacy_ids": [
