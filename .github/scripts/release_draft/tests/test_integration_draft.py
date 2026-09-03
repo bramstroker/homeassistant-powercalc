@@ -25,8 +25,10 @@ class FakeClient:
         self._files_by_pull_request = files_by_pull_request or {}
         self.created: list[dict[str, Any]] = []
         self.updated: list[tuple[int, dict[str, Any]]] = []
+        self.release_requests = 0
 
     def releases(self) -> list[dict[str, Any]]:
+        self.release_requests += 1
         return self._releases
 
     def commit_sha(self, ref: str) -> str:
@@ -89,6 +91,7 @@ def test_stable_creates_draft_and_resolves_minor(monkeypatch: pytest.MonkeyPatch
     assert payload["draft"] is True
     assert "### 🚀 Features" in payload["body"]
     assert "- #10 feat: add sensor @octocat" in payload["body"]
+    assert client.release_requests == 1
 
 
 def test_stable_updates_existing_draft(monkeypatch: pytest.MonkeyPatch) -> None:
