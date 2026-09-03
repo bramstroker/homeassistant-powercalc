@@ -264,15 +264,28 @@ async def resolve_entity_ids_recursively(
     entry: ConfigEntry,
     device_class: SensorDeviceClass,
     resolved_ids: set[str] | None = None,
+    seen_entry_ids: set[str] | None = None,
 ) -> set[str]:
-    """Get all the entity IDs for the current group and all the subgroups."""
+    """Get all the entity IDs for the current group and all the subgroups.
+
+    Groups can reference each other as a subgroup, either in a cycle or as two groups sharing
+    the same subgroup. `seen_entry_ids` makes sure every group is only visited once, so a cycle
+    does not recurse until the stack runs out.
+    """
     if resolved_ids is None:
         resolved_ids = set()
+    if seen_entry_ids is None:
+        seen_entry_ids = set()
+
+    if entry.entry_id in seen_entry_ids:
+        _LOGGER.debug("Group config entry %s already resolved, skipping", entry.entry_id)
+        return resolved_ids
+    seen_entry_ids.add(entry.entry_id)
 
     _add_member_entry_ids(hass, entry, device_class, resolved_ids)
     _add_specified_sensors(entry, device_class, resolved_ids)
     await _add_include_based_sensors(hass, entry, device_class, resolved_ids)
-    await _add_subgroup_entities(hass, entry, device_class, resolved_ids)
+    await _add_subgroup_entities(hass, entry, device_class, resolved_ids, seen_entry_ids)
 
     return resolved_ids
 
@@ -331,6 +344,7 @@ async def _add_subgroup_entities(
     entry: ConfigEntry,
     device_class: SensorDeviceClass,
     resolved_ids: set[str],
+    seen_entry_ids: set[str],
 ) -> None:
     """Recursively add entities from subgroups."""
     subgroups = entry.data.get(CONF_SUB_GROUPS)
@@ -343,7 +357,7 @@ async def _add_subgroup_entities(
             _LOGGER.error("Subgroup config entry not found: %s", subgroup_entry_id)
             continue
 
-        await resolve_entity_ids_recursively(hass, subgroup_entry, device_class, resolved_ids)
+        await resolve_entity_ids_recursively(hass, subgroup_entry, device_class, resolved_ids, seen_entry_ids)
 
 
 @callback
