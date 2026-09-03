@@ -10137,6 +10137,9 @@
           "hash": "7a278574d414398e0eb037e9c1ecbe80"
         },
         {
+          "aliases": [
+            "TRADFRI bulb GU10 WS 400lm"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2024-11-20T11:28:25Z",
           "device_type": "light",
@@ -10168,7 +10171,7 @@
           ],
           "id": "LED1739R5",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-03T07:28:19",
           "max_power": 5.36,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-11-20T11:34:38",
@@ -10183,7 +10186,7 @@
             "score": 97.4,
             "color_temp": 97.4
           },
-          "hash": "b767b4a0d06a9d4dfff91601b4a55163"
+          "hash": "9b9d5602a1316a249deb2f12b3f9bcb4"
         },
         {
           "calculation_strategy": "lut",
