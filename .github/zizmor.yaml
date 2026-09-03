@@ -6,3 +6,11 @@ rules:
       - comment-merged-power-profile.yml
       - pr-comment-upload-and-comment.yml
       - validate-model-json-comment.yml
+  self-repository:
+    # The $/ syntax downloads the whole repository as an action, but the
+    # intentional cyclic symlink used by the test integration cannot be extracted.
+    ignore:
+      - pr-comment-upload-and-comment.yml
+      - publish-measure-image.yml
+      - test-measure.yml
+      - validate-model-json-comment.yml
