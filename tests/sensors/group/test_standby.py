@@ -59,6 +59,23 @@ async def test_standby_group(hass: HomeAssistant) -> None:
     assert_entity_state(hass, "sensor.all_standby_power", "0.20")
 
 
+async def test_standby_group_includes_devices_already_off_at_startup(hass: HomeAssistant) -> None:
+    await set_states(hass, [("input_boolean.test", STATE_OFF)])
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 20},
+        },
+    )
+
+    assert_entity_state(hass, "sensor.test_power", "0.20")
+    assert_entity_state(hass, "sensor.all_standby_power", "0.20")
+
+
 async def test_standby_group_utility_meter(hass: HomeAssistant) -> None:
     await run_powercalc_setup(
         hass,

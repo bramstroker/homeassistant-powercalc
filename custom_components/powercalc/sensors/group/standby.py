@@ -77,6 +77,7 @@ class StandbyPowerSensor(PowerSensor, SensorEntity):
                 self._recalculate,
             ),
         )
+        await self._recalculate()
 
     async def _recalculate(self) -> None:
         """Calculate sum of all power sensors in standby, and update the state of the sensor."""
