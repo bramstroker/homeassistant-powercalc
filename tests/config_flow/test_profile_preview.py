@@ -9,7 +9,7 @@ from homeassistant.components import websocket_api
 from homeassistant.const import ATTR_FRIENDLY_NAME, ATTR_ICON, CONF_ENTITY_ID, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import UnknownFlow
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import HomeAssistantError, Unauthorized
 import pytest
 import voluptuous as vol
 
@@ -58,8 +58,9 @@ def _build_ws_message(
     }
 
 
-def _make_ws_connection() -> MagicMock:
+def _make_ws_connection(*, is_admin: bool = True) -> MagicMock:
     connection = MagicMock()
+    connection.user.is_admin = is_admin
     connection.subscriptions = {}
     return connection
 
@@ -69,6 +70,13 @@ async def test_async_setup_preview_registers_websocket_command(hass: HomeAssista
         await async_setup_preview(hass)
 
     register_command.assert_called_once_with(hass, ws_start_preview)
+
+
+def test_preview_websocket_requires_admin(hass: HomeAssistant) -> None:
+    connection = _make_ws_connection(is_admin=False)
+
+    with pytest.raises(Unauthorized):
+        ws_start_preview(hass, connection, _build_ws_message("flow-id", {CONF_POWER: 10}))
 
 
 async def test_build_profile_preview_returns_current_power(hass: HomeAssistant) -> None:
