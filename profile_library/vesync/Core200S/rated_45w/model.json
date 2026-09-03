@@ -8,15 +8,15 @@
     ]
   },
   "measure_device": "P3 P4400 Kill A Watt Usage Monitor",
-  "measure_description": "US 120 V Core 200S-P, label rated 45 W, date code 1225.",
+  "measure_description": "US 120 V Core 200S-P, label rated 45 W, date code 1225. Night light adds 0.08 W (dim) or 0.23 W (on) in any mode: three minute averages on a Tasmota Sonoff S31 with the fan off gave 0.83 W off, 0.91 W dim, 1.06 W bright.",
   "mains_voltage": 120,
-  "standby_power": 0.8,
+  "standby_power": "{% set nl = states('[[entity_by_translation_key:night_light_level]]') %}{{ 0.83 + (0.23 if nl == 'on' else 0.08 if nl == 'dim' else 0) }}",
   "fixed_config": {
     "states_power": {
-      "preset_mode|sleep": 7.7,
-      "percentage|33": 16.1,
-      "percentage|66": 23.7,
-      "percentage|100": 45.4
+      "preset_mode|sleep": "{% set nl = states('[[entity_by_translation_key:night_light_level]]') %}{{ 7.7 + (0.23 if nl == 'on' else 0.08 if nl == 'dim' else 0) }}",
+      "percentage|33": "{% set nl = states('[[entity_by_translation_key:night_light_level]]') %}{{ 16.1 + (0.23 if nl == 'on' else 0.08 if nl == 'dim' else 0) }}",
+      "percentage|66": "{% set nl = states('[[entity_by_translation_key:night_light_level]]') %}{{ 23.7 + (0.23 if nl == 'on' else 0.08 if nl == 'dim' else 0) }}",
+      "percentage|100": "{% set nl = states('[[entity_by_translation_key:night_light_level]]') %}{{ 45.4 + (0.23 if nl == 'on' else 0.08 if nl == 'dim' else 0) }}"
     }
   }
 }
