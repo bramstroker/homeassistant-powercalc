@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "TRADFRI bulb GU10 WS 400lm"
+  ],
   "calculation_strategy": "lut",
   "created_at": "2024-11-20T11:28:25Z",
   "device_type": "light",
