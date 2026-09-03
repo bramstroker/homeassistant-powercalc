@@ -38364,24 +38364,28 @@
           "mains_voltage": 230,
           "name": "Smart Air Purifier",
           "product_url": "https://levoit.com/products/core-200s-p-smart-air-purifier",
-          "standby_power": 0.6,
           "authors": [
             {
               "name": "SH1FT-W",
               "github": "SH1FT-W",
               "email": "danielvizzino@outlook.com"
+            },
+            {
+              "name": "Ryan Ronnander",
+              "github": "ryan-ronnander"
             }
           ],
           "id": "Core200S",
           "manufacturer": "vesync",
-          "updated_at": "2026-08-31T12:33:32",
-          "max_power": 39.0,
-          "sub_profile_count": 0,
+          "updated_at": "2026-09-03T04:03:04",
+          "max_power": 45.4,
+          "sub_profile_count": 2,
           "power_range": {
             "min": 0.6,
-            "max": 39.0
+            "max": 45.4
           },
-          "hash": "5af7261c6b178995689ff49bdd7c9ff4"
+          "standby_power": 0.8,
+          "hash": "d66141c1d589512b814155e9a7e4a6ee"
         },
         {
           "calculation_strategy": "fixed",
