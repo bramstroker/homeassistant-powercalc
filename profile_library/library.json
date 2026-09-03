@@ -38380,15 +38380,15 @@
           ],
           "id": "Core200S",
           "manufacturer": "vesync",
-          "updated_at": "2026-09-03T04:03:04",
-          "max_power": 45.4,
+          "updated_at": "2026-09-03T16:14:47",
+          "max_power": 39.0,
           "sub_profile_count": 2,
           "power_range": {
             "min": 0.6,
-            "max": 45.4
+            "max": 39.0
           },
-          "standby_power": 0.8,
-          "hash": "d66141c1d589512b814155e9a7e4a6ee"
+          "standby_power": 0.6,
+          "hash": "c48a72b50c7bb6ccc8fb2fe9e0f2a718"
         },
         {
           "calculation_strategy": "fixed",
