@@ -34,6 +34,7 @@ async def async_setup_preview(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_start_preview)
 
 
+@websocket_api.require_admin
 @websocket_api.websocket_command(
     {
         vol.Required("type"): f"{PREVIEW_NAME}/start_preview",

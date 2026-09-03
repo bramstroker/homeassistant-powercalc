@@ -28,6 +28,7 @@ from homeassistant.helpers.entity_platform import async_get_platforms
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import async_call_later, async_track_time_interval
 from homeassistant.helpers.reload import async_integration_yaml_config
+from homeassistant.helpers.service import async_register_admin_service
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
@@ -306,7 +307,8 @@ def register_services(hass: HomeAssistant) -> None:
     async def _handle_change_gui_service(call: ServiceCall) -> None:
         await change_gui_configuration(hass, call)
 
-    hass.services.async_register(
+    async_register_admin_service(
+        hass,
         DOMAIN,
         SERVICE_CHANGE_GUI_CONFIGURATION,
         _handle_change_gui_service,
@@ -318,7 +320,8 @@ def register_services(hass: HomeAssistant) -> None:
         discovery_manager = get_discovery_manager(hass)
         await discovery_manager.update_library_and_rediscover()
 
-    hass.services.async_register(
+    async_register_admin_service(
+        hass,
         DOMAIN,
         SERVICE_UPDATE_LIBRARY,
         _handle_update_library_service,
@@ -353,7 +356,8 @@ def register_services(hass: HomeAssistant) -> None:
         setup_domain_groups(hass, global_config)
         await create_standby_group(hass, global_config)
 
-    hass.services.async_register(
+    async_register_admin_service(
+        hass,
         DOMAIN,
         SERVICE_RELOAD,
         _reload_config,

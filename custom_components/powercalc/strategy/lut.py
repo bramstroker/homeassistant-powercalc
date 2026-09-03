@@ -232,7 +232,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return None
 
         effect = attrs.get(ATTR_EFFECT)
-        if effect and str(effect).lower() not in ("off", "none", "white"):
+        if effect and str(effect).lower() not in ("off", "none", "white", "default", "mode color"):
             return await self._calculate_effect_power(entity_state, str(effect), brightness)
 
         lut_mode = LookupMode.from_color_mode(color_mode)

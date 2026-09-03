@@ -10137,6 +10137,9 @@
           "hash": "7a278574d414398e0eb037e9c1ecbe80"
         },
         {
+          "aliases": [
+            "TRADFRI bulb GU10 WS 400lm"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2024-11-20T11:28:25Z",
           "device_type": "light",
@@ -10168,7 +10171,7 @@
           ],
           "id": "LED1739R5",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-03T07:28:19",
           "max_power": 5.36,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-11-20T11:34:38",
@@ -10183,7 +10186,7 @@
             "score": 97.4,
             "color_temp": 97.4
           },
-          "hash": "b767b4a0d06a9d4dfff91601b4a55163"
+          "hash": "9b9d5602a1316a249deb2f12b3f9bcb4"
         },
         {
           "calculation_strategy": "lut",
@@ -22102,6 +22105,56 @@
             "max": 0.52
           },
           "hash": "07762d07b9f9effe88fe080208b0b123"
+        },
+        {
+          "aliases": [
+            "Shelly 1PM Gen3"
+          ],
+          "calculation_strategy": "fixed",
+          "description": "Compact Smart Wi-Fi Relay with Power Monitoring",
+          "created_at": "2026-09-02T22:00:25Z",
+          "device_type": "smart_switch",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 3680,
+            "power_monitoring": true,
+            "rated_power": 1.2,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "matter"
+            ]
+          },
+          "ean": [
+            "3800235261798"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 60 seconds. Multiple combinations of settings were tested. Firmware version 2.0.0.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.6.0:app"
+          },
+          "name": "1PM Gen3",
+          "only_self_usage": true,
+          "product_url": "https://www.shelly.com/products/shelly-1pm-gen3",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S3SW-001P16EU",
+          "manufacturer": "shelly",
+          "updated_at": "2026-09-03T18:00:19",
+          "max_power": 0.87,
+          "sub_profile_count": 4,
+          "power_range": {
+            "min": 0.29,
+            "max": 0.87
+          },
+          "standby_power": 0.62,
+          "hash": "2ba5a8f18e50cfbcc581d638129d6c9f"
         },
         {
           "aliases": [
@@ -38364,24 +38417,28 @@
           "mains_voltage": 230,
           "name": "Smart Air Purifier",
           "product_url": "https://levoit.com/products/core-200s-p-smart-air-purifier",
-          "standby_power": 0.6,
           "authors": [
             {
               "name": "SH1FT-W",
               "github": "SH1FT-W",
               "email": "danielvizzino@outlook.com"
+            },
+            {
+              "name": "Ryan Ronnander",
+              "github": "ryan-ronnander"
             }
           ],
           "id": "Core200S",
           "manufacturer": "vesync",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-03T16:14:47",
           "max_power": 39.0,
-          "sub_profile_count": 0,
+          "sub_profile_count": 2,
           "power_range": {
             "min": 0.6,
             "max": 39.0
           },
-          "hash": "5af7261c6b178995689ff49bdd7c9ff4"
+          "standby_power": 0.6,
+          "hash": "c48a72b50c7bb6ccc8fb2fe9e0f2a718"
         },
         {
           "calculation_strategy": "fixed",

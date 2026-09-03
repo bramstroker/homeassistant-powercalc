@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from homeassistant.auth.const import GROUP_ID_ADMIN, GROUP_ID_USER
 from homeassistant.components import input_boolean, light
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntryState
@@ -12,14 +13,18 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Context, HomeAssistant
+from homeassistant.exceptions import Unauthorized
 from homeassistant.helpers.entity_registry import EntityRegistry
+import pytest
 
 from custom_components.powercalc import (
     CONF_DISCOVERY,
     DATA_DISCOVERY_MANAGER,
     DOMAIN_CONFIG,
+    SERVICE_CHANGE_GUI_CONFIGURATION,
     SERVICE_RELOAD,
+    SERVICE_UPDATE_LIBRARY,
     DiscoveryManager,
     repair_none_config_entries_issue,
 )
@@ -82,6 +87,33 @@ async def test_domain_groups(hass: HomeAssistant, entity_registry: EntityRegistr
     entity_entry = entity_registry.async_get("sensor.all_input_boolean_power")
     assert entity_entry
     assert entity_entry.platform == "powercalc"
+
+
+@pytest.mark.parametrize(
+    "service,service_data",
+    [
+        (SERVICE_CHANGE_GUI_CONFIGURATION, {"field": CONF_CREATE_ENERGY_SENSOR, "value": "1"}),
+        (SERVICE_UPDATE_LIBRARY, {}),
+        (SERVICE_RELOAD, {}),
+    ],
+)
+async def test_management_services_require_admin(
+    hass: HomeAssistant,
+    service: str,
+    service_data: dict[str, str],
+) -> None:
+    await run_powercalc_setup(hass)
+    await hass.auth.async_create_user("Owner", group_ids=[GROUP_ID_ADMIN])
+    user = await hass.auth.async_create_user("Non-admin", group_ids=[GROUP_ID_USER])
+
+    with pytest.raises(Unauthorized):
+        await hass.services.async_call(
+            DOMAIN,
+            service,
+            service_data,
+            blocking=True,
+            context=Context(user_id=user.id),
+        )
 
 
 async def test_unload_entry(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:

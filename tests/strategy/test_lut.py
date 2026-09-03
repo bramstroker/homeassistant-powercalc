@@ -231,6 +231,8 @@ async def test_effect_not_found_logs_warning(hass: HomeAssistant, caplog: pytest
         "Off",
         "White",
         "None",
+        "Default",
+        "Mode Color",
     ],
 )
 async def test_lut_effect_is_ignored(

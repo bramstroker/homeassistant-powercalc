@@ -297,6 +297,67 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
     )
 
 
+async def test_circular_subgroups_are_resolved_once(hass: HomeAssistant) -> None:
+    """Two groups referencing each other as subgroup must not recurse endlessly."""
+    config_entry_group_a = await create_mock_group_entry(
+        hass,
+        "GroupA",
+        {
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test1_power"],
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.test1_energy"],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+    config_entry_group_b = await create_mock_group_entry(
+        hass,
+        "GroupB",
+        {
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test2_power"],
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.test2_energy"],
+            CONF_SUB_GROUPS: [config_entry_group_a.entry_id],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+    hass.config_entries.async_update_entry(
+        config_entry_group_a,
+        data={**config_entry_group_a.data, CONF_SUB_GROUPS: [config_entry_group_b.entry_id]},
+    )
+
+    resolved = await resolve_entity_ids_recursively(hass, config_entry_group_a, SensorDeviceClass.POWER)
+    assert resolved == {"sensor.test1_power", "sensor.test2_power"}
+
+    resolved = await resolve_entity_ids_recursively(hass, config_entry_group_a, SensorDeviceClass.ENERGY)
+    assert resolved == {"sensor.test1_energy", "sensor.test2_energy"}
+
+
+async def test_shared_subgroup_resolved_for_both_parents(hass: HomeAssistant) -> None:
+    """Two groups sharing the same subgroup must both include its entities."""
+    shared_entry = await create_mock_group_entry(
+        hass,
+        "Shared",
+        {
+            CONF_GROUP_POWER_ENTITIES: ["sensor.shared_power"],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+    parent_entries = [
+        await create_mock_group_entry(
+            hass,
+            name,
+            {
+                CONF_GROUP_POWER_ENTITIES: [power_entity],
+                CONF_SUB_GROUPS: [shared_entry.entry_id],
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        )
+        for name, power_entity in (("ParentA", "sensor.test1_power"), ("ParentB", "sensor.test2_power"))
+    ]
+
+    for parent_entry, power_entity in zip(parent_entries, ("sensor.test1_power", "sensor.test2_power"), strict=True):
+        resolved = await resolve_entity_ids_recursively(hass, parent_entry, SensorDeviceClass.POWER)
+        assert resolved == {power_entity, "sensor.shared_power"}
+
+
 async def test_parent_group_reloaded_on_subgroup_update(hass: HomeAssistant) -> None:
     """When an entity is added to a subgroup all the groups referring this subgroup should be reloaded"""
 

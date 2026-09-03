@@ -1,0 +1,22 @@
+{
+  "name": "Rated 37 W (US) / 38 W (EU)",
+  "device_specs": {
+    "form_factor": "air_purifier",
+    "rated_power": 37,
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "measure_device": "SONOFF S60ZBTPF",
+  "measure_description": "Measured manually on a 230 V unit rated 38 W. Original flat profile values. Levoit's 2021 US manual lists the same generation at 37 W.",
+  "mains_voltage": 230,
+  "standby_power": 0.6,
+  "fixed_config": {
+    "states_power": {
+      "preset_mode|sleep": 17,
+      "percentage|33": 21,
+      "percentage|66": 27,
+      "percentage|100": 39
+    }
+  }
+}
