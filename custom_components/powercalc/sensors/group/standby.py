@@ -1,12 +1,13 @@
 from decimal import Decimal
 import logging
+from typing import Any
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import CONF_NAME, UnitOfPower
+from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_NAME, UnitOfPower
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
@@ -14,6 +15,8 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
+    ATTR_MEMBERS,
+    ATTR_STATE,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_POWER_SENSOR_PRECISION,
     DATA_STANDBY_POWER_SENSORS,
@@ -91,3 +94,18 @@ class StandbyPowerSensor(PowerSensor, SensorEntity):
         else:
             self._attr_native_value = None
         self.async_schedule_update_ha_state(True)
+
+    def debug_group(self) -> dict[str, Any]:
+        """Return the current standby contribution of each tracked power sensor."""
+        members = {
+            entity_id: {
+                ATTR_STATE: str(round(power, self._rounding_digits)),
+                ATTR_UNIT_OF_MEASUREMENT: self.native_unit_of_measurement,
+            }
+            for entity_id, power in sorted(self.standby_sensors.items())
+        }
+        return {
+            ATTR_STATE: str(self.state),
+            ATTR_UNIT_OF_MEASUREMENT: self.native_unit_of_measurement,
+            ATTR_MEMBERS: members,
+        }
