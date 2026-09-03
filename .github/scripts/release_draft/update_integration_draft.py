@@ -84,11 +84,11 @@ def _qualifies(pull_request: dict[str, Any]) -> bool:
     return not _labels(pull_request) & EXCLUDE_LABELS
 
 
-def _latest_stable_release(client: GitHubClient) -> dict[str, Any] | None:
+def _latest_stable_release(releases: list[dict[str, Any]]) -> dict[str, Any] | None:
     """The highest published, non-prerelease ``vX.Y.Z`` release."""
     best: dict[str, Any] | None = None
     best_version: tuple[int, int, int] | None = None
-    for release in client.releases():
+    for release in releases:
         if release["draft"] or release["prerelease"]:
             continue
         match = STABLE_TAG.match(release["tag_name"])
@@ -101,11 +101,11 @@ def _latest_stable_release(client: GitHubClient) -> dict[str, Any] | None:
     return best
 
 
-def _next_beta_number(client: GitHubClient, core: tuple[int, int, int]) -> int:
+def _next_beta_number(releases: list[dict[str, Any]], core: tuple[int, int, int]) -> int:
     prefix = f"v{format_version(core)}-beta."
     numbers = [
         int(release["tag_name"][len(prefix) :])
-        for release in client.releases()
+        for release in releases
         if not release["draft"]
         and release["tag_name"].startswith(prefix)
         and release["tag_name"][len(prefix) :].isdigit()
@@ -113,7 +113,7 @@ def _next_beta_number(client: GitHubClient, core: tuple[int, int, int]) -> int:
     return max(numbers) + 1 if numbers else 0
 
 
-def _find_draft(client: GitHubClient, *, prerelease: bool) -> dict[str, Any] | None:
+def _find_draft(releases: list[dict[str, Any]], *, prerelease: bool) -> dict[str, Any] | None:
     """The existing integration draft for the given channel, if any.
 
     Matched on the prerelease flag and a ``v`` tag, which keeps the two channel
@@ -122,7 +122,7 @@ def _find_draft(client: GitHubClient, *, prerelease: bool) -> dict[str, Any] | N
     return next(
         (
             release
-            for release in client.releases()
+            for release in releases
             if release["draft"] and bool(release["prerelease"]) == prerelease and release["tag_name"].startswith("v")
         ),
         None,
@@ -194,7 +194,8 @@ def main() -> None:
     channel = os.environ.get("CHANNEL", "stable")
     head_ref = os.environ.get("HEAD_REF", "master")
 
-    base = _latest_stable_release(client)
+    releases = client.releases()
+    base = _latest_stable_release(releases)
     if base is None:
         print("No published stable release found; nothing to draft against")
         return
@@ -219,13 +220,13 @@ def main() -> None:
     body = _build_body(pull_requests, _supporters_footer(), new_profile_counts)
 
     if channel == "beta":
-        version = f"{format_version(next_core)}-beta.{_next_beta_number(client, next_core)}"
+        version = f"{format_version(next_core)}-beta.{_next_beta_number(releases, next_core)}"
         prerelease = True
     else:
         version = format_version(next_core)
         prerelease = False
 
-    draft = _find_draft(client, prerelease=prerelease)
+    draft = _find_draft(releases, prerelease=prerelease)
     payload = {
         "tag_name": f"v{version}",
         "name": NAME_TEMPLATE.format(version=version),
