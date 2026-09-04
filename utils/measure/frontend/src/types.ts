@@ -279,6 +279,7 @@ export interface SessionSnapshot {
     voltage: number;
   } | null;
   entity_states?: Record<string, string>;
+  can_analyse?: boolean;
 }
 
 export interface SessionSummary {

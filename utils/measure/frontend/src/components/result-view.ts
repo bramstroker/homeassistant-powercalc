@@ -40,6 +40,14 @@ interface ResultOutcome {
   description: string;
 }
 
+interface JsonInspectorState {
+  name: string;
+  content?: unknown;
+  error?: string;
+}
+
+const INSPECTABLE_JSON_FILES = new Set(["analyser.json", "analysis.json", "model.json"]);
+
 const COMPLETED: ResultOutcome = {
   mark: "✓",
   title: "Profile captured",
@@ -91,6 +99,9 @@ export class ResultView extends LitElement {
   @property({ attribute: false })
   downloadAll: () => void = () => {};
 
+  @property({ attribute: false })
+  inspectJsonFile: (name: string) => Promise<unknown> = async () => undefined;
+
   @property({ type: String })
   diagnosticsUrl = "";
 
@@ -99,6 +110,12 @@ export class ResultView extends LitElement {
 
   @property({ type: Boolean })
   canResume = false;
+
+  @property({ type: Boolean })
+  canAnalyse = false;
+
+  @property({ type: Boolean })
+  analysisComplete = false;
 
   @property({ type: String })
   errorMessage = "";
@@ -130,6 +147,9 @@ export class ResultView extends LitElement {
   @state()
   contributionMethod?: ContributionMethodId;
 
+  @state()
+  jsonInspector?: JsonInspectorState;
+
   static readonly styles = [sharedStyles, css`
     .result-summary { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1rem; align-items: start; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
     .result-summary h2 { margin-bottom: 0.4rem; }
@@ -143,7 +163,7 @@ export class ResultView extends LitElement {
     .metric strong { display: block; margin-top: 0.35rem; font: 700 1.4rem/1.1 "DIN Alternate", sans-serif; color: var(--signal-strong); }
     .analysis-panel { margin-top: 1.5rem; padding: clamp(1rem, 3vw, 1.35rem); border: 1px solid var(--line); border-radius: 14px; background: var(--well); }
     .analysis-panel h3 { margin: 0; font-size: 1.05rem; }
-    .analysis-explanation { max-width: 80ch; margin: 0.55rem 0 0; color: var(--muted); line-height: 1.55; }
+    .analysis-explanation { margin: 0.55rem 0 0; color: var(--muted); line-height: 1.55; }
     .analysis-explanation code { color: var(--ink); overflow-wrap: anywhere; }
     .analysis-outcome { display: flex; flex-wrap: wrap; gap: 0.4rem 0.75rem; align-items: baseline; margin: 1rem 0 0; }
     .analysis-outcome span { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
@@ -154,9 +174,22 @@ export class ResultView extends LitElement {
     .analysis-details div { display: flex; flex-wrap: wrap; gap: 0.3rem 0.5rem; min-width: 0; align-items: baseline; }
     .analysis-details dt { color: var(--muted); font-size: 0.75rem; }
     .analysis-details dd { margin: 0; color: var(--ink); font-weight: 700; overflow-wrap: anywhere; }
+    .analysis-retry { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+    .analysis-retry p { flex: 1 1 30rem; margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+    .analysis-retry p.complete { color: var(--good); font-weight: 700; }
     .files-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1.5rem; }
     .files-header h3 { margin: 0; font-size: 1rem; }
     .download-all { min-height: 36px; padding: 0.45rem 0.75rem; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    .file-actions { display: flex; align-items: center; gap: 0.55rem; }
+    .inspect-file { display: grid; place-items: center; width: 38px; min-height: 38px; padding: 0; color: var(--signal-strong); }
+    .inspect-file svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .json-backdrop { position: fixed; z-index: 1000; inset: 0; display: grid; place-items: center; padding: clamp(1rem, 4vw, 3rem); background: rgb(0 0 0 / 0.72); }
+    .json-dialog { display: grid; grid-template-rows: auto minmax(0, 1fr); width: min(900px, 100%); max-height: min(82vh, 900px); padding: 1rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 24px 80px rgb(0 0 0 / 0.45); }
+    .json-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 0.8rem; }
+    .json-dialog-header h3 { margin: 0; overflow-wrap: anywhere; }
+    .json-dialog-header button { min-height: 38px; padding: 0.4rem 0.7rem; }
+    .json-dialog pre { max-height: none; min-height: 12rem; white-space: pre; overflow-wrap: normal; }
+    .json-dialog .notice { margin: 0; }
     .plots-header { margin: 1.5rem 0 0.75rem; }
     .plots-header h3 { margin: 0; font-size: 1rem; }
     .plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 1rem; }
@@ -220,10 +253,11 @@ export class ResultView extends LitElement {
         </div>
         ${error ? html`<p class="notice error" role="alert">${this.renderError(error)}</p>` : nothing}
         ${showArtifacts ? this.renderSummary() : nothing}
-        ${showArtifacts ? this.renderAnalysis() : nothing}
+        ${showArtifacts || this.canAnalyse ? this.renderAnalysis() : nothing}
         ${showArtifacts ? this.renderWarnings() : nothing}
         ${showArtifacts ? this.renderPlots() : nothing}
         ${showArtifacts ? this.renderFiles() : nothing}
+        ${this.renderJsonInspector()}
         ${showArtifacts ? this.renderContributionSection(state) : nothing}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${diagnosticsDownload(this.diagnosticsUrl)}
@@ -250,12 +284,60 @@ export class ResultView extends LitElement {
           <button class="download-all" type="button" @click=${() => this.downloadAll()}>Download all</button>
         </div>
         <ul>${this.files.map((file) => html`
-          <li><span>${file.name}</span><small>${fileSize(file.size)}</small><a href=${this.fileUrl(file.name)} download>Download<span class="sr-only"> ${file.name}</span></a></li>
+          <li><span>${file.name}</span><small>${fileSize(file.size)}</small><div class="file-actions">
+            ${this.isInspectableJson(file) ? html`
+              <button class="inspect-file" type="button" title=${`View ${file.name}`} aria-label=${`View ${file.name}`} @click=${() => void this.openJsonInspector(file.name)}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+              </button>
+            ` : nothing}
+            <a href=${this.fileUrl(file.name)} download>Download<span class="sr-only"> ${file.name}</span></a>
+          </div></li>
         `)}</ul>
       `;
     }
     if (this.summaryEntries().length) return nothing;
     return html`<p class="notice">No downloadable files are available for this session.</p>`;
+  }
+
+  private isInspectableJson(file: SessionFile): boolean {
+    const basename = file.name.split("/").at(-1) ?? file.name;
+    return file.media_type === "application/json" && INSPECTABLE_JSON_FILES.has(basename);
+  }
+
+  private async openJsonInspector(name: string): Promise<void> {
+    this.jsonInspector = { name };
+    try {
+      const content = await this.inspectJsonFile(name);
+      if (this.jsonInspector?.name === name) this.jsonInspector = { name, content };
+    } catch (error) {
+      if (this.jsonInspector?.name === name) {
+        this.jsonInspector = { name, error: error instanceof Error ? error.message : "Could not load this file." };
+      }
+    }
+  }
+
+  private renderJsonInspector() {
+    const inspector = this.jsonInspector;
+    if (!inspector) return nothing;
+    return html`
+      <div class="json-backdrop" role="presentation" @click=${(event: MouseEvent) => {
+        if (event.target === event.currentTarget) this.jsonInspector = undefined;
+      }}>
+        <section class="json-dialog" role="dialog" aria-modal="true" aria-labelledby="json-dialog-title">
+          <div class="json-dialog-header">
+            <h3 id="json-dialog-title">${inspector.name}</h3>
+            <button type="button" autofocus @click=${() => { this.jsonInspector = undefined; }}>Close</button>
+          </div>
+          ${this.renderJsonInspectorContent(inspector)}
+        </section>
+      </div>
+    `;
+  }
+
+  private renderJsonInspectorContent(inspector: JsonInspectorState) {
+    if (inspector.error) return html`<p class="notice error" role="alert">${inspector.error}</p>`;
+    if (inspector.content === undefined) return html`<p class="muted" role="status">Loading JSON…</p>`;
+    return html`<pre>${JSON.stringify(inspector.content, null, 2)}</pre>`;
   }
 
   private renderPlots() {
@@ -512,7 +594,7 @@ ${preview.pr_body}</pre>
 
   private renderAnalysis() {
     const entries = this.summaryEntries().filter(([label]) => ANALYSIS_SUMMARY_LABELS.has(label));
-    if (!entries.length) return nothing;
+    if (!entries.length && !this.canAnalyse) return nothing;
     const result = entries.find(([label]) => label === "Recording analysis")?.[1]
       ?? entries.find(([label]) => label === "Profile analysis")?.[1];
     const reason = entries.find(([label]) => label === "Recording analysis reason")?.[1]
@@ -534,6 +616,20 @@ ${preview.pr_body}</pre>
             <div><dt>${this.analysisDetailLabel(label)}</dt><dd>${label === "Analysed feature" ? this.analysisFeature(value) : value}</dd></div>
           `)}
         </dl>` : nothing}
+        ${this.canAnalyse ? html`
+          <div class="analysis-retry">
+            <p class=${this.analysisComplete ? "complete" : ""} role=${this.analysisComplete ? "status" : nothing}>
+              ${this.busy
+                ? "Analysing the saved recording and refreshing the result…"
+                : this.analysisComplete
+                  ? "✓ Recording analysed again. The result and generated files are now up to date."
+                  : html`Run the saved <code>record.jsonl</code> through the current analyser again. No new measurement is needed.`}
+            </p>
+            <button type="button" @click=${() => this.emit("analyse")} ?disabled=${this.busy}>
+              ${this.busy ? "Analysing…" : "Analyse recording again"}
+            </button>
+          </div>
+        ` : nothing}
       </section>
     `;
   }
@@ -624,7 +720,7 @@ ${preview.pr_body}</pre>
     emit<{ section: SettingsSection }>(this, "open-settings", { section: "github" });
   }
 
-  private emit(name: "sessions" | "new" | "resume"): void {
+  private emit(name: "sessions" | "new" | "resume" | "analyse"): void {
     emit(this, name);
   }
 }

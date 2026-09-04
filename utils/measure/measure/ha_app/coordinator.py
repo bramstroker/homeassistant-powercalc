@@ -7,6 +7,7 @@ import time
 from typing import Protocol, cast
 from uuid import uuid4
 
+from measure.analyser.execution import RecorderAnalysisExecution
 from measure.clock import utc_now
 from measure.execution import MeasurementCancelledError, OperatingPoint
 from measure.ha_app.session import (
@@ -20,11 +21,17 @@ from measure.ha_app.session import (
     SessionState,
 )
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
-from measure.request import MeasurementRequest, ResumePolicy
+from measure.request import MeasurementRequest, RecorderMeasurementRequest, ResumePolicy
 from measure.runner.runner import RunnerResult
 
 _LOGGER = logging.getLogger("measure")
 _SNAPSHOT_PERSIST_INTERVAL = 5.0
+_ANALYSIS_WARNING_PREFIXES = (
+    "Profile was not created:",
+    "Profile model was not created:",
+    "Recording analysis:",
+    "Recording analysis failed:",
+)
 
 
 class SessionConflictError(Exception):
@@ -65,6 +72,7 @@ class MeasurementCoordinator:
         self._last_snapshot_write = 0.0
         self._control: SessionControl | None = None
         self._worker: Thread | None = None
+        self._analysing: set[str] = set()
         self._listeners: list[Callable[[], None]] = []
 
     @property
@@ -120,6 +128,8 @@ class MeasurementCoordinator:
         with self._lock:
             if self._snapshot and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
+            if self._analysing:
+                raise SessionConflictError("Recording analysis is already active")
             if request.resume_policy == ResumePolicy.RESUME:
                 raise SessionConflictError("Use the resume action for persisted output")
             now = utc_now()
@@ -144,6 +154,8 @@ class MeasurementCoordinator:
         with self._lock:
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
+            if self._analysing:
+                raise SessionConflictError("Recording analysis is already active")
             try:
                 snapshot = self._snapshot_locked(session_id)
             except SESSION_LOAD_ERRORS as error:
@@ -224,11 +236,57 @@ class MeasurementCoordinator:
                 raise SessionConflictError("The requested session does not exist") from error
             if snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("An active measurement session cannot be deleted")
+            if session_id in self._analysing:
+                raise SessionConflictError("A session cannot be deleted while its recording is being analysed")
             self.storage.delete_session(session_id)
             if self._snapshot is not None and self._snapshot.id == session_id:
                 self._snapshot = None
                 self._events = []
         self._notify_listeners()
+
+    def analyse(self, session_id: str) -> SessionSnapshot:
+        """Rebuild analysis and profile output from a retained raw recording."""
+
+        with self._lock:
+            if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
+                raise SessionConflictError("A measurement session is already active")
+            try:
+                snapshot = self._snapshot_locked(session_id)
+            except SESSION_LOAD_ERRORS as error:
+                raise SessionConflictError("The requested session does not exist") from error
+            if session_id in self._analysing:
+                raise SessionConflictError("The requested recording is already being analysed")
+            if snapshot.state in ACTIVE_SESSION_STATES or not self.storage.can_analyse(session_id):
+                raise SessionConflictError("The requested session has no recording that can be analysed")
+            request = self.storage.load_request(session_id)
+            if not isinstance(request, RecorderMeasurementRequest):  # pragma: no cover - guarded by can_analyse
+                raise SessionConflictError("The requested session is not a recorder session")
+            self._analysing.add(session_id)
+
+        try:
+            summary = RecorderAnalysisExecution().run(
+                request,
+                self.storage.artifact_directory(session_id, request.model_id),
+                summary=snapshot.summary,
+            )
+            with self._lock:
+                updated = replace(
+                    snapshot,
+                    updated_at=utc_now(),
+                    files=self.storage.list_files(session_id),
+                    summary=summary,
+                    warnings=tuple(
+                        warning for warning in snapshot.warnings if not warning.startswith(_ANALYSIS_WARNING_PREFIXES)
+                    ),
+                )
+                self.storage.write_snapshot(updated)
+                if self._snapshot is not None and self._snapshot.id == session_id:
+                    self._snapshot = updated
+        finally:
+            with self._lock:
+                self._analysing.discard(session_id)
+        self._notify_listeners()
+        return updated
 
     def _require_active(self, session_id: str) -> SessionSnapshot:
         """Return the live projection, refusing any session that does not hold the measurement slot."""

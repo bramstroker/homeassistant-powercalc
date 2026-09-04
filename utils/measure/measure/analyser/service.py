@@ -22,6 +22,7 @@ from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe
 MIN_VALIDATION_COVERAGE = 0.9
 MIN_RELATIVE_MAE_IMPROVEMENT = 0.15
 MIN_ABSOLUTE_MAE_IMPROVEMENT_W = 0.1
+MIN_PREDICTION_RANGE_W = 0.1
 MIN_SAMPLES_PER_MODEL_VALUE = 5
 
 _LOGGER = logging.getLogger("measure")
@@ -50,17 +51,16 @@ class RecorderAnalyser:
                 _LOGGER.debug("Analyser strategy %s was not applicable: %s", strategy.strategy_id, candidate.reason)
                 continue
             metrics = _evaluate(candidate, samples, validation)
+            prediction_range = _prediction_range(candidate, samples)
             _LOGGER.debug("Analyser strategy %s produced %s", strategy.strategy_id, metrics.to_dict())
             if not _has_minimum_support(candidate, samples):
                 reasons.append(
                     f"{strategy.strategy_id} needs at least {MIN_SAMPLES_PER_MODEL_VALUE} samples for every value",
                 )
-            elif _credible(metrics, baseline):
+            elif _credible(metrics, baseline, prediction_range):
                 evaluated.append((candidate, metrics))
             else:
-                reasons.append(
-                    f"{strategy.strategy_id} did not improve validation error enough or cover enough samples",
-                )
+                reasons.append(_credibility_reason(strategy.strategy_id, metrics, baseline, prediction_range))
 
         if not evaluated:
             reason = reasons[0] if reasons else "No analysis strategy could explain the recorded power"
@@ -139,14 +139,48 @@ def _metrics(
     return AnalysisMetrics(sample_count, len(validation), coverage, mae, rmse, power_range)
 
 
-def _credible(metrics: AnalysisMetrics, baseline: AnalysisMetrics) -> bool:
+def _credible(metrics: AnalysisMetrics, baseline: AnalysisMetrics, prediction_range: float) -> bool:
     improvement = baseline.mae_w - metrics.mae_w
     relative = improvement / baseline.mae_w if baseline.mae_w else 0
     return (
         metrics.coverage >= MIN_VALIDATION_COVERAGE
-        and improvement >= MIN_ABSOLUTE_MAE_IMPROVEMENT_W
-        and relative >= MIN_RELATIVE_MAE_IMPROVEMENT
+        and prediction_range >= MIN_PREDICTION_RANGE_W
+        and (improvement >= MIN_ABSOLUTE_MAE_IMPROVEMENT_W or relative >= MIN_RELATIVE_MAE_IMPROVEMENT)
     )
+
+
+def _prediction_range(candidate: AnalysisCandidate, samples: Sequence[RecordingSample]) -> float:
+    predictions = [estimate for sample in samples if (estimate := candidate.estimate_power(sample)) is not None]
+    return max(predictions) - min(predictions) if predictions else 0
+
+
+def _credibility_reason(
+    strategy_id: str,
+    metrics: AnalysisMetrics,
+    baseline: AnalysisMetrics,
+    prediction_range: float,
+) -> str:
+    label = "The state-based profile" if strategy_id == "fixed_states_power" else f"The {strategy_id} profile"
+    issues: list[str] = []
+    if metrics.coverage < MIN_VALIDATION_COVERAGE:
+        issues.append(
+            f"it could estimate {metrics.coverage:.0%} of validation samples; "
+            f"at least {MIN_VALIDATION_COVERAGE:.0%} is required",
+        )
+    if prediction_range < MIN_PREDICTION_RANGE_W:
+        issues.append(
+            f"its power estimates differed by only {prediction_range:.2f} W between recorded values; "
+            f"at least {MIN_PREDICTION_RANGE_W:.2f} W is required",
+        )
+    improvement = baseline.mae_w - metrics.mae_w
+    relative = improvement / baseline.mae_w if baseline.mae_w else 0
+    if improvement < MIN_ABSOLUTE_MAE_IMPROVEMENT_W and relative < MIN_RELATIVE_MAE_IMPROVEMENT:
+        issues.append(
+            f"it reduced the typical validation difference from {baseline.mae_w:.2f} W to {metrics.mae_w:.2f} W "
+            f"({relative:.0%}); at least {MIN_ABSOLUTE_MAE_IMPROVEMENT_W:.2f} W or "
+            f"{MIN_RELATIVE_MAE_IMPROVEMENT:.0%} improvement is required",
+        )
+    return f"{label} was not reliable enough: {'; '.join(issues)}."
 
 
 def _has_minimum_support(candidate: AnalysisCandidate, samples: Sequence[RecordingSample]) -> bool:

@@ -120,6 +120,49 @@ describe("result view", () => {
     expect(details?.textContent).toContain("100%");
   });
 
+  it("can run the analyser again without starting a new measurement", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      canAnalyse: boolean;
+      analysisComplete: boolean;
+      busy: boolean;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "completed",
+      summary: {
+        "Samples recorded": "20",
+        "Recording analysis": "More data needed",
+        "Recording analysis reason": "The old analyser could not use this recording",
+      },
+    };
+    element.canAnalyse = true;
+    const analyse = vi.fn();
+    element.addEventListener("analyse", analyse);
+    document.body.append(element);
+    await element.updateComplete;
+
+    const panel = element.shadowRoot.querySelector(".analysis-panel");
+    expect(panel?.textContent).toContain("No new measurement is needed");
+    const button = panel?.querySelector(".analysis-retry button") as HTMLButtonElement;
+    expect(button.textContent).toContain("Analyse recording again");
+    button.click();
+    expect(analyse).toHaveBeenCalledOnce();
+
+    element.busy = true;
+    await element.updateComplete;
+    expect((panel?.querySelector(".analysis-retry button") as HTMLButtonElement).disabled).toBe(true);
+    expect(panel?.querySelector(".analysis-retry button")?.textContent).toContain("Analysing…");
+    expect(panel?.querySelector(".analysis-retry p")?.textContent).toContain("refreshing the result");
+
+    element.busy = false;
+    element.analysisComplete = true;
+    await element.updateComplete;
+    expect(panel?.querySelector(".analysis-retry p")?.textContent).toContain("Recording analysed again");
+    expect(panel?.querySelector(".analysis-retry p")?.getAttribute("role")).toBe("status");
+  });
+
   it("shows a download-all action for generated files", async () => {
     const element = document.createElement("measure-result-view") as HTMLElement & {
       snapshot: SessionSnapshot;
@@ -155,6 +198,75 @@ describe("result view", () => {
     expect(guide.href).toBe("https://docs.powercalc.nl/contributing/measure/output/");
     expect(guide.target).toBe("_blank");
     expect(guide.rel).toContain("noopener");
+  });
+
+  it("opens analyser and model JSON in an in-app viewer", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      files: { name: string; size: number; media_type: string }[];
+      fileUrl: (name: string) => string;
+      inspectJsonFile: (name: string) => Promise<unknown>;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    let resolveJson: (value: unknown) => void = () => {};
+    const pendingJson = new Promise<unknown>((resolve) => { resolveJson = resolve; });
+    const inspectJsonFile = vi.fn((name: string) => name === "analyser.json"
+      ? pendingJson
+      : Promise.resolve({ calculation_strategy: "fixed" }));
+    element.snapshot = { state: "completed" };
+    element.files = [
+      { name: "analyser.json", size: 100, media_type: "application/json" },
+      { name: "profile/model.json", size: 200, media_type: "application/json" },
+      { name: "record.jsonl", size: 300, media_type: "application/json" },
+      { name: "metadata.json", size: 400, media_type: "application/json" },
+    ];
+    element.fileUrl = (name) => `/download/${name}`;
+    element.inspectJsonFile = inspectJsonFile;
+    document.body.append(element);
+    await element.updateComplete;
+
+    const viewButtons = Array.from(element.shadowRoot.querySelectorAll<HTMLButtonElement>(".inspect-file"));
+    expect(viewButtons).toHaveLength(2);
+    expect(viewButtons.map((button) => button.getAttribute("aria-label"))).toEqual([
+      "View analyser.json",
+      "View profile/model.json",
+    ]);
+
+    viewButtons[0]?.click();
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector('[role="dialog"]')?.textContent).toContain("Loading JSON…");
+    resolveJson({ status: "model_ready", sample_count: 228 });
+    await vi.waitFor(() => expect(element.shadowRoot.querySelector(".json-dialog pre")?.textContent).toContain('"sample_count": 228'));
+    expect(inspectJsonFile).toHaveBeenCalledWith("analyser.json");
+
+    (element.shadowRoot.querySelector(".json-dialog-header button") as HTMLButtonElement).click();
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector('[role="dialog"]')).toBeNull();
+
+    viewButtons[1]?.click();
+    await vi.waitFor(() => expect(element.shadowRoot.querySelector(".json-dialog pre")?.textContent).toContain('"calculation_strategy": "fixed"'));
+    expect(inspectJsonFile).toHaveBeenCalledWith("profile/model.json");
+  });
+
+  it("shows JSON inspection failures inside the viewer", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      files: { name: string; size: number; media_type: string }[];
+      inspectJsonFile: (name: string) => Promise<unknown>;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "completed" };
+    element.files = [{ name: "analysis.json", size: 100, media_type: "application/json" }];
+    element.inspectJsonFile = async () => { throw new Error("File could not be read"); };
+    document.body.append(element);
+    await element.updateComplete;
+
+    (element.shadowRoot.querySelector(".inspect-file") as HTMLButtonElement).click();
+
+    await vi.waitFor(() => expect(element.shadowRoot.querySelector('.json-dialog [role="alert"]')?.textContent).toContain("File could not be read"));
+    expect(element.shadowRoot.querySelector(".json-dialog")?.textContent).toContain("analysis.json");
   });
 
   it("defaults to the GitHub method for an eligible draft and offers manual as an alternative", async () => {

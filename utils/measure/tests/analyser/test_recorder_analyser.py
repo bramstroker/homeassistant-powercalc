@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import json
 from pathlib import Path
 
@@ -14,9 +15,9 @@ from measure.analyser.models import (
     StrategyNotApplicable,
 )
 from measure.analyser.recording import load_recording
-from measure.analyser.service import RecorderAnalyser, _select_candidate, analysis_context_for
+from measure.analyser.service import RecorderAnalyser, _credibility_reason, _select_candidate, analysis_context_for
 from measure.powermeter.spec import DummyPowerMeterSpec
-from measure.request import RecorderMeasurementRequest
+from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, RecorderPurpose
 import pytest
 
 CONTEXT = AnalysisContext(
@@ -24,6 +25,42 @@ CONTEXT = AnalysisContext(
     primary_entity_id="switch.device",
     device_type="generic_iot",
     entities=(RecordedEntity("switch.device", "switch", "primary"),),
+)
+
+
+@dataclass(frozen=True)
+class RecorderRegressionCase:
+    fixture: str
+    context: AnalysisContext
+    strategy: str
+    feature: FeatureReference
+    model_config_fragment: dict[str, object]
+    standby_power: float | None
+    sample_count: int
+    validation_mae_w: float
+    validation_coverage: float
+
+
+RECORDER_REGRESSION_CASES = (
+    RecorderRegressionCase(
+        fixture="set_top_box_two_states.jsonl",
+        context=AnalysisContext(
+            recipe="generic",
+            primary_entity_id="media_player.kpn_diw7022",
+            device_type="generic_iot",
+            entities=(RecordedEntity("media_player.kpn_diw7022", "media_player", "primary"),),
+        ),
+        strategy="fixed_states_power",
+        feature=FeatureReference("media_player.kpn_diw7022", "state"),
+        model_config_fragment={
+            "calculation_strategy": "fixed",
+            "fixed_config": {"states_power": {"off": 2.4, "on": 3.1}},
+        },
+        standby_power=2.4,
+        sample_count=228,
+        validation_mae_w=0.162,
+        validation_coverage=1,
+    ),
 )
 
 
@@ -57,6 +94,28 @@ def write_recording(path: Path, samples: list[RecordingSample], *, typed: bool =
         for item in samples
     )
     path.write_text("".join(f"{json.dumps(record)}\n" for record in records), encoding="utf-8")
+
+
+@pytest.mark.parametrize(
+    "case",
+    RECORDER_REGRESSION_CASES,
+    ids=lambda case: case.fixture.removesuffix(".jsonl"),
+)
+def test_real_world_recorder_regressions(case: RecorderRegressionCase) -> None:
+    path = Path(__file__).parent / "fixtures" / case.fixture
+
+    result = RecorderAnalyser().analyse(path, case.context)
+
+    assert result.model_ready
+    assert result.sample_count == case.sample_count
+    assert result.strategy == case.strategy
+    assert result.feature == case.feature
+    assert result.model_config_fragment is not None
+    assert result.model_config_fragment.to_dict() == case.model_config_fragment
+    assert result.standby_power == pytest.approx(case.standby_power)
+    assert result.metrics is not None
+    assert result.metrics.mae_w == pytest.approx(case.validation_mae_w, abs=0.001)
+    assert result.metrics.coverage == pytest.approx(case.validation_coverage)
 
 
 def test_load_recording_accepts_typed_and_legacy_samples_and_reports_bad_lines(tmp_path: Path) -> None:
@@ -179,6 +238,20 @@ def test_analyser_selects_scalar_attribute_when_state_is_constant(tmp_path: Path
     }
 
 
+def test_analyser_accepts_a_meaningful_relative_improvement_for_a_low_power_device(tmp_path: Path) -> None:
+    path = tmp_path / "record.jsonl"
+    samples = [sample(index, 2.4 if index < 5 else 3.1, "off" if index < 5 else "on") for index in range(50)]
+    write_recording(path, samples)
+
+    result = RecorderAnalyser().analyse(path, CONTEXT)
+
+    assert result.model_ready
+    assert result.model_config_fragment is not None
+    assert result.model_config_fragment.to_dict()["fixed_config"] == {
+        "states_power": {"off": 2.4, "on": 3.1},
+    }
+
+
 @pytest.mark.parametrize(
     "samples,reason",
     [
@@ -186,7 +259,7 @@ def test_analyser_selects_scalar_attribute_when_state_is_constant(tmp_path: Path
         ([sample(index, float(index), f"state_{index}") for index in range(25)], "No state or scalar attribute"),
         (
             [sample(index, 1.0 if index % 2 else 1.05, "on" if index % 2 else "off") for index in range(20)],
-            "did not improve",
+            "not reliable enough",
         ),
     ],
 )
@@ -207,6 +280,36 @@ def test_analyser_rejects_recordings_without_a_credible_fixed_model(
         "Recording analysis": "More data needed",
         "Recording analysis reason": result.reason,
     }
+
+
+def test_analyser_explains_which_credibility_threshold_was_not_met(tmp_path: Path) -> None:
+    path = tmp_path / "record.jsonl"
+    write_recording(
+        path,
+        [sample(index, 1.0 if index % 2 else 1.05, "on" if index % 2 else "off") for index in range(20)],
+    )
+
+    result = RecorderAnalyser().analyse(path, CONTEXT)
+
+    assert result.reason == (
+        "The state-based profile was not reliable enough: its power estimates differed by only 0.05 W between "
+        "recorded values; at least 0.10 W is required."
+    )
+
+
+def test_credibility_reason_reports_coverage_and_improvement_values() -> None:
+    reason = _credibility_reason(
+        "composite",
+        AnalysisMetrics(20, 4, 0.5, 0.95, 1.0, 5),
+        AnalysisMetrics(20, 4, 1.0, 1.0, 1.0, 5),
+        prediction_range=2,
+    )
+
+    assert reason == (
+        "The composite profile was not reliable enough: it could estimate 50% of validation samples; at least 90% "
+        "is required; it reduced the typical validation difference from 1.00 W to 0.95 W (5%); at least 0.10 W "
+        "or 15% improvement is required."
+    )
 
 
 def test_analyser_requires_enough_samples(tmp_path: Path) -> None:
@@ -248,14 +351,14 @@ def test_analyser_requires_five_recorded_samples_for_every_model_value(tmp_path:
 def test_analysis_context_maps_generic_and_vacuum_recipes() -> None:
     generic = RecorderMeasurementRequest(
         power_meter=DummyPowerMeterSpec(),
-        recorder_purpose="complex_profile",
-        profile_recipe="generic",
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
         tracked_entity_ids=("switch.device", "sensor.mode"),
     )
     vacuum = RecorderMeasurementRequest(
         power_meter=DummyPowerMeterSpec(),
-        recorder_purpose="complex_profile",
-        profile_recipe="vacuum_robot",
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.VACUUM_ROBOT,
         vacuum_entity_id="vacuum.robot",
         battery_entity_id="sensor.robot_battery",
     )

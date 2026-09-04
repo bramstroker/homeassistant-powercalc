@@ -1,5 +1,6 @@
 from dataclasses import replace
 from datetime import UTC, datetime
+import json
 from pathlib import Path
 import time
 from types import SimpleNamespace
@@ -35,8 +36,8 @@ from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
 from measure.powermeter.diagnostics import PowerMeterDiagnostics
 from measure.powermeter.powermeter import PowerMeter, PowerMeterDiagnosticSample
-from measure.powermeter.spec import HassPowerMeterSpec, KasaPowerMeterSpec
-from measure.request import MeasurementRequest
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, KasaPowerMeterSpec
+from measure.request import MeasurementRequest, RecorderMeasurementRequest, RecorderProfileRecipe, RecorderPurpose
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
 from measure.version import measure_version
@@ -946,6 +947,90 @@ def test_session_summary_is_exposed(tmp_path: Path) -> None:
     assert current["summary"] == {"Average power": "42.3 W", "Duration": "30 s"}
 
 
+def test_completed_recording_can_be_analysed_again(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    request = RecorderMeasurementRequest(
+        model_id="test-switch",
+        product_name="Test switch",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
+        tracked_entity_ids=("switch.device",),
+    )
+    now = "2026-09-04T08:00:00Z"
+    snapshot = SessionSnapshot(
+        id="recorder-session",
+        state=SessionState.COMPLETED,
+        created_at=now,
+        updated_at=now,
+        summary={
+            "Samples recorded": "20",
+            "Recording analysis": "Failed",
+            "Recording analysis reason": "Old analyser failed",
+        },
+    )
+    context.storage.create(snapshot, request)
+    output = context.storage.artifact_directory(snapshot.id, request.model_id)
+    output.mkdir()
+    records = [
+        {
+            "record_type": "sample",
+            "elapsed_seconds": index,
+            "power": 0.2 if index % 2 == 0 else 5.2,
+            "entities": {"switch.device": {"state": "off" if index % 2 == 0 else "on", "attributes": {}}},
+        }
+        for index in range(20)
+    ]
+    (output / "record.jsonl").write_text(
+        "".join(f"{json.dumps(record)}\n" for record in records),
+        encoding="utf-8",
+    )
+    (output / "model.json").write_text(
+        json.dumps({"voltage_range": {"min": 229.5, "max": 231.0}}),
+        encoding="utf-8",
+    )
+
+    before = test_client.get(f"/api/sessions/{snapshot.id}")
+    response = test_client.post(f"/api/sessions/{snapshot.id}/analyse")
+
+    assert before.json()["can_analyse"] is True
+    assert response.status_code == 200
+    body = response.json()
+    assert body["state"] == "completed"
+    assert body["can_analyse"] is True
+    assert body["summary"] == {
+        "Samples recorded": "20",
+        "Recording analysis": "Fixed states_power profile created",
+        "Analysed feature": "switch.device.state",
+        "Validation MAE": "0.00 W",
+        "Validation coverage": "100%",
+    }
+    model = json.loads((output / "model.json").read_text(encoding="utf-8"))
+    assert model["fixed_config"]["states_power"] == {"off": 0.2, "on": 5.2}
+    assert model["voltage_range"] == {"min": 229.5, "max": 231.0}
+
+
+def test_analyse_rejects_a_session_without_a_profile_recording(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    now = "2026-09-04T08:00:00Z"
+    snapshot = SessionSnapshot(
+        id="playbook-session",
+        state=SessionState.COMPLETED,
+        created_at=now,
+        updated_at=now,
+    )
+    context.storage.create(snapshot, request)
+
+    response = test_client.post(f"/api/sessions/{snapshot.id}/analyse")
+
+    assert response.status_code == 409
+    assert "no recording" in response.json()["message"]
+
+
 def test_validation_errors_have_stable_shape(tmp_path: Path) -> None:
     response = client(tmp_path).post("/api/preflight", json=payload() | {"model_id": "../secret"})
 
@@ -965,6 +1050,7 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
     assert set(paths["/api/sessions/{session_id}/cancel"]) == {"post"}
     assert set(paths["/api/sessions/{session_id}/confirm"]) == {"post"}
     assert set(paths["/api/sessions/{session_id}/resume"]) == {"post"}
+    assert set(paths["/api/sessions/{session_id}/analyse"]) == {"post"}
     assert set(paths["/api/sessions/{session_id}/diagnostics"]) == {"get"}
     assert set(paths["/api/sessions/{session_id}/plots"]) == {"get"}
     assert set(paths["/api/sessions/{session_id}/files/{name}"]) == {"get"}

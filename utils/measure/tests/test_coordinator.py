@@ -1,7 +1,7 @@
 from pathlib import Path
-from threading import Event
+from threading import Event, Thread
 import time
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.execution import LightOperatingPoint
@@ -19,6 +19,8 @@ from measure.request import (
     LightMeasurementRequest,
     MeasurementRequest,
     RecorderMeasurementRequest,
+    RecorderProfileRecipe,
+    RecorderPurpose,
 )
 from measure.runner.recorder import RecorderRunner
 from measure.runner.runner import RunnerResult
@@ -249,10 +251,74 @@ def test_coordinator_rejects_concurrent_start_and_cancels(tmp_path: Path) -> Non
     duplicate = light_request()
     with pytest.raises(SessionConflictError):
         coordinator.start(duplicate)
+    with pytest.raises(SessionConflictError, match="measurement session is already active"):
+        coordinator.analyse(session.id)
 
     coordinator.cancel(session.id)
     wait_for_state(coordinator, SessionState.CANCELLED)
     assert coordinator.cancel(session.id).state == SessionState.CANCELLED
+
+
+def test_coordinator_serializes_recording_analysis_with_other_session_actions(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    request = RecorderMeasurementRequest(
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
+        tracked_entity_ids=("switch.device",),
+        power_meter=DummyPowerMeterSpec(),
+    )
+    completed = SessionSnapshot(
+        id="recording",
+        state=SessionState.COMPLETED,
+        created_at="2026-09-04T08:00:00Z",
+        updated_at="2026-09-04T08:00:00Z",
+        warnings=(
+            "Power meter briefly stopped reporting",
+            "Profile was not created: the previous analysis rejected the recording",
+            "Recording analysis: skipped one malformed line",
+        ),
+    )
+    storage.create(completed, request)
+    output = storage.artifact_directory(completed.id, request.model_id)
+    output.mkdir()
+    (output / "record.jsonl").write_text("recording", encoding="utf-8")
+    coordinator = MeasurementCoordinator(storage, CompletingService)
+    analysis_started = Event()
+    finish_analysis = Event()
+
+    def analyse_recording(*_args: object, **_kwargs: object) -> dict[str, str]:
+        analysis_started.set()
+        assert finish_analysis.wait(1)
+        return {"Recording analysis": "Profile created"}
+
+    with patch("measure.ha_app.coordinator.RecorderAnalysisExecution") as execution_class:
+        execution_class.return_value.run.side_effect = analyse_recording
+        thread = Thread(target=coordinator.analyse, args=(completed.id,))
+        thread.start()
+        assert analysis_started.wait(1)
+
+        with pytest.raises(SessionConflictError, match="Recording analysis is already active"):
+            coordinator.start(light_request())
+        with pytest.raises(SessionConflictError, match="Recording analysis is already active"):
+            coordinator.resume(completed.id)
+        with pytest.raises(SessionConflictError, match="already being analysed"):
+            coordinator.analyse(completed.id)
+        with pytest.raises(SessionConflictError, match="while its recording is being analysed"):
+            coordinator.delete(completed.id)
+
+        finish_analysis.set()
+        thread.join(1)
+
+    assert not thread.is_alive()
+    assert coordinator.get(completed.id).summary == {"Recording analysis": "Profile created"}
+    assert coordinator.get(completed.id).warnings == ("Power meter briefly stopped reporting",)
+
+
+def test_coordinator_rejects_analysis_for_unknown_session(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+
+    with pytest.raises(SessionConflictError, match="requested session does not exist"):
+        coordinator.analyse("missing-session")
 
 
 def test_coordinator_rejects_resume_without_compatible_output(tmp_path: Path) -> None:

@@ -1,15 +1,14 @@
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-import logging
 from pathlib import Path
 from statistics import mean
 import time
 from typing import Any, Literal, NotRequired, Protocol, TypedDict
 
-from measure.analyser import RecorderAnalyser, analysis_context_for
+from measure.analyser import RecorderAnalyser
+from measure.analyser.execution import RecorderAnalysisExecution
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION, Trend
 from measure.dummy_load import DummyLoadCalibration
-from measure.files import write_json_atomic
 from measure.model import write_model_json
 from measure.request import (
     DummyLoadRequest,
@@ -51,8 +50,6 @@ class ChargingOperatingPoint(TypedDict):
 
 
 type OperatingPoint = LightOperatingPoint | SpeakerOperatingPoint | FanOperatingPoint | ChargingOperatingPoint
-
-_LOGGER = logging.getLogger("measure")
 
 
 class RunInteraction(Protocol):
@@ -289,7 +286,17 @@ class MeasurementExecution:
                 and request.recorder_purpose == RecorderPurpose.COMPLEX_PROFILE
                 and output_directory is not None
             ):
-                result = self._analyse_recorder(request, result, output_directory)
+                self.measurement.interaction.phase("Analysing recording")
+                result = RunnerResult(
+                    model_json_data=result.model_json_data,
+                    voltages=result.voltages,
+                    summary=RecorderAnalysisExecution(self.analyser).run(
+                        request,
+                        output_directory,
+                        summary=result.summary,
+                        voltages=result.voltages,
+                    ),
+                )
             if request.generate_model_json and output_directory is not None:
                 standby = runner.measure_standby_power()
                 write_model_json(
@@ -304,58 +311,3 @@ class MeasurementExecution:
             return result
         finally:
             runner.cleanup()
-
-    def _analyse_recorder(
-        self,
-        request: RecorderMeasurementRequest,
-        result: RunnerResult,
-        output_directory: Path,
-    ) -> RunnerResult:
-        self.measurement.interaction.phase("Analysing recording")
-        try:
-            context = analysis_context_for(request)
-            analysis = self.analyser.analyse(output_directory / request.export_filename, context)
-            write_json_atomic(output_directory / "analysis.json", analysis.to_dict())
-            if analysis.model_ready and analysis.model_config_fragment is not None:
-                write_model_json(
-                    output_directory,
-                    standby_power=analysis.standby_power,
-                    name=request.model_name,
-                    measure_device=request.measure_device,
-                    parameters=request.parameters,
-                    extra_json_data={
-                        "device_type": context.device_type,
-                        **analysis.model_config_fragment.to_dict(),
-                    },
-                    voltages=result.voltages,
-                )
-            elif analysis.reason:
-                _LOGGER.warning("Profile was not created: %s", analysis.reason)
-            for warning in analysis.warnings:
-                _LOGGER.warning("Recording analysis: %s", warning)
-            return RunnerResult(
-                model_json_data=result.model_json_data,
-                voltages=result.voltages,
-                summary={**(result.summary or {}), **analysis.summary()},
-            )
-        except Exception as error:  # noqa: BLE001 - raw recording must survive optional analysis failures
-            reason = f"Recording analysis failed: {error}"
-            _LOGGER.warning(reason)
-            write_json_atomic(
-                output_directory / "analysis.json",
-                {
-                    "schema_version": 1,
-                    "status": "insufficient_data",
-                    "sample_count": 0,
-                    "reason": reason,
-                },
-            )
-            return RunnerResult(
-                model_json_data=result.model_json_data,
-                voltages=result.voltages,
-                summary={
-                    **(result.summary or {}),
-                    "Recording analysis": "Failed",
-                    "Recording analysis reason": reason,
-                },
-            )

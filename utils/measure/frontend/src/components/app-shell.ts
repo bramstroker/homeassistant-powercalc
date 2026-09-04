@@ -41,6 +41,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   errorMessage = "";
   errorHelp?: ErrorHelp;
   busy = false;
+  lastAnalysedSessionId?: string;
   connectedToEvents = false;
   snapshot?: SessionSnapshot;
   sessions: SessionSummary[] = [];
@@ -251,13 +252,17 @@ export class AppShell extends LitElement implements MeasureAppState {
       <measure-result-view
         .snapshot=${snapshot} .files=${this.files} .plotCollection=${this.plotCollection}
         .fileUrl=${(name: string) => this.api.fileUrl(sessionId, name)} .downloadAll=${this.downloadAllFiles.bind(this)}
+        .inspectJsonFile=${(name: string) => this.api.getJsonFile(sessionId, name)}
         .diagnosticsUrl=${this.api.diagnosticsUrl(sessionId)}
-        .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
+        .busy=${this.busy} .canResume=${this.canResumeSession()} .canAnalyse=${Boolean(snapshot.can_analyse)}
+        .analysisComplete=${this.lastAnalysedSessionId === sessionId}
+        .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         .contributionAuth=${this.contributionAuth} .contributionDraft=${this.contributionDraft}
         .contributionPreview=${this.contributionPreview} .contributionResult=${this.contributionResult}
         .contributionBusy=${this.contributionBusy} .contributionError=${this.contributionError}
         .contributionErrorField=${this.contributionErrorField}
         @sessions=${this.showSessions} @new=${() => this.controller.newMeasurement()} @resume=${() => void this.controller.resume()}
+        @analyse=${() => void this.controller.analyseRecording()}
         @open-settings=${this.openSettings}
         @contribution-preview=${(event: CustomEvent<ContributionPreviewRequest>) => void this.controller.previewContribution(event.detail)}
         @contribution-submit=${(event: CustomEvent<ContributionSubmitRequest>) => void this.controller.submitContribution(event.detail)}

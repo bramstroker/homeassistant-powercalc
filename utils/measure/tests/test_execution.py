@@ -163,14 +163,16 @@ def test_execution_analyses_complex_recording_and_writes_schema_valid_model(
     runner.run.side_effect = write_recording
     interaction = MagicMock(spec=RunInteraction)
     prepared = PreparedMeasurement(request=request, runner=runner, interaction=interaction)
+    (tmp_path / "analysis.json").write_text('{"status": "stale"}', encoding="utf-8")
 
     result = MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
 
-    analysis = json.loads((tmp_path / "analysis.json").read_text(encoding="utf-8"))
+    analysis = json.loads((tmp_path / "analyser.json").read_text(encoding="utf-8"))
     model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
     schema_path = Path(__file__).parents[3] / "profile_library" / "model_schema.json"
     validate(model, json.loads(schema_path.read_text(encoding="utf-8")))
     assert analysis["status"] == "model_ready"
+    assert not (tmp_path / "analysis.json").exists()
     assert analysis["feature"] == "switch.device.state"
     assert model["device_type"] == "generic_iot"
     assert model["calculation_strategy"] == "fixed"
@@ -200,11 +202,12 @@ def test_execution_preserves_recording_when_analysis_fails(tmp_path: Path, caplo
     analyser = MagicMock()
     analyser.analyse.side_effect = RuntimeError("broken analyser")
     prepared = PreparedMeasurement(request=request, runner=runner)
+    (tmp_path / "model.json").write_text('{"stale": true}', encoding="utf-8")
 
     result = MeasurementExecution(measurement=prepared, output_directory=tmp_path, analyser=analyser).run()
 
     assert (tmp_path / "record.jsonl").read_text(encoding="utf-8") == "raw recording\n"
-    analysis = json.loads((tmp_path / "analysis.json").read_text(encoding="utf-8"))
+    analysis = json.loads((tmp_path / "analyser.json").read_text(encoding="utf-8"))
     assert analysis["status"] == "insufficient_data"
     assert "broken analyser" in analysis["reason"]
     assert not (tmp_path / "model.json").exists()
@@ -249,7 +252,7 @@ def test_execution_completes_without_model_when_recording_is_insufficient(
 
     result = MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
 
-    analysis = json.loads((tmp_path / "analysis.json").read_text(encoding="utf-8"))
+    analysis = json.loads((tmp_path / "analyser.json").read_text(encoding="utf-8"))
     assert analysis["status"] == "insufficient_data"
     assert analysis["warnings"] == [
         "Skipped 1 invalid recorder line(s); first was line 1: Expecting value: line 1 column 1 (char 0)",

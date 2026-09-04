@@ -44,6 +44,30 @@ describe("MeasureApiClient", () => {
     );
   });
 
+  it("loads a generated JSON file for in-app inspection", async () => {
+    const contents = { status: "model_ready" };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(contents));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getJsonFile("session 1", "analyser.json")).resolves.toEqual(contents);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/sessions/session%201/files/analyser.json"),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
+  it("restarts recording analysis below the ingress prefix", async () => {
+    const snapshot = { state: "completed", can_analyse: true };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(snapshot));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.analyse("session 1")).resolves.toEqual(snapshot);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/sessions/session%201/analyse"),
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
   it("uses the contribution auth endpoints below the ingress prefix", async () => {
     const fetcher = vi.fn<typeof fetch>()
       .mockResolvedValueOnce(response({ connected: false }))

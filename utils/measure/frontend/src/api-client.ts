@@ -163,8 +163,16 @@ export class MeasureApiClient {
     return this.request(`api/sessions/${encodeURIComponent(sessionId)}/resume`, { method: "POST" });
   }
 
+  analyse(sessionId: string): Promise<SessionSnapshot> {
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}/analyse`, { method: "POST" });
+  }
+
   getFiles(sessionId: string): Promise<SessionFile[]> {
     return this.request<SessionFile[]>(`api/sessions/${encodeURIComponent(sessionId)}/files`);
+  }
+
+  getJsonFile(sessionId: string, name: string): Promise<unknown> {
+    return this.request(`api/sessions/${encodeURIComponent(sessionId)}/files/${encodeURIComponent(name)}`);
   }
 
   getPlots(sessionId: string): Promise<PlotCollection> {
