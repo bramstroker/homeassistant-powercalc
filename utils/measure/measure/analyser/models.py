@@ -213,8 +213,11 @@ class RecorderAnalysisResult:
             return summary
         assert self.feature is not None
         assert self.metrics is not None
+        assert self.model_config_fragment is not None
+        fixed_config = self.model_config_fragment.configuration
+        profile_type = "Fixed power" if "power" in fixed_config else "Fixed states_power"
         return {
-            "Recording analysis": "Fixed states_power profile created",
+            "Recording analysis": f"{profile_type} profile created",
             "Analysed feature": self.feature.identifier,
             "Validation MAE": f"{self.metrics.mae_w:.2f} W",
             "Validation coverage": f"{self.metrics.coverage:.0%}",

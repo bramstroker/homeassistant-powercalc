@@ -1002,13 +1002,13 @@ def test_completed_recording_can_be_analysed_again(tmp_path: Path) -> None:
     assert body["can_analyse"] is True
     assert body["summary"] == {
         "Samples recorded": "20",
-        "Recording analysis": "Fixed states_power profile created",
+        "Recording analysis": "Fixed power profile created",
         "Analysed feature": "switch.device.state",
         "Validation MAE": "0.00 W",
         "Validation coverage": "100%",
     }
     model = json.loads((output / "model.json").read_text(encoding="utf-8"))
-    assert model["fixed_config"]["states_power"] == {"off": 0.2, "on": 5.2}
+    assert model["fixed_config"] == {"power": 5.2}
     assert model["voltage_range"] == {"min": 229.5, "max": 231.0}
 
 

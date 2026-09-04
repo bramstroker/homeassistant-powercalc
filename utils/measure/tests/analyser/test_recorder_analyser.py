@@ -54,7 +54,7 @@ RECORDER_REGRESSION_CASES = (
         feature=FeatureReference("media_player.kpn_diw7022", "state"),
         model_config_fragment={
             "calculation_strategy": "fixed",
-            "fixed_config": {"states_power": {"off": 2.4, "on": 3.1}},
+            "fixed_config": {"power": 3.1},
         },
         standby_power=2.4,
         sample_count=228,
@@ -173,7 +173,7 @@ def test_fixed_strategy_builds_a_lookup_candidate_for_primary_state() -> None:
     assert candidate.standby_power == pytest.approx(0.2)
     assert candidate.build_model_config_fragment().to_dict() == {
         "calculation_strategy": "fixed",
-        "fixed_config": {"states_power": {"off": 0.2, "on": 5.2}},
+        "fixed_config": {"power": 5.2},
     }
 
     missing_entity = RecordingSample(30, 1, {})
@@ -186,6 +186,20 @@ def test_fixed_strategy_ignores_unavailable_values_and_non_scalar_attributes() -
     result = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT)
 
     assert isinstance(result, StrategyNotApplicable)
+
+
+def test_fixed_strategy_keeps_multiple_active_states_as_states_power() -> None:
+    samples = [
+        sample(index, (2.0, 5.0, 8.0)[index % 3], ("idle", "playing", "recording")[index % 3]) for index in range(12)
+    ]
+
+    candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT)
+
+    assert not isinstance(candidate, StrategyNotApplicable)
+    assert candidate.build_model_config_fragment().to_dict() == {
+        "calculation_strategy": "fixed",
+        "fixed_config": {"states_power": {"idle": 2.0, "playing": 5.0, "recording": 8.0}},
+    }
 
 
 def test_feature_reference_accepts_finite_scalar_attributes_only() -> None:
@@ -248,7 +262,7 @@ def test_analyser_accepts_a_meaningful_relative_improvement_for_a_low_power_devi
     assert result.model_ready
     assert result.model_config_fragment is not None
     assert result.model_config_fragment.to_dict()["fixed_config"] == {
-        "states_power": {"off": 2.4, "on": 3.1},
+        "power": 3.1,
     }
 
 

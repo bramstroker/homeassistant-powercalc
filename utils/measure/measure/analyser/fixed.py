@@ -35,10 +35,15 @@ class FixedStatesPowerCandidate:
         return self.powers.get(self.feature.model_key(value))
 
     def build_model_config_fragment(self) -> ModelConfigFragment:
+        configuration: dict[str, object]
+        if self.feature.source == "state" and set(self.powers) == {"off", "on"}:
+            configuration = {"power": self.powers["on"]}
+        else:
+            configuration = {"states_power": dict(self.powers)}
         return ModelConfigFragment(
             calculation_strategy="fixed",
             configuration_key="fixed_config",
-            configuration={"states_power": dict(self.powers)},
+            configuration=configuration,
         )
 
     @property

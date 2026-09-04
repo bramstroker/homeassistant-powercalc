@@ -635,6 +635,7 @@ ${preview.pr_body}</pre>
   }
 
   private analysisResult(result: string): string {
+    if (result === "Fixed power profile created") return "A fixed power profile was created."
     return result === "Fixed states_power model created" || result === "Fixed states_power profile created"
       ? "A state-based power profile was created."
       : result;

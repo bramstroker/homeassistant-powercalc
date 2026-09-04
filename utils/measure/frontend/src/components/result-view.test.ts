@@ -93,7 +93,7 @@ describe("result view", () => {
       summary: {
         "Samples recorded": "39",
         Duration: "160 s",
-        "Recording analysis": "Fixed states_power profile created",
+        "Recording analysis": "Fixed power profile created",
         "Analysed feature": "input_select.powercalc_test_state.state",
         "Validation MAE": "0.02 W",
         "Validation coverage": "100%",
@@ -105,10 +105,10 @@ describe("result view", () => {
     const measurement = element.shadowRoot.querySelector('[aria-label="Measurement result"]');
     expect(measurement?.textContent).toContain("39");
     expect(measurement?.textContent).toContain("160 s");
-    expect(measurement?.textContent).not.toContain("Fixed states_power profile created");
+    expect(measurement?.textContent).not.toContain("Fixed power profile created");
 
     const analysis = element.shadowRoot.querySelector(".analysis-panel");
-    expect(analysis?.textContent).toContain("A state-based power profile was created.");
+    expect(analysis?.textContent).toContain("A fixed power profile was created.");
     expect(analysis?.textContent).toContain("analysed how the measured power changed");
     expect(analysis?.textContent).toContain("input_select.powercalc_test_state");
     const details = analysis?.querySelector('[aria-label="Recording analysis details"]');

@@ -176,10 +176,10 @@ def test_execution_analyses_complex_recording_and_writes_schema_valid_model(
     assert analysis["feature"] == "switch.device.state"
     assert model["device_type"] == "generic_iot"
     assert model["calculation_strategy"] == "fixed"
-    assert model["fixed_config"]["states_power"] == {"off": 0.2, "on": 5.2}
+    assert model["fixed_config"] == {"power": 5.2}
     assert model["standby_power"] == pytest.approx(0.2)
     assert result.summary is not None
-    assert result.summary["Recording analysis"] == "Fixed states_power profile created"
+    assert result.summary["Recording analysis"] == "Fixed power profile created"
     interaction.phase.assert_called_once_with("Analysing recording")
     runner.measure_standby_power.assert_not_called()
 
