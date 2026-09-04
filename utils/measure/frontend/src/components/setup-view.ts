@@ -50,6 +50,7 @@ const LIGHT_DISCOVERY_HINT =
 
 const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging. Do not repeat the manufacturer name.";
 const MULTIPLE_LIGHTS_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights";
+const HOME_ASSISTANT_GROUP_GUIDE_URL = "https://www.home-assistant.io/integrations/group/";
 
 @customElement("measure-setup-view")
 export class SetupView extends LitElement {
@@ -336,6 +337,9 @@ export class SetupView extends LitElement {
         </label>
         <p class="muted">
           Measuring multiple identical lights together increases the load, making very low power use easier to measure accurately.
+          Select up to three individual lights. For larger sets, select a native Zigbee or Hue group, or create a
+          <a href=${HOME_ASSISTANT_GROUP_GUIDE_URL} target="_blank" rel="noopener noreferrer">Home Assistant light group</a>,
+          then enter the total number of physical lights.
           <a
             class="help-link"
             href=${MULTIPLE_LIGHTS_GUIDE_URL}
