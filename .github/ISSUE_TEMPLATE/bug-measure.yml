@@ -10,7 +10,6 @@ body:
   attributes:
     label: "System information"
     description: "Paste the data from the measurement app here or manually write your used versions"
-    required: true
 - type: checkboxes
   attributes:
     label: Checklist
@@ -43,9 +42,8 @@ body:
   validations:
     required: true
 - type: upload
-  id: "Measurement logs and diagnostics"
   attributes:
-    label: Upload measurement logs and diagnostics
+    label: Measurement logs and diagnostics
     description: Please upload your measurement data. You can download that from the GUI or write the CLI output into a file.
   validations:
     required: true
