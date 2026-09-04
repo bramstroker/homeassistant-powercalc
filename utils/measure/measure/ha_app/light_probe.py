@@ -101,14 +101,22 @@ class LightLoadProbe:
                 sleep_time=request.parameters.sleep_time,
                 wait=self._wait,
             )
-            self._wait(request.parameters.sleep_initial)
             points = [
                 LightLoadProbePoint(
                     label=light_load_probe_label(variation),
                     mode=variation.mode,
-                    power_w=round(self._measure_variation(controller, measure_util, request, variation), 3),
+                    power_w=round(
+                        self._measure_variation(
+                            controller,
+                            measure_util,
+                            request,
+                            variation,
+                            initial=index == 0,
+                        ),
+                        3,
+                    ),
                 )
-                for variation in variations
+                for index, variation in enumerate(variations)
             ]
             return LightLoadProbeResult(
                 checked_variations=len(points),
@@ -144,10 +152,14 @@ class LightLoadProbe:
         measure_util: MeasureUtil,
         request: LightMeasurementRequest,
         variation: Variation,
+        *,
+        initial: bool,
     ) -> float:
         start_timestamp = self._now()
         controller.change_light_state(variation.mode, on=True, **asdict(variation))
         self._wait(request.parameters.sleep_time)
+        if initial:
+            self._wait(request.parameters.sleep_initial)
         return measure_util.take_measurement(start_timestamp=start_timestamp).power
 
     @staticmethod

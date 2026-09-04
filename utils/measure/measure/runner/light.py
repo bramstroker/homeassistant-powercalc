@@ -206,14 +206,10 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                 checkpoint=self._checkpoint,
             )
 
-            # Initially wait longer so the smartplug can settle
             _LOGGER.info(
                 "Start taking measurements for color mode: %s",
                 mode.value,
             )
-            _LOGGER.info("Waiting %d seconds...", self.config.sleep_initial)
-            self.interaction.phase(f"Stabilizing light before the first reading ({self.config.sleep_initial} s)")
-            self._wait(self.config.sleep_initial)
 
             self._report_progress(mode, all_variations, remaining_variations)
             previous_variation = None
@@ -331,6 +327,11 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         self._wait(self.config.sleep_time)
 
         if not previous_variation:
+            # Initially wait longer after selecting the first measurement point so
+            # the smart plug cannot report a reading left over from maximum load.
+            _LOGGER.info("Waiting %d seconds...", self.config.sleep_initial)
+            self.interaction.phase(f"Stabilizing light before the first reading ({self.config.sleep_initial} s)")
+            self._wait(self.config.sleep_initial)
             return
 
         if (

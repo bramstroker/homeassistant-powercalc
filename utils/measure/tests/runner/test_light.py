@@ -162,6 +162,31 @@ def test_run(export_path: str) -> None:
     assert points[-1] == {"type": "light", "on": True, "brightness": 255}
 
 
+def test_initial_wait_happens_after_selecting_first_measurement_point(tmp_path: Path) -> None:
+    events: list[tuple[str, object]] = []
+    variation = Variation(1)
+    run = _brightness_run(tmp_path, [variation])
+    run.runner.config = replace(run.runner.config, sleep_time=2, sleep_initial=10)
+    light_controller = MagicMock(spec=DummyLightController)
+    light_controller.change_light_state.side_effect = lambda *args, **kwargs: events.append(("change", (args, kwargs)))
+    run.runner.light_controller = light_controller
+    run.runner.interaction.wait.side_effect = lambda seconds: events.append(("wait", seconds))
+    run.measure_util.take_measurement.return_value = MeasurementResult(power=1, voltages=[])
+
+    run.execute()
+
+    assert events[:7] == [
+        ("change", ((LutMode.BRIGHTNESS,), {"on": True, "bri": 255})),
+        ("wait", 2),
+        ("change", ((LutMode.BRIGHTNESS,), {"on": True, "bri": 255})),
+        ("wait", 2),
+        ("change", ((LutMode.BRIGHTNESS,), {"on": True, "bri": 1})),
+        ("wait", 2),
+        ("wait", 10),
+    ]
+    run.runner.interaction.phase.assert_called_once_with("Stabilizing light before the first reading (10 s)")
+
+
 def test_zero_reading_retries_current_variation_and_reports_skipped_progress(tmp_path: Path) -> None:
     variations = [Variation(1), Variation(2)]
     run = _brightness_run(tmp_path, variations)

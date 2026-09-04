@@ -28,15 +28,19 @@ import pytest
 
 
 class FakeLightController:
-    def __init__(self, *, fail_cleanup: bool = False) -> None:
+    def __init__(self, *, fail_cleanup: bool = False, events: list[tuple[str, object]] | None = None) -> None:
         self.changes: list[tuple[LutMode, bool, dict[str, object]]] = []
         self.closed = False
         self.fail_cleanup = fail_cleanup
+        self.events = events
 
     def change_light_state(self, lut_mode: LutMode, on: bool = True, **kwargs: object) -> None:
         if not on and self.fail_cleanup:
             raise RuntimeError("turn-off failed")
-        self.changes.append((lut_mode, on, kwargs))
+        change = (lut_mode, on, kwargs)
+        self.changes.append(change)
+        if self.events is not None:
+            self.events.append(("change", change))
 
     def get_light_info(self) -> LightInfo:
         return LightInfo("test", min_mired=153, max_mired=454)
@@ -142,32 +146,63 @@ def test_active_probe_checks_rgb_primaries_and_caches_an_exact_request() -> None
 
 
 @pytest.mark.parametrize(
-    "mode, powers, expected_change",
+    "mode, powers, expected_maximum, expected_low",
     [
-        (LutMode.BRIGHTNESS, [1.2], (LutMode.BRIGHTNESS, True, {"bri": 255})),
-        (LutMode.COLOR_TEMP, [1.2, 1.1], (LutMode.COLOR_TEMP, True, {"bri": 255, "ct": 153})),
-        (LutMode.HS, [1.2, 0.9, 1.1], (LutMode.HS, True, {"bri": 255, "hue": 0, "sat": 1})),
+        (
+            LutMode.BRIGHTNESS,
+            [1.2],
+            (LutMode.BRIGHTNESS, True, {"bri": 255}),
+            (LutMode.BRIGHTNESS, True, {"bri": 1}),
+        ),
+        (
+            LutMode.COLOR_TEMP,
+            [1.2, 1.1],
+            (LutMode.COLOR_TEMP, True, {"bri": 255, "ct": 153}),
+            (LutMode.COLOR_TEMP, True, {"bri": 1, "ct": 153}),
+        ),
+        (
+            LutMode.HS,
+            [1.2, 0.9, 1.1],
+            (LutMode.HS, True, {"bri": 255, "hue": 0, "sat": 1}),
+            (LutMode.HS, True, {"bri": 1, "hue": 1, "sat": 255}),
+        ),
     ],
 )
 def test_active_probe_stabilizes_full_load_before_checking_low_load(
     mode: LutMode,
     powers: list[float],
-    expected_change: tuple[LutMode, bool, dict[str, int]],
+    expected_maximum: tuple[LutMode, bool, dict[str, int]],
+    expected_low: tuple[LutMode, bool, dict[str, int]],
 ) -> None:
-    controller = FakeLightController()
+    events: list[tuple[str, object]] = []
+    controller = FakeLightController(events=events)
     meter = FakePowerMeter(powers)
     waits: list[float] = []
     parameters = MeasurementParameters(sleep_time=2, sleep_initial=10)
+
+    def record_wait(seconds: float) -> None:
+        waits.append(seconds)
+        events.append(("wait", seconds))
+
     probe = LightLoadProbe(
         lambda: FakeAssembler(controller, meter),
-        wait=waits.append,
+        wait=record_wait,
         now=lambda: 10,
     )
 
     probe.evaluate(request(parameters=parameters, modes={mode}))
 
-    assert controller.changes[:2] == [expected_change, expected_change]
-    assert waits[:3] == [2, 2, 10]
+    assert controller.changes[:3] == [expected_maximum, expected_maximum, expected_low]
+    assert events[:7] == [
+        ("change", expected_maximum),
+        ("wait", 2),
+        ("change", expected_maximum),
+        ("wait", 2),
+        ("change", expected_low),
+        ("wait", 2),
+        ("wait", 10),
+    ]
+    assert waits[:4] == [2, 2, 2, 10]
 
 
 def test_active_probe_rejects_repeated_zero_on_saturated_green_and_cleans_up() -> None:
