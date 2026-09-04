@@ -19,6 +19,7 @@ import pytest
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
     CONF_CALIBRATE,
+    CONF_GAMMA_CURVE,
     CONF_LINEAR,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
@@ -282,6 +283,24 @@ async def test_lower_value_than_calibration_table_defines(hass: HomeAssistant) -
                 "100 -> 8",
                 "255 -> 15",
             ],
+        },
+    )
+    state = State("light.test", STATE_ON, {ATTR_BRIGHTNESS: 20})
+    assert pytest.approx(float(await strategy.calculate(state)), 0.01) == 3.52
+
+
+async def test_lower_value_than_calibration_table_defines_with_gamma(hass: HomeAssistant) -> None:
+    """Below the calibrated range there is no curve to apply, extrapolation stays linear."""
+    strategy = await _create_strategy_instance(
+        hass,
+        create_source_entity("light.test", hass),
+        {
+            CONF_CALIBRATE: [
+                "50 -> 5",
+                "100 -> 8",
+                "255 -> 15",
+            ],
+            CONF_GAMMA_CURVE: 2.8,
         },
     )
     state = State("light.test", STATE_ON, {ATTR_BRIGHTNESS: 20})

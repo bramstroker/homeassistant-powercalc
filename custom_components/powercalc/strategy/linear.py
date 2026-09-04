@@ -1,4 +1,4 @@
-from bisect import bisect_left
+from bisect import bisect_left, bisect_right
 from decimal import Decimal
 import logging
 from typing import Any
@@ -98,8 +98,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if value is None:
             return None
 
-        min_calibrate = self.get_min_calibrate(value)
-        max_calibrate = self.get_max_calibrate(value)
+        min_calibrate, max_calibrate = self.get_calibration_segment(value)
         min_value = min_calibrate[0]
         max_value = max_calibrate[0]
 
@@ -118,10 +117,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         power_range = max_power - min_power
 
         relative_value = (value - min_value) / value_range
-        curve_value = self.apply_curve(relative_value)
-        if self._power_curve and value_range < 0:
-            curve_value = 1 - self.apply_curve(1 - relative_value)
-        power = power_range * curve_value + min_power
+        power = power_range * self.apply_curve(relative_value) + min_power
 
         return Decimal(power)
 
@@ -129,13 +125,19 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         """Return if this strategy is enabled based on entity state."""
         return not (self._source_entity.domain == media_player.DOMAIN and entity_state.state != STATE_PLAYING)
 
-    def get_min_calibrate(self, value: int) -> tuple[int, float]:
-        """Get closest lower value from calibration table."""
-        return min(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
+    def get_calibration_segment(self, value: int) -> tuple[tuple[int, float], tuple[int, float]]:
+        """Get the two calibration points to interpolate between, in ascending order.
 
-    def get_max_calibrate(self, value: int) -> tuple[int, float]:
-        """Get closest higher value from calibration table."""
-        return max(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
+        Values inside the table use the segment they fall in. Values outside it are
+        extrapolated along the chord between the first and the last point.
+        """
+        calibration = self._calibration or []
+        if value < calibration[0][0] or value > calibration[-1][0]:
+            return calibration[0], calibration[-1]
+
+        index = bisect_right(calibration, value, key=lambda point: point[0])
+        index = min(max(index, 1), len(calibration) - 1)
+        return calibration[index - 1], calibration[index]
 
     def create_calibrate_list(self) -> list[tuple[int, float]]:
         """Build a table of calibration values."""
@@ -181,6 +183,10 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         """Apply a configured gamma or normalized power curve."""
         gamma_curve = self._config.get(CONF_GAMMA_CURVE)
         if gamma_curve:
+            if relative_value < 0:
+                # A negative base raised to a fractional exponent is complex. Below the
+                # calibrated range there is no curve to apply, so stay linear.
+                return relative_value
             return float(relative_value ** float(gamma_curve))
 
         if self._power_curve:
