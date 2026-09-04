@@ -28,11 +28,54 @@ export class SessionsView extends LitElement {
     .actions button, .actions .action-button { display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; min-height: 34px; padding: 0.4rem 0.65rem; font-size: 0.78rem; }
     .actions .action-button { border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--surface-raised); font-weight: 650; text-decoration: none; transition: transform 150ms ease, border-color 150ms ease, background 150ms ease; }
     .actions .action-button:hover { border-color: var(--signal); transform: translateY(-1px); }
+    .tooltip-trigger { position: relative; display: inline-flex; }
+    .tooltip-content {
+      position: absolute;
+      z-index: 10;
+      bottom: calc(100% + 0.55rem);
+      left: 50%;
+      width: max-content;
+      max-width: min(16rem, calc(100vw - 2rem));
+      padding: 0.5rem 0.65rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-raised);
+      box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+      color: var(--ink);
+      font-size: 0.74rem;
+      font-weight: 500;
+      line-height: 1.35;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translate(-50%, 0.2rem);
+      transition: opacity 80ms ease, transform 80ms ease, visibility 0s linear 80ms;
+    }
+    .tooltip-content::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-raised);
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+    .tooltip-trigger:hover .tooltip-content,
+    .tooltip-trigger:focus-within .tooltip-content {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, 0);
+      transition-delay: 0s;
+    }
     .icon { width: 1rem; height: 1rem; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
     .danger { color: var(--danger); }
     .empty { padding: 2rem; text-align: center; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); }
     @media (max-width: 720px) { .heading { flex-direction: column; } }
-    @media (max-width: 640px) { .actions .action-button { width: 100%; } }
+    @media (max-width: 640px) { .actions .action-button, .actions .tooltip-trigger { width: 100%; } }
   `];
 
   @property({ attribute: false })
@@ -68,6 +111,7 @@ export class SessionsView extends LitElement {
   }
 
   private renderSession(session: SessionSummary) {
+    const measureAgainTooltipId = `measure-again-tooltip-${session.session_id}`;
     return html`<article class=${session.active ? "active" : ""}>
       <div class="session-head">
         <div><h3>${session.product_name || session.model_id}</h3><small class="muted">${session.model_id} · ${humanize(session.measure_type)}</small></div>
@@ -83,7 +127,10 @@ export class SessionsView extends LitElement {
       <div class="actions">
         <button type="button" ?disabled=${this.busy} @click=${() => this.emit("open", session.session_id)}>${this.icon(session.active ? "monitor" : "open")}<span>${session.active ? "Monitor" : "Open"}</span></button>
         ${session.can_resume ? html`<button type="button" ?disabled=${this.busy || this.sessions.some((item) => item.active)} @click=${() => this.emit("resume", session.session_id)}>${this.icon("resume")}<span>Resume</span></button>` : nothing}
-        <button type="button" title="Create a new draft with this configuration" ?disabled=${this.busy} @click=${() => this.emit("duplicate", session.session_id)}>${this.icon("duplicate")}<span>Duplicate</span></button>
+        <span class="tooltip-trigger">
+          <button type="button" aria-describedby=${measureAgainTooltipId} ?disabled=${this.busy} @click=${() => this.emit("duplicate", session.session_id)}>${this.icon("duplicate")}<span>Measure again</span></button>
+          <span class="tooltip-content" id=${measureAgainTooltipId} role="tooltip">Start a new measurement using these settings</span>
+        </span>
         <a class="action-button" href=${this.diagnosticsUrl(session.session_id)} download>${this.icon("diagnostics")}<span>Diagnostics</span></a>
         ${this.pendingDelete === session.session_id ? html`
           <button class="danger" type="button" ?disabled=${this.busy} @click=${() => this.confirmDelete(session.session_id)}>${this.icon("delete")}<span>Confirm delete</span></button>
