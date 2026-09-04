@@ -46,6 +46,6 @@ body:
   id: "Measurement logs and diagnostics"
   attributes:
     label: Upload measurement logs and diagnostics
-    description: Please upload your measurement data. You can downoad that from the GUI or write the CLI output into a file.
+    description: Please upload your measurement data. You can download that from the GUI or write the CLI output into a file.
   validations:
     required: true
