@@ -112,12 +112,18 @@ describe("result view", () => {
     expect(analysis?.textContent).toContain("analysed how the measured power changed");
     expect(analysis?.textContent).toContain("input_select.powercalc_test_state");
     const details = analysis?.querySelector('[aria-label="Recording analysis details"]');
-    expect(details?.querySelector("dt")?.textContent).toBe("Model input");
+    expect(details?.querySelector("dt > span")?.textContent).toBe("Model input");
     expect(details?.querySelector("dd")?.textContent).toBe("input_select.powercalc_test_state");
     expect(details?.textContent).toContain("Typical difference");
     expect(details?.textContent).toContain("0.02 W");
     expect(details?.textContent).toContain("Data coverage");
     expect(details?.textContent).toContain("100%");
+    const help = [...(details?.querySelectorAll<HTMLElement>(".analysis-help") ?? [])];
+    expect(help).toHaveLength(3);
+    expect(help[0]?.title).toContain("generated profile will use this as its input");
+    expect(help[1]?.title).toContain("lower is better");
+    expect(help[2]?.title).toContain("100% means every sample was covered");
+    expect(help.every((item) => item.tabIndex === 0 && item.getAttribute("aria-label")?.includes(item.title))).toBe(true);
   });
 
   it("can run the analyser again without starting a new measurement", async () => {

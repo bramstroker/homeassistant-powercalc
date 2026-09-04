@@ -172,8 +172,11 @@ export class ResultView extends LitElement {
     .analysis-reason strong { color: var(--muted); }
     .analysis-details { display: flex; flex-wrap: wrap; gap: 0.65rem 1.5rem; margin: 1rem 0 0; padding-top: 0.85rem; border-top: 1px solid var(--line); }
     .analysis-details div { display: flex; flex-wrap: wrap; gap: 0.3rem 0.5rem; min-width: 0; align-items: baseline; }
-    .analysis-details dt { color: var(--muted); font-size: 0.75rem; }
+    .analysis-details dt { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--muted); font-size: 0.75rem; }
     .analysis-details dd { margin: 0; color: var(--ink); font-weight: 700; overflow-wrap: anywhere; }
+    .analysis-help { position: relative; display: inline-grid; place-items: center; width: 1rem; height: 1rem; flex: 0 0 auto; border: 1px solid currentColor; border-radius: 50%; color: var(--muted); cursor: help; font: 700 0.65rem/1 sans-serif; }
+    .analysis-help::after { position: absolute; z-index: 10; bottom: calc(100% + 0.5rem); left: 50%; width: min(16rem, calc(100vw - 2rem)); padding: 0.55rem 0.65rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-raised); box-shadow: 0 8px 24px rgb(0 0 0 / 0.3); color: var(--ink); content: attr(data-help); font-size: 0.75rem; font-weight: 500; letter-spacing: normal; line-height: 1.4; opacity: 0; pointer-events: none; text-align: left; text-transform: none; transform: translate(-50%, 0.2rem); transition: opacity 120ms ease, transform 120ms ease; visibility: hidden; }
+    .analysis-help:hover::after, .analysis-help:focus::after { opacity: 1; transform: translate(-50%, 0); visibility: visible; }
     .analysis-retry { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--line); }
     .analysis-retry p { flex: 1 1 30rem; margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
     .analysis-retry p.complete { color: var(--good); font-weight: 700; }
@@ -612,9 +615,19 @@ ${preview.pr_body}</pre>
         ${result ? html`<p class="analysis-outcome"><span>Result</span><strong>${this.analysisResult(result)}</strong></p>` : nothing}
         ${reason ? html`<p class="analysis-reason"><strong>Why:</strong> ${reason}</p>` : nothing}
         ${details.length ? html`<dl class="analysis-details" aria-label="Recording analysis details">
-          ${details.map(([label, value]) => html`
-            <div><dt>${this.analysisDetailLabel(label)}</dt><dd>${label === "Analysed feature" ? this.analysisFeature(value) : value}</dd></div>
-          `)}
+          ${details.map(([label, value]) => {
+            const displayLabel = this.analysisDetailLabel(label);
+            const help = this.analysisDetailHelp(label);
+            return html`
+              <div>
+                <dt>
+                  <span>${displayLabel}</span>
+                  ${help ? html`<span class="analysis-help" tabindex="0" data-help=${help} title=${help} aria-label=${`${displayLabel}: ${help}`}>?</span>` : nothing}
+                </dt>
+                <dd>${label === "Analysed feature" ? this.analysisFeature(value) : value}</dd>
+              </div>
+            `;
+          })}
         </dl>` : nothing}
         ${this.canAnalyse ? html`
           <div class="analysis-retry">
@@ -646,6 +659,19 @@ ${preview.pr_body}</pre>
     if (label === "Validation MAE") return "Typical difference";
     if (label === "Validation coverage") return "Data coverage";
     return label;
+  }
+
+  private analysisDetailHelp(label: string): string | undefined {
+    if (label === "Analysed feature") {
+      return "The Home Assistant entity data that best explained the measured power changes. The generated profile will use this as its input.";
+    }
+    if (label === "Validation MAE") {
+      return "How closely the profile matched measurement samples it had not used to learn. This is the typical difference in watts; lower is better.";
+    }
+    if (label === "Validation coverage") {
+      return "The share of those measurement samples for which the profile could estimate power. 100% means every sample was covered.";
+    }
+    return undefined;
   }
 
   private analysisFeature(feature: string): string {
