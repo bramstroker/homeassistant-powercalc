@@ -32818,7 +32818,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.12.1:docker"
           },
-          "name": "Hue White Ambiance A19 E26 (75W)",
+          "name": "Hue White Ambiance A19 E26",
           "standby_power": 0.35,
           "authors": [
             {
@@ -32828,7 +32828,7 @@
           ],
           "id": "LTW015",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-04T17:22:49",
           "max_power": 7.86,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:02:50",
@@ -32843,7 +32843,7 @@
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "e1659745eae45c441d465b7bb5689acb"
+          "hash": "bc202e059346d6370acce642c0e8ce99"
         },
         {
           "aliases": [
