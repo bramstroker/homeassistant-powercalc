@@ -35407,6 +35407,9 @@
           "hash": "2f8136e877446469f87a0c6e7fd75f60"
         },
         {
+          "aliases": [
+            "S31"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2024-06-07T12:11:13Z",
           "device_type": "smart_speaker",
@@ -35437,14 +35440,14 @@
           ],
           "id": "beam",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-04T05:01:01",
           "max_power": 23.6,
           "sub_profile_count": 0,
           "power_range": {
             "min": 7.3,
             "max": 23.6
           },
-          "hash": "58d41f126bdf5056c45df36edbaec54f"
+          "hash": "541c4c26e69746e08eec73b3cd678ac4"
         },
         {
           "calculation_strategy": "fixed",
