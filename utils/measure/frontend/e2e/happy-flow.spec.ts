@@ -25,6 +25,13 @@ test("boots and lists the stored measurement sessions", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Hue White Ambiance A60" })).toBeVisible();
   await expect(page.getByText("Completed")).toBeVisible();
   await expect(page.getByRole("button", { name: "New measurement" })).toBeEnabled();
+
+  const measureAgain = page.getByRole("button", { name: "Measure again" });
+  const tooltip = page.getByRole("tooltip");
+  await expect(tooltip).toBeHidden();
+  await measureAgain.hover();
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toHaveText("Start a new measurement using these settings");
 });
 
 test("configures a measurement and reaches the setup check", async ({ page }) => {

@@ -31,7 +31,11 @@ describe("sessions view", () => {
     await element.updateComplete;
 
     const labels = [...element.shadowRoot.querySelectorAll("button")].map((button) => button.textContent?.trim());
-    expect(labels).toEqual(expect.arrayContaining(["New measurement", "Open", "Resume", "Duplicate", "Delete"]));
+    expect(labels).toEqual(expect.arrayContaining(["New measurement", "Open", "Resume", "Measure again", "Delete"]));
+    const measureAgain = [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.trim() === "Measure again");
+    const tooltip = element.shadowRoot.querySelector<HTMLElement>('[role="tooltip"]');
+    expect(tooltip?.textContent).toBe("Start a new measurement using these settings");
+    expect(measureAgain?.getAttribute("aria-describedby")).toBe(tooltip?.id);
     const diagnostics = element.shadowRoot.querySelector<HTMLAnchorElement>('a[download]');
     expect(diagnostics?.href).toContain("/api/sessions/session-1/diagnostics");
     expect(diagnostics?.classList.contains("action-button")).toBe(true);
