@@ -268,6 +268,13 @@ describe("setup view", () => {
     expect(element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')).toBeNull();
     expect(element.shadowRoot.querySelectorAll('measure-combobox[name="light_entity_id"]')).toHaveLength(1);
     expect(element.shadowRoot.querySelector(".multiple-lights")?.textContent).toContain("very low power use");
+    expect(element.shadowRoot.querySelector(".multiple-lights")?.textContent).toContain("Select up to three individual lights");
+    const groupGuide = element.shadowRoot.querySelector<HTMLAnchorElement>(
+      '.multiple-lights a[href="https://www.home-assistant.io/integrations/group/"]',
+    );
+    expect(groupGuide?.textContent).toBe("Home Assistant light group");
+    expect(groupGuide?.getAttribute("target")).toBe("_blank");
+    expect(groupGuide?.getAttribute("rel")).toBe("noopener noreferrer");
 
     element.shadowRoot.querySelector<HTMLInputElement>('input[name="measure_multiple_lights"]')!.click();
     await element.updateComplete;
