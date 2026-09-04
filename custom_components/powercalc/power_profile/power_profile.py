@@ -28,6 +28,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
     BUILT_IN_LIBRARY_DIR,
+    CONF_CALIBRATE,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
@@ -309,9 +310,11 @@ class PowerProfile:
         if self.only_self_usage:
             return False
 
-        return self.is_strategy_supported(
-            CalculationStrategy.LINEAR,
-        ) and not self._json_data.get("linear_config")
+        if not self.is_strategy_supported(CalculationStrategy.LINEAR):
+            return False
+
+        linear_config = self._json_data.get("linear_config") or {}
+        return CONF_MAX_POWER not in linear_config and not linear_config.get(CONF_CALIBRATE)
 
     @property
     def device_type(self) -> DeviceType | None:

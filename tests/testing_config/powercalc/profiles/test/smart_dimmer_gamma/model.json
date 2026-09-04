@@ -1,0 +1,10 @@
+{
+  "calculation_strategy": "linear",
+  "device_type": "smart_dimmer",
+  "linear_config": {
+    "gamma_curve": 2
+  },
+  "name": "Some smart dimmer with gamma curve",
+  "standby_power": 0.3,
+  "standby_power_on": 0.5
+}
