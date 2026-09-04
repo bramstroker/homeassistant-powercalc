@@ -57,11 +57,12 @@ export function numberField(name: string, label: string, value: string, options:
 export interface EntitySelectOptions {
   selected?: string;
   required?: boolean;
+  hint?: string;
   onChange?: ((event: Event) => void) | null;
 }
 
 export function entitySelect(name: string, label: string, entities: EntityDescriptor[], options: EntitySelectOptions = {}) {
-  const { selected = "", required = false, onChange = null } = options;
+  const { selected = "", required = false, hint = "", onChange = null } = options;
   const comboboxOptions: ComboboxOption[] = entities.map((entity) => ({
     value: entity.entity_id,
     label: `${entity.name} · ${entity.entity_id}`,
@@ -74,6 +75,7 @@ export function entitySelect(name: string, label: string, entities: EntityDescri
       .value=${selected}
       .options=${comboboxOptions}
       placeholder=${`Search ${label.toLowerCase()} entities`}
+      hint=${hint}
       ?required=${required}
     >
       <input slot="value" type="hidden" name=${name} .value=${selected} @change=${onChange} />

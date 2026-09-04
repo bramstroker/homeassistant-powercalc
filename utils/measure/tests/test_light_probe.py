@@ -135,10 +135,39 @@ def test_active_probe_checks_rgb_primaries_and_caches_an_exact_request() -> None
         "Color 240° / 100% saturation · brightness 1",
     ]
     assert meter.calls == 3
-    hues = [change[2]["hue"] for change in controller.changes if change[0] == LutMode.HS]
+    hues = [change[2]["hue"] for change in controller.changes if change[0] == LutMode.HS and change[2]["bri"] == 1]
     assert hues == [1, 21849, 43697]
     assert controller.changes[-1] == (LutMode.BRIGHTNESS, False, {})
     assert controller.closed
+
+
+@pytest.mark.parametrize(
+    "mode, powers, expected_change",
+    [
+        (LutMode.BRIGHTNESS, [1.2], (LutMode.BRIGHTNESS, True, {"bri": 255})),
+        (LutMode.COLOR_TEMP, [1.2, 1.1], (LutMode.COLOR_TEMP, True, {"bri": 255, "ct": 153})),
+        (LutMode.HS, [1.2, 0.9, 1.1], (LutMode.HS, True, {"bri": 255, "hue": 0, "sat": 1})),
+    ],
+)
+def test_active_probe_stabilizes_full_load_before_checking_low_load(
+    mode: LutMode,
+    powers: list[float],
+    expected_change: tuple[LutMode, bool, dict[str, int]],
+) -> None:
+    controller = FakeLightController()
+    meter = FakePowerMeter(powers)
+    waits: list[float] = []
+    parameters = MeasurementParameters(sleep_time=2, sleep_initial=10)
+    probe = LightLoadProbe(
+        lambda: FakeAssembler(controller, meter),
+        wait=waits.append,
+        now=lambda: 10,
+    )
+
+    probe.evaluate(request(parameters=parameters, modes={mode}))
+
+    assert controller.changes[:2] == [expected_change, expected_change]
+    assert waits[:3] == [2, 2, 10]
 
 
 def test_active_probe_rejects_repeated_zero_on_saturated_green_and_cleans_up() -> None:

@@ -7,7 +7,7 @@ import time
 
 from measure.assembler import MeasurementAssembler
 from measure.controller.light.const import LutMode
-from measure.controller.light.controller import LightController
+from measure.controller.light.controller import LightController, LightInfo
 from measure.execution import ImmediateInteraction
 from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.errors import ZeroReadingError
@@ -93,6 +93,7 @@ class LightLoadProbe:
             meter = assembler.build_power_meter(request.power_meter)
             measure_util = MeasureUtil(meter, request.parameters, wait=self._wait)
             light_driven = True
+            self._stabilize_load(controller, request, variations[0].mode, light_info)
             points = [
                 LightLoadProbePoint(
                     label=light_load_probe_label(variation),
@@ -140,6 +141,28 @@ class LightLoadProbe:
         controller.change_light_state(variation.mode, on=True, **asdict(variation))
         self._wait(request.parameters.sleep_time)
         return measure_util.take_measurement(start_timestamp=start_timestamp).power
+
+    def _stabilize_load(
+        self,
+        controller: LightController,
+        request: LightMeasurementRequest,
+        mode: LutMode,
+        light_info: LightInfo,
+    ) -> None:
+        """Match the runner's full-load preparation before probing low-load points."""
+
+        kwargs: dict[str, int] = {"bri": 255}
+        if mode == LutMode.HS:
+            kwargs.update(hue=0, sat=1)
+        elif mode == LutMode.COLOR_TEMP:
+            kwargs["ct"] = light_info.min_mired
+        else:
+            mode = LutMode.BRIGHTNESS
+
+        for _ in range(2):
+            controller.change_light_state(mode, on=True, **kwargs)
+            self._wait(request.parameters.sleep_time)
+        self._wait(request.parameters.sleep_initial)
 
     @staticmethod
     def _cache_key(request: LightMeasurementRequest) -> str:

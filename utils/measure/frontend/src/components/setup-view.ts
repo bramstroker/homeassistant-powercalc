@@ -45,6 +45,9 @@ import {
 } from "./setup-chrome";
 import { errorHelpLink } from "./error-help-link";
 
+const LIGHT_DISCOVERY_HINT =
+  "Newly discovered lights may not have a usable state until Home Assistant receives their first update. If a light is missing, change its state once in Home Assistant, then reload this page.";
+
 const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging. Do not repeat the manufacturer name.";
 const MULTIPLE_LIGHTS_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights";
 
@@ -459,7 +462,12 @@ export class SetupView extends LitElement {
       let selected = field.multiple ? this.selectedEntityId(field, run) || value : value;
       if (!selected && field.same_device_only && entities.length === 1) selected = entities[0]?.entity_id ?? "";
       const relatedMissing = Boolean(field.same_device_only && this.relatedEntity(field, run) && entities.length === 0);
-      const selector = entitySelect(name, field.label, entities, { selected, required: field.required, onChange: this.entityChanged });
+      const selector = entitySelect(name, field.label, entities, {
+        selected,
+        required: field.required,
+        hint: this.lightDiscoveryHint(field),
+        onChange: this.entityChanged,
+      });
       if (!field.hint && !relatedMissing) return selector;
       return html`<div class="field-block">
         ${selector}
@@ -546,12 +554,19 @@ export class SetupView extends LitElement {
   }
 
   private multiEntityField(field: FormField, entities: EntityDescriptor[], run?: MeasurementRequest) {
+    const hint = [field.hint, this.lightDiscoveryHint(field)].filter(Boolean).join(" ");
     return renderEntityList({
-      field,
+      field: { ...field, hint },
       entities,
       rows: this.entityRows(field, run),
       onChange: (rows) => this.selectEntities(field.name, rows),
     });
+  }
+
+  private lightDiscoveryHint(field: FormField): string {
+    return field.role === "controller" && this.fieldDomains(field).includes("light")
+      ? LIGHT_DISCOVERY_HINT
+      : "";
   }
 
   private fieldDomains(field: MeasureDefinition["fields"][number]): string[] {
