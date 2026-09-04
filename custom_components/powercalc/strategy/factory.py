@@ -12,7 +12,11 @@ import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_CALIBRATE,
     CONF_COMPOSITE,
+    CONF_GAMMA_CURVE,
+    CONF_MAX_POWER,
+    CONF_MIN_POWER,
     CONF_MODE,
     CONF_MULTI_SWITCH,
     CONF_POWER,
@@ -118,7 +122,7 @@ class PowerCalculatorStrategyFactory:
         power_profile: PowerProfile | None,
     ) -> LinearStrategy:
         """Create the linear strategy."""
-        linear_config = self._get_strategy_config(CalculationStrategy.LINEAR, config, power_profile)
+        linear_config = self._get_linear_config(config, power_profile)
 
         return LinearStrategy(
             linear_config,
@@ -126,6 +130,45 @@ class PowerCalculatorStrategyFactory:
             source_entity,
             config.get(CONF_STANDBY_POWER),
         )
+
+    @staticmethod
+    def _get_linear_config(config: ConfigType, power_profile: PowerProfile | None) -> ConfigType:
+        """Combine an incomplete profile configuration with user supplied power values."""
+        user_config = cast(ConfigType | None, config.get(CalculationStrategy.LINEAR))
+
+        if power_profile is None or not power_profile.is_strategy_supported(CalculationStrategy.LINEAR):
+            if user_config is not None:
+                return user_config
+            raise StrategyConfigurationError("No linear configuration supplied")
+
+        profile_config = dict(power_profile.linear_config or {})
+
+        # Preserve the existing behavior for complete profiles: an explicitly supplied
+        # user configuration replaces the profile configuration entirely.
+        if not power_profile.needs_linear_config:
+            return user_config if user_config is not None else profile_config
+
+        # Smart dimmer profiles without load values can be used from YAML to measure
+        # only the dimmer's own consumption. Keep that behavior when the profile adds
+        # defaults such as gamma_curve but the user omits the linear configuration.
+        if not user_config:
+            return {
+                CONF_MIN_POWER: 0,
+                CONF_MAX_POWER: 0,
+                **profile_config,
+            }
+
+        linear_config = {
+            **profile_config,
+            **user_config,
+        }
+
+        # A user supplied calibration curve fully describes the power curve. Do not
+        # modify it with a gamma value inherited from the profile.
+        if CONF_CALIBRATE in user_config and CONF_GAMMA_CURVE not in user_config:
+            linear_config.pop(CONF_GAMMA_CURVE, None)
+
+        return linear_config
 
     def _create_fixed(
         self,

@@ -9,7 +9,9 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry, Regist
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_CALIBRATE,
     CONF_ENERGY_SENSOR_NAMING,
+    CONF_GAMMA_CURVE,
     CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
@@ -356,6 +358,36 @@ async def test_needs_user_configuration(hass: HomeAssistant, json_data: dict[str
     )
 
     assert await power_profile.needs_user_configuration == expected_result
+
+
+@pytest.mark.parametrize(
+    "linear_config,expected_result",
+    [
+        (None, True),
+        ({CONF_GAMMA_CURVE: 2.4}, True),
+        ({CONF_MIN_POWER: 1, CONF_GAMMA_CURVE: 2.4}, True),
+        ({CONF_MAX_POWER: 20, CONF_GAMMA_CURVE: 2.4}, False),
+        ({CONF_CALIBRATE: ["0 -> 1", "255 -> 20"]}, False),
+    ],
+)
+def test_needs_linear_config(
+    hass: HomeAssistant,
+    linear_config: dict[str, Any] | None,
+    expected_result: bool,
+) -> None:
+    json_data: dict[str, Any] = {"calculation_strategy": CalculationStrategy.LINEAR}
+    if linear_config is not None:
+        json_data["linear_config"] = linear_config
+
+    power_profile = PowerProfile(
+        hass,
+        manufacturer="test",
+        model="test",
+        directory=get_test_profile_dir("smart_dimmer"),
+        json_data=json_data,
+    )
+
+    assert power_profile.needs_linear_config == expected_result
 
 
 @pytest.mark.parametrize(

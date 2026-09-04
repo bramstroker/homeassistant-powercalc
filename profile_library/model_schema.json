@@ -529,6 +529,10 @@
         "max_power": {
           "type": "number"
         },
+        "gamma_curve": {
+          "type": "number",
+          "description": "Exponent applied to the normalized entity value before scaling it between min_power and max_power"
+        },
         "calibrate": {
           "type": "array",
           "items": {
