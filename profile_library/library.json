@@ -21731,7 +21731,7 @@
           ],
           "calculation_strategy": "fixed",
           "compatible_integrations": [
-            "androidtv"
+            "androidtv_remote"
           ],
           "created_at": "2026-08-31T14:18:12Z",
           "device_type": "set_top_box",
@@ -21756,7 +21756,7 @@
           ],
           "id": "DIW7022",
           "manufacturer": "sagemcom",
-          "updated_at": "2026-09-02T16:12:58",
+          "updated_at": "2026-09-04T07:49:37",
           "max_power": 3.22,
           "sub_profile_count": 2,
           "power_range": {
@@ -21764,7 +21764,7 @@
             "max": 3.22
           },
           "standby_power": 2.45,
-          "hash": "792b5ac29f9e03bc9a89a89269d278da"
+          "hash": "5fe6efb1cdd965ca26696fb7d6c32bb5"
         }
       ],
       "device_types": [
