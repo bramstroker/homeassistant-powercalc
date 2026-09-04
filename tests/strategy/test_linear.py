@@ -22,6 +22,7 @@ from custom_components.powercalc.const import (
     CONF_LINEAR,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_POWER_CURVE,
     CONF_SENSOR_TYPE,
     SensorType,
 )
@@ -57,6 +58,32 @@ async def test_fan_min_and_max_power(hass: HomeAssistant) -> None:
 
     state = State("fan.test", STATE_ON, {ATTR_PERCENTAGE: 50})
     assert await strategy.calculate(state) == 55
+
+
+@pytest.mark.parametrize(
+    "percentage,expected_power",
+    [
+        (0, 3),
+        (25, 3.5),
+        (50, 4),
+        (75, 8),
+        (100, 12),
+    ],
+)
+async def test_fan_power_curve(hass: HomeAssistant, percentage: int, expected_power: float) -> None:
+    """Test a normalized power curve is interpolated and scaled to the power range."""
+    strategy = await _create_strategy_instance(
+        hass,
+        create_source_entity("fan.test", hass),
+        {
+            CONF_MIN_POWER: 2,
+            CONF_MAX_POWER: 12,
+            CONF_POWER_CURVE: ["0 -> 0.1", "0.5 -> 0.2", "1 -> 1"],
+        },
+    )
+
+    state = State("fan.test", STATE_ON, {ATTR_PERCENTAGE: percentage})
+    assert await strategy.calculate(state) == expected_power
 
 
 async def test_light_calibrate(hass: HomeAssistant) -> None:

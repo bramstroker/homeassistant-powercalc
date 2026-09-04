@@ -1,0 +1,17 @@
+{
+  "calculation_strategy": "linear",
+  "created_at": "2026-09-04T00:00:00Z",
+  "device_type": "smart_dimmer",
+  "linear_config": {
+    "power_curve": [
+      "0 -> 0",
+      "0.5 -> 0.2",
+      "1 -> 1"
+    ]
+  },
+  "measure_device": "Test",
+  "measure_method": "manual",
+  "name": "Some smart dimmer with normalized power curve",
+  "standby_power": 0.3,
+  "standby_power_on": 0.5
+}

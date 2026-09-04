@@ -1,3 +1,4 @@
+from bisect import bisect_left
 from decimal import Decimal
 import logging
 from typing import Any
@@ -24,6 +25,7 @@ from custom_components.powercalc.const import (
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_POWER,
+    CONF_POWER_CURVE,
     CONF_VALUE,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
@@ -41,6 +43,11 @@ CONFIG_SCHEMA = vol.Schema(
         vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
         vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
+        vol.Optional(CONF_POWER_CURVE): vol.All(
+            cv.ensure_list,
+            [vol.Match(r"^(?:0(?:\.\d+)?|1(?:\.0+)?) -> (?:0(?:\.\d+)?|1(?:\.0+)?)$")],
+            vol.Length(min=2),
+        ),
         vol.Optional(CONF_ATTRIBUTE): cv.string,
     },
 )
@@ -71,11 +78,13 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._initialized: bool = False
         self._missing_attribute_warned: bool = False
         self._calibration: list[tuple[int, float]] | None = None
+        self._power_curve: list[tuple[float, float]] | None = None
 
     async def initialize(self) -> None:
         """Initialize the strategy, called once on creation."""
         self._value_entity = await self.get_value_entity()
         self._calibration = self.create_calibrate_list()
+        self._power_curve = self.create_power_curve_list()
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate the current power consumption."""
@@ -108,11 +117,11 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         value_range = max_value - min_value
         power_range = max_power - min_power
 
-        gamma_curve = self._config.get(CONF_GAMMA_CURVE) or 1
-
         relative_value = (value - min_value) / value_range
-
-        power = power_range * relative_value**gamma_curve + min_power
+        curve_value = self.apply_curve(relative_value)
+        if self._power_curve and value_range < 0:
+            curve_value = 1 - self.apply_curve(1 - relative_value)
+        power = power_range * curve_value + min_power
 
         return Decimal(power)
 
@@ -155,6 +164,39 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             calibration_list.append((int(parts[0]), float(parts[1])))
 
         return sorted(calibration_list, key=lambda tup: tup[0])
+
+    def create_power_curve_list(self) -> list[tuple[float, float]] | None:
+        """Build a table of normalized power curve values."""
+        power_curve = self._config.get(CONF_POWER_CURVE)
+        if not power_curve:
+            return None
+
+        points = []
+        for line in power_curve:
+            value, power = line.split(" -> ")
+            points.append((float(value), float(power)))
+        return sorted(points, key=lambda point: point[0])
+
+    def apply_curve(self, relative_value: float) -> float:
+        """Apply a configured gamma or normalized power curve."""
+        gamma_curve = self._config.get(CONF_GAMMA_CURVE)
+        if gamma_curve:
+            return float(relative_value ** float(gamma_curve))
+
+        if self._power_curve:
+            if relative_value <= self._power_curve[0][0]:
+                return self._power_curve[0][1]
+            if relative_value >= self._power_curve[-1][0]:
+                return self._power_curve[-1][1]
+
+            max_index = bisect_left(self._power_curve, relative_value, key=lambda point: point[0])
+            min_point = self._power_curve[max_index - 1]
+            max_point = self._power_curve[max_index]
+            value_range = max_point[0] - min_point[0]
+            curve_range = max_point[1] - min_point[1]
+            return curve_range * ((relative_value - min_point[0]) / value_range) + min_point[1]
+
+        return relative_value
 
     def get_entity_value_range(self) -> tuple[int, int]:
         """Get the min/max range for a given entity domain."""

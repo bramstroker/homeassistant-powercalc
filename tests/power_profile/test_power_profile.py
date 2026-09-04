@@ -17,6 +17,7 @@ from custom_components.powercalc.const import (
     CONF_MIN_POWER,
     CONF_MODEL,
     CONF_POWER,
+    CONF_POWER_CURVE,
     CONF_POWER_SENSOR_NAMING,
     DEFAULT_SELF_USAGE_ENERGY_NAME_PATTERN,
     DEFAULT_SELF_USAGE_POWER_NAME_PATTERN,
@@ -365,6 +366,7 @@ async def test_needs_user_configuration(hass: HomeAssistant, json_data: dict[str
     [
         (None, True),
         ({CONF_GAMMA_CURVE: 2.4}, True),
+        ({CONF_POWER_CURVE: ["0 -> 0", "1 -> 1"]}, True),
         ({CONF_MIN_POWER: 1, CONF_GAMMA_CURVE: 2.4}, True),
         ({CONF_MAX_POWER: 20, CONF_GAMMA_CURVE: 2.4}, False),
         ({CONF_CALIBRATE: ["0 -> 1", "255 -> 20"]}, False),

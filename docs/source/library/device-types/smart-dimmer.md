@@ -40,6 +40,24 @@ powercalc:
 
 When using GUI configuration flow (either discovery or manual), the user will be able to define the linear configuration for the light.
 
+A profile can provide a normalized dimming curve while still asking the user for the connected light's minimum and maximum power:
+
+```json
+{
+  "device_type": "smart_dimmer",
+  "calculation_strategy": "linear",
+  "linear_config": {
+    "power_curve": [
+      "0.00 -> 0.00",
+      "0.50 -> 0.20",
+      "1.00 -> 1.00"
+    ]
+  }
+}
+```
+
+Both sides of every point use a normalized 0–1 scale. Powercalc interpolates the curve and scales its output to the power range supplied by the user.
+
 ## Smart dimmer with built-in powermeter
 
 When the dimmer already has a built-in powermeter, the following configuration can be used:
