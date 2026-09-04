@@ -93,6 +93,7 @@ describe("setup view", () => {
     const light = entityCombobox(element, "light_entity_id");
     await light.updateComplete;
     expect((light.shadowRoot.querySelector("input") as HTMLInputElement).value).toBe("Desk lamp · light.desk");
+    expect(light.shadowRoot.textContent).toContain("If a light is missing, change its state once in Home Assistant, then reload this page.");
     expect(element.shadowRoot.textContent).toContain("Brightness");
     expect(element.shadowRoot.querySelector("details")?.open).toBe(false);
     expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
@@ -232,6 +233,8 @@ describe("setup view", () => {
     expect(removeButton?.getAttribute("aria-label")).toBe("Remove Light");
     expect(removeButton?.querySelector("svg")).toBeTruthy();
     expect(removeButton?.textContent?.trim()).toBe("");
+    expect(element.shadowRoot.querySelector(".entity-list > .field-hint")?.textContent)
+      .toContain("If a light is missing, change its state once in Home Assistant, then reload this page.");
     expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
     expect((element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value).toBe("LWA017");
     expect((element.shadowRoot.querySelector('input[name="multiple_light_count"]') as HTMLInputElement).value).toBe("2");
