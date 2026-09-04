@@ -42,10 +42,10 @@ body:
       ...
   validations:
     required: true
-- type: textarea
+- type: upload
+  id: "Measurement logs and diagnostics"
   attributes:
-    label: "Measurement logs"
-    description: "Get them via a click on the Measurement UI or paste the CLI output."
-
+    label: Upload measurement logs and diagnostics
+    description: Please upload your measurement data. You can downoad that from the GUI or write the CLI output into a file.
   validations:
     required: true
