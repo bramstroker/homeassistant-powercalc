@@ -32,6 +32,7 @@ from measure.runner.light_plan import (
     variation_from_csv_row,
     variations_after,
 )
+from measure.runner.light_setup import set_light_to_maximum_brightness
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.tuning import MeasurementParameters
 from measure.util.measure_util import AverageMeasurementConvergence, MeasurementResult, MeasureUtil
@@ -195,7 +196,15 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             # again, after they received two turn-off commands, followed by a single
             # turn on command, we set them to maximum brightness, twice here.
             # See issue #2598
-            self.set_light_to_maximum_brightness(mode)
+            assert self.light_info is not None
+            set_light_to_maximum_brightness(
+                self.light_controller,
+                self.light_info,
+                mode,
+                sleep_time=self.config.sleep_time,
+                wait=self._wait,
+                checkpoint=self._checkpoint,
+            )
 
             # Initially wait longer so the smartplug can settle
             _LOGGER.info(
@@ -349,36 +358,6 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         ):
             _LOGGER.info("Extra waiting for effect change...")
             self._wait(self.config.sleep_time_effect_change)
-
-    def set_light_to_maximum_brightness(self, mode: LutMode) -> None:
-        """Set maximum brightness twice for lights that turn off after rapid commands."""
-        assert self.light_info is not None
-        _LOGGER.info("Turning on light with maximum brightness")
-        # Turn the light on twice to ensure it's in the correct state
-        for _ in range(2):
-            self._checkpoint()
-            if mode == LutMode.HS:
-                self.light_controller.change_light_state(
-                    mode,
-                    on=True,
-                    bri=255,
-                    hue=0,  # Set default hue
-                    sat=1,  # Set default saturation
-                )
-            elif mode == LutMode.COLOR_TEMP:
-                self.light_controller.change_light_state(
-                    mode,
-                    on=True,
-                    bri=255,
-                    ct=self.light_info.min_mired,  # Set to minimum mired value for color temp
-                )
-            else:
-                self.light_controller.change_light_state(
-                    LutMode.BRIGHTNESS,
-                    on=True,
-                    bri=255,
-                )
-            self._wait(self.config.sleep_time)  # Wait for the light to process
 
     def calculate_time_left(
         self,
