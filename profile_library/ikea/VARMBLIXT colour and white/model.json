@@ -6,23 +6,23 @@
     {
       "github": "luuk58",
       "name": "luuk58"
-    }
+      }
   ],
   "calculation_strategy": "lut",
-  "created_at": "2026-08-27T08:50:54Z",
+  "created_at": "2026-09-05T21:35:24Z",
   "device_type": "light",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plus Plug S",
   "measure_method": "script",
   "measure_settings": {
-    "SAMPLE_COUNT": 1,
-    "SLEEP_TIME": 2.0,
-    "VERSION": "v0.4.1:app"
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 4.0,
+    "VERSION": "v0.6.0:app"
   },
   "name": "VARMBLIXT LED table-wall lamp, dimmable smart-white glass colour and white spectrum, 30 cm",
-  "standby_power": 0.4,
+  "standby_power": 0.5,
   "voltage_range": {
-    "max": 240.2,
-    "min": 231.6
+    "max": 239.2,
+    "min": 231.5
   }
 }
