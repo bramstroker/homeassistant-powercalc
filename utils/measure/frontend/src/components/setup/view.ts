@@ -7,8 +7,6 @@ import type {
   EntityDescriptor,
   ErrorHelp,
   FormField,
-  FormFieldOption,
-  LutMode,
   MeasureDefinition,
   MeasureParameterName,
   MeasureType,
@@ -19,21 +17,16 @@ import { hasVoltageReading, meterFor } from "../../power-meter";
 import type { MeterContext } from "../../power-meter";
 import {
   buildMeasurementRequest,
-  deviceFields,
-  enabledParameters,
   entityDomain,
   entityDomains,
-  fieldVisible,
-  fieldOptions,
   narrowingField,
   requestFieldValue,
 } from "../../measure-definition";
 import { emit } from "../../events";
 import { formText } from "../../form";
 import { sharedStyles } from "../../styles";
-import { entitySelect, fieldHint, optionSelect, textField } from "../shared/fields";
 import { defaultDummyLoadMode, dummyLoadSpec, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
-import { entityListStyles, renderEntityList } from "./entity-list-field";
+import { entityListStyles } from "./entity-list-field";
 import type { Combobox } from "../shared/combobox";
 import {
   renderPowerMeterRequired,
@@ -43,15 +36,17 @@ import {
   setupChromeStyles,
 } from "./chrome";
 import { errorHelpLink } from "../shared/error-help-link";
+import type {
+  EntitySelectionChange,
+  MultiSelectionChange,
+  MultipleLightsChange,
+  SelectValueChange,
+} from "./fields-section";
 import type { ParameterChange } from "./tuning-section";
 import "./developer-options";
-import "./tuning-section";
+import "./fields-section";
 
-const LIGHT_DISCOVERY_HINT =
-  "Newly discovered lights may not have a usable state until Home Assistant receives their first update. If a light is missing, change its state once in Home Assistant, then reload this page.";
-
-const MULTIPLE_LIGHTS_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights";
-const HOME_ASSISTANT_GROUP_GUIDE_URL = "https://www.home-assistant.io/integrations/group/";
+export { recorderExportFilename } from "./fields-section";
 
 @customElement("measure-setup-view")
 export class SetupView extends LitElement {
@@ -140,7 +135,7 @@ export class SetupView extends LitElement {
 
   static readonly styles = [sharedStyles, dummyLoadStyles, entityListStyles, setupChromeStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
-    measure-setup-tuning-section, measure-setup-developer-options { display: contents; }
+    measure-setup-fields-section, measure-setup-developer-options { display: contents; }
     form { display: grid; gap: 1rem; }
     .profile-grid { align-items: start; }
     .device-section { display: grid; gap: 1rem; min-width: 0; }
@@ -224,7 +219,7 @@ export class SetupView extends LitElement {
   protected async getUpdateComplete(): Promise<boolean> {
     const complete = await super.getUpdateComplete();
     const sections = this.shadowRoot?.querySelectorAll<LitElement>(
-      "measure-setup-tuning-section, measure-setup-developer-options",
+      "measure-setup-fields-section, measure-setup-developer-options",
     ) ?? [];
     await Promise.all(Array.from(sections, (section) => section.updateComplete));
     return complete;
@@ -273,44 +268,33 @@ export class SetupView extends LitElement {
     const definition = this.definition(type);
     if (!definition || !this.capabilities) return html`<p class="muted">Loading measurement capabilities…</p>`;
     const run = this.initialRequest?.measure_type === type ? this.initialRequest : undefined;
-    const fields = deviceFields(definition);
-    const multipleController = this.multiControllerField();
-    // A multi-select needs the room of its own fieldset; the rest are grid cells.
-    const blocks = fields.filter((field) => field.control === "multi_select" && this.isFieldVisible(field, run));
     const activeLightCheck = type === "light" && !this.dummyController && !this.dummyLoadEnabled;
     return html`
       <form @submit=${this.submitMeasurement}>
-        <div class="device-section">
-          ${this.dummyController ? html`<p class="test-mode-status" role="status">Virtual device · test output only</p>` : nothing}
-          ${multipleController && !this.dummyController ? this.renderMultipleLightsToggle(multipleController) : nothing}
-          <div class="field-with-help">
-            <div class="grid profile-grid ${type === "light" ? "light-grid" : ""}">
-              ${fields.filter((field) => field.control !== "multi_select").map((field) => this.genericField(field, run))}
-              ${this.dummyController || !definition.fields.some((field) => field.role === "controller")
-                ? textField("session_name", "Session name (optional)", {
-                    value: run?.session_name ?? "",
-                    placeholder: "e.g. Desk lamp test",
-                    hint: "A label for finding this measurement later; it is not the product name.",
-                  })
-                : nothing}
-            </div>
-            ${type === "light" && !this.dummyController
-              ? this.contextHelp("Light not found?", html`<p>${LIGHT_DISCOVERY_HINT}</p>`, "discovery-help")
-              : nothing}
-          </div>
-          ${blocks.map((field) => this.multiSelectField(field, run))}
-        </div>
-
-        ${this.renderDummyLoadSection(run?.dummy_load)}
-        <measure-setup-tuning-section
+        <measure-setup-fields-section
           .capabilities=${this.capabilities}
           .definition=${definition}
           .definitions=${this.definitions}
           .request=${run}
-          .values=${this.parameterValues}
-          .activeParameters=${this.activeParameters(definition, run)}
+          .lights=${this.lights}
+          .deviceEntities=${this.deviceEntities}
+          .deviceEntityErrors=${this.deviceEntityErrors}
+          .selectedEntities=${this.selectedEntities}
+          .selectValues=${this.selectValues}
+          .multiSelection=${this.multiSelection}
+          .parameterValues=${this.parameterValues}
+          .dummyController=${this.dummyController}
+          .multipleLights=${this.multipleLights}
+          .derivedCountOverride=${this.derivedCountOverride}
+          @entity-selection-change=${this.entitySelectionChanged}
+          @select-value-change=${this.selectValueChanged}
+          @multi-selection-change=${this.multiSelectionChanged}
+          @multiple-lights-change=${this.multipleLightsChanged}
+          @derived-count-change=${this.derivedCountChanged}
           @parameter-change=${this.parameterChanged}
-        ></measure-setup-tuning-section>
+        ></measure-setup-fields-section>
+
+        ${this.renderDummyLoadSection(run?.dummy_load)}
         <measure-setup-developer-options
           .developerMode=${this.capabilities.developer_mode ?? false}
           .fastTestMode=${this.capabilities.fast_test_mode ?? false}
@@ -335,63 +319,6 @@ export class SetupView extends LitElement {
           : activeLightCheck ? "Check light and setup" : "Check setup"}</button></div>
       </form>
     `;
-  }
-
-  private renderMultipleLightsToggle(field: FormField) {
-    return html`
-      <div class="multiple-lights field-with-help">
-        <label class="check toggle-pill">
-          <input
-            type="checkbox"
-            name="measure_multiple_lights"
-            .checked=${this.multipleLights}
-            data-field=${field.name}
-            @change=${this.multipleLightsChanged}
-          />
-          Measure multiple lights
-        </label>
-        ${this.contextHelp("About measuring multiple lights", html`<p>
-          Measuring multiple identical lights together increases the load, making very low power use easier to measure accurately.
-          </p><p>
-          Select up to three individual lights. For larger sets, select a native Zigbee or Hue group, or create a
-          <a href=${HOME_ASSISTANT_GROUP_GUIDE_URL} target="_blank" rel="noopener noreferrer">Home Assistant light group</a>,
-          then enter the total number of physical lights.
-          </p><p>
-          <a
-            class="help-link"
-            href=${MULTIPLE_LIGHTS_GUIDE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Learn more about measuring multiple identical lights"
-          >Multiple-light measurement guide ↗</a>
-        </p>`)}
-      </div>
-    `;
-  }
-
-  private contextHelp(label: string, content: unknown, className = "") {
-    return html`<details class="context-help ${className}" @keydown=${this.helpKeydown} @focusout=${this.helpFocusOut}>
-      <summary aria-label=${label} title=${label}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="9"></circle>
-          <path d="M9.75 9a2.4 2.4 0 0 1 4.57 1c0 1.75-2.32 2.1-2.32 3.5M12 17h.01"></path>
-        </svg>
-      </summary>
-      <div class="help-content">${content}</div>
-    </details>`;
-  }
-
-  private helpKeydown(event: KeyboardEvent): void {
-    if (event.key !== "Escape") return;
-    const help = event.currentTarget as HTMLDetailsElement;
-    help.open = false;
-    help.querySelector("summary")?.focus();
-    event.stopPropagation();
-  }
-
-  private helpFocusOut(event: FocusEvent): void {
-    const help = event.currentTarget as HTMLDetailsElement;
-    if (!help.contains(event.relatedTarget as Node | null)) help.open = false;
   }
 
   private renderDummyLoadSection(stored?: DummyLoadSpec | null) {
@@ -420,276 +347,32 @@ export class SetupView extends LitElement {
     this.parameterValues = { ...this.parameterValues, [event.detail.name]: event.detail.value };
   }
 
-
-  private genericField(field: MeasureDefinition["fields"][number], run?: MeasurementRequest) {
-    if (!this.selectedType) return nothing;
-    const definition = this.definition(this.selectedType);
-    if (!definition) return nothing;
-    if (!this.isFieldVisible(field, run)) return nothing;
-    const name = field.name;
-    if (this.dummyController && field.role === "controller") return nothing;
-    if (field.derived_from) return this.derivedCountField(field, run);
-    const stored = run && requestFieldValue(run, field);
-    if (field.control === "boolean") {
-      return html`<label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>`;
-    }
-    if (field.control === "entity") {
-      const value = (stored ?? field.default ?? "").toString();
-      const source = narrowingField(definition, field);
-      const domains = source
-        ? [entityDomain(definition, field, this.selectValue(source, run))].filter((domain): domain is string => Boolean(domain))
-        : this.fieldDomains(field);
-      // An all-entities field reads the "*" catalog; its declared domains only filter that
-      // catalog client-side, so a stale error from another measure type must not surface here.
-      const failed = field.all_entities
-        ? (this.deviceEntityErrors["*"] ? "*" : undefined)
-        : domains.find((domain) => this.deviceEntityErrors[domain]);
-      if (failed) {
-        return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
-      }
-      const entities = this.entityChoices(field, domains, run);
-      if (field.multiple && (field.role !== "controller" || this.multipleLights)) {
-        return this.multiEntityField(field, entities, run);
-      }
-      let selected = field.multiple ? this.selectedEntityId(field, run) || value : value;
-      if (!selected && field.same_device_only && entities.length === 1) selected = entities[0]?.entity_id ?? "";
-      const relatedMissing = Boolean(field.same_device_only && this.relatedEntity(field, run) && entities.length === 0);
-      const selector = entitySelect(name, field.label, entities, {
-        selected,
-        required: field.required,
-        onChange: this.entityChanged,
-      });
-      if (!field.hint && !relatedMissing) return selector;
-      return html`<div class="field-block">
-        ${selector}
-        ${fieldHint(field.hint ?? "")}
-        ${relatedMissing ? html`<p class="notice error" role="alert">No usable battery percentage sensor was found on the same Home Assistant device. PowerCalc vacuum profiles require one; expose or add that sensor before recording.</p>` : nothing}
-      </div>`;
-    }
-    if (field.control === "select") {
-      const value = this.selectValue(field, run) ?? (stored ?? field.default ?? "").toString();
-      // Re-render when this select narrows another field, so that field's entities follow.
-      const affectsAnother = definition.fields.some(
-        (candidate) => candidate.narrowed_by === name || Object.hasOwn(candidate.visible_when ?? {}, name),
-      );
-      const selectedOption = field.options.find((option) => option.value === value);
-      return html`<div class="field-block">${optionSelect(name, field.label, field.options, {
-        selected: value,
-        required: field.required,
-        onChange: affectsAnother ? this.selectChanged : null,
-      })}${this.optionGuidance(selectedOption)}</div>`;
-    }
-    if (name === "export_filename" && this.selectedType === "recorder") {
-      return this.valueField(field, recorderExportFilename(this.recorderPurpose(run), (stored ?? field.default ?? "").toString()));
-    }
-    return this.valueField(field, (stored ?? field.default ?? "").toString());
-  }
-
-  private recorderPurpose(request?: MeasurementRequest): string | undefined {
-    if (this.selectedType !== "recorder") return undefined;
-    if (this.selectValues.recorder_purpose) return this.selectValues.recorder_purpose;
-    if (request?.measure_type === "recorder") return request.recorder_purpose;
-    return this.definition("recorder")?.fields.find((field) => field.name === "recorder_purpose")?.default?.toString();
-  }
-
-  private isFieldVisible(field: FormField, request?: MeasurementRequest): boolean {
-    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
-    return fieldVisible(field, (name) => {
-      const source = definition?.fields.find((candidate) => candidate.name === name);
-      if (!source) return "";
-      if (source.control === "select") return this.selectValue(source, request) ?? "";
-      const stored = request && requestFieldValue(request, source);
-      return this.selectedEntityId(source, request) || (typeof stored === "string" ? stored : "");
-    });
-  }
-
-  private optionGuidance(option?: FormFieldOption) {
-    if (!option?.description && !option?.guidance?.length) return nothing;
-    const guidanceItems = option.guidance?.map((item) => html`<li>${item}</li>`);
-    return html`<div class="select-guidance">
-      ${option.description ? html`<p class="muted">${option.description}</p>` : nothing}
-      ${guidanceItems?.length ? html`<ul>${guidanceItems}</ul>` : nothing}
-    </div>`;
-  }
-
-  /** A plain text or number input, rendered from what the field declares about itself. */
-  private valueField(field: FormField, value: string, onInput: ((event: Event) => void) | null = null) {
-    return html`<label><span>${field.label}</span><input
-      type=${field.control === "number" ? "number" : "text"}
-      name=${field.name}
-      min=${field.minimum ?? nothing}
-      max=${field.maximum ?? nothing}
-      .value=${value}
-      ?required=${field.required}
-      autocomplete="off"
-      @input=${onInput}
-    />${field.hint ? html`<small class="field-hint">${field.hint}</small>` : nothing}</label>`;
-  }
-
-  /**
-   * A count that follows how many entities its source field selects. It only means anything
-   * while several devices are measured together, so until then it submits a fixed 1 out of sight.
-   */
-  private derivedCountField(field: FormField, run?: MeasurementRequest) {
-    if (!this.multipleLights) return html`<input type="hidden" name=${field.name} value="1" />`;
-    const source = this.selectedType
-      ? this.definition(this.selectedType)?.fields.find((candidate) => candidate.name === field.derived_from)
-      : undefined;
-    const derived = source ? this.selectedEntityIds(source, run).length : 0;
-    const stored = run && requestFieldValue(run, field);
-    const value = this.derivedCountOverride
-      ?? (derived > 1 ? String(derived) : (stored ?? field.default ?? "").toString());
-    return html`<div class="field-with-help">
-      ${this.valueField({ ...field, hint: undefined }, value, this.derivedCountChanged)}
-      ${this.contextHelp(field.label, html`<p>Total number of identical physical lights, including all members of a group. Measured power is divided by this value to calculate power per light.</p>`)}
-    </div>`;
-  }
-
-  private derivedCountChanged(event: Event): void {
-    this.derivedCountOverride = (event.currentTarget as HTMLInputElement).value;
-  }
-
-  private multiEntityField(field: FormField, entities: EntityDescriptor[], run?: MeasurementRequest) {
-    if (this.selectedType === "light" && field.role === "controller") {
-      return html`<measure-combobox
-        name=${field.name}
-        label=${field.plural_label || field.label}
-        .value=${this.selectedEntityIds(field, run)}
-        .options=${entities.map((entity) => ({ value: entity.entity_id, label: `${entity.name} · ${entity.entity_id}` }))}
-        placeholder="Select lights"
-        ?required=${field.required}
-        multiple
-        @combobox-change=${(event: CustomEvent<{ value: string[] }>) => this.selectEntities(field.name, event.detail.value)}
-      ></measure-combobox>`;
-    }
-    return renderEntityList({
-      field,
-      entities,
-      rows: this.entityRows(field, run),
-      onChange: (rows) => this.selectEntities(field.name, rows),
-    });
-  }
-
-  private fieldDomains(field: MeasureDefinition["fields"][number]): string[] {
-    return field.entity_domains ?? [];
-  }
-
-  private multiSelectField(field: FormField, request?: MeasurementRequest) {
-    const selected = this.selectedOptions(field, request);
-    return html`
-      <fieldset>
-        <legend>${this.selectedType === "light" && field.name === "modes" ? "What do you want to measure?" : field.label}</legend>
-        <div class="checks">
-          ${this.availableOptions(field, request).map((option) => html`
-            <label class="check">
-              <input
-                type="checkbox"
-                name=${field.name}
-                value=${option.value}
-                .checked=${selected.includes(option.value)}
-                @change=${this.multiSelectChanged(field)}
-              />
-              ${option.label}
-            </label>
-          `)}
-        </div>
-      </fieldset>
-    `;
-  }
-
-  private multiSelectChanged(field: FormField): () => void {
-    return () => {
-      const boxes = [...(this.shadowRoot?.querySelectorAll<HTMLInputElement>(`input[name="${field.name}"]`) ?? [])];
-      this.multiSelection = { ...this.multiSelection, [field.name]: boxes.filter((box) => box.checked).map((box) => box.value) };
-    };
-  }
-
   private dummyControllerChanged(event: CustomEvent<boolean>): void {
     this.dummyController = event.detail;
   }
 
-  private multipleLightsChanged(event: Event): void {
-    const input = event.currentTarget as HTMLInputElement;
-    this.multipleLights = input.checked;
+  private multipleLightsChanged(event: CustomEvent<MultipleLightsChange>): void {
+    this.multipleLights = event.detail.checked;
     if (this.multipleLights) return;
     // Back to one light: keep the first pick so the single selector stays populated, and let the count be derived again.
-    const field = input.dataset.field ?? "";
-    this.selectEntities(field, this.currentRows(field).filter(Boolean).slice(0, 1));
+    this.selectEntities(event.detail.fieldName, this.currentRows(event.detail.fieldName).filter(Boolean).slice(0, 1));
     this.derivedCountOverride = undefined;
   }
 
-  /** Options a field offers right now, narrowed by the capabilities of the entities it names. */
-  private availableOptions(field: FormField, request?: MeasurementRequest): FormFieldOption[] {
-    // A virtual device stands in for any real one, so it supports everything on offer.
-    if (this.dummyController) return field.options;
-    return fieldOptions(field, this.narrowedModes(field, request));
+  private entitySelectionChanged(event: CustomEvent<EntitySelectionChange>): void {
+    this.selectEntities(event.detail.name, event.detail.rows);
   }
 
-  /** Currently selected values: what the user picked, else the previous run's, else everything offered. */
-  private selectedOptions(field: FormField, request?: MeasurementRequest): string[] {
-    const available = this.availableOptions(field, request).map((option) => option.value);
-    const stored = request && requestFieldValue(request, field);
-    const chosen = this.multiSelection[field.name] ?? (Array.isArray(stored) && stored.length ? stored : available);
-    return available.filter((value) => chosen.includes(value));
+  private selectValueChanged(event: CustomEvent<SelectValueChange>): void {
+    this.selectValues = { ...this.selectValues, [event.detail.name]: event.detail.value };
   }
 
-  /** Parameters the selected options activate; every other parameter stays disabled. */
-  private activeParameters(definition: MeasureDefinition, request?: MeasurementRequest): ReadonlySet<string> {
-    const active = new Set<string>();
-    for (const field of definition.fields.filter((candidate) => candidate.control === "multi_select")) {
-      for (const name of enabledParameters(field, this.selectedOptions(field, request))) active.add(name);
-    }
-    return active;
+  private multiSelectionChanged(event: CustomEvent<MultiSelectionChange>): void {
+    this.multiSelection = { ...this.multiSelection, [event.detail.name]: event.detail.values };
   }
 
-  /** Modes every entity named by this field's narrowing source supports; undefined when none is selected. */
-  private narrowedModes(field: FormField, request?: MeasurementRequest): LutMode[] | undefined {
-    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
-    const source = field.narrowed_by ? definition?.fields.find((candidate) => candidate.name === field.narrowed_by) : undefined;
-    if (!source) return undefined;
-    const choices = this.entityChoices(source);
-    const selected = this.selectedEntityIds(source, request)
-      .map((entityId) => choices.find((entity) => entity.entity_id === entityId))
-      .filter((entity): entity is EntityDescriptor => Boolean(entity));
-    const [first, ...rest] = selected;
-    if (!first) return undefined;
-    return (first.supported_modes ?? []).filter((mode) => rest.every((entity) => entity.supported_modes?.includes(mode)));
-  }
-
-  /** Entities offered for a controller field. Lights arrive with the startup catalog, other domains on demand. */
-  private entityChoices(field: FormField, domains = this.fieldDomains(field), request?: MeasurementRequest): EntityDescriptor[] {
-    let entities = field.all_entities ? [...(this.deviceEntities["*"] ?? [])] : this.entitiesIn(domains);
-    if (field.all_entities && domains.length) {
-      entities = entities.filter((entity) => entity.domain && domains.includes(entity.domain));
-    }
-    if (field.entity_device_classes?.length) {
-      entities = entities.filter((entity) => this.matchesDeviceClass(entity, field.entity_device_classes ?? []));
-    }
-    const related = this.relatedEntity(field, request);
-    if (!related?.device_id) return field.same_device_only ? [] : entities;
-    if (field.same_device_only) return entities.filter((entity) => entity.device_id === related.device_id);
-    return entities.sort((left, right) => Number(right.device_id === related.device_id) - Number(left.device_id === related.device_id));
-  }
-
-  private matchesDeviceClass(entity: EntityDescriptor, deviceClasses: readonly string[]): boolean {
-    if (!entity.device_class || !deviceClasses.includes(entity.device_class)) return false;
-    if (entity.device_class !== "battery") return true;
-    return entity.domain === "sensor"
-      && entity.unit === "%"
-      && !["unavailable", "unknown", "none"].includes((entity.state ?? "").toLowerCase())
-      && Number.isFinite(Number(entity.state));
-  }
-
-  private relatedEntity(field: FormField, request?: MeasurementRequest): EntityDescriptor | undefined {
-    if (!field.related_to || !this.selectedType) return undefined;
-    const source = this.definition(this.selectedType)?.fields.find((candidate) => candidate.name === field.related_to);
-    if (!source) return undefined;
-    const entityId = this.selectedEntityId(source, request);
-    return (this.deviceEntities["*"] ?? []).find((entity) => entity.entity_id === entityId);
-  }
-
-  private entitiesIn(domains: string[]): EntityDescriptor[] {
-    return domains.flatMap((domain) => (domain === "light" ? this.lights : this.deviceEntities[domain] ?? []));
+  private derivedCountChanged(event: CustomEvent<string>): void {
+    this.derivedCountOverride = event.detail;
   }
 
   /**
@@ -702,10 +385,6 @@ export class SetupView extends LitElement {
     const stored = request && requestFieldValue(request, field);
     if (Array.isArray(stored)) return stored.map(String);
     return typeof stored === "string" && stored ? [stored] : [];
-  }
-
-  private selectedEntityId(field: FormField, request?: MeasurementRequest): string {
-    return this.entityRows(field, request)[0] ?? "";
   }
 
   private selectedEntityIds(field: FormField, request?: MeasurementRequest): string[] {
@@ -724,18 +403,6 @@ export class SetupView extends LitElement {
     this.errorMessage = "";
     this.selectedType = undefined;
   };
-
-
-
-  private entityChanged(event: Event): void {
-    const select = event.currentTarget as HTMLInputElement;
-    this.selectEntities(select.name, [select.value]);
-    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
-    for (const dependent of definition?.fields.filter((field) => field.related_to === select.name) ?? []) {
-      this.selectEntities(dependent.name, []);
-    }
-  }
-
   /** Rows as the form currently shows them, so an edit starts from what the user can see. */
   private currentRows(name: string): string[] {
     const field = this.selectedType
@@ -747,12 +414,6 @@ export class SetupView extends LitElement {
   /** The previous run, when it belongs to the type now being configured. */
   private get currentRun(): MeasurementRequest | undefined {
     return this.initialRequest?.measure_type === this.selectedType ? this.initialRequest : undefined;
-  }
-
-  /** The controller field that accepts several entities at once, when this type has one. */
-  private multiControllerField(): FormField | undefined {
-    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
-    return definition?.fields.find((field) => field.role === "controller" && field.multiple);
   }
 
   private selectEntities(name: string, rows: string[]): void {
@@ -778,22 +439,6 @@ export class SetupView extends LitElement {
       }
     }
     return undefined;
-  }
-
-  private selectChanged(event: Event): void {
-    const select = event.currentTarget as HTMLInputElement;
-    this.selectValues = { ...this.selectValues, [select.name]: select.value };
-    const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
-    const form = select.closest("form");
-    if (definition) emit<string[]>(this, "entity-domains-requested", entityDomains(definition, form ? new FormData(form) : undefined));
-  }
-
-  /** Value a narrowing select currently holds: the user's choice, else the previous run's, else its first option. */
-  private selectValue(field: FormField, request?: MeasurementRequest): string | undefined {
-    const stored = request && requestFieldValue(request, field);
-    return this.selectValues[field.name]
-      ?? (typeof stored === "string" ? stored : undefined)
-      ?? field.options[0]?.value;
   }
 
   private definition(type: MeasureType): MeasureDefinition | undefined {
@@ -898,18 +543,4 @@ export class SetupView extends LitElement {
   }
 
 
-}
-
-/**
- * The export filename a recorder purpose implies. Both the server and the result plotter
- * pick the format by extension, so the name follows the purpose rather than whatever a
- * duplicated session left behind. An unrecognised extension is the user's own, and stays.
- */
-export function recorderExportFilename(purpose: string | undefined, name: string): string {
-  const wanted = purpose === "complex_profile" ? "jsonl" : "csv";
-  if (!name) return `record.${wanted}`;
-  const dot = name.lastIndexOf(".");
-  const current = dot === -1 ? "" : name.slice(dot + 1).toLowerCase();
-  if (current !== "csv" && current !== "jsonl") return name;
-  return current === wanted ? name : `${name.slice(0, dot)}.${wanted}`;
 }
