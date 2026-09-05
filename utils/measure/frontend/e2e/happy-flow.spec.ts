@@ -403,7 +403,7 @@ test("shows required field errors inline with red borders and keeps edited previ
     await expect(control).toHaveCSS("border-top-color", "rgb(255, 123, 114)");
   }
   await expect(page.getByText("Fields marked")).toBeVisible();
-  await expect(page.locator("measure-result-view .required-marker")).toHaveCount(7);
+  await expect(page.locator("measure-profile-prepare-view .required-marker")).toHaveCount(7);
   await summary.getByRole("button", { name: /Product name/ }).click();
   await expect(product).toBeFocused();
   await product.fill(originalProduct);
