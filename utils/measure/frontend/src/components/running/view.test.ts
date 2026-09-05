@@ -1,4 +1,4 @@
-import type { OperatingPoint, SessionSnapshot } from "../../types";
+import type { SessionSnapshot } from "../../types";
 import "./view";
 
 describe("running view", () => {
@@ -136,21 +136,6 @@ describe("running view", () => {
     expect(element.shadowRoot.textContent).toContain("Skipped");
   });
 
-  it("draws a live power chart from streamed samples", async () => {
-    const element = document.createElement("measure-running-view") as HTMLElement & {
-      snapshot: SessionSnapshot; samples: number[]; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
-    element.snapshot = { state: "running", progress: { completed: 1, total: 10 } };
-    element.samples = [4.2, 5.1, 4.8];
-    document.body.append(element);
-    await element.updateComplete;
-
-    expect(element.shadowRoot.querySelector(".chart")).toBeTruthy();
-    expect(element.shadowRoot.querySelector("svg.spark polyline.line")?.getAttribute("points")).toContain(",");
-    expect(element.shadowRoot.querySelector(".chart-head strong")?.textContent).toContain("4.8");
-    expect(element.shadowRoot.querySelector(".chart-scale")?.textContent).toContain("peak 5.1 W");
-  });
-
   it("keeps live samples visible while numeric progress is not available yet", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot; samples: number[]; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
@@ -161,7 +146,7 @@ describe("running view", () => {
     await element.updateComplete;
 
     expect(element.shadowRoot.querySelector(".preparation")).toBeTruthy();
-    expect(element.shadowRoot.querySelector(".chart")).toBeTruthy();
+    expect(element.shadowRoot.querySelector("measure-power-chart")).toBeTruthy();
     expect(element.shadowRoot.querySelector(".value")).toBeNull();
   });
 
@@ -185,59 +170,6 @@ describe("running view", () => {
     expect(calibration?.textContent).toContain("Voltage230.25 V");
   });
 
-  it.each([
-    [
-      { type: "light", on: true, brightness: 128, color_temp_mired: 370, hue: 32_768, saturation: 128 } as OperatingPoint,
-      ["Brightness 50%", "Color temp 2703 K", "Hue 180°", "Saturation 50%"],
-    ],
-    [{ type: "light", on: false } as OperatingPoint, ["Off"]],
-    [{ type: "speaker", volume: 40, muted: false } as OperatingPoint, ["Volume 40%"]],
-    [{ type: "speaker", volume: 0, muted: true } as OperatingPoint, ["Muted"]],
-    [{ type: "fan", percentage: 65, on: true } as OperatingPoint, ["Fan speed 65%"]],
-    [{ type: "charging", battery_level: 72, charging: true } as OperatingPoint, ["Battery 72%", "Charging"]],
-  ])("renders a compact current measurement point for %#", async (operatingPoint, expected) => {
-    const element = document.createElement("measure-running-view") as HTMLElement & {
-      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
-    element.snapshot = { state: "running", operating_point: operatingPoint };
-    document.body.append(element);
-    await element.updateComplete;
-
-    const state = element.shadowRoot.querySelector(".operating-point");
-    expect(element.shadowRoot.querySelector(".preparation")).toBeTruthy();
-    expect(element.shadowRoot.querySelector(".value")).toBeNull();
-    expect(state?.getAttribute("aria-live")).toBe("polite");
-    expect(state?.textContent).toContain("Current measurement point");
-    for (const value of expected) expect(state?.textContent).toContain(value);
-  });
-
-  it.each([
-    [
-      { type: "light", on: true, brightness: 128, color_temp_mired: 370, hue: 32_768, saturation: 128, effect: "candle" } as OperatingPoint,
-      ["brightness", "color-temp", "hue", "saturation", "effect"],
-    ],
-    [{ type: "light", on: false } as OperatingPoint, ["off"]],
-    [{ type: "speaker", volume: 40, muted: false } as OperatingPoint, ["volume"]],
-    [{ type: "speaker", volume: 0, muted: true } as OperatingPoint, ["muted"]],
-    [{ type: "fan", percentage: 65, on: true } as OperatingPoint, ["fan-speed"]],
-    [{ type: "fan", percentage: 0, on: false } as OperatingPoint, ["off"]],
-    [{ type: "charging", battery_level: 72, charging: true } as OperatingPoint, ["battery", "charging"]],
-    [{ type: "charging", battery_level: 25, charging: false } as OperatingPoint, ["battery", "not-charging"]],
-  ])("adds an icon to every operating-point chip for %#", async (operatingPoint, icons) => {
-    const element = document.createElement("measure-running-view") as HTMLElement & {
-      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
-    element.snapshot = { state: "running", operating_point: operatingPoint };
-    document.body.append(element);
-    await element.updateComplete;
-
-    const chips = [...element.shadowRoot.querySelectorAll(".state-chip")];
-    const renderedIcons = [...element.shadowRoot.querySelectorAll("[data-state-icon]")];
-    expect(renderedIcons.map((icon) => icon.getAttribute("data-state-icon"))).toEqual(icons);
-    expect(renderedIcons).toHaveLength(chips.length);
-    for (const icon of renderedIcons) expect(icon.getAttribute("aria-hidden")).toBe("true");
-  });
-
   it("hides the power chart until the first sample arrives", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
@@ -246,7 +178,7 @@ describe("running view", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.querySelector(".chart")).toBeNull();
+    expect(element.shadowRoot.querySelector("measure-power-chart")).toBeNull();
   });
 
   it("shows a live sample count for an open-ended recording", async () => {
@@ -298,67 +230,17 @@ describe("running view", () => {
     expect(element.shadowRoot.textContent).toContain("12 / 60");
   });
 
-  it("keeps the log collapsed by default and opens it as an overlay on toggle", async () => {
-    const element = document.createElement("measure-running-view") as HTMLElement & {
-      snapshot: SessionSnapshot; logs: string[]; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
-    };
-    element.snapshot = { state: "running", progress: { completed: 1, total: 10 } };
-    element.logs = ["First log", "Second log"];
-    document.body.append(element);
-    await element.updateComplete;
-
-    expect(element.shadowRoot.querySelector(".log-overlay")).toBeNull();
-    const toggle = element.shadowRoot.querySelector(".log-toggle") as HTMLButtonElement;
-    expect(toggle.textContent).toContain("View log");
-    expect(toggle.textContent).toContain("2");
-
-    toggle.click();
-    await element.updateComplete;
-    expect(element.shadowRoot.querySelector(".log-overlay")).toBeTruthy();
-    expect(element.shadowRoot.querySelector(".log-overlay")?.textContent).toContain("Second log");
-  });
-
-  it("presents discarded readings as warnings in the page and log panel", async () => {
+  it("presents the latest discarded reading as a page warning", async () => {
     const warning = "Discarding measurement: 0 watt was read from the power meter";
     const element = document.createElement("measure-running-view") as HTMLElement & {
-      snapshot: SessionSnapshot; logs: string[]; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
     };
     element.snapshot = { state: "running", progress: { completed: 0, total: 2 }, warnings: [warning] };
-    element.logs = [warning];
     document.body.append(element);
     await element.updateComplete;
 
     const notice = element.shadowRoot.querySelector(".notice.warning");
     expect(notice?.getAttribute("role")).toBe("alert");
     expect(notice?.textContent).toContain(warning);
-
-    (element.shadowRoot.querySelector(".log-toggle") as HTMLButtonElement).click();
-    await element.updateComplete;
-    expect(element.shadowRoot.querySelector(".log p.warning")?.textContent).toContain(warning);
-  });
-
-  it("auto-scrolls the log container when new log lines arrive", async () => {
-    const element = document.createElement("measure-running-view") as HTMLElement & {
-      snapshot: SessionSnapshot;
-      connected: boolean;
-      logs: string[];
-      logOpen: boolean;
-      updateComplete: Promise<boolean>;
-      shadowRoot: ShadowRoot;
-    };
-    element.snapshot = { state: "running", progress: { completed: 1, total: 10 } };
-    element.logs = ["First log"];
-    element.logOpen = true;
-    document.body.append(element);
-    await element.updateComplete;
-
-    const logContainer = element.shadowRoot.querySelector(".log") as HTMLDivElement;
-    Object.defineProperty(logContainer, "scrollHeight", { value: 240, configurable: true });
-    Object.defineProperty(logContainer, "scrollTop", { value: 0, writable: true, configurable: true });
-
-    element.logs = [...element.logs, "Second log"];
-    await element.updateComplete;
-
-    expect(logContainer.scrollTop).toBe(240);
   });
 });
