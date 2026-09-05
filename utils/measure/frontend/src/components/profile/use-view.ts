@@ -119,7 +119,7 @@ export class ProfileUseView extends LitElement {
       <section class="contribution profile-delivery" aria-labelledby="delivery-title">
         <h3 id="delivery-title">Available options</h3>
         <p class="muted">You can return to preparation without losing the validated metadata.</p>
-        <div class="contribution-methods" role="radiogroup" aria-label="Profile delivery method">
+        <div class="contribution-methods" role="radiogroup" aria-label="Profile delivery method" @keydown=${this.methodKeydown}>
           ${methods.map((method) => this.renderMethodCard(method, selected))}
         </div>
         ${this.renderMethodPanel(selected)}
@@ -133,6 +133,7 @@ export class ProfileUseView extends LitElement {
         type="button"
         role="radio"
         aria-checked=${active ? "true" : "false"}
+        tabindex=${active ? 0 : -1}
         class="method-card ${active ? "active" : ""}"
         ?disabled=${!method.available}
         @click=${() => { this.contributionMethod = method.id; }}
@@ -141,6 +142,20 @@ export class ProfileUseView extends LitElement {
         <span>${method.summary}</span>
         ${method.available ? nothing : html`<em class="method-flag">${method.unavailableReason}</em>`}
       </button>`;
+  }
+
+  private methodKeydown(event: KeyboardEvent): void {
+    if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(event.key)) return;
+    if (!(event.target instanceof HTMLButtonElement)) return;
+    const group = event.currentTarget as HTMLDivElement;
+    const buttons = [...group.querySelectorAll<HTMLButtonElement>('button[role="radio"]:not(:disabled)')];
+    const index = buttons.indexOf(event.target);
+    if (index < 0) return;
+    event.preventDefault();
+    const direction = event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 : -1;
+    const next = buttons[(index + direction + buttons.length) % buttons.length];
+    next?.focus();
+    next?.click();
   }
 
   private renderMethodPanel(method: ContributionMethodId) {

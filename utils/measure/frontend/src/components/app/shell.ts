@@ -277,7 +277,7 @@ export class AppShell extends LitElement implements MeasureAppState {
       <measure-result-view
         .snapshot=${snapshot} .files=${this.files} .plotCollection=${this.plotCollection}
         .canPrepareProfile=${this.measurementType() !== "average"}
-        .fileUrl=${(name: string) => this.api.fileUrl(sessionId, name)} .downloadAll=${this.downloadAllFiles.bind(this)}
+        .fileUrl=${this.resultFileUrl} .downloadAll=${this.downloadAllFiles}
         .diagnosticsUrl=${this.api.diagnosticsUrl(sessionId)}
         .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         @sessions=${this.showSessions} @new=${() => this.controller.newMeasurement()} @resume=${() => void this.controller.resume()}
@@ -308,7 +308,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     return html`
       <measure-profile-use-view
         .snapshot=${snapshot}
-        .preparedProfileUrl=${(jobId: string) => this.api.preparedProfileUrl(snapshot.session_id ?? "", jobId)}
+        .preparedProfileUrl=${this.preparedProfileUrl}
         .contributionAuth=${this.contributionAuth} .contributionDraft=${this.contributionDraft}
         .contributionPreview=${this.contributionPreview} .contributionResult=${this.contributionResult}
         .contributionBusy=${this.contributionBusy} .contributionError=${this.contributionError}
@@ -395,7 +395,11 @@ export class AppShell extends LitElement implements MeasureAppState {
     await this.controller.boot();
   }
 
-  private downloadAllFiles(): void {
+  private readonly resultFileUrl = (name: string): string => this.api.fileUrl(this.snapshot?.session_id ?? "", name);
+
+  private readonly preparedProfileUrl = (jobId: string): string => this.api.preparedProfileUrl(this.snapshot?.session_id ?? "", jobId);
+
+  private readonly downloadAllFiles = (): void => {
     const sessionId = this.snapshot?.session_id;
     if (!sessionId) return;
     for (const file of this.files) {
@@ -408,7 +412,7 @@ export class AppShell extends LitElement implements MeasureAppState {
       anchor.click();
       anchor.remove();
     }
-  }
+  };
 
   private showSessions(): void {
     void this.controller.showSessions();

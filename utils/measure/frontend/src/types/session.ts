@@ -16,9 +16,9 @@ export type SessionState =
 export interface PreflightResponse {
   valid: boolean;
   warnings: string[];
-  estimated_variations?: number;
-  estimated_duration_seconds?: number;
-  supported_modes?: LutMode[];
+  estimated_variations?: number | null;
+  estimated_duration_seconds?: number | null;
+  supported_modes?: LutMode[] | null;
   power_meter_diagnostic?: PowerMeterDiagnostic | null;
   battery_level_entity_id?: string | null;
   battery_level_attribute?: string | null;
@@ -46,7 +46,7 @@ export interface SessionSnapshot {
   state: SessionState;
   created_at?: string;
   updated_at?: string;
-  phase?: string;
+  phase?: string | null;
   confirmation_message?: string | null;
   confirmation_action?: string | null;
   mode?: string | null;

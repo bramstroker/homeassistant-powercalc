@@ -195,4 +195,87 @@ describe("combobox", () => {
     expect(input.disabled).toBe(true);
     expect(input.checkValidity()).toBe(true);
   });
+
+  it("only references options that are present and enabled", async () => {
+    const { picker } = createCombobox();
+    await picker.updateComplete;
+    const input = picker.shadowRoot!.querySelector("input")!;
+    expect(input.hasAttribute("aria-controls")).toBe(false);
+    input.focus();
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    await picker.updateComplete;
+    expect(input.getAttribute("aria-controls")).toBe("combobox-options");
+    expect(input.getAttribute("aria-activedescendant")).toBe("combobox-option-0");
+
+    picker.options = picker.options.map((option) => ({ ...option, disabled: true }));
+    await picker.updateComplete;
+    expect(input.hasAttribute("aria-activedescendant")).toBe(false);
+    picker.options = [];
+    await picker.updateComplete;
+    expect(input.hasAttribute("aria-activedescendant")).toBe(false);
+
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await picker.updateComplete;
+    expect(input.hasAttribute("aria-controls")).toBe(false);
+  });
+
+  it("keeps required multi-selection valid while its search input is empty", async () => {
+    const { picker } = createCombobox();
+    picker.multiple = true;
+    picker.value = ["sensor.office"];
+    await picker.updateComplete;
+    const input = picker.shadowRoot!.querySelector("input")!;
+    expect(input.value).toBe("");
+    expect(input.checkValidity()).toBe(true);
+    expect(input.getAttribute("aria-required")).toBe("true");
+    expect(input.hasAttribute("aria-multiselectable")).toBe(false);
+
+    input.focus();
+    await picker.updateComplete;
+    expect(picker.shadowRoot!.querySelector('[role="listbox"]')!.getAttribute("aria-multiselectable")).toBe("true");
+    picker.value = [];
+    await picker.updateComplete;
+    expect(input.checkValidity()).toBe(false);
+  });
+
+  it("preserves both change events and synchronizes values before notifying listeners", async () => {
+    const { form, picker } = createCombobox();
+    const changed = vi.fn((event: Event) => {
+      const customEvent = event as CustomEvent<{ value: string }>;
+      expect(customEvent.detail).toEqual({ value: "sensor.office" });
+      expect(customEvent.bubbles).toBe(true);
+      expect(customEvent.composed).toBe(true);
+      expect(new FormData(form).get("device")).toBe("sensor.office");
+    });
+    const legacyChanged = vi.fn();
+    picker.addEventListener("combobox-change", changed);
+    picker.querySelector("input")!.addEventListener("change", legacyChanged);
+    await picker.updateComplete;
+    picker.shadowRoot!.querySelector("input")!.focus();
+    await picker.updateComplete;
+    picker.shadowRoot!.querySelector<HTMLElement>(".option")!.click();
+    expect(changed).toHaveBeenCalledTimes(1);
+    expect(legacyChanged).toHaveBeenCalledTimes(1);
+  });
+
+  it("synchronizes a replacement slotted fallback and respects Boolean attributes", async () => {
+    const { form, picker } = createCombobox();
+    picker.value = "sensor.office";
+    await picker.updateComplete;
+    const fallback = document.createElement("input");
+    fallback.type = "hidden";
+    fallback.name = picker.name;
+    fallback.slot = "value";
+    picker.replaceChildren(fallback);
+    await new Promise<void>((resolve) => queueMicrotask(resolve));
+    expect(new FormData(form).get("device")).toBe("sensor.office");
+
+    picker.setAttribute("disabled", "false");
+    await picker.updateComplete;
+    expect(picker.disabled).toBe(true);
+    expect(new FormData(form).has("device")).toBe(false);
+    picker.removeAttribute("disabled");
+    await picker.updateComplete;
+    expect(new FormData(form).get("device")).toBe("sensor.office");
+  });
 });

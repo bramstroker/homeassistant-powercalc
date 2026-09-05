@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { contributionPreview, mockApi, parameters, startedSnapshot } from "./mock-api";
+import { contributionPreview, mockApi, startedSnapshot } from "./mock-api";
 import type { SessionSnapshot } from "../src/types";
 
 /**
@@ -189,6 +189,10 @@ test("starts the measurement and shows live events on the running screen", async
   // not asserted: the mocked stream is one response body, reported closed once replayed.
   await page.getByRole("button", { name: /View log/ }).click();
   await expect(page.getByText("Connected to the power meter")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Close log" })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("complementary", { name: "Measurement log" })).toBeHidden();
+  await expect(page.getByRole("button", { name: /View log/ })).toBeFocused();
 });
 
 test("opens a completed session and shows its result artifacts", async ({ page }) => {
@@ -221,12 +225,11 @@ test("offers a graceful stop for average measurements", async ({ page }) => {
 
 test("ends a reopened average session at Result without profile preparation", async ({ page }) => {
   const snapshot: SessionSnapshot = {
-    session_id: "session-completed", state: "completed", phase: "Measurement complete", mode: "Averaging",
+    ...startedSnapshot,
+    session_id: "session-completed", state: "completed", phase: "Measurement complete",
+    progress: { completed: 1, total: 1, skipped: 0, percent: 100, estimated_remaining_seconds: 0 },
     summary: { "Average power": "4.2 W", Duration: "6.5 s" },
-    request: {
-      measure_type: "average", duration: 60, model_id: "", product_name: "", measure_device: "Test meter",
-      generate_model: false, parameters, resume_policy: "new", power_meter: { type: "dummy" },
-    },
+    request: { ...startedSnapshot.request, measure_device: "Test meter", power_meter: { type: "dummy" } },
   };
   await page.route("**/api/sessions/session-completed", (route) => route.fulfill({ json: snapshot }));
   await page.getByRole("button", { name: "Open", exact: true }).click();
@@ -257,6 +260,15 @@ for (const width of [1280, 390]) {
     await page.getByRole("button", { name: "Prepare profile" }).click();
     await page.getByRole("button", { name: /^Validate (profile|changes)$/ }).click();
     await page.getByRole("button", { name: "Continue to use profile" }).click();
+    const github = page.getByRole("radio", { name: /^GitHub pull request/ });
+    const manual = page.getByRole("radio", { name: /^Manual contribution/ });
+    await github.focus();
+    await github.press("ArrowRight");
+    await expect(manual).toBeFocused();
+    await expect(manual).toBeChecked();
+    await manual.press("ArrowRight");
+    await expect(github).toBeFocused();
+    await expect(github).toBeChecked();
     const row = page.locator(".confirm-row");
     await row.scrollIntoViewIfNeeded();
     const checkbox = row.getByRole("checkbox");

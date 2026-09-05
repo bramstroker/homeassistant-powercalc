@@ -6,7 +6,7 @@ export interface ContributionAuthState {
   connected: boolean;
   device_flow_available?: boolean;
   identity?: ContributionIdentity | null;
-  method?: "device" | "token" | null;
+  method?: "device" | "token" | "none" | null;
   scopes?: string[];
   permissions_verified?: boolean;
 }

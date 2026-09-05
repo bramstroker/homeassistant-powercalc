@@ -16,15 +16,19 @@ export interface EntityDescriptor {
   name: string;
   domain?: string;
   device_class?: DeviceClass | null;
-  device_id?: string;
-  manufacturer?: string;
-  model_id?: string;
-  product_name?: string;
+  device_id?: string | null;
+  integration?: string | null;
+  manufacturer?: string | null;
+  model_id?: string | null;
+  product_name?: string | null;
   state?: string;
-  unit?: string;
-  supported_modes?: LutMode[];
-  effect_list?: string[];
-  related_voltage_entity_id?: string;
+  unit?: string | null;
+  attribute_names?: string[];
+  supported_modes?: LutMode[] | null;
+  effect_list?: string[] | null;
+  min_mired?: number | null;
+  max_mired?: number | null;
+  related_voltage_entity_id?: string | null;
   member_entity_ids?: string[];
 }
 
@@ -209,7 +213,7 @@ export interface LightMeasurementRequest extends BaseMeasurementRequest {
   measure_type: "light";
   controller: LightControllerSpec;
   modes: LutMode[];
-  gzip: boolean;
+  gzip?: boolean;
   multiple_light_count: number;
 }
 

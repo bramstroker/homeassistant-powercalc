@@ -37,4 +37,24 @@ describe("session log", () => {
     await element.updateComplete;
     expect(container.scrollTop).toBe(240);
   });
+
+  it.each(["Escape", "button"])("returns focus to the toggle when closed with %s", async (method) => {
+    const element = document.createElement("measure-session-log");
+    element.logs = ["First log"];
+    document.body.append(element);
+    await element.updateComplete;
+    const toggle = element.shadowRoot!.querySelector<HTMLButtonElement>(".log-toggle")!;
+    toggle.click();
+    await element.updateComplete;
+    const close = element.shadowRoot!.querySelector<HTMLButtonElement>(".log-head button")!;
+    expect(element.shadowRoot!.activeElement).toBe(close);
+    expect(toggle.getAttribute("aria-controls")).toBe("session-log");
+    if (method === "Escape") close.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    else close.click();
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector(".log-overlay")).toBeNull();
+    expect(element.shadowRoot!.activeElement).toBe(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(toggle.hasAttribute("aria-controls")).toBe(false);
+  });
 });

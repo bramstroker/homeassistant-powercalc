@@ -21,7 +21,7 @@ from measure.assembler import MeasurementAssembler
 from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.light.const import LutMode
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
-from measure.execution import ImmediateInteraction
+from measure.execution import ImmediateInteraction, OperatingPoint
 from measure.ha_app.contribution import (
     ConnectPatRequest,
     ContributionApiCoordinator,
@@ -193,6 +193,50 @@ class SessionSummary(BaseModel):
     file_count: int
     size: int
     active: bool
+
+
+class SessionProgressResponse(BaseModel):
+    completed: int
+    total: int
+    skipped: int
+    percent: float
+    estimated_remaining_seconds: int | None
+
+
+class CalibrationSampleResponse(BaseModel):
+    power: float
+    resistance: float
+    voltage: float
+
+
+class SessionSnapshotResponse(BaseModel):
+    """Complete JSON contract returned by session endpoints and embedded in SSE events."""
+
+    session_id: str
+    state: SessionState
+    created_at: str
+    updated_at: str
+    phase: str | None
+    confirmation_message: str | None
+    confirmation_action: str | None
+    mode: str | None
+    progress: SessionProgressResponse
+    warnings: list[str]
+    error: str | None
+    summary: dict[str, str] | None
+    operating_point: OperatingPoint | None
+    calibration_sample: CalibrationSampleResponse | None
+    entity_states: dict[str, str]
+    request: MeasurementRequest
+
+
+class SessionEventResponse(BaseModel):
+    """Wire envelope shared by stored session events and SSE heartbeats."""
+
+    sequence: int
+    type: str
+    data: dict[str, object]
+    snapshot: SessionSnapshotResponse | None = None
 
 
 class CapabilitiesResponse(BaseModel):
@@ -610,7 +654,7 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
 
 def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
     @router.post("/sessions", status_code=201, responses={409: _ERROR, 422: _ERROR})
-    async def start_session(payload: MeasurementRequestPayload, request: Request) -> dict[str, object]:
+    async def start_session(payload: MeasurementRequestPayload, request: Request) -> SessionSnapshotResponse:
         context = _context(request)
         prepared = await run_in_threadpool(_apply_fast_test_mode, context, payload)
         await run_in_threadpool(_preflight, context, prepared)
@@ -628,7 +672,7 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
         return sorted(summaries, key=lambda item: not item.active)
 
     @router.get("/sessions/{session_id}", responses={404: _ERROR})
-    async def session(session_id: str, request: Request) -> dict[str, object]:
+    async def session(session_id: str, request: Request) -> SessionSnapshotResponse:
         context = _context(request)
         return _snapshot_response(context, _require_session(context, session_id))
 
@@ -643,15 +687,15 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
         return Response(status_code=204)
 
     @router.post("/sessions/{session_id}/cancel", status_code=202, responses={404: _ERROR, 409: _ERROR})
-    async def cancel_session(session_id: str, request: Request) -> dict[str, object]:
+    async def cancel_session(session_id: str, request: Request) -> SessionSnapshotResponse:
         return _cancel_session(_context(request), session_id)
 
     @router.post("/sessions/{session_id}/confirm", responses={404: _ERROR, 409: _ERROR})
-    async def confirm_session(session_id: str, request: Request) -> dict[str, object]:
+    async def confirm_session(session_id: str, request: Request) -> SessionSnapshotResponse:
         return _confirm_session(_context(request), session_id)
 
     @router.post("/sessions/{session_id}/resume", responses={404: _ERROR, 409: _ERROR, 422: _ERROR})
-    async def resume_session(session_id: str, request: Request) -> dict[str, object]:
+    async def resume_session(session_id: str, request: Request) -> SessionSnapshotResponse:
         return await _resume_session(_context(request), session_id)
 
     @router.get("/sessions/{session_id}/files", responses={404: _ERROR})
@@ -773,7 +817,7 @@ def _require_session(context: AppContext, session_id: str) -> SessionSnapshot:
         raise HTTPException(status_code=404, detail="Measurement session not found") from error
 
 
-def _cancel_session(context: AppContext, session_id: str) -> dict[str, object]:
+def _cancel_session(context: AppContext, session_id: str) -> SessionSnapshotResponse:
     try:
         snapshot = context.coordinator.cancel(session_id)
     except SessionConflictError as error:
@@ -781,7 +825,7 @@ def _cancel_session(context: AppContext, session_id: str) -> dict[str, object]:
     return _snapshot_response(context, snapshot)
 
 
-def _confirm_session(context: AppContext, session_id: str) -> dict[str, object]:
+def _confirm_session(context: AppContext, session_id: str) -> SessionSnapshotResponse:
     try:
         snapshot = context.coordinator.confirm(session_id)
     except SessionConflictError as error:
@@ -789,7 +833,7 @@ def _confirm_session(context: AppContext, session_id: str) -> dict[str, object]:
     return _snapshot_response(context, snapshot)
 
 
-async def _resume_session(context: AppContext, session_id: str) -> dict[str, object]:
+async def _resume_session(context: AppContext, session_id: str) -> SessionSnapshotResponse:
     snapshot = _require_session(context, session_id)
     await run_in_threadpool(_preflight, context, context.storage.load_request(snapshot.id))
     try:
@@ -1075,32 +1119,31 @@ def _is_active(snapshot: SessionSnapshot | None) -> bool:
     return snapshot is not None and snapshot.state in ACTIVE_SESSION_STATES
 
 
-def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[str, object]:
-    request = context.storage.load_request(snapshot.id).model_dump(mode="json")
-    return {
-        "session_id": snapshot.id,
-        "state": snapshot.state,
-        "created_at": snapshot.created_at,
-        "updated_at": snapshot.updated_at,
-        "phase": snapshot.phase,
-        "confirmation_message": snapshot.confirmation_message,
-        "confirmation_action": snapshot.confirmation_action,
-        "mode": snapshot.mode,
-        "progress": {
-            "completed": snapshot.completed,
-            "total": snapshot.total,
-            "skipped": snapshot.skipped,
-            "percent": snapshot.progress,
-            "estimated_remaining_seconds": _duration_seconds(snapshot.estimated_remaining),
-        },
-        "warnings": list(snapshot.warnings),
-        "error": snapshot.error,
-        "summary": snapshot.summary,
-        "operating_point": snapshot.operating_point,
-        "calibration_sample": snapshot.calibration_sample,
-        "entity_states": snapshot.entity_states,
-        "request": request,
-    }
+def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> SessionSnapshotResponse:
+    return SessionSnapshotResponse(
+        session_id=snapshot.id,
+        state=snapshot.state,
+        created_at=snapshot.created_at,
+        updated_at=snapshot.updated_at,
+        phase=snapshot.phase,
+        confirmation_message=snapshot.confirmation_message,
+        confirmation_action=snapshot.confirmation_action,
+        mode=snapshot.mode,
+        progress=SessionProgressResponse(
+            completed=snapshot.completed,
+            total=snapshot.total,
+            skipped=snapshot.skipped,
+            percent=snapshot.progress,
+            estimated_remaining_seconds=_duration_seconds(snapshot.estimated_remaining),
+        ),
+        warnings=list(snapshot.warnings),
+        error=snapshot.error,
+        summary=snapshot.summary,
+        operating_point=snapshot.operating_point,
+        calibration_sample=snapshot.calibration_sample,
+        entity_states=snapshot.entity_states,
+        request=context.storage.load_request(snapshot.id),
+    )
 
 
 def _session_summary(context: AppContext, snapshot: SessionSnapshot) -> SessionSummary:
@@ -1162,13 +1205,13 @@ async def _event_stream(request: Request, context: AppContext, session_id: str) 
                 snapshot = context.coordinator.get(session_id)
             except SESSION_LOAD_ERRORS:
                 return
-            heartbeat = {
-                "sequence": snapshot.event_sequence,
-                "type": "heartbeat",
-                "data": {},
-                "snapshot": _snapshot_response(context, snapshot),
-            }
-            yield f"event: heartbeat\ndata: {json.dumps(heartbeat, default=str)}\n\n"
+            heartbeat = SessionEventResponse(
+                sequence=snapshot.event_sequence,
+                type="heartbeat",
+                data={},
+                snapshot=_snapshot_response(context, snapshot),
+            )
+            yield f"event: heartbeat\ndata: {heartbeat.model_dump_json()}\n\n"
         await asyncio.sleep(1)
 
 
@@ -1177,11 +1220,11 @@ def _encode_event(context: AppContext, event: SessionEvent, session_id: str) -> 
         snapshot = context.coordinator.get(session_id)
     except SESSION_LOAD_ERRORS:
         snapshot = None
-    payload: dict[str, object] = {
-        "sequence": event.sequence,
-        "type": event.type,
-        "data": event.data,
-    }
-    if snapshot is not None:
-        payload["snapshot"] = _snapshot_response(context, snapshot)
-    return f"id: {event.sequence}\nevent: {event.type}\ndata: {json.dumps(payload, default=str)}\n\n"
+    payload = SessionEventResponse(
+        sequence=event.sequence,
+        type=event.type,
+        data=event.data,
+        snapshot=_snapshot_response(context, snapshot) if snapshot is not None else None,
+    )
+    exclude = {"snapshot"} if snapshot is None else None
+    return f"id: {event.sequence}\nevent: {event.type}\ndata: {payload.model_dump_json(exclude=exclude)}\n\n"

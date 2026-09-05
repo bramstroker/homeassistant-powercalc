@@ -1,6 +1,7 @@
 import { LitElement, css, html, nothing, type PropertyValues } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { customElement, property, query as queryElement, state } from "lit/decorators.js";
 import { sharedStyles } from "../../styles";
+import { emit } from "../../utils/events";
 
 export interface ComboboxOption {
   value: string;
@@ -30,6 +31,9 @@ export class Combobox extends LitElement {
   @state() private active = -1;
 
   private readonly internals = this.createInternals();
+
+  @queryElement("#combobox-input")
+  private input!: HTMLInputElement | null;
 
   static readonly styles = [sharedStyles, css`
     :host { display: grid; gap: 0.4rem; min-width: 0; }
@@ -75,8 +79,11 @@ export class Combobox extends LitElement {
     if (!this.multiple && (changed.has("value") || changed.has("options"))) this.query = this.displayValue(this.singleValue());
   }
 
-  protected updated(): void {
-    this.syncFormControl();
+  protected updated(changed: PropertyValues<this>): void {
+    if (changed.has("value") || changed.has("name") || changed.has("disabled")
+      || changed.has("multiple") || changed.has("required") || changed.has("label")) {
+      this.syncFormControl();
+    }
   }
 
   render() {
@@ -84,7 +91,7 @@ export class Combobox extends LitElement {
       ${this.renderLabel()}
       ${this.renderControl()}
       ${this.renderSupportingText()}
-      <slot name="value" hidden></slot>
+      <slot name="value" hidden @slotchange=${this.syncFormControl}></slot>
     `;
   }
 
@@ -96,6 +103,8 @@ export class Combobox extends LitElement {
   }
 
   private renderControl() {
+    const options = this.open ? this.filteredOptions() : [];
+    const activeOption = options[this.active];
     const describedBy = [this.hint ? "combobox-hint" : "", this.error ? "combobox-error" : ""]
       .filter(Boolean)
       .join(" ");
@@ -105,7 +114,7 @@ export class Combobox extends LitElement {
         <input
           id="combobox-input"
           .value=${this.query}
-          ?required=${this.required}
+          ?required=${this.required && (!this.multiple || !this.values().length)}
           ?disabled=${this.disabled}
           ?readonly=${!this.searchable}
           autocomplete="off"
@@ -114,11 +123,11 @@ export class Combobox extends LitElement {
           aria-autocomplete=${this.searchable ? "list" : "none"}
           aria-readonly=${this.searchable ? nothing : "true"}
           aria-invalid=${this.error ? "true" : "false"}
+          aria-required=${this.required ? "true" : "false"}
           aria-describedby=${describedBy || nothing}
-          aria-controls="combobox-options"
-          aria-multiselectable=${this.multiple ? "true" : nothing}
+          aria-controls=${this.open ? "combobox-options" : nothing}
           aria-expanded=${this.open ? "true" : "false"}
-          aria-activedescendant=${this.active >= 0 ? `combobox-option-${this.active}` : nothing}
+          aria-activedescendant=${activeOption && !activeOption.disabled ? `combobox-option-${this.active}` : nothing}
           @focus=${this.openOptions}
           @click=${this.inputClicked}
           @input=${this.inputChanged}
@@ -127,7 +136,7 @@ export class Combobox extends LitElement {
         <button class="toggle" type="button" aria-label=${`Show ${this.label.toLowerCase()} options`} ?disabled=${this.disabled} @click=${this.toggle}>
           ${this.open ? "▲" : "▼"}
         </button>
-        ${this.open ? this.renderMenu(this.filteredOptions()) : nothing}
+        ${this.open ? this.renderMenu(options) : nothing}
       </div>
     `;
   }
@@ -167,7 +176,7 @@ export class Combobox extends LitElement {
       role="option"
       aria-selected=${this.isSelected(option.value) ? "true" : "false"}
       aria-disabled=${option.disabled ? "true" : "false"}
-      @mousedown=${(event: MouseEvent) => event.preventDefault()}
+      @mousedown=${this.preventOptionBlur}
       @mousemove=${() => this.activateOption(option, index)}
       @click=${() => this.select(option)}
     >${option.label}</div>`;
@@ -180,8 +189,7 @@ export class Combobox extends LitElement {
   }
 
   private filteredOptions(): ComboboxOption[] {
-    if (!this.searchable) return this.options.filter((option) => !this.multiple || !this.values().includes(option.value));
-    const terms = this.filter.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+    const terms = this.searchable ? this.filter.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean) : [];
     const selected = new Set(this.multiple ? this.values() : []);
     return this.options.filter((option) => {
       if (selected.has(option.value)) return false;
@@ -213,12 +221,11 @@ export class Combobox extends LitElement {
     } else {
       this.internals?.setFormValue(this.disabled || !this.name ? null : this.singleValue());
     }
-    const input = this.renderRoot.querySelector<HTMLInputElement>("input");
     const missing = !this.disabled && this.required && (this.multiple ? !this.values().length : !this.singleValue());
     this.internals?.setValidity(
       missing ? { valueMissing: true } : {},
       missing ? `Select or enter ${this.label.toLowerCase()}.` : "",
-      input ?? undefined,
+      this.input ?? undefined,
     );
     const hidden = this.hiddenInput();
     if (hidden && !this.multiple) {
@@ -237,7 +244,7 @@ export class Combobox extends LitElement {
 
   private toggle() {
     this.open = !this.open;
-    if (this.open) this.renderRoot.querySelector<HTMLInputElement>("input")?.focus();
+    if (this.open) this.input?.focus();
   }
 
   private inputClicked(): void {
@@ -279,7 +286,7 @@ export class Combobox extends LitElement {
     const increment = event.key === "ArrowDown" ? 1 : -1;
     let next = (current + increment + available.length) % available.length;
     if (current < 0) next = event.key === "ArrowDown" ? 0 : available.length - 1;
-    this.active = available[next]!.index;
+    this.active = available[next]?.index ?? -1;
     void this.updateComplete.then(() => this.renderRoot.querySelector(`#combobox-option-${this.active}`)?.scrollIntoView?.({ block: "nearest" }));
   }
 
@@ -327,7 +334,11 @@ export class Combobox extends LitElement {
     this.commit(option.value, true);
     this.open = false;
     this.active = -1;
-    this.renderRoot.querySelector<HTMLInputElement>("input")?.focus();
+    this.input?.focus();
+  }
+
+  private preventOptionBlur(event: MouseEvent): void {
+    event.preventDefault();
   }
 
   private activateOption(option: ComboboxOption, index: number): void {
@@ -342,19 +353,18 @@ export class Combobox extends LitElement {
       if (emitChange) hidden.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
     }
     this.syncFormControl();
-    this.dispatchEvent(new CustomEvent("combobox-change", { detail: { value }, bubbles: true, composed: true }));
+    emit(this, "combobox-change", { value });
   }
 
-  private focusOut(): void {
+  private focusOut(event: FocusEvent): void {
+    // During a native focus transition activeElement can still be null at the
+    // microtask checkpoint. Keep the menu open when focus is moving to a tag or toggle.
+    if (event.relatedTarget instanceof Node && this.renderRoot.contains(event.relatedTarget)) return;
     queueMicrotask(() => {
       const activeElement = this.shadowRoot?.activeElement;
-      if (activeElement && this.containsFocusTarget(activeElement)) return;
+      if (activeElement && this.renderRoot.contains(activeElement)) return;
       this.closeAndRestore();
     });
-  }
-
-  private containsFocusTarget(target: Node): boolean {
-    return this.renderRoot.contains(target);
   }
 
   private closeAndRestore() {
@@ -377,11 +387,12 @@ export class Combobox extends LitElement {
   private removeValue(value: string): void {
     this.value = this.values().filter((candidate) => candidate !== value);
     this.changed();
+    this.input?.focus();
   }
 
   private changed(): void {
     this.syncFormControl();
-    this.dispatchEvent(new CustomEvent("combobox-change", { detail: { value: this.value }, bubbles: true, composed: true }));
+    emit(this, "combobox-change", { value: this.value });
   }
 
   private values(): string[] {

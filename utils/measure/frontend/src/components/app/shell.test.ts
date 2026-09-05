@@ -1,5 +1,7 @@
 import type { MeasureDefinition, MeasureParameter, MeasurementRequest } from "../../types";
 import { AppShell } from "./shell";
+import type { ResultView } from "../result/view";
+import type { ProfileUseView } from "../profile/use-view";
 import { capabilities, controllerOf, defaultSettings, goodPowerMeterDiagnostic } from "../testing/fixtures";
 
 describe("app shell device entities", () => {
@@ -84,6 +86,46 @@ describe("app shell device entities", () => {
 });
 
 describe("app shell", () => {
+  it("keeps download callbacks stable while using the current session", async () => {
+    const element = new AppShell();
+    vi.spyOn(controllerOf(element), "boot").mockResolvedValue();
+    element.view = "result";
+    element.snapshot = { state: "completed", session_id: "first" };
+    document.body.append(element);
+    await element.updateComplete;
+    const result = element.shadowRoot!.querySelector<ResultView>("measure-result-view")!;
+    await result.updateComplete;
+    const { fileUrl, downloadAll } = result;
+    expect(fileUrl("model.json")).toContain("/api/sessions/first/files/model.json");
+
+    const rendered = vi.spyOn(result, "render");
+    element.requestUpdate();
+    await element.updateComplete;
+    await result.updateComplete;
+    expect(result.fileUrl).toBe(fileUrl);
+    expect(result.downloadAll).toBe(downloadAll);
+    expect(rendered).not.toHaveBeenCalled();
+
+    element.snapshot = { state: "completed", session_id: "second" };
+    element.requestUpdate();
+    await element.updateComplete;
+    await result.updateComplete;
+    expect(result.fileUrl).toBe(fileUrl);
+    expect(fileUrl("model.json")).toContain("/api/sessions/second/files/model.json");
+
+    element.view = "share";
+    element.requestUpdate();
+    await element.updateComplete;
+    const share = element.shadowRoot!.querySelector<ProfileUseView>("measure-profile-use-view")!;
+    const preparedUrl = share.preparedProfileUrl;
+    element.snapshot = { state: "completed", session_id: "third" };
+    element.requestUpdate();
+    await element.updateComplete;
+    expect(share.preparedProfileUrl).toBe(preparedUrl);
+    expect(preparedUrl("job-1")).toContain("/api/sessions/third/contribution/job-1/profile.zip");
+    element.remove();
+  });
+
   it("shows the auto-discovered battery sensor in the charging preflight review", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;

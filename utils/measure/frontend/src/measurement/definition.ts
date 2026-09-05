@@ -7,8 +7,10 @@ import type {
   MeasureDefinition,
   MeasurementParameters,
   MeasurementRequest,
+  ResumePolicy,
   PowerMeterSpec,
 } from "../types";
+import { isMeasurementRequest } from "../api-decoders";
 import { formChecked, formList, formNumber, formText } from "../utils/form";
 
 /** A single submitted form value, before it is placed in a request. */
@@ -25,12 +27,12 @@ export function deviceFields(definition: MeasureDefinition): FormField[] {
  */
 export function requestFieldValue(request: MeasurementRequest, field: FormField): FieldValue | undefined {
   if (field.role === "controller") return controllerEntityId(request);
-  const value = (request as unknown as Record<string, unknown>)[field.name];
+  const value = Object.getOwnPropertyDescriptor(request, field.name)?.value;
   return isFieldValue(value) ? value : undefined;
 }
 
 function controllerEntityId(request: MeasurementRequest): string | string[] | undefined {
-  const { controller } = request as { controller?: { type: string; entity_id?: string; entity_ids?: string[] } };
+  const controller = "controller" in request ? request.controller : undefined;
   if (controller?.type === "hass") return controller.entity_id;
   return controller?.type === "hass_multi" ? controller.entity_ids : undefined;
 }
@@ -47,7 +49,7 @@ function isFieldValue(value: unknown): value is FieldValue {
 export function fieldOptions(field: FormField, supportedModes?: LutMode[]): FormFieldOption[] {
   const supported = field.narrowed_by ? supportedModes : undefined;
   if (!supported?.length) return field.options;
-  return field.options.filter((option) => supported.includes(option.value as LutMode));
+  return field.options.filter((option) => supported.some((mode) => mode === option.value));
 }
 
 /**
@@ -147,7 +149,7 @@ export function buildMeasurementRequest(
     generate_model: definition.supports_profile,
     parameters: submittedParameters(definition, form, capabilities),
     // Only a resumable type offers the choice; the rest fall through to a fresh session.
-    resume_policy: (formText(form, "resume_policy") || "new") as BaseMeasurementRequest["resume_policy"],
+    resume_policy: resumePolicy(form),
   };
 
   const declared: Record<string, unknown> = {};
@@ -161,12 +163,15 @@ export function buildMeasurementRequest(
     declared[field.name] = formValue(form, field);
   }
 
-  // The server validates the assembled payload against its own discriminated model.
-  return { ...base, ...declared, measure_type: definition.measure_type } as MeasurementRequest;
+  const request: unknown = { ...base, ...declared, measure_type: definition.measure_type };
+  if (!isMeasurementRequest(request)) {
+    throw new Error(`The ${definition.label} form produced an invalid measurement request.`);
+  }
+  return request;
 }
 
 /** The controller spec a submitted entity field describes: a virtual device, one entity, or several. */
-function controllerSpec(form: FormData, field: FormField, dummyController: boolean): Record<string, unknown> {
+function controllerSpec(form: FormData, field: FormField, dummyController: boolean): { type: "dummy" } | { type: "hass"; entity_id: string } | { type: "hass_multi"; entity_ids: string[] } {
   if (dummyController) return { type: "dummy" };
   const entityIds = form.getAll(field.name)
     .filter((value): value is string => typeof value === "string")
@@ -176,14 +181,20 @@ function controllerSpec(form: FormData, field: FormField, dummyController: boole
   return { type: "hass", entity_id: entityIds[0] ?? "" };
 }
 
+function resumePolicy(form: FormData): ResumePolicy {
+  const value = formText(form, "resume_policy") || "new";
+  if (value === "new" || value === "resume") return value;
+  throw new Error("The selected resume policy is invalid.");
+}
+
 /** The tuning parameters this type declares, taken from the form where the user set one. */
 function submittedParameters(definition: MeasureDefinition, form: FormData, capabilities: Capabilities): MeasurementParameters {
-  const parameters: Record<string, number> = { ...capabilities.defaults };
+  const parameters = { ...capabilities.defaults };
   for (const { name } of definition.parameters) {
     const value = form.get(name);
     if (typeof value === "string" && value !== "") parameters[name] = Number(value);
   }
-  return parameters as unknown as MeasurementParameters;
+  return parameters;
 }
 
 /** Read one submitted field, coerced to the type its declared control produces. */

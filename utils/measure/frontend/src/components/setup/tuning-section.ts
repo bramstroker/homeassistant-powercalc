@@ -66,6 +66,8 @@ export class SetupTuningSection extends LitElement {
 
   private readonly parameterChanged = (event: Event): void => {
     const input = event.currentTarget as HTMLInputElement;
-    emit<ParameterChange>(this, "parameter-change", { name: input.name as MeasureParameterName, value: input.value });
+    const parameter = this.definition.parameters.find((candidate) => candidate.name === input.name);
+    if (!parameter) throw new Error("The selected measurement parameter is invalid.");
+    emit<ParameterChange>(this, "parameter-change", { name: parameter.name, value: input.value });
   };
 }

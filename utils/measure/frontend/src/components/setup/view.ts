@@ -1,4 +1,4 @@
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type {
   Capabilities,
@@ -6,14 +6,12 @@ import type {
   DummyLoadSpec,
   EntityDescriptor,
   ErrorHelp,
-  FormField,
   MeasureDefinition,
   MeasureParameterName,
   MeasureType,
   MeasurementRequest,
   PowerMeterSpec,
 } from "../../types";
-import { requestFieldValue } from "../../measurement/definition";
 import { hasVoltageReading, meterFor } from "../../power-meter/registry";
 import type { MeterContext } from "../../power-meter/registry";
 import { emit } from "../../utils/events";
@@ -37,6 +35,7 @@ import type {
 } from "./fields-section";
 import type { ParameterChange } from "./tuning-section";
 import { prepareRequest } from "./request";
+import { entityRows } from "./options";
 import "./developer-options";
 import "./fields-section";
 
@@ -126,7 +125,6 @@ export class SetupView extends LitElement {
   /** Deliberately not reactive: it exists so a typed count survives re-renders instead of being recomputed. */
   private derivedCountOverride?: string;
 
-
   static readonly styles = [sharedStyles, dummyLoadStyles, entityListStyles, setupChromeStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
     measure-setup-fields-section, measure-setup-developer-options { display: contents; }
@@ -163,22 +161,12 @@ export class SetupView extends LitElement {
     .advanced-heading { grid-column: 1 / -1; margin: 0.25rem 0 -0.25rem; color: var(--signal-strong); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
     .context p { margin-bottom: 0; }
 
-    .dummy-load { display: grid; gap: 0.9rem; }
-    .dummy-load-toggle { width: fit-content; }
     /* A checkbox that reveals or hides a block of the form, rather than submitting a value. */
     .toggle-pill { width: fit-content; }
     .dummy-controller { display: grid; gap: 0.4rem; }
     .dummy-controller p { margin: 0; }
     .multiple-lights { padding-right: 2rem; }
     .multiple-lights .toggle-pill { min-height: 28px; padding: 0; border: 0; border-radius: 0; }
-    .dummy-load-options { display: grid; gap: 0.8rem; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--field); }
-    .dummy-load-options p { margin: 0; }
-    .calibration-card { display: grid; gap: 0.2rem; }
-    .calibration-card strong { color: var(--ink); }
-    .calibration-meta { color: var(--muted); font-size: 0.78rem; }
-    .choice-list { display: grid; gap: 0.5rem; }
-    .choice { display: flex; grid-template-columns: none; align-items: flex-start; gap: 0.55rem; color: var(--ink); }
-    .choice input { width: auto; min-height: auto; margin-top: 0.2rem; accent-color: var(--signal); }
     .field-block { display: grid; gap: 0.45rem; }
     .field-block .field-hint, .select-guidance p { margin: 0; }
     .select-guidance { display: grid; gap: 0.35rem; }
@@ -189,7 +177,7 @@ export class SetupView extends LitElement {
     }
   `];
 
-  willUpdate(changed: Map<string, unknown>): void {
+  willUpdate(changed: PropertyValues<this>): void {
     // Restore the previously chosen type when returning from the review step.
     if (changed.has("initialType") && this.initialType && this.selectedType === undefined) {
       this.selectedType = this.initialType;
@@ -334,7 +322,9 @@ export class SetupView extends LitElement {
   }
 
   private dummyLoadModeChanged(event: Event): void {
-    this.dummyLoadMode = (event.currentTarget as HTMLInputElement).value as DummyLoadSpec["mode"];
+    const value = (event.currentTarget as HTMLInputElement).value;
+    if (value !== "calibrate" && value !== "reuse") throw new Error("The selected dummy-load mode is invalid.");
+    this.dummyLoadMode = value;
   }
 
   private parameterChanged(event: CustomEvent<ParameterChange>): void {
@@ -369,18 +359,6 @@ export class SetupView extends LitElement {
     this.derivedCountOverride = event.detail;
   }
 
-  /**
-   * Rows a field currently shows: what the user picked, else what a previous run stored.
-   * Empty rows are kept, because an unanswered select is still a row in the form.
-   */
-  private entityRows(field: FormField, request?: MeasurementRequest): string[] {
-    const chosen = this.selectedEntities[field.name];
-    if (chosen) return chosen;
-    const stored = request && requestFieldValue(request, field);
-    if (Array.isArray(stored)) return stored.map(String);
-    return typeof stored === "string" && stored ? [stored] : [];
-  }
-
   private readonly selectType = (type: MeasureType): void => {
     this.errorMessage = "";
     this.selectedType = type;
@@ -398,7 +376,7 @@ export class SetupView extends LitElement {
     const field = this.selectedType
       ? this.definition(this.selectedType)?.fields.find((candidate) => candidate.name === name)
       : undefined;
-    return field ? this.entityRows(field, this.currentRun) : [];
+    return field ? entityRows(field, { selectedEntities: this.selectedEntities, request: this.currentRun }) : [];
   }
 
   /** The previous run, when it belongs to the type now being configured. */
@@ -445,6 +423,4 @@ export class SetupView extends LitElement {
   private meterContext(): MeterContext {
     return { powers: this.powers, voltages: this.voltages };
   }
-
-
 }

@@ -226,8 +226,11 @@ export class SettingsPowerMeterSection extends LitElement {
 
   private readonly powerMeterChanged = (event: Event): void => {
     this.clearTestResult();
-    this.meter = (event.currentTarget as HTMLInputElement).value as PowerMeterType;
-    if (meterFor(this.meter).discoverable) this.discoverShellys();
+    const value = (event.currentTarget as HTMLInputElement).value;
+    const meter = POWER_METER_LIST.find((candidate) => candidate.type === value);
+    if (!meter) throw new Error("The selected power meter is invalid.");
+    this.meter = meter.type;
+    if (meter.discoverable) this.discoverShellys();
   };
 
   private powerMeterSettingsChanged(): void {

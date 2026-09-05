@@ -5,6 +5,21 @@ export function formText(form: FormData, name: string): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+/** Read a finite string choice without asserting that arbitrary form data belongs to its union. */
+export function formChoice<const T extends readonly string[]>(
+  form: FormData,
+  name: string,
+  choices: T,
+  fallback: T[number],
+): T[number] {
+  const value = formText(form, name);
+  if (!value) return fallback;
+  for (const choice of choices) {
+    if (choice === value) return choice;
+  }
+  throw new Error(`The selected ${name.replaceAll("_", " ")} is invalid.`);
+}
+
 /** The same, keeping surrounding whitespace — for secrets and free-form notes where it may be meaningful. */
 export function formRaw(form: FormData, name: string): string {
   const value = form.get(name);

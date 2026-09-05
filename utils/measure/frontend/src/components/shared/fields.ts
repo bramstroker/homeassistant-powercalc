@@ -98,25 +98,13 @@ export function entitySelect(name: string, label: string, entities: EntityDescri
     label: `${entity.name} · ${entity.entity_id}`,
   }));
   if (!required) comboboxOptions.unshift({ value: "", label: "None" });
-  return html`
-    <measure-combobox
-      name=${name}
-      label=${label}
-      .value=${selected}
-      .options=${comboboxOptions}
-      placeholder=${`Search ${label.toLowerCase()} entities`}
-      hint=${hint}
-      ?required=${required}
-    >
-      <input slot="value" type="hidden" name=${name} .value=${selected} @change=${onChange} />
-    </measure-combobox>
-  `;
-}
-
-export function entityOption(entity: EntityDescriptor, selected: boolean, disabled = false) {
-  return html`<option value=${entity.entity_id} ?selected=${selected} ?disabled=${disabled}>
-    ${entity.name} · ${entity.entity_id}
-  </option>`;
+  return optionSelect(name, label, comboboxOptions, {
+    selected,
+    required,
+    hint,
+    placeholder: `Search ${label.toLowerCase()} entities`,
+    onChange,
+  });
 }
 
 export function fieldHint(hint: string) {

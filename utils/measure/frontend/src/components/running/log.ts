@@ -1,5 +1,5 @@
 import { LitElement, css, html, nothing, type PropertyValues } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { customElement, property, query, state } from "lit/decorators.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { sharedStyles } from "../../styles";
 
@@ -16,6 +16,9 @@ export class SessionLog extends LitElement {
 
   private readonly container = createRef<HTMLDivElement>();
 
+  @query(".log-toggle") private toggleButton!: HTMLButtonElement | null;
+  @query(".log-head button") private closeButton!: HTMLButtonElement | null;
+
   static readonly styles = [sharedStyles, css`
     :host { display: inline-flex; }
     .log-toggle { display: inline-flex; align-items: center; gap: 0.55rem; min-height: 44px; padding: 0.55rem 0.75rem 0.55rem 0.9rem; border-radius: 999px; font: 700 0.78rem/1 ui-monospace, monospace; color: var(--ink); background: var(--surface-raised); }
@@ -30,6 +33,7 @@ export class SessionLog extends LitElement {
   `];
 
   protected updated(changedProperties: PropertyValues<this>): void {
+    if (changedProperties.has("open") && this.open) this.closeButton?.focus();
     if ((changedProperties.has("logs") || changedProperties.has("open")) && this.open && this.logs.length) {
       const container = this.container.value;
       if (container) container.scrollTop = container.scrollHeight;
@@ -38,18 +42,19 @@ export class SessionLog extends LitElement {
 
   render() {
     if (!this.logs.length) return nothing;
+    const warnings = new Set(this.warnings);
     return html`
-      <button class="log-toggle" type="button" @click=${this.toggle} aria-expanded=${this.open}>
+      <button class="log-toggle" type="button" @click=${this.toggle} aria-expanded=${this.open} aria-controls=${this.open ? "session-log" : nothing}>
         View log <span class="log-count">${this.logs.length}</span>
       </button>
       ${this.open ? html`
-        <aside class="log-overlay" aria-label="Measurement log">
+        <aside id="session-log" class="log-overlay" aria-label="Measurement log" @keydown=${this.keydown}>
           <div class="log-head">
             <span>Measurement log</span>
-            <button type="button" @click=${this.toggle} aria-label="Close log">Close ✕</button>
+            <button type="button" @click=${this.close} aria-label="Close log">Close ✕</button>
           </div>
           <div ${ref(this.container)} class="log" aria-live="polite">
-            ${this.logs.map((log) => html`<p class=${this.warnings.includes(log) ? "warning" : ""}>${log}</p>`)}
+            ${this.logs.map((log) => html`<p class=${warnings.has(log) ? "warning" : ""}>${log}</p>`)}
           </div>
         </aside>
       ` : nothing}
@@ -58,6 +63,17 @@ export class SessionLog extends LitElement {
 
   private toggle(): void {
     this.open = !this.open;
+  }
+
+  private close(): void {
+    this.open = false;
+    this.toggleButton?.focus();
+  }
+
+  private keydown(event: KeyboardEvent): void {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    this.close();
   }
 }
 

@@ -1,5 +1,5 @@
-import { LitElement, css, html } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { LitElement, css, html, nothing } from "lit";
+import { customElement, property, query } from "lit/decorators.js";
 import type { PlotSpec } from "../../types";
 import { sharedStyles } from "../../styles";
 
@@ -21,6 +21,9 @@ export class ResultPlot extends LitElement {
 
   private resizeObserver?: ResizeObserver;
 
+  @query("canvas")
+  private canvas!: HTMLCanvasElement | null;
+
   static readonly styles = [sharedStyles, css`
     :host { display: block; min-width: 0; }
     .plot-card { height: 100%; padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--field); }
@@ -33,13 +36,16 @@ export class ResultPlot extends LitElement {
     .plot-download { min-height: 36px; padding: 0.45rem 0.75rem; font-size: 0.72rem; }
   `];
 
-  protected firstUpdated(): void {
-    const canvas = this.renderRoot.querySelector("canvas");
-    if (canvas && typeof ResizeObserver !== "undefined") {
-      this.resizeObserver = new ResizeObserver(() => this.draw());
-      this.resizeObserver.observe(canvas);
+  connectedCallback(): void {
+    super.connectedCallback();
+    if (this.hasUpdated) {
+      this.observeCanvas();
+      this.draw();
     }
-    this.draw();
+  }
+
+  protected firstUpdated(): void {
+    this.observeCanvas();
   }
 
   protected updated(): void {
@@ -48,7 +54,14 @@ export class ResultPlot extends LitElement {
 
   disconnectedCallback(): void {
     this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
     super.disconnectedCallback();
+  }
+
+  private observeCanvas(): void {
+    if (!this.isConnected || !this.canvas || this.resizeObserver || typeof ResizeObserver === "undefined") return;
+    this.resizeObserver = new ResizeObserver(() => this.draw());
+    this.resizeObserver.observe(this.canvas);
   }
 
   render() {
@@ -56,7 +69,7 @@ export class ResultPlot extends LitElement {
       <article class="plot-card">
         <div class="plot-head">
           <div><h4>${this.plot.title}</h4><span class="source">${this.plot.source}</span></div>
-          ${this.partial ? html`<span class="partial">Partial result</span>` : ""}
+          ${this.partial ? html`<span class="partial">Partial result</span>` : nothing}
         </div>
         <canvas role="img" aria-label="${this.plot.title}: ${this.plot.y_label} by ${this.plot.x_label}"></canvas>
         <div class="plot-actions">
@@ -67,8 +80,8 @@ export class ResultPlot extends LitElement {
   }
 
   private draw(): void {
-    const canvas = this.renderRoot.querySelector("canvas");
-    if (!canvas || !this.plot) return;
+    const canvas = this.canvas;
+    if (!this.isConnected || !canvas || !this.plot) return;
     const width = Math.max(320, Math.round(canvas.clientWidth || 800));
     const height = width < 520 ? 300 : 360;
     const scale = Math.min(2, globalThis.devicePixelRatio || 1);

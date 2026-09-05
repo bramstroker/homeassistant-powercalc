@@ -1,5 +1,5 @@
 import type { AppSettings, EntityDescriptor, MeasurementRequest, PowerMeterSpec, PowerMeterType } from "../types";
-import { formText, formTextOrNull } from "../utils/form";
+import { formChoice, formTextOrNull } from "../utils/form";
 
 /** Username Shelly devices are reached with unless the user configured another one. */
 export const DEFAULT_SHELLY_USERNAME = "admin";
@@ -166,7 +166,7 @@ export function specFromRequest(
 
 /** The settings payload the form describes: the selected meter's keys, and null for the rest. */
 export function settingsFromForm(form: FormData): PowerMeterSettings & { power_meter: PowerMeterType } {
-  const type = (formText(form, "power_meter") || "hass") as PowerMeterType;
+  const type = formChoice(form, "power_meter", ["hass", "shelly", "kasa", "dummy"] as const, "hass");
   return {
     power_meter: type,
     default_power_entity_id: null,

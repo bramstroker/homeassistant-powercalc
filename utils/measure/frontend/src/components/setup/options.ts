@@ -75,7 +75,8 @@ export function activeParameters(state: FieldState): ReadonlySet<string> {
   return active;
 }
 
-export function entityRows(field: FormField, state: FieldState): string[] {
+/** Keep empty rows: an unanswered select is still a row in the form. */
+export function entityRows(field: FormField, state: Pick<FieldState, "selectedEntities" | "request">): string[] {
   const chosen = state.selectedEntities[field.name];
   if (chosen) return chosen;
   const stored = state.request && requestFieldValue(state.request, field);

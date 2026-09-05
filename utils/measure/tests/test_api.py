@@ -1048,7 +1048,8 @@ def test_validation_errors_have_stable_shape(tmp_path: Path) -> None:
 def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -> None:
     app = create_app(data_root=tmp_path, hass_token="test-token", trusted_ingress_only=False)  # noqa: S106
 
-    paths = app.openapi()["paths"]
+    contract = app.openapi()
+    paths = contract["paths"]
 
     assert set(paths["/api/sessions"]) == {"get", "post"}
     assert set(paths["/api/library/measure-devices"]) == {"get"}
@@ -1068,6 +1069,23 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
     assert set(paths["/api/contribution/auth/device"]) == {"post"}
     assert set(paths["/api/contribution/auth/device/{flow_id}"]) == {"post"}
     assert set(paths["/api/contribution/status"]) == {"get"}
+
+    snapshot_ref = {"$ref": "#/components/schemas/SessionSnapshotResponse"}
+    assert paths["/api/sessions"]["post"]["responses"]["201"]["content"]["application/json"]["schema"] == snapshot_ref
+    for path, method, status in (
+        ("/api/sessions/{session_id}", "get", "200"),
+        ("/api/sessions/{session_id}/cancel", "post", "202"),
+        ("/api/sessions/{session_id}/confirm", "post", "200"),
+        ("/api/sessions/{session_id}/resume", "post", "200"),
+    ):
+        assert paths[path][method]["responses"][status]["content"]["application/json"]["schema"] == snapshot_ref
+
+    snapshot_schema = contract["components"]["schemas"]["SessionSnapshotResponse"]
+    assert set(snapshot_schema["required"]) == set(snapshot_schema["properties"])
+    assert snapshot_schema["properties"]["operating_point"] == {
+        "anyOf": [{"$ref": "#/components/schemas/OperatingPoint"}, {"type": "null"}],
+    }
+    assert contract["components"]["schemas"]["AppPowerMeterType"]["enum"] == ["hass", "shelly", "kasa", "dummy"]
 
 
 def test_contribution_device_flow_reports_configuration_and_uses_injected_service(tmp_path: Path) -> None:

@@ -1,3 +1,4 @@
+import { isMeasurementRequest } from "../../api-decoders";
 import { formText } from "../../utils/form";
 import {
   buildMeasurementRequest,
@@ -44,14 +45,19 @@ export function prepareRequest(options: RequestOptions): RequestResult {
   );
   if (empty) return { error: `Select at least one ${empty.label.toLowerCase().replace(/s$/, "")}.` };
 
-  const request = buildMeasurementRequest(
-    definition,
-    form,
-    options.capabilities,
-    options.meter,
-    options.measureDevice,
-    options.dummyController,
-  );
+  let request: MeasurementRequest;
+  try {
+    request = buildMeasurementRequest(
+      definition,
+      form,
+      options.capabilities,
+      options.meter,
+      options.measureDevice,
+      options.dummyController,
+    );
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "The measurement form produced an invalid request." };
+  }
   const defaults = profileDefaults(options);
   const previous = previousRequest(options.initialRequest, definition, request);
   request.model_id = previous?.model_id || defaults.model_id;
@@ -62,7 +68,9 @@ export function prepareRequest(options: RequestOptions): RequestResult {
     : undefined;
 
   const mismatch = options.dummyController ? undefined : narrowedEntityMismatch(definition, form);
-  return mismatch ? { error: mismatch } : { request };
+  if (mismatch) return { error: mismatch };
+  if (!isMeasurementRequest(request)) return { error: "The measurement form produced an invalid request." };
+  return { request };
 }
 
 /** Only metadata shared by every selected device is safe as a profile default. */

@@ -18,11 +18,11 @@ export function reviewMetrics(
   if (!request || !preflight) return [];
   const { estimated_variations: variations, estimated_duration_seconds: seconds } = preflight;
   const metrics: LabelledValue[] =
-    variations === undefined && seconds === undefined
+    variations == null && seconds == null
       ? []
       : [
           { label: "Variations", value: String(variations ?? "—") },
-          { label: "Estimated time", value: seconds === undefined ? "—" : formatDuration(seconds) },
+          { label: "Estimated time", value: seconds == null ? "—" : formatDuration(seconds) },
         ];
   for (const [field, values] of multiSelections(request, definition)) {
     metrics.push({ label: field.label, value: String(values.length) });
