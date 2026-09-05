@@ -20,6 +20,7 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_MULTI_SWITCH,
     CONF_POWER,
+    CONF_POWER_CURVE,
     CONF_POWER_OFF,
     CONF_POWER_TEMPLATE,
     CONF_STANDBY_POWER,
@@ -163,12 +164,22 @@ class PowerCalculatorStrategyFactory:
             **user_config,
         }
 
-        # A user supplied calibration curve fully describes the power curve. Do not
-        # modify it with a gamma value inherited from the profile.
-        if CONF_CALIBRATE in user_config and CONF_GAMMA_CURVE not in user_config:
-            linear_config.pop(CONF_GAMMA_CURVE, None)
+        PowerCalculatorStrategyFactory._remove_overridden_profile_curves(linear_config, user_config)
 
         return linear_config
+
+    @staticmethod
+    def _remove_overridden_profile_curves(linear_config: ConfigType, user_config: ConfigType) -> None:
+        """Remove profile curve options superseded by explicit user configuration."""
+        if CONF_CALIBRATE in user_config:
+            if CONF_GAMMA_CURVE not in user_config:
+                linear_config.pop(CONF_GAMMA_CURVE, None)
+            if CONF_POWER_CURVE not in user_config:
+                linear_config.pop(CONF_POWER_CURVE, None)
+        elif CONF_GAMMA_CURVE in user_config:
+            linear_config.pop(CONF_POWER_CURVE, None)
+        elif CONF_POWER_CURVE in user_config:
+            linear_config.pop(CONF_GAMMA_CURVE, None)
 
     def _create_fixed(
         self,
