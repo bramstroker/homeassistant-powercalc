@@ -40,6 +40,8 @@ def write_model_json(
     extra_json_data: dict[str, Any] | None = None,
     voltages: list[float] | None = None,
     num_lights: int | None = None,
+    dummy_load: bool = False,
+    dummy_load_resistance: float | None = None,
 ) -> Path:
     created_at = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
     json_data: dict[str, Any] = {
@@ -51,12 +53,21 @@ def write_model_json(
             "VERSION": measure_version(),
             "SAMPLE_COUNT": parameters.sample_count,
             "SLEEP_TIME": parameters.sleep_time,
+            "DUMMY_LOAD": dummy_load,
         },
         "name": name,
         "standby_power": standby_power,
     }
     if num_lights is not None:
         json_data["measure_settings"]["NUM_LIGHTS"] = num_lights
+    if dummy_load_resistance is not None:
+        json_data["measure_settings"]["DUMMY_LOAD_RESISTANCE"] = round(dummy_load_resistance, 2)
+        if voltages:
+            average_voltage = sum(voltages) / len(voltages)
+            json_data["measure_settings"]["DUMMY_LOAD_POWER"] = round(
+                average_voltage**2 / dummy_load_resistance,
+                2,
+            )
     if voltages:
         voltage_range = {
             MODEL_JSON_VOLTAGE_RANGE_MIN: round(min(voltages), 2),
