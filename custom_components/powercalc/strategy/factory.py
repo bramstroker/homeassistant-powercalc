@@ -164,7 +164,13 @@ class PowerCalculatorStrategyFactory:
             **user_config,
         }
 
-        # Explicit user curve configuration takes precedence over profile defaults.
+        PowerCalculatorStrategyFactory._remove_overridden_profile_curves(linear_config, user_config)
+
+        return linear_config
+
+    @staticmethod
+    def _remove_overridden_profile_curves(linear_config: ConfigType, user_config: ConfigType) -> None:
+        """Remove profile curve options superseded by explicit user configuration."""
         if CONF_CALIBRATE in user_config:
             if CONF_GAMMA_CURVE not in user_config:
                 linear_config.pop(CONF_GAMMA_CURVE, None)
@@ -174,8 +180,6 @@ class PowerCalculatorStrategyFactory:
             linear_config.pop(CONF_POWER_CURVE, None)
         elif CONF_POWER_CURVE in user_config:
             linear_config.pop(CONF_GAMMA_CURVE, None)
-
-        return linear_config
 
     def _create_fixed(
         self,

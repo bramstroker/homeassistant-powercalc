@@ -307,6 +307,19 @@ async def test_lower_value_than_calibration_table_defines_with_gamma(hass: HomeA
     assert pytest.approx(float(await strategy.calculate(state)), 0.01) == 3.52
 
 
+def test_get_calibration_segment_before_initialization(hass: HomeAssistant) -> None:
+    """Test calibration segments cannot be read before strategy initialization."""
+    strategy = LinearStrategy(
+        source_entity=create_source_entity("light.test", hass),
+        config={CONF_MAX_POWER: 100},
+        hass=hass,
+        standby_power=None,
+    )
+
+    with pytest.raises(StrategyConfigurationError, match="Linear strategy has not been initialized"):
+        strategy.get_calibration_segment(50)
+
+
 async def _create_strategy_instance(
     hass: HomeAssistant,
     source_entity: SourceEntity,

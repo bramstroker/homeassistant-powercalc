@@ -131,7 +131,10 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         Values inside the table use the segment they fall in. Values outside it are
         extrapolated along the chord between the first and the last point.
         """
-        calibration = self._calibration or []
+        calibration = self._calibration
+        if not calibration:
+            raise StrategyConfigurationError("Linear strategy has not been initialized")
+
         if value < calibration[0][0] or value > calibration[-1][0]:
             return calibration[0], calibration[-1]
 
