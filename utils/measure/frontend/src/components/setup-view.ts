@@ -36,6 +36,7 @@ import { sharedStyles } from "../styles";
 import { entitySelect, fieldHint, numberField, optionSelect, textField } from "./fields";
 import { defaultDummyLoadMode, dummyLoadSpec, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
 import { entityListStyles, renderEntityList } from "./entity-list-field";
+import type { Combobox } from "./combobox";
 import {
   renderPowerMeterRequired,
   renderPowerMeterSummary,
@@ -149,8 +150,22 @@ export class SetupView extends LitElement {
     details { border-top: 1px solid var(--line); padding-top: 1rem; }
     summary { width: fit-content; color: var(--signal-strong); cursor: pointer; font-weight: 700; }
     details .grid { margin-top: 1rem; }
-    details.discovery-help { border: 0; padding: 0; font-size: 0.82rem; }
-    .discovery-help p { margin: 0.5rem 0 0; }
+    .field-with-help { position: relative; min-width: 0; }
+    details.context-help { border: 0; padding: 0; }
+    .context-help > summary {
+      position: absolute; top: 0; right: 0; display: grid; place-items: center;
+      width: 24px; height: 24px; padding: 0; list-style: none;
+    }
+    .context-help > summary::-webkit-details-marker { display: none; }
+    .context-help svg { width: 18px; height: 18px; }
+    .help-content {
+      position: absolute; top: 1.9rem; right: 0; z-index: 25; width: min(28rem, 100%);
+      box-sizing: border-box; padding: 0.85rem 1rem; border: 1px solid var(--line); border-radius: 10px;
+      background: var(--surface-raised); box-shadow: 0 10px 28px rgb(0 0 0 / 35%);
+      color: var(--ink); font-size: 0.82rem; line-height: 1.5;
+    }
+    .help-content p { margin: 0; }
+    .help-content p + p { margin-top: 0.65rem; }
     .developer-content { display: grid; gap: 0.75rem; margin-top: 0.75rem; }
     .developer-content .notice { margin: 0; }
     .test-mode-status { margin: 0; color: var(--signal-strong); font-size: 0.82rem; }
@@ -163,10 +178,8 @@ export class SetupView extends LitElement {
     .toggle-pill { width: fit-content; }
     .dummy-controller { display: grid; gap: 0.4rem; }
     .dummy-controller p { margin: 0; }
-    .multiple-lights { display: grid; justify-items: start; gap: 0.4rem; }
-    .multiple-lights p { margin: 0; }
-    .help-link { display: inline-flex; align-items: center; margin-left: 0.25rem; color: var(--signal-strong); vertical-align: 0.15em; }
-    .help-link svg { width: 16px; height: 16px; }
+    .multiple-lights { padding-right: 2rem; }
+    .multiple-lights .toggle-pill { min-height: 28px; padding: 0; border: 0; border-radius: 0; }
     .dummy-load-options { display: grid; gap: 0.8rem; padding: 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--field); }
     .dummy-load-options p { margin: 0; }
     .calibration-card { display: grid; gap: 0.2rem; }
@@ -258,23 +271,22 @@ export class SetupView extends LitElement {
       <form @submit=${this.submitMeasurement}>
         <div class="device-section">
           ${this.dummyController ? html`<p class="test-mode-status" role="status">Virtual device · test output only</p>` : nothing}
-          <div class="grid profile-grid ${type === "light" ? "light-grid" : ""}">
-            ${fields.filter((field) => field.control !== "multi_select").map((field) => this.genericField(field, run))}
-            ${this.dummyController || !definition.fields.some((field) => field.role === "controller")
-              ? textField("session_name", "Session name (optional)", {
-                  value: run?.session_name ?? "",
-                  placeholder: "e.g. Desk lamp test",
-                  hint: "A label for finding this measurement later; it is not the product name.",
-                })
+          ${multipleController && !this.dummyController ? this.renderMultipleLightsToggle(multipleController) : nothing}
+          <div class="field-with-help">
+            <div class="grid profile-grid ${type === "light" ? "light-grid" : ""}">
+              ${fields.filter((field) => field.control !== "multi_select").map((field) => this.genericField(field, run))}
+              ${this.dummyController || !definition.fields.some((field) => field.role === "controller")
+                ? textField("session_name", "Session name (optional)", {
+                    value: run?.session_name ?? "",
+                    placeholder: "e.g. Desk lamp test",
+                    hint: "A label for finding this measurement later; it is not the product name.",
+                  })
+                : nothing}
+            </div>
+            ${type === "light" && !this.dummyController
+              ? this.contextHelp("Light not found?", html`<p>${LIGHT_DISCOVERY_HINT}</p>`, "discovery-help")
               : nothing}
           </div>
-          ${type === "light" && !this.dummyController ? html`
-            <details class="discovery-help">
-              <summary>Light not found?</summary>
-              <p class="muted">${LIGHT_DISCOVERY_HINT}</p>
-            </details>
-          ` : nothing}
-          ${multipleController && !this.dummyController ? this.renderMultipleLightsToggle(multipleController) : nothing}
           ${blocks.map((field) => this.multiSelectField(field, run))}
         </div>
 
@@ -336,7 +348,7 @@ export class SetupView extends LitElement {
 
   private renderMultipleLightsToggle(field: FormField) {
     return html`
-      <div class="multiple-lights">
+      <div class="multiple-lights field-with-help">
         <label class="check toggle-pill">
           <input
             type="checkbox"
@@ -347,27 +359,48 @@ export class SetupView extends LitElement {
           />
           Measure multiple lights
         </label>
-        ${this.multipleLights ? html`<p class="muted">
+        ${this.contextHelp("About measuring multiple lights", html`<p>
           Measuring multiple identical lights together increases the load, making very low power use easier to measure accurately.
+          </p><p>
           Select up to three individual lights. For larger sets, select a native Zigbee or Hue group, or create a
           <a href=${HOME_ASSISTANT_GROUP_GUIDE_URL} target="_blank" rel="noopener noreferrer">Home Assistant light group</a>,
           then enter the total number of physical lights.
+          </p><p>
           <a
             class="help-link"
             href=${MULTIPLE_LIGHTS_GUIDE_URL}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Learn more about measuring multiple identical lights"
-            title="Learn more"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"></circle>
-              <path d="M9.75 9a2.4 2.4 0 0 1 4.57 1c0 1.75-2.32 2.1-2.32 3.5M12 17h.01"></path>
-            </svg>
-          </a>
-        </p>` : nothing}
+          >Multiple-light measurement guide ↗</a>
+        </p>`)}
       </div>
     `;
+  }
+
+  private contextHelp(label: string, content: unknown, className = "") {
+    return html`<details class="context-help ${className}" @keydown=${this.helpKeydown} @focusout=${this.helpFocusOut}>
+      <summary aria-label=${label} title=${label}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M9.75 9a2.4 2.4 0 0 1 4.57 1c0 1.75-2.32 2.1-2.32 3.5M12 17h.01"></path>
+        </svg>
+      </summary>
+      <div class="help-content">${content}</div>
+    </details>`;
+  }
+
+  private helpKeydown(event: KeyboardEvent): void {
+    if (event.key !== "Escape") return;
+    const help = event.currentTarget as HTMLDetailsElement;
+    help.open = false;
+    help.querySelector("summary")?.focus();
+    event.stopPropagation();
+  }
+
+  private helpFocusOut(event: FocusEvent): void {
+    const help = event.currentTarget as HTMLDetailsElement;
+    if (!help.contains(event.relatedTarget as Node | null)) help.open = false;
   }
 
   private renderDummyLoadSection(stored?: DummyLoadSpec | null) {
@@ -563,7 +596,10 @@ export class SetupView extends LitElement {
     const stored = run && requestFieldValue(run, field);
     const value = this.derivedCountOverride
       ?? (derived > 1 ? String(derived) : (stored ?? field.default ?? "").toString());
-    return this.valueField(field, value, this.derivedCountChanged);
+    return html`<div class="field-with-help">
+      ${this.valueField({ ...field, hint: undefined }, value, this.derivedCountChanged)}
+      ${this.contextHelp(field.label, html`<p>Total number of identical physical lights, including all members of a group. Measured power is divided by this value to calculate power per light.</p>`)}
+    </div>`;
   }
 
   private derivedCountChanged(event: Event): void {
@@ -571,6 +607,18 @@ export class SetupView extends LitElement {
   }
 
   private multiEntityField(field: FormField, entities: EntityDescriptor[], run?: MeasurementRequest) {
+    if (this.selectedType === "light" && field.role === "controller") {
+      return html`<measure-combobox
+        name=${field.name}
+        label=${field.plural_label || field.label}
+        .value=${this.selectedEntityIds(field, run)}
+        .options=${entities.map((entity) => ({ value: entity.entity_id, label: `${entity.name} · ${entity.entity_id}` }))}
+        placeholder="Select lights"
+        ?required=${field.required}
+        multiple
+        @combobox-change=${(event: CustomEvent<{ value: string[] }>) => this.selectEntities(field.name, event.detail.value)}
+      ></measure-combobox>`;
+    }
     return renderEntityList({
       field,
       entities,
@@ -838,7 +886,15 @@ export class SetupView extends LitElement {
     event.preventDefault();
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
     if (!definition || !this.capabilities) return;
-    const form = new FormData(event.currentTarget as HTMLFormElement);
+    const formElement = event.currentTarget as HTMLFormElement;
+    const form = new FormData(formElement);
+    // Read multiselects explicitly as well for environments without form-associated custom elements.
+    for (const picker of formElement.querySelectorAll<Combobox>("measure-combobox[multiple]")) {
+      form.delete(picker.name);
+      if (!picker.disabled && Array.isArray(picker.value)) {
+        for (const value of picker.value) form.append(picker.name, value);
+      }
+    }
     const failedDomain = this.dummyController
       ? undefined
       : entityDomains(definition, form).find((domain) => this.deviceEntityErrors[domain]);

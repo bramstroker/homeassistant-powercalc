@@ -228,11 +228,12 @@ describe("setup view", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.querySelectorAll('measure-combobox[name="light_entity_id"]')).toHaveLength(2);
-    const removeButton = element.shadowRoot.querySelector<HTMLButtonElement>("button.remove-entity");
-    expect(removeButton?.getAttribute("aria-label")).toBe("Remove Light");
-    expect(removeButton?.querySelector("svg")).toBeTruthy();
-    expect(removeButton?.textContent?.trim()).toBe("");
+    expect(element.shadowRoot.querySelectorAll('measure-combobox[name="light_entity_id"]')).toHaveLength(1);
+    const picker = entityCombobox(element, "light_entity_id");
+    await picker.updateComplete;
+    expect(picker.hasAttribute("multiple")).toBe(true);
+    expect(picker.shadowRoot.querySelectorAll(".tag")).toHaveLength(2);
+    expect(element.shadowRoot.querySelector("button.remove-entity")).toBeNull();
     expect(element.shadowRoot.querySelector(".discovery-help")?.textContent)
       .toContain("If a light is missing, change its state once in Home Assistant, then reload this page.");
     expect(element.shadowRoot.querySelector<HTMLDetailsElement>(".discovery-help")?.open).toBe(false);
@@ -268,8 +269,11 @@ describe("setup view", () => {
     expect(element.shadowRoot.querySelector(".add-entity")).toBeNull();
     expect(element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')).toBeNull();
     expect(element.shadowRoot.querySelectorAll('measure-combobox[name="light_entity_id"]')).toHaveLength(1);
-    expect(element.shadowRoot.querySelector(".multiple-lights p")).toBeNull();
-    expect(element.shadowRoot.querySelector(".multiple-lights a")).toBeNull();
+    const help = element.shadowRoot.querySelector<HTMLDetailsElement>(".multiple-lights details")!;
+    expect(help.open).toBe(false);
+    const toggle = element.shadowRoot.querySelector<HTMLInputElement>('input[name="measure_multiple_lights"]')!;
+    const grid = element.shadowRoot.querySelector(".profile-grid")!;
+    expect(toggle.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     element.shadowRoot.querySelector<HTMLInputElement>('input[name="measure_multiple_lights"]')!.click();
     await element.updateComplete;
@@ -283,17 +287,64 @@ describe("setup view", () => {
     expect(groupGuide?.getAttribute("target")).toBe("_blank");
     expect(groupGuide?.getAttribute("rel")).toBe("noopener noreferrer");
 
-    expect(element.shadowRoot.querySelector(".add-entity")).not.toBeNull();
+    expect(element.shadowRoot.querySelector(".add-entity")).toBeNull();
+    expect(entityCombobox(element, "light_entity_id").hasAttribute("multiple")).toBe(true);
     expect(element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')).not.toBeNull();
     const helpLink = element.shadowRoot.querySelector<HTMLAnchorElement>(".multiple-lights .help-link");
     expect(helpLink?.href).toBe("https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights");
     expect(helpLink?.getAttribute("aria-label")).toBe("Learn more about measuring multiple identical lights");
-    expect(helpLink?.querySelector("svg")).toBeTruthy();
+    expect(help.open).toBe(false);
+    help.open = true;
+    help.querySelector("summary")!.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    expect(help.open).toBe(false);
+    help.open = true;
+    help.dispatchEvent(new FocusEvent("focusout", { relatedTarget: helpLink }));
+    expect(help.open).toBe(true);
+    help.dispatchEvent(new FocusEvent("focusout", { relatedTarget: toggle }));
+    expect(help.open).toBe(false);
+    const count = element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')!;
+    expect(count.closest(".field-with-help")?.querySelector("details")?.textContent).toContain("power per light");
+    expect(count.closest("label")?.querySelector(".field-hint")).toBeNull();
 
     element.shadowRoot.querySelector<HTMLInputElement>('input[name="measure_multiple_lights"]')!.click();
     await element.updateComplete;
-    expect(element.shadowRoot.querySelector(".multiple-lights p")).toBeNull();
+    expect(help.open).toBe(false);
     expect(element.shadowRoot.querySelector(".add-entity")).toBeNull();
+  });
+
+  it("removes light tags, preserves a group count override, and keeps the first light when switching back", async () => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.definitions = [lightDefinition];
+    element.selectedType = "light";
+    element.lights = [
+      { entity_id: "light.one", name: "One", supported_modes: ["brightness", "hs"] },
+      { entity_id: "light.two", name: "Two", supported_modes: ["brightness"] },
+    ];
+    element.multipleLights = true;
+    element.selectedEntities = { light_entity_id: ["light.one", "light.two"] };
+    document.body.append(element);
+    await element.updateComplete;
+    const picker = entityCombobox(element, "light_entity_id");
+    await picker.updateComplete;
+    const count = element.shadowRoot.querySelector<HTMLInputElement>('[name="multiple_light_count"]')!;
+    count.value = "6";
+    count.dispatchEvent(new Event("input", { bubbles: true }));
+
+    picker.shadowRoot.querySelector<HTMLButtonElement>('[aria-label="Remove Two · light.two"]')!.click();
+    await element.updateComplete;
+    await picker.updateComplete;
+    expect(element.selectedEntities.light_entity_id).toEqual(["light.one"]);
+    expect(picker.shadowRoot.querySelectorAll(".tag")).toHaveLength(1);
+    expect(count.value).toBe("6");
+    expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(2);
+
+    element.shadowRoot.querySelector<HTMLInputElement>('[name="measure_multiple_lights"]')!.click();
+    await element.updateComplete;
+    const single = entityCombobox(element, "light_entity_id");
+    expect(single.hasAttribute("multiple")).toBe(false);
+    expect(single.value).toBe("light.one");
+    expect(element.shadowRoot.querySelector<HTMLInputElement>('[name="multiple_light_count"]')!.value).toBe("1");
   });
 
   it("hides the virtual-device toggle unless developer mode is enabled", async () => {

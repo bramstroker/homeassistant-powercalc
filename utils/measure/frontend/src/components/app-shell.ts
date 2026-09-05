@@ -125,6 +125,10 @@ export class AppShell extends LitElement implements MeasureAppState {
     .sequence > li.active .step-number { border-color: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 16%, transparent); color: var(--on-signal); background: var(--signal); }
     .sequence > li.done .step-number { border-color: var(--signal); color: var(--on-signal); background: var(--signal); }
     .sequence > li.done:not(:last-child)::after { background: var(--signal); }
+    .sequence > li::after { pointer-events: none; }
+    .step-link { display: grid; align-content: start; justify-items: start; gap: 0.45rem; min-width: 0; padding: 0; border: 0; border-radius: 4px; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; text-align: left; }
+    .step-link:hover:not(:disabled) { background: transparent; color: var(--ink); transform: none; }
+    .step-link:hover:not(:disabled) > span:last-child { text-decoration: underline; text-underline-offset: 0.2em; }
     .loading { min-height: 260px; display: grid; place-items: center; text-align: center; }
     .pulse { width: 40px; height: 40px; margin: 0 auto 1rem; border: 2px solid var(--line); border-top-color: var(--signal); border-radius: 50%; animation: spin 850ms linear infinite; }
     footer { margin-top: 1rem; color: var(--muted); font-size: 0.72rem; text-align: right; }
@@ -424,10 +428,18 @@ export class AppShell extends LitElement implements MeasureAppState {
     return html`
       <nav aria-label="Measurement progress">
         <ol class="sequence">
-          ${steps.map(({ label }, index) => html`
+          ${steps.map(({ view, label }, index) => {
+            const content = html`<span class="step-number">${index < current ? "✓" : index + 1}</span><span>${label}</span>`;
+            const canGoBack = (view === "result" && (this.view === "profile" || this.view === "share"))
+              || (view === "profile" && this.view === "share");
+            return html`
             <li class=${stepClass(index, current)} aria-current=${index === current ? "step" : nothing}>
-              <span class="step-number">${index < current ? "✓" : index + 1}</span><span>${label}</span>
-            </li>`)}
+              ${canGoBack
+                ? html`<button type="button" class="step-link" aria-label=${label} ?disabled=${this.busy || this.contributionBusy}
+                    @click=${() => view === "result" ? this.controller.backToResult() : this.controller.backToProfile()}>${content}</button>`
+                : content}
+            </li>`;
+          })}
         </ol>
       </nav>`;
   }

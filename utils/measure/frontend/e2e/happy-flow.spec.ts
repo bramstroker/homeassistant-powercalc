@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { mockApi, parameters, startedSnapshot } from "./mock-api";
+import { contributionPreview, mockApi, parameters, startedSnapshot } from "./mock-api";
 import type { SessionSnapshot } from "../src/types";
 
 /**
@@ -89,21 +89,74 @@ for (const width of [1280, 390]) {
     await expect(setup.locator("fieldset.section")).toHaveCount(0);
     await expect(setup.getByRole("button", { name: "Change power meter" })).toBeVisible();
     await expect(setup.locator(".discovery-help p")).toBeHidden();
-    await expect(setup.locator(".multiple-lights p")).toHaveCount(0);
+    await expect(setup.locator(".multiple-lights .help-content")).toBeHidden();
     await expect(setup.getByRole("group", { name: "What do you want to measure?" })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
     await page.screenshot({ path: testInfo.outputPath("setup.png"), fullPage: true });
 
-    await setup.getByText("Light not found?", { exact: true }).click();
+    const discoveryHelp = setup.locator('summary[aria-label="Light not found?"]');
+    const initialGridBounds = await grid.boundingBox();
+    await discoveryHelp.click();
     await expect(setup.locator(".discovery-help p")).toBeVisible();
-    await setup.getByText("Light not found?", { exact: true }).click();
-    await setup.getByLabel("Measure multiple lights", { exact: true }).check();
-    await expect(setup.locator(".multiple-lights p")).toBeVisible();
+    expect(await grid.boundingBox()).toEqual(initialGridBounds);
+    await discoveryHelp.press("Escape");
+    await expect(setup.locator(".discovery-help p")).toBeHidden();
+
+    const toggle = setup.getByLabel("Measure multiple lights", { exact: true });
+    await toggle.scrollIntoViewIfNeeded();
+    const toggleBefore = await toggle.boundingBox();
+    await toggle.check();
+    expect(await toggle.boundingBox()).toEqual(toggleBefore);
+    await expect(setup.locator(".multiple-lights .help-content")).toBeHidden();
+    const multipleHelp = setup.locator('summary[aria-label="About measuring multiple lights"]');
+    await multipleHelp.focus();
+    await multipleHelp.press("Enter");
+    await expect(setup.locator(".multiple-lights .help-content")).toBeVisible();
     await expect(setup.getByRole("link", { name: "Home Assistant light group" })).toBeVisible();
-    await setup.getByLabel("Measure multiple lights", { exact: true }).uncheck();
-    await expect(setup.locator(".multiple-lights p")).toHaveCount(0);
+    expect(await toggle.boundingBox()).toEqual(toggleBefore);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    await multipleHelp.press("Escape");
+    await setup.getByRole("combobox", { name: "Lights", exact: true }).click();
+    await setup.getByRole("option", { name: "Desk lamp · light.desk" }).click();
+    await setup.getByRole("option", { name: "Floor lamp · light.floor" }).click();
+    await setup.getByRole("combobox", { name: "Lights", exact: true }).press("Escape");
+    expect(await toggle.boundingBox()).toEqual(toggleBefore);
+    await expect(setup.locator('measure-combobox[name="light_entity_id"]')).toHaveCount(1);
+    await expect(light.locator(".tag")).toHaveCount(2);
+    await expect(setup.getByRole("button", { name: "Add another light" })).toHaveCount(0);
+    await expect(setup.getByRole("spinbutton", { name: "Number of lights" })).toHaveValue("2");
+    const countHelp = setup.locator('summary[aria-label="Number of lights"]');
+    await countHelp.click();
+    await expect(setup.getByText(/Measured power is divided by this value/)).toBeVisible();
+    await page.screenshot({ path: testInfo.outputPath("multiple-lights-help.png"), fullPage: true });
+    await countHelp.press("Escape");
+    await page.screenshot({ path: testInfo.outputPath("multiple-lights.png"), fullPage: true });
+    await light.getByRole("button", { name: "Remove Floor lamp · light.floor" }).click();
+    await expect(light.locator(".tag")).toHaveCount(1);
+    await expect(setup.getByRole("spinbutton", { name: "Number of lights" })).toHaveValue("1");
+    await toggle.uncheck();
+    await expect(setup.getByRole("combobox", { name: "Light", exact: true })).toHaveValue("Desk lamp · light.desk");
+    await expect(setup.locator(".multiple-lights .help-content")).toBeHidden();
   });
 }
+
+test("submits light tags as distinct controller entities", async ({ page }) => {
+  await page.getByRole("button", { name: "New measurement" }).click();
+  await page.getByRole("button", { name: /Light bulb/ }).click();
+  await page.getByLabel("Measure multiple lights", { exact: true }).check();
+  const picker = page.getByRole("combobox", { name: "Lights", exact: true });
+  await picker.click();
+  await page.getByRole("option", { name: "Desk lamp · light.desk" }).click();
+  await page.getByRole("option", { name: "Floor lamp · light.floor" }).click();
+  await picker.press("Escape");
+  const request = page.waitForRequest("**/api/preflight");
+  await page.getByRole("button", { name: "Check light and setup", exact: true }).click();
+  expect((await request).postDataJSON()).toMatchObject({
+    controller: { type: "hass_multi", entity_ids: ["light.desk", "light.floor"] },
+    multiple_light_count: 2,
+  });
+  await expect(page.getByRole("heading", { name: "Ready for the bench" })).toBeVisible();
+});
 
 test("keeps developer controls collapsed but virtual measurement status visible", async ({ page }) => {
   await mockApi(page, { capabilities: { developer_mode: true, fast_test_mode: true } });
@@ -224,6 +277,9 @@ for (const width of [1280, 390]) {
 }
 
 test("preserves unfinished profile fields and tags when navigating back to Result", async ({ page }) => {
+  await page.route("**/api/sessions/session-completed/contribution/preview", (route) => route.fulfill({
+    json: { ...contributionPreview, product_name: "Edited lamp" },
+  }));
   await page.getByRole("button", { name: "Open", exact: true }).click();
   await page.getByRole("button", { name: "Prepare profile" }).click();
   const product = page.locator('input[name="product_name"]');
@@ -234,7 +290,9 @@ test("preserves unfinished profile fields and tags when navigating back to Resul
   await meter.fill("Custom meter");
   await page.getByRole("combobox", { name: "Connectivity", exact: true }).click();
   await page.getByRole("option", { name: "Zigbee", exact: true }).click();
-  await page.getByRole("button", { name: "Back to result", exact: true }).click();
+  const progress = page.getByRole("navigation", { name: "Measurement progress" });
+  await progress.getByRole("button", { name: "Result", exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   await page.getByRole("button", { name: "Prepare profile" }).click();
 
   await expect(product).toHaveValue("Edited lamp ");
@@ -246,6 +304,18 @@ test("preserves unfinished profile fields and tags when navigating back to Resul
   await expect(page.locator(".validation-status")).toContainText("Profile validated");
   await page.getByRole("button", { name: "Continue to use profile" }).click();
   await expect(page.getByRole("heading", { name: "Choose how to use the profile" })).toBeVisible();
+  const prepareStep = progress.getByRole("button", { name: "Prepare", exact: true });
+  await prepareStep.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { name: "Prepare your Powercalc profile" })).toBeVisible();
+  await expect(product).toHaveValue("Edited lamp");
+  await expect(page.getByRole("button", { name: "Continue to use profile" })).toBeEnabled();
+  await page.getByRole("button", { name: "Continue to use profile" }).click();
+  const resultStep = progress.getByRole("button", { name: "Result", exact: true });
+  await resultStep.focus();
+  await page.keyboard.press("Space");
+  await expect(page.getByRole("heading", { name: "Measurement complete" })).toBeVisible();
+  await expect(progress.getByRole("button")).toHaveCount(0);
 });
 
 test("keeps profile metadata controls aligned at a consistent height", async ({ page }) => {

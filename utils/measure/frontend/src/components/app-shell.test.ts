@@ -373,6 +373,44 @@ describe("app shell", () => {
     expect(document.body.scrollTop).toBe(500);
   });
 
+  it("allows backward navigation to Result and Prepare only, without leaving a busy operation", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = new AppShell();
+    element.view = "share";
+    element.snapshot = { state: "completed", session_id: "session-1" };
+    document.body.append(element);
+    await element.updateComplete;
+    const controller = controllerOf(element);
+    const result = vi.spyOn(controller, "backToResult").mockImplementation(() => {});
+    const prepare = vi.spyOn(controller, "backToProfile").mockImplementation(() => {});
+    const buttons = () => [...element.shadowRoot!.querySelectorAll<HTMLButtonElement>(".sequence button")];
+    expect(buttons().map((button) => button.getAttribute("aria-label"))).toEqual(["Result", "Prepare"]);
+    buttons()[0]!.click();
+    buttons()[1]!.click();
+    expect(result).toHaveBeenCalledOnce();
+    expect(prepare).toHaveBeenCalledOnce();
+
+    element.contributionBusy = true;
+    element.requestUpdate();
+    await element.updateComplete;
+    for (const button of buttons()) {
+      expect(button.disabled).toBe(true);
+      button.click();
+    }
+    expect(result).toHaveBeenCalledOnce();
+    expect(prepare).toHaveBeenCalledOnce();
+
+    element.contributionBusy = false;
+    element.view = "profile";
+    element.requestUpdate();
+    await element.updateComplete;
+    expect(buttons().map((button) => button.getAttribute("aria-label"))).toEqual(["Result"]);
+    element.view = "result";
+    element.requestUpdate();
+    await element.updateComplete;
+    expect(buttons()).toHaveLength(0);
+  });
+
   it.each(["setup", "review", "running", "result"] as const)("ends the average flow at Result in %s", async (view) => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = document.createElement("powercalc-measure-app") as AppShell;

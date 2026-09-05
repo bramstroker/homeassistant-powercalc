@@ -108,6 +108,9 @@ export class SettingsView extends LitElement {
   @state()
   private githubCopyStatus = "";
 
+  @state()
+  private contributorGithubValue?: string;
+
   @property({ attribute: false })
   shellyDiscoveryDevices: ShellyDiscoveryDevice[] = [];
 
@@ -208,6 +211,7 @@ export class SettingsView extends LitElement {
     if (changedProperties.has("settings")) {
       this.measureDeviceValue = this.settings?.default_measure_device ?? "";
       this.hassPowerEntity = this.settings?.default_power_entity_id ?? "";
+      this.contributorGithubValue = undefined;
     }
     // Honour a requested section (e.g. opened from the GitHub contribution shortcut) once,
     // while still letting the user switch sections afterwards.
@@ -220,6 +224,9 @@ export class SettingsView extends LitElement {
   render() {
     const powerMeter = this.meter ?? this.settings?.power_meter ?? "hass";
     const descriptor = meterFor(powerMeter);
+    const connectedGithubUsername = this.contributionAuth?.connected ? this.contributionAuth.identity?.login : "";
+    const contributorGithub = this.contributorGithubValue
+      ?? (this.settings?.default_contributor_github || connectedGithubUsername || "");
     const defaults = this.settings?.measurement_defaults
       ?? this.capabilities?.defaults
       ?? { sleep_time: 2, sample_count: 1, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 };
@@ -292,7 +299,12 @@ export class SettingsView extends LitElement {
                 </label>
                 <label>
                   <span>GitHub username</span>
-                  <input name="default_contributor_github" .value=${this.settings?.default_contributor_github ?? ""} autocomplete="username" />
+                  <input
+                    name="default_contributor_github"
+                    .value=${contributorGithub}
+                    @input=${this.contributorGithubChanged}
+                    autocomplete="username"
+                  />
                 </label>
                 <label>
                   <span>Email (optional)</span>
@@ -353,6 +365,10 @@ export class SettingsView extends LitElement {
   private measureDeviceOptions(): ComboboxOption[] {
     if (this.measureDevicesLoading || this.measureDevicesError) return [];
     return this.measureDevices.map((device) => ({ value: device, label: device }));
+  }
+
+  private contributorGithubChanged(event: Event): void {
+    this.contributorGithubValue = (event.target as HTMLInputElement).value;
   }
 
   private measureDeviceChanged(event: CustomEvent<{ value: string }>): void {

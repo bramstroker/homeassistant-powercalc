@@ -1,5 +1,6 @@
 import type { AppSettings, AppSettingsUpdate, Capabilities, EntityDescriptor, PowerMeterDiagnostic, SettingsSection } from "../types";
 import "./settings-view";
+import type { SettingsView } from "./settings-view";
 import { capabilities, defaultSettings, goodPowerMeterDiagnostic, measurementDefaults } from "./test-fixtures";
 
 interface TestCombobox extends HTMLElement {
@@ -19,6 +20,50 @@ function chooseOption(picker: TestCombobox, value: string): void {
 }
 
 describe("settings view", () => {
+  it.each(["device", "token"] as const)("prefills and saves the contributor username after connecting with %s", async (method) => {
+    const element = document.createElement("measure-settings-view") as SettingsView;
+    element.settings = { ...defaultSettings, power_meter: "dummy", default_measure_device: "Test meter", default_contributor_github: null };
+    document.body.append(element);
+    await element.updateComplete;
+    const input = element.shadowRoot!.querySelector<HTMLInputElement>('[name="default_contributor_github"]')!;
+    expect(input.value).toBe("");
+
+    element.contributionAuth = { connected: true, method, identity: { login: "octocat" } };
+    await element.updateComplete;
+    expect(input.value).toBe("octocat");
+
+    const saved = new Promise<AppSettingsUpdate>((resolve) => {
+      element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettingsUpdate>).detail));
+    });
+    element.shadowRoot!.querySelector<HTMLFormElement>("form")!.requestSubmit();
+    expect((await saved).default_contributor_github).toBe("octocat");
+  });
+
+  it("prefills from an existing connection but preserves saved and unsaved contributor usernames", async () => {
+    const element = document.createElement("measure-settings-view") as SettingsView;
+    element.settings = { ...defaultSettings, default_contributor_github: null };
+    element.contributionAuth = { connected: true, identity: { login: "octocat" } };
+    document.body.append(element);
+    await element.updateComplete;
+    const input = element.shadowRoot!.querySelector<HTMLInputElement>('[name="default_contributor_github"]')!;
+    expect(input.value).toBe("octocat");
+
+    element.settings = { ...element.settings, default_contributor_github: "saved-author" };
+    await element.updateComplete;
+    expect(input.value).toBe("saved-author");
+
+    element.settings = { ...element.settings, default_contributor_github: null };
+    element.contributionAuth = { connected: false };
+    await element.updateComplete;
+    for (const value of ["unsaved-author", ""]) {
+      input.value = value;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      element.contributionAuth = { connected: true, identity: { login: "another-account" } };
+      await element.updateComplete;
+      expect(input.value).toBe(value);
+    }
+  });
+
   it("lists power sensors and emits the selected default on save", async () => {
     const element = document.createElement("measure-settings-view") as HTMLElement & {
       powers: EntityDescriptor[];

@@ -46,7 +46,10 @@ const powers: EntityDescriptor[] = [
   { entity_id: "sensor.plug_power", name: "Plug power", unit: "W", related_voltage_entity_id: "sensor.plug_voltage" },
 ];
 const voltages: EntityDescriptor[] = [{ entity_id: "sensor.plug_voltage", name: "Plug voltage", unit: "V" }];
-const lights: EntityDescriptor[] = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"] }];
+const lights: EntityDescriptor[] = [
+  { entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"] },
+  { entity_id: "light.floor", name: "Floor lamp", supported_modes: ["brightness"] },
+];
 
 const catalog: EntityCatalog = { lights, powers, voltages };
 const measureDevices: MeasureDeviceCatalog = {
@@ -112,6 +115,7 @@ const lightDefinition: MeasureDefinition = {
   fields: [
     { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, entity_domains: ["sensor"], options: [] },
     { name: "light_entity_id", role: "controller", label: "Light", plural_label: "Lights", control: "entity", required: true, multiple: true, entity_domains: ["light"], options: [] },
+    { name: "multiple_light_count", role: "attribute", label: "Number of lights", control: "number", required: true, options: [], default: 1, minimum: 1, maximum: 100, derived_from: "light_entity_id" },
     {
       name: "modes", role: "attribute", label: "Lookup-table modes", control: "multi_select",
       narrowed_by: "light_entity_id", required: true,
@@ -342,4 +346,4 @@ export async function mockApi(page: Page, options: MockApiOptions = {}): Promise
   });
 }
 
-export { completedSession, settings, startedSnapshot, parameters };
+export { completedSession, settings, startedSnapshot, parameters, contributionPreview };
