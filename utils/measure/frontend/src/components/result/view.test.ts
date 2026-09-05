@@ -31,7 +31,7 @@ describe("result view", () => {
     };
     element.snapshot = {
       state: "failed",
-      error: "Use a more sensitive meter. See https://docs.powercalc.nl/contributing/measure/troubleshooting/ for troubleshooting guidance.",
+      error: "Aborting measurement session after repeated 0 W readings. The power meter may not resolve this low load. See https://docs.powercalc.nl/contributing/measure/troubleshooting/ for troubleshooting guidance.",
     };
     element.files = [{ name: "brightness.csv", size: 10, media_type: "text/csv" }];
     element.plotCollection = { partial: true, plots: [], warnings: ["Could not plot brightness.csv"] };
@@ -39,7 +39,7 @@ describe("result view", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.querySelector(".notice.error")?.textContent).toContain("Use a more sensitive meter.");
+    expect(element.shadowRoot.querySelector(".notice.error")?.textContent).toContain("use a more sensitive meter.");
     const troubleshootingLink = element.shadowRoot.querySelector(".notice.error a") as HTMLAnchorElement;
     expect(troubleshootingLink.textContent).toBe("Troubleshooting guide");
     expect(troubleshootingLink.href).toBe("https://docs.powercalc.nl/contributing/measure/troubleshooting/");
@@ -48,6 +48,23 @@ describe("result view", () => {
     expect(element.shadowRoot.textContent).not.toContain("Generated files");
     expect(element.shadowRoot.textContent).not.toContain("Download all");
     expect(element.shadowRoot.querySelector(".diagnostics-download a")).toBeTruthy();
+  });
+
+  it("does not linkify a trusted URL embedded in an arbitrary error", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot;
+      updateComplete: Promise<boolean>;
+      shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "failed",
+      error: "Unexpected response from https://malicious.example/https://docs.powercalc.nl/contributing/measure/troubleshooting/",
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".notice.error")?.textContent).toContain("malicious.example");
+    expect(element.shadowRoot.querySelector(".notice.error a")).toBeNull();
   });
 
   it("shows a download-all action for generated files", async () => {

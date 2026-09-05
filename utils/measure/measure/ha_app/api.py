@@ -1140,7 +1140,11 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> Sessio
         error=snapshot.error,
         summary=snapshot.summary,
         operating_point=snapshot.operating_point,
-        calibration_sample=snapshot.calibration_sample,
+        calibration_sample=(
+            CalibrationSampleResponse(**snapshot.calibration_sample)
+            if snapshot.calibration_sample is not None
+            else None
+        ),
         entity_states=snapshot.entity_states,
         request=context.storage.load_request(snapshot.id),
     )

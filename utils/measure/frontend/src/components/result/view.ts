@@ -8,6 +8,7 @@ import { errorHelpLink } from "../shared/error-help-link";
 import "./plot";
 
 const TROUBLESHOOTING_URL = "https://docs.powercalc.nl/contributing/measure/troubleshooting/";
+const ZERO_READING_ERROR_PREFIX = "Aborting measurement session after repeated 0 W readings.";
 
 interface ResultOutcome {
   mark: string;
@@ -135,9 +136,14 @@ export class ResultView extends LitElement {
   }
 
   private renderError(error: string) {
-    if (!error.includes(TROUBLESHOOTING_URL)) return error;
-    const [before, after] = error.split(TROUBLESHOOTING_URL, 2);
-    return html`${before}<a href=${TROUBLESHOOTING_URL} target="_blank" rel="noopener noreferrer">Troubleshooting guide</a>${after}`;
+    if (!error.startsWith(ZERO_READING_ERROR_PREFIX)) return error;
+    return html`
+      Aborting measurement session after repeated 0 W readings. The power meter may not resolve this low load.
+      Verify the device is on and connected, measure multiple identical lights together, add a resistive dummy load,
+      or use a more sensitive meter. See
+      <a href=${TROUBLESHOOTING_URL} target="_blank" rel="noopener noreferrer">Troubleshooting guide</a>
+      for troubleshooting guidance.
+    `;
   }
 
   private renderFiles() {
