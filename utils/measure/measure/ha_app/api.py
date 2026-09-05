@@ -88,6 +88,7 @@ from measure.tuning import MeasurementParameters
 from measure.version import measure_version
 from measure.visualization import PlotSpec, build_session_plots
 
+CACHE_CONTROL_LIBRARY = "public, max-age=600"
 _LOGGER = logging.getLogger("measure")
 
 
@@ -516,7 +517,7 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
             devices = await run_in_threadpool(_context(request).measure_device_catalog.devices)
         except LibraryCatalogError as error:
             raise HTTPException(status_code=503, detail=str(error)) from error
-        response.headers["Cache-Control"] = "public, max-age=600"
+        response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
         return MeasureDeviceCatalogResponse(devices=list(devices))
 
     @router.get("/library/manufacturers", responses={503: _ERROR})
@@ -525,7 +526,7 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
             values = await run_in_threadpool(_context(request).manufacturer_catalog.manufacturers)
         except LibraryCatalogError as error:
             raise HTTPException(status_code=503, detail=str(error)) from error
-        response.headers["Cache-Control"] = "public, max-age=600"
+        response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
         return ManufacturerCatalogResponse(manufacturers=list(values))
 
     @router.get("/library/device-specifications", responses={503: _ERROR})
@@ -534,7 +535,7 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
             values = await run_in_threadpool(_context(request).device_specification_catalog.fields)
         except LibraryCatalogError as error:
             raise HTTPException(status_code=503, detail=str(error)) from error
-        response.headers["Cache-Control"] = "public, max-age=600"
+        response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
         return DeviceSpecificationCatalogResponse(
             device_types={
                 device_type: [

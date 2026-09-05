@@ -80,16 +80,28 @@ export class Combobox extends LitElement {
   }
 
   render() {
-    const options = this.filteredOptions();
     return html`
-      <label for="combobox-input"><span>${this.label}${this.required ? html` <span class="required-marker" aria-hidden="true">*</span>` : nothing}</span></label>
+      ${this.renderLabel()}
+      ${this.renderControl()}
+      ${this.renderSupportingText()}
+      <slot name="value" hidden></slot>
+    `;
+  }
+
+  private renderLabel() {
+    const requiredMarker = this.required
+      ? html` <span class="required-marker" aria-hidden="true">*</span>`
+      : nothing;
+    return html`<label for="combobox-input"><span>${this.label}${requiredMarker}</span></label>`;
+  }
+
+  private renderControl() {
+    const describedBy = [this.hint ? "combobox-hint" : "", this.error ? "combobox-error" : ""]
+      .filter(Boolean)
+      .join(" ");
+    return html`
       <div class=${this.controlClass()} @focusout=${this.focusOut}>
-        ${this.multiple ? this.values().map((value) => html`
-          <span class="tag">
-            ${this.displayValue(value)}
-            <button type="button" ?disabled=${this.disabled} aria-label=${`Remove ${this.displayValue(value)}`} @click=${() => this.removeValue(value)}>×</button>
-          </span>
-        `) : nothing}
+        ${this.renderSelectedValues()}
         <input
           id="combobox-input"
           .value=${this.query}
@@ -97,12 +109,12 @@ export class Combobox extends LitElement {
           ?disabled=${this.disabled}
           ?readonly=${!this.searchable}
           autocomplete="off"
-          placeholder=${this.multiple && this.values().length ? "Add another…" : this.placeholder}
+          placeholder=${this.inputPlaceholder()}
           role="combobox"
           aria-autocomplete=${this.searchable ? "list" : "none"}
           aria-readonly=${this.searchable ? nothing : "true"}
           aria-invalid=${this.error ? "true" : "false"}
-          aria-describedby=${[this.hint ? "combobox-hint" : "", this.error ? "combobox-error" : ""].filter(Boolean).join(" ") || nothing}
+          aria-describedby=${describedBy || nothing}
           aria-controls="combobox-options"
           aria-multiselectable=${this.multiple ? "true" : nothing}
           aria-expanded=${this.open ? "true" : "false"}
@@ -115,31 +127,56 @@ export class Combobox extends LitElement {
         <button class="toggle" type="button" aria-label=${`Show ${this.label.toLowerCase()} options`} ?disabled=${this.disabled} @click=${this.toggle}>
           ${this.open ? "▲" : "▼"}
         </button>
-        ${this.open ? html`
-          <div id="combobox-options" class="menu" role="listbox" aria-label=${`${this.label} options`} aria-multiselectable=${this.multiple ? "true" : nothing}>
-            ${options.length
-              ? options.map((option, index) => html`
-                  <div
-                    id=${`combobox-option-${index}`}
-                    class=${this.optionClass(option, index)}
-                    role="option"
-                    aria-selected=${this.isSelected(option.value) ? "true" : "false"}
-                    aria-disabled=${option.disabled ? "true" : "false"}
-                    @mousedown=${(event: MouseEvent) => event.preventDefault()}
-                    @mousemove=${() => this.activateOption(option, index)}
-                    @click=${() => this.select(option)}
-                  >${option.label}</div>
-                `)
-              : html`<p class="empty">${this.allowCustom
-                ? "No existing option matches. This value will be saved as a custom entry."
-                : "No matching options."}</p>`}
-          </div>
-        ` : nothing}
+        ${this.open ? this.renderMenu(this.filteredOptions()) : nothing}
       </div>
+    `;
+  }
+
+  private renderSupportingText() {
+    return html`
       ${this.hint ? html`<small id="combobox-hint" class="field-hint">${this.hint}</small>` : nothing}
       ${this.error ? html`<small id="combobox-error" class="field-hint error">${this.error}</small>` : nothing}
-      <slot name="value" hidden></slot>
     `;
+  }
+
+  private renderSelectedValues() {
+    if (!this.multiple) return nothing;
+    return this.values().map((value) => html`
+      <span class="tag">
+        ${this.displayValue(value)}
+        <button type="button" ?disabled=${this.disabled} aria-label=${`Remove ${this.displayValue(value)}`} @click=${() => this.removeValue(value)}>×</button>
+      </span>
+    `);
+  }
+
+  private inputPlaceholder(): string {
+    return this.multiple && this.values().length ? "Add another…" : this.placeholder;
+  }
+
+  private renderMenu(options: ComboboxOption[]) {
+    const content = options.length
+      ? options.map((option, index) => this.renderOption(option, index))
+      : html`<p class="empty">${this.emptyMessage()}</p>`;
+    return html`<div id="combobox-options" class="menu" role="listbox" aria-label=${`${this.label} options`} aria-multiselectable=${this.multiple ? "true" : nothing}>${content}</div>`;
+  }
+
+  private renderOption(option: ComboboxOption, index: number) {
+    return html`<div
+      id=${`combobox-option-${index}`}
+      class=${this.optionClass(option, index)}
+      role="option"
+      aria-selected=${this.isSelected(option.value) ? "true" : "false"}
+      aria-disabled=${option.disabled ? "true" : "false"}
+      @mousedown=${(event: MouseEvent) => event.preventDefault()}
+      @mousemove=${() => this.activateOption(option, index)}
+      @click=${() => this.select(option)}
+    >${option.label}</div>`;
+  }
+
+  private emptyMessage(): string {
+    return this.allowCustom
+      ? "No existing option matches. This value will be saved as a custom entry."
+      : "No matching options.";
   }
 
   private filteredOptions(): ComboboxOption[] {
@@ -217,38 +254,50 @@ export class Combobox extends LitElement {
   }
 
   private keydown(event: KeyboardEvent) {
-    const options = this.filteredOptions();
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      this.open = true;
-      const available = options.map((option, index) => ({ option, index })).filter(({ option }) => !option.disabled);
-      if (!available.length) return;
-      const current = available.findIndex(({ index }) => index === this.active);
-      const increment = event.key === "ArrowDown" ? 1 : -1;
-      const next = current < 0
-        ? (event.key === "ArrowDown" ? 0 : available.length - 1)
-        : (current + increment + available.length) % available.length;
-      this.active = available[next]!.index;
-      void this.updateComplete.then(() => this.renderRoot.querySelector(`#combobox-option-${this.active}`)?.scrollIntoView?.({ block: "nearest" }));
+      this.moveActiveOption(event);
       return;
     }
-    if (event.key === "Enter" && this.open) {
-      const option = this.active >= 0 ? options[this.active] : this.enterFallback(options);
-      if (option && !option.disabled) {
-        event.preventDefault();
-        this.select(option);
-        return;
-      }
-    }
-    if (event.key === "Enter" && this.multiple && this.allowCustom && this.query.trim()) {
-      event.preventDefault();
-      this.add(this.query.trim());
+    if (event.key === "Enter") {
+      this.selectOnEnter(event);
       return;
     }
     if (event.key === "Escape") {
       event.preventDefault();
       this.closeAndRestore();
     }
+  }
+
+  private moveActiveOption(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.open = true;
+    const available = this.filteredOptions()
+      .map((option, index) => ({ option, index }))
+      .filter(({ option }) => !option.disabled);
+    if (!available.length) return;
+    const current = available.findIndex(({ index }) => index === this.active);
+    const increment = event.key === "ArrowDown" ? 1 : -1;
+    let next = (current + increment + available.length) % available.length;
+    if (current < 0) next = event.key === "ArrowDown" ? 0 : available.length - 1;
+    this.active = available[next]!.index;
+    void this.updateComplete.then(() => this.renderRoot.querySelector(`#combobox-option-${this.active}`)?.scrollIntoView?.({ block: "nearest" }));
+  }
+
+  private selectOnEnter(event: KeyboardEvent): void {
+    const options = this.filteredOptions();
+    const option = this.enterOption(options);
+    if (option && !option.disabled) {
+      event.preventDefault();
+      this.select(option);
+    } else if (this.multiple && this.allowCustom && this.query.trim()) {
+      event.preventDefault();
+      this.add(this.query.trim());
+    }
+  }
+
+  private enterOption(options: ComboboxOption[]): ComboboxOption | undefined {
+    if (!this.open) return undefined;
+    return this.active >= 0 ? options[this.active] : this.enterFallback(options);
   }
 
   /**
@@ -334,11 +383,13 @@ export class Combobox extends LitElement {
   }
 
   private values(): string[] {
-    return Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+    if (Array.isArray(this.value)) return this.value;
+    return this.value ? [this.value] : [];
   }
 
   private singleValue(): string {
-    return Array.isArray(this.value) ? (this.value[0] ?? "") : this.value;
+    if (Array.isArray(this.value)) return this.value[0] ?? "";
+    return this.value;
   }
 
   private isSelected(value: string): boolean {

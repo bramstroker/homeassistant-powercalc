@@ -20,6 +20,7 @@ from measure.profile.output import write_prepared_profile
 from measure.profile.specifications import DeviceSpecField, device_spec_fields
 
 Prompt = Callable[[str], str]
+MODEL_SCHEMA_FILENAME = "model_schema.json"
 
 
 @dataclass(frozen=True)
@@ -47,7 +48,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="profile_library directory or repository checkout used for validation",
     )
-    prepare.add_argument("--schema", type=Path, help="model schema path (defaults to <library-root>/model_schema.json)")
+    prepare.add_argument(
+        "--schema",
+        type=Path,
+        help=f"model schema path (defaults to <library-root>/{MODEL_SCHEMA_FILENAME})",
+    )
     prepare.add_argument(
         "--output",
         type=Path,
@@ -74,7 +79,7 @@ def prepare_profile(argv: Sequence[str], *, prompt: Prompt = input) -> ProfilePr
     metadata_values.update(supplied)
 
     library_root = _resolve_library_root(args.library_root)
-    schema_path = args.schema.resolve() if args.schema else library_root / "model_schema.json"
+    schema_path = args.schema.resolve() if args.schema else library_root / MODEL_SCHEMA_FILENAME
     if not schema_path.is_file():
         raise ProfilePreparationError(f"Model schema does not exist: {schema_path}")
     if not args.non_interactive:
@@ -207,7 +212,7 @@ def _prompt_device_specs(
     existing = defaults if isinstance(defaults, dict) else {}
     if not fields:
         return existing or None
-    print("\nDevice specifications from model_schema.json (leave blank when unknown).")
+    print(f"\nDevice specifications from {MODEL_SCHEMA_FILENAME} (leave blank when unknown).")
     # Specifications the current schema no longer describes are kept as they are, so editing
     # an older profile never silently drops metadata its model.json already carries.
     prompted = {field.name for field in fields}
@@ -255,7 +260,9 @@ def _specification_values(values: list[str], field: DeviceSpecField) -> list[Any
 def _ask_valid_options(prompt: Prompt, label: str, default: object, field: DeviceSpecField) -> str | None:
     while True:
         value = _ask(prompt, label, default)
-        values = _split_list(value) if field.collection != "scalar" else ([value] if value else [])
+        values = _split_list(value)
+        if field.collection == "scalar":
+            values = [value] if value else []
         invalid = next((item for item in values if field.options and item not in field.options), None)
         if invalid is None:
             return value
@@ -263,7 +270,11 @@ def _ask_valid_options(prompt: Prompt, label: str, default: object, field: Devic
 
 
 def _ask_boolean(prompt: Prompt, label: str, default: object) -> bool | None:
-    default_text = "yes" if default is True else "no" if default is False else None
+    default_text = None
+    if default is True:
+        default_text = "yes"
+    elif default is False:
+        default_text = "no"
     while True:
         value = _ask(prompt, f"{label} (yes/no)", default_text)
         if value is None:
@@ -300,7 +311,7 @@ def _split_list(value: str | None) -> list[str]:
 def _resolve_library_root(configured: Path | None) -> Path:
     candidate = configured.resolve() if configured else PROJECT_DIR.parents[1] / "profile_library"
     nested = candidate / "profile_library"
-    if not (candidate / "model_schema.json").is_file() and (nested / "model_schema.json").is_file():
+    if not (candidate / MODEL_SCHEMA_FILENAME).is_file() and (nested / MODEL_SCHEMA_FILENAME).is_file():
         candidate = nested
     if not candidate.is_dir():
         raise ProfilePreparationError(

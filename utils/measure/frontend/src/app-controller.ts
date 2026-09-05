@@ -121,7 +121,7 @@ export class MeasureAppController {
   private contributionDevicePollInterval = 0;
   private contributionDeviceExpiresAt = 0;
   private contributionDevicePollTimer?: ReturnType<typeof setTimeout>;
-  private contributionTouchedFields = new Set<string>();
+  private readonly contributionTouchedFields = new Set<string>();
 
   constructor(
     private readonly state: MeasureAppState,

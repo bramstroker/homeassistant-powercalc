@@ -125,27 +125,41 @@ def resolve_manufacturer_name(library: object, value: str) -> str:
     candidate = value.strip()
     if not candidate:
         return candidate
-    direct_names: dict[str, str] = {}
-    aliases: dict[str, set[str]] = {}
-    for manufacturer in _manufacturer_entries(library):
-        canonical_value = manufacturer.get("full_name") or manufacturer.get("name")
-        if not isinstance(canonical_value, str) or not (canonical := canonical_value.strip()):
-            continue
-        for direct_value in (manufacturer.get("name"), manufacturer.get("full_name")):
-            if isinstance(direct_value, str) and (name := direct_value.strip()):
-                direct_names.setdefault(name.casefold(), canonical)
-        manufacturer_aliases = manufacturer.get("aliases")
-        if not isinstance(manufacturer_aliases, list):
-            continue
-        for alias_value in manufacturer_aliases:
-            if isinstance(alias_value, str) and (alias := alias_value.strip()):
-                aliases.setdefault(alias.casefold(), set()).add(canonical)
-
+    direct_names, aliases = _manufacturer_name_indexes(_manufacturer_entries(library))
     key = candidate.casefold()
     if resolved := direct_names.get(key):
         return resolved
     alias_matches = aliases.get(key, set())
     return next(iter(alias_matches)) if len(alias_matches) == 1 else candidate
+
+
+def _manufacturer_name_indexes(
+    manufacturers: list[dict[str, object]],
+) -> tuple[dict[str, str], dict[str, set[str]]]:
+    direct_names: dict[str, str] = {}
+    aliases: dict[str, set[str]] = {}
+    for manufacturer in manufacturers:
+        canonical = _canonical_manufacturer_name(manufacturer)
+        if canonical is None:
+            continue
+        for direct_value in (manufacturer.get("name"), manufacturer.get("full_name")):
+            if isinstance(direct_value, str) and (name := direct_value.strip()):
+                direct_names.setdefault(name.casefold(), canonical)
+        for alias in _manufacturer_aliases(manufacturer):
+            aliases.setdefault(alias.casefold(), set()).add(canonical)
+    return direct_names, aliases
+
+
+def _canonical_manufacturer_name(manufacturer: dict[str, object]) -> str | None:
+    value = manufacturer.get("full_name") or manufacturer.get("name")
+    return value.strip() or None if isinstance(value, str) else None
+
+
+def _manufacturer_aliases(manufacturer: dict[str, object]) -> tuple[str, ...]:
+    values = manufacturer.get("aliases")
+    if not isinstance(values, list):
+        return ()
+    return tuple(alias for value in values if isinstance(value, str) and (alias := value.strip()))
 
 
 def extract_measure_devices(library: object) -> tuple[str, ...]:

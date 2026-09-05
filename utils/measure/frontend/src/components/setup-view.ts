@@ -888,24 +888,14 @@ export class SetupView extends LitElement {
     if (!definition || !this.capabilities) return;
     const formElement = event.currentTarget as HTMLFormElement;
     const form = new FormData(formElement);
-    // Read multiselects explicitly as well for environments without form-associated custom elements.
-    for (const picker of formElement.querySelectorAll<Combobox>("measure-combobox[multiple]")) {
-      form.delete(picker.name);
-      if (!picker.disabled && Array.isArray(picker.value)) {
-        for (const value of picker.value) form.append(picker.name, value);
-      }
-    }
-    const failedDomain = this.dummyController
-      ? undefined
-      : entityDomains(definition, form).find((domain) => this.deviceEntityErrors[domain]);
+    this.syncMultiselectValues(formElement, form);
+    const failedDomain = this.failedEntityDomain(definition, form);
     if (failedDomain) {
       this.errorMessage = `Could not load ${failedDomain} entities. Retry before starting the measurement.`;
       return;
     }
     // A checkbox group submits nothing at all when it is empty, so require it here.
-    const empty = definition.fields.find(
-      (field) => field.control === "multi_select" && field.required && form.getAll(field.name).length === 0,
-    );
+    const empty = this.missingRequiredMultiselect(definition, form);
     if (empty) {
       this.errorMessage = `Select at least one ${empty.label.toLowerCase().replace(/s$/, "")}.`;
       return;
@@ -919,9 +909,7 @@ export class SetupView extends LitElement {
       this.dummyController,
     );
     const defaults = this.profileDefaults();
-    const previous = this.initialRequest?.measure_type === definition.measure_type
-      && JSON.stringify(this.initialRequest.controller) === JSON.stringify(request.controller)
-      ? this.initialRequest : undefined;
+    const previous = this.previousRequest(definition, request);
     request.model_id = previous?.model_id || defaults.model_id;
     request.product_name = previous?.product_name || defaults.product_name;
     request.session_name ||= previous?.session_name || defaults.session_name || definition.label;
@@ -934,6 +922,32 @@ export class SetupView extends LitElement {
       return;
     }
     emit<MeasurementRequest>(this, "preflight", request);
+  }
+
+  private failedEntityDomain(definition: MeasureDefinition, form: FormData): string | undefined {
+    if (this.dummyController) return undefined;
+    return entityDomains(definition, form).find((domain) => this.deviceEntityErrors[domain]);
+  }
+
+  private missingRequiredMultiselect(definition: MeasureDefinition, form: FormData): FormField | undefined {
+    return definition.fields.find(
+      (field) => field.control === "multi_select" && field.required && form.getAll(field.name).length === 0,
+    );
+  }
+
+  private previousRequest(definition: MeasureDefinition, request: MeasurementRequest): MeasurementRequest | undefined {
+    if (this.initialRequest?.measure_type !== definition.measure_type) return undefined;
+    if (JSON.stringify(this.initialRequest.controller) !== JSON.stringify(request.controller)) return undefined;
+    return this.initialRequest;
+  }
+
+  /** Read multiselects explicitly for environments without form-associated custom elements. */
+  private syncMultiselectValues(formElement: HTMLFormElement, form: FormData): void {
+    for (const picker of formElement.querySelectorAll<Combobox>("measure-combobox[multiple]")) {
+      form.delete(picker.name);
+      if (picker.disabled || !Array.isArray(picker.value)) continue;
+      for (const value of picker.value) form.append(picker.name, value);
+    }
   }
 
   private meterContext(): MeterContext {

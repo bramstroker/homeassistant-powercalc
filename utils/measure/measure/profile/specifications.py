@@ -53,24 +53,32 @@ def _apply_conditional_fields(
     schema: dict[str, Any],
 ) -> None:
     for condition in conditions:
-        if not isinstance(condition, dict):
+        resolved = _conditional_fields(condition, schema)
+        if resolved is None:
             continue
-        matching_types = _condition_device_types(condition.get("if"))
-        if matching_types is None:
-            continue
-        then_schema = condition.get("then")
-        if not isinstance(then_schema, dict):
-            continue
-        then_properties = then_schema.get("properties")
-        if not isinstance(then_properties, dict):
-            continue
-        specs_schema = then_properties.get("device_specs")
-        if not isinstance(specs_schema, dict):
-            continue
-        conditional_fields = _fields_from_object(specs_schema, schema)
+        matching_types, conditional_fields = resolved
         for device_type in matching_types:
             if device_type in fields_by_type:
                 fields_by_type[device_type].update(conditional_fields)
+
+
+def _conditional_fields(
+    condition: object,
+    schema: dict[str, Any],
+) -> tuple[tuple[str, ...], dict[str, DeviceSpecField]] | None:
+    if not isinstance(condition, dict):
+        return None
+    matching_types = _condition_device_types(condition.get("if"))
+    then_schema = condition.get("then")
+    if matching_types is None or not isinstance(then_schema, dict):
+        return None
+    then_properties = then_schema.get("properties")
+    if not isinstance(then_properties, dict):
+        return None
+    specs_schema = then_properties.get("device_specs")
+    if not isinstance(specs_schema, dict):
+        return None
+    return matching_types, _fields_from_object(specs_schema, schema)
 
 
 def _condition_device_types(value: object) -> tuple[str, ...] | None:

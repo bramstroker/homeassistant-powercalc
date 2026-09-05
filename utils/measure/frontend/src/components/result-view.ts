@@ -2,12 +2,11 @@ import { LitElement, css, html, nothing } from "lit";
 import type { PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { guard } from "lit/directives/guard.js";
-import type { ContributionAuthState, ContributionDraft, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SessionState, SettingsSection } from "../types";
+import type { ContributionAuthState, ContributionDraft, ContributionDraftFile, ContributionFormValues, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SessionState, SettingsSection } from "../types";
 import { emit } from "../events";
 import { fileSize, words } from "../format";
 import { formText } from "../form";
 import { metadataLabels, validateMetadata } from "../profile-validation";
-import type { ContributionFormValues } from "../types";
 import { diagnosticsDownload, sharedStyles } from "../styles";
 import { errorHelpLink } from "./error-help-link";
 import "./result-plot";
@@ -525,125 +524,145 @@ export class ResultView extends LitElement {
           @combobox-change=${this.metadataChanged}>
           ${this.renderValidationSummary()}
           <p class="muted required-guidance">Fields marked <span class="required-marker" aria-hidden="true">*</span><span class="sr-only">with an asterisk</span> are required.</p>
-          <fieldset class="metadata-group" ?disabled=${this.contributionBusy}>
-            <legend>Product</legend>
-            <div class="metadata-group-body">
-              <p class="metadata-group-description">Identity and manufacturer details used to place and discover this profile.</p>
-              <div class="contribution-grid">
-                <div class="field-stack">
-                  <measure-combobox
-                    name="manufacturer_name"
-                    label="Manufacturer"
-                    .error=${this.fieldError("manufacturer_name")}
-                    ?disabled=${this.contributionBusy}
-                    .value=${this.fieldValue("manufacturer_name", draft.manufacturer_name)}
-                    .options=${this.manufacturers.map((manufacturer) => ({ value: manufacturer, label: manufacturer }))}
-                    placeholder="Search or enter a manufacturer"
-                    hint="Choose an existing manufacturer or enter a new one."
-                    required
-                    allowCustom
-                  >
-                    <input slot="value" type="hidden" name="manufacturer_name" .value=${this.fieldValue("manufacturer_name", draft.manufacturer_name)} />
-                  </measure-combobox>
-                </div>
-                ${this.input("model_id", "Model ID", draft.model_id)}
-                ${this.input("product_name", "Product name", draft.product_name, {
-                  hint: "Use the marketed name without repeating the manufacturer, e.g. “Hue White Ambiance GU10”.",
-                })}
-                ${this.input("product_url", "Manufacturer product URL", draft.product_url ?? "", { required: false, placeholder: "https://…" })}
-                ${this.input("aliases", "Model aliases", (draft.aliases ?? []).join(", "), { required: false, placeholder: "Comma separated" })}
-                ${this.input("gtins", "GTIN / barcodes", (draft.gtins ?? []).join(", "), { required: false, placeholder: "Comma separated" })}
-              </div>
-            </div>
-          </fieldset>
-          <fieldset class="metadata-group" ?disabled=${this.contributionBusy}>
-            <legend>Contributor</legend>
-            <div class="metadata-group-body">
-              <p class="metadata-group-description">These details are prefilled from your profile settings and credited in model.json.</p>
-              <div class="contribution-grid contributor-grid">
-                ${this.input("contributor", "Name", draft.contributor)}
-                ${this.input("contributor_github", "GitHub username", draft.contributor_github ?? this.contributionAuth?.identity?.login ?? "")}
-                ${this.input("contributor_email", "Email", draft.contributor_email ?? "", { required: false })}
-              </div>
-            </div>
-          </fieldset>
-          <fieldset class="metadata-group" ?disabled=${this.contributionBusy}>
-            <legend>Measurement</legend>
-            <div class="metadata-group-body">
-              <p class="metadata-group-description">Document the equipment and method used to create the profile.</p>
-              <div class="contribution-grid">
-                <div class="field-stack">
-                  <measure-combobox
-                    name="measure_device"
-                    label="Measurement device"
-                    .value=${this.fieldValue("measure_device", draft.measure_device)}
-                    .options=${this.measureDevices.map((device) => ({ value: device, label: device }))}
-                    .error=${this.fieldError("measure_device")}
-                    ?disabled=${this.contributionBusy}
-                    placeholder="e.g. Shelly Plug S"
-                    .hint=${this.measureDevicesLoading
-                      ? "Loading names used by existing Powercalc profiles…"
-                      : "Choose an existing power meter or enter its manufacturer and model."}
-                    required
-                    allowCustom
-                  >
-                    <input slot="value" type="hidden" name="measure_device" .value=${this.fieldValue("measure_device", draft.measure_device)} />
-                  </measure-combobox>
-                  ${this.measureDevicesError
-                    ? html`<small class="field-hint error" role="status">Library suggestions are unavailable; manual entry still works.</small>`
-                    : nothing}
-                </div>
-                ${this.input("measure_device_firmware", "Device firmware", draft.measure_device_firmware ?? "", { required: false })}
-                ${this.renderMainsVoltage(draft)}
-              </div>
-              <label class="notes-field">
-                <span id="measure_description-label">Measurement description</span>
-                <textarea name="measure_description" .value=${this.fieldValue("measure_description", draft.measure_description)}
-                  aria-labelledby="measure_description-label"
-                  aria-invalid=${this.fieldError("measure_description") ? "true" : "false"}
-                  aria-describedby=${this.fieldError("measure_description") ? "measure_description-error" : nothing}></textarea>
-                ${this.renderFieldError("measure_description")}
-              </label>
-            </div>
-          </fieldset>
+          ${this.renderProductMetadata(draft)}
+          ${this.renderContributorMetadata(draft)}
+          ${this.renderMeasurementMetadata(draft)}
           ${this.renderDeviceSpecifications(draft)}
-          <fieldset class="metadata-group" ?disabled=${this.contributionBusy}>
-            <legend>Contribution notes</legend>
-            <div class="metadata-group-body">
-              <p class="metadata-group-description">Optional context for reviewers; this is not added to model.json.</p>
-              <label class="notes-field">
-                <span id="notes-label">Notes</span>
-                <textarea name="notes" .value=${this.fieldValue("notes", draft.notes)} aria-labelledby="notes-label" aria-invalid=${this.fieldError("notes") ? "true" : "false"}
-                  aria-describedby=${this.fieldError("notes") ? "notes-error" : nothing}></textarea>
-                ${this.renderFieldError("notes")}
-              </label>
-            </div>
-          </fieldset>
+          ${this.renderContributionNotes(draft)}
           ${this.renderMeasurementContext(draft)}
-          <div class="validation-footer">
-            <p class=${`validation-status${this.canContinue() ? " valid" : this.previewDirty ? " pending" : ""}`} role="status">
-              ${this.canContinue()
-                ? html`<span aria-hidden="true">✓</span> Profile validated`
-                : this.contributionBusy
-                  ? "Checking your metadata and generated profile…"
-                  : this.contributionError || Object.keys(this.fieldErrors).length
-                    ? "Review the validation errors above, then validate again."
-                    : this.previewDirty
-                      ? "Your changes have not been validated yet."
-                      : "Validate your metadata before continuing."}
-            </p>
-            ${this.canContinue()
-              ? html`<button class="primary" type="button" @click=${() => { if (this.canContinue()) this.emit("share"); }}>Continue to use profile</button>`
-              : html`<button class="primary" type="submit" ?disabled=${this.contributionBusy}>
-                  ${this.contributionBusy ? "Validating profile…" : this.previewDirty ? "Validate changes" : "Validate profile"}
-                </button>`}
-          </div>
+          ${this.renderValidationFooter()}
         </form>
         ${this.contributionPreview && this.canContinue()
           ? this.renderPreparedPreview(this.contributionPreview)
           : nothing}
       </div>
     `;
+  }
+
+  private renderProductMetadata(draft: ContributionDraft) {
+    const manufacturer = this.fieldValue("manufacturer_name", draft.manufacturer_name);
+    return html`<fieldset class="metadata-group" ?disabled=${this.contributionBusy}>
+      <legend>Product</legend>
+      <div class="metadata-group-body">
+        <p class="metadata-group-description">Identity and manufacturer details used to place and discover this profile.</p>
+        <div class="contribution-grid">
+          <div class="field-stack">
+            <measure-combobox name="manufacturer_name" label="Manufacturer"
+              .error=${this.fieldError("manufacturer_name")} ?disabled=${this.contributionBusy}
+              .value=${manufacturer}
+              .options=${this.manufacturers.map((name) => ({ value: name, label: name }))}
+              placeholder="Search or enter a manufacturer" hint="Choose an existing manufacturer or enter a new one."
+              required allowCustom>
+              <input slot="value" type="hidden" name="manufacturer_name" .value=${manufacturer} />
+            </measure-combobox>
+          </div>
+          ${this.input("model_id", "Model ID", draft.model_id)}
+          ${this.input("product_name", "Product name", draft.product_name, {
+            hint: "Use the marketed name without repeating the manufacturer, e.g. “Hue White Ambiance GU10”.",
+          })}
+          ${this.input("product_url", "Manufacturer product URL", draft.product_url ?? "", { required: false, placeholder: "https://…" })}
+          ${this.input("aliases", "Model aliases", (draft.aliases ?? []).join(", "), { required: false, placeholder: "Comma separated" })}
+          ${this.input("gtins", "GTIN / barcodes", (draft.gtins ?? []).join(", "), { required: false, placeholder: "Comma separated" })}
+        </div>
+      </div>
+    </fieldset>`;
+  }
+
+  private renderContributorMetadata(draft: ContributionDraft) {
+    return html`<fieldset class="metadata-group" ?disabled=${this.contributionBusy}>
+      <legend>Contributor</legend>
+      <div class="metadata-group-body">
+        <p class="metadata-group-description">These details are prefilled from your profile settings and credited in model.json.</p>
+        <div class="contribution-grid contributor-grid">
+          ${this.input("contributor", "Name", draft.contributor)}
+          ${this.input("contributor_github", "GitHub username", draft.contributor_github ?? this.contributionAuth?.identity?.login ?? "")}
+          ${this.input("contributor_email", "Email", draft.contributor_email ?? "", { required: false })}
+        </div>
+      </div>
+    </fieldset>`;
+  }
+
+  private renderMeasurementMetadata(draft: ContributionDraft) {
+    const measureDevice = this.fieldValue("measure_device", draft.measure_device);
+    const hint = this.measureDevicesLoading
+      ? "Loading names used by existing Powercalc profiles…"
+      : "Choose an existing power meter or enter its manufacturer and model.";
+    return html`<fieldset class="metadata-group" ?disabled=${this.contributionBusy}>
+      <legend>Measurement</legend>
+      <div class="metadata-group-body">
+        <p class="metadata-group-description">Document the equipment and method used to create the profile.</p>
+        <div class="contribution-grid">
+          <div class="field-stack">
+            <measure-combobox name="measure_device" label="Measurement device"
+              .value=${measureDevice}
+              .options=${this.measureDevices.map((device) => ({ value: device, label: device }))}
+              .error=${this.fieldError("measure_device")} ?disabled=${this.contributionBusy}
+              placeholder="e.g. Shelly Plug S" .hint=${hint} required allowCustom>
+              <input slot="value" type="hidden" name="measure_device" .value=${measureDevice} />
+            </measure-combobox>
+            ${this.measureDevicesError
+              ? html`<small class="field-hint error" role="status">Library suggestions are unavailable; manual entry still works.</small>`
+              : nothing}
+          </div>
+          ${this.input("measure_device_firmware", "Device firmware", draft.measure_device_firmware ?? "", { required: false })}
+          ${this.renderMainsVoltage(draft)}
+        </div>
+        ${this.renderTextarea("measure_description", "Measurement description", draft.measure_description)}
+      </div>
+    </fieldset>`;
+  }
+
+  private renderContributionNotes(draft: ContributionDraft) {
+    return html`<fieldset class="metadata-group" ?disabled=${this.contributionBusy}>
+      <legend>Contribution notes</legend>
+      <div class="metadata-group-body">
+        <p class="metadata-group-description">Optional context for reviewers; this is not added to model.json.</p>
+        ${this.renderTextarea("notes", "Notes", draft.notes)}
+      </div>
+    </fieldset>`;
+  }
+
+  private renderTextarea(name: "measure_description" | "notes", label: string, value: unknown) {
+    const error = this.fieldError(name);
+    const labelId = `${name}-label`;
+    const errorId = `${name}-error`;
+    return html`<label class="notes-field">
+      <span id=${labelId}>${label}</span>
+      <textarea name=${name} .value=${this.fieldValue(name, value)} aria-labelledby=${labelId}
+        aria-invalid=${error ? "true" : "false"} aria-describedby=${error ? errorId : nothing}></textarea>
+      ${this.renderFieldError(name)}
+    </label>`;
+  }
+
+  private renderValidationFooter() {
+    const valid = this.canContinue();
+    let statusClass = "validation-status";
+    if (valid) statusClass += " valid";
+    else if (this.previewDirty) statusClass += " pending";
+    return html`<div class="validation-footer">
+      <p class=${statusClass} role="status">${this.validationStatus(valid)}</p>
+      ${valid ? this.renderContinueButton() : this.renderValidateButton()}
+    </div>`;
+  }
+
+  private validationStatus(valid: boolean) {
+    if (valid) return html`<span aria-hidden="true">✓</span> Profile validated`;
+    if (this.contributionBusy) return "Checking your metadata and generated profile…";
+    if (this.contributionError || Object.keys(this.fieldErrors).length) {
+      return "Review the validation errors above, then validate again.";
+    }
+    return this.previewDirty ? "Your changes have not been validated yet." : "Validate your metadata before continuing.";
+  }
+
+  private renderContinueButton() {
+    return html`<button class="primary" type="button" @click=${() => { if (this.canContinue()) this.emit("share"); }}>Continue to use profile</button>`;
+  }
+
+  private renderValidateButton() {
+    let label = "Validate profile";
+    if (this.contributionBusy) label = "Validating profile…";
+    else if (this.previewDirty) label = "Validate changes";
+    return html`<button class="primary" type="submit" ?disabled=${this.contributionBusy}>${label}</button>`;
   }
 
   private renderContributionAuthShortcut() {
@@ -697,7 +716,8 @@ export class ResultView extends LitElement {
 
   private renderDeviceSpecifications(draft: ContributionDraft) {
     const deviceType = this.deviceType(draft);
-    const fields = deviceType ? (this.deviceSpecificationFields[deviceType] ?? []) : [];
+    let fields: DeviceSpecificationField[] = [];
+    if (deviceType) fields = this.deviceSpecificationFields[deviceType] ?? [];
     const typeLabel = deviceType ? optionLabel(deviceType) : "this device type";
     return html`
       <fieldset class="metadata-group" ?disabled=${this.contributionBusy}>
@@ -715,60 +735,64 @@ export class ResultView extends LitElement {
   private renderDeviceSpecification(field: DeviceSpecificationField, value: unknown) {
     const name = `device_specs.${field.name}`;
     const error = this.fieldError(name);
-    const describedBy = [field.description ? `${name}-hint` : "", error ? `${name}-error` : ""].filter(Boolean).join(" ");
     if (field.collection !== "scalar") {
-      const selected = Array.isArray(value) ? value.map(String) : value === undefined || value === null ? [] : [String(value)];
-      return html`
-        <measure-combobox
-          name=${name}
-          label=${field.label}
-          .error=${error}
-          ?disabled=${this.contributionBusy}
-          .value=${guard([value, this.contributionFormValues[name]], () => this.contributionFormValues[name] ?? selected)}
-          .options=${field.options.map((option) => ({ value: option, label: optionLabel(option) }))}
-          placeholder="Select an option…"
-          hint=${field.description}
-          multiple
-        ></measure-combobox>`;
+      return this.renderSpecificationCollection(field, name, value, error);
     }
     if (field.value_type === "boolean" || field.options.length) {
-      const options = field.value_type === "boolean" ? ["true", "false"] : field.options;
-      return html`
-        <measure-combobox
-          name=${name}
-          label=${field.label}
-          .value=${this.fieldValue(name, value)}
-          .options=${[
-            { value: "", label: "Not specified" },
-            ...options.map((option) => ({
-              value: option,
-              label: field.value_type === "boolean" ? option === "true" ? "Yes" : "No" : optionLabel(option),
-            })),
-          ]}
-          .error=${error}
-          ?disabled=${this.contributionBusy}
-          placeholder="Not specified"
-          hint=${field.description}
-        ></measure-combobox>`;
+      return this.renderSpecificationChoice(field, name, value, error);
     }
+    return this.renderSpecificationInput(field, name, value, error);
+  }
+
+  private renderSpecificationCollection(field: DeviceSpecificationField, name: string, value: unknown, error: string) {
+    const selected = specificationValues(value);
+    return html`<measure-combobox name=${name} label=${field.label} .error=${error}
+      ?disabled=${this.contributionBusy}
+      .value=${guard([value, this.contributionFormValues[name]], () => this.contributionFormValues[name] ?? selected)}
+      .options=${field.options.map((option) => ({ value: option, label: optionLabel(option) }))}
+      placeholder="Select an option…" hint=${field.description} multiple></measure-combobox>`;
+  }
+
+  private renderSpecificationChoice(field: DeviceSpecificationField, name: string, value: unknown, error: string) {
+    const values = field.value_type === "boolean" ? ["true", "false"] : field.options;
+    const options = values.map((option) => ({ value: option, label: specificationOptionLabel(field, option) }));
+    return html`<measure-combobox name=${name} label=${field.label}
+      .value=${this.fieldValue(name, value)}
+      .options=${[{ value: "", label: "Not specified" }, ...options]}
+      .error=${error} ?disabled=${this.contributionBusy}
+      placeholder="Not specified" hint=${field.description}></measure-combobox>`;
+  }
+
+  private renderSpecificationInput(field: DeviceSpecificationField, name: string, value: unknown, error: string) {
+    const labelId = `${name}-label`;
+    const hintId = `${name}-hint`;
+    const errorId = `${name}-error`;
+    const describedBy = [field.description ? hintId : "", error ? errorId : ""].filter(Boolean).join(" ");
+    const numeric = field.value_type === "number" || field.value_type === "integer";
+    const label = specificationInputLabel(field);
+    let step: string | typeof nothing = nothing;
+    if (field.value_type === "integer") step = "1";
+    else if (field.value_type === "number") step = "any";
     return html`
       <label>
-        <span id=${`${name}-label`}>${field.name === "rated_power" ? "Rated power (W)" : field.name === "lumens" ? "Light output (lm)" : field.label}</span>
+        <span id=${labelId}>${label}</span>
         <input
           name=${name}
-          aria-labelledby=${`${name}-label`}
+          aria-labelledby=${labelId}
           aria-invalid=${error ? "true" : "false"}
           aria-describedby=${describedBy || nothing}
-          type=${field.value_type === "number" || field.value_type === "integer" ? "number" : "text"}
-          step=${field.value_type === "integer" ? "1" : field.value_type === "number" ? "any" : nothing}
+          type=${numeric ? "number" : "text"}
+          step=${step}
           .value=${this.fieldValue(name, value)}
         />
-        ${field.description ? html`<small id=${`${name}-hint`} class="field-hint">${field.description}</small>` : nothing}
+        ${field.description ? html`<small id=${hintId} class="field-hint">${field.description}</small>` : nothing}
         ${this.renderFieldError(name)}
       </label>`;
   }
 
   private renderPreparedPreview(preview: ContributionPreview) {
+    const files = preview.files.map((file) => formatPreparedFile(file)).join("\n");
+    const model = preview.model_json ?? preview.files.find((file) => file.path.endsWith("model.json"))?.rendered_json ?? {};
     return html`
       ${preview.warnings.map((warning) => html`<p class="notice warning preparation-warning">${warning}</p>`)}
       <details class="profile-details prepared-preview">
@@ -776,11 +800,11 @@ export class ResultView extends LitElement {
         <div class="profile-details-body">
           <div class="preview-block">
             <span>Files</span>
-            <pre>${preview.files.map((file) => file.size === undefined ? file.path : `${file.path} (${fileSize(file.size)})`).join("\n")}</pre>
+            <pre>${files}</pre>
           </div>
           <div class="preview-block">
             <span>Generated model.json</span>
-            <pre>${JSON.stringify(preview.model_json ?? preview.files.find((file) => file.path.endsWith("model.json"))?.rendered_json ?? {}, null, 2)}</pre>
+            <pre>${JSON.stringify(model, null, 2)}</pre>
           </div>
         </div>
       </details>
@@ -788,12 +812,13 @@ export class ResultView extends LitElement {
   }
 
   private renderGithubPreview(preview: ContributionPreview) {
+    const baseRevision = preview.base_sha ? ` @ ${preview.base_sha}` : "";
     return html`
       <div class="preview-block">
         <span>Repository</span>
         <pre>Upstream: ${preview.repository}
 Fork: ${preview.fork_repository ?? "Created when submitted"}
-Base: ${preview.base_branch}${preview.base_sha ? ` @ ${preview.base_sha}` : ""}
+Base: ${preview.base_branch}${baseRevision}
 Branch: ${preview.branch_name}</pre>
       </div>
       <div class="preview-block">
@@ -855,14 +880,21 @@ ${preview.pr_body}</pre>
   ) {
     const { required = true, placeholder = "", hint = "" } = options;
     const error = options.error ?? this.fieldError(name);
+    const labelId = `${name}-label`;
+    const hintId = `${name}-hint`;
+    const errorId = `${name}-error`;
+    const requiredMarker = required ? html` <span class="required-marker" aria-hidden="true">*</span>` : nothing;
+    const hintMarkup = hint ? html`<small id=${hintId} class="field-hint">${hint}</small>` : nothing;
+    const errorMarkup = error ? html`<small id=${errorId} class="field-hint error">${error}</small>` : nothing;
+    const describedBy = [hint ? hintId : "", error ? errorId : ""].filter(Boolean).join(" ");
     return html`
       <label>
-        <span id=${`${name}-label`}>${label}${required ? html` <span class="required-marker" aria-hidden="true">*</span>` : nothing}</span>
+        <span id=${labelId}>${label}${requiredMarker}</span>
         <input name=${name} type=${name === "contributor_email" ? "email" : "text"} .value=${this.fieldValue(name, value)} ?required=${required} placeholder=${placeholder} autocomplete="off" aria-invalid=${error ? "true" : "false"}
-          aria-labelledby=${`${name}-label`}
-          aria-describedby=${[hint ? `${name}-hint` : "", error ? `${name}-error` : ""].filter(Boolean).join(" ") || nothing} />
-        ${hint ? html`<small id=${`${name}-hint`} class="field-hint">${hint}</small>` : nothing}
-        ${error ? html`<small id=${`${name}-error`} class="field-hint error">${error}</small>` : nothing}
+          aria-labelledby=${labelId}
+          aria-describedby=${describedBy || nothing} />
+        ${hintMarkup}
+        ${errorMarkup}
       </label>
     `;
   }
@@ -872,12 +904,11 @@ ${preview.pr_body}</pre>
     if (!form) return this.shareMode ? this.preparedContribution() : null;
     const data = new FormData(form);
     const draft = this.editableDraft();
-    const fields = draft ? (this.deviceSpecificationFields[this.deviceType(draft)] ?? []) : [];
+    let fields: DeviceSpecificationField[] = [];
+    if (draft) fields = this.deviceSpecificationFields[this.deviceType(draft)] ?? [];
     const deviceSpecs = fields.length ? collectDeviceSpecifications(form, data, fields) : draft?.device_specs ?? null;
     const mainsVoltageControl = form.querySelector('measure-combobox[name="mains_voltage"]') as (HTMLElement & { value?: string }) | null;
-    const mainsVoltageValue = formText(data, "mains_voltage")
-      || (typeof mainsVoltageControl?.value === "string" ? mainsVoltageControl.value : "")
-      || (draft?.mains_voltage === undefined || draft.mains_voltage === null ? "" : String(draft.mains_voltage));
+    const mainsVoltageValue = contributionMainsVoltage(data, mainsVoltageControl, draft);
     return {
       manufacturer_name: formText(data, "manufacturer_name"),
       model_id: formText(data, "model_id"),
@@ -954,12 +985,17 @@ ${preview.pr_body}</pre>
   }
 
   private fieldError(name: string): string {
-    return this.fieldErrors[name] ?? (this.contributionErrorField === name && this.dismissedServerField !== name ? this.contributionError : "");
+    const clientError = this.fieldErrors[name];
+    if (clientError) return clientError;
+    if (this.contributionErrorField === name && this.dismissedServerField !== name) return this.contributionError;
+    return "";
   }
 
   private renderFieldError(name: string) {
     const error = this.fieldError(name);
-    return error ? html`<small id=${`${name}-error`} class="field-hint error">${error}</small>` : nothing;
+    if (!error) return nothing;
+    const id = `${name}-error`;
+    return html`<small id=${id} class="field-hint error">${error}</small>`;
   }
 
   private validationErrors(): Record<string, string> {
@@ -975,10 +1011,18 @@ ${preview.pr_body}</pre>
     if (!errors.length) return nothing;
     return html`<div class="notice error validation-summary" role="alert" tabindex="-1">
       <strong>Check these profile details:</strong>
-      <ul>${errors.map(([name, message]) => html`<li>${(name in metadataLabels && name !== "device_specs") || Object.values(this.deviceSpecificationFields).flat().some((field) => name === `device_specs.${field.name}`)
-        ? html`<button type="button" @click=${() => this.focusField(name)}>${this.fieldLabel(name)}: ${message}</button>`
-        : html`${message}`}</li>`)}</ul>
+      <ul>${errors.map(([name, message]) => this.renderValidationError(name, message))}</ul>
     </div>`;
+  }
+
+  private renderValidationError(name: string, message: string) {
+    const knownSpec = Object.values(this.deviceSpecificationFields).flat()
+      .some((field) => name === `device_specs.${field.name}`);
+    const focusable = (name in metadataLabels && name !== "device_specs") || knownSpec;
+    const content = focusable
+      ? html`<button type="button" @click=${() => this.focusField(name)}>${this.fieldLabel(name)}: ${message}</button>`
+      : message;
+    return html`<li>${content}</li>`;
   }
 
   private fieldLabel(name: string): string {
@@ -1025,7 +1069,7 @@ ${preview.pr_body}</pre>
 
   private fieldValue(name: string, fallback: unknown): string {
     const value = this.contributionFormValues[name] ?? fallback;
-    return value === undefined || value === null ? "" : String(value);
+    return formValue(value);
   }
 
   private validateField(event: FocusEvent): void {
@@ -1073,23 +1117,83 @@ function collectDeviceSpecifications(form: HTMLFormElement, data: FormData, fiel
   for (const field of fields) {
     const name = `device_specs.${field.name}`;
     if (field.collection !== "scalar") {
-      const control = Array.from(form.querySelectorAll("measure-combobox"))
-        .find((candidate) => candidate.multiple && candidate.name === name);
-      const controlValues = Array.isArray(control?.value) ? control.value : [];
-      const values = (data.getAll(name).length ? data.getAll(name).map(String) : controlValues).filter(Boolean);
-      if (!values.length) continue;
-      result[field.name] = field.collection === "scalar_or_array" && values.length === 1 ? values[0] : values;
+      collectSpecificationCollection(result, form, data, field, name);
       continue;
     }
-    const control = Array.from(form.querySelectorAll("measure-combobox"))
-      .find((candidate) => !candidate.multiple && candidate.name === name);
-    const value = formText(data, name) || (typeof control?.value === "string" ? control.value : "");
-    if (!value) continue;
-    if (field.value_type === "number" || field.value_type === "integer") result[field.name] = Number(value);
-    else if (field.value_type === "boolean") result[field.name] = value === "true";
-    else result[field.name] = value;
+    collectScalarSpecification(result, form, data, field, name);
   }
   return result;
+}
+
+function collectSpecificationCollection(
+  result: Record<string, unknown>,
+  form: HTMLFormElement,
+  data: FormData,
+  field: DeviceSpecificationField,
+  name: string,
+): void {
+  const control = Array.from(form.querySelectorAll("measure-combobox"))
+    .find((candidate) => candidate.multiple && candidate.name === name);
+  const controlValues = Array.isArray(control?.value) ? control.value : [];
+  const submitted = data.getAll(name).map(String);
+  const values = (submitted.length ? submitted : controlValues).filter(Boolean);
+  if (!values.length) return;
+  result[field.name] = field.collection === "scalar_or_array" && values.length === 1 ? values[0] : values;
+}
+
+function collectScalarSpecification(
+  result: Record<string, unknown>,
+  form: HTMLFormElement,
+  data: FormData,
+  field: DeviceSpecificationField,
+  name: string,
+): void {
+  const control = Array.from(form.querySelectorAll("measure-combobox"))
+    .find((candidate) => !candidate.multiple && candidate.name === name);
+  const controlValue = typeof control?.value === "string" ? control.value : "";
+  const value = formText(data, name) || controlValue;
+  if (!value) return;
+  if (field.value_type === "number" || field.value_type === "integer") result[field.name] = Number(value);
+  else if (field.value_type === "boolean") result[field.name] = value === "true";
+  else result[field.name] = value;
+}
+
+function specificationValues(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String);
+  if (value === undefined || value === null) return [];
+  return [formValue(value)];
+}
+
+function specificationOptionLabel(field: DeviceSpecificationField, option: string): string {
+  if (field.value_type !== "boolean") return optionLabel(option);
+  return option === "true" ? "Yes" : "No";
+}
+
+function specificationInputLabel(field: DeviceSpecificationField): string {
+  if (field.name === "rated_power") return "Rated power (W)";
+  if (field.name === "lumens") return "Light output (lm)";
+  return field.label;
+}
+
+function contributionMainsVoltage(
+  data: FormData,
+  control: (HTMLElement & { value?: string }) | null,
+  draft: ContributionDraft | undefined,
+): string {
+  const submitted = formText(data, "mains_voltage");
+  if (submitted) return submitted;
+  if (typeof control?.value === "string" && control.value) return control.value;
+  return formValue(draft?.mains_voltage);
+}
+
+function formValue(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return "";
+}
+
+function formatPreparedFile(file: ContributionDraftFile): string {
+  return file.size === undefined ? file.path : `${file.path} (${fileSize(file.size)})`;
 }
 
 function optionLabel(value: string): string {

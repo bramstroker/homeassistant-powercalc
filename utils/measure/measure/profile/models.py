@@ -27,7 +27,7 @@ class ProfileAuthor(BaseModel):
         if value is None:
             return None
         normalized = value.strip() or None
-        if normalized and not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", normalized):
+        if normalized and not _valid_email(normalized):
             raise ValueError("Enter a valid email address, for example name@example.com.")
         return normalized
 
@@ -102,7 +102,7 @@ class ProfileMetadata(BaseModel):
         if value is None:
             return None
         normalized = tuple(dict.fromkeys(item.strip() for item in value if item.strip()))
-        invalid = next((item for item in normalized if not re.fullmatch(r"[0-9]{8}|[0-9]{12,14}", item)), None)
+        invalid = next((item for item in normalized if not re.fullmatch(r"\d{8}|\d{12,14}", item, re.ASCII)), None)
         if invalid is not None:
             raise ValueError(f"invalid GTIN: {invalid}")
         return normalized
@@ -113,3 +113,11 @@ class ProfileMetadata(BaseModel):
         if value and not value.startswith("https://"):
             raise ValueError("product_url must use https://")
         return value
+
+
+def _valid_email(value: str) -> bool:
+    if any(character.isspace() for character in value) or value.count("@") != 1:
+        return False
+    local, domain = value.split("@")
+    host, separator, suffix = domain.rpartition(".")
+    return bool(local and host and separator and suffix)

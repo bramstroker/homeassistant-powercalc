@@ -180,12 +180,11 @@ def test_preparer_derives_mains_voltage_from_measured_voltage_range(tmp_path: Pa
 def test_preparer_requires_mains_voltage_when_no_voltage_range_was_measured(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
     write_profile_artifacts(artifacts)
+    preparer = make_preparer(tmp_path)
+    profile_metadata = metadata().model_copy(update={"mains_voltage": None})
 
     with pytest.raises(ProfilePreparationError, match="Select the nominal mains voltage") as error:
-        make_preparer(tmp_path).prepare(
-            artifacts,
-            metadata().model_copy(update={"mains_voltage": None}),
-        )
+        preparer.prepare(artifacts, profile_metadata)
 
     assert error.value.field == "mains_voltage"
 
@@ -239,12 +238,13 @@ def test_preparer_reports_model_schema_validation_errors(tmp_path: Path) -> None
         encoding="utf-8",
     )
     preparer = ProfilePreparer(library_root=library_root(tmp_path), model_schema_path=schema)
+    profile_metadata = metadata()
 
     with pytest.raises(
         ProfilePreparationError,
         match=r"model\.json does not match model_schema\.json at device_type: 'light' is not one of",
     ):
-        preparer.prepare(artifacts, metadata())
+        preparer.prepare(artifacts, profile_metadata)
 
 
 @pytest.mark.parametrize("field", ["product_url", "measure_device_firmware", "measure_description"])

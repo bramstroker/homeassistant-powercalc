@@ -134,17 +134,7 @@ class MeasureUtil:
                 if not first_measurement and not self._sleep_before_next_average_reading(start_time, duration):
                     break
                 first_measurement = False
-                if on_progress is not None:
-                    on_progress(time.time() - start_time, duration)
-
-                try:
-                    result = self._take_average_measurement_reading(measure_resistance)
-                except PowerMeterError as error:
-                    if self._average_measurement_retry_limit_reached(state, error):
-                        raise
-                    continue
-
-                if self._record_average_measurement_result(state, result, convergence):
+                if self._collect_average_measurement(state, duration, measure_resistance, convergence, on_progress):
                     break
         except KeyboardInterrupt, MeasurementCancelledError:
             # Never turn an interrupted calibration/profile point or an empty run into a valid result.
@@ -154,6 +144,24 @@ class MeasureUtil:
             _LOGGER.info("Stopped averaging; keeping %d valid readings", len(state.readings))
 
         return state
+
+    def _collect_average_measurement(
+        self,
+        state: AverageMeasurementState,
+        duration: int,
+        measure_resistance: bool,
+        convergence: AverageMeasurementConvergence | None,
+        on_progress: Callable[[float, float], None] | None,
+    ) -> bool:
+        if on_progress is not None:
+            on_progress(time.time() - state.start_time, duration)
+        try:
+            result = self._take_average_measurement_reading(measure_resistance)
+        except PowerMeterError as error:
+            if self._average_measurement_retry_limit_reached(state, error):
+                raise
+            return False
+        return self._record_average_measurement_result(state, result, convergence)
 
     def _average_measurement_retry_limit_reached(self, state: AverageMeasurementState, error: PowerMeterError) -> bool:
         state.consecutive_errors += 1

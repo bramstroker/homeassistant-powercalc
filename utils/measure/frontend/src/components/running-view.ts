@@ -292,7 +292,10 @@ export class RunningView extends LitElement {
     const cancelling = this.snapshot.state === "cancelling";
     const averaging = this.snapshot.mode === "Averaging" && this.snapshot.state !== "awaiting_confirmation";
     if (openEnded || averaging) {
-      return html`<button class="primary" type="button" @click=${this.cancel} ?disabled=${this.busy || cancelling}>${cancelling ? "Stopping…" : openEnded ? "Stop recording" : "Stop measurement"}</button>`;
+      let label = "Stop measurement";
+      if (cancelling) label = "Stopping…";
+      else if (openEnded) label = "Stop recording";
+      return html`<button class="primary" type="button" @click=${this.cancel} ?disabled=${this.busy || cancelling}>${label}</button>`;
     }
     return html`<button class="danger" type="button" @click=${this.cancel} ?disabled=${this.busy || cancelling}>${cancelling ? "Cancelling…" : "Cancel measurement"}</button>`;
   }

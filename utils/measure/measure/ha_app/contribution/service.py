@@ -54,6 +54,8 @@ from measure.model import mains_voltage_from_range
 from measure.profile.output import prepared_profile_archive
 from measure.request import MeasurementRequest
 
+MODEL_FILENAME = "model.json"
+
 
 class SharedContributionService:
     def __init__(self, data_root: Path) -> None:
@@ -356,29 +358,51 @@ def _positive_integer(value: object) -> int | None:
     return None
 
 
+@dataclass(frozen=True)
+class _RequestMetadata:
+    manufacturer: str
+    model_id: str
+    product_name: str | None
+    contributor: str
+    github_username: str | None
+    contributor_email: str | None
+    notes: str
+
+
+def _request_metadata_values(
+    request: MeasurementRequest,
+    payload: ContributionPreviewRequest | None,
+    auth: ContributionAuthStatus,
+) -> _RequestMetadata:
+    if payload is None:
+        return _RequestMetadata(
+            manufacturer="Unknown",
+            model_id=request.model_id,
+            product_name=request.product_name,
+            contributor=auth.username or "",
+            github_username=auth.username,
+            contributor_email=None,
+            notes="",
+        )
+    return _RequestMetadata(
+        manufacturer=payload.manufacturer_name,
+        model_id=payload.model_id,
+        product_name=payload.product_name,
+        contributor=payload.contributor,
+        github_username=payload.contributor_github or auth.username,
+        contributor_email=payload.contributor_email,
+        notes=payload.notes,
+    )
+
+
 def _metadata_from_request(
     request: MeasurementRequest,
     payload: ContributionPreviewRequest | None,
     auth: ContributionAuthStatus,
     integration: str | None = None,
 ) -> ContributionMetadata:
-    if payload is not None:
-        manufacturer = payload.manufacturer_name
-        model_id = payload.model_id
-        product_name: str | None = payload.product_name
-        contributor = payload.contributor
-        github_username = payload.contributor_github or auth.username
-        contributor_email = payload.contributor_email
-        notes = payload.notes
-    else:
-        github_username = auth.username
-        contributor_email = None
-        manufacturer = "Unknown"
-        model_id = request.model_id
-        product_name = request.product_name
-        contributor = github_username or ""
-        notes = ""
-    if not github_username:
+    values = _request_metadata_values(request, payload, auth)
+    if not values.github_username:
         raise ContributionApiError(
             ContributionApiErrorCode.INVALID_METADATA,
             "Contributor GitHub username is required",
@@ -386,23 +410,25 @@ def _metadata_from_request(
         )
     try:
         return ContributionMetadata(
-            manufacturer=manufacturer,
-            model_id=model_id,
-            product_name=product_name,
+            manufacturer=values.manufacturer,
+            model_id=values.model_id,
+            product_name=values.product_name,
             measure_type=request.measure_type.value,
             aliases=tuple(payload.aliases) if payload is not None else None,
             gtins=tuple(payload.gtins) if payload is not None else None,
             product_url=payload.product_url if payload is not None else None,
             mains_voltage=payload.mains_voltage if payload is not None else None,
             device_specs=payload.device_specs if payload is not None else None,
-            measure_device=(
-                (payload.measure_device or request.measure_device) if payload is not None else request.measure_device
-            ),
+            measure_device=_requested_measure_device(request, payload),
             measure_device_firmware=payload.measure_device_firmware if payload is not None else None,
             measure_description=payload.measure_description if payload is not None else None,
             integration=integration,
-            notes=notes,
-            author=ContributionAuthor(name=contributor, github=github_username, email=contributor_email),
+            notes=values.notes,
+            author=ContributionAuthor(
+                name=values.contributor,
+                github=values.github_username,
+                email=values.contributor_email,
+            ),
         )
     except ValidationError as error:
         first_location = error.errors()[0].get("loc", ())
@@ -422,6 +448,15 @@ def _metadata_from_request(
             str(error.errors()[0]["msg"]).removeprefix("Value error, "),
             field=field,
         ) from error
+
+
+def _requested_measure_device(
+    request: MeasurementRequest,
+    payload: ContributionPreviewRequest | None,
+) -> str:
+    if payload is None:
+        return request.measure_device
+    return payload.measure_device or request.measure_device
 
 
 @dataclass(frozen=True)
@@ -471,14 +506,7 @@ def draft_from_request(
 ) -> ContributionPreviewResponse:
     """Build a placeholder preview, before a contribution job exists."""
     files = _list_draft_files(artifact_root)
-    supported = request.measure_type in SUPPORTED_MEASURE_TYPES
-    has_model = artifact_root.is_dir() and any(Path(file.path).name == "model.json" for file in files)
-    if not supported:
-        reason = "Automatic contribution is available for light, speaker, fan, and charging profiles"
-    elif not has_model:
-        reason = "Contribution requires a generated model.json artifact"
-    else:
-        reason = None
+    reason = _contribution_ineligibility_reason(request, artifact_root, files)
     artifact_model = _artifact_model(artifact_root)
     voltage_range = _voltage_range(artifact_model)
     author = _first_author(artifact_model)
@@ -496,9 +524,7 @@ def draft_from_request(
         product_url=str(artifact_model.get("product_url") or ""),
         mains_voltage=_model_mains_voltage(artifact_model),
         voltage_range=voltage_range,
-        device_specs=(
-            artifact_model.get("device_specs") if isinstance(artifact_model.get("device_specs"), dict) else None
-        ),
+        device_specs=_artifact_device_specs(artifact_model),
         device_type=str(artifact_model.get("device_type") or ""),
         measure_device=str(artifact_model.get("measure_device") or request.measure_device),
         measure_device_firmware=str(
@@ -532,6 +558,22 @@ def draft_from_request(
         reason=reason,
         content=content,
     )
+
+
+def _contribution_ineligibility_reason(
+    request: MeasurementRequest,
+    artifact_root: Path,
+    files: list[ContributionFile],
+) -> str | None:
+    if request.measure_type not in SUPPORTED_MEASURE_TYPES:
+        return "Automatic contribution is available for light, speaker, fan, and charging profiles"
+    has_model = artifact_root.is_dir() and any(Path(file.path).name == MODEL_FILENAME for file in files)
+    return None if has_model else f"Contribution requires a generated {MODEL_FILENAME} artifact"
+
+
+def _artifact_device_specs(model: dict[str, Any]) -> dict[str, Any] | None:
+    value = model.get("device_specs")
+    return value if isinstance(value, dict) else None
 
 
 def _preview_from_job(
@@ -649,7 +691,7 @@ def _build_preview_response(
         branch_name=content.branch_name,
         job_id=content.job_id,
         model_json=next(
-            (file.rendered_json for file in files if Path(file.path).name == "model.json"),
+            (file.rendered_json for file in files if Path(file.path).name == MODEL_FILENAME),
             None,
         ),
         warnings=content.warnings,
@@ -668,7 +710,7 @@ def _list_draft_files(artifact_root: Path) -> list[ContributionFile]:
 
 def _artifact_model(artifact_root: Path) -> dict[str, Any]:
     try:
-        value = json.loads((artifact_root / "model.json").read_text(encoding="utf-8"))
+        value = json.loads((artifact_root / MODEL_FILENAME).read_text(encoding="utf-8"))
     except OSError, ValueError:
         return {}
     return value if isinstance(value, dict) else {}
@@ -702,7 +744,7 @@ def _model_mains_voltage(model: dict[str, Any]) -> Literal[120, 230] | None:
 
 
 def _prepared_model(contents: tuple[tuple[str, bytes], ...]) -> dict[str, Any]:
-    content = next((content for path, content in contents if Path(path).name == "model.json"), None)
+    content = next((content for path, content in contents if Path(path).name == MODEL_FILENAME), None)
     if content is None:
         return {}
     try:
