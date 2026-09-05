@@ -24,7 +24,6 @@ import {
   availableOptions,
   entityChoices,
   entityRows,
-  recorderExportFilename,
   recorderPurpose,
   selectedEntityId,
   selectedEntityIds,
@@ -39,6 +38,7 @@ const LIGHT_DISCOVERY_HINT =
   "Newly discovered lights may not have a usable state until Home Assistant receives their first update. If a light is missing, change its state once in Home Assistant, then reload this page.";
 const MULTIPLE_LIGHTS_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights";
 const HOME_ASSISTANT_GROUP_GUIDE_URL = "https://www.home-assistant.io/integrations/group/";
+const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging. Do not repeat the manufacturer name.";
 
 export interface EntitySelectionChange {
   name: string;
@@ -116,6 +116,7 @@ export class SetupFieldsSection extends LitElement {
         <div class="field-with-help">
           <div class="grid profile-grid ${definition.measure_type === "light" ? "light-grid" : ""}">
             ${fields.filter((field) => field.control !== "multi_select").map((field) => this.renderField(field))}
+            ${this.renderRecorderProfileFields()}
             ${this.dummyController || !definition.fields.some((field) => field.role === "controller")
               ? textField("session_name", "Session name (optional)", {
                   value: this.request?.session_name ?? "",
@@ -138,6 +139,24 @@ export class SetupFieldsSection extends LitElement {
         .values=${this.parameterValues}
         .activeParameters=${activeParameters(this.fieldState!)}
       ></measure-setup-tuning-section>
+    `;
+  }
+
+  private renderRecorderProfileFields() {
+    if (!this.definition || !this.fieldState || this.definition.measure_type !== "recorder"
+      || recorderPurpose(this.fieldState) !== "complex_profile") return nothing;
+    return html`
+      ${textField("model_id", "Model ID", {
+        value: this.request?.model_id ?? "",
+        placeholder: this.definition.model_id_example ? `e.g. ${this.definition.model_id_example}` : "",
+        required: true,
+      })}
+      ${textField("product_name", "Full product name", {
+        value: this.request?.product_name ?? "",
+        placeholder: this.definition.product_name_example || this.definition.label,
+        required: true,
+        hint: FULL_PRODUCT_NAME_HINT,
+      })}
     `;
   }
 
@@ -250,9 +269,6 @@ export class SetupFieldsSection extends LitElement {
         required: field.required,
         onChange: affectsAnother ? this.selectChanged : null,
       })}${this.optionGuidance(selectedOption)}</div>`;
-    }
-    if (name === "export_filename" && definition.measure_type === "recorder") {
-      return this.valueField(field, recorderExportFilename(recorderPurpose(this.fieldState), (stored ?? field.default ?? "").toString()));
     }
     return this.valueField(field, (stored ?? field.default ?? "").toString());
   }

@@ -26,7 +26,6 @@ describe("setup view defaults", () => {
       recorder_purpose: "complex_profile",
       profile_recipe: "generic",
       tracked_entity_ids: ["climate.room"],
-      export_filename: "record.jsonl",
     };
     element.meter = { type: "dummy" };
     document.body.append(element);
@@ -52,6 +51,7 @@ describe("setup view defaults", () => {
     expect(element.shadowRoot.querySelector('[name="recorder_purpose"]')).toBeTruthy();
     expect(element.shadowRoot.querySelector('[name="profile_recipe"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[name="tracked_entity_ids"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[name="model_id"]')).toBeNull();
     expect(element.shadowRoot.textContent).toContain("Record the playbook format");
 
     const requestedDomains = new Promise<string[]>((resolve) => {
@@ -63,9 +63,11 @@ describe("setup view defaults", () => {
     expect(await requestedDomains).toContain("*");
     expect(element.shadowRoot.querySelector('[name="profile_recipe"]')).toBeTruthy();
     expect(element.shadowRoot.querySelector('[name="tracked_entity_ids"]')).toBeTruthy();
+    expect(element.shadowRoot.querySelector('[name="model_id"]')).toBeTruthy();
+    expect(element.shadowRoot.querySelector('[name="product_name"]')).toBeTruthy();
     expect(element.shadowRoot.textContent).toContain("not feature complete");
-    expect(element.shadowRoot.textContent).toContain("does not create a profile model.json yet");
-    expect((element.shadowRoot.querySelector('[name="export_filename"]') as HTMLInputElement).value).toBe("record.jsonl");
+    expect(element.shadowRoot.textContent).toContain("only creates fixed states_power models");
+    expect(element.shadowRoot.querySelector('[name="export_filename"]')).toBeNull();
   });
 
   it("guides a vacuum selection and prefills its single same-device battery sensor", async () => {
@@ -134,12 +136,17 @@ describe("setup view defaults", () => {
     selectEntity(entityCombobox(element, "recorder_purpose"), "complex_profile");
     await element.updateComplete;
     selectEntity(entityCombobox(element, "tracked_entity_ids"), "climate.room");
+    (element.shadowRoot.querySelector('[name="model_id"]') as HTMLInputElement).value = "test-device";
+    (element.shadowRoot.querySelector('[name="product_name"]') as HTMLInputElement).value = "Test Device";
     const submitted = new Promise<MeasurementRequest>((resolve) => element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail)));
     (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
 
     const request = await submitted;
     expect(request).toMatchObject({
       measure_type: "recorder",
+      generate_model: true,
+      model_id: "test-device",
+      product_name: "Test Device",
       recorder_purpose: "complex_profile",
       profile_recipe: "generic",
       tracked_entity_ids: ["climate.room"],

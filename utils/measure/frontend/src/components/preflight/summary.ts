@@ -47,7 +47,7 @@ export function reviewSummary(
   const battery = batterySource(request, preflight);
   return [
     { label: "Type", value: definition?.label ?? request.measure_type },
-    ...profileRows(request),
+    ...profileRows(request, definition),
     ...controllerRows(request, definition),
     ...reviewFieldRows(request, definition),
     { label: "Power", value: summarize(request.power_meter) },
@@ -57,8 +57,11 @@ export function reviewSummary(
   ];
 }
 
-function profileRows(request: MeasurementRequest): LabelledValue[] {
+function profileRows(request: MeasurementRequest, definition?: MeasureDefinition): LabelledValue[] {
   const rows: LabelledValue[] = [];
+  const createsProfile = definition?.supports_profile
+    || (request.measure_type === "recorder" && request.recorder_purpose === "complex_profile");
+  if (createsProfile) rows.push({ label: "Model", value: `${request.product_name} (${request.model_id})` });
   if (request.session_name) rows.push({ label: "Session", value: request.session_name });
   if (request.measure_device) rows.push({ label: "Device", value: request.measure_device });
   return rows;

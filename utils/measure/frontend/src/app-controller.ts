@@ -44,6 +44,7 @@ export interface MeasureAppState {
   errorMessage: string;
   errorHelp?: ErrorHelp;
   busy: boolean;
+  lastAnalysedSessionId?: string;
   connectedToEvents: boolean;
   snapshot?: SessionSnapshot;
   sessions: SessionSummary[];
@@ -235,6 +236,18 @@ export class MeasureAppController {
     await this.run(async () => {
       this.state.snapshot = await this.api().resume(sessionId);
       await this.enterRunning();
+    });
+  }
+
+  async analyseRecording(): Promise<void> {
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
+    this.state.lastAnalysedSessionId = undefined;
+    await this.run(async () => {
+      this.state.snapshot = await this.api().analyse(sessionId);
+      await this.loadResultArtifacts();
+      await this.refreshSessions();
+      this.state.lastAnalysedSessionId = sessionId;
     });
   }
 

@@ -15,7 +15,12 @@ from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapsh
 from measure.ha_app.shelly_credentials import ShellyCredentials
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
-from measure.request import LightMeasurementRequest
+from measure.request import (
+    LightMeasurementRequest,
+    RecorderMeasurementRequest,
+    RecorderProfileRecipe,
+    RecorderPurpose,
+)
 import pytest
 
 
@@ -191,6 +196,26 @@ def test_interrupted_session_without_compatible_complete_row_fails(tmp_path: Pat
     assert loaded is not None
     assert loaded.state == SessionState.FAILED
     assert not SessionStorage(tmp_path).can_resume(loaded.id)
+
+
+def test_storage_recognizes_only_existing_complex_profile_recordings_as_analysable(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    request = RecorderMeasurementRequest(
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
+        tracked_entity_ids=("switch.device",),
+        power_meter=DummyPowerMeterSpec(),
+    )
+    storage.create(snapshot(SessionState.COMPLETED), request)
+
+    assert not storage.can_analyse("missing-session")
+    assert not storage.can_analyse("a1b2-c3d4")
+
+    output = storage.artifact_directory("a1b2-c3d4", request.model_id)
+    output.mkdir()
+    (output / "record.jsonl").write_text("recording", encoding="utf-8")
+
+    assert storage.can_analyse("a1b2-c3d4")
 
 
 def test_file_path_rejects_traversal(tmp_path: Path) -> None:

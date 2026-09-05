@@ -173,6 +173,7 @@ const lightRequest = {
 const completedSnapshot = {
   session_id: "session-completed",
   state: "completed",
+  can_analyse: false,
   created_at: completedSession.created_at,
   updated_at: completedSession.updated_at,
   phase: "Measurement complete",
@@ -271,6 +272,7 @@ const preflight: PreflightResponse = {
 const startedSnapshot = {
   session_id: "session-running",
   state: "running",
+  can_analyse: false,
   created_at: "2026-08-14T10:00:00Z",
   updated_at: "2026-08-14T10:00:01Z",
   phase: "Measuring average power",

@@ -44,6 +44,7 @@ export interface SessionProgress {
 export interface SessionSnapshot {
   session_id?: string;
   state: SessionState;
+  can_analyse?: boolean;
   created_at?: string;
   updated_at?: string;
   phase?: string | null;

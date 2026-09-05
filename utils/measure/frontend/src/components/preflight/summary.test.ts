@@ -62,7 +62,6 @@ describe("review summary", () => {
       vacuum_entity_id: "vacuum.robot",
       battery_entity_id: "sensor.robot_battery",
       additional_entity_ids: ["sensor.dock_state"],
-      export_filename: "record.jsonl",
     };
     const definition: MeasureDefinition = {
       measure_type: "recorder", label: "Recorder", description: "Record states.", icon: "⏺",
@@ -77,6 +76,7 @@ describe("review summary", () => {
     };
 
     expect(reviewSummary(recorder, { valid: true, warnings: [] }, definition)).toEqual(expect.arrayContaining([
+      { label: "Model", value: "Recorder (measurement)" },
       { label: "Purpose", value: "Data for a complex power profile (experimental)" },
       { label: "Device type", value: "Robot vacuum" },
       { label: "Vacuum", value: "vacuum.robot" },

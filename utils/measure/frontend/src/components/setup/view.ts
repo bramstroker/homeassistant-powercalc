@@ -39,8 +39,6 @@ import { entityRows } from "./options";
 import "./developer-options";
 import "./fields-section";
 
-export { recorderExportFilename } from "./options";
-
 @customElement("measure-setup-view")
 export class SetupView extends LitElement {
   @property({ attribute: false })

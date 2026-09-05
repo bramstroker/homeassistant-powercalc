@@ -100,8 +100,20 @@ def test_recorder_writes_entity_states_as_json_lines(tmp_path: Path) -> None:
 
     runner.run(request, str(tmp_path))
 
-    samples = [json.loads(line) for line in (tmp_path / "record.jsonl").read_text().splitlines()]
+    records = [json.loads(line) for line in (tmp_path / "record.jsonl").read_text().splitlines()]
+    metadata, *samples = records
+    assert metadata == {
+        "entities": [
+            {"domain": "vacuum", "entity_id": "vacuum.robot", "role": "primary"},
+            {"domain": "sensor", "entity_id": "sensor.robot_battery", "role": "battery"},
+        ],
+        "format_version": 1,
+        "primary_entity_id": "vacuum.robot",
+        "recipe": "vacuum_robot",
+        "record_type": "metadata",
+    }
     assert len(samples) == 1
+    assert samples[0]["record_type"] == "sample"
     assert samples[0]["power"] == 4.2
     assert samples[0]["entities"] == {
         "vacuum.robot": {
@@ -142,7 +154,11 @@ def test_recorder_skips_unreadable_samples_and_keeps_recording(tmp_path: Path) -
 
     result = runner.run(request, str(tmp_path))
 
-    samples = [json.loads(line) for line in (tmp_path / "record.jsonl").read_text().splitlines()]
+    samples = [
+        record
+        for line in (tmp_path / "record.jsonl").read_text().splitlines()
+        if (record := json.loads(line)).get("record_type") == "sample"
+    ]
     assert [sample["entities"]["switch.plug"]["state"] for sample in samples] == ["on", "off"]
     assert result.summary is not None
     assert result.summary["Samples recorded"] == "2"

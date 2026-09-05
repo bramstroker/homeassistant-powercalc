@@ -18,6 +18,7 @@ function sessionSnapshot(overrides: Record<string, unknown> = {}): Record<string
   return {
     session_id: "session-1",
     state: "running",
+    can_analyse: false,
     created_at: "2026-09-05T10:00:00Z",
     updated_at: "2026-09-05T10:00:01Z",
     phase: null,
@@ -86,6 +87,30 @@ describe("MeasureApiClient", () => {
     expect(fetcher).toHaveBeenCalledWith(
       new URL("http://ha.local/prefix/api/sessions/session-1/plots"),
       expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
+  it("loads a generated JSON file for in-app inspection", async () => {
+    const contents = { status: "model_ready" };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(contents));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getJsonFile("session 1", "analyser.json")).resolves.toEqual(contents);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/sessions/session%201/files/analyser.json"),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
+  it("restarts recording analysis below the ingress prefix", async () => {
+    const snapshot = sessionSnapshot({ state: "completed", can_analyse: true });
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(snapshot));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.analyse("session 1")).resolves.toEqual(snapshot);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/sessions/session%201/analyse"),
+      expect.objectContaining({ method: "POST" }),
     );
   });
 

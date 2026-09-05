@@ -5,6 +5,8 @@ from statistics import mean
 import time
 from typing import Any, Literal, NotRequired, Protocol, TypedDict
 
+from measure.analyser import RecorderAnalyser
+from measure.analyser.execution import RecorderAnalysisExecution
 from measure.cancellation import MeasurementCancelledError as MeasurementCancelledError
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION, Trend
 from measure.dummy_load import DummyLoadCalibration
@@ -14,6 +16,8 @@ from measure.request import (
     DummyLoadReuseRequest,
     LightMeasurementRequest,
     MeasurementRequest,
+    RecorderMeasurementRequest,
+    RecorderPurpose,
 )
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import DummyLoadMeasurementError, MeasureUtil
@@ -250,6 +254,7 @@ class MeasurementExecution:
         *,
         measurement: PreparedMeasurement,
         output_directory: Path | None,
+        analyser: RecorderAnalyser | None = None,
     ) -> None:
         self.measurement = measurement
         self.output_directory = (
@@ -258,6 +263,7 @@ class MeasurementExecution:
             and (measurement.request.generate_model_json or measurement.runner.writes_export_files())
             else None
         )
+        self.analyser = analyser or RecorderAnalyser()
 
     def run(self) -> RunnerResult:
         """Run, optionally write the model, and always clean up runner resources."""
@@ -273,6 +279,22 @@ class MeasurementExecution:
             for preparation in self.measurement.preparations:
                 preparation.run(self.measurement.interaction)
             result = runner.run(request, str(output_directory or ""))
+            if (
+                isinstance(request, RecorderMeasurementRequest)
+                and request.recorder_purpose == RecorderPurpose.COMPLEX_PROFILE
+                and output_directory is not None
+            ):
+                self.measurement.interaction.phase("Analysing recording")
+                result = RunnerResult(
+                    model_json_data=result.model_json_data,
+                    voltages=result.voltages,
+                    summary=RecorderAnalysisExecution(self.analyser).run(
+                        request,
+                        output_directory,
+                        summary=result.summary,
+                        voltages=result.voltages,
+                    ),
+                )
             if request.generate_model_json and output_directory is not None:
                 standby = runner.measure_standby_power()
                 voltages = list(result.voltages or []) + standby.voltages

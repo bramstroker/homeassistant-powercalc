@@ -218,19 +218,25 @@ class RecorderMeasurementRequest(BaseMeasurementRequest):
     additional_entity_ids: tuple[str, ...] = Field(default=(), max_length=100)
     export_filename: str = Field(default=DEFAULT_EXPORT_FILENAME, min_length=1, max_length=200)
 
+    @property
+    def generate_model_json(self) -> bool:
+        """Recorder model generation is handled by the analyser after capture."""
+
+        return False
+
     @model_validator(mode="before")
     @classmethod
-    def select_default_export_filename(cls, data: object) -> object:
-        if not isinstance(data, dict) or data.get("recorder_purpose") != RecorderPurpose.COMPLEX_PROFILE:
-            return data
-        if data.get("export_filename", DEFAULT_EXPORT_FILENAME) != DEFAULT_EXPORT_FILENAME:
-            return data
-        return data | {"export_filename": COMPLEX_PROFILE_EXPORT_FILENAME}
+    def select_export_filename(cls, data: object) -> object:
+        """Use the fixed filename for the selected recorder output format."""
 
-    @field_validator("export_filename")
-    @classmethod
-    def validate_export_filename(cls, value: str) -> str:
-        return validate_export_filename(value)
+        if not isinstance(data, dict):
+            return data
+        filename = (
+            COMPLEX_PROFILE_EXPORT_FILENAME
+            if data.get("recorder_purpose") == RecorderPurpose.COMPLEX_PROFILE
+            else DEFAULT_EXPORT_FILENAME
+        )
+        return data | {"export_filename": filename}
 
     @field_validator(
         "tracked_entity_ids",
@@ -255,15 +261,10 @@ class RecorderMeasurementRequest(BaseMeasurementRequest):
         if self.recorder_purpose == RecorderPurpose.PLAYBOOK:
             if self._has_profile_selection():
                 raise ValueError("Playbook recordings cannot include complex-profile entity selections")
-            # Plotting picks the reader by extension, so a CSV under a .jsonl name reads as empty.
-            if self.export_filename.lower().endswith(".jsonl"):
-                raise ValueError("Playbook recordings must use a .csv export filename")
             return self
 
         if self.profile_recipe is None:
             raise ValueError("profile_recipe is required for a complex-profile recording")
-        if not self.export_filename.lower().endswith(".jsonl"):
-            raise ValueError("Complex-profile recordings must use a .jsonl export filename")
         if self.profile_recipe == RecorderProfileRecipe.GENERIC:
             self._validate_generic_selection()
         else:
