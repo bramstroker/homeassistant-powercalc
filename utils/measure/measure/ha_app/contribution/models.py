@@ -2,7 +2,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Literal, Protocol
 
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from measure.const import MeasureType
 from measure.contribution.github import UPSTREAM_BRANCH, UPSTREAM_OWNER, UPSTREAM_REPO
@@ -119,11 +119,22 @@ class ContributionFile(BaseModel):
 
 
 class ContributionPreviewRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     manufacturer_name: str = Field(min_length=1, max_length=200)
-    manufacturer_directory: str | None = Field(default=None, max_length=120)
     model_id: str = Field(min_length=1, max_length=120)
     product_name: str = Field(min_length=1, max_length=200)
     contributor: str = Field(min_length=1, max_length=200)
+    contributor_github: str | None = Field(default=None, max_length=100)
+    contributor_email: str | None = Field(default=None, max_length=200)
+    aliases: list[str] = Field(default_factory=list)
+    gtins: list[str] = Field(default_factory=list)
+    product_url: str | None = Field(default=None, max_length=2_000)
+    mains_voltage: Literal[120, 230] | None = None
+    device_specs: dict[str, Any] | None = None
+    measure_device: str | None = Field(default=None, max_length=200)
+    measure_device_firmware: str | None = Field(default=None, max_length=200)
+    measure_description: str | None = Field(default=None, max_length=2_000)
     notes: str = Field(default="", max_length=2_000)
 
 
@@ -145,6 +156,18 @@ class ContributionPreviewResponse(BaseModel):
     model_id: str
     product_name: str
     contributor: str
+    contributor_github: str = ""
+    contributor_email: str = ""
+    aliases: list[str] = Field(default_factory=list)
+    gtins: list[str] = Field(default_factory=list)
+    product_url: str = ""
+    mains_voltage: Literal[120, 230] | None = None
+    voltage_range: dict[str, float] | None = None
+    device_specs: dict[str, Any] | None = None
+    device_type: str = ""
+    measure_device: str = ""
+    measure_device_firmware: str = ""
+    measure_description: str = ""
     device_info: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
     home_assistant: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
     notes: str = ""
@@ -196,6 +219,8 @@ class ContributionService(Protocol):
         payload: ContributionPreviewRequest | None,
         integration: str | None = None,
     ) -> ContributionPreviewResponse: ...
+
+    def prepared_archive(self, job_id: str) -> bytes: ...
 
     def submit(
         self,

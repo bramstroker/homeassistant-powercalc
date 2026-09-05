@@ -31,6 +31,43 @@ Start the CLI with:
 uv run --extra cli python -m measure.measure
 ```
 
+Model ID and product name are entered in **Prepare**, not when starting a
+measurement. The app uses the selected Home Assistant entity name as the session
+label and prefills known device details in Prepare. For measurements without a
+controlled entity, you can supply an optional session name.
+
+CLI profile measurements without a `MODEL_ID` use a unique `export/session-<id>`
+directory, printed when the run finishes. Existing `MODEL_ID` and `MODEL_NAME`
+environment settings remain supported; a supplied ID keeps `export/<model-id>`
+as the output directory. To resume a CLI measurement, set `MODEL_ID` to its export
+directory name.
+
+Prepare validates the metadata and creates a profile-library-shaped package in
+`<artifact-directory>/prepared` without changing the raw artifacts. Use the
+directory printed by the measurement command:
+
+```bash
+uv run powercalc-profile prepare export/<model-id>
+```
+
+For automation, put the same answers in a JSON file and disable prompts:
+
+```bash
+uv run powercalc-profile prepare export/<model-id> \
+  --metadata profile-metadata.json \
+  --non-interactive
+```
+
+The JSON keys are `manufacturer`, `model_id`, `product_name`, `aliases`,
+`gtins`, `product_url`, `mains_voltage`,
+`device_specs`, `measure_device`, `measure_device_firmware`,
+`measure_description`, and `author` (`name`, `github`, and optional `email`). Use
+`--library-root` when running outside a repository checkout. The manufacturer
+directory is resolved from the existing library or derived from the manufacturer;
+it is not a user-supplied field. `mains_voltage` must be either `120` or `230`
+when the measurement did not record a voltage range; otherwise it is derived from
+that range.
+
 ### Visualize measurement output
 
 Visualization is part of the measure package, while its scientific dependencies are isolated from the normal CLI and Home Assistant app installations:

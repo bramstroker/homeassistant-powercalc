@@ -1,5 +1,5 @@
 import asyncio
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from contextlib import asynccontextmanager
 from dataclasses import replace
 import json
@@ -8,7 +8,7 @@ import mimetypes
 import os
 from pathlib import Path
 import re
-from typing import Annotated, cast
+from typing import Annotated, Literal, cast
 
 from fastapi import APIRouter, Body, FastAPI, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
@@ -38,7 +38,12 @@ from measure.ha_app.contribution import (
 )
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
-from measure.ha_app.library_catalog import LibraryCatalogError, MeasureDeviceCatalog
+from measure.ha_app.library_catalog import (
+    DeviceSpecificationCatalog,
+    LibraryCatalogError,
+    ManufacturerCatalog,
+    MeasureDeviceCatalog,
+)
 from measure.ha_app.light_probe import (
     LightLoadProbe,
     LightLoadProbeError,
@@ -140,6 +145,23 @@ class EntityCatalogResponse(BaseModel):
 
 class MeasureDeviceCatalogResponse(BaseModel):
     devices: list[str]
+
+
+class ManufacturerCatalogResponse(BaseModel):
+    manufacturers: list[str]
+
+
+class DeviceSpecificationFieldResponse(BaseModel):
+    name: str
+    label: str
+    description: str
+    value_type: Literal["string", "number", "integer", "boolean"]
+    collection: Literal["scalar", "array", "scalar_or_array"]
+    options: list[str]
+
+
+class DeviceSpecificationCatalogResponse(BaseModel):
+    device_types: dict[str, list[DeviceSpecificationFieldResponse]]
 
 
 class SessionFile(BaseModel):
@@ -252,6 +274,8 @@ class AppContext:
         self.developer_mode = developer_mode
         self.storage = SessionStorage(data_root)
         self.measure_device_catalog = MeasureDeviceCatalog()
+        self.manufacturer_catalog = ManufacturerCatalog()
+        self.device_specification_catalog = DeviceSpecificationCatalog()
         self.power_meter_diagnostics = PowerMeterDiagnostics(self.build_power_meter)
         self.light_load_probe = LightLoadProbe(
             lambda: app_measurement_assembler(
@@ -259,20 +283,51 @@ class AppContext:
                 shelly_password=self.shelly_password(),
             ),
         )
-        self.contribution = ContributionApiCoordinator(self.storage, resolve_integration=self.entity_integration)
+        self.contribution = ContributionApiCoordinator(
+            self.storage,
+            resolve_integration=self.entity_integrations,
+            resolve_manufacturer=self.entity_manufacturers,
+            resolve_model_id=self.entity_model_ids,
+        )
         self.coordinator = MeasurementCoordinator(
             self.storage,
             self._measurement_service,
         )
 
-    def entity_integration(self, entity_id: str) -> str | None:
-        """Look up which integration provides an entity; contribution details stay usable without it."""
+    def entity_integrations(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
+        """Look up which integration provides each entity; contribution details stay usable without it."""
+        entities = self._entity_descriptors(entity_ids, "integration")
+        return {entity_id: entity.integration if entity is not None else None for entity_id, entity in entities.items()}
+
+    def entity_manufacturers(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
+        """Look up HA's device manufacturer per entity and normalize known aliases to the library name."""
+        entities = self._entity_descriptors(entity_ids, "manufacturer")
+        return {
+            entity_id: self._canonical_manufacturer(entity.manufacturer) if entity is not None else None
+            for entity_id, entity in entities.items()
+        }
+
+    def entity_model_ids(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
+        entities = self._entity_descriptors(entity_ids, "model ID")
+        return {entity_id: entity.model_id if entity is not None else None for entity_id, entity in entities.items()}
+
+    def _entity_descriptors(self, entity_ids: Sequence[str], purpose: str) -> dict[str, EntityDescriptor | None]:
+        """Read one entity snapshot for the whole batch, rather than one per entity."""
         try:
-            entity = HomeAssistantEntityCatalog(self.home_assistant).load_snapshot().get(entity_id)
-        except Exception as error:  # noqa: BLE001 - the integration is optional context for a pull request
-            _LOGGER.warning("Could not resolve the integration for %s: %s", entity_id, error)
+            snapshot = HomeAssistantEntityCatalog(self.home_assistant).load_snapshot()
+        except Exception as error:  # noqa: BLE001 - this metadata is optional context for a pull request
+            _LOGGER.warning("Could not resolve the %s for %s: %s", purpose, ", ".join(entity_ids), error)
+            return dict.fromkeys(entity_ids)
+        return {entity_id: snapshot.get(entity_id) for entity_id in entity_ids}
+
+    def _canonical_manufacturer(self, manufacturer: str | None) -> str | None:
+        if not manufacturer:
             return None
-        return entity.integration if entity is not None else None
+        try:
+            return self.manufacturer_catalog.canonical_name(manufacturer)
+        except LibraryCatalogError as error:
+            _LOGGER.warning("Could not normalize manufacturer %s: %s", manufacturer, error)
+            return manufacturer
 
     def _measurement_service(self) -> MeasurementService:
         return MeasurementService(
@@ -464,6 +519,39 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
         response.headers["Cache-Control"] = "public, max-age=600"
         return MeasureDeviceCatalogResponse(devices=list(devices))
 
+    @router.get("/library/manufacturers", responses={503: _ERROR})
+    async def manufacturers(request: Request, response: Response) -> ManufacturerCatalogResponse:
+        try:
+            values = await run_in_threadpool(_context(request).manufacturer_catalog.manufacturers)
+        except LibraryCatalogError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+        response.headers["Cache-Control"] = "public, max-age=600"
+        return ManufacturerCatalogResponse(manufacturers=list(values))
+
+    @router.get("/library/device-specifications", responses={503: _ERROR})
+    async def device_specifications(request: Request, response: Response) -> DeviceSpecificationCatalogResponse:
+        try:
+            values = await run_in_threadpool(_context(request).device_specification_catalog.fields)
+        except LibraryCatalogError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+        response.headers["Cache-Control"] = "public, max-age=600"
+        return DeviceSpecificationCatalogResponse(
+            device_types={
+                device_type: [
+                    DeviceSpecificationFieldResponse(
+                        name=field.name,
+                        label=field.label,
+                        description=field.description,
+                        value_type=field.value_type,
+                        collection=field.collection,
+                        options=list(field.options),
+                    )
+                    for field in fields
+                ]
+                for device_type, fields in values.items()
+            },
+        )
+
     @router.get("/settings")
     async def get_settings(request: Request) -> AppSettingsResponse:
         return await run_in_threadpool(_settings_response, _context(request))
@@ -593,7 +681,7 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
         return StreamingResponse(_event_stream(request, context, session_id), media_type="text/event-stream")
 
 
-def _register_contribution_routes(router: APIRouter) -> None:
+def _register_contribution_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/contribution/auth")
     async def contribution_auth_status(request: Request) -> ContributionAuthStatus:
         return await run_in_threadpool(_context(request).contribution.auth_status)
@@ -653,6 +741,23 @@ def _register_contribution_routes(router: APIRouter) -> None:
             context.contribution.submit,
             _require_session(context, session_id),
             payload,
+        )
+
+    @router.get(
+        "/sessions/{session_id}/contribution/{job_id}/profile.zip",
+        responses={404: _ERROR, 409: _ERROR},
+    )
+    async def contribution_profile_archive(session_id: str, job_id: str, request: Request) -> Response:
+        context = _context(request)
+        content = await run_in_threadpool(
+            context.contribution.prepared_archive,
+            _require_session(context, session_id),
+            job_id,
+        )
+        return Response(
+            content=content,
+            media_type="application/zip",
+            headers={"Content-Disposition": 'attachment; filename="powercalc-profile.zip"'},
         )
 
 
@@ -1007,7 +1112,9 @@ def _session_summary(context: AppContext, snapshot: SessionSnapshot) -> SessionS
         updated_at=snapshot.updated_at,
         measure_type=request.measure_type,
         model_id=request.model_id,
-        product_name=request.product_name,
+        product_name=(
+            request.session_name or request.product_name or ", ".join(request.controlled_entity_ids) or "Measurement"
+        ),
         measure_device=request.measure_device,
         completed=snapshot.completed,
         total=snapshot.total,

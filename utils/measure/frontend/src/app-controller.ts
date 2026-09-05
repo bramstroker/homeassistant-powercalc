@@ -10,12 +10,14 @@ import type {
   ContributionAuthDeviceStatus,
   ContributionAuthState,
   ContributionDeviceFlow,
+  ContributionFormValues,
   ContributionPreview,
   ContributionPreviewRequest,
   ContributionResult,
   ContributionStatus,
   ContributionSubmitRequest,
   DummyLoadCalibration,
+  DeviceSpecificationField,
   EntityDescriptor,
   ErrorHelp,
   MeasureDefinition,
@@ -33,7 +35,7 @@ import type {
   ShellyDiscoveryDevice,
 } from "./types";
 
-export type AppView = "loading" | "sessions" | "setup" | "review" | "running" | "result" | "settings";
+export type AppView = "loading" | "sessions" | "setup" | "review" | "running" | "result" | "profile" | "share" | "settings";
 
 export interface MeasureAppState {
   view: AppView;
@@ -61,10 +63,13 @@ export interface MeasureAppState {
   measureDevices: string[];
   measureDevicesLoading: boolean;
   measureDevicesError: string;
+  manufacturers?: string[];
+  deviceSpecificationFields: Record<string, DeviceSpecificationField[]>;
   contributionAuth?: ContributionAuthState;
   contributionDeviceFlow?: ContributionDeviceFlow;
   contributionDeviceStatus?: ContributionAuthDeviceStatus;
   contributionDraft?: ContributionPreview;
+  contributionFormValues?: ContributionFormValues;
   contributionPreview?: ContributionPreview;
   contributionResult?: ContributionResult;
   contributionBusy: boolean;
@@ -88,7 +93,10 @@ export interface MeasureAppState {
  * Everything the controller calls on the API client. Derived from the client itself so the two
  * cannot drift; the URL builders are excluded because only the shell hands those to its views.
  */
-export type MeasureAppApi = Omit<MeasureApiClient, "fileUrl" | "diagnosticsUrl" | "eventsUrl">;
+export type MeasureAppApi = Omit<
+  MeasureApiClient,
+  "fileUrl" | "diagnosticsUrl" | "eventsUrl" | "preparedProfileUrl"
+>;
 
 export interface EventConnection {
   connect(): void;
@@ -113,6 +121,7 @@ export class MeasureAppController {
   private contributionDevicePollInterval = 0;
   private contributionDeviceExpiresAt = 0;
   private contributionDevicePollTimer?: ReturnType<typeof setTimeout>;
+  private contributionTouchedFields = new Set<string>();
 
   constructor(
     private readonly state: MeasureAppState,
@@ -233,6 +242,38 @@ export class MeasureAppController {
   newMeasurement(): void {
     this.resetDraft();
     this.state.view = "setup";
+    this.changed();
+  }
+
+  openProfile(): void {
+    if (this.state.snapshot?.state !== "completed" || this.isAverageMeasurement()) return;
+    this.clearError();
+    this.state.view = "profile";
+    this.changed();
+  }
+
+  openShare(): void {
+    if (this.state.snapshot?.state !== "completed" || !this.state.contributionPreview || this.isAverageMeasurement()) return;
+    if (Object.keys(this.state.contributionFormValues ?? {}).length) return;
+    this.clearError();
+    this.state.view = "share";
+    this.changed();
+  }
+
+  backToProfile(): void {
+    if (this.isAverageMeasurement()) return;
+    this.clearError();
+    this.state.view = "profile";
+    this.changed();
+  }
+
+  private isAverageMeasurement(): boolean {
+    return (this.state.snapshot?.request?.measure_type ?? this.state.request?.measure_type ?? this.state.selectedMeasureType) === "average";
+  }
+
+  backToResult(): void {
+    this.clearError();
+    this.state.view = "result";
     this.changed();
   }
 
@@ -393,9 +434,43 @@ export class MeasureAppController {
       [this.state.capabilities] = await Promise.all([
         this.api().getCapabilities(),
         this.refreshDummyLoadCalibration(),
+        this.refreshContributionDefaults(),
       ]);
       this.state.view = this.settingsReturnView;
     });
+  }
+
+  private async refreshContributionDefaults(): Promise<void> {
+    const previous = this.state.contributionDraft;
+    const sessionId = this.state.snapshot?.session_id;
+    if (!previous || !sessionId) return;
+    const defaults = await this.api().getContributionDraft(sessionId);
+    if (this.state.snapshot?.session_id !== sessionId) return;
+    const current = this.state.contributionPreview ?? previous;
+    const merged = { ...current };
+    let changed = false;
+    for (const field of ["contributor", "contributor_github", "contributor_email", "measure_device_firmware"] as const) {
+      // Keep both edits made here (including explicit blanks) and overrides in a restored preview.
+      if ((current[field] ?? "") !== (previous[field] ?? "")) this.contributionTouchedFields.add(field);
+      if (this.contributionTouchedFields.has(field)) continue;
+      if ((current[field] ?? "") === (defaults[field] ?? "")) continue;
+      merged[field] = defaults[field] ?? "";
+      changed = true;
+    }
+    if (changed) {
+      this.state.contributionDraft = merged;
+      this.state.contributionPreview = undefined;
+      this.state.contributionResult = undefined;
+      this.state.contributionError = "";
+      this.state.contributionErrorField = undefined;
+      if (this.settingsReturnView === "share") this.settingsReturnView = "profile";
+    }
+  }
+
+  editContribution(values: ContributionFormValues): void {
+    this.state.contributionFormValues = values;
+    for (const field of Object.keys(values)) this.contributionTouchedFields.add(field);
+    this.changed();
   }
 
   async startContributionDeviceAuth(): Promise<void> {
@@ -557,6 +632,7 @@ export class MeasureAppController {
     if (!sessionId) return;
     await this.runContribution(async () => {
       this.state.contributionPreview = await this.api().previewContribution(sessionId, request);
+      this.state.contributionFormValues = undefined;
       this.state.contributionResult = undefined;
     });
   }
@@ -690,6 +766,8 @@ export class MeasureAppController {
     this.state.logs = [];
     this.state.samples = [];
     this.state.contributionDraft = undefined;
+    this.state.contributionFormValues = undefined;
+    this.contributionTouchedFields.clear();
     this.state.contributionPreview = undefined;
     this.state.contributionResult = undefined;
     this.state.contributionError = "";
@@ -760,13 +838,18 @@ export class MeasureAppController {
   private async loadResultArtifacts(): Promise<void> {
     const sessionId = this.state.snapshot?.session_id;
     if (!sessionId) return;
-    const [files, plots, calibration, auth, contribution, contributionStatus] = await Promise.allSettled([
+    this.state.contributionFormValues = undefined;
+    this.contributionTouchedFields.clear();
+    const [files, plots, calibration, auth, contribution, contributionStatus, manufacturers, deviceSpecifications, measureDevices] = await Promise.allSettled([
       this.api().getFiles(sessionId),
       this.api().getPlots(sessionId),
       this.api().getDummyLoadCalibration(),
       this.api().getContributionAuth(),
       this.api().getContributionDraft(sessionId),
       this.api().getContributionStatus(),
+      this.api().getManufacturers(),
+      this.api().getDeviceSpecifications(),
+      this.api().getMeasureDevices(),
     ]);
     this.state.files = files.status === "fulfilled" ? files.value : [];
     this.state.plotCollection = plots.status === "fulfilled" ? plots.value : emptyPlots(["Plots could not be loaded."]);
@@ -782,6 +865,12 @@ export class MeasureAppController {
       this.state.contributionPreview = undefined;
     }
     if (contributionStatus.status === "fulfilled") this.restoreContributionStatus(contributionStatus.value);
+    this.state.manufacturers = manufacturers.status === "fulfilled" ? manufacturers.value.manufacturers : [];
+    this.state.deviceSpecificationFields = deviceSpecifications.status === "fulfilled"
+      ? deviceSpecifications.value.device_types
+      : {};
+    this.state.measureDevices = measureDevices.status === "fulfilled" ? measureDevices.value.devices : [];
+    this.state.measureDevicesError = measureDevices.status === "rejected" ? message(measureDevices.reason) : "";
   }
 
   /** Recover persisted contribution progress (e.g. after a reload or dropped connection mid-submit). */

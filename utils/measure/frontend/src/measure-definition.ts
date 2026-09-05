@@ -139,8 +139,9 @@ export function buildMeasurementRequest(
   dummyController = false,
 ): MeasurementRequest {
   const base: BaseMeasurementRequest = {
-    model_id: formText(form, "model_id") || "measurement",
-    product_name: formText(form, "product_name") || definition.label,
+    model_id: formText(form, "model_id"),
+    product_name: formText(form, "product_name"),
+    session_name: formText(form, "session_name"),
     measure_device: measureDevice,
     power_meter: powerMeter,
     generate_model: definition.supports_profile,

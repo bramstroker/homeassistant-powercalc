@@ -2,6 +2,35 @@ import type { OperatingPoint, SessionSnapshot } from "../types";
 import "./running-view";
 
 describe("running view", () => {
+  it("stops averaging through the same action as recording and disables repeated requests", async () => {
+    const element = document.createElement("measure-running-view") as HTMLElement & {
+      snapshot: SessionSnapshot; busy: boolean; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = { state: "running", mode: "Averaging", progress: { completed: 6, total: 60 } };
+    document.body.append(element);
+    await element.updateComplete;
+    const cancel = vi.fn();
+    element.addEventListener("cancel", cancel);
+    const stop = element.shadowRoot.querySelector<HTMLButtonElement>(".actions button")!;
+    expect(stop.textContent).toBe("Stop measurement");
+    expect(stop.classList.contains("primary")).toBe(true);
+    stop.click();
+    expect(cancel).toHaveBeenCalledOnce();
+
+    element.busy = true;
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector<HTMLButtonElement>(".actions button")?.disabled).toBe(true);
+    element.busy = false;
+    element.snapshot = { ...element.snapshot, state: "cancelling" };
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector(".actions button")?.textContent).toBe("Stopping…");
+    expect(element.shadowRoot.querySelector<HTMLButtonElement>(".actions button")?.disabled).toBe(true);
+
+    element.snapshot = { ...element.snapshot, state: "awaiting_confirmation" };
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector(".actions button")?.textContent).toBe("Cancel measurement");
+  });
+
   it("shows an indeterminate preparation state instead of zero progress", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;

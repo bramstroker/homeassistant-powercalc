@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from measure.const import (
     MODEL_JSON_VOLTAGE_RANGE,
@@ -10,6 +10,24 @@ from measure.const import (
 )
 from measure.tuning import MeasurementParameters
 from measure.version import measure_version
+
+
+def mains_voltage_from_range(voltage_range: object) -> Literal[120, 230] | None:
+    """Return the nominal mains voltage represented by an observed range."""
+    if not isinstance(voltage_range, dict):
+        return None
+    minimum = voltage_range.get(MODEL_JSON_VOLTAGE_RANGE_MIN)
+    maximum = voltage_range.get(MODEL_JSON_VOLTAGE_RANGE_MAX)
+    if (
+        isinstance(minimum, bool)
+        or isinstance(maximum, bool)
+        or not isinstance(minimum, int | float)
+        or not isinstance(maximum, int | float)
+        or minimum > maximum
+    ):
+        return None
+    midpoint = (minimum + maximum) / 2
+    return 120 if abs(120 - midpoint) <= abs(230 - midpoint) else 230
 
 
 def write_model_json(
@@ -21,6 +39,7 @@ def write_model_json(
     parameters: MeasurementParameters,
     extra_json_data: dict[str, Any] | None = None,
     voltages: list[float] | None = None,
+    num_lights: int | None = None,
 ) -> Path:
     created_at = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
     json_data: dict[str, Any] = {
@@ -36,11 +55,15 @@ def write_model_json(
         "name": name,
         "standby_power": standby_power,
     }
+    if num_lights is not None:
+        json_data["measure_settings"]["NUM_LIGHTS"] = num_lights
     if voltages:
-        json_data[MODEL_JSON_VOLTAGE_RANGE] = {
+        voltage_range = {
             MODEL_JSON_VOLTAGE_RANGE_MIN: round(min(voltages), 2),
             MODEL_JSON_VOLTAGE_RANGE_MAX: round(max(voltages), 2),
         }
+        json_data[MODEL_JSON_VOLTAGE_RANGE] = voltage_range
+        json_data["mains_voltage"] = mains_voltage_from_range(voltage_range)
     if extra_json_data:
         json_data.update(extra_json_data)
 

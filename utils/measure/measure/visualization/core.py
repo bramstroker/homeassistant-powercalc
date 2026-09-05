@@ -118,7 +118,7 @@ def _session_plot_candidates(
     max_line_points: int,
 ) -> list[tuple[Path, str, LutMode | None, int]]:
     candidates: list[tuple[Path, str, LutMode | None, int]] = []
-    model_root = request.model_id
+    model_root = request.model_id or "measurement"
     if isinstance(request, LightMeasurementRequest):
         for mode in _LIGHT_MODE_ORDER:
             if mode not in request.modes:

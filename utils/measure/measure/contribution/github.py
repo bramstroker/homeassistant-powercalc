@@ -177,6 +177,7 @@ class GitHubClient:
             "GET",
             f"{self.api_base_url}/repos/{owner}/{repo}/contents/{path}",
             params={"ref": ref},
+            authenticated=bool(self.token),
         )
         if data.get("encoding") == "base64" and isinstance(data.get("content"), str) and data["content"].strip():
             return self._decode_base64(data["content"], path)
@@ -185,7 +186,11 @@ class GitHubClient:
         blob_sha = data.get("sha")
         if not isinstance(blob_sha, str) or not blob_sha:
             raise GitHubApiError(f"GitHub did not return content or a blob sha for {path}")
-        blob = self._request("GET", f"{self.api_base_url}/repos/{owner}/{repo}/git/blobs/{blob_sha}")
+        blob = self._request(
+            "GET",
+            f"{self.api_base_url}/repos/{owner}/{repo}/git/blobs/{blob_sha}",
+            authenticated=bool(self.token),
+        )
         if blob.get("encoding") != "base64" or not isinstance(blob.get("content"), str):
             raise GitHubApiError(f"GitHub did not return base64 content for {path}")
         return self._decode_base64(blob["content"], path)
@@ -198,7 +203,11 @@ class GitHubClient:
             raise GitHubApiError(f"GitHub returned invalid base64 content for {path}") from error
 
     def get_ref(self, owner: str, repo: str, branch: str) -> dict[str, Any] | None:
-        response = self._send("GET", f"{self.api_base_url}/repos/{owner}/{repo}/git/ref/heads/{branch}")
+        response = self._send(
+            "GET",
+            f"{self.api_base_url}/repos/{owner}/{repo}/git/ref/heads/{branch}",
+            authenticated=bool(self.token),
+        )
         if response.status_code == 404:
             return None
         return self._decode_object(response)

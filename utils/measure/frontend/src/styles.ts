@@ -8,7 +8,7 @@ export const sharedStyles = css`
     --surface: #151b24;
     --surface-raised: #1e2632;
     --well: #0a0e15;
-    --field: #0f1520;
+    --field: #111925;
     --line: #2c3644;
     --track: #2a3444;
     --grid: #55647a;
@@ -54,7 +54,7 @@ export const sharedStyles = css`
   button.primary:hover:not(:disabled) { border-color: var(--signal); background: var(--signal); }
   button.danger { border-color: color-mix(in srgb, var(--danger) 70%, var(--line)); color: var(--danger); }
 
-  button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible {
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible {
     outline: 3px solid color-mix(in srgb, var(--signal) 60%, transparent);
     outline-offset: 3px;
   }
@@ -77,9 +77,16 @@ export const sharedStyles = css`
     width: 100%; min-width: 0; max-width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 9px;
     padding: 0.65rem 0.75rem; background: var(--field); color: var(--ink);
   }
+  input::placeholder, textarea::placeholder {
+    background: transparent;
+    color: var(--muted);
+    opacity: 0.75;
+  }
   .check { display: flex; grid-template-columns: none; align-items: center; gap: 0.5rem; color: var(--ink); }
   .check input { width: auto; min-height: auto; accent-color: var(--signal); }
   .field-hint { color: var(--muted); font-size: 0.74rem; line-height: 1.4; }
+  .field-hint.error, .required-marker { color: var(--danger); }
+  input[aria-invalid="true"], textarea[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--danger); box-shadow: inset 0 0 0 1px var(--danger); }
   .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
   .context { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
 

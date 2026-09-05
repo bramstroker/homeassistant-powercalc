@@ -33,7 +33,7 @@ import {
 import { emit } from "../events";
 import { formText } from "../form";
 import { sharedStyles } from "../styles";
-import { entitySelect, fieldHint, numberField, textField } from "./fields";
+import { entitySelect, fieldHint, numberField, optionSelect, textField } from "./fields";
 import { defaultDummyLoadMode, dummyLoadSpec, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
 import { entityListStyles, renderEntityList } from "./entity-list-field";
 import {
@@ -48,7 +48,6 @@ import { errorHelpLink } from "./error-help-link";
 const LIGHT_DISCOVERY_HINT =
   "Newly discovered lights may not have a usable state until Home Assistant receives their first update. If a light is missing, change its state once in Home Assistant, then reload this page.";
 
-const FULL_PRODUCT_NAME_HINT = "Enter the complete marketed name, including the series and variant shown on the product or packaging. Do not repeat the manufacturer name.";
 const MULTIPLE_LIGHTS_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights";
 const HOME_ASSISTANT_GROUP_GUIDE_URL = "https://www.home-assistant.io/integrations/group/";
 
@@ -141,9 +140,8 @@ export class SetupView extends LitElement {
     :host { display: block; min-width: 0; max-width: 100%; }
     form { display: grid; gap: 1rem; }
     .profile-grid { align-items: start; }
-    .profile-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1rem; }
-    fieldset.section { border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem 1.2rem; margin: 0; display: grid; gap: 1rem; }
-    fieldset.section > legend { padding: 0 0.4rem; color: var(--signal-strong); font-size: 0.85rem; font-weight: 700; }
+    .device-section { display: grid; gap: 1rem; min-width: 0; }
+    .light-grid > measure-combobox, .light-grid > .entity-list, .light-grid > .field-block { grid-column: 1 / -1; }
     .checks { display: flex; flex-wrap: wrap; gap: 0.6rem; }
     .check { min-height: 42px; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 999px; }
     /* A checkbox pill has no caption above it, so pin it to the input line of its row. */
@@ -151,6 +149,11 @@ export class SetupView extends LitElement {
     details { border-top: 1px solid var(--line); padding-top: 1rem; }
     summary { width: fit-content; color: var(--signal-strong); cursor: pointer; font-weight: 700; }
     details .grid { margin-top: 1rem; }
+    details.discovery-help { border: 0; padding: 0; font-size: 0.82rem; }
+    .discovery-help p { margin: 0.5rem 0 0; }
+    .developer-content { display: grid; gap: 0.75rem; margin-top: 0.75rem; }
+    .developer-content .notice { margin: 0; }
+    .test-mode-status { margin: 0; color: var(--signal-strong); font-size: 0.82rem; }
     .advanced-heading { grid-column: 1 / -1; margin: 0.25rem 0 -0.25rem; color: var(--signal-strong); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
     .context p { margin-bottom: 0; }
 
@@ -212,9 +215,6 @@ export class SetupView extends LitElement {
             <h2 id="setup-title">Configure the measurement</h2>
           </div>
         </div>
-        ${this.capabilities?.fast_test_mode
-          ? html`<p class="notice" role="status"><strong>Fast test mode is enabled.</strong> Dummy light, fan, speaker and charging runs use minimal waits and measurement points. Their output is for app testing only.</p>`
-          : nothing}
         ${this.initialRequest ? html`<p class="notice" role="status">
           This draft uses the selected session's measurement device and power-meter configuration.
           <button type="button" @click=${this.useCurrentSettings}>Use current app defaults</button>
@@ -227,7 +227,15 @@ export class SetupView extends LitElement {
   private renderSetupContent() {
     return html`
       ${this.selectedType
-        ? renderTypeChip(this.selectedType, this.definition(this.selectedType), this.changeType)
+        ? html`<div class="setup-summary">
+            ${renderTypeChip(this.selectedType, this.definition(this.selectedType), this.changeType)}
+            ${renderPowerMeterSummary({
+              meter: this.meter,
+              measureDevice: this.defaultMeasureDevice,
+              context: this.meterContext(),
+              onOpenSettings: this.openSettings,
+            })}
+          </div>`
         : renderTypePicker(this.definitions, this.selectType)}
       ${this.selectedType ? this.renderMeasurementForm(this.selectedType) : nothing}
     `;
@@ -248,41 +256,31 @@ export class SetupView extends LitElement {
     const activeLightCheck = type === "light" && !this.dummyController && !this.dummyLoadEnabled;
     return html`
       <form @submit=${this.submitMeasurement}>
-        <fieldset class="section">
-          <legend>Measurement device</legend>
-          ${renderPowerMeterSummary({
-            meter: this.meter,
-            measureDevice: this.defaultMeasureDevice,
-            context: this.meterContext(),
-            onOpenSettings: this.openSettings,
-          })}
-          ${this.renderDummyLoadSection(run?.dummy_load)}
-        </fieldset>
-
-        <fieldset class="section">
-          <legend>${definition.label}</legend>
-          ${definition.fields.some((field) => field.role === "controller") ? this.renderDummyControllerToggle() : nothing}
-          ${multipleController && !this.dummyController ? this.renderMultipleLightsToggle(multipleController) : nothing}
-          <div class="grid profile-grid">
+        <div class="device-section">
+          ${this.dummyController ? html`<p class="test-mode-status" role="status">Virtual device · test output only</p>` : nothing}
+          <div class="grid profile-grid ${type === "light" ? "light-grid" : ""}">
             ${fields.filter((field) => field.control !== "multi_select").map((field) => this.genericField(field, run))}
-            ${definition.supports_profile ? html`<div class="profile-fields">
-              ${textField("model_id", "Model ID", {
-                value: this.modelId(run),
-                placeholder: definition.model_id_example && `e.g. ${definition.model_id_example}`,
-                required: true,
-              })}
-              ${textField("product_name", "Full product name", {
-                value: run?.product_name ?? "",
-                placeholder: definition.product_name_example || definition.label,
-                required: true,
-                hint: FULL_PRODUCT_NAME_HINT,
-              })}
-            </div>` : nothing}
+            ${this.dummyController || !definition.fields.some((field) => field.role === "controller")
+              ? textField("session_name", "Session name (optional)", {
+                  value: run?.session_name ?? "",
+                  placeholder: "e.g. Desk lamp test",
+                  hint: "A label for finding this measurement later; it is not the product name.",
+                })
+              : nothing}
           </div>
+          ${type === "light" && !this.dummyController ? html`
+            <details class="discovery-help">
+              <summary>Light not found?</summary>
+              <p class="muted">${LIGHT_DISCOVERY_HINT}</p>
+            </details>
+          ` : nothing}
+          ${multipleController && !this.dummyController ? this.renderMultipleLightsToggle(multipleController) : nothing}
           ${blocks.map((field) => this.multiSelectField(field, run))}
-        </fieldset>
+        </div>
 
+        ${this.renderDummyLoadSection(run?.dummy_load)}
         ${this.renderTuning(definition, run)}
+        ${this.renderDeveloperOptions(definition)}
 
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${activeLightCheck ? html`
@@ -300,6 +298,20 @@ export class SetupView extends LitElement {
           : activeLightCheck ? "Check light and setup" : "Check setup"}</button></div>
       </form>
     `;
+  }
+
+  private renderDeveloperOptions(definition: MeasureDefinition) {
+    const hasController = definition.fields.some((field) => field.role === "controller");
+    if (!(this.capabilities?.developer_mode && hasController) && !this.capabilities?.fast_test_mode) return nothing;
+    return html`<details class="developer-options">
+      <summary>Developer options</summary>
+      <div class="developer-content">
+        ${hasController ? this.renderDummyControllerToggle() : nothing}
+        ${this.capabilities?.fast_test_mode
+          ? html`<p class="notice"><strong>Fast test mode is enabled.</strong> Dummy light, fan, speaker and charging runs use minimal waits and measurement points. Their output is for app testing only.</p>`
+          : nothing}
+      </div>
+    </details>`;
   }
 
   private renderDummyControllerToggle() {
@@ -335,7 +347,7 @@ export class SetupView extends LitElement {
           />
           Measure multiple lights
         </label>
-        <p class="muted">
+        ${this.multipleLights ? html`<p class="muted">
           Measuring multiple identical lights together increases the load, making very low power use easier to measure accurately.
           Select up to three individual lights. For larger sets, select a native Zigbee or Hue group, or create a
           <a href=${HOME_ASSISTANT_GROUP_GUIDE_URL} target="_blank" rel="noopener noreferrer">Home Assistant light group</a>,
@@ -353,7 +365,7 @@ export class SetupView extends LitElement {
               <path d="M9.75 9a2.4 2.4 0 0 1 4.57 1c0 1.75-2.32 2.1-2.32 3.5M12 17h.01"></path>
             </svg>
           </a>
-        </p>
+        </p>` : nothing}
       </div>
     `;
   }
@@ -469,7 +481,6 @@ export class SetupView extends LitElement {
       const selector = entitySelect(name, field.label, entities, {
         selected,
         required: field.required,
-        hint: this.lightDiscoveryHint(field),
         onChange: this.entityChanged,
       });
       if (!field.hint && !relatedMissing) return selector;
@@ -486,9 +497,11 @@ export class SetupView extends LitElement {
         (candidate) => candidate.narrowed_by === name || Object.hasOwn(candidate.visible_when ?? {}, name),
       );
       const selectedOption = field.options.find((option) => option.value === value);
-      return html`<div class="field-block"><label><span>${field.label}</span><select name=${name} ?required=${field.required} @change=${affectsAnother ? this.selectChanged : null}>
-        ${field.options.map((option) => html`<option value=${option.value} ?selected=${option.value === value}>${option.label}</option>`)}
-      </select></label>${this.optionGuidance(selectedOption)}</div>`;
+      return html`<div class="field-block">${optionSelect(name, field.label, field.options, {
+        selected: value,
+        required: field.required,
+        onChange: affectsAnother ? this.selectChanged : null,
+      })}${this.optionGuidance(selectedOption)}</div>`;
     }
     if (name === "export_filename" && this.selectedType === "recorder") {
       return this.valueField(field, recorderExportFilename(this.recorderPurpose(run), (stored ?? field.default ?? "").toString()));
@@ -558,19 +571,12 @@ export class SetupView extends LitElement {
   }
 
   private multiEntityField(field: FormField, entities: EntityDescriptor[], run?: MeasurementRequest) {
-    const hint = [field.hint, this.lightDiscoveryHint(field)].filter(Boolean).join(" ");
     return renderEntityList({
-      field: { ...field, hint },
+      field,
       entities,
       rows: this.entityRows(field, run),
       onChange: (rows) => this.selectEntities(field.name, rows),
     });
-  }
-
-  private lightDiscoveryHint(field: FormField): string {
-    return field.role === "controller" && this.fieldDomains(field).includes("light")
-      ? LIGHT_DISCOVERY_HINT
-      : "";
   }
 
   private fieldDomains(field: MeasureDefinition["fields"][number]): string[] {
@@ -581,7 +587,7 @@ export class SetupView extends LitElement {
     const selected = this.selectedOptions(field, request);
     return html`
       <fieldset>
-        <legend>${field.label}</legend>
+        <legend>${this.selectedType === "light" && field.name === "modes" ? "What do you want to measure?" : field.label}</legend>
         <div class="checks">
           ${this.availableOptions(field, request).map((option) => html`
             <label class="check">
@@ -731,7 +737,7 @@ export class SetupView extends LitElement {
 
 
   private entityChanged(event: Event): void {
-    const select = event.currentTarget as HTMLSelectElement;
+    const select = event.currentTarget as HTMLInputElement;
     this.selectEntities(select.name, [select.value]);
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
     for (const dependent of definition?.fields.filter((field) => field.related_to === select.name) ?? []) {
@@ -784,7 +790,7 @@ export class SetupView extends LitElement {
   }
 
   private selectChanged(event: Event): void {
-    const select = event.currentTarget as HTMLSelectElement;
+    const select = event.currentTarget as HTMLInputElement;
     this.selectValues = { ...this.selectValues, [select.name]: select.value };
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
     const form = select.closest("form");
@@ -803,20 +809,29 @@ export class SetupView extends LitElement {
     return this.definitions.find((item) => item.measure_type === type);
   }
 
-  /** Model to prefill: the one every selected device reports, or blank when they differ or any is unknown. */
-  private modelId(request?: MeasurementRequest): string {
-    if (request?.model_id) return request.model_id;
+  /** Only shared device metadata is safe to use as profile defaults for a multi-device run. */
+  private profileDefaults(): { model_id: string; product_name: string; session_name: string } {
+    const empty = { model_id: "", product_name: "", session_name: "" };
+    if (this.dummyController) return empty;
     const controller = this.selectedType
       ? this.definition(this.selectedType)?.fields.find((field) => field.role === "controller")
       : undefined;
-    if (!controller) return "";
+    if (!controller) return empty;
     const entities = [...this.lights, ...Object.values(this.deviceEntities).flat()];
-    const models = new Set(
-      this.selectedEntityIds(controller, request)
-        .map((entityId) => entities.find((entity) => entity.entity_id === entityId)?.model_id),
-    );
-    if (models.size !== 1) return "";
-    return [...models][0] ?? "";
+    const ids = this.selectedEntityIds(controller, this.initialRequest);
+    const selected = ids.map((id) => entities.find((entity) => entity.entity_id === id));
+    const shared = (field: "model_id" | "product_name") => {
+      const values = new Set(selected.map((entity) => entity?.[field]));
+      return values.size === 1 ? [...values][0] ?? "" : "";
+    };
+    const modelId = shared("model_id");
+    return {
+      // An HA model ID can contain characters not allowed in an export path.
+      // Leave those for Prepare, which also resolves the original ID from HA.
+      model_id: modelId.length <= 120 && /^[A-Za-z0-9][A-Za-z0-9 ._()+-]*$/.test(modelId) ? modelId : "",
+      product_name: shared("product_name"),
+      session_name: selected.map((entity, index) => entity?.name || ids[index]).join(", ").slice(0, 200),
+    };
   }
 
   private submitMeasurement(event: SubmitEvent): void {
@@ -847,6 +862,13 @@ export class SetupView extends LitElement {
       this.defaultMeasureDevice,
       this.dummyController,
     );
+    const defaults = this.profileDefaults();
+    const previous = this.initialRequest?.measure_type === definition.measure_type
+      && JSON.stringify(this.initialRequest.controller) === JSON.stringify(request.controller)
+      ? this.initialRequest : undefined;
+    request.model_id = previous?.model_id || defaults.model_id;
+    request.product_name = previous?.product_name || defaults.product_name;
+    request.session_name ||= previous?.session_name || defaults.session_name || definition.label;
     request.dummy_load = meterFor(this.meter.type).supportsDummyLoad
       ? dummyLoadSpec(form, this.dummyLoadCalibration)
       : undefined;

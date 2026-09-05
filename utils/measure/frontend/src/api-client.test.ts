@@ -29,6 +29,7 @@ describe("MeasureApiClient", () => {
     );
     expect(client.fileUrl("session 1", "model data.json")).toBe("http://ha.local/api/hassio_ingress/token/api/sessions/session%201/files/model%20data.json");
     expect(client.diagnosticsUrl("session 1")).toBe("http://ha.local/api/hassio_ingress/token/api/sessions/session%201/diagnostics");
+    expect(client.preparedProfileUrl("session 1", "job 1")).toBe("http://ha.local/api/hassio_ingress/token/api/sessions/session%201/contribution/job%201/profile.zip");
     expect(apiUrl("api/entities", "http://ha.local/prefix/").pathname).toBe("/prefix/api/entities");
   });
 
@@ -93,8 +94,8 @@ describe("MeasureApiClient", () => {
     const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
 
     await client.getContributionDraft("session-1");
-    await client.previewContribution("session-1", { manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "" });
-    await client.submitContribution("session-1", { manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "", confirmed: true });
+    await client.previewContribution("session-1", { manufacturer_name: "Signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "" });
+    await client.submitContribution("session-1", { manufacturer_name: "Signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "", confirmed: true });
 
     expect(fetcher).toHaveBeenNthCalledWith(1, new URL("http://ha.local/prefix/api/sessions/session-1/contribution"), expect.anything());
     expect(fetcher).toHaveBeenNthCalledWith(2, new URL("http://ha.local/prefix/api/sessions/session-1/contribution/preview"), expect.objectContaining({ method: "POST" }));
@@ -159,6 +160,30 @@ describe("MeasureApiClient", () => {
     await expect(client.getMeasureDevices()).resolves.toEqual(catalog);
     expect(fetcher).toHaveBeenCalledWith(
       new URL("http://ha.local/prefix/api/library/measure-devices"),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
+  it("loads manufacturer suggestions below the ingress prefix", async () => {
+    const catalog = { manufacturers: ["IKEA", "Signify"] };
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(catalog));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getManufacturers()).resolves.toEqual(catalog);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/library/manufacturers"),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
+  it("loads device specification fields below the ingress prefix", async () => {
+    const catalog = { device_types: { light: [{ name: "rated_power", label: "Rated power", description: "", value_type: "number", collection: "scalar", options: [] }] } } as const;
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(catalog));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getDeviceSpecifications()).resolves.toEqual(catalog);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/library/device-specifications"),
       expect.objectContaining({ headers: expect.any(Headers) }),
     );
   });

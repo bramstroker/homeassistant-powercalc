@@ -1,4 +1,4 @@
-import { css, html, nothing } from "lit";
+import { css, html } from "lit";
 import { describe as describeMeter } from "../power-meter";
 import type { MeterContext } from "../power-meter";
 import type { MeasureDefinition, MeasureType, PowerMeterSpec } from "../types";
@@ -17,28 +17,27 @@ export const setupChromeStyles = css`
   .type-label { font-weight: 700; color: var(--ink); }
   .type-desc { color: var(--muted); font-size: 0.82rem; font-weight: 500; line-height: 1.35; }
 
-  .type-chip { display: flex; align-items: center; gap: 0.75rem; margin: 1.25rem 0 0.5rem; padding: 0.75rem 1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--field); }
+  .setup-summary { display: grid; gap: 0.5rem; margin: 1.25rem 0 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+  .type-chip { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
   .type-chip .type-icon { grid-row: auto; font-size: 1.4rem; }
   .type-chip .chip-body { display: grid; gap: 0.1rem; flex: 1; min-width: 0; }
   .type-chip button { min-height: 38px; padding: 0.4rem 0.9rem; }
 
   .power-meter-required { display: grid; justify-items: start; gap: 0.65rem; margin-top: 1.25rem; padding: 1.1rem; border: 1px solid var(--signal); border-radius: 12px; background: color-mix(in srgb, var(--signal) 8%, var(--field)); }
   .power-meter-required h3, .power-meter-required p { margin: 0; }
-  .power-meter-summary { display: flex; align-items: center; gap: 0.8rem; min-width: 0; padding: 0.8rem 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: var(--field); }
-  .power-meter-icon { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: color-mix(in srgb, var(--signal) 14%, transparent); color: var(--signal-strong); font-size: 1.05rem; }
+  .power-meter-summary { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+  .power-meter-icon, .type-chip .type-icon { display: grid; place-items: center; flex: 0 0 28px; width: 28px; }
+  .power-meter-icon { color: var(--signal-strong); font-size: 1.05rem; }
   .power-meter-details { display: grid; gap: 0.12rem; flex: 1; min-width: 0; }
   .power-meter-details strong { overflow-wrap: anywhere; color: var(--ink); font-size: 0.84rem; }
   .power-meter-details span { overflow-wrap: anywhere; color: var(--muted); font-size: 0.78rem; line-height: 1.35; }
+  .power-meter-details .power-meter-meta { display: flex; flex-wrap: wrap; column-gap: 1rem; row-gap: 0.12rem; }
   .power-meter-summary button { flex: 0 0 auto; min-height: 38px; padding: 0.4rem 0.9rem; }
 
   @media (max-width: 640px) {
     .type-grid { grid-template-columns: 1fr; }
-    .type-chip { flex-wrap: wrap; }
-    .type-chip .chip-body { min-width: calc(100% - 50px); }
-    .type-chip button { width: 100%; }
-    .power-meter-summary { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; }
-    .power-meter-details { min-width: 0; }
-    .power-meter-summary button { grid-column: 1 / -1; width: 100%; }
+    .type-chip, .power-meter-summary { gap: 0.5rem; }
+    .type-chip button, .power-meter-summary button { padding: 0.4rem 0.6rem; }
   }
 `;
 
@@ -76,7 +75,6 @@ export function renderTypeChip(type: MeasureType, definition: MeasureDefinition 
       <span class="type-icon" aria-hidden="true">${definition?.icon ?? ""}</span>
       <span class="chip-body">
         <strong>${definition?.label ?? type}</strong>
-        ${definition ? html`<span class="type-desc">${definition.description}</span>` : nothing}
       </span>
       <button type="button" aria-label="Change measurement type" @click=${onChange}>Change</button>
     </div>
@@ -97,8 +95,10 @@ export function renderPowerMeterSummary(options: PowerMeterSummaryOptions) {
       <span class="power-meter-icon" aria-hidden="true">⚡</span>
       <span class="power-meter-details">
         <strong>${source}</strong>
-        <span>Measurement device: ${options.measureDevice}</span>
-        <span>${detail}</span>
+        <span class="power-meter-meta">
+          <span>Measurement device: ${options.measureDevice}</span>
+          <span>${detail}</span>
+        </span>
       </span>
       <button type="button" aria-label="Change power meter" @click=${options.onOpenSettings}>Change</button>
     </div>

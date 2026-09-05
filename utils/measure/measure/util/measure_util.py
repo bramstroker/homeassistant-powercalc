@@ -5,6 +5,7 @@ import logging
 from statistics import mean
 import time
 
+from measure.cancellation import MeasurementCancelledError
 from measure.const import (
     DUMMY_LOAD_TREND_RELATIVE_THRESHOLD,
     RETRY_COUNT_LIMIT,
@@ -61,6 +62,7 @@ class AverageMeasurementState:
     snapshots: list[AverageMeasurementSnapshot]
     voltages: list[float]
     consecutive_errors: int = 0
+    interrupted: bool = False
 
 
 class MeasureUtil:
@@ -87,12 +89,21 @@ class MeasureUtil:
         measure_resistance: bool = False,
         convergence: AverageMeasurementConvergence | None = None,
         on_progress: Callable[[float, float], None] | None = None,
+        *,
+        finish_on_interrupt: bool = False,
     ) -> MeasurementResult:
-        """Average valid readings, optionally as resistance, until duration or convergence."""
+        """Average valid readings; only standalone averaging may finish early on operator stop."""
         _LOGGER.info("Measuring average %s over %s seconds", "resistance" if measure_resistance else "power", duration)
-        state = self._collect_average_measurements(duration, measure_resistance, convergence, on_progress)
+        state = self._collect_average_measurements(
+            duration,
+            measure_resistance,
+            convergence,
+            on_progress,
+            finish_on_interrupt,
+        )
         if on_progress is not None:
-            on_progress(duration, duration)
+            elapsed = min(duration, max(0.0, time.time() - state.start_time)) if state.interrupted else duration
+            on_progress(elapsed, duration)
 
         if not state.readings:
             raise NoValidReadingsError("No valid readings were recorded")
@@ -112,27 +123,35 @@ class MeasureUtil:
         measure_resistance: bool,
         convergence: AverageMeasurementConvergence | None,
         on_progress: Callable[[float, float], None] | None = None,
+        finish_on_interrupt: bool = False,
     ) -> AverageMeasurementState:
         start_time = time.time()
         state = AverageMeasurementState(start_time, [], [], [])
         first_measurement = True
 
-        while (time.time() - start_time) < duration:
-            if not first_measurement and not self._sleep_before_next_average_reading(start_time, duration):
-                break
-            first_measurement = False
-            if on_progress is not None:
-                on_progress(time.time() - start_time, duration)
+        try:
+            while (time.time() - start_time) < duration:
+                if not first_measurement and not self._sleep_before_next_average_reading(start_time, duration):
+                    break
+                first_measurement = False
+                if on_progress is not None:
+                    on_progress(time.time() - start_time, duration)
 
-            try:
-                result = self._take_average_measurement_reading(measure_resistance)
-            except PowerMeterError as error:
-                if self._average_measurement_retry_limit_reached(state, error):
-                    raise
-                continue
+                try:
+                    result = self._take_average_measurement_reading(measure_resistance)
+                except PowerMeterError as error:
+                    if self._average_measurement_retry_limit_reached(state, error):
+                        raise
+                    continue
 
-            if self._record_average_measurement_result(state, result, convergence):
-                break
+                if self._record_average_measurement_result(state, result, convergence):
+                    break
+        except KeyboardInterrupt, MeasurementCancelledError:
+            # Never turn an interrupted calibration/profile point or an empty run into a valid result.
+            if not finish_on_interrupt or not state.readings:
+                raise
+            state.interrupted = True
+            _LOGGER.info("Stopped averaging; keeping %d valid readings", len(state.readings))
 
         return state
 

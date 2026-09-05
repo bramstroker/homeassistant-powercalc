@@ -7,8 +7,9 @@ import type { AppView, MeasureAppState } from "../app-controller";
 import { isAddressed, specFromRequest, specFromSettings } from "../power-meter";
 import type { MeterContext } from "../power-meter";
 import { reviewMetrics, reviewSummary } from "../review-summary";
-import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SettingsSection, ShellyDiscoveryDevice } from "../types";
+import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SettingsSection, ShellyDiscoveryDevice } from "../types";
 import { sharedStyles } from "../styles";
+import type { ContributionFormValues } from "../types";
 import "./preflight-view";
 import "./result-view";
 import "./running-view";
@@ -27,6 +28,8 @@ const MEASUREMENT_STEPS: readonly { view: AppView; label: string }[] = [
   { view: "review", label: "Review" },
   { view: "running", label: "Measure" },
   { view: "result", label: "Result" },
+  { view: "profile", label: "Prepare" },
+  { view: "share", label: "Use profile" },
 ];
 
 /**
@@ -61,10 +64,13 @@ export class AppShell extends LitElement implements MeasureAppState {
   measureDevices: string[] = [];
   measureDevicesLoading = false;
   measureDevicesError = "";
+  manufacturers: string[] = [];
+  deviceSpecificationFields: Record<string, DeviceSpecificationField[]> = {};
   contributionAuth?: ContributionAuthState;
   contributionDeviceFlow?: ContributionDeviceFlow;
   contributionDeviceStatus?: ContributionAuthDeviceStatus;
   contributionDraft?: ContributionPreview;
+  contributionFormValues?: ContributionFormValues;
   contributionPreview?: ContributionPreview;
   contributionResult?: ContributionResult;
   contributionBusy = false;
@@ -82,6 +88,8 @@ export class AppShell extends LitElement implements MeasureAppState {
   shellyDiscoveryError = "";
   shellyDiscoveryAvailable?: boolean;
   shellyDiscoveryMessage?: string | null;
+
+  private renderedView?: AppView;
 
   private readonly api: MeasureApiClient = new MeasureApiClient();
   private readonly controller = new MeasureAppController(
@@ -107,7 +115,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     .topbar-actions { display: flex; align-items: center; gap: 0.55rem; }
     .topbar-action { min-height: 36px; padding: 0.4rem 0.8rem; border-radius: 999px; font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.45rem; }
     .settings-toggle::before { content: "⚙"; font-size: 0.95rem; }
-    .sequence { margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; list-style: none; }
+    .sequence { margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0.45rem; list-style: none; }
     .sequence > li { position: relative; display: grid; gap: 0.45rem; min-width: 0; color: var(--muted); font: 700 0.68rem/1.15 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
     .sequence > li:not(:last-child)::after { content: ""; position: absolute; top: 10px; left: calc(20px + 0.45rem); width: calc(100% - 40px - 0.45rem); height: 2px; border-radius: 99px; background: var(--line); }
     .step-number { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid var(--line); border-radius: 50%; background: var(--canvas); color: var(--muted); font-size: 0.66rem; z-index: 1; }
@@ -126,6 +134,17 @@ export class AppShell extends LitElement implements MeasureAppState {
 
   connectedCallback(): void { super.connectedCallback(); void this.boot(); }
   disconnectedCallback(): void { this.controller.dispose(); super.disconnectedCallback(); }
+
+  protected updated(): void {
+    const previousView = this.renderedView;
+    this.renderedView = this.view;
+    if (previousView !== undefined && previousView !== this.view) {
+      document.documentElement.scrollTop = 0;
+      document.documentElement.scrollLeft = 0;
+      document.body.scrollTop = 0;
+      document.body.scrollLeft = 0;
+    }
+  }
 
   render() {
     return html`
@@ -185,6 +204,8 @@ export class AppShell extends LitElement implements MeasureAppState {
       case "review": return this.preflight && this.request ? this.renderReview() : this.renderSetup();
       case "running": return this.snapshot ? this.renderRunning(this.snapshot) : this.renderSetup();
       case "result": return this.snapshot ? this.renderResult(this.snapshot) : this.renderSetup();
+      case "profile": return this.snapshot ? this.renderProfile(this.snapshot) : this.renderSetup();
+      case "share": return this.snapshot ? this.renderProfile(this.snapshot, true) : this.renderSetup();
       default: return this.renderSetup();
     }
   }
@@ -250,6 +271,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     return html`
       <measure-result-view
         .snapshot=${snapshot} .files=${this.files} .plotCollection=${this.plotCollection}
+        .canPrepareProfile=${this.measurementType() !== "average"}
         .fileUrl=${(name: string) => this.api.fileUrl(sessionId, name)} .downloadAll=${this.downloadAllFiles.bind(this)}
         .diagnosticsUrl=${this.api.diagnosticsUrl(sessionId)}
         .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
@@ -257,8 +279,34 @@ export class AppShell extends LitElement implements MeasureAppState {
         .contributionPreview=${this.contributionPreview} .contributionResult=${this.contributionResult}
         .contributionBusy=${this.contributionBusy} .contributionError=${this.contributionError}
         .contributionErrorField=${this.contributionErrorField}
+        .manufacturers=${this.manufacturers ?? []}
+        .measureDevices=${this.measureDevices} .measureDevicesLoading=${this.measureDevicesLoading} .measureDevicesError=${this.measureDevicesError}
+        .deviceSpecificationFields=${this.deviceSpecificationFields}
         @sessions=${this.showSessions} @new=${() => this.controller.newMeasurement()} @resume=${() => void this.controller.resume()}
+        @prepare=${() => this.controller.openProfile()}
         @open-settings=${this.openSettings}
+        @contribution-preview=${(event: CustomEvent<ContributionPreviewRequest>) => void this.controller.previewContribution(event.detail)}
+        @contribution-submit=${(event: CustomEvent<ContributionSubmitRequest>) => void this.controller.submitContribution(event.detail)}
+      ></measure-result-view>`;
+  }
+
+  private renderProfile(snapshot: SessionSnapshot, shareMode = false) {
+    return html`
+      <measure-result-view
+        .snapshot=${snapshot} .profileMode=${true} .shareMode=${shareMode}
+        .preparedProfileUrl=${(jobId: string) => this.api.preparedProfileUrl(snapshot.session_id ?? "", jobId)}
+        .contributionAuth=${this.contributionAuth} .contributionDraft=${this.contributionDraft}
+        .contributionFormValues=${this.contributionFormValues ?? {}}
+        .contributionPreview=${this.contributionPreview} .contributionResult=${this.contributionResult}
+        .contributionBusy=${this.contributionBusy} .contributionError=${this.contributionError}
+        .contributionErrorField=${this.contributionErrorField}
+        .manufacturers=${this.manufacturers ?? []}
+        .measureDevices=${this.measureDevices} .measureDevicesLoading=${this.measureDevicesLoading} .measureDevicesError=${this.measureDevicesError}
+        .deviceSpecificationFields=${this.deviceSpecificationFields}
+        @back=${() => shareMode ? this.controller.backToProfile() : this.controller.backToResult()}
+        @share=${() => this.controller.openShare()}
+        @open-settings=${this.openSettings}
+        @contribution-edit=${(event: CustomEvent<ContributionFormValues>) => this.controller.editContribution(event.detail)}
         @contribution-preview=${(event: CustomEvent<ContributionPreviewRequest>) => void this.controller.previewContribution(event.detail)}
         @contribution-submit=${(event: CustomEvent<ContributionSubmitRequest>) => void this.controller.submitContribution(event.detail)}
       ></measure-result-view>`;
@@ -372,10 +420,11 @@ export class AppShell extends LitElement implements MeasureAppState {
   private renderProgress() {
     const current = this.currentStep();
     if (current < 0) return nothing;
+    const steps = this.measurementType() === "average" ? MEASUREMENT_STEPS.slice(0, 4) : MEASUREMENT_STEPS;
     return html`
       <nav aria-label="Measurement progress">
         <ol class="sequence">
-          ${MEASUREMENT_STEPS.map(({ label }, index) => html`
+          ${steps.map(({ label }, index) => html`
             <li class=${stepClass(index, current)} aria-current=${index === current ? "step" : nothing}>
               <span class="step-number">${index < current ? "✓" : index + 1}</span><span>${label}</span>
             </li>`)}
@@ -386,6 +435,11 @@ export class AppShell extends LitElement implements MeasureAppState {
   /** Index within the measurement flow, or -1 for a view outside it. */
   private currentStep(): number {
     return MEASUREMENT_STEPS.findIndex((step) => step.view === this.view);
+  }
+
+  private measurementType(): MeasureType | undefined {
+    if (this.view === "setup") return this.pendingType();
+    return this.snapshot?.request?.measure_type ?? this.pendingType();
   }
 }
 

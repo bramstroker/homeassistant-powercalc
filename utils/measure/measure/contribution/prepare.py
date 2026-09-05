@@ -7,13 +7,23 @@ from pathlib import Path
 import re
 from typing import Any
 
-from measure.contribution.models import ContributionMetadata, ContributionPreparedFile, ContributionPreview
+from measure.contribution.models import ContributionPreparedFile, ContributionPreview
+from measure.model import mains_voltage_from_range
+from measure.profile.models import ProfileMetadata
 
 JsonValidator = Callable[[dict[str, Any], dict[str, Any]], None]
 
 MODEL_JSON = "model.json"
 MANUFACTURER_JSON = "manufacturer.json"
 LIBRARY_URL = "https://library.powercalc.nl"
+EMPTY_OPTIONAL_MODEL_FIELDS = (
+    "aliases",
+    "ean",
+    "product_url",
+    "device_specs",
+    "measure_device_firmware",
+    "measure_description",
+)
 
 
 class ProfilePreparationError(ValueError):
@@ -59,11 +69,23 @@ class ProfilePreparer:
         self.model_schema_path = model_schema_path
         self.validator = validator or _jsonschema_validate
 
-    def prepare(self, artifact_directory: Path, metadata: ContributionMetadata) -> ContributionPreview:
+    def prepare(self, artifact_directory: Path, metadata: ProfileMetadata) -> ContributionPreview:
         artifact_directory = artifact_directory.resolve()
         csv_names = self._artifact_csv_names(artifact_directory)
         model = self._apply_metadata(self._read_object(artifact_directory / MODEL_JSON), metadata)
-        manufacturer = self._resolve_manufacturer(metadata.manufacturer, metadata.manufacturer_directory)
+        if not str(model.get("name") or "").strip():
+            raise ProfilePreparationError("Enter the product name", field="product_name")
+        if "mains_voltage" not in model:
+            raise ProfilePreparationError(
+                "Select the nominal mains voltage because no voltage range was measured",
+                field="mains_voltage",
+            )
+        if model["mains_voltage"] not in (120, 230):
+            raise ProfilePreparationError(
+                "Nominal mains voltage must be either 120 or 230",
+                field="mains_voltage",
+            )
+        manufacturer = self._resolve_manufacturer(metadata.manufacturer)
         self._validate_product_name(str(model.get("name", "")), metadata.manufacturer, manufacturer.primary_names)
         if model.get("calculation_strategy") == "lut" and not csv_names:
             raise ProfilePreparationError("At least one .csv.gz artifact is required for LUT profiles")
@@ -90,7 +112,7 @@ class ProfilePreparer:
     def render_contents(
         self,
         artifact_directory: Path,
-        metadata: ContributionMetadata,
+        metadata: ProfileMetadata,
         preview: ContributionPreview,
     ) -> tuple[tuple[str, bytes], ...]:
         model = self._apply_metadata(self._read_object(artifact_directory / MODEL_JSON), metadata)
@@ -114,19 +136,38 @@ class ProfilePreparer:
         return tuple(sorted({f"{name.removesuffix('.gz')}.gz" for name in csv_names}))
 
     @staticmethod
-    def _apply_metadata(model: dict[str, Any], metadata: ContributionMetadata) -> dict[str, Any]:
+    def _apply_metadata(model: dict[str, Any], metadata: ProfileMetadata) -> dict[str, Any]:
         if metadata.product_name is not None:
             model["name"] = metadata.product_name
-        model["authors"] = [
-            {
-                "name": metadata.author.name,
-                "github": metadata.author.github,
-                **({"email": metadata.author.email} if metadata.author.email else {}),
-            },
-        ]
+        optional_values: tuple[tuple[str, Any], ...] = (
+            ("aliases", list(metadata.aliases) if metadata.aliases is not None else None),
+            ("ean", list(metadata.gtins) if metadata.gtins is not None else None),
+            ("product_url", metadata.product_url),
+            ("mains_voltage", metadata.mains_voltage),
+            ("device_specs", metadata.device_specs),
+            ("measure_device", metadata.measure_device),
+            ("measure_device_firmware", metadata.measure_device_firmware),
+            ("measure_description", metadata.measure_description),
+        )
+        model.update({key: value for key, value in optional_values if value is not None})
+        derived_mains_voltage = mains_voltage_from_range(model.get("voltage_range"))
+        if derived_mains_voltage is not None:
+            model["mains_voltage"] = derived_mains_voltage
+        if metadata.author is not None:
+            model["authors"] = [
+                {
+                    "name": metadata.author.name,
+                    "github": metadata.author.github,
+                    **({"email": metadata.author.email} if metadata.author.email else {}),
+                },
+            ]
+        for key in EMPTY_OPTIONAL_MODEL_FIELDS:
+            value = model.get(key)
+            if _is_empty_optional_value(value):
+                model.pop(key, None)
         return model
 
-    def _resolve_manufacturer(self, manufacturer: str, requested_directory: str | None) -> ManufacturerResolution:
+    def _resolve_manufacturer(self, manufacturer: str) -> ManufacturerResolution:
         requested = self._normalize(manufacturer)
         for directory, manifest in self._manufacturer_manifests():
             if requested in self._known_names(manifest, "name"):
@@ -143,13 +184,12 @@ class ProfilePreparer:
                     primary_names=frozenset(self._name_values(entry, "name", "full_name")),
                     exists=True,
                 )
-        directory = requested_directory or self._slugify(manufacturer)
+        directory = self._slugify(manufacturer)
         return ManufacturerResolution(
             directory=directory,
             primary_names=frozenset({manufacturer}),
-            # The entered name matched nothing, but the directory it resolves to may
-            # still be an existing manufacturer (the directory is user-editable), and
-            # overwriting its manifest would drop the upstream name and aliases.
+            # The entered name matched nothing, but its derived directory may still
+            # exist. Never overwrite an upstream manifest in that case.
             exists=self._manufacturer_directory_exists(directory),
         )
 
@@ -271,7 +311,7 @@ class ProfilePreparer:
         relative_path: Path,
         artifact_directory: Path,
         model: dict[str, Any],
-        metadata: ContributionMetadata,
+        metadata: ProfileMetadata,
     ) -> ContributionPreparedFile:
         content = self._render_file_content(relative_path, artifact_directory, model, metadata)
         return ContributionPreparedFile(
@@ -285,7 +325,7 @@ class ProfilePreparer:
         relative_path: Path,
         artifact_directory: Path,
         model: dict[str, Any],
-        metadata: ContributionMetadata,
+        metadata: ProfileMetadata,
     ) -> bytes:
         if relative_path.name == MODEL_JSON:
             return _dump_json(model)
@@ -331,11 +371,45 @@ class ProfilePreparer:
         return slug
 
 
+def _is_empty_optional_value(value: object) -> bool:
+    return (
+        value is None
+        or (isinstance(value, str) and not value.strip())
+        or (isinstance(value, (list, dict)) and not value)
+    )
+
+
 def _dump_json(value: dict[str, Any]) -> bytes:
     return json.dumps(value, indent=2, sort_keys=True).encode("utf-8") + b"\n"
 
 
 def _jsonschema_validate(instance: dict[str, Any], schema: dict[str, Any]) -> None:
-    from jsonschema import validate
+    from jsonschema import SchemaError, ValidationError, validate
 
-    validate(instance=instance, schema=schema)
+    try:
+        validate(instance=instance, schema=schema)
+    except ValidationError as error:
+        from jsonschema.exceptions import best_match
+
+        error = best_match(error.context) or error
+        location = ".".join(str(part) for part in error.absolute_path)
+        location_suffix = f" at {location}" if location else ""
+        field = _schema_error_field(tuple(error.absolute_path))
+        raise ProfilePreparationError(
+            f"model.json does not match model_schema.json{location_suffix}: {error.message}",
+            field=field,
+        ) from error
+    except SchemaError as error:
+        raise ProfilePreparationError(f"model_schema.json is invalid: {error.message}") from error
+
+
+def _schema_error_field(path: tuple[str | int, ...]) -> str | None:
+    """Translate generated model paths to editable form fields (not array indices)."""
+    if not path:
+        return None
+    root = str(path[0])
+    if root == "authors" and len(path) >= 3:
+        return {"name": "contributor", "github": "contributor_github", "email": "contributor_email"}.get(str(path[2]))
+    if root == "device_specs":
+        return ".".join(str(part) for part in path[:2])
+    return {"name": "product_name", "ean": "gtins"}.get(root, root)

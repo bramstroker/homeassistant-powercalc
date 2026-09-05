@@ -4,6 +4,7 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 from measure.const import Trend
+from measure.execution import MeasurementCancelledError
 from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.util.measure_util import (
@@ -68,6 +69,49 @@ def test_no_valid_average_readings_raise_typed_error(mock_config_factory: MockCo
         pytest.raises(NoValidReadingsError),
     ):
         measure_util.take_average_measurement(1)
+
+
+@pytest.mark.parametrize("interrupt", [MeasurementCancelledError, KeyboardInterrupt])
+@pytest.mark.parametrize("finish_on_interrupt", [False, True])
+def test_average_stop_preserves_samples_only_when_requested(
+    mock_config_factory: MockConfigFactory,
+    interrupt: type[BaseException],
+    finish_on_interrupt: bool,
+) -> None:
+    clock = [0.0]
+    meter = MagicMock(PowerMeter)
+    meter.get_power.side_effect = [
+        PowerMeasurementResult(power=4.0, voltage=230.0, updated=0),
+        PowerMeasurementResult(power=8.0, voltage=232.0, updated=0),
+    ]
+
+    def wait(seconds: float) -> None:
+        clock[0] += seconds
+        if meter.get_power.call_count == 2:
+            raise interrupt
+
+    progress = MagicMock()
+    util = MeasureUtil(meter, mock_config_factory({"sleep_time": 2}), include_voltage=lambda: True, wait=wait)
+    with patch("time.time", side_effect=lambda: clock[0]):
+        if not finish_on_interrupt:
+            with pytest.raises(interrupt):
+                util.take_average_measurement(60, on_progress=progress)
+        else:
+            result = util.take_average_measurement(60, on_progress=progress, finish_on_interrupt=True)
+            assert result == MeasurementResult(power=6.0, voltages=[230.0, 232.0])
+            progress.assert_called_with(4.0, 60)
+
+
+@pytest.mark.parametrize("interrupt", [MeasurementCancelledError, KeyboardInterrupt])
+def test_average_stop_without_readings_is_not_successful(
+    mock_config_factory: MockConfigFactory,
+    interrupt: type[BaseException],
+) -> None:
+    meter = MagicMock(PowerMeter)
+    meter.get_power.side_effect = interrupt
+    util = MeasureUtil(meter, mock_config_factory())
+    with pytest.raises(interrupt):
+        util.take_average_measurement(60, finish_on_interrupt=True)
 
 
 def test_dummy_load_requires_voltage_support(mock_config_factory: MockConfigFactory) -> None:

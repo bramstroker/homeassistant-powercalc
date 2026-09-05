@@ -14,14 +14,18 @@ from measure.ha_app.coordinator import (
 from measure.ha_app.interaction import SessionInteraction
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import (
+    AverageMeasurementRequest,
     LightMeasurementRequest,
     MeasurementRequest,
     RecorderMeasurementRequest,
 )
+from measure.runner.average import AverageRunner
 from measure.runner.recorder import RecorderRunner
 from measure.runner.runner import RunnerResult
+from measure.tuning import MeasurementParameters
 from measure.util.measure_util import MeasurementResult, MeasureUtil
 import pytest
 
@@ -220,6 +224,45 @@ def test_stopping_recorder_marks_session_completed(tmp_path: Path) -> None:
     assert coordinator.current.summary is not None
     assert coordinator.current.summary["Samples recorded"] == "1"
     assert coordinator.current.files == ("measurement/record.csv",)
+
+
+@pytest.mark.parametrize("stop_before_confirmation", [False, True])
+def test_stopping_average_keeps_result_after_sampling(tmp_path: Path, stop_before_confirmation: bool) -> None:
+    sample_recorded = Event()
+
+    class AverageService(SessionMeasurementService):
+        def run(
+            self,
+            request: MeasurementRequest,
+            control: SessionControl,
+            context: SessionExecutionContext,
+        ) -> RunnerResult:
+            assert isinstance(request, AverageMeasurementRequest)
+            meter = MagicMock(PowerMeter)
+            meter.get_power.return_value = PowerMeasurementResult(power=4.2, voltage=230.0, updated=time.time())
+            util = MeasureUtil(
+                meter,
+                MeasurementParameters(),
+                include_voltage=lambda: True,
+                wait=control.wait,
+                on_sample=lambda _: sample_recorded.set(),
+            )
+            return AverageRunner(util, SessionInteraction(control)).run(request, "")
+
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), AverageService)
+    session = coordinator.start(AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), duration=60))
+    wait_for_state(coordinator, SessionState.AWAITING_CONFIRMATION)
+    if not stop_before_confirmation:
+        coordinator.confirm(session.id)
+        assert sample_recorded.wait(1)
+    coordinator.cancel(session.id)
+    wait_for_state(coordinator, SessionState.CANCELLED if stop_before_confirmation else SessionState.COMPLETED)
+    assert coordinator.current is not None
+    if not stop_before_confirmation:
+        assert coordinator.current.summary is not None
+        assert coordinator.current.summary["Average power"] == "4.2 W"
+        assert coordinator.current.summary["Average voltage"] == "230.0 V"
+        assert float(coordinator.current.summary["Duration"].split()[0]) < 60
 
 
 def test_coordinator_isolates_session_state_listener_failures(

@@ -8,6 +8,7 @@ import { emit } from "../events";
 import { sharedStyles } from "../styles";
 import type { ComboboxOption } from "./combobox";
 import "./combobox";
+import { optionSelect } from "./fields";
 import "./power-meter-diagnostic";
 
 interface SettingsSectionDescriptor {
@@ -24,6 +25,11 @@ const SETTINGS_SECTIONS: SettingsSectionDescriptor[] = [
     id: "power_meter",
     label: "Power meter",
     icon: () => icon(svg`<path d="M13 2 5.5 13h6L11 22l7.5-11h-6L13 2Z"></path>`),
+  },
+  {
+    id: "profile",
+    label: "Profile metadata",
+    icon: () => icon(svg`<path d="M4 4h16v16H4z"></path><path d="M8 9h8M8 13h8M8 17h5"></path>`),
   },
   {
     id: "measure_tuning",
@@ -190,7 +196,7 @@ export class SettingsView extends LitElement {
     .token-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.65rem; align-items: end; }
     @media (max-width: 700px) {
       .settings-layout { grid-template-columns: 1fr; }
-      .settings-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .settings-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
     @media (max-width: 520px) {
       .token-row, .device-code-row { grid-template-columns: 1fr; }
@@ -234,17 +240,17 @@ export class SettingsView extends LitElement {
 
             <section class="settings-section" ?hidden=${this.activeSection !== "power_meter"} aria-labelledby="power-meter-title">
               <h3 id="power-meter-title">Power meter</h3>
-              <p class="muted">Choose where readings come from and set the default measurement hardware.</p>
+              <p class="muted">Choose where readings come from and set the hardware metadata added to new profiles.</p>
               <div class="section-fields">
                 <measure-combobox
                   name="default_measure_device"
-                  label="Measurement device name"
+                  label="Power measurement device"
                   .value=${this.measureDeviceValue}
                   .options=${this.measureDeviceOptions()}
                   placeholder="e.g. Shelly Plug S"
                   .hint=${this.measureDevicesLoading
                     ? "Loading names used by existing Powercalc profiles…"
-                    : "Choose an existing name for consistent profile metadata, or type a name when your meter is not listed."}
+                    : "Manufacturer and model of the meter used to take readings. This is prefilled in each profile and can still be changed there."}
                   required
                   allowCustom
                   @combobox-change=${this.measureDeviceChanged}
@@ -255,16 +261,43 @@ export class SettingsView extends LitElement {
                   ? html`<small class="field-hint error" role="status">Library suggestions are unavailable; manual entry still works.</small>`
                   : nothing}
                 <label>
-                  <span>Type</span>
-                  <select name="power_meter" @change=${this.powerMeterChanged}>
-                    ${POWER_METER_LIST.map((meter) => html`
-                      <option value=${meter.type} ?selected=${powerMeter === meter.type}>${meter.label}</option>
-                    `)}
-                  </select>
+                  <span>Power measurement device firmware</span>
+                  <input
+                    name="default_measure_device_firmware"
+                    .value=${this.settings?.default_measure_device_firmware ?? ""}
+                    autocomplete="off"
+                    placeholder="Optional firmware version"
+                  />
+                  <small class="field-hint">Prefilled in new profile metadata and editable for each profile.</small>
                 </label>
+                ${optionSelect("power_meter", "Type", POWER_METER_LIST.map((meter) => ({ value: meter.type, label: meter.label })), {
+                  selected: powerMeter,
+                  required: true,
+                  placeholder: "Select a power meter type",
+                  onChange: this.powerMeterChanged,
+                })}
                 ${this.renderMeterFields(powerMeter)}
                 ${descriptor.qualityNote ? html`<p class="quality-requirements">${descriptor.qualityNote}</p>` : nothing}
                 ${descriptor.validatable ? this.renderTestRow() : nothing}
+              </div>
+            </section>
+
+            <section class="settings-section" ?hidden=${this.activeSection !== "profile"} aria-labelledby="profile-metadata-title">
+              <h3 id="profile-metadata-title">Profile metadata</h3>
+              <p class="muted">Set contributor details once. They are prefilled when preparing every profile and remain editable there.</p>
+              <div class="section-fields">
+                <label>
+                  <span>Contributor name</span>
+                  <input name="default_contributor_name" .value=${this.settings?.default_contributor_name ?? ""} autocomplete="name" />
+                </label>
+                <label>
+                  <span>GitHub username</span>
+                  <input name="default_contributor_github" .value=${this.settings?.default_contributor_github ?? ""} autocomplete="username" />
+                </label>
+                <label>
+                  <span>Email (optional)</span>
+                  <input name="default_contributor_email" type="email" .value=${this.settings?.default_contributor_email ?? ""} autocomplete="email" />
+                </label>
               </div>
             </section>
 
@@ -534,18 +567,18 @@ export class SettingsView extends LitElement {
       return html`<p class="discovery-status">${this.shellyDiscoveryMessage ?? "Shelly discovery is unavailable. Enter the IP address manually."}</p>`;
     }
     if (!this.shellyDiscoveryDevices.length) return html`<p class="discovery-status">No Shelly devices found. You can refresh or enter an IP address manually.</p>`;
-    return html`<label>
-      <span>Select device</span>
-      <select name="discovered_shelly" @change=${this.discoveredShellyChanged}>
-        <option value="">Select a discovered Shelly</option>
-        ${this.shellyDiscoveryDevices.map((device) => html`
-          <option
-            value=${device.ip_address}
-            ?selected=${(device.supported || device.auth_required) && device.ip_address === selectedAddress}
-            ?disabled=${!device.supported && !device.auth_required}
-          >${this.shellyDeviceLabel(device)}</option>`)}
-      </select>
-    </label>`;
+    return optionSelect("discovered_shelly", "Select device", [
+      { value: "", label: "Select a discovered Shelly" },
+      ...this.shellyDiscoveryDevices.map((device) => ({
+        value: device.ip_address,
+        label: this.shellyDeviceLabel(device),
+        disabled: !device.supported && !device.auth_required,
+      })),
+    ], {
+      selected: selectedAddress,
+      placeholder: "Search discovered Shelly devices",
+      onChange: this.discoveredShellyChanged,
+    });
   }
 
   private renderKasaFields() {
@@ -575,6 +608,10 @@ export class SettingsView extends LitElement {
     return {
       ...meter,
       default_measure_device: formTextOrNull(data, "default_measure_device"),
+      default_measure_device_firmware: formTextOrNull(data, "default_measure_device_firmware"),
+      default_contributor_name: formTextOrNull(data, "default_contributor_name"),
+      default_contributor_github: formTextOrNull(data, "default_contributor_github"),
+      default_contributor_email: formTextOrNull(data, "default_contributor_email"),
       shelly_username: formText(data, "shelly_username") || DEFAULT_SHELLY_USERNAME,
       shelly_password_configured: this.settings?.shelly_password_configured ?? false,
       shelly_password: meter.power_meter === "shelly" ? shellyPassword || null : null,
@@ -621,7 +658,7 @@ export class SettingsView extends LitElement {
     this.clearTestResult();
     // Keep the choice in local state so an app-shell re-render can't clobber the
     // in-progress form (which would reset the meter type and typed device IP).
-    this.meter = (event.currentTarget as HTMLSelectElement).value as PowerMeterType;
+    this.meter = (event.currentTarget as HTMLInputElement).value as PowerMeterType;
     if (meterFor(this.meter).discoverable) this.discoverShellys();
   }
 
@@ -657,7 +694,7 @@ export class SettingsView extends LitElement {
   }
 
   private discoveredShellyChanged(event: Event): void {
-    const address = (event.currentTarget as HTMLSelectElement).value;
+    const address = (event.currentTarget as HTMLInputElement).value;
     if (!address) return;
     this.shellyIp = address;
     this.powerMeterSettingsChanged();

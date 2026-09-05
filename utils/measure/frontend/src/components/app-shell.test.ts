@@ -1,4 +1,4 @@
-import type { MeasureDefinition, MeasureParameter } from "../types";
+import type { MeasureDefinition, MeasureParameter, MeasurementRequest } from "../types";
 import { AppShell } from "./app-shell";
 import { capabilities, controllerOf, defaultSettings, goodPowerMeterDiagnostic } from "./test-fixtures";
 
@@ -340,8 +340,62 @@ describe("app shell", () => {
     expect(topbar?.querySelector(".brand")?.getAttribute("aria-label")).toBe("Open all measurement sessions");
     expect(topbar?.querySelector(".sessions-toggle")?.textContent).toContain("All sessions");
     expect(topbar?.querySelector(".settings-toggle")?.textContent).toContain("Settings");
-    expect(steps.map((step) => step.textContent?.trim())).toEqual(["✓Set up", "✓Review", "3Measure", "4Result"]);
+    expect(steps.map((step) => step.textContent?.trim())).toEqual(["✓Set up", "✓Review", "3Measure", "4Result", "5Prepare", "6Use profile"]);
     expect(steps.at(2)?.getAttribute("aria-current")).toBe("step");
     expect(new URL(running.diagnosticsUrl).pathname).toContain("/api/sessions/session-1/diagnostics");
+  });
+
+  it("scrolls to the top whenever the active screen changes", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.view = "result";
+    element.snapshot = { state: "completed", session_id: "session-1" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    document.documentElement.scrollTop = 500;
+    document.documentElement.scrollLeft = 20;
+    document.body.scrollTop = 500;
+    document.body.scrollLeft = 20;
+    element.view = "profile";
+    element.requestUpdate();
+    await element.updateComplete;
+    expect(document.documentElement.scrollTop).toBe(0);
+    expect(document.documentElement.scrollLeft).toBe(0);
+    expect(document.body.scrollTop).toBe(0);
+    expect(document.body.scrollLeft).toBe(0);
+
+    document.documentElement.scrollTop = 500;
+    document.body.scrollTop = 500;
+    element.requestUpdate();
+    await element.updateComplete;
+    expect(document.documentElement.scrollTop).toBe(500);
+    expect(document.body.scrollTop).toBe(500);
+  });
+
+  it.each(["setup", "review", "running", "result"] as const)("ends the average flow at Result in %s", async (view) => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    const request: MeasurementRequest = {
+      measure_type: "average", duration: 60, model_id: "", product_name: "", measure_device: "Test meter",
+      generate_model: false, parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+    };
+    element.view = view;
+    element.selectedMeasureType = view === "setup" ? "average" : "light";
+    if (view === "review") element.request = request;
+    if (view === "running" || view === "result") {
+      element.snapshot = { state: view === "result" ? "completed" : "running", request };
+    }
+    document.body.append(element);
+    await element.updateComplete;
+    const steps = [...(element.shadowRoot?.querySelectorAll(".sequence > li") ?? [])];
+    expect(steps).toHaveLength(4);
+    expect(steps.at(-1)?.textContent).toContain("Result");
+    if (view === "result") {
+      const result = element.shadowRoot?.querySelector("measure-result-view") as HTMLElement & { updateComplete: Promise<boolean> };
+      await result.updateComplete;
+      expect(result.shadowRoot?.querySelector(".contribution")).toBeNull();
+      expect(steps.at(-1)?.getAttribute("aria-current")).toBe("step");
+    }
   });
 });

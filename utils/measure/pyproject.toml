@@ -44,6 +44,7 @@ dev = [
 ]
 
 [project.scripts]
+powercalc-profile = "measure.cli.profile:main"
 powercalc-visualize = "measure.visualization.cli:main"
 
 [dependency-groups]

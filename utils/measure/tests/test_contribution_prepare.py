@@ -1,4 +1,3 @@
-from collections.abc import Callable
 import gzip
 import json
 from pathlib import Path
@@ -13,13 +12,12 @@ def metadata(
     manufacturer: str = "Philips",
     model_id: str = "LCT999",
     product_name: str | None = None,
-    manufacturer_directory: str | None = None,
 ) -> ContributionMetadata:
     return ContributionMetadata(
         manufacturer=manufacturer,
         model_id=model_id,
         product_name=product_name,
-        manufacturer_directory=manufacturer_directory,
+        mains_voltage=230,
         author=ContributionAuthor(name="Test User", github="test-user", email="test@example.com"),
     )
 
@@ -130,6 +128,159 @@ def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_u
     assert prepared_model["name"] == "Hue test lamp"
     assert "aliases" not in prepared_model
     assert all(file.sha for file in preview.files)
+
+
+def test_preparer_applies_delivery_independent_profile_metadata(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_library(tmp_path)
+    write_profile_artifacts(artifacts)
+    preparer = make_preparer(tmp_path)
+    contribution_metadata = ContributionMetadata(
+        manufacturer="Philips",
+        model_id="LCT999",
+        product_name="Hue test lamp",
+        aliases=("Hue test",),
+        gtins=("12345678", "1234567890123"),
+        product_url="https://example.com/hue-test",
+        mains_voltage=230,
+        device_specs={"rated_power": 9.5},
+        measure_device="Shelly PM Mini Gen3",
+        measure_device_firmware="1.7.0",
+        measure_description="Measured at 230 V",
+        author=ContributionAuthor(name="Test User", github="test-user"),
+    )
+
+    preview = preparer.prepare(artifacts, contribution_metadata)
+    model = json.loads(dict(preparer.render_contents(artifacts, contribution_metadata, preview))[preview.files[0].path])
+
+    assert model["aliases"] == ["Hue test"]
+    assert model["ean"] == ["12345678", "1234567890123"]
+    assert model["product_url"] == "https://example.com/hue-test"
+    assert model["device_specs"] == {"rated_power": 9.5}
+    assert model["measure_device"] == "Shelly PM Mini Gen3"
+    assert model["measure_device_firmware"] == "1.7.0"
+    assert model["measure_description"] == "Measured at 230 V"
+
+
+def test_preparer_derives_mains_voltage_from_measured_voltage_range(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    artifact_model = json.loads((artifacts / "model.json").read_text(encoding="utf-8"))
+    artifact_model["voltage_range"] = {"min": 117.2, "max": 122.1}
+    (artifacts / "model.json").write_text(json.dumps(artifact_model), encoding="utf-8")
+
+    voltage_metadata = metadata().model_copy(update={"mains_voltage": None})
+    preparer = make_preparer(tmp_path)
+    preview = preparer.prepare(artifacts, voltage_metadata)
+    model = json.loads(dict(preparer.render_contents(artifacts, voltage_metadata, preview))[preview.files[0].path])
+
+    assert model["mains_voltage"] == 120
+
+
+def test_preparer_requires_mains_voltage_when_no_voltage_range_was_measured(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+
+    with pytest.raises(ProfilePreparationError, match="Select the nominal mains voltage") as error:
+        make_preparer(tmp_path).prepare(
+            artifacts,
+            metadata().model_copy(update={"mains_voltage": None}),
+        )
+
+    assert error.value.field == "mains_voltage"
+
+
+def test_preparer_omits_empty_optional_profile_metadata(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_library(tmp_path)
+    write_profile_artifacts(artifacts)
+    artifact_model = json.loads((artifacts / "model.json").read_text(encoding="utf-8"))
+    artifact_model.update(
+        {
+            "aliases": [],
+            "ean": [],
+            "product_url": "",
+            "device_specs": {},
+            "measure_device_firmware": " ",
+            "measure_description": "",
+        },
+    )
+    (artifacts / "model.json").write_text(json.dumps(artifact_model), encoding="utf-8")
+    contribution_metadata = metadata()
+    contribution_metadata = contribution_metadata.model_copy(update={"aliases": (), "gtins": (), "device_specs": {}})
+
+    preview = make_preparer(tmp_path).prepare(artifacts, contribution_metadata)
+    model = json.loads(
+        dict(make_preparer(tmp_path).render_contents(artifacts, contribution_metadata, preview))[preview.files[0].path],
+    )
+
+    assert not {
+        "aliases",
+        "ean",
+        "product_url",
+        "device_specs",
+        "measure_device_firmware",
+        "measure_description",
+    }.intersection(model)
+
+
+def test_preparer_reports_model_schema_validation_errors(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_library(tmp_path)
+    write_profile_artifacts(artifacts)
+    schema = tmp_path / "model_schema.json"
+    schema.write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "properties": {"device_type": {"enum": ["fan"]}},
+            },
+        ),
+        encoding="utf-8",
+    )
+    preparer = ProfilePreparer(library_root=library_root(tmp_path), model_schema_path=schema)
+
+    with pytest.raises(
+        ProfilePreparationError,
+        match=r"model\.json does not match model_schema\.json at device_type: 'light' is not one of",
+    ):
+        preparer.prepare(artifacts, metadata())
+
+
+@pytest.mark.parametrize("field", ["product_url", "measure_device_firmware", "measure_description"])
+def test_preparer_clears_explicitly_blank_optional_text_but_preserves_omitted_fields(field: str) -> None:
+    from measure.profile.models import ProfileMetadata
+
+    model = {field: "https://example.com" if field == "product_url" else "Original value"}
+    omitted = ProfileMetadata(manufacturer="Acme", model_id="Test")
+    assert ProfilePreparer._apply_metadata(dict(model), omitted) == model  # noqa: SLF001
+    cleared = ProfileMetadata.model_validate({"manufacturer": "Acme", "model_id": "Test", field: "  "})
+    assert field not in ProfilePreparer._apply_metadata(dict(model), cleared)  # noqa: SLF001
+
+
+@pytest.mark.parametrize(
+    "instance,schema,field",
+    [
+        ({"name": 123}, {"properties": {"name": {"type": "string"}}}, "product_name"),
+        ({"ean": [123]}, {"properties": {"ean": {"items": {"type": "string"}}}}, "gtins"),
+        (
+            {"device_specs": {"rated_power": -1}},
+            {"properties": {"device_specs": {"properties": {"rated_power": {"minimum": 0}}}}},
+            "device_specs.rated_power",
+        ),
+        (
+            {"authors": [{"email": 123}]},
+            {"properties": {"authors": {"items": {"properties": {"email": {"type": "string"}}}}}},
+            "contributor_email",
+        ),
+    ],
+)
+def test_schema_errors_identify_editable_fields(instance: dict, schema: dict, field: str) -> None:
+    from measure.contribution.prepare import _jsonschema_validate
+
+    with pytest.raises(ProfilePreparationError) as info:
+        _jsonschema_validate(instance, schema)
+    assert info.value.field == field
 
 
 def test_preparer_generates_new_manufacturer_manifest_without_adding_aliases(tmp_path: Path) -> None:
@@ -250,26 +401,6 @@ def test_preparer_allows_product_names_starting_with_a_sub_brand_alias(tmp_path:
     )
 
     assert preview.manufacturer_directory == EXISTING_DIRECTORY
-
-
-@pytest.mark.parametrize("seed_library", [write_library, write_library_index])
-def test_preparer_keeps_existing_manufacturer_manifest_when_only_the_directory_matches(
-    tmp_path: Path,
-    seed_library: Callable[[Path], None],
-) -> None:
-    """The manufacturer directory is user-editable, so an unrecognised manufacturer name
-    can still point at an existing manufacturer whose manifest must not be overwritten."""
-    artifacts = tmp_path / "artifacts"
-    seed_library(tmp_path)
-    write_profile_artifacts(artifacts)
-
-    preview = make_preparer(tmp_path).prepare(
-        artifacts,
-        metadata("Unrecognised Brand", manufacturer_directory=EXISTING_DIRECTORY),
-    )
-
-    assert preview.manufacturer_directory == EXISTING_DIRECTORY
-    assert f"profile_library/{EXISTING_DIRECTORY}/manufacturer.json" not in {file.path for file in preview.files}
 
 
 def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts(tmp_path: Path) -> None:
