@@ -264,8 +264,9 @@ export class ResultView extends LitElement {
     .preview-block { display: grid; gap: 0.45rem; min-width: 0; }
     .schema-valid { border-left-color: var(--good); background: color-mix(in srgb, var(--good) 9%, transparent); }
     pre { max-height: 240px; overflow: auto; margin: 0; padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--well); color: var(--ink); font-size: 0.75rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
-    .confirm-row { display: flex; align-items: flex-start; gap: 0.55rem; color: var(--muted); font-size: 0.82rem; }
-    .confirm-row input { width: auto; margin-top: 0.2rem; }
+    .confirm-row { display: flex; align-items: flex-start; gap: 0.65rem; margin-top: 0.75rem; min-height: 44px; color: var(--muted); font-size: 0.82rem; line-height: 1.5; cursor: pointer; }
+    .confirm-row input { flex: 0 0 1rem; width: 1rem; height: 1rem; min-height: 0; margin: 0.1rem 0 0; padding: 0; accent-color: var(--signal); cursor: pointer; }
+    .confirm-row > span { min-width: 0; font-weight: 400; }
     .success-link { display: inline-flex; margin-top: 0.75rem; color: var(--good); font-weight: 700; }
     .manufacturer-library-link { white-space: nowrap; }
     .auth-shortcut { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--well); }

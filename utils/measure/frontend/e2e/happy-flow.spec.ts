@@ -196,6 +196,33 @@ test("scrolls to the top when moving from result to profile preparation", async 
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 });
 
+for (const width of [1280, 390]) {
+  test(`aligns the contribution confirmation checkbox with its label at ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.route("**/api/contribution/auth", (route) => route.fulfill({ json: { connected: true, identity: { login: "tester" } } }));
+    await page.getByRole("button", { name: "Open", exact: true }).click();
+    await page.getByRole("button", { name: "Prepare profile" }).click();
+    await page.getByRole("button", { name: /^Validate (profile|changes)$/ }).click();
+    await page.getByRole("button", { name: "Continue to use profile" }).click();
+    const row = page.locator(".confirm-row");
+    await row.scrollIntoViewIfNeeded();
+    const checkbox = row.getByRole("checkbox");
+    const text = row.locator("span");
+    const checkboxBounds = await checkbox.boundingBox();
+    const textBounds = await text.boundingBox();
+    expect(checkboxBounds).not.toBeNull();
+    expect(textBounds).not.toBeNull();
+    expect(checkboxBounds!.height).toBeLessThanOrEqual(20);
+    expect(Math.abs(checkboxBounds!.y - textBounds!.y)).toBeLessThan(4);
+    expect(textBounds!.x).toBeGreaterThan(checkboxBounds!.x + checkboxBounds!.width);
+    await expect(page.getByRole("button", { name: "Confirm and open PR" })).toBeDisabled();
+    await text.click();
+    await expect(checkbox).toBeChecked();
+    await expect(page.getByRole("button", { name: "Confirm and open PR" })).toBeEnabled();
+    await row.screenshot({ path: testInfo.outputPath("contribution-confirmation.png") });
+  });
+}
+
 test("preserves unfinished profile fields and tags when navigating back to Result", async ({ page }) => {
   await page.getByRole("button", { name: "Open", exact: true }).click();
   await page.getByRole("button", { name: "Prepare profile" }).click();
