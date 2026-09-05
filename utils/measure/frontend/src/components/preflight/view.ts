@@ -1,0 +1,114 @@
+import { LitElement, css, html, nothing } from "lit";
+import { customElement, property } from "lit/decorators.js";
+import type { LabelledValue } from "./summary";
+import type { ErrorHelp, PowerMeterDiagnostic, PreflightResponse } from "../../types";
+import { emit } from "../../utils/events";
+import { sharedStyles } from "../../styles";
+import { errorHelpLink } from "../shared/error-help-link";
+import "../shared/power-meter-diagnostic";
+
+@customElement("measure-preflight-view")
+export class PreflightView extends LitElement {
+  @property({ type: String })
+  heading = "Ready for the bench";
+
+  @property({ attribute: false })
+  metrics: LabelledValue[] = [];
+
+  @property({ attribute: false })
+  summary: LabelledValue[] = [];
+
+  @property({ attribute: false })
+  warnings: string[] = [];
+
+  @property({ attribute: false })
+  powerMeterDiagnostic?: PowerMeterDiagnostic | null;
+
+  @property({ attribute: false })
+  lightLoadProbe?: PreflightResponse["light_load_probe"];
+
+  @property({ type: String })
+  confirmationAction = "";
+
+  @property({ type: Boolean })
+  busy = false;
+
+  @property({ type: String })
+  errorMessage = "";
+
+  @property({ attribute: false })
+  errorHelp?: ErrorHelp;
+
+  static readonly styles = [sharedStyles, css`
+    .readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--line); margin-bottom: 1rem; }
+    .metric { padding: 1rem; background: var(--field); }
+    .metric span { display: block; color: var(--muted); font-size: 0.75rem; }
+    .metric strong { display: block; margin-top: 0.35rem; font: 650 1rem/1.3 ui-monospace, monospace; }
+    dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.6rem 1rem; }
+    dt { color: var(--muted); } dd { margin: 0; overflow-wrap: anywhere; }
+    .warning-list { padding-left: 1.25rem; }
+    .probe-list { display: grid; gap: 0.45rem; padding: 0; margin: 0.75rem 0 0; list-style: none; }
+    .probe-list li { display: flex; justify-content: space-between; gap: 1rem; padding-top: 0.45rem; border-top: 1px solid var(--line); }
+    .probe-list strong { white-space: nowrap; font-family: ui-monospace, monospace; }
+    .starting { display: flex; align-items: center; gap: 0.8rem; margin-top: 1rem; }
+    .starting-indicator { width: 22px; height: 22px; flex: none; border: 2px solid var(--line); border-top-color: var(--signal); border-radius: 50%; animation: spin 850ms linear infinite; }
+    .starting strong, .starting span { display: block; }
+    .starting span { margin-top: 0.2rem; color: var(--muted); font-size: 0.86rem; }
+    @media (max-width: 640px) { dl { grid-template-columns: 1fr; gap: 0.2rem; } dd { margin-bottom: 0.6rem; } }
+    @media (prefers-reduced-motion: reduce) { .starting-indicator { animation: none; } }
+  `];
+
+  render() {
+    return html`
+      <section class="panel" aria-labelledby="review-title">
+        <p class="eyebrow">02 / Setup check</p>
+        <h2 id="review-title">${this.heading}</h2>
+        <p class="muted">${this.confirmationAction
+          ? "Powercalc checked entity availability and storage. Preparing sets up the selected devices; you will explicitly start the measurement on the next screen."
+          : "Powercalc checked the configured setup. Starting will begin controlling the selected device."}</p>
+        ${this.metrics.length ? html`
+          <div class="readout" aria-label="Measurement estimate">
+            ${this.metrics.map((metric) => html`<div class="metric"><span>${metric.label}</span><strong>${metric.value}</strong></div>`)}
+          </div>` : nothing}
+        <dl>
+          ${this.summary.map((row) => html`<dt>${row.label}</dt><dd>${row.value}</dd>`)}
+        </dl>
+        ${this.powerMeterDiagnostic ? html`<measure-power-meter-diagnostic heading="Measurement device quality" .diagnostic=${this.powerMeterDiagnostic}></measure-power-meter-diagnostic>` : nothing}
+        ${this.lightLoadProbe?.points.length ? html`
+          <div class="notice" aria-label="Low-load light check results">
+            <strong>Low-load light check passed</strong>
+            <p>The meter returned a usable aggregate value at every representative low-load point.</p>
+            <ul class="probe-list">
+              ${this.lightLoadProbe.points.map((point) => html`
+                <li><span>${point.label}</span><strong>${point.power_w.toFixed(3)} W aggregate</strong></li>
+              `)}
+            </ul>
+          </div>
+        ` : nothing}
+        ${this.warnings.length ? html`
+          <div class="notice"><strong>Check before starting</strong><ul class="warning-list">${this.warnings.map((warning) => html`<li>${warning}</li>`)}</ul></div>
+        ` : nothing}
+        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
+        ${this.busy ? html`
+          <div class="notice starting" role="status" aria-live="polite">
+            <span class="starting-indicator" aria-hidden="true"></span>
+            <span><strong>Initializing measurement session</strong><span>This can take a few seconds while Powercalc prepares the measurement devices.</span></span>
+          </div>
+        ` : nothing}
+        <div class="actions">
+          <button type="button" @click=${() => this.emit("back")} ?disabled=${this.busy}>Back</button>
+          <button class="primary" type="button" @click=${() => this.emit("start")} ?disabled=${this.busy}>${this.startButtonLabel()}</button>
+        </div>
+      </section>
+    `;
+  }
+
+  private startButtonLabel(): string {
+    if (this.busy) return "Preparing…";
+    return this.confirmationAction ? "Prepare measurement" : "Start measurement";
+  }
+
+  private emit(name: "back" | "start"): void {
+    emit(this, name);
+  }
+}

@@ -4,9 +4,53 @@ function response(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 }
 
+const capabilitiesResponse = {
+  runtime_version: "test",
+  defaults: {
+    sleep_time: 1, sample_count: 1, sleep_time_sample: 1, max_retries: 1, max_nudges: 0,
+    bri_bri_steps: 1, ct_bri_steps: 1, ct_mired_steps: 1, hs_bri_steps: 1, hs_hue_steps: 1,
+    hs_sat_steps: 1, min_brightness: 1, sleep_initial: 1, sleep_standby: 1,
+    effect_bri_steps: 1, measure_time_effect: 1, measure_time_effect_min: 1,
+  },
+};
+
+function sessionSnapshot(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    session_id: "session-1",
+    state: "running",
+    created_at: "2026-09-05T10:00:00Z",
+    updated_at: "2026-09-05T10:00:01Z",
+    phase: null,
+    confirmation_message: null,
+    confirmation_action: null,
+    mode: null,
+    progress: { completed: 0, total: 1, skipped: 0, percent: 0, estimated_remaining_seconds: null },
+    warnings: [],
+    error: null,
+    summary: null,
+    operating_point: null,
+    calibration_sample: null,
+    entity_states: {},
+    request: {
+      measure_type: "average",
+      model_id: "",
+      product_name: "",
+      session_name: "Average power",
+      measure_device: "",
+      power_meter: { type: "dummy" },
+      generate_model: false,
+      parameters: capabilitiesResponse.defaults,
+      resume_policy: "new",
+      duration: 60,
+      controller: null,
+    },
+    ...overrides,
+  };
+}
+
 describe("MeasureApiClient", () => {
   it("binds the browser fetch implementation to its global receiver", async () => {
-    const browserFetch = vi.fn<typeof fetch>().mockResolvedValue(response({ modes: [], defaults: {} }));
+    const browserFetch = vi.fn<typeof fetch>().mockResolvedValue(response(capabilitiesResponse));
     vi.stubGlobal("fetch", browserFetch);
 
     await new MeasureApiClient(undefined, "http://ha.local/prefix/").getCapabilities();
@@ -18,7 +62,7 @@ describe("MeasureApiClient", () => {
   });
 
   it("keeps requests and downloads below the ingress prefix", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ modes: [], defaults: {} }));
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(capabilitiesResponse));
     const client = new MeasureApiClient(fetcher, "http://ha.local/api/hassio_ingress/token/");
 
     await client.getCapabilities();
@@ -137,7 +181,26 @@ describe("MeasureApiClient", () => {
 
   it("loads the entity catalog with one request", async () => {
     const catalog = {
-      lights: [{ entity_id: "light.desk", name: "Desk" }],
+      lights: [{
+        entity_id: "light.desk",
+        name: "Desk",
+        domain: "light",
+        device_class: null,
+        device_id: null,
+        integration: null,
+        manufacturer: null,
+        model_id: null,
+        product_name: null,
+        state: "on",
+        unit: null,
+        attribute_names: [],
+        supported_modes: ["brightness"],
+        effect_list: null,
+        min_mired: null,
+        max_mired: null,
+        related_voltage_entity_id: null,
+        member_entity_ids: [],
+      }],
       powers: [{ entity_id: "sensor.plug_power", name: "Plug power" }],
       voltages: [{ entity_id: "sensor.plug_voltage", name: "Plug voltage" }],
     };
@@ -226,6 +289,24 @@ describe("MeasureApiClient", () => {
     await expect(client.cancel("session-1")).rejects.toEqual(expected);
     await expect(client.deleteSession("session-1")).rejects.toEqual(expected);
   });
+
+  it("rejects a successful response that violates its endpoint contract", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ runtime_version: "test", defaults: null }));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getCapabilities()).rejects.toThrow("Invalid capabilities response from the measure app.");
+  });
+
+  it("uses the stable fallback for a null JSON error response", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(null, 502));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.getCapabilities()).rejects.toEqual(expect.objectContaining({
+      status: 502,
+      code: "request_failed",
+      message: "Request failed (502)",
+    }));
+  });
 });
 
 describe("SessionEventStream", () => {
@@ -249,7 +330,11 @@ describe("SessionEventStream", () => {
       data: JSON.stringify({ sequence: 1, type: "phase", data: { message: "Preparing measurement devices" } }),
     }));
     listeners.get("progress")?.(new MessageEvent("progress", {
-      data: JSON.stringify({ sequence: 2, type: "progress", data: { completed: 2, total: 4 } }),
+      data: JSON.stringify({
+        sequence: 2,
+        type: "progress",
+        data: { completed: 2, total: 4, skipped: 0, mode: "brightness", estimated_remaining: "0:00:10" },
+      }),
     }));
     listeners.get("entity_states")?.(new MessageEvent("entity_states", {
       data: JSON.stringify({
@@ -285,10 +370,13 @@ describe("SessionEventStream", () => {
 
     stream.connect();
     listeners.get("heartbeat")?.(new MessageEvent("heartbeat", {
-      data: JSON.stringify({ sequence: 1, type: "heartbeat", data: {}, snapshot: { state: "running" } }),
+      data: JSON.stringify({ sequence: 1, type: "heartbeat", data: {}, snapshot: sessionSnapshot() }),
     }));
 
-    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: "heartbeat", snapshot: { state: "running" } }));
+    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({
+      type: "heartbeat",
+      snapshot: expect.objectContaining({ session_id: "session-1", state: "running" }),
+    }));
   });
 
   it("consumes named operating-point events", () => {
@@ -309,7 +397,7 @@ describe("SessionEventStream", () => {
         sequence: 3,
         type: "operating_point",
         data: { type: "fan", percentage: 35, on: true },
-        snapshot: { state: "running", operating_point: { type: "fan", percentage: 35, on: true } },
+        snapshot: sessionSnapshot({ operating_point: { type: "fan", percentage: 35, on: true } }),
       }),
     }));
 
@@ -317,5 +405,80 @@ describe("SessionEventStream", () => {
       type: "operating_point",
       data: { type: "fan", percentage: 35, on: true },
     }));
+  });
+
+  it("rejects an event with a malformed authoritative snapshot", () => {
+    const listeners = new Map<string, EventListener>();
+    const fake = {
+      close: vi.fn(),
+      onopen: null,
+      onerror: null,
+      onmessage: null,
+      addEventListener: vi.fn((type: string, listener: EventListener) => listeners.set(type, listener)),
+    };
+    const onEvent = vi.fn();
+    const onConnection = vi.fn();
+    const stream = new SessionEventStream("events", onEvent, onConnection, vi.fn(), () => fake as unknown as EventSource);
+
+    stream.connect();
+    listeners.get("heartbeat")?.(new MessageEvent("heartbeat", {
+      data: JSON.stringify({ sequence: 1, type: "heartbeat", data: {}, snapshot: { state: "running" } }),
+    }));
+
+    expect(onConnection).toHaveBeenCalledWith(false);
+    expect(onEvent).toHaveBeenCalledWith({
+      sequence: 0,
+      type: "log",
+      data: { message: "Received an invalid event from the measure app." },
+    });
+  });
+
+  it("uses a valid snapshot from an unknown future event as a refresh", () => {
+    const fake = {
+      close: vi.fn(),
+      onopen: null,
+      onerror: null,
+      onmessage: null as ((event: MessageEvent) => void) | null,
+      addEventListener: vi.fn(),
+    };
+    const onEvent = vi.fn();
+    const stream = new SessionEventStream("events", onEvent, vi.fn(), vi.fn(), () => fake as unknown as EventSource);
+
+    stream.connect();
+    fake.onmessage?.(new MessageEvent("message", {
+      data: JSON.stringify({ sequence: 8, type: "future_event", data: { ignored: true }, snapshot: sessionSnapshot() }),
+    }));
+
+    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({
+      sequence: 8,
+      type: "heartbeat",
+      snapshot: expect.objectContaining({ session_id: "session-1" }),
+    }));
+  });
+
+  it("does not misreport application callback failures as malformed wire data", () => {
+    const listeners = new Map<string, EventListener>();
+    const fake = {
+      close: vi.fn(),
+      onopen: null,
+      onerror: null,
+      onmessage: null,
+      addEventListener: vi.fn((type: string, listener: EventListener) => listeners.set(type, listener)),
+    };
+    const onConnection = vi.fn();
+    const stream = new SessionEventStream(
+      "events",
+      () => { throw new Error("consumer failed"); },
+      onConnection,
+      vi.fn(),
+      () => fake as unknown as EventSource,
+    );
+
+    stream.connect();
+
+    expect(() => listeners.get("log")?.(new MessageEvent("log", {
+      data: JSON.stringify({ sequence: 1, type: "log", data: { message: "Measuring" } }),
+    }))).toThrow("consumer failed");
+    expect(onConnection).not.toHaveBeenCalledWith(false);
   });
 });

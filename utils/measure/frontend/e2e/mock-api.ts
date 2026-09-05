@@ -144,15 +144,50 @@ const completedSession: SessionSummary = {
   active: false,
 };
 
-const completedSnapshot: SessionSnapshot = {
+const averageRequest = {
+  measure_type: "average",
+  duration: 60,
+  model_id: "",
+  product_name: "",
+  measure_device: "Shelly Plug S",
+  generate_model: false,
+  parameters,
+  resume_policy: "new",
+  power_meter: { type: "hass", entity_id: "sensor.plug_power", voltage_entity_id: "sensor.plug_voltage" },
+} as const satisfies SessionSnapshot["request"];
+
+const lightRequest = {
+  measure_type: "light",
+  controller: { type: "hass", entity_id: "light.desk" },
+  modes: ["brightness"],
+  multiple_light_count: 1,
+  model_id: "LWA017",
+  product_name: "Hue White Ambiance A60",
+  measure_device: "Shelly Plug S",
+  generate_model: true,
+  parameters,
+  resume_policy: "new",
+  power_meter: { type: "hass", entity_id: "sensor.plug_power", voltage_entity_id: "sensor.plug_voltage" },
+} as const satisfies SessionSnapshot["request"];
+
+const completedSnapshot = {
   session_id: "session-completed",
   state: "completed",
   created_at: completedSession.created_at,
   updated_at: completedSession.updated_at,
   phase: "Measurement complete",
-  progress: { completed: 255, total: 255 },
+  confirmation_message: null,
+  confirmation_action: null,
+  mode: "brightness",
+  progress: { completed: 255, total: 255, skipped: 0, percent: 100, estimated_remaining_seconds: 0 },
+  warnings: [],
+  error: null,
   summary: { "Maximum power": "8.42 W", "Measured points": "255" },
-};
+  request: lightRequest,
+  operating_point: null,
+  calibration_sample: null,
+  entity_states: {},
+} satisfies SessionSnapshot;
 
 /** A light run writes one CSV per lookup-table mode, named after the mode, plus the model. */
 const files: SessionFile[] = [
@@ -233,15 +268,24 @@ const preflight: PreflightResponse = {
   },
 };
 
-const startedSnapshot: SessionSnapshot = {
+const startedSnapshot = {
   session_id: "session-running",
   state: "running",
   created_at: "2026-08-14T10:00:00Z",
   updated_at: "2026-08-14T10:00:01Z",
   phase: "Measuring average power",
+  confirmation_message: null,
+  confirmation_action: null,
   mode: "Averaging",
-  progress: { completed: 0, total: 1 },
-};
+  progress: { completed: 0, total: 1, skipped: 0, percent: 0, estimated_remaining_seconds: 60 },
+  warnings: [],
+  error: null,
+  summary: null,
+  request: averageRequest,
+  operating_point: null,
+  calibration_sample: null,
+  entity_states: {},
+} satisfies SessionSnapshot;
 
 /**
  * Events the mocked stream replays once the running view subscribes.
