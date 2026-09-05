@@ -19121,7 +19121,7 @@
           },
           "id": "ZB-TD5-RCW-GU10",
           "manufacturer": "moes",
-          "updated_at": "2026-09-05T10:50:23",
+          "updated_at": "2026-09-05T10:53:39",
           "max_power": 4.93,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-04T17:56:37",
@@ -19138,7 +19138,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "96529cf7dfb61df9f44b158b43efa349"
+          "hash": "74d5619cf59f14631ffc7513625522b3"
         }
       ],
       "device_types": [
