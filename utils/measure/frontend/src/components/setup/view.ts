@@ -10,7 +10,6 @@ import type {
   FormFieldOption,
   LutMode,
   MeasureDefinition,
-  MeasureParameter,
   MeasureParameterName,
   MeasureType,
   MeasurementRequest,
@@ -23,7 +22,6 @@ import {
   deviceFields,
   enabledParameters,
   entityDomain,
-  gatedParameters,
   entityDomains,
   fieldVisible,
   fieldOptions,
@@ -33,7 +31,7 @@ import {
 import { emit } from "../../events";
 import { formText } from "../../form";
 import { sharedStyles } from "../../styles";
-import { entitySelect, fieldHint, numberField, optionSelect, textField } from "../shared/fields";
+import { entitySelect, fieldHint, optionSelect, textField } from "../shared/fields";
 import { defaultDummyLoadMode, dummyLoadSpec, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
 import { entityListStyles, renderEntityList } from "./entity-list-field";
 import type { Combobox } from "../shared/combobox";
@@ -45,6 +43,9 @@ import {
   setupChromeStyles,
 } from "./chrome";
 import { errorHelpLink } from "../shared/error-help-link";
+import type { ParameterChange } from "./tuning-section";
+import "./developer-options";
+import "./tuning-section";
 
 const LIGHT_DISCOVERY_HINT =
   "Newly discovered lights may not have a usable state until Home Assistant receives their first update. If a light is missing, change its state once in Home Assistant, then reload this page.";
@@ -139,6 +140,7 @@ export class SetupView extends LitElement {
 
   static readonly styles = [sharedStyles, dummyLoadStyles, entityListStyles, setupChromeStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
+    measure-setup-tuning-section, measure-setup-developer-options { display: contents; }
     form { display: grid; gap: 1rem; }
     .profile-grid { align-items: start; }
     .device-section { display: grid; gap: 1rem; min-width: 0; }
@@ -219,6 +221,15 @@ export class SetupView extends LitElement {
     }
   }
 
+  protected async getUpdateComplete(): Promise<boolean> {
+    const complete = await super.getUpdateComplete();
+    const sections = this.shadowRoot?.querySelectorAll<LitElement>(
+      "measure-setup-tuning-section, measure-setup-developer-options",
+    ) ?? [];
+    await Promise.all(Array.from(sections, (section) => section.updateComplete));
+    return complete;
+  }
+
   render() {
     return html`
       <section class="panel" aria-labelledby="setup-title">
@@ -291,8 +302,22 @@ export class SetupView extends LitElement {
         </div>
 
         ${this.renderDummyLoadSection(run?.dummy_load)}
-        ${this.renderTuning(definition, run)}
-        ${this.renderDeveloperOptions(definition)}
+        <measure-setup-tuning-section
+          .capabilities=${this.capabilities}
+          .definition=${definition}
+          .definitions=${this.definitions}
+          .request=${run}
+          .values=${this.parameterValues}
+          .activeParameters=${this.activeParameters(definition, run)}
+          @parameter-change=${this.parameterChanged}
+        ></measure-setup-tuning-section>
+        <measure-setup-developer-options
+          .developerMode=${this.capabilities.developer_mode ?? false}
+          .fastTestMode=${this.capabilities.fast_test_mode ?? false}
+          .hasController=${definition.fields.some((field) => field.role === "controller")}
+          .dummyController=${this.dummyController}
+          @dummy-controller-change=${this.dummyControllerChanged}
+        ></measure-setup-developer-options>
 
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${activeLightCheck ? html`
@@ -309,40 +334,6 @@ export class SetupView extends LitElement {
           ? activeLightCheck ? "Checking light and setup…" : "Checking setup…"
           : activeLightCheck ? "Check light and setup" : "Check setup"}</button></div>
       </form>
-    `;
-  }
-
-  private renderDeveloperOptions(definition: MeasureDefinition) {
-    const hasController = definition.fields.some((field) => field.role === "controller");
-    if (!(this.capabilities?.developer_mode && hasController) && !this.capabilities?.fast_test_mode) return nothing;
-    return html`<details class="developer-options">
-      <summary>Developer options</summary>
-      <div class="developer-content">
-        ${hasController ? this.renderDummyControllerToggle() : nothing}
-        ${this.capabilities?.fast_test_mode
-          ? html`<p class="notice"><strong>Fast test mode is enabled.</strong> Dummy light, fan, speaker and charging runs use minimal waits and measurement points. Their output is for app testing only.</p>`
-          : nothing}
-      </div>
-    </details>`;
-  }
-
-  private renderDummyControllerToggle() {
-    if (!this.capabilities?.developer_mode) return nothing;
-    return html`
-      <div class="dummy-controller">
-        <label class="check toggle-pill">
-          <input
-            type="checkbox"
-            name="use_dummy_controller"
-            .checked=${this.dummyController}
-            @change=${this.dummyControllerChanged}
-          />
-          Use virtual device (developer)
-        </label>
-        ${this.dummyController
-          ? html`<p class="muted">No real device is controlled during this measurement. Use it only to test the app itself.</p>`
-          : nothing}
-      </div>
     `;
   }
 
@@ -425,56 +416,8 @@ export class SetupView extends LitElement {
     this.dummyLoadMode = (event.currentTarget as HTMLInputElement).value as DummyLoadSpec["mode"];
   }
 
-  /**
-   * Advanced tuning section, built from the parameters the server says this type exposes.
-   * A parameter that some option claims is shown only while that option is selected.
-   */
-  private renderTuning(definition: MeasureDefinition, request?: MeasurementRequest) {
-    if (!this.capabilities) return nothing;
-    const gated = gatedParameters(definition);
-    const active = this.activeParameters(definition, request);
-    const shown = definition.parameters.filter((parameter) => !gated.has(parameter.name) || active.has(parameter.name));
-    return html`<details>
-      <summary>Advanced timing & quality</summary>
-      <div class="grid">
-        ${shown.map((parameter, index) => html`
-          ${parameter.group && parameter.group !== shown[index - 1]?.group
-            ? html`<p class="advanced-heading">${parameter.group}</p>`
-            : nothing}
-          ${this.parameterField(parameter, request)}
-        `)}
-      </div>
-    </details>`;
-  }
-
-  private parameterField(parameter: MeasureParameter, request?: MeasurementRequest) {
-    const gate = parameter.requires_multiple;
-    // Bounds come from the capabilities endpoint so the form cannot drift from server-side validation.
-    const { min, max } = this.capabilities?.limits?.[parameter.name] ?? {};
-    return numberField(parameter.name, parameter.label, this.parameterValue(parameter.name, request), {
-      min,
-      max,
-      step: parameter.step,
-      hint: parameter.hint,
-      disabled: gate ? Number(this.parameterValue(gate, request)) <= 1 : false,
-      // Re-render when a parameter that gates another one changes, so the gate keeps up.
-      onInput: this.gatesAnother(parameter.name) ? this.parameterChanged : null,
-    });
-  }
-
-  /** What the field should show: what the user typed, else the previous run's, else the default. */
-  private parameterValue(name: MeasureParameterName, request?: MeasurementRequest): string {
-    const stored = request?.parameters[name] ?? this.capabilities?.defaults[name];
-    return this.parameterValues[name] ?? String(stored ?? "");
-  }
-
-  private gatesAnother(name: MeasureParameterName): boolean {
-    return this.definitions.some((definition) => definition.parameters.some((parameter) => parameter.requires_multiple === name));
-  }
-
-  private parameterChanged(event: Event): void {
-    const input = event.currentTarget as HTMLInputElement;
-    this.parameterValues = { ...this.parameterValues, [input.name as MeasureParameterName]: input.value };
+  private parameterChanged(event: CustomEvent<ParameterChange>): void {
+    this.parameterValues = { ...this.parameterValues, [event.detail.name]: event.detail.value };
   }
 
 
@@ -661,8 +604,8 @@ export class SetupView extends LitElement {
     };
   }
 
-  private dummyControllerChanged(event: Event): void {
-    this.dummyController = (event.currentTarget as HTMLInputElement).checked;
+  private dummyControllerChanged(event: CustomEvent<boolean>): void {
+    this.dummyController = event.detail;
   }
 
   private multipleLightsChanged(event: Event): void {
