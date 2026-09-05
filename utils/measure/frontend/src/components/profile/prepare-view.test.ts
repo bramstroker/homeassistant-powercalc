@@ -1,4 +1,4 @@
-import { ProfilePrepareView } from "./profile-prepare-view";
+import { ProfilePrepareView } from "./prepare-view";
 import type { Combobox } from "../shared/combobox";
 import type { ContributionPreview } from "../../types";
 
@@ -49,7 +49,7 @@ describe("profile validation", () => {
     expect(input(element, "model_id").getAttribute("aria-invalid")).toBe("true");
     expect(input(element, "model_id").getAttribute("aria-describedby")).toBe("model_id-error");
     expect(manufacturer.shadowRoot!.querySelector("input")!.getAttribute("aria-invalid")).toBe("true");
-    expect(manufacturer.shadowRoot!.activeElement).toBe(manufacturer.shadowRoot!.querySelector("input"));
+    await vi.waitFor(() => expect(manufacturer.shadowRoot!.activeElement).toBe(manufacturer.shadowRoot!.querySelector("input")));
     const link = [...element.shadowRoot!.querySelectorAll<HTMLButtonElement>(".validation-summary button")].find((button) => button.textContent!.includes("Product name"))!;
     link.click();
     expect(element.shadowRoot!.activeElement).toBe(input(element, "product_name"));
@@ -115,6 +115,7 @@ describe("profile validation", () => {
     const colorMode = element.shadowRoot!.querySelector('measure-combobox[name="device_specs.color_mode"]') as Combobox;
     await colorMode.updateComplete;
     expect(colorMode.shadowRoot!.querySelector("input")!.getAttribute("aria-invalid")).toBe("true");
+    await vi.waitFor(() => expect(colorMode.shadowRoot!.activeElement).toBe(colorMode.shadowRoot!.querySelector("input")));
     expect(element.shadowRoot!.querySelector(".validation-summary")!.textContent).toContain("Color mode: Choose a supported color mode.");
   });
 
@@ -124,6 +125,6 @@ describe("profile validation", () => {
     element.contributionErrorField = "standby_power";
     await element.updateComplete;
     expect(element.shadowRoot!.querySelector(".validation-summary")!.textContent).toContain(element.contributionError);
-    expect(element.shadowRoot!.activeElement).toBe(element.shadowRoot!.querySelector(".validation-summary"));
+    await vi.waitFor(() => expect(element.shadowRoot!.activeElement).toBe(element.shadowRoot!.querySelector(".validation-summary")));
   });
 });

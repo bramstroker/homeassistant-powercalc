@@ -5,7 +5,7 @@ import { emit } from "../../events";
 import { fileSize } from "../../format";
 import { diagnosticsDownload, sharedStyles } from "../../styles";
 import { errorHelpLink } from "../shared/error-help-link";
-import "./result-plot";
+import "./plot";
 
 const TROUBLESHOOTING_URL = "https://docs.powercalc.nl/contributing/measure/troubleshooting/";
 

@@ -9,14 +9,14 @@ import type { MeterContext } from "../../power-meter";
 import { reviewMetrics, reviewSummary } from "../../review-summary";
 import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionFormValues, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SettingsSection, ShellyDiscoveryDevice } from "../../types";
 import { sharedStyles } from "../../styles";
-import "../preflight/preflight-view";
-import "../profile/profile-prepare-view";
-import "../profile/profile-use-view";
-import "../result/result-view";
-import "../running/running-view";
-import "../settings/settings-view";
-import "../setup/setup-view";
-import "../sessions/sessions-view";
+import "../preflight/view";
+import "../profile/prepare-view";
+import "../profile/use-view";
+import "../result/view";
+import "../running/view";
+import "../settings/view";
+import "../setup/view";
+import "../sessions/view";
 
 const POWERCALC_LOGO_URL = new URL("../../assets/powercalc-logo.svg", import.meta.url).href;
 

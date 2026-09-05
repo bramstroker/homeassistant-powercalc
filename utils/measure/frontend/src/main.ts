@@ -1,1 +1,1 @@
-import "./components/app/app-shell";
+import "./components/app/shell";

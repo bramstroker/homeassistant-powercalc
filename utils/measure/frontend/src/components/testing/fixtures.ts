@@ -12,7 +12,7 @@ import type {
   PowerMeterSpec,
 } from "../../types";
 import type { MeasureAppController } from "../../app-controller";
-import type { AppShell } from "../app/app-shell";
+import type { AppShell } from "../app/shell";
 
 /** Fixtures and element shapes shared by the view tests. */
 

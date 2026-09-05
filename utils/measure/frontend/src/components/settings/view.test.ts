@@ -1,7 +1,7 @@
 import type { AppSettings, AppSettingsUpdate, Capabilities, EntityDescriptor, PowerMeterDiagnostic, SettingsSection } from "../../types";
-import "./settings-view";
-import type { SettingsView } from "./settings-view";
-import { capabilities, defaultSettings, goodPowerMeterDiagnostic, measurementDefaults } from "../testing/test-fixtures";
+import "./view";
+import type { SettingsView } from "./view";
+import { capabilities, defaultSettings, goodPowerMeterDiagnostic, measurementDefaults } from "../testing/fixtures";
 
 interface TestCombobox extends HTMLElement {
   value: string | string[];

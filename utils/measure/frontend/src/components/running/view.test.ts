@@ -1,5 +1,5 @@
 import type { OperatingPoint, SessionSnapshot } from "../../types";
-import "./running-view";
+import "./view";
 
 describe("running view", () => {
   it("stops averaging through the same action as recording and disables repeated requests", async () => {

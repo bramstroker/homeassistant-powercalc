@@ -1,6 +1,6 @@
 import type { ContributionPreview, SessionSnapshot } from "../../types";
-import "./profile-prepare-view";
-import "./profile-use-view";
+import "./prepare-view";
+import "./use-view";
 
 describe("profile flow components", () => {
   it("defaults to the GitHub method for an eligible draft and offers manual as an alternative", async () => {

@@ -1,5 +1,5 @@
 import type { SessionSummary } from "../../types";
-import "./sessions-view";
+import "./view";
 
 describe("sessions view", () => {
   it("offers retained-session actions and confirms deletion inline", async () => {

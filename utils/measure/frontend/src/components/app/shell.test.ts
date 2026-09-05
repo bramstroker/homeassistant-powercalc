@@ -1,6 +1,6 @@
 import type { MeasureDefinition, MeasureParameter, MeasurementRequest } from "../../types";
-import { AppShell } from "./app-shell";
-import { capabilities, controllerOf, defaultSettings, goodPowerMeterDiagnostic } from "../testing/test-fixtures";
+import { AppShell } from "./shell";
+import { capabilities, controllerOf, defaultSettings, goodPowerMeterDiagnostic } from "../testing/fixtures";
 
 describe("app shell device entities", () => {
   it("loads device entities only after their measurement type is selected", async () => {

@@ -1,5 +1,5 @@
 import type { SessionSnapshot } from "../../types";
-import "./result-view";
+import "./view";
 
 describe("result view", () => {
   it.each(["completed", "failed", "cancelled", "resumable"] as const)("offers diagnostics for a %s session without generated files", async (state) => {

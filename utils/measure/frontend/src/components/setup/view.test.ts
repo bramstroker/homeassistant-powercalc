@@ -1,7 +1,7 @@
 import type { MeasureDefinition, MeasureParameter, MeasurementRequest } from "../../types";
-import "./setup-view";
-import { recorderExportFilename } from "./setup-view";
-import { SetupViewElement, capabilities, definitions, lightDefinition, lights } from "../testing/test-fixtures";
+import "./view";
+import { recorderExportFilename } from "./view";
+import { SetupViewElement, capabilities, definitions, lightDefinition, lights } from "../testing/fixtures";
 
 interface TestCombobox extends HTMLElement {
   label: string;

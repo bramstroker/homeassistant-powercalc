@@ -1,6 +1,6 @@
 import type { PowerMeterDiagnostic, PreflightResponse } from "../../types";
-import "./preflight-view";
-import { goodPowerMeterDiagnostic } from "../testing/test-fixtures";
+import "./view";
+import { goodPowerMeterDiagnostic } from "../testing/fixtures";
 
 describe("preflight power meter diagnostics", () => {
   it("explains preparation and provides immediate feedback while the session initializes", async () => {

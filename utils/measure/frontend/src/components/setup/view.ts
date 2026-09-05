@@ -43,7 +43,7 @@ import {
   renderTypeChip,
   renderTypePicker,
   setupChromeStyles,
-} from "./setup-chrome";
+} from "./chrome";
 import { errorHelpLink } from "../shared/error-help-link";
 
 const LIGHT_DISCOVERY_HINT =

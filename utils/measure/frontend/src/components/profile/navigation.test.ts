@@ -1,8 +1,8 @@
 import type { AppSettings, ContributionPreview } from "../../types";
-import { AppShell } from "../app/app-shell";
+import { AppShell } from "../app/shell";
 import type { Combobox } from "../shared/combobox";
-import type { ProfilePrepareView } from "./profile-prepare-view";
-import { capabilities, controllerOf, defaultSettings } from "../testing/test-fixtures";
+import type { ProfilePrepareView } from "./prepare-view";
+import { capabilities, controllerOf, defaultSettings } from "../testing/fixtures";
 
 const draft: ContributionPreview = {
   eligible: true, manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010",
