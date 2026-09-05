@@ -2,7 +2,7 @@ import { LitElement, html, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { AppSettings, EntityDescriptor, PowerMeterDiagnostic, PowerMeterType, ShellyDiscoveryDevice } from "../../types";
 import { DEFAULT_SHELLY_USERNAME, POWER_METER_LIST, meterFor } from "../../power-meter";
-import { emit } from "../../events";
+import { emit } from "../../utils/events";
 import type { ComboboxOption } from "../shared/combobox";
 import "../shared/combobox";
 import { optionSelect } from "../shared/fields";

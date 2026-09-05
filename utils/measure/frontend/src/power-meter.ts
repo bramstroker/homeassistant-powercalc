@@ -1,4 +1,4 @@
-import { formText, formTextOrNull } from "./form";
+import { formText, formTextOrNull } from "./utils/form";
 import type { AppSettings, EntityDescriptor, MeasurementRequest, PowerMeterSpec, PowerMeterType } from "./types";
 
 /** Username Shelly devices are reached with unless the user configured another one. */

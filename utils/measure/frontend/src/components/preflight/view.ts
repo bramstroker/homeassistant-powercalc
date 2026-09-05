@@ -2,7 +2,7 @@ import { LitElement, css, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { LabelledValue } from "../../review-summary";
 import type { ErrorHelp, PowerMeterDiagnostic, PreflightResponse } from "../../types";
-import { emit } from "../../events";
+import { emit } from "../../utils/events";
 import { sharedStyles } from "../../styles";
 import { errorHelpLink } from "../shared/error-help-link";
 import "../shared/power-meter-diagnostic";

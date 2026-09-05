@@ -16,7 +16,7 @@ import {
   narrowingField,
   requestFieldValue,
 } from "../../measure-definition";
-import { emit } from "../../events";
+import { emit } from "../../utils/events";
 import { entitySelect, fieldHint, optionSelect, textField } from "../shared/fields";
 import { renderEntityList } from "./entity-list-field";
 import {

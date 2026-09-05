@@ -1,8 +1,8 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SessionState } from "../../types";
-import { emit } from "../../events";
-import { fileSize } from "../../format";
+import { emit } from "../../utils/events";
+import { fileSize } from "../../utils/format";
 import { diagnosticsDownload, sharedStyles } from "../../styles";
 import { errorHelpLink } from "../shared/error-help-link";
 import "./plot";

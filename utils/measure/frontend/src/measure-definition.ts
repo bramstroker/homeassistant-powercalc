@@ -1,4 +1,4 @@
-import { formChecked, formList, formNumber, formText } from "./form";
+import { formChecked, formList, formNumber, formText } from "./utils/form";
 import type {
   BaseMeasurementRequest,
   Capabilities,

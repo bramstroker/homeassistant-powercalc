@@ -1,7 +1,7 @@
 import { LitElement, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { ContributionDraftFile, ContributionPreview } from "../../types";
-import { fileSize } from "../../format";
+import { fileSize } from "../../utils/format";
 
 @customElement("measure-profile-prepared-preview")
 export class ProfilePreparedPreview extends LitElement {

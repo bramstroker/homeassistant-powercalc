@@ -1,8 +1,8 @@
 import { LitElement, css, html, nothing, svg } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { SessionSummary } from "../../types";
-import { emit } from "../../events";
-import { fileSize, humanize, timestamp } from "../../format";
+import { emit } from "../../utils/events";
+import { fileSize, humanize, timestamp } from "../../utils/format";
 import { sharedStyles } from "../../styles";
 
 @customElement("measure-sessions-view")

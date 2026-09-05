@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow } from "../../types";
-import { emit } from "../../events";
+import { emit } from "../../utils/events";
 
 @customElement("measure-settings-github-section")
 export class SettingsGithubSection extends LitElement {

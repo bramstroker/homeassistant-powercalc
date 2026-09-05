@@ -1,6 +1,6 @@
 import { html, nothing } from "lit";
 import { customElement } from "lit/decorators.js";
-import { words } from "../../format";
+import { words } from "../../utils/format";
 import { ProfileFormSection } from "./form-section";
 
 @customElement("measure-profile-contribution-details")

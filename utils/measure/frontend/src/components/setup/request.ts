@@ -1,4 +1,4 @@
-import { formText } from "../../form";
+import { formText } from "../../utils/form";
 import {
   buildMeasurementRequest,
   entityDomain,

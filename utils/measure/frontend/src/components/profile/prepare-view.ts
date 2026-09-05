@@ -10,9 +10,9 @@ import type {
   DeviceSpecificationField,
   SessionSnapshot,
 } from "../../types";
-import { emit } from "../../events";
-import { words } from "../../format";
-import { formText, submittedForm } from "../../form";
+import { emit } from "../../utils/events";
+import { formText, submittedForm } from "../../utils/form";
+import { words } from "../../utils/format";
 import { metadataLabels, validateMetadata } from "../../profile-validation";
 import { sharedStyles } from "../../styles";
 import { profileDeviceType } from "./device-specification-fields";

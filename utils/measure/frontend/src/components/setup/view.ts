@@ -16,8 +16,8 @@ import type {
 import { hasVoltageReading, meterFor } from "../../power-meter";
 import type { MeterContext } from "../../power-meter";
 import { requestFieldValue } from "../../measure-definition";
-import { emit } from "../../events";
-import { submittedForm } from "../../form";
+import { emit } from "../../utils/events";
+import { submittedForm } from "../../utils/form";
 import { sharedStyles } from "../../styles";
 import { defaultDummyLoadMode, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
 import { entityListStyles } from "./entity-list-field";

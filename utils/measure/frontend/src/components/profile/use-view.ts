@@ -9,7 +9,7 @@ import type {
   SessionSnapshot,
   SettingsSection,
 } from "../../types";
-import { emit } from "../../events";
+import { emit } from "../../utils/events";
 import { sharedStyles } from "../../styles";
 
 const CONTRIBUTION_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/output/";

@@ -1,6 +1,6 @@
 import { LitElement, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { emit } from "../../events";
+import { emit } from "../../utils/events";
 
 @customElement("measure-setup-developer-options")
 export class SetupDeveloperOptions extends LitElement {

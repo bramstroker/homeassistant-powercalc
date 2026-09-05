@@ -1,8 +1,8 @@
 import { LitElement, css, html, nothing, svg } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { SessionProgress, SessionSnapshot } from "../../types";
-import { emit } from "../../events";
-import { remaining } from "../../format";
+import { emit } from "../../utils/events";
+import { remaining } from "../../utils/format";
 import { diagnosticsDownload, sharedStyles } from "../../styles";
 import "./chart";
 import "./log";

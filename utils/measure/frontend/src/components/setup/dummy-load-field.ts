@@ -1,5 +1,5 @@
 import { css, html, nothing } from "lit";
-import { calibrationDate, resistance } from "../../format";
+import { calibrationDate, resistance } from "../../utils/format";
 import type { DummyLoadCalibration, DummyLoadSpec } from "../../types";
 import { textField } from "../shared/fields";
 
