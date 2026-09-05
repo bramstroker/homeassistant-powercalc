@@ -1,6 +1,6 @@
 import { css, html } from "lit";
-import { describe as describeMeter } from "../../power-meter";
-import type { MeterContext } from "../../power-meter";
+import { describe as describeMeter } from "../../power-meter/registry";
+import type { MeterContext } from "../../power-meter/registry";
 import type { MeasureDefinition, MeasureType, PowerMeterSpec } from "../../types";
 
 /**

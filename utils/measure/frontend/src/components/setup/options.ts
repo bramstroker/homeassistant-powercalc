@@ -3,7 +3,7 @@ import {
   fieldOptions,
   fieldVisible,
   requestFieldValue,
-} from "../../measure-definition";
+} from "../../measurement/definition";
 import type {
   EntityDescriptor,
   FormField,

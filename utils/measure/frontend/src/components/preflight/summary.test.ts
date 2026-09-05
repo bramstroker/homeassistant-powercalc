@@ -1,6 +1,6 @@
-import type { MeasureDefinition, MeasurementRequest, PreflightResponse } from "./types";
-import { reviewMetrics, reviewSummary } from "./review-summary";
-import { capabilities, lightDefinition } from "./components/testing/fixtures";
+import type { MeasureDefinition, MeasurementRequest, PreflightResponse } from "../../types";
+import { capabilities, lightDefinition } from "../testing/fixtures";
+import { reviewMetrics, reviewSummary } from "./summary";
 
 const request: MeasurementRequest = {
   measure_type: "light",

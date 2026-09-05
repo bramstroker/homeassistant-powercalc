@@ -13,7 +13,7 @@ import type {
 import { emit } from "../../utils/events";
 import { formText, submittedForm } from "../../utils/form";
 import { words } from "../../utils/format";
-import { metadataLabels, validateMetadata } from "../../profile-validation";
+import { metadataLabels, validateMetadata } from "./validation";
 import { sharedStyles } from "../../styles";
 import { profileDeviceType } from "./device-specification-fields";
 import { formValue, type ProfileFormSection } from "./form-section";

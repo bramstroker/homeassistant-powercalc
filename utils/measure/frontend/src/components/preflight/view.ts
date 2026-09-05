@@ -1,6 +1,6 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import type { LabelledValue } from "../../review-summary";
+import type { LabelledValue } from "./summary";
 import type { ErrorHelp, PowerMeterDiagnostic, PreflightResponse } from "../../types";
 import { emit } from "../../utils/events";
 import { sharedStyles } from "../../styles";

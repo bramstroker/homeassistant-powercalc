@@ -2,7 +2,7 @@ import { LitElement, css, html, nothing, svg, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, EntityDescriptor, MeasureParameterName, PowerMeterDiagnostic, SettingsSection, ShellyDiscoveryDevice } from "../../types";
-import { DEFAULT_SHELLY_USERNAME, settingsFromForm } from "../../power-meter";
+import { DEFAULT_SHELLY_USERNAME, settingsFromForm } from "../../power-meter/registry";
 import { emit } from "../../utils/events";
 import { formRaw, formText, formTextOrNull } from "../../utils/form";
 import { sharedStyles } from "../../styles";

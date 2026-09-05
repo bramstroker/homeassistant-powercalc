@@ -1,5 +1,5 @@
-import { formText, formTextOrNull } from "./utils/form";
-import type { AppSettings, EntityDescriptor, MeasurementRequest, PowerMeterSpec, PowerMeterType } from "./types";
+import type { AppSettings, EntityDescriptor, MeasurementRequest, PowerMeterSpec, PowerMeterType } from "../types";
+import { formText, formTextOrNull } from "../utils/form";
 
 /** Username Shelly devices are reached with unless the user configured another one. */
 export const DEFAULT_SHELLY_USERNAME = "admin";

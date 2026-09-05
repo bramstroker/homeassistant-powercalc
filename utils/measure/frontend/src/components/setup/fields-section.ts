@@ -15,7 +15,7 @@ import {
   entityDomains,
   narrowingField,
   requestFieldValue,
-} from "../../measure-definition";
+} from "../../measurement/definition";
 import { emit } from "../../utils/events";
 import { entitySelect, fieldHint, optionSelect, textField } from "../shared/fields";
 import { renderEntityList } from "./entity-list-field";

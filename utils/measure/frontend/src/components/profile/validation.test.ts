@@ -1,4 +1,4 @@
-import { validateMetadata } from "./profile-validation";
+import { validateMetadata } from "./validation";
 
 const valid = {
   manufacturer_name: "Signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "Tester",

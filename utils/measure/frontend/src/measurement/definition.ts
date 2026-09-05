@@ -1,4 +1,3 @@
-import { formChecked, formList, formNumber, formText } from "./utils/form";
 import type {
   BaseMeasurementRequest,
   Capabilities,
@@ -9,7 +8,8 @@ import type {
   MeasurementParameters,
   MeasurementRequest,
   PowerMeterSpec,
-} from "./types";
+} from "../types";
+import { formChecked, formList, formNumber, formText } from "../utils/form";
 
 /** A single submitted form value, before it is placed in a request. */
 type FieldValue = string | number | boolean | string[];

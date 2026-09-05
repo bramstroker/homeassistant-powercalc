@@ -1,8 +1,8 @@
 import { ApiError } from "./api-client";
 import type { MeasureApiClient } from "./api-client";
 import { AuthController } from "./contribution/auth";
-import { entityDomains, requestFormData } from "./measure-definition";
-import { meterFor } from "./power-meter";
+import { entityDomains, requestFormData } from "./measurement/definition";
+import { meterFor } from "./power-meter/registry";
 import { emptyPlots } from "./types";
 import type {
   AppSettings,

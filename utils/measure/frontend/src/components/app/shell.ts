@@ -4,9 +4,9 @@ import { MeasureApiClient, SessionEventStream } from "../../api-client";
 import { MeasureAppController } from "../../app-controller";
 import type { AppView, MeasureAppState } from "../../app-controller";
 
-import { isAddressed, specFromRequest, specFromSettings } from "../../power-meter";
-import type { MeterContext } from "../../power-meter";
-import { reviewMetrics, reviewSummary } from "../../review-summary";
+import { reviewMetrics, reviewSummary } from "../preflight/summary";
+import { isAddressed, specFromRequest, specFromSettings } from "../../power-meter/registry";
+import type { MeterContext } from "../../power-meter/registry";
 import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionFormValues, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SettingsSection, ShellyDiscoveryDevice } from "../../types";
 import { sharedStyles } from "../../styles";
 import "../preflight/view";

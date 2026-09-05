@@ -1,4 +1,4 @@
-import type { ContributionPreviewRequest } from "./types";
+import type { ContributionPreviewRequest } from "../../types";
 
 export const metadataLabels: Record<string, string> = {
   manufacturer_name: "Manufacturer", model_id: "Model ID", product_name: "Product name",

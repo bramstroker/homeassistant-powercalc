@@ -1,7 +1,7 @@
-import { duration as formatDuration } from "./utils/format";
-import { requestFieldValue } from "./measure-definition";
-import { summarize } from "./power-meter";
-import type { FormField, MeasureDefinition, MeasurementRequest, PreflightResponse } from "./types";
+import { requestFieldValue } from "../../measurement/definition";
+import { summarize } from "../../power-meter/registry";
+import type { FormField, MeasureDefinition, MeasurementRequest, PreflightResponse } from "../../types";
+import { duration as formatDuration } from "../../utils/format";
 
 /** One labelled value on the review screen, as a headline metric or a summary row. */
 export interface LabelledValue {

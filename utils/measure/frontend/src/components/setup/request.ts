@@ -4,8 +4,8 @@ import {
   entityDomain,
   entityDomains,
   narrowingField,
-} from "../../measure-definition";
-import { meterFor } from "../../power-meter";
+} from "../../measurement/definition";
+import { meterFor } from "../../power-meter/registry";
 import type {
   Capabilities,
   DummyLoadCalibration,

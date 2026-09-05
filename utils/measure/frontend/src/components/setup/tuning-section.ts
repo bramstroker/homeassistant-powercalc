@@ -2,7 +2,7 @@ import { LitElement, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { Capabilities, MeasureDefinition, MeasureParameter, MeasureParameterName, MeasurementRequest } from "../../types";
 import { emit } from "../../utils/events";
-import { gatedParameters } from "../../measure-definition";
+import { gatedParameters } from "../../measurement/definition";
 import { numberField } from "../shared/fields";
 
 export interface ParameterChange {

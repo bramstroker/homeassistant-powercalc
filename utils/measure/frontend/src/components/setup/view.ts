@@ -13,9 +13,9 @@ import type {
   MeasurementRequest,
   PowerMeterSpec,
 } from "../../types";
-import { hasVoltageReading, meterFor } from "../../power-meter";
-import type { MeterContext } from "../../power-meter";
-import { requestFieldValue } from "../../measure-definition";
+import { requestFieldValue } from "../../measurement/definition";
+import { hasVoltageReading, meterFor } from "../../power-meter/registry";
+import type { MeterContext } from "../../power-meter/registry";
 import { emit } from "../../utils/events";
 import { submittedForm } from "../../utils/form";
 import { sharedStyles } from "../../styles";

@@ -9,9 +9,9 @@ import {
   specFromRequest,
   specFromSettings,
   summarize,
-} from "./power-meter";
-import type { MeterContext } from "./power-meter";
-import type { AppSettings, MeasurementRequest, PowerMeterSpec, PowerMeterType } from "./types";
+} from "./registry";
+import type { MeterContext } from "./registry";
+import type { AppSettings, MeasurementRequest, PowerMeterSpec, PowerMeterType } from "../types";
 
 const settings: AppSettings = {
   default_power_entity_id: "sensor.plug_power",
