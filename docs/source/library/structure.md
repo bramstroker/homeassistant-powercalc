@@ -51,7 +51,6 @@ Below is a comprehensive table of all fields that can be used in a `model.json` 
 | `ean`                             | array of strings | No | Barcode numbers on the packaging (EAN-8, UPC-12, EAN-13 or GTIN-14). A model often ships under several, one per region                  |
 | `fields`                          | array of objects | No | Custom fields for the profile, more about it explained in [Variables](variables.md)                                                     |
 | `fixed_config`                    | object           | No | Configuration for [fixed](../strategies/fixed.md) calculation strategy                                                                  |
-| `is_dumb_bulb`                    | boolean          | No | Indicates if the profile is for a dumb light bulb without smart capabilities                                                            |
 | `linear_config`                   | object           | No | Configuration for [linear](../strategies/linear.md) calculation strategy                                                                |
 | `linked_profile`                  | string           | No | Use data from another model                                                                                                             |
 | `mains_voltage`                   | number           | No | Nominal mains voltage the measurements were taken on, e.g. `230` or `120`                                                                |
