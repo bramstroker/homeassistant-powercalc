@@ -10,6 +10,7 @@ import type { ComboboxOption } from "../shared/combobox";
 import "../shared/combobox";
 import { optionSelect } from "../shared/fields";
 import "../shared/power-meter-diagnostic";
+import "./github-section";
 
 interface SettingsSectionDescriptor {
   id: SettingsSection;
@@ -106,9 +107,6 @@ export class SettingsView extends LitElement {
   contributionAuthError = "";
 
   @state()
-  private githubCopyStatus = "";
-
-  @state()
   private contributorGithubValue?: string;
 
   @property({ attribute: false })
@@ -151,6 +149,7 @@ export class SettingsView extends LitElement {
 
   static readonly styles = [sharedStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
+    measure-settings-github-section { display: contents; }
     form { display: grid; gap: 1rem; min-width: 0; max-width: 100%; margin-top: 1rem; }
     .settings-layout { display: grid; grid-template-columns: minmax(180px, 0.32fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
     .settings-nav { display: grid; gap: 0.4rem; padding: 0.45rem; border: 1px solid var(--line); border-radius: 12px; background: var(--field); }
@@ -219,6 +218,13 @@ export class SettingsView extends LitElement {
       this.activeSection = this.initialSection;
       this.appliedInitialSection = true;
     }
+  }
+
+  protected async getUpdateComplete(): Promise<boolean> {
+    const complete = await super.getUpdateComplete();
+    const github = this.shadowRoot?.querySelector<LitElement>("measure-settings-github-section");
+    await github?.updateComplete;
+    return complete;
   }
 
   render() {
@@ -339,7 +345,13 @@ export class SettingsView extends LitElement {
             <section class="settings-section" ?hidden=${this.activeSection !== "github"} aria-labelledby="github-title">
               <h3 id="github-title">GitHub</h3>
               <p class="muted">Connect GitHub once to open profile-library pull requests from completed measurements.</p>
-              ${this.renderGithubSection()}
+              <measure-settings-github-section
+                .auth=${this.contributionAuth}
+                .deviceFlow=${this.contributionDeviceFlow}
+                .deviceStatus=${this.contributionDeviceStatus}
+                .busy=${this.contributionAuthBusy}
+                .errorMessage=${this.contributionAuthError}
+              ></measure-settings-github-section>
             </section>
           </div>
           ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}</p>` : nothing}
@@ -424,115 +436,6 @@ export class SettingsView extends LitElement {
   private renderTestResult() {
     if (!this.testResult) return nothing;
     return html`<measure-power-meter-diagnostic .diagnostic=${this.testResult}></measure-power-meter-diagnostic>`;
-  }
-
-  private renderGithubIdentity() {
-    const identity = this.contributionAuth?.identity;
-    const permissionsHint = this.contributionAuth?.permissions_verified === false
-      ? html`<span class="field-hint">Identity verified. Fine-grained token permissions can only be confirmed during submission.</span>`
-      : nothing;
-    return html`
-      <div class="identity">
-        <div>
-          <span class="field-hint">Connected as</span>
-          <strong>${identity ? identity.login : "GitHub"}</strong>
-          ${permissionsHint}
-        </div>
-        <button class="danger" type="button" @click=${this.disconnectGithub} ?disabled=${this.contributionAuthBusy}>Disconnect</button>
-      </div>
-    `;
-  }
-
-  private renderGithubConnect() {
-    const deviceFlowHint = this.contributionAuth?.device_flow_available === false
-      ? html`<p class="field-hint">Device login is not configured for this app build. Use a personal access token.</p>`
-      : nothing;
-    return html`
-      <p class="muted">Connect GitHub to contribute measured profiles. You only need to do this once.</p>
-      ${this.renderDeviceFlow()}
-      ${deviceFlowHint}
-    `;
-  }
-
-  private renderGithubSection() {
-    return html`
-      <div class="section-fields">
-        <div class="github-card">
-          ${this.contributionAuth?.connected ? this.renderGithubIdentity() : this.renderGithubConnect()}
-        </div>
-        ${this.contributionAuth?.connected ? nothing : this.renderTokenFallback()}
-        <p class="notice">GitHub credentials are stored by the measure app and can be included in Home Assistant backups. Disconnect GitHub before sharing or exporting backups you do not control.</p>
-        ${this.contributionAuthError ? html`<p class="notice error" role="alert">${this.contributionAuthError}</p>` : nothing}
-      </div>
-    `;
-  }
-
-  private renderDeviceFlow() {
-    if (!this.contributionDeviceFlow) {
-      return html`
-        <button
-          type="button"
-          @click=${this.startGithubDeviceLogin}
-          ?disabled=${this.contributionAuthBusy || this.contributionAuth?.device_flow_available === false}
-        >
-          ${this.contributionAuthBusy ? "Starting…" : "Connect GitHub"}
-        </button>
-      `;
-    }
-    const status = this.contributionDeviceStatus;
-    if (status?.status === "expired" || status?.status === "denied") {
-      return html`
-        <div class="device-flow">
-          <p class="field-hint error" role="alert">${status.message ?? "GitHub authorization did not complete."}</p>
-          <button type="button" @click=${this.startGithubDeviceLogin} ?disabled=${this.contributionAuthBusy}>
-            ${this.contributionAuthBusy ? "Starting…" : "Get a new code"}
-          </button>
-        </div>
-      `;
-    }
-    const validMinutes = Math.max(1, Math.ceil(this.contributionDeviceFlow.expires_in / 60));
-    return html`
-      <div class="device-flow">
-        <div class="device-step">
-          <p><strong>1. Copy this code</strong></p>
-          <div class="device-code-row">
-            <input
-              class="device-code"
-              aria-label="GitHub device code"
-              readonly
-              .value=${this.contributionDeviceFlow.user_code}
-              @focus=${this.selectGithubCode}
-            />
-            <button type="button" @click=${this.copyGithubCode}>Copy code</button>
-          </div>
-          ${this.githubCopyStatus ? html`<span class="field-hint" role="status" aria-live="polite">${this.githubCopyStatus}</span>` : nothing}
-        </div>
-        <div class="device-step">
-          <p><strong>2. Authorize Powercalc</strong></p>
-          <a class="github-link" href=${this.contributionDeviceFlow.verification_uri} target="_blank" rel="noopener noreferrer">Continue on GitHub ↗</a>
-          <span class="field-hint">Paste the code on GitHub. It is valid for up to ${validMinutes} minutes.</span>
-        </div>
-        <span class="field-hint" role="status" aria-live="polite">
-          ${status?.message ?? "Waiting for GitHub authorization… This page will connect automatically when you finish."}
-        </span>
-      </div>
-    `;
-  }
-
-  private renderTokenFallback() {
-    return html`
-      <details class="github-card token-fallback">
-        <summary>Use a personal access token instead</summary>
-        <label>
-          <span>Personal access token</span>
-          <div class="token-row">
-            <input name="github_token" type="password" autocomplete="off" placeholder="ghp_…" @keydown=${this.tokenKeydown} />
-            <button type="button" @click=${this.saveGithubToken} ?disabled=${this.contributionAuthBusy}>Save token</button>
-          </div>
-          <small class="field-hint">Use only when device login is unavailable.</small>
-        </label>
-      </details>
-    `;
   }
 
   private renderShellyFields() {
@@ -723,75 +626,6 @@ export class SettingsView extends LitElement {
   private clearTestResult(): void {
     this.testResult = undefined;
     emit(this, "test-clear");
-  }
-
-  private startGithubDeviceLogin(): void {
-    this.githubCopyStatus = "";
-    emit(this, "github-device-start");
-  }
-
-  private selectGithubCode(event: Event): void {
-    (event.currentTarget as HTMLInputElement).select();
-  }
-
-  private async copyGithubCode(): Promise<void> {
-    const code = this.contributionDeviceFlow?.user_code;
-    if (!code) return;
-    if (await this.writeToClipboard(code)) {
-      this.githubCopyStatus = "Code copied.";
-      return;
-    }
-    this.githubCopyStatus = "Couldn’t copy automatically. Select the code and copy it manually.";
-    this.shadowRoot?.querySelector<HTMLInputElement>(".device-code")?.select();
-  }
-
-  // The async clipboard API only exists in a secure context. Home Assistant is usually reached over
-  // plain http on the local network, so inside the ingress panel we have to fall back to execCommand.
-  private async writeToClipboard(code: string): Promise<boolean> {
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(code);
-        return true;
-      }
-    } catch {
-      // Permission or focus problem, try the legacy path below.
-    }
-    return this.legacyCopy(code);
-  }
-
-  private legacyCopy(code: string): boolean {
-    const scratch = document.createElement("textarea");
-    scratch.value = code;
-    scratch.setAttribute("readonly", "");
-    scratch.style.cssText = "position:fixed;top:-1000px;opacity:0";
-    document.body.append(scratch);
-    try {
-      scratch.select();
-      scratch.setSelectionRange(0, code.length);
-      return document.execCommand("copy");
-    } catch {
-      return false;
-    } finally {
-      scratch.remove();
-    }
-  }
-
-  private saveGithubToken(): void {
-    const input = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="github_token"]');
-    const token = input?.value.trim() ?? "";
-    if (!token) return;
-    emit<string>(this, "github-token-save", token);
-    if (input) input.value = "";
-  }
-
-  private tokenKeydown(event: KeyboardEvent): void {
-    if (event.key !== "Enter") return;
-    event.preventDefault();
-    this.saveGithubToken();
-  }
-
-  private disconnectGithub(): void {
-    emit(this, "github-disconnect");
   }
 
   private selectSection(section: SettingsSection): void {
