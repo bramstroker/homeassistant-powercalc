@@ -1,6 +1,5 @@
 import { css, html, nothing } from "lit";
 import { calibrationDate, resistance } from "../../format";
-import { formText } from "../../form";
 import type { DummyLoadCalibration, DummyLoadSpec } from "../../types";
 import { textField } from "../shared/fields";
 
@@ -57,15 +56,6 @@ export function renderDummyLoad(options: DummyLoadOptions) {
 /** The mode a fresh form should start in: reuse the saved calibration when there is one. */
 export function defaultDummyLoadMode(calibration: DummyLoadCalibration | null): DummyLoadSpec["mode"] {
   return calibration ? "reuse" : "calibrate";
-}
-
-/** What the submitted form means for this measurement, or undefined when the load is not used. */
-export function dummyLoadSpec(form: FormData, calibration: DummyLoadCalibration | null): DummyLoadSpec | undefined {
-  if (!form.has("use_dummy_load")) return undefined;
-  if (form.get("dummy_load_mode") === "reuse" && calibration) {
-    return { mode: "reuse", description: calibration.description, resistance: calibration.resistance };
-  }
-  return { mode: "calibrate", description: formText(form, "dummy_load_description") };
 }
 
 function renderOptions({ calibration, stored, mode, onModeChange }: DummyLoadOptions) {

@@ -15,19 +15,12 @@ import type {
 } from "../../types";
 import { hasVoltageReading, meterFor } from "../../power-meter";
 import type { MeterContext } from "../../power-meter";
-import {
-  buildMeasurementRequest,
-  entityDomain,
-  entityDomains,
-  narrowingField,
-  requestFieldValue,
-} from "../../measure-definition";
+import { requestFieldValue } from "../../measure-definition";
 import { emit } from "../../events";
-import { formText } from "../../form";
+import { submittedForm } from "../../form";
 import { sharedStyles } from "../../styles";
-import { defaultDummyLoadMode, dummyLoadSpec, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
+import { defaultDummyLoadMode, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
 import { entityListStyles } from "./entity-list-field";
-import type { Combobox } from "../shared/combobox";
 import {
   renderPowerMeterRequired,
   renderPowerMeterSummary,
@@ -43,10 +36,11 @@ import type {
   SelectValueChange,
 } from "./fields-section";
 import type { ParameterChange } from "./tuning-section";
+import { prepareRequest } from "./request";
 import "./developer-options";
 import "./fields-section";
 
-export { recorderExportFilename } from "./fields-section";
+export { recorderExportFilename } from "./options";
 
 @customElement("measure-setup-view")
 export class SetupView extends LitElement {
@@ -387,10 +381,6 @@ export class SetupView extends LitElement {
     return typeof stored === "string" && stored ? [stored] : [];
   }
 
-  private selectedEntityIds(field: FormField, request?: MeasurementRequest): string[] {
-    return this.entityRows(field, request).filter(Boolean);
-  }
-
   private readonly selectType = (type: MeasureType): void => {
     this.errorMessage = "";
     this.selectedType = type;
@@ -424,50 +414,8 @@ export class SetupView extends LitElement {
     emit(this, "open-settings");
   };
 
-  /**
-   * Catch an entity that does not match the domain its narrowing field currently calls for —
-   * stale options can survive a change of that field until the entity list reloads.
-   */
-  private narrowedEntityMismatch(definition: MeasureDefinition, form: FormData): string | undefined {
-    for (const field of definition.fields) {
-      const source = narrowingField(definition, field);
-      if (!source || field.role !== "controller") continue;
-      const expected = entityDomain(definition, field, formText(form, source.name));
-      const chosen = formText(form, field.name);
-      if (!expected || !chosen.startsWith(`${expected}.`)) {
-        return `Select a ${expected ?? "matching"} entity for the chosen ${source.label.toLowerCase()}.`;
-      }
-    }
-    return undefined;
-  }
-
   private definition(type: MeasureType): MeasureDefinition | undefined {
     return this.definitions.find((item) => item.measure_type === type);
-  }
-
-  /** Only shared device metadata is safe to use as profile defaults for a multi-device run. */
-  private profileDefaults(): { model_id: string; product_name: string; session_name: string } {
-    const empty = { model_id: "", product_name: "", session_name: "" };
-    if (this.dummyController) return empty;
-    const controller = this.selectedType
-      ? this.definition(this.selectedType)?.fields.find((field) => field.role === "controller")
-      : undefined;
-    if (!controller) return empty;
-    const entities = [...this.lights, ...Object.values(this.deviceEntities).flat()];
-    const ids = this.selectedEntityIds(controller, this.initialRequest);
-    const selected = ids.map((id) => entities.find((entity) => entity.entity_id === id));
-    const shared = (field: "model_id" | "product_name") => {
-      const values = new Set(selected.map((entity) => entity?.[field]));
-      return values.size === 1 ? [...values][0] ?? "" : "";
-    };
-    const modelId = shared("model_id");
-    return {
-      // An HA model ID can contain characters not allowed in an export path.
-      // Leave those for Prepare, which also resolves the original ID from HA.
-      model_id: modelId.length <= 120 && /^[A-Za-z0-9][A-Za-z0-9 ._()+-]*$/.test(modelId) ? modelId : "",
-      product_name: shared("product_name"),
-      session_name: selected.map((entity, index) => entity?.name || ids[index]).join(", ").slice(0, 200),
-    };
   }
 
   private submitMeasurement(event: SubmitEvent): void {
@@ -475,67 +423,23 @@ export class SetupView extends LitElement {
     const definition = this.selectedType ? this.definition(this.selectedType) : undefined;
     if (!definition || !this.capabilities) return;
     const formElement = event.currentTarget as HTMLFormElement;
-    const form = new FormData(formElement);
-    this.syncMultiselectValues(formElement, form);
-    const failedDomain = this.failedEntityDomain(definition, form);
-    if (failedDomain) {
-      this.errorMessage = `Could not load ${failedDomain} entities. Retry before starting the measurement.`;
-      return;
-    }
-    // A checkbox group submits nothing at all when it is empty, so require it here.
-    const empty = this.missingRequiredMultiselect(definition, form);
-    if (empty) {
-      this.errorMessage = `Select at least one ${empty.label.toLowerCase().replace(/s$/, "")}.`;
-      return;
-    }
-    const request = buildMeasurementRequest(
+    const result = prepareRequest({
       definition,
-      form,
-      this.capabilities,
-      this.meter,
-      this.defaultMeasureDevice,
-      this.dummyController,
-    );
-    const defaults = this.profileDefaults();
-    const previous = this.previousRequest(definition, request);
-    request.model_id = previous?.model_id || defaults.model_id;
-    request.product_name = previous?.product_name || defaults.product_name;
-    request.session_name ||= previous?.session_name || defaults.session_name || definition.label;
-    request.dummy_load = meterFor(this.meter.type).supportsDummyLoad
-      ? dummyLoadSpec(form, this.dummyLoadCalibration)
-      : undefined;
-    const mismatch = this.dummyController ? undefined : this.narrowedEntityMismatch(definition, form);
-    if (mismatch) {
-      this.errorMessage = mismatch;
+      form: submittedForm(formElement),
+      capabilities: this.capabilities,
+      meter: this.meter,
+      measureDevice: this.defaultMeasureDevice,
+      dummyController: this.dummyController,
+      calibration: this.dummyLoadCalibration,
+      initialRequest: this.initialRequest,
+      entities: [...this.lights, ...Object.values(this.deviceEntities).flat()],
+      entityErrors: this.deviceEntityErrors,
+    });
+    if (result.error) {
+      this.errorMessage = result.error;
       return;
     }
-    emit<MeasurementRequest>(this, "preflight", request);
-  }
-
-  private failedEntityDomain(definition: MeasureDefinition, form: FormData): string | undefined {
-    if (this.dummyController) return undefined;
-    return entityDomains(definition, form).find((domain) => this.deviceEntityErrors[domain]);
-  }
-
-  private missingRequiredMultiselect(definition: MeasureDefinition, form: FormData): FormField | undefined {
-    return definition.fields.find(
-      (field) => field.control === "multi_select" && field.required && form.getAll(field.name).length === 0,
-    );
-  }
-
-  private previousRequest(definition: MeasureDefinition, request: MeasurementRequest): MeasurementRequest | undefined {
-    if (this.initialRequest?.measure_type !== definition.measure_type) return undefined;
-    if (JSON.stringify(this.initialRequest.controller) !== JSON.stringify(request.controller)) return undefined;
-    return this.initialRequest;
-  }
-
-  /** Read multiselects explicitly for environments without form-associated custom elements. */
-  private syncMultiselectValues(formElement: HTMLFormElement, form: FormData): void {
-    for (const picker of formElement.querySelectorAll<Combobox>("measure-combobox[multiple]")) {
-      form.delete(picker.name);
-      if (picker.disabled || !Array.isArray(picker.value)) continue;
-      for (const value of picker.value) form.append(picker.name, value);
-    }
+    emit<MeasurementRequest>(this, "preflight", result.request);
   }
 
   private meterContext(): MeterContext {

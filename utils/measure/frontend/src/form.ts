@@ -28,3 +28,29 @@ export function formList(form: FormData, name: string): string[] {
 export function formTextOrNull(form: FormData, name: string): string | null {
   return formText(form, name) || null;
 }
+
+interface FormValueElement extends Element {
+  name: string;
+  value: string | string[];
+  disabled: boolean;
+}
+
+/**
+ * Build submitted values and normalize form-associated custom elements.
+ *
+ * Browsers contribute these through ElementInternals. The explicit copy also supports test DOMs
+ * and older webviews without form-associated custom-element support.
+ */
+export function submittedForm(form: HTMLFormElement): FormData {
+  const data = new FormData(form);
+  for (const control of form.querySelectorAll<FormValueElement>("measure-combobox")) {
+    if (!control.name) continue;
+    data.delete(control.name);
+    if (control.disabled) continue;
+    const values = Array.isArray(control.value) ? control.value : [control.value];
+    for (const value of values) {
+      if (value) data.append(control.name, value);
+    }
+  }
+  return data;
+}

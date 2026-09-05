@@ -12,7 +12,7 @@ import type {
 } from "../../types";
 import { emit } from "../../events";
 import { words } from "../../format";
-import { formText } from "../../form";
+import { formText, submittedForm } from "../../form";
 import { metadataLabels, validateMetadata } from "../../profile-validation";
 import { sharedStyles } from "../../styles";
 import { profileDeviceType } from "./device-specification-fields";
@@ -227,13 +227,12 @@ export class ProfilePrepareView extends LitElement {
   private collectContribution(): ContributionPreviewRequest | null {
     const form = this.shadowRoot?.querySelector<HTMLFormElement>(".contribution-form");
     if (!form) return null;
-    const data = new FormData(form);
+    const data = submittedForm(form);
     const draft = this.editableDraft();
     let fields: DeviceSpecificationField[] = [];
     if (draft) fields = this.deviceSpecificationFields[profileDeviceType(draft)] ?? [];
-    const deviceSpecs = fields.length ? collectDeviceSpecifications(form, data, fields) : draft?.device_specs ?? null;
-    const mainsVoltageControl = form.querySelector('measure-combobox[name="mains_voltage"]') as (HTMLElement & { value?: string }) | null;
-    const mainsVoltageValue = contributionMainsVoltage(data, mainsVoltageControl, draft);
+    const deviceSpecs = fields.length ? collectDeviceSpecifications(data, fields) : draft?.device_specs ?? null;
+    const mainsVoltageValue = contributionMainsVoltage(data, draft);
     return {
       manufacturer_name: formText(data, "manufacturer_name"),
       model_id: formText(data, "model_id"),
@@ -379,46 +378,37 @@ function formList(data: FormData, name: string): string[] {
   return formText(data, name).split(",").map((value) => value.trim()).filter(Boolean);
 }
 
-function collectDeviceSpecifications(form: HTMLFormElement, data: FormData, fields: DeviceSpecificationField[]): Record<string, unknown> {
+function collectDeviceSpecifications(data: FormData, fields: DeviceSpecificationField[]): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   for (const field of fields) {
     const name = `device_specs.${field.name}`;
     if (field.collection !== "scalar") {
-      collectSpecificationCollection(result, form, data, field, name);
+      collectSpecificationCollection(result, data, field, name);
       continue;
     }
-    collectScalarSpecification(result, form, data, field, name);
+    collectScalarSpecification(result, data, field, name);
   }
   return result;
 }
 
 function collectSpecificationCollection(
   result: Record<string, unknown>,
-  form: HTMLFormElement,
   data: FormData,
   field: DeviceSpecificationField,
   name: string,
 ): void {
-  const control = Array.from(form.querySelectorAll("measure-combobox"))
-    .find((candidate) => candidate.multiple && candidate.name === name);
-  const controlValues = Array.isArray(control?.value) ? control.value : [];
-  const submitted = data.getAll(name).map(String);
-  const values = (submitted.length ? submitted : controlValues).filter(Boolean);
+  const values = data.getAll(name).map(String).filter(Boolean);
   if (!values.length) return;
   result[field.name] = field.collection === "scalar_or_array" && values.length === 1 ? values[0] : values;
 }
 
 function collectScalarSpecification(
   result: Record<string, unknown>,
-  form: HTMLFormElement,
   data: FormData,
   field: DeviceSpecificationField,
   name: string,
 ): void {
-  const control = Array.from(form.querySelectorAll("measure-combobox"))
-    .find((candidate) => !candidate.multiple && candidate.name === name);
-  const controlValue = typeof control?.value === "string" ? control.value : "";
-  const value = formText(data, name) || controlValue;
+  const value = formText(data, name);
   if (!value) return;
   if (field.value_type === "number" || field.value_type === "integer") result[field.name] = Number(value);
   else if (field.value_type === "boolean") result[field.name] = value === "true";
@@ -428,11 +418,9 @@ function collectScalarSpecification(
 
 function contributionMainsVoltage(
   data: FormData,
-  control: (HTMLElement & { value?: string }) | null,
   draft: ContributionDraft | undefined,
 ): string {
   const submitted = formText(data, "mains_voltage");
   if (submitted) return submitted;
-  if (typeof control?.value === "string" && control.value) return control.value;
   return formValue(draft?.mains_voltage);
 }
