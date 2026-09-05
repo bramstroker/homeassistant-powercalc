@@ -4,7 +4,7 @@ import { createRef, ref } from "lit/directives/ref.js";
 import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, EntityDescriptor, MeasureParameterName, PowerMeterDiagnostic, SettingsSection, ShellyDiscoveryDevice } from "../../types";
 import { DEFAULT_SHELLY_USERNAME, settingsFromForm } from "../../power-meter/registry";
 import { emit } from "../../utils/events";
-import { formRaw, formText, formTextOrNull } from "../../utils/form";
+import { formChecked, formNumber, formRaw, formText, formTextOrNull } from "../../utils/form";
 import { sharedStyles } from "../../styles";
 import "./github-section";
 import "./power-meter-section";
@@ -344,14 +344,14 @@ export class SettingsView extends LitElement {
       shelly_username: formText(data, "shelly_username") || DEFAULT_SHELLY_USERNAME,
       shelly_password_configured: this.settings?.shelly_password_configured ?? false,
       shelly_password: meter.power_meter === "shelly" ? shellyPassword || null : null,
-      clear_shelly_password: data.get("clear_shelly_password") === "on",
-      fast_test_mode: data.get("fast_test_mode") === "on",
+      clear_shelly_password: formChecked(data, "clear_shelly_password"),
+      fast_test_mode: formChecked(data, "fast_test_mode"),
       measurement_defaults: {
-        sleep_time: this.number(data, "sleep_time"),
-        sample_count: this.number(data, "sample_count"),
-        sleep_time_sample: this.number(data, "sleep_time_sample"),
-        max_retries: this.number(data, "max_retries"),
-        max_nudges: this.number(data, "max_nudges"),
+        sleep_time: formNumber(data, "sleep_time"),
+        sample_count: formNumber(data, "sample_count"),
+        sleep_time_sample: formNumber(data, "sleep_time_sample"),
+        max_retries: formNumber(data, "max_retries"),
+        max_nudges: formNumber(data, "max_nudges"),
       },
     };
   }
@@ -363,10 +363,6 @@ export class SettingsView extends LitElement {
       <input type="number" name=${name} min=${min} max=${max} step=${step} .value=${String(value)} required />
       <small class="field-hint">${hint}</small>
     </label>`;
-  }
-
-  private number(data: FormData, name: string): number {
-    return Number(data.get(name));
   }
 
   private submit(event: SubmitEvent): void {
