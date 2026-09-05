@@ -1,3 +1,4 @@
+import { afterEach } from "vitest";
 import type { Combobox } from "./combobox";
 import "./combobox";
 
@@ -25,6 +26,19 @@ function createCombobox(allowCustom = false): { form: HTMLFormElement; picker: C
 }
 
 describe("combobox", () => {
+  afterEach(() => document.body.replaceChildren());
+
+  it("settles external value and option changes in one update", async () => {
+    const { picker } = createCombobox();
+    await picker.updateComplete;
+
+    picker.value = "sensor.kitchen";
+    picker.options = [...picker.options];
+
+    expect(await picker.updateComplete).toBe(true);
+    expect((picker.shadowRoot?.querySelector("input") as HTMLInputElement).value).toBe("Kitchen plug · sensor.kitchen");
+  });
+
   it("filters, supports keyboard selection, and contributes the selected value to its form", async () => {
     const { form, picker } = createCombobox();
     await picker.updateComplete;
@@ -94,6 +108,7 @@ describe("combobox", () => {
 
     expect(picker.value).toEqual(["sensor.office", "sensor.kitchen"]);
     expect(input.value).toBe("");
+    expect(picker.shadowRoot?.activeElement).toBe(input);
     (picker.shadowRoot?.querySelector('[aria-label="Remove Office plug · sensor.office"]') as HTMLButtonElement).click();
     await picker.updateComplete;
     expect(picker.value).toEqual(["sensor.kitchen"]);
@@ -141,5 +156,43 @@ describe("combobox", () => {
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     await picker.updateComplete;
     expect(picker.value).toBe("sensor.office");
+  });
+
+  it("skips disabled options and wraps keyboard navigation", async () => {
+    const { picker } = createCombobox();
+    picker.options = [
+      { value: "disabled", label: "Disabled", disabled: true },
+      { value: "first", label: "First" },
+      { value: "last", label: "Last" },
+    ];
+    await picker.updateComplete;
+    const input = picker.shadowRoot?.querySelector("input") as HTMLInputElement;
+    input.focus();
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
+    await picker.updateComplete;
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await picker.updateComplete;
+
+    expect(picker.value).toBe("last");
+  });
+
+  it("closes on Escape and exposes required and disabled input state", async () => {
+    const { picker } = createCombobox();
+    await picker.updateComplete;
+    const input = picker.shadowRoot?.querySelector("input") as HTMLInputElement;
+    input.focus();
+    await picker.updateComplete;
+    expect(input.required).toBe(true);
+    expect(input.checkValidity()).toBe(false);
+    expect(input.getAttribute("aria-expanded")).toBe("true");
+
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await picker.updateComplete;
+    expect(input.getAttribute("aria-expanded")).toBe("false");
+
+    picker.disabled = true;
+    await picker.updateComplete;
+    expect(input.disabled).toBe(true);
+    expect(input.checkValidity()).toBe(true);
   });
 });

@@ -71,7 +71,7 @@ export class Combobox extends LitElement {
     .empty { margin: 0; padding: 0.7rem; color: var(--muted); font-size: 0.78rem; line-height: 1.4; }
   `];
 
-  protected willUpdate(changed: PropertyValues<this>) {
+  protected willUpdate(changed: PropertyValues<this>): void {
     if (!this.multiple && (changed.has("value") || changed.has("options"))) this.query = this.displayValue(this.singleValue());
   }
 
@@ -345,9 +345,12 @@ export class Combobox extends LitElement {
     this.dispatchEvent(new CustomEvent("combobox-change", { detail: { value }, bubbles: true, composed: true }));
   }
 
-  private focusOut(event: FocusEvent) {
-    if (event.relatedTarget instanceof Node && this.containsFocusTarget(event.relatedTarget)) return;
-    this.closeAndRestore();
+  private focusOut(): void {
+    queueMicrotask(() => {
+      const activeElement = this.shadowRoot?.activeElement;
+      if (activeElement && this.containsFocusTarget(activeElement)) return;
+      this.closeAndRestore();
+    });
   }
 
   private containsFocusTarget(target: Node): boolean {
@@ -369,7 +372,6 @@ export class Combobox extends LitElement {
     this.active = -1;
     this.open = true;
     this.changed();
-    void this.updateComplete.then(() => this.renderRoot.querySelector<HTMLInputElement>("input")?.focus());
   }
 
   private removeValue(value: string): void {
