@@ -2,7 +2,8 @@ from dataclasses import dataclass
 import json
 from pathlib import Path
 import shutil
-from typing import Any
+import tempfile
+from typing import Any, Literal
 
 from pydantic import SecretStr, ValidationError
 
@@ -49,7 +50,11 @@ from measure.ha_app.contribution.models import (
     DeviceFlowPollResponse,
     DeviceFlowStart,
 )
+from measure.model import mains_voltage_from_range
+from measure.profile.output import prepared_profile_archive
 from measure.request import MeasurementRequest
+
+MODEL_FILENAME = "model.json"
 
 
 class SharedContributionService:
@@ -171,7 +176,12 @@ class SharedContributionService:
         payload: ContributionPreviewRequest | None,
         integration: str | None = None,
     ) -> ContributionPreviewResponse:
-        credential, client, preparer, base_sha = self._load_github_context("building a contribution preview")
+        credential = self._credential_store.load()
+        client = GitHubClient(credential.token if credential is not None else None)
+        try:
+            preparer, base_sha = self._build_reference_preparer(client)
+        except GitHubApiError as error:
+            raise ContributionApiError(ContributionApiErrorCode.SUBMISSION_FAILED, str(error)) from error
         metadata = _metadata_from_request(request, payload, self.auth_status(), integration)
         try:
             job = self._build_coordinator(preparer, client).create_job(artifact_root, metadata, base_sha=base_sha)
@@ -183,6 +193,7 @@ class SharedContributionService:
             )
             raise ContributionApiError(code, str(error), field=error.field) from error
         contents = preparer.render_contents(artifact_root, metadata, job.preview)
+        self._save_prepared_archive(job.id, contents)
         return _preview_from_job(
             session_id=session_id,
             request=request,
@@ -190,9 +201,48 @@ class SharedContributionService:
             notes=payload.notes if payload is not None else "",
             contents=contents,
             base_sha=base_sha,
-            fork_owner=credential.github_username,
+            fork_owner=credential.github_username if credential is not None else None,
             repository=client.repository,
         )
+
+    def prepared_archive(self, job_id: str) -> bytes:
+        """Return the exact profile package rendered for a persisted preview."""
+
+        try:
+            self._job_store.load(job_id)
+        except KeyError, ValueError:
+            raise ContributionApiError(
+                ContributionApiErrorCode.PREVIEW_REQUIRED,
+                "Profile preview expired; refresh the preview before downloading",
+            ) from None
+        path = self._prepared_archive_path(job_id)
+        if not path.is_file():
+            raise ContributionApiError(
+                ContributionApiErrorCode.PREVIEW_REQUIRED,
+                "Prepared profile expired; refresh the preview before downloading",
+            )
+        return path.read_bytes()
+
+    def _save_prepared_archive(self, job_id: str, contents: tuple[tuple[str, bytes], ...]) -> None:
+        directory = self._contribution_root / "prepared"
+        directory.mkdir(parents=True, exist_ok=True)
+        path = self._prepared_archive_path(job_id)
+        archive = prepared_profile_archive(contents)
+        with tempfile.NamedTemporaryFile(dir=directory, prefix=f".{job_id}.", delete=False) as file:
+            temporary = Path(file.name)
+            file.write(archive)
+        try:
+            temporary.replace(path)
+        except BaseException:
+            temporary.unlink(missing_ok=True)
+            raise
+        for existing in directory.glob("*.zip"):
+            if existing != path:
+                existing.unlink(missing_ok=True)
+
+    def _prepared_archive_path(self, job_id: str) -> Path:
+        # The job store validates identifiers before this path is used.
+        return self._contribution_root / "prepared" / f"{job_id}.zip"
 
     def submit(
         self,
@@ -308,53 +358,105 @@ def _positive_integer(value: object) -> int | None:
     return None
 
 
+@dataclass(frozen=True)
+class _RequestMetadata:
+    manufacturer: str
+    model_id: str
+    product_name: str | None
+    contributor: str
+    github_username: str | None
+    contributor_email: str | None
+    notes: str
+
+
+def _request_metadata_values(
+    request: MeasurementRequest,
+    payload: ContributionPreviewRequest | None,
+    auth: ContributionAuthStatus,
+) -> _RequestMetadata:
+    if payload is None:
+        return _RequestMetadata(
+            manufacturer="Unknown",
+            model_id=request.model_id,
+            product_name=request.product_name,
+            contributor=auth.username or "",
+            github_username=auth.username,
+            contributor_email=None,
+            notes="",
+        )
+    return _RequestMetadata(
+        manufacturer=payload.manufacturer_name,
+        model_id=payload.model_id,
+        product_name=payload.product_name,
+        contributor=payload.contributor,
+        github_username=payload.contributor_github or auth.username,
+        contributor_email=payload.contributor_email,
+        notes=payload.notes,
+    )
+
+
 def _metadata_from_request(
     request: MeasurementRequest,
     payload: ContributionPreviewRequest | None,
     auth: ContributionAuthStatus,
     integration: str | None = None,
 ) -> ContributionMetadata:
-    github_username = auth.username
-    if not github_username:
+    values = _request_metadata_values(request, payload, auth)
+    if not values.github_username:
         raise ContributionApiError(
-            ContributionApiErrorCode.AUTH_UNAVAILABLE,
-            "Connected GitHub account has no username",
+            ContributionApiErrorCode.INVALID_METADATA,
+            "Contributor GitHub username is required",
+            field="contributor_github",
         )
-    if payload is not None:
-        manufacturer = payload.manufacturer_name
-        manufacturer_directory = payload.manufacturer_directory or None
-        model_id = payload.model_id
-        product_name: str | None = payload.product_name
-        contributor = payload.contributor
-        notes = payload.notes
-    else:
-        manufacturer = "Unknown"
-        manufacturer_directory = None
-        model_id = request.model_id
-        product_name = request.product_name
-        contributor = github_username
-        notes = ""
     try:
         return ContributionMetadata(
-            manufacturer=manufacturer,
-            manufacturer_directory=manufacturer_directory,
-            model_id=model_id,
-            product_name=product_name,
+            manufacturer=values.manufacturer,
+            model_id=values.model_id,
+            product_name=values.product_name,
             measure_type=request.measure_type.value,
-            measure_device=request.measure_device,
+            aliases=tuple(payload.aliases) if payload is not None else None,
+            gtins=tuple(payload.gtins) if payload is not None else None,
+            product_url=payload.product_url if payload is not None else None,
+            mains_voltage=payload.mains_voltage if payload is not None else None,
+            device_specs=payload.device_specs if payload is not None else None,
+            measure_device=_requested_measure_device(request, payload),
+            measure_device_firmware=payload.measure_device_firmware if payload is not None else None,
+            measure_description=payload.measure_description if payload is not None else None,
             integration=integration,
-            notes=notes,
-            author=ContributionAuthor(name=contributor, github=github_username),
+            notes=values.notes,
+            author=ContributionAuthor(
+                name=values.contributor,
+                github=values.github_username,
+                email=values.contributor_email,
+            ),
         )
     except ValidationError as error:
-        raise ContributionApiError(ContributionApiErrorCode.INVALID_METADATA, _validation_message(error)) from error
+        first_location = error.errors()[0].get("loc", ())
+        field = str(first_location[0]) if first_location else None
+        # ProfileAuthor is validated before ContributionMetadata, so its error
+        # locations are name/github/email, without an "author" prefix.
+        field_names: dict[str, str] = {
+            "name": "contributor",
+            "github": "contributor_github",
+            "email": "contributor_email",
+            "manufacturer": "manufacturer_name",
+        }
+        if field is not None:
+            field = field_names.get(field, field)
+        raise ContributionApiError(
+            ContributionApiErrorCode.INVALID_METADATA,
+            str(error.errors()[0]["msg"]).removeprefix("Value error, "),
+            field=field,
+        ) from error
 
 
-def _validation_message(error: ValidationError) -> str:
-    issues = "; ".join(
-        f"{'.'.join(str(part) for part in item['loc']) or 'value'}: {item['msg']}" for item in error.errors()
-    )
-    return f"Contribution details are invalid — {issues}"
+def _requested_measure_device(
+    request: MeasurementRequest,
+    payload: ContributionPreviewRequest | None,
+) -> str:
+    if payload is None:
+        return request.measure_device
+    return payload.measure_device or request.measure_device
 
 
 @dataclass(frozen=True)
@@ -367,6 +469,18 @@ class _PreviewContent:
     model_id: str
     product_name: str
     contributor: str
+    contributor_github: str
+    contributor_email: str
+    aliases: list[str]
+    gtins: list[str]
+    product_url: str
+    mains_voltage: Literal[120, 230] | None
+    voltage_range: dict[str, float] | None
+    device_specs: dict[str, Any] | None
+    device_type: str
+    measure_device: str
+    measure_device_firmware: str
+    measure_description: str
     integration: str | None
     commit_message: str
     pr_title: str
@@ -383,30 +497,46 @@ def draft_from_request(
     artifact_root: Path,
     auth: ContributionAuthStatus,
     integration: str | None = None,
+    manufacturer: str | None = None,
+    default_model_id: str | None = None,
+    default_measure_device_firmware: str | None = None,
+    default_contributor_name: str | None = None,
+    default_contributor_github: str | None = None,
+    default_contributor_email: str | None = None,
 ) -> ContributionPreviewResponse:
     """Build a placeholder preview, before a contribution job exists."""
     files = _list_draft_files(artifact_root)
-    supported = request.measure_type in SUPPORTED_MEASURE_TYPES
-    has_model = artifact_root.is_dir() and any(Path(file.path).name == "model.json" for file in files)
-    if not supported:
-        reason = "Automatic contribution is available for light, speaker, fan, and charging profiles"
-    elif not has_model:
-        reason = "Contribution requires a generated model.json artifact"
-    else:
-        reason = None
+    reason = _contribution_ineligibility_reason(request, artifact_root, files)
+    artifact_model = _artifact_model(artifact_root)
+    voltage_range = _voltage_range(artifact_model)
+    author = _first_author(artifact_model)
     content = _PreviewContent(
-        manufacturer_name="",
+        manufacturer_name=manufacturer or "",
         manufacturer_directory="",
         manufacturer_library_url=None,
-        model_id=request.model_id,
+        model_id=request.model_id or default_model_id or "",
         product_name=request.product_name,
-        contributor=auth.username or "",
+        contributor=str(author.get("name") or default_contributor_name or auth.username or ""),
+        contributor_github=str(author.get("github") or default_contributor_github or auth.username or ""),
+        contributor_email=str(author.get("email") or default_contributor_email or ""),
+        aliases=_string_list(artifact_model.get("aliases")),
+        gtins=_string_list(artifact_model.get("ean")),
+        product_url=str(artifact_model.get("product_url") or ""),
+        mains_voltage=_model_mains_voltage(artifact_model),
+        voltage_range=voltage_range,
+        device_specs=_artifact_device_specs(artifact_model),
+        device_type=str(artifact_model.get("device_type") or ""),
+        measure_device=str(artifact_model.get("measure_device") or request.measure_device),
+        measure_device_firmware=str(
+            artifact_model.get("measure_device_firmware") or default_measure_device_firmware or ""
+        ),
+        measure_description=str(artifact_model.get("measure_description") or ""),
         integration=integration,
         commit_message=f"feat(profile): add {request.model_id}",
         pr_title=f"Add {request.model_id} power profile",
         pr_body=profile_pull_request_body(
             DeviceInfo(
-                manufacturer="Unknown",
+                manufacturer=manufacturer or "Unknown",
                 model_id=request.model_id,
                 product_name=request.product_name,
                 integration=integration,
@@ -430,6 +560,22 @@ def draft_from_request(
     )
 
 
+def _contribution_ineligibility_reason(
+    request: MeasurementRequest,
+    artifact_root: Path,
+    files: list[ContributionFile],
+) -> str | None:
+    if request.measure_type not in SUPPORTED_MEASURE_TYPES:
+        return "Automatic contribution is available for light, speaker, fan, and charging profiles"
+    has_model = artifact_root.is_dir() and any(Path(file.path).name == MODEL_FILENAME for file in files)
+    return None if has_model else f"Contribution requires a generated {MODEL_FILENAME} artifact"
+
+
+def _artifact_device_specs(model: dict[str, Any]) -> dict[str, Any] | None:
+    value = model.get("device_specs")
+    return value if isinstance(value, dict) else None
+
+
 def _preview_from_job(
     *,
     session_id: str,
@@ -442,6 +588,7 @@ def _preview_from_job(
     repository: GitHubRepository,
 ) -> ContributionPreviewResponse:
     content_by_path = dict(contents)
+    prepared_model = _prepared_model(contents)
     content = _PreviewContent(
         manufacturer_name=job.metadata.manufacturer,
         manufacturer_directory=job.preview.manufacturer_directory,
@@ -449,6 +596,18 @@ def _preview_from_job(
         model_id=job.metadata.model_id,
         product_name=job.metadata.product_name or request.product_name,
         contributor=job.metadata.author.name,
+        contributor_github=job.metadata.author.github,
+        contributor_email=job.metadata.author.email or "",
+        aliases=list(job.metadata.aliases or ()),
+        gtins=list(job.metadata.gtins or ()),
+        product_url=job.metadata.product_url or "",
+        mains_voltage=_model_mains_voltage(prepared_model),
+        voltage_range=_voltage_range(prepared_model),
+        device_specs=job.metadata.device_specs,
+        device_type=str(prepared_model.get("device_type") or ""),
+        measure_device=job.metadata.measure_device or request.measure_device,
+        measure_device_firmware=job.metadata.measure_device_firmware or "",
+        measure_description=job.metadata.measure_description or "",
         integration=job.metadata.integration,
         commit_message=conventional_commit_message(job.preview),
         pr_title=pull_request_title(job.preview),
@@ -489,7 +648,7 @@ def _build_preview_response(
         "manufacturer": content.manufacturer_name,
         "model_id": content.model_id,
         "product_name": content.product_name,
-        "measure_device": request.measure_device,
+        "measure_device": content.measure_device,
     }
     home_assistant_info: dict[str, str | int | float | bool | None] = {
         "measure_type": request.measure_type.value,
@@ -510,6 +669,18 @@ def _build_preview_response(
         model_id=content.model_id,
         product_name=content.product_name,
         contributor=content.contributor,
+        contributor_github=content.contributor_github,
+        contributor_email=content.contributor_email,
+        aliases=content.aliases,
+        gtins=content.gtins,
+        product_url=content.product_url,
+        mains_voltage=content.mains_voltage,
+        voltage_range=content.voltage_range,
+        device_specs=content.device_specs,
+        device_type=content.device_type,
+        measure_device=content.measure_device,
+        measure_device_firmware=content.measure_device_firmware,
+        measure_description=content.measure_description,
         device_info=device_info,
         home_assistant=home_assistant_info,
         notes=notes,
@@ -520,7 +691,7 @@ def _build_preview_response(
         branch_name=content.branch_name,
         job_id=content.job_id,
         model_json=next(
-            (file.rendered_json for file in files if Path(file.path).name == "model.json"),
+            (file.rendered_json for file in files if Path(file.path).name == MODEL_FILENAME),
             None,
         ),
         warnings=content.warnings,
@@ -535,6 +706,63 @@ def _list_draft_files(artifact_root: Path) -> list[ContributionFile]:
         for path in sorted(artifact_root.iterdir())
         if path.is_file() and not path.is_symlink()
     ]
+
+
+def _artifact_model(artifact_root: Path) -> dict[str, Any]:
+    try:
+        value = json.loads((artifact_root / MODEL_FILENAME).read_text(encoding="utf-8"))
+    except OSError, ValueError:
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def _voltage_range(model: dict[str, Any]) -> dict[str, float] | None:
+    value = model.get("voltage_range")
+    if not isinstance(value, dict):
+        return None
+    minimum = value.get("min")
+    maximum = value.get("max")
+    if (
+        isinstance(minimum, bool)
+        or isinstance(maximum, bool)
+        or not isinstance(minimum, int | float)
+        or not isinstance(maximum, int | float)
+        or minimum > maximum
+    ):
+        return None
+    return {"min": float(minimum), "max": float(maximum)}
+
+
+def _model_mains_voltage(model: dict[str, Any]) -> Literal[120, 230] | None:
+    derived = mains_voltage_from_range(model.get("voltage_range"))
+    if derived is not None:
+        return derived
+    value = model.get("mains_voltage")
+    if isinstance(value, bool) or value not in (120, 230):
+        return None
+    return 120 if value == 120 else 230
+
+
+def _prepared_model(contents: tuple[tuple[str, bytes], ...]) -> dict[str, Any]:
+    content = next((content for path, content in contents if Path(path).name == MODEL_FILENAME), None)
+    if content is None:
+        return {}
+    try:
+        value = json.loads(content)
+    except ValueError:
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def _first_author(model: dict[str, Any]) -> dict[str, Any]:
+    authors = model.get("authors")
+    if isinstance(authors, list) and authors and isinstance(authors[0], dict):
+        return authors[0]
+    return {}
+
+
+def _string_list(value: object) -> list[str]:
+    return [str(item) for item in value] if isinstance(value, list) else []
 
 
 def _build_preview_file(path: str, content: bytes) -> ContributionFile:

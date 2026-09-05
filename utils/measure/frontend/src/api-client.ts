@@ -15,12 +15,14 @@ import type {
   ContributionTokenRequest,
   DeviceClass,
   DummyLoadCalibration,
+  DeviceSpecificationCatalog,
   EntityCatalog,
   EntityDescriptor,
   ErrorHelp,
   MeasurementRequest,
   MeasureDefinition,
   MeasureDeviceCatalog,
+  ManufacturerCatalog,
   PlotCollection,
   PowerMeterDiagnostic,
   PreflightResponse,
@@ -70,6 +72,14 @@ export class MeasureApiClient {
     return this.request("api/library/measure-devices");
   }
 
+  getManufacturers(): Promise<ManufacturerCatalog> {
+    return this.request("api/library/manufacturers");
+  }
+
+  getDeviceSpecifications(): Promise<DeviceSpecificationCatalog> {
+    return this.request("api/library/device-specifications");
+  }
+
   getSettings(): Promise<AppSettings> {
     return this.request("api/settings");
   }
@@ -88,6 +98,13 @@ export class MeasureApiClient {
 
   getContributionStatus(): Promise<ContributionStatus> {
     return this.request("api/contribution/status");
+  }
+
+  preparedProfileUrl(sessionId: string, jobId: string): string {
+    return apiUrl(
+      `api/sessions/${encodeURIComponent(sessionId)}/contribution/${encodeURIComponent(jobId)}/profile.zip`,
+      this.base,
+    ).toString();
   }
 
   saveContributionToken(token: string): Promise<ContributionAuthState> {

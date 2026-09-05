@@ -1,4 +1,4 @@
-export type SettingsSection = "power_meter" | "measure_tuning" | "github";
+export type SettingsSection = "power_meter" | "profile" | "measure_tuning" | "github";
 
 export type SessionState =
   | "idle"
@@ -31,7 +31,9 @@ export interface EntityDescriptor {
   domain?: string;
   device_class?: DeviceClass | null;
   device_id?: string;
+  manufacturer?: string;
   model_id?: string;
+  product_name?: string;
   state?: string;
   unit?: string;
   supported_modes?: LutMode[];
@@ -48,6 +50,23 @@ export interface EntityCatalog {
 
 export interface MeasureDeviceCatalog {
   devices: string[];
+}
+
+export interface ManufacturerCatalog {
+  manufacturers: string[];
+}
+
+export interface DeviceSpecificationField {
+  name: string;
+  label: string;
+  description: string;
+  value_type: "string" | "number" | "integer" | "boolean";
+  collection: "scalar" | "array" | "scalar_or_array";
+  options: string[];
+}
+
+export interface DeviceSpecificationCatalog {
+  device_types: Record<string, DeviceSpecificationField[]>;
 }
 
 export interface MeasurementParameters {
@@ -156,6 +175,7 @@ export interface MeasureDefinition {
 }
 
 export interface BaseMeasurementRequest {
+  session_name?: string;
   model_id: string;
   product_name: string;
   measure_device: string;
@@ -386,6 +406,10 @@ export type SessionEvent = RegularSessionEvent | OperatingPointSessionEvent;
 export interface AppSettings {
   default_power_entity_id: string | null;
   default_measure_device: string | null;
+  default_measure_device_firmware?: string | null;
+  default_contributor_name?: string | null;
+  default_contributor_github?: string | null;
+  default_contributor_email?: string | null;
   power_meter: PowerMeterType | null;
   shelly_ip: string | null;
   shelly_username?: string;
@@ -435,6 +459,7 @@ export interface ContributionTokenRequest {
 
 export interface ContributionDraftFile {
   path: string;
+  size?: number;
   content?: string | null;
   rendered_json?: unknown;
 }
@@ -452,6 +477,18 @@ export interface ContributionDraft {
   model_id: string;
   product_name: string;
   contributor: string;
+  contributor_github?: string;
+  contributor_email?: string;
+  aliases?: string[];
+  gtins?: string[];
+  product_url?: string;
+  mains_voltage?: number | null;
+  voltage_range?: { min: number; max: number } | null;
+  device_specs?: Record<string, unknown> | null;
+  device_type?: string;
+  measure_device?: string;
+  measure_device_firmware?: string;
+  measure_description?: string;
   device_info: Record<string, PrimitiveValue>;
   home_assistant: Record<string, PrimitiveValue>;
   notes: string;
@@ -464,12 +501,24 @@ export interface ContributionDraft {
   job_id?: string | null;
 }
 
+/** Unparsed, edited controls: preserve intermediate text and multi-select values across steps. */
+export type ContributionFormValues = Record<string, string | string[]>;
+
 export interface ContributionPreviewRequest {
   manufacturer_name: string;
-  manufacturer_directory: string;
   model_id: string;
   product_name: string;
   contributor: string;
+  contributor_github?: string;
+  contributor_email?: string;
+  aliases?: string[];
+  gtins?: string[];
+  product_url?: string;
+  mains_voltage?: number | null;
+  device_specs?: Record<string, unknown> | null;
+  measure_device?: string;
+  measure_device_firmware?: string;
+  measure_description?: string;
   notes: string;
 }
 

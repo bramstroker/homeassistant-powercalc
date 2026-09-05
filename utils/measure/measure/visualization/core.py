@@ -117,24 +117,37 @@ def _session_plot_candidates(
     max_scatter_points: int,
     max_line_points: int,
 ) -> list[tuple[Path, str, LutMode | None, int]]:
-    candidates: list[tuple[Path, str, LutMode | None, int]] = []
-    model_root = request.model_id
+    model_root = request.model_id or "measurement"
     if isinstance(request, LightMeasurementRequest):
-        for mode in _LIGHT_MODE_ORDER:
-            if mode not in request.modes:
-                continue
-            candidate = _preferred_file(files, f"{model_root}/{mode.value}.csv")
-            if candidate is not None:
-                candidates.append((*candidate, mode, max_scatter_points))
-    elif isinstance(request, RecorderMeasurementRequest):
-        candidate = _preferred_file(files, f"{model_root}/{request.export_filename}")
-        if candidate is not None:
-            candidates.append((*candidate, None, max_line_points))
-    elif isinstance(request, SpeakerMeasurementRequest | FanMeasurementRequest | ChargingMeasurementRequest):
-        candidate = _preferred_file(files, f"{model_root}/model.json")
-        if candidate is not None:
-            candidates.append((*candidate, None, max_line_points))
-    return candidates
+        return _light_plot_candidates(request, files, model_root, max_scatter_points)
+    if isinstance(request, RecorderMeasurementRequest):
+        return _single_plot_candidate(files, f"{model_root}/{request.export_filename}", max_line_points)
+    if isinstance(request, SpeakerMeasurementRequest | FanMeasurementRequest | ChargingMeasurementRequest):
+        return _single_plot_candidate(files, f"{model_root}/model.json", max_line_points)
+    return []
+
+
+def _light_plot_candidates(
+    request: LightMeasurementRequest,
+    files: Mapping[str, Path],
+    model_root: str,
+    max_points: int,
+) -> list[tuple[Path, str, LutMode | None, int]]:
+    return [
+        (*candidate, mode, max_points)
+        for mode in _LIGHT_MODE_ORDER
+        if mode in request.modes
+        if (candidate := _preferred_file(files, f"{model_root}/{mode.value}.csv")) is not None
+    ]
+
+
+def _single_plot_candidate(
+    files: Mapping[str, Path],
+    name: str,
+    max_points: int,
+) -> list[tuple[Path, str, LutMode | None, int]]:
+    candidate = _preferred_file(files, name)
+    return [(*candidate, None, max_points)] if candidate is not None else []
 
 
 def build_plot_from_file(

@@ -34,6 +34,10 @@ class AppPreferences(BaseModel):
 
     default_power_entity_id: str | None = Field(default=None, pattern=POWER_ENTITY_PATTERN)
     default_measure_device: str | None = Field(default=None, max_length=200)
+    default_measure_device_firmware: str | None = Field(default=None, max_length=200)
+    default_contributor_name: str | None = Field(default=None, max_length=200)
+    default_contributor_github: str | None = Field(default=None, max_length=100)
+    default_contributor_email: str | None = Field(default=None, max_length=200)
     power_meter: PowerMeterType = PowerMeterType.HASS
     shelly_ip: str | None = Field(default=None, max_length=255)
     shelly_username: str = Field(default="admin", min_length=1, max_length=50)

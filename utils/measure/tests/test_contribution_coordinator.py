@@ -28,6 +28,7 @@ from measure.ha_app.contribution import (
 from measure.ha_app.contribution.service import _metadata_from_request, _validate_latest_preview
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import LightMeasurementRequest
+from pydantic import ValidationError
 import pytest
 
 
@@ -333,6 +334,17 @@ def test_contribution_author_rejects_blank_required_fields() -> None:
     assert author.email is None
 
 
+@pytest.mark.parametrize("email", ["invalid", "a@", "a@b", "a@@example.com", "a b@example.com"])
+def test_contribution_author_rejects_invalid_email(email: str) -> None:
+    with pytest.raises(ValueError, match="valid email address"):
+        ContributionAuthor(name="Tester", github="tester", email=email)
+
+
+@pytest.mark.parametrize("email", ["name@example.com", "name+test@sub.example.com"])
+def test_contribution_author_accepts_valid_email(email: str) -> None:
+    assert ContributionAuthor(name="Tester", github="tester", email=f" {email} ").email == email
+
+
 def test_metadata_from_request_maps_validation_errors_to_invalid_metadata() -> None:
     request = LightMeasurementRequest(
         model_id="LCT010",
@@ -344,21 +356,39 @@ def test_metadata_from_request_maps_validation_errors_to_invalid_metadata() -> N
     auth = ContributionAuthStatus(authenticated=True, connected=True, username="octo")
     payload = ContributionPreviewRequest(
         manufacturer_name="Signify",
-        manufacturer_directory="Signify",
         model_id="LCT010",
         product_name="Test light",
         contributor="Test User",
+        gtins=["invalid"],
     )
 
-    with pytest.raises(ContributionApiError, match="manufacturer_directory") as info:
+    with pytest.raises(ContributionApiError, match="invalid GTIN") as info:
         _metadata_from_request(request, payload, auth)
     assert info.value.code == ContributionApiErrorCode.INVALID_METADATA
+    assert info.value.field == "gtins"
 
-    metadata = _metadata_from_request(request, payload.model_copy(update={"manufacturer_directory": ""}), auth, "hue")
-    assert metadata.manufacturer_directory is None
+    for payload_field in ("contributor", "contributor_github", "manufacturer_name"):
+        invalid = payload.model_copy(update={"gtins": [], payload_field: " "})
+        with pytest.raises(ContributionApiError) as info:
+            _metadata_from_request(request, invalid, auth)
+        assert info.value.field == payload_field
+
+    metadata = _metadata_from_request(request, payload.model_copy(update={"gtins": []}), auth, "hue")
     assert metadata.measure_type == "light"
     assert metadata.measure_device == "Test meter"
     assert metadata.integration == "hue"
+
+
+@pytest.mark.parametrize("mains_voltage", [90, 110, 240, 260])
+def test_contribution_preview_request_rejects_unsupported_mains_voltage(mains_voltage: int) -> None:
+    with pytest.raises(ValidationError):
+        ContributionPreviewRequest(
+            manufacturer_name="Signify",
+            model_id="LCT010",
+            product_name="Hue lamp",
+            contributor="Test User",
+            mains_voltage=mains_voltage,  # type: ignore[arg-type]
+        )
 
 
 def test_submit_preview_validation_rejects_base_or_content_drift() -> None:

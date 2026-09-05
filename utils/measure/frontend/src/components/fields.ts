@@ -61,6 +61,36 @@ export interface EntitySelectOptions {
   onChange?: ((event: Event) => void) | null;
 }
 
+export interface OptionSelectOptions {
+  selected?: string;
+  required?: boolean;
+  hint?: string;
+  placeholder?: string;
+  onChange?: ((event: Event) => void) | null;
+}
+
+export function optionSelect(
+  name: string,
+  label: string,
+  options: ComboboxOption[],
+  settings: OptionSelectOptions = {},
+) {
+  const { selected = "", required = false, hint = "", placeholder = `Select ${label.toLowerCase()}`, onChange = null } = settings;
+  return html`
+    <measure-combobox
+      name=${name}
+      label=${label}
+      .value=${selected}
+      .options=${options}
+      placeholder=${placeholder}
+      hint=${hint}
+      ?required=${required}
+    >
+      <input slot="value" type="hidden" name=${name} .value=${selected} @change=${onChange} />
+    </measure-combobox>
+  `;
+}
+
 export function entitySelect(name: string, label: string, entities: EntityDescriptor[], options: EntitySelectOptions = {}) {
   const { selected = "", required = false, hint = "", onChange = null } = options;
   const comboboxOptions: ComboboxOption[] = entities.map((entity) => ({

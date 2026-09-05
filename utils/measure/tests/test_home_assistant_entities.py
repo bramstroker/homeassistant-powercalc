@@ -84,7 +84,12 @@ def _entity_data(*, power_state: str = "4.2") -> HomeAssistantEntityData:
             SimpleNamespace(entity_id="sensor.desk_voltage", device_id="meter-device", platform="shelly"),
         ],
         device_registry=[
-            {"id": "light-device", "model_id": "LWA017", "model": "Hue White Ambiance"},
+            {
+                "id": "light-device",
+                "manufacturer": "Signify",
+                "model_id": "LWA017",
+                "model": "Hue White Ambiance",
+            },
             {"id": "meter-device", "model_id": "PM-001", "model": "Power Meter"},
         ],
     )
@@ -99,6 +104,8 @@ def test_catalog_applies_one_selection_policy_and_enriches_entities() -> None:
     lights = snapshot.select(domain=EntityDomain.LIGHT)
     assert [entity.entity_id for entity in lights] == ["light.desk"]
     assert lights[0].model_id == "LWA017"
+    assert lights[0].product_name == "Hue White Ambiance"
+    assert lights[0].manufacturer == "Signify"
     assert lights[0].integration == "hue"
     assert lights[0].supported_modes == [LutMode.BRIGHTNESS, LutMode.COLOR_TEMP, LutMode.HS, LutMode.EFFECT]
     assert lights[0].min_mired == 153
@@ -211,6 +218,8 @@ def test_catalog_exposes_group_members_and_infers_their_shared_model() -> None:
 
     assert group.member_entity_ids == ["light.desk", "light.second"]
     assert group.model_id == "LWA017"
+    assert group.product_name == "Hue White Ambiance"
+    assert group.manufacturer == "Signify"
 
 
 def test_snapshot_requires_exactly_one_entity_filter() -> None:

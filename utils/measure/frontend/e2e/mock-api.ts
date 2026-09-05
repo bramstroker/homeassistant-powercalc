@@ -2,10 +2,13 @@ import type { Page, Route } from "@playwright/test";
 import type {
   AppSettings,
   Capabilities,
+  ContributionPreview,
+  DeviceSpecificationCatalog,
   EntityCatalog,
   EntityDescriptor,
   MeasureDefinition,
   MeasureDeviceCatalog,
+  ManufacturerCatalog,
   MeasurementParameters,
   PlotCollection,
   PreflightResponse,
@@ -43,16 +46,33 @@ const powers: EntityDescriptor[] = [
   { entity_id: "sensor.plug_power", name: "Plug power", unit: "W", related_voltage_entity_id: "sensor.plug_voltage" },
 ];
 const voltages: EntityDescriptor[] = [{ entity_id: "sensor.plug_voltage", name: "Plug voltage", unit: "V" }];
-const lights: EntityDescriptor[] = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"] }];
+const lights: EntityDescriptor[] = [
+  { entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"] },
+  { entity_id: "light.floor", name: "Floor lamp", supported_modes: ["brightness"] },
+];
 
 const catalog: EntityCatalog = { lights, powers, voltages };
 const measureDevices: MeasureDeviceCatalog = {
   devices: ["Aeotec ZWA023", "Kasa EP25", "Shelly Plug S", "Shelly Plus Plug S", "TP-Link Kasa KP115"],
 };
+const manufacturers: ManufacturerCatalog = { manufacturers: ["IKEA", "Signify"] };
+const deviceSpecifications: DeviceSpecificationCatalog = {
+  device_types: {
+    light: [
+      { name: "rated_power", label: "Rated power", description: "Manufacturer-rated power in watts", value_type: "number", collection: "scalar", options: [] },
+      { name: "connectivity", label: "Connectivity", description: "Protocols the device communicates over", value_type: "string", collection: "array", options: ["zigbee", "wifi", "matter"] },
+      { name: "socket", label: "Socket", description: "Lamp base", value_type: "string", collection: "scalar_or_array", options: ["E27", "E14", "GU10"] },
+    ],
+  },
+};
 
 const settings: AppSettings = {
   default_power_entity_id: "sensor.plug_power",
   default_measure_device: "Shelly Plug S",
+  default_measure_device_firmware: "1.2.3",
+  default_contributor_name: "Powercalc Tester",
+  default_contributor_github: "powercalc-tester",
+  default_contributor_email: "tester@example.com",
   power_meter: "hass",
   shelly_ip: null,
   kasa_ip: null,
@@ -95,6 +115,7 @@ const lightDefinition: MeasureDefinition = {
   fields: [
     { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, entity_domains: ["sensor"], options: [] },
     { name: "light_entity_id", role: "controller", label: "Light", plural_label: "Lights", control: "entity", required: true, multiple: true, entity_domains: ["light"], options: [] },
+    { name: "multiple_light_count", role: "attribute", label: "Number of lights", control: "number", required: true, options: [], default: 1, minimum: 1, maximum: 100, derived_from: "light_entity_id" },
     {
       name: "modes", role: "attribute", label: "Lookup-table modes", control: "multi_select",
       narrowed_by: "light_entity_id", required: true,
@@ -153,6 +174,47 @@ const plots: PlotCollection = {
   }],
 };
 
+const contributionDraft: ContributionPreview = {
+  eligible: true,
+  repository: "bramstroker/homeassistant-powercalc",
+  base_branch: "master",
+  manufacturer_name: "Signify",
+  manufacturer_directory: "signify",
+  manufacturer_library_url: "https://library.powercalc.nl/manufacturers/signify",
+  model_id: "LWA017",
+  product_name: "Hue White Ambiance A60",
+  contributor: "Powercalc Tester",
+  contributor_github: "powercalc-tester",
+  contributor_email: "tester@example.com",
+  aliases: [],
+  gtins: [],
+  product_url: "",
+  mains_voltage: 230,
+  voltage_range: { min: 229.9, max: 231.2 },
+  device_specs: null,
+  device_type: "light",
+  measure_device: "Shelly Plug S",
+  measure_device_firmware: "1.2.3",
+  measure_description: "Measured with utils/measure script",
+  device_info: { entity_id: "light.desk" },
+  home_assistant: { version: "2026.9.0" },
+  notes: "",
+  files: [],
+  commit_message: "Add Signify LWA017",
+  pr_title: "Add Signify LWA017",
+  pr_body: "Adds a measured profile.",
+  branch_name: "measure/signify-lwa017",
+  warnings: [],
+};
+
+const contributionPreview: ContributionPreview = {
+  ...contributionDraft,
+  device_specs: { rated_power: 9.5, connectivity: ["zigbee", "wifi"] },
+  files: [{ path: "profile_library/signify/LWA017/model.json", size: 512, rendered_json: { name: "Hue White Ambiance A60", device_type: "light" } }],
+  model_json: { name: "Hue White Ambiance A60", device_type: "light" },
+  job_id: "job-1",
+};
+
 const preflight: PreflightResponse = {
   valid: true,
   warnings: [],
@@ -177,6 +239,7 @@ const startedSnapshot: SessionSnapshot = {
   created_at: "2026-08-14T10:00:00Z",
   updated_at: "2026-08-14T10:00:01Z",
   phase: "Measuring average power",
+  mode: "Averaging",
   progress: { completed: 0, total: 1 },
 };
 
@@ -205,6 +268,7 @@ function eventStreamBody(events: SessionEvent[]): string {
 export interface MockApiOptions {
   /** Sessions the app lists on boot. Defaults to the one completed session. */
   sessions?: SessionSummary[];
+  capabilities?: Partial<Capabilities>;
 }
 
 /** What a route may vary its response on: the request itself, and the mock's options. */
@@ -230,12 +294,16 @@ const fixedRoutes = new Map<string, unknown>([
   ["contribution/status", { submitted: false }],
   ["measure-definitions", [averageDefinition, lightDefinition]],
   ["library/measure-devices", measureDevices],
+  ["library/manufacturers", manufacturers],
+  ["library/device-specifications", deviceSpecifications],
   ["dummy-load/calibration", null],
   ["preflight", preflight],
   ["sessions/session-running", startedSnapshot],
   ["sessions/session-completed", completedSnapshot],
   ["sessions/session-completed/files", files],
   ["sessions/session-completed/plots", plots],
+  ["sessions/session-completed/contribution", contributionDraft],
+  ["sessions/session-completed/contribution/preview", contributionPreview],
 ]);
 
 /** Paths whose payload depends on the request or on the sessions the test asked for. */
@@ -248,7 +316,6 @@ const dynamicRoutes = new Map<string, (context: RequestContext) => unknown>([
 const rawRoutes = new Map<string, (route: Route) => Promise<void>>([
   ["sessions/session-running/events", (route) =>
     route.fulfill({ status: 200, contentType: "text/event-stream", body: eventStreamBody(streamEvents) })],
-  ["sessions/session-completed/contribution", (route) => problem(route, 404, "not_found", "No draft")],
 ]);
 
 /**
@@ -263,6 +330,7 @@ export async function mockApi(page: Page, options: MockApiOptions = {}): Promise
     const url = new URL(route.request().url());
     const path = url.pathname.replace(/^.*\/api\//, "");
     const method = route.request().method();
+    if (path === "capabilities") return json(route, { ...capabilities, ...options.capabilities });
 
     const raw = rawRoutes.get(path);
     if (raw) return raw(route);
@@ -278,4 +346,4 @@ export async function mockApi(page: Page, options: MockApiOptions = {}): Promise
   });
 }
 
-export { completedSession, settings, startedSnapshot };
+export { completedSession, settings, startedSnapshot, parameters, contributionPreview };

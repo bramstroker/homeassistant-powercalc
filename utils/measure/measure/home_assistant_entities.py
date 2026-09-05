@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from measure.const import (
     HASS_DEVICE_REGISTRY_ID,
+    HASS_DEVICE_REGISTRY_MANUFACTURER,
     HASS_DEVICE_REGISTRY_MODEL,
     HASS_DEVICE_REGISTRY_MODEL_ID,
     HASS_ENTITY_DEVICE_CLASS,
@@ -56,7 +57,9 @@ class EntityDescriptor(BaseModel):
     device_id: str | None = None
     #: Home Assistant integration providing the entity, as shown on the device page.
     integration: str | None = None
+    manufacturer: str | None = None
     model_id: str | None = None
+    product_name: str | None = None
     state: str
     unit: str | None = None
     attribute_names: list[str]
@@ -189,35 +192,46 @@ class HomeAssistantEntityCatalog:
                 for entity in group.entities.values()
             )
         by_id = {descriptor.entity_id: descriptor for descriptor in descriptors}
-        return EntityCatalogSnapshot([_with_group_model(descriptor, by_id) for descriptor in descriptors])
+        return EntityCatalogSnapshot([_with_group_device_metadata(descriptor, by_id) for descriptor in descriptors])
 
 
-def _with_group_model(
+def _with_group_device_metadata(
     descriptor: EntityDescriptor,
     by_id: dict[str, EntityDescriptor],
 ) -> EntityDescriptor:
-    """Give a light group the model of its members, so a group can be measured as one product."""
+    """Give a group device metadata shared by all its members."""
 
-    if descriptor.model_id or not descriptor.member_entity_ids:
+    if not descriptor.member_entity_ids:
         return descriptor
-    model_id = _group_model(descriptor, by_id, frozenset())
-    return descriptor.model_copy(update={"model_id": model_id}) if model_id else descriptor
+    update: dict[str, str] = {}
+    if not descriptor.model_id and (model_id := _group_value(descriptor, by_id, frozenset(), "model_id")):
+        update["model_id"] = model_id
+    if not descriptor.product_name and (product_name := _group_value(descriptor, by_id, frozenset(), "product_name")):
+        update["product_name"] = product_name
+    if not descriptor.manufacturer and (manufacturer := _group_value(descriptor, by_id, frozenset(), "manufacturer")):
+        update["manufacturer"] = manufacturer
+    return descriptor.model_copy(update=update) if update else descriptor
 
 
-def _group_model(descriptor: EntityDescriptor, by_id: dict[str, EntityDescriptor], seen: frozenset[str]) -> str | None:
-    """Model shared by every member of a group, or None when they differ or any is unknown."""
+def _group_value(
+    descriptor: EntityDescriptor,
+    by_id: dict[str, EntityDescriptor],
+    seen: frozenset[str],
+    field: str,
+) -> str | None:
+    """Device-registry value shared by every member of a group."""
 
-    if descriptor.model_id:
-        return descriptor.model_id
+    if value := getattr(descriptor, field):
+        return str(value)
     # Groups can nest, and a malformed one can point back at itself.
     if descriptor.entity_id in seen or not descriptor.member_entity_ids:
         return None
     seen = seen | {descriptor.entity_id}
-    models = {
-        _group_model(member, by_id, seen) if (member := by_id.get(entity_id)) is not None else None
+    values = {
+        _group_value(member, by_id, seen, field) if (member := by_id.get(entity_id)) is not None else None
         for entity_id in descriptor.member_entity_ids
     }
-    return models.pop() if len(models) == 1 and None not in models else None
+    return values.pop() if len(values) == 1 and None not in values else None
 
 
 def _describe_entity(
@@ -238,6 +252,7 @@ def _describe_entity(
     detailed = domain in _MEASURABLE_DOMAINS
     device_id = str(registry_entry.device_id) if registry_entry is not None and registry_entry.device_id else None
     device = device_registry.get(device_id, {}) if device_id is not None else {}
+    manufacturer = device.get(HASS_DEVICE_REGISTRY_MANUFACTURER)
     model_id = device.get(HASS_DEVICE_REGISTRY_MODEL_ID) or device.get(HASS_DEVICE_REGISTRY_MODEL)
     device_class = _device_class(attributes.get(HASS_ENTITY_DEVICE_CLASS))
     supported_modes = supported_light_modes(attributes) if domain == EntityDomain.LIGHT else None
@@ -251,7 +266,9 @@ def _describe_entity(
         device_class=device_class,
         device_id=device_id,
         integration=str(registry_entry.platform) if registry_entry is not None and registry_entry.platform else None,
+        manufacturer=str(manufacturer) if manufacturer else None,
         model_id=str(model_id) if model_id else None,
+        product_name=str(device[HASS_DEVICE_REGISTRY_MODEL]) if device.get(HASS_DEVICE_REGISTRY_MODEL) else None,
         state=str(entity.state.state),
         unit=str(unit) if unit else None,
         attribute_names=sorted(attributes) if detailed else [],

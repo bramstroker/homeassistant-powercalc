@@ -23,6 +23,7 @@ from measure.const import (
 )
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.light.const import LutMode
+from measure.model import mains_voltage_from_range
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.runner.const import (
     QUESTION_CHARGING_DEVICE_TYPE,
@@ -87,12 +88,6 @@ def test_wizard(mock_config_factory: MockConfigFactory) -> None:
             "y",
             # DUMMY_LOAD
             "n",
-            # MODEL_ID
-            "m",
-            key.ENTER,
-            # MODEL_NAME
-            "a",
-            key.ENTER,
             # MEASURE_DEVICE
             "a",
             key.ENTER,
@@ -107,10 +102,13 @@ def test_wizard(mock_config_factory: MockConfigFactory) -> None:
         ),
     )
 
-    measure.start()
+    with patch("measure.cli.main.uuid4") as session_id:
+        session_id.return_value.hex = "a" * 32
+        measure.start()
 
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/m/brightness.csv.gz"))
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/m/model.json"))
+    output = PROJECT_DIR / "export" / f"session-{'a' * 32}"
+    assert (output / "brightness.csv.gz").is_file()
+    assert (output / "model.json").is_file()
 
 
 def test_run_light(mock_config_factory: MockConfigFactory) -> None:
@@ -129,6 +127,7 @@ def test_run_light(mock_config_factory: MockConfigFactory) -> None:
         MODEL_JSON_VOLTAGE_RANGE_MIN: 233.0,
         MODEL_JSON_VOLTAGE_RANGE_MAX: 233.0,
     }
+    assert model_json["mains_voltage"] == 230
 
 
 def test_take_measurement_tracks_voltage_range(mock_config_factory: MockConfigFactory) -> None:
@@ -149,6 +148,18 @@ def test_take_measurement_tracks_voltage_range(mock_config_factory: MockConfigFa
     result = measure_util.take_measurement()
     assert result.power == 2.0
     assert result.voltages == [231.2, 229.9, 230.4]
+
+
+@pytest.mark.parametrize(
+    "voltage_range, expected",
+    [
+        ({"min": 110, "max": 125}, 120),
+        ({"min": 220, "max": 240}, 230),
+        ({"min": 230, "max": 120}, None),
+    ],
+)
+def test_mains_voltage_from_range(voltage_range: dict[str, int], expected: int | None) -> None:
+    assert mains_voltage_from_range(voltage_range) == expected
 
 
 @pytest.mark.parametrize(

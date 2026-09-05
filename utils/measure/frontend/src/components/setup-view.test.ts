@@ -5,6 +5,7 @@ import { SetupViewElement, capabilities, definitions, lightDefinition, lights } 
 
 interface TestCombobox extends HTMLElement {
   label: string;
+  value: string | string[];
   options: Array<{ value: string; label: string }>;
   updateComplete: Promise<boolean>;
   shadowRoot: ShadowRoot;
@@ -15,6 +16,7 @@ function entityCombobox(element: SetupViewElement, name: string): TestCombobox {
 }
 
 function selectEntity(picker: TestCombobox, value: string): void {
+  picker.value = value;
   const input = picker.querySelector('input[slot="value"]') as HTMLInputElement;
   input.value = value;
   input.dispatchEvent(new Event("change", { bubbles: true }));
@@ -93,7 +95,7 @@ describe("setup view", () => {
     const light = entityCombobox(element, "light_entity_id");
     await light.updateComplete;
     expect((light.shadowRoot.querySelector("input") as HTMLInputElement).value).toBe("Desk lamp · light.desk");
-    expect(light.shadowRoot.textContent).toContain("If a light is missing, change its state once in Home Assistant, then reload this page.");
+    expect(element.shadowRoot.querySelector(".discovery-help")?.textContent).toContain("If a light is missing, change its state once in Home Assistant, then reload this page.");
     expect(element.shadowRoot.textContent).toContain("Brightness");
     expect(element.shadowRoot.querySelector("details")?.open).toBe(false);
     expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
@@ -184,8 +186,6 @@ describe("setup view", () => {
     const submitted = new Promise<MeasurementRequest>((resolve) => {
       element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
     });
-    (element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value = "LCT010";
-    (element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).value = "Test light";
     (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
 
     const request = await submitted;
@@ -228,18 +228,19 @@ describe("setup view", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.querySelectorAll('measure-combobox[name="light_entity_id"]')).toHaveLength(2);
-    const removeButton = element.shadowRoot.querySelector<HTMLButtonElement>("button.remove-entity");
-    expect(removeButton?.getAttribute("aria-label")).toBe("Remove Light");
-    expect(removeButton?.querySelector("svg")).toBeTruthy();
-    expect(removeButton?.textContent?.trim()).toBe("");
-    expect(element.shadowRoot.querySelector(".entity-list > .field-hint")?.textContent)
+    expect(element.shadowRoot.querySelectorAll('measure-combobox[name="light_entity_id"]')).toHaveLength(1);
+    const picker = entityCombobox(element, "light_entity_id");
+    await picker.updateComplete;
+    expect(picker.hasAttribute("multiple")).toBe(true);
+    expect(picker.shadowRoot.querySelectorAll(".tag")).toHaveLength(2);
+    expect(element.shadowRoot.querySelector("button.remove-entity")).toBeNull();
+    expect(element.shadowRoot.querySelector(".discovery-help")?.textContent)
       .toContain("If a light is missing, change its state once in Home Assistant, then reload this page.");
+    expect(element.shadowRoot.querySelector<HTMLDetailsElement>(".discovery-help")?.open).toBe(false);
     expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(1);
-    expect((element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value).toBe("LWA017");
+    expect(element.shadowRoot.querySelector('input[name="model_id"]')).toBeNull();
     expect((element.shadowRoot.querySelector('input[name="multiple_light_count"]') as HTMLInputElement).value).toBe("2");
 
-    (element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).value = "Two identical lights";
     const submitted = new Promise<MeasurementRequest>((resolve) => {
       element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
     });
@@ -251,6 +252,7 @@ describe("setup view", () => {
     const lightRequest = request as Extract<MeasurementRequest, { measure_type: "light" }>;
     expect(lightRequest.controller).toEqual({ type: "hass_multi", entity_ids: ["light.one", "light.two"] });
     expect(lightRequest.multiple_light_count).toBe(2);
+    expect(lightRequest.model_id).toBe("LWA017");
   });
 
   it("keeps multi-light controls hidden until the user opts in", async () => {
@@ -267,6 +269,15 @@ describe("setup view", () => {
     expect(element.shadowRoot.querySelector(".add-entity")).toBeNull();
     expect(element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')).toBeNull();
     expect(element.shadowRoot.querySelectorAll('measure-combobox[name="light_entity_id"]')).toHaveLength(1);
+    const help = element.shadowRoot.querySelector<HTMLDetailsElement>(".multiple-lights details")!;
+    expect(help.open).toBe(false);
+    const toggle = element.shadowRoot.querySelector<HTMLInputElement>('input[name="measure_multiple_lights"]')!;
+    const grid = element.shadowRoot.querySelector(".profile-grid")!;
+    expect(toggle.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    element.shadowRoot.querySelector<HTMLInputElement>('input[name="measure_multiple_lights"]')!.click();
+    await element.updateComplete;
+
     expect(element.shadowRoot.querySelector(".multiple-lights")?.textContent).toContain("very low power use");
     expect(element.shadowRoot.querySelector(".multiple-lights")?.textContent).toContain("Select up to three individual lights");
     const groupGuide = element.shadowRoot.querySelector<HTMLAnchorElement>(
@@ -276,15 +287,64 @@ describe("setup view", () => {
     expect(groupGuide?.getAttribute("target")).toBe("_blank");
     expect(groupGuide?.getAttribute("rel")).toBe("noopener noreferrer");
 
-    element.shadowRoot.querySelector<HTMLInputElement>('input[name="measure_multiple_lights"]')!.click();
-    await element.updateComplete;
-
-    expect(element.shadowRoot.querySelector(".add-entity")).not.toBeNull();
+    expect(element.shadowRoot.querySelector(".add-entity")).toBeNull();
+    expect(entityCombobox(element, "light_entity_id").hasAttribute("multiple")).toBe(true);
     expect(element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')).not.toBeNull();
     const helpLink = element.shadowRoot.querySelector<HTMLAnchorElement>(".multiple-lights .help-link");
     expect(helpLink?.href).toBe("https://docs.powercalc.nl/contributing/measure/lights/#multiple-identical-lights");
     expect(helpLink?.getAttribute("aria-label")).toBe("Learn more about measuring multiple identical lights");
-    expect(helpLink?.querySelector("svg")).toBeTruthy();
+    expect(help.open).toBe(false);
+    help.open = true;
+    help.querySelector("summary")!.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    expect(help.open).toBe(false);
+    help.open = true;
+    help.dispatchEvent(new FocusEvent("focusout", { relatedTarget: helpLink }));
+    expect(help.open).toBe(true);
+    help.dispatchEvent(new FocusEvent("focusout", { relatedTarget: toggle }));
+    expect(help.open).toBe(false);
+    const count = element.shadowRoot.querySelector('input[name="multiple_light_count"][type="number"]')!;
+    expect(count.closest(".field-with-help")?.querySelector("details")?.textContent).toContain("power per light");
+    expect(count.closest("label")?.querySelector(".field-hint")).toBeNull();
+
+    element.shadowRoot.querySelector<HTMLInputElement>('input[name="measure_multiple_lights"]')!.click();
+    await element.updateComplete;
+    expect(help.open).toBe(false);
+    expect(element.shadowRoot.querySelector(".add-entity")).toBeNull();
+  });
+
+  it("removes light tags, preserves a group count override, and keeps the first light when switching back", async () => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.definitions = [lightDefinition];
+    element.selectedType = "light";
+    element.lights = [
+      { entity_id: "light.one", name: "One", supported_modes: ["brightness", "hs"] },
+      { entity_id: "light.two", name: "Two", supported_modes: ["brightness"] },
+    ];
+    element.multipleLights = true;
+    element.selectedEntities = { light_entity_id: ["light.one", "light.two"] };
+    document.body.append(element);
+    await element.updateComplete;
+    const picker = entityCombobox(element, "light_entity_id");
+    await picker.updateComplete;
+    const count = element.shadowRoot.querySelector<HTMLInputElement>('[name="multiple_light_count"]')!;
+    count.value = "6";
+    count.dispatchEvent(new Event("input", { bubbles: true }));
+
+    picker.shadowRoot.querySelector<HTMLButtonElement>('[aria-label="Remove Two · light.two"]')!.click();
+    await element.updateComplete;
+    await picker.updateComplete;
+    expect(element.selectedEntities.light_entity_id).toEqual(["light.one"]);
+    expect(picker.shadowRoot.querySelectorAll(".tag")).toHaveLength(1);
+    expect(count.value).toBe("6");
+    expect(element.shadowRoot.querySelectorAll('input[name="modes"]')).toHaveLength(2);
+
+    element.shadowRoot.querySelector<HTMLInputElement>('[name="measure_multiple_lights"]')!.click();
+    await element.updateComplete;
+    const single = entityCombobox(element, "light_entity_id");
+    expect(single.hasAttribute("multiple")).toBe(false);
+    expect(single.value).toBe("light.one");
+    expect(element.shadowRoot.querySelector<HTMLInputElement>('[name="multiple_light_count"]')!.value).toBe("1");
   });
 
   it("hides the virtual-device toggle unless developer mode is enabled", async () => {
@@ -299,11 +359,12 @@ describe("setup view", () => {
     await element.updateComplete;
 
     expect(element.shadowRoot.querySelector('input[name="use_dummy_controller"]')).toBeNull();
+    expect(element.shadowRoot.querySelector(".developer-options")).toBeNull();
   });
 
   it("submits a dummy light controller when the developer virtual-device toggle is on", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
-    element.capabilities = { ...capabilities, developer_mode: true };
+    element.capabilities = { ...capabilities, developer_mode: true, fast_test_mode: true };
     element.lights = lights;
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", unit: "W" }];
     element.voltages = [];
@@ -313,9 +374,13 @@ describe("setup view", () => {
     document.body.append(element);
     await element.updateComplete;
 
+    expect(element.shadowRoot.querySelector<HTMLDetailsElement>(".developer-options")?.open).toBe(false);
+    expect(element.shadowRoot.querySelector(".developer-options")?.textContent).toContain("Fast test mode is enabled.");
+    expect(element.shadowRoot.querySelector(".test-mode-status")).toBeNull();
     element.shadowRoot.querySelector<HTMLInputElement>('input[name="use_dummy_controller"]')!.click();
     await element.updateComplete;
 
+    expect(element.shadowRoot.querySelector(".test-mode-status")?.textContent).toContain("Virtual device · test output only");
     expect(element.shadowRoot.querySelector('select[name="light_entity_id"]')).toBeNull();
     const checkedModes = [...element.shadowRoot.querySelectorAll<HTMLInputElement>('input[name="modes"]:checked')].map((input) => input.value);
     expect(checkedModes).toEqual(["brightness", "color_temp", "hs", "effect"]);
@@ -323,12 +388,12 @@ describe("setup view", () => {
     const submitted = new Promise<MeasurementRequest>((resolve) => {
       element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
     });
-    (element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value = "dummy";
-    (element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).value = "Virtual light";
+    (element.shadowRoot.querySelector('input[name="session_name"]') as HTMLInputElement).value = "Virtual light";
     (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
 
     const request = await submitted;
     expect(request.measure_type).toBe("light");
+    expect(request).toMatchObject({ model_id: "", product_name: "", session_name: "Virtual light" });
     expect("controller" in request && request.controller).toEqual({ type: "dummy" });
   });
 
@@ -359,8 +424,7 @@ describe("setup view", () => {
     const submitted = new Promise<MeasurementRequest>((resolve) => {
       element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
     });
-    (element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value = "dummy";
-    (element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).value = "Virtual fan";
+    (element.shadowRoot.querySelector('input[name="session_name"]') as HTMLInputElement).value = "Virtual fan";
     (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
 
     const request = await submitted;
@@ -640,7 +704,7 @@ describe("setup type picker", () => {
       entities: { fan: [{ entity_id: "fan.bedroom", name: "Bedroom fan", model_id: "FAN-001" }] },
       entityField: "fan_entity_id",
       entityId: "fan.bedroom",
-      expectedFields: ["fan_entity_id", "model_id", "product_name"],
+      expectedFields: ["fan_entity_id"],
       modelId: "FAN-001",
     },
     {
@@ -663,7 +727,7 @@ describe("setup type picker", () => {
       entities: { media_player: [{ entity_id: "media_player.office", name: "Office speaker", model_id: "SPEAKER-001" }] },
       entityField: "media_player_entity_id",
       entityId: "media_player.office",
-      expectedFields: ["media_player_entity_id", "disable_streaming", "model_id", "product_name"],
+      expectedFields: ["media_player_entity_id", "disable_streaming"],
       modelId: "SPEAKER-001",
     },
     {
@@ -705,7 +769,7 @@ describe("setup type picker", () => {
       entities: { vacuum: [{ entity_id: "vacuum.downstairs", name: "Downstairs vacuum", model_id: "VAC-001" }] },
       entityField: "charging_entity_id",
       entityId: "vacuum.downstairs",
-      expectedFields: ["charging_device_type", "charging_entity_id", "model_id", "product_name"],
+      expectedFields: ["charging_device_type", "charging_entity_id"],
       modelId: "VAC-001",
     },
   ])("orders $type fields by dependency and prefills the selected device model ID", async ({
@@ -720,20 +784,24 @@ describe("setup type picker", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const profileSection = [...element.shadowRoot.querySelectorAll("fieldset.section")][1];
+    const profileSection = element.shadowRoot.querySelector(".device-section");
     // Query from the profile grid directly instead of using a `:scope >` selector.
     // jsdom's selector engine does not resolve `:scope` against a context node that
     // lives inside a shadow root, so those selectors match nothing under the app's
     // shadow DOM even though browsers resolve them fine.
     const profileGrid = profileSection?.querySelector(".profile-grid");
-    const fields = [...(profileGrid?.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[name]") ?? [])]
+    const fields = [...(profileGrid?.querySelectorAll<HTMLInputElement & { name: string }>("[name]") ?? [])]
       .filter((field) => field.getAttribute("slot") !== "value");
     expect(fields.map((field) => field.name)).toEqual(expectedFields);
 
     selectEntity(entityCombobox(element, entityField), entityId);
     await element.updateComplete;
 
-    expect((element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement).value).toBe(modelId);
+    let request: MeasurementRequest | undefined;
+    element.addEventListener("preflight", (event) => { request = (event as CustomEvent<MeasurementRequest>).detail; });
+    element.shadowRoot.querySelector("form")!.dispatchEvent(new Event("submit", { cancelable: true }));
+    expect(request?.model_id).toBe(modelId);
+    expect(element.shadowRoot.querySelector('input[name="model_id"]')).toBeNull();
   });
 
   it("shows entity discovery failures instead of silently enabling free-text input", async () => {
@@ -797,9 +865,7 @@ describe("setup type picker", () => {
     expect(entity.options.map((option) => option.label)).toContain("Downstairs vacuum · vacuum.downstairs");
     expect(entity.options.map((option) => option.label)).not.toContain("Garden mower · lawn_mower.garden");
 
-    const type = element.shadowRoot.querySelector('[name="charging_device_type"]') as HTMLSelectElement;
-    type.value = "lawn_mower_robot";
-    type.dispatchEvent(new Event("change"));
+    selectEntity(entityCombobox(element, "charging_device_type"), "lawn_mower_robot");
     await element.updateComplete;
 
     const updated = entityCombobox(element, "charging_entity_id");
@@ -861,9 +927,7 @@ describe("setup view defaults", () => {
     const requestedDomains = new Promise<string[]>((resolve) => {
       element.addEventListener("entity-domains-requested", (event) => resolve((event as CustomEvent<string[]>).detail));
     });
-    const purpose = element.shadowRoot.querySelector('[name="recorder_purpose"]') as HTMLSelectElement;
-    purpose.value = "complex_profile";
-    purpose.dispatchEvent(new Event("change"));
+    selectEntity(entityCombobox(element, "recorder_purpose"), "complex_profile");
     await element.updateComplete;
 
     expect(await requestedDomains).toContain("*");
@@ -889,13 +953,9 @@ describe("setup view defaults", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const purpose = element.shadowRoot.querySelector('[name="recorder_purpose"]') as HTMLSelectElement;
-    purpose.value = "complex_profile";
-    purpose.dispatchEvent(new Event("change"));
+    selectEntity(entityCombobox(element, "recorder_purpose"), "complex_profile");
     await element.updateComplete;
-    const recipe = element.shadowRoot.querySelector('[name="profile_recipe"]') as HTMLSelectElement;
-    recipe.value = "vacuum_robot";
-    recipe.dispatchEvent(new Event("change"));
+    selectEntity(entityCombobox(element, "profile_recipe"), "vacuum_robot");
     await element.updateComplete;
     selectEntity(entityCombobox(element, "vacuum_entity_id"), "vacuum.robot");
     await element.updateComplete;
@@ -922,9 +982,7 @@ describe("setup view defaults", () => {
     await element.updateComplete;
 
     for (const [name, value] of [["recorder_purpose", "complex_profile"], ["profile_recipe", "vacuum_robot"]] as const) {
-      const select = element.shadowRoot.querySelector(`[name="${name}"]`) as HTMLSelectElement;
-      select.value = value;
-      select.dispatchEvent(new Event("change"));
+      selectEntity(entityCombobox(element, name), value);
       await element.updateComplete;
     }
     selectEntity(entityCombobox(element, "vacuum_entity_id"), "vacuum.robot");
@@ -943,9 +1001,7 @@ describe("setup view defaults", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const purpose = element.shadowRoot.querySelector('[name="recorder_purpose"]') as HTMLSelectElement;
-    purpose.value = "complex_profile";
-    purpose.dispatchEvent(new Event("change"));
+    selectEntity(entityCombobox(element, "recorder_purpose"), "complex_profile");
     await element.updateComplete;
     selectEntity(entityCombobox(element, "tracked_entity_ids"), "climate.room");
     const submitted = new Promise<MeasurementRequest>((resolve) => element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail)));
@@ -1011,7 +1067,7 @@ describe("setup view defaults", () => {
   it("prefills the model ID from the selected measurement device", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
-    element.lights = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"], device_id: "light-device", model_id: "LWA017" }];
+    element.lights = [{ entity_id: "light.desk", name: "Desk lamp", supported_modes: ["brightness"], device_id: "light-device", model_id: "LWA017", product_name: "Hue White Ambiance" }];
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power", device_id: "plug-device", model_id: "WSP002" }];
     element.voltages = [];
     element.meter = { type: "hass", entity_id: "sensor.plug_power" };
@@ -1023,11 +1079,13 @@ describe("setup view defaults", () => {
     selectEntity(entityCombobox(element, "light_entity_id"), "light.desk");
     await element.updateComplete;
 
-    const modelId = element.shadowRoot.querySelector('input[name="model_id"]') as HTMLInputElement;
-    expect(modelId.value).toBe("LWA017");
+    let request: MeasurementRequest | undefined;
+    element.addEventListener("preflight", (event) => { request = (event as CustomEvent<MeasurementRequest>).detail; });
+    element.shadowRoot.querySelector("form")!.dispatchEvent(new Event("submit", { cancelable: true }));
+    expect(request).toMatchObject({ model_id: "LWA017", product_name: "Hue White Ambiance", session_name: "Desk lamp" });
   });
 
-  it("orders the light fields by dependency and explains the full product name", async () => {
+  it("keeps setup focused on measurement controls without repeating profile metadata guidance", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.lights = lights;
@@ -1038,7 +1096,7 @@ describe("setup view defaults", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const profileSection = [...element.shadowRoot.querySelectorAll("fieldset.section")][1];
+    const profileSection = element.shadowRoot.querySelector(".device-section");
     expect(profileSection).toBeTruthy();
     const profileGrid = profileSection?.querySelector(".profile-grid");
     expect(profileGrid).toBeTruthy();
@@ -1051,11 +1109,13 @@ describe("setup view defaults", () => {
     );
     const labels = profileFields.map((field) => field.label);
     expect(labels).toEqual(["Light"]);
-    expect([...element.shadowRoot.querySelectorAll(".profile-fields > label > span")].map((label) => label.textContent?.trim()))
-      .toEqual(["Model ID", "Full product name"]);
-    expect((element.shadowRoot.querySelector('input[name="product_name"]') as HTMLInputElement).placeholder)
-      .toBe("Hue White Ambiance A60 E27");
-    expect(element.shadowRoot.querySelector(".field-hint")?.textContent).toContain("complete marketed name");
+    expect(element.shadowRoot.querySelector('input[name="model_id"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('input[name="product_name"]')).toBeNull();
+    expect(profileSection?.textContent).not.toContain("model ID and product name in Prepare after the measurement");
+    expect(profileSection?.textContent).toContain("What do you want to measure?");
+    expect(element.shadowRoot.querySelectorAll("fieldset.section")).toHaveLength(0);
+    expect(element.shadowRoot.querySelector(".setup-summary .type-chip")).toBeTruthy();
+    expect(element.shadowRoot.querySelector(".setup-summary .power-meter-summary")).toBeTruthy();
   });
 });
 

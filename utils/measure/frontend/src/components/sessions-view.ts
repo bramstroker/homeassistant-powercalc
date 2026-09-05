@@ -114,7 +114,7 @@ export class SessionsView extends LitElement {
     const measureAgainTooltipId = `measure-again-tooltip-${session.session_id}`;
     return html`<article class=${session.active ? "active" : ""}>
       <div class="session-head">
-        <div><h3>${session.product_name || session.model_id}</h3><small class="muted">${session.model_id} · ${humanize(session.measure_type)}</small></div>
+        <div><h3>${session.product_name || session.model_id || "Measurement"}</h3><small class="muted">${session.model_id ? `${session.model_id} · ` : ""}${humanize(session.measure_type)}</small></div>
         <span class="state ${session.state}">${humanize(session.state)}</span>
       </div>
       <dl>

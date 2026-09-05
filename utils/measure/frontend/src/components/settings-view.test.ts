@@ -1,8 +1,69 @@
 import type { AppSettings, AppSettingsUpdate, Capabilities, EntityDescriptor, PowerMeterDiagnostic, SettingsSection } from "../types";
 import "./settings-view";
+import type { SettingsView } from "./settings-view";
 import { capabilities, defaultSettings, goodPowerMeterDiagnostic, measurementDefaults } from "./test-fixtures";
 
+interface TestCombobox extends HTMLElement {
+  value: string | string[];
+  options: Array<{ value: string; label: string; disabled?: boolean }>;
+}
+
+function settingsCombobox(root: ShadowRoot, name: string): TestCombobox {
+  return root.querySelector(`measure-combobox[name="${name}"]`) as TestCombobox;
+}
+
+function chooseOption(picker: TestCombobox, value: string): void {
+  picker.value = value;
+  const input = picker.querySelector('input[slot="value"]') as HTMLInputElement;
+  input.value = value;
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
 describe("settings view", () => {
+  it.each(["device", "token"] as const)("prefills and saves the contributor username after connecting with %s", async (method) => {
+    const element = document.createElement("measure-settings-view") as SettingsView;
+    element.settings = { ...defaultSettings, power_meter: "dummy", default_measure_device: "Test meter", default_contributor_github: null };
+    document.body.append(element);
+    await element.updateComplete;
+    const input = element.shadowRoot!.querySelector<HTMLInputElement>('[name="default_contributor_github"]')!;
+    expect(input.value).toBe("");
+
+    element.contributionAuth = { connected: true, method, identity: { login: "octocat" } };
+    await element.updateComplete;
+    expect(input.value).toBe("octocat");
+
+    const saved = new Promise<AppSettingsUpdate>((resolve) => {
+      element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettingsUpdate>).detail));
+    });
+    element.shadowRoot!.querySelector<HTMLFormElement>("form")!.requestSubmit();
+    expect((await saved).default_contributor_github).toBe("octocat");
+  });
+
+  it("prefills from an existing connection but preserves saved and unsaved contributor usernames", async () => {
+    const element = document.createElement("measure-settings-view") as SettingsView;
+    element.settings = { ...defaultSettings, default_contributor_github: null };
+    element.contributionAuth = { connected: true, identity: { login: "octocat" } };
+    document.body.append(element);
+    await element.updateComplete;
+    const input = element.shadowRoot!.querySelector<HTMLInputElement>('[name="default_contributor_github"]')!;
+    expect(input.value).toBe("octocat");
+
+    element.settings = { ...element.settings, default_contributor_github: "saved-author" };
+    await element.updateComplete;
+    expect(input.value).toBe("saved-author");
+
+    element.settings = { ...element.settings, default_contributor_github: null };
+    element.contributionAuth = { connected: false };
+    await element.updateComplete;
+    for (const value of ["unsaved-author", ""]) {
+      input.value = value;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      element.contributionAuth = { connected: true, identity: { login: "another-account" } };
+      await element.updateComplete;
+      expect(input.value).toBe(value);
+    }
+  });
+
   it("lists power sensors and emits the selected default on save", async () => {
     const element = document.createElement("measure-settings-view") as HTMLElement & {
       powers: EntityDescriptor[];
@@ -18,13 +79,13 @@ describe("settings view", () => {
     await element.updateComplete;
 
     const sectionButtons = [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".settings-nav button")];
-    expect(sectionButtons.map((button) => button.textContent?.trim())).toEqual(["Power meter", "Measure tuning", "GitHub"]);
+    expect(sectionButtons.map((button) => button.textContent?.trim())).toEqual(["Power meter", "Profile metadata", "Measure tuning", "GitHub"]);
     expect(sectionButtons[0]?.classList.contains("active")).toBe(true);
     expect(element.shadowRoot.querySelector<HTMLElement>('[aria-labelledby="measure-tuning-title"]')?.hidden).toBe(true);
 
-    sectionButtons[1]?.click();
+    sectionButtons[2]?.click();
     await element.updateComplete;
-    expect(sectionButtons[1]?.classList.contains("active")).toBe(true);
+    expect(sectionButtons[2]?.classList.contains("active")).toBe(true);
     expect(element.shadowRoot.querySelector<HTMLElement>('[aria-labelledby="power-meter-title"]')?.hidden).toBe(true);
     expect(element.shadowRoot.querySelector<HTMLElement>('[aria-labelledby="measure-tuning-title"]')?.hidden).toBe(false);
     sectionButtons[0]?.click();
@@ -36,6 +97,14 @@ describe("settings view", () => {
     const powerSensor = element.shadowRoot.querySelector('measure-combobox[name="default_power_entity_id"]') as HTMLElement;
     const measureDevicePicker = element.shadowRoot.querySelector('measure-combobox[name="default_measure_device"]') as HTMLElement & { updateComplete: Promise<boolean>; shadowRoot: ShadowRoot };
     const measureDevice = measureDevicePicker.shadowRoot.querySelector("input") as HTMLInputElement;
+    const firmware = element.shadowRoot.querySelector('input[name="default_measure_device_firmware"]') as HTMLInputElement;
+    const contributorName = element.shadowRoot.querySelector('input[name="default_contributor_name"]') as HTMLInputElement;
+    const contributorGithub = element.shadowRoot.querySelector('input[name="default_contributor_github"]') as HTMLInputElement;
+    const contributorEmail = element.shadowRoot.querySelector('input[name="default_contributor_email"]') as HTMLInputElement;
+    firmware.value = "1.2.3";
+    contributorName.value = "Test User";
+    contributorGithub.value = "test-user";
+    contributorEmail.value = "test@example.com";
     expect(measureDevice.required).toBe(true);
     measureDevice.focus();
     await measureDevicePicker.updateComplete;
@@ -63,6 +132,10 @@ describe("settings view", () => {
     const settings = await saved;
     expect(settings.default_power_entity_id).toBe("sensor.plug_power");
     expect(settings.default_measure_device).toBe("Shelly Plug S");
+    expect(settings.default_measure_device_firmware).toBe("1.2.3");
+    expect(settings.default_contributor_name).toBe("Test User");
+    expect(settings.default_contributor_github).toBe("test-user");
+    expect(settings.default_contributor_email).toBe("test@example.com");
     expect(settings.measurement_defaults).toEqual(measurementDefaults);
   });
 
@@ -297,9 +370,7 @@ describe("settings power meter test", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const meterSelect = element.shadowRoot.querySelector('select[name="power_meter"]') as HTMLSelectElement;
-    meterSelect.value = "shelly";
-    meterSelect.dispatchEvent(new Event("change"));
+    chooseOption(settingsCombobox(element.shadowRoot, "power_meter"), "shelly");
     await element.updateComplete;
     (element.shadowRoot.querySelector('input[name="shelly_ip"]') as HTMLInputElement).value = "10.0.0.5";
 
@@ -329,14 +400,12 @@ describe("settings power meter test", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const meterSelect = element.shadowRoot.querySelector('select[name="power_meter"]') as HTMLSelectElement;
-    meterSelect.value = "kasa";
-    meterSelect.dispatchEvent(new Event("change"));
+    chooseOption(settingsCombobox(element.shadowRoot, "power_meter"), "kasa");
     await element.updateComplete;
     expect(discover).not.toHaveBeenCalled();
     // Selecting a direct meter invalidates the earlier Home Assistant sensor result.
     expect(element.shadowRoot.querySelector("measure-power-meter-diagnostic")).toBeNull();
-    expect(element.shadowRoot.querySelector('select[name="discovered_shelly"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('measure-combobox[name="discovered_shelly"]')).toBeNull();
 
     const kasaIp = element.shadowRoot.querySelector('input[name="kasa_ip"]') as HTMLInputElement;
     kasaIp.value = "192.0.2.30";
@@ -362,9 +431,7 @@ describe("settings power meter test", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const meterSelect = element.shadowRoot.querySelector('select[name="power_meter"]') as HTMLSelectElement;
-    meterSelect.value = "shelly";
-    meterSelect.dispatchEvent(new Event("change"));
+    chooseOption(settingsCombobox(element.shadowRoot, "power_meter"), "shelly");
     await element.updateComplete;
     expect(discover).toHaveBeenCalledOnce();
 
@@ -374,12 +441,11 @@ describe("settings power meter test", () => {
     ];
     await element.updateComplete;
 
-    const discovered = element.shadowRoot.querySelector('select[name="discovered_shelly"]') as HTMLSelectElement;
-    expect(discovered.options[1]?.textContent).toContain("Kitchen plug");
-    expect(discovered.options[2]?.textContent).toContain("Authentication is enabled");
+    const discovered = settingsCombobox(element.shadowRoot, "discovered_shelly");
+    expect(discovered.options[1]?.label).toContain("Kitchen plug");
+    expect(discovered.options[2]?.label).toContain("Authentication is enabled");
     expect(discovered.options[2]?.disabled).toBe(false);
-    discovered.value = "10.0.0.8";
-    discovered.dispatchEvent(new Event("change"));
+    chooseOption(discovered, "10.0.0.8");
     await element.updateComplete;
     expect((element.shadowRoot.querySelector('input[name="shelly_ip"]') as HTMLInputElement).value).toBe("10.0.0.8");
   });
@@ -476,9 +542,7 @@ describe("settings power meter test", () => {
 
     element.testResult = goodPowerMeterDiagnostic;
     await element.updateComplete;
-    const meterType = element.shadowRoot.querySelector('select[name="power_meter"]') as HTMLSelectElement;
-    meterType.value = "shelly";
-    meterType.dispatchEvent(new Event("change"));
+    chooseOption(settingsCombobox(element.shadowRoot, "power_meter"), "shelly");
     await element.updateComplete;
     expect(element.shadowRoot.querySelector("measure-power-meter-diagnostic")).toBeNull();
 

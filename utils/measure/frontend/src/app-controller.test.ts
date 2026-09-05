@@ -50,6 +50,7 @@ function state(): MeasureAppState {
     logs: [], samples: [], lights: [], powers: [], voltages: [], definitions: [],
     dummyLoadCalibration: null, dummyLoadCalibrationError: "",
     measureDevices: [], measureDevicesLoading: false, measureDevicesError: "",
+    deviceSpecificationFields: {},
     contributionBusy: false, contributionAuthBusy: false, contributionError: "", contributionAuthError: "",
     deviceEntities: {}, deviceEntityErrors: {}, testingPowerMeter: false,
     shellyDiscoveryDevices: [], discoveringShellys: false, shellyDiscoveryError: "",
@@ -61,6 +62,8 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     getCapabilities: async () => capabilities,
     getMeasureDefinitions: async () => [],
     getMeasureDevices: async () => ({ devices: [] }),
+    getManufacturers: async () => ({ manufacturers: [] }),
+    getDeviceSpecifications: async () => ({ device_types: {} }),
     getSettings: async () => settings,
     getContributionAuth: async () => ({ connected: false }),
     getContributionStatus: async () => ({ state: "idle" as const }),
@@ -128,7 +131,7 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
       repository: "bramstroker/homeassistant-powercalc",
       base_branch: "master",
       manufacturer_name: request.manufacturer_name,
-      manufacturer_directory: request.manufacturer_directory,
+      manufacturer_directory: "signify",
       model_id: request.model_id,
       product_name: request.product_name,
       contributor: request.contributor,
@@ -148,6 +151,24 @@ function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
 }
 
 describe("measure app controller", () => {
+  it.each(["snapshot", "request"] as const)("prevents profile navigation for average measurements from %s", (source) => {
+    const appState = state();
+    const request = {
+      measure_type: "average" as const, duration: 60, model_id: "", product_name: "", measure_device: "Test meter",
+      generate_model: false, parameters: capabilities.defaults, resume_policy: "new" as const, power_meter: { type: "dummy" as const },
+    };
+    appState.view = "result";
+    appState.snapshot = { state: "completed", ...(source === "snapshot" ? { request } : {}) };
+    if (source === "request") appState.request = request;
+    const controller = new MeasureAppController(appState, () => api(), () => connection(), () => undefined);
+    controller.openProfile();
+    expect(appState.view).toBe("result");
+    controller.openShare();
+    expect(appState.view).toBe("result");
+    controller.backToProfile();
+    expect(appState.view).toBe("result");
+  });
+
   it("preserves structured help from API errors", async () => {
     const appState = state();
     const help = {
@@ -249,6 +270,13 @@ describe("measure app controller", () => {
     const controller = new MeasureAppController(appState, () => api({
       getSession: async () => ({ state: "completed", session_id: "session-1" }),
       getContributionAuth: async () => ({ connected: true, identity: { login: "octocat" }, method: "device" }),
+      getManufacturers: async () => ({ manufacturers: ["IKEA", "Signify"] }),
+      getMeasureDevices: async () => ({ devices: ["Shelly Plug S", "Kasa EP25"] }),
+      getDeviceSpecifications: async () => ({
+        device_types: {
+          light: [{ name: "rated_power", label: "Rated power", description: "Rated watts", value_type: "number", collection: "scalar", options: [] }],
+        },
+      }),
       getContributionDraft: async () => ({
         eligible: true,
         repository: "bramstroker/homeassistant-powercalc",
@@ -277,6 +305,9 @@ describe("measure app controller", () => {
     expect(appState.view).toBe("result");
     expect(appState.contributionAuth?.identity?.login).toBe("octocat");
     expect(appState.contributionDraft?.files[0]?.path).toBe("profile_library/signify/LCT010/model.json");
+    expect(appState.manufacturers).toEqual(["IKEA", "Signify"]);
+    expect(appState.measureDevices).toEqual(["Shelly Plug S", "Kasa EP25"]);
+    expect(appState.deviceSpecificationFields.light?.[0]?.name).toBe("rated_power");
     expect(appState.contributionPreview).toBeUndefined();
   });
 
@@ -331,7 +362,7 @@ describe("measure app controller", () => {
         repository: "bramstroker/homeassistant-powercalc",
         base_branch: "master",
         manufacturer_name: request.manufacturer_name,
-        manufacturer_directory: request.manufacturer_directory,
+        manufacturer_directory: "signify",
         model_id: request.model_id,
         product_name: request.product_name,
         contributor: request.contributor,
@@ -363,10 +394,19 @@ describe("measure app controller", () => {
     await controller.saveContributionToken("token");
     expect(appState.contributionAuth?.method).toBe("token");
 
-    await controller.previewContribution({ manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "No aliases." });
+    await controller.previewContribution({ manufacturer_name: "Signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "No aliases." });
     expect(appState.contributionPreview?.notes).toBe("No aliases.");
 
-    await controller.submitContribution({ manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "No aliases.", confirmed: true });
+    controller.openProfile();
+    expect(appState.view).toBe("profile");
+    controller.openShare();
+    expect(appState.view).toBe("share");
+    controller.backToProfile();
+    expect(appState.view).toBe("profile");
+    controller.backToResult();
+    expect(appState.view).toBe("result");
+
+    await controller.submitContribution({ manufacturer_name: "Signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "octocat", notes: "No aliases.", confirmed: true });
     expect(appState.contributionResult?.pull_request_url).toBe("https://github.com/pull/1");
 
     await controller.disconnectContributionAuth();
@@ -391,7 +431,6 @@ describe("measure app controller", () => {
 
     await controller.previewContribution({
       manufacturer_name: "Signify",
-      manufacturer_directory: "signify",
       model_id: "LCT010",
       product_name: "Signify Hue lamp",
       contributor: "octocat",
