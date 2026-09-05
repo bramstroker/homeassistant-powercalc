@@ -20,6 +20,7 @@ class AverageRunner(MeasurementRunner[AverageMeasurementRequest]):
     ) -> None:
         self.measure_util = measure_util
         self.duration = 60
+        self.elapsed = 0.0
         self.interaction = interaction or ImmediateInteraction()
 
     def run(
@@ -28,14 +29,19 @@ class AverageRunner(MeasurementRunner[AverageMeasurementRequest]):
         export_directory: str,
     ) -> RunnerResult:
         self.duration = request.duration
+        self.elapsed = float(self.duration)
         self.interaction.confirm("Ready to start the average measurement.")
         self.interaction.phase("Starting averaging")
 
-        result = self.measure_util.take_average_measurement(self.duration, on_progress=self._report_progress)
+        result = self.measure_util.take_average_measurement(
+            self.duration,
+            on_progress=self._report_progress,
+            finish_on_interrupt=True,
+        )
 
         summary = {
             "Average power": f"{round(result.power, 2)} W",
-            "Duration": f"{self.duration} s",
+            "Duration": f"{round(self.elapsed, 1):g} s",
         }
         if result.voltages:
             summary["Average voltage"] = f"{round(mean(result.voltages), 1)} V"
@@ -43,6 +49,7 @@ class AverageRunner(MeasurementRunner[AverageMeasurementRequest]):
         return RunnerResult(model_json_data={}, voltages=result.voltages, summary=summary)
 
     def _report_progress(self, elapsed: float, duration: float) -> None:
+        self.elapsed = elapsed
         self.interaction.progress(
             int(min(elapsed, duration)),
             int(duration),

@@ -60,13 +60,15 @@ def request_from_answers(
 ) -> MeasurementRequest:
     """Adapt CLI/Inquirer answers once at the transport boundary."""
     common: dict[str, Any] = {
-        "model_id": str(answers.get(QUESTION_MODEL_ID, "measurement")),
-        "product_name": str(answers.get(QUESTION_MODEL_NAME, "Measurement")),
+        "model_id": str(answers.get(QUESTION_MODEL_ID) or ""),
+        "product_name": str(answers.get(QUESTION_MODEL_NAME) or ""),
         "measure_device": str(answers.get(QUESTION_MEASURE_DEVICE, "")),
         "generate_model": bool(answers.get(QUESTION_GENERATE_MODEL_JSON, False)),
         "power_meter": _power_meter_spec(environment, answers),
         "parameters": _parameters_from_environment(environment),
-        "resume_policy": ResumePolicy.RESUME if environment.resume else ResumePolicy.NEW,
+        "resume_policy": (
+            ResumePolicy.RESUME if environment.resume and answers.get(QUESTION_MODEL_ID) else ResumePolicy.NEW
+        ),
     }
     if measure_type == MeasureType.LIGHT:
         return LightMeasurementRequest(

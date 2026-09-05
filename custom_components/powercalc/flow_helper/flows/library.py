@@ -39,6 +39,7 @@ from custom_components.powercalc.helpers import (
     resolve_related_entity_placeholder,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
+from custom_components.powercalc.power_profile.library_url import profile_url
 from custom_components.powercalc.power_profile.power_profile import (
     DEVICE_TYPE_DOMAIN,
     DOMAIN_DEVICE_TYPE_MAPPING,
@@ -473,6 +474,20 @@ class LibraryFlow:
             return DiscoveryBy.CONFIG_ENTRY
         return DiscoveryBy.DEVICE
 
+    def _build_profile_details(self, profile: PowerProfile) -> str:
+        """Build a link to the profile in the public library when available."""
+        if profile.is_custom_profile:
+            return ""
+
+        translations = translation.async_get_cached_translations(
+            self.flow.hass,
+            self.flow.hass.config.language,
+            "common",
+            DOMAIN,
+        )
+        label = translations[f"component.{DOMAIN}.common.view_measurement_details"]
+        return f"\n\n[{label}]({profile_url(profile.manufacturer, profile.model)})"
+
 
 class LibraryConfigFlow(LibraryFlow):
     def __init__(self, flow: PowercalcConfigFlow) -> None:
@@ -592,6 +607,7 @@ class LibraryConfigFlow(LibraryFlow):
             "remarks": self._build_library_remarks(profile),
             "manufacturer": profile.manufacturer,
             "model": profile.model,
+            "profile_details": self._build_profile_details(profile),
             "source": self._get_profile_source(profile),
         }
 
@@ -674,11 +690,14 @@ class LibraryOptionsFlow(LibraryFlow):
         if user_input is not None:
             return await self.async_step_manufacturer()
 
+        profile = self.flow.selected_profile
+        assert profile is not None
         return self.flow.async_show_form(
             step_id=Step.LIBRARY_OPTIONS,
             description_placeholders={
-                "manufacturer": self.flow.selected_profile.manufacturer,  # type: ignore
-                "model": self.flow.selected_profile.model,  # type: ignore
+                "manufacturer": profile.manufacturer,
+                "model": profile.model,
+                "profile_details": self._build_profile_details(profile),
             },
             last_step=False,
         )

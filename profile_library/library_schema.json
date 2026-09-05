@@ -136,11 +136,14 @@
     "device_type": {
       "type": "string",
       "enum": [
+        "air_conditioner",
+        "air_purifier",
         "camera",
         "cover",
         "fan",
         "generic_iot",
         "heating",
+        "humidifier",
         "lawn_mower_robot",
         "light",
         "power_meter",
@@ -152,7 +155,8 @@
         "television",
         "network",
         "ups",
-        "vacuum_robot"
+        "vacuum_robot",
+        "water_heater"
       ],
       "description": "Type of device"
     }

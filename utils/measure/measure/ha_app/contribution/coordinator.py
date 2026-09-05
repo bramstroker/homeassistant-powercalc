@@ -1,5 +1,6 @@
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+import json
 import logging
 import os
 from threading import Lock
@@ -32,6 +33,9 @@ from measure.request import MeasurementRequest
 _LOGGER = logging.getLogger("measure")
 _OAUTH_CLIENT_ID_ENV = "POWERCALC_GITHUB_CLIENT_ID"
 
+#: Resolves optional profile metadata for every measured entity in a single lookup.
+EntityValueResolver = Callable[[Sequence[str]], Mapping[str, str | None]]
+
 
 @dataclass(frozen=True)
 class _DeviceFlow:
@@ -54,12 +58,16 @@ class ContributionApiCoordinator:
         storage: SessionStorage,
         *,
         service_factory: Callable[[], ContributionService] | None = None,
-        resolve_integration: Callable[[str], str | None] | None = None,
+        resolve_integration: EntityValueResolver | None = None,
+        resolve_manufacturer: EntityValueResolver | None = None,
+        resolve_model_id: EntityValueResolver | None = None,
         oauth_client_id: str | None = None,
     ) -> None:
         self._storage = storage
         self._service_factory = service_factory or (lambda: create_contribution_service(storage.data_root))
         self._resolve_integration = resolve_integration
+        self._resolve_manufacturer = resolve_manufacturer
+        self._resolve_model_id = resolve_model_id
         self._oauth_client_id = oauth_client_id if oauth_client_id is not None else os.environ.get(_OAUTH_CLIENT_ID_ENV)
         self._lock = Lock()
         self._device_flows: dict[str, _DeviceFlow] = {}
@@ -122,12 +130,21 @@ class ContributionApiCoordinator:
     def draft(self, snapshot: SessionSnapshot) -> ContributionPreviewResponse:
         self._require_completed_session(snapshot)
         request = self._storage.load_request(snapshot.id)
+        settings = self._storage.load_settings()
         return draft_from_request(
             session_id=snapshot.id,
             request=request,
             artifact_root=self._storage.artifact_directory(snapshot.id, request.model_id),
             auth=self.auth_status(),
             integration=self._integration(request),
+            manufacturer=self._shared_entity_value(request, self._resolve_manufacturer),
+            default_model_id=(
+                self._shared_entity_value(request, self._resolve_model_id) if not request.model_id else None
+            ),
+            default_measure_device_firmware=settings.default_measure_device_firmware,
+            default_contributor_name=settings.default_contributor_name,
+            default_contributor_github=settings.default_contributor_github,
+            default_contributor_email=settings.default_contributor_email,
         )
 
     def preview(
@@ -161,6 +178,21 @@ class ContributionApiCoordinator:
             )
             self._storage.save_contribution_status(self._status)
         return preview
+
+    def prepared_archive(self, snapshot: SessionSnapshot, job_id: str) -> bytes:
+        """Download only the prepared package belonging to this session's latest preview."""
+
+        self._require_completed_session(snapshot)
+        request = self._storage.load_request(snapshot.id)
+        self._require_supported_request(request)
+        with self._lock:
+            preview = self._status.preview
+            if preview is None or preview.session_id != snapshot.id or preview.job_id != job_id:
+                raise ContributionApiError(
+                    ContributionApiErrorCode.PREVIEW_REQUIRED,
+                    "Refresh the profile preview before downloading",
+                )
+        return self._service_factory().prepared_archive(job_id)
 
     def submit(self, snapshot: SessionSnapshot, payload: ContributionSubmitRequest) -> ContributionSubmissionResult:
         if not payload.confirmed:
@@ -229,11 +261,22 @@ class ContributionApiCoordinator:
 
     def _integration(self, request: MeasurementRequest) -> str | None:
         """Return the Home Assistant integration providing every measured entity, when they agree on one."""
-        if self._resolve_integration is None:
+        return self._shared_entity_value(request, self._resolve_integration)
+
+    @staticmethod
+    def _shared_entity_value(
+        request: MeasurementRequest,
+        resolver: EntityValueResolver | None,
+    ) -> str | None:
+        entity_ids = tuple(request.controlled_entity_ids)
+        if resolver is None or not entity_ids:
             return None
-        integrations = {self._resolve_integration(entity_id) for entity_id in request.controlled_entity_ids}
+        # Resolved in one call: a resolver reads a Home Assistant snapshot and the published
+        # library, which are far too expensive to fetch once per measured entity.
+        resolved = resolver(entity_ids)
+        values = {resolved.get(entity_id) for entity_id in entity_ids}
         # A single unresolved entity yields {None}, which pops back to None just the same.
-        return integrations.pop() if len(integrations) == 1 else None
+        return values.pop() if len(values) == 1 else None
 
     def _require_oauth_client_id(self) -> str:
         if not self._oauth_client_id:
@@ -280,9 +323,18 @@ class ContributionApiCoordinator:
 def _preview_request_values(value: ContributionPreviewResponse | ContributionPreviewRequest) -> tuple[str, ...]:
     return (
         value.manufacturer_name,
-        value.manufacturer_directory or "",
         value.model_id,
         value.product_name,
         value.contributor,
+        value.contributor_github or "",
+        value.contributor_email or "",
+        "\0".join(value.aliases),
+        "\0".join(value.gtins),
+        value.product_url or "",
+        str(value.mains_voltage or ""),
+        json.dumps(value.device_specs, sort_keys=True) if value.device_specs is not None else "",
+        value.measure_device or "",
+        value.measure_device_firmware or "",
+        value.measure_description or "",
         value.notes,
     )

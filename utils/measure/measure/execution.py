@@ -7,12 +7,14 @@ from typing import Any, Literal, NotRequired, Protocol, TypedDict
 
 from measure.analyser import RecorderAnalyser
 from measure.analyser.execution import RecorderAnalysisExecution
+from measure.cancellation import MeasurementCancelledError as MeasurementCancelledError
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION, Trend
 from measure.dummy_load import DummyLoadCalibration
 from measure.model import write_model_json
 from measure.request import (
     DummyLoadRequest,
     DummyLoadReuseRequest,
+    LightMeasurementRequest,
     MeasurementRequest,
     RecorderMeasurementRequest,
     RecorderPurpose,
@@ -89,10 +91,6 @@ class RunInteraction(Protocol):
 
     def entity_states(self, states: Mapping[str, str]) -> None:
         """Report the latest states captured by a recorder session."""
-
-
-class MeasurementCancelledError(Exception):
-    """Raised when an active measurement is cancelled cooperatively."""
 
 
 class ImmediateInteraction(RunInteraction):
@@ -299,6 +297,7 @@ class MeasurementExecution:
                 )
             if request.generate_model_json and output_directory is not None:
                 standby = runner.measure_standby_power()
+                voltages = list(result.voltages or []) + standby.voltages
                 write_model_json(
                     output_directory,
                     standby_power=standby.power,
@@ -306,8 +305,19 @@ class MeasurementExecution:
                     measure_device=request.measure_device,
                     parameters=request.parameters,
                     extra_json_data=result.model_json_data,
-                    voltages=list(result.voltages or []) + standby.voltages,
+                    voltages=voltages,
+                    num_lights=request.multiple_light_count if isinstance(request, LightMeasurementRequest) else None,
+                    dummy_load=request.dummy_load is not None,
+                    dummy_load_resistance=self._dummy_load_resistance(),
                 )
             return result
         finally:
             runner.cleanup()
+
+    def _dummy_load_resistance(self) -> float | None:
+        if isinstance(self.measurement.request.dummy_load, DummyLoadReuseRequest):
+            return self.measurement.request.dummy_load.resistance
+        for preparation in self.measurement.preparations:
+            if isinstance(preparation, DummyLoadPreparation):
+                return preparation.measure_util.dummy_load_value
+        return None

@@ -3,7 +3,8 @@
     "source_entity": "Encja źródłowa",
     "source_device": "Urządzenie źródłowe",
     "remarks_smart_switch": "Ten profil dostarcza tylko wartości poboru mocy w trybie czuwania. \n Gdy masz urządzenie, które zużywa stałą ilość energii po włączeniu, możesz podać tę wartość w następnym kroku przepływu konfiguracji",
-    "remarks_smart_dimmer": "Ten profil dostarcza tylko wartości poboru mocy w trybie czuwania. \n W następnym kroku możesz opcjonalnie podać wartości dla podłączonego światła"
+    "remarks_smart_dimmer": "Ten profil dostarcza tylko wartości poboru mocy w trybie czuwania. \n W następnym kroku możesz opcjonalnie podać wartości dla podłączonego światła",
+    "view_measurement_details": "Zobacz szczegóły pomiaru"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Jeśli zdecydujesz się nie potwierdzać, możesz samodzielnie wprowadzić producenta i model"
         },
-        "description": "{source}\n\nProducent \"{manufacturer}\" i model \"{model}\" zostały automatycznie wykryte dla twojego urządzenia.{remarks}",
+        "description": "{source}\n\nProducent \"{manufacturer}\" i model \"{model}\" zostały automatycznie wykryte dla twojego urządzenia.{remarks}{profile_details}",
         "title": "Biblioteka"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Opcje biblioteki",
-        "description": "Obecnie wybrany jest następujący profil biblioteki: \n producent: {manufacturer}\n model: {model}\n\nJeśli chcesz zmienić profil, kliknij dalej."
+        "description": "Obecnie wybrany jest następujący profil biblioteki: \n producent: {manufacturer}\n model: {model}\n\nJeśli chcesz zmienić profil, kliknij dalej.{profile_details}"
       },
       "select_device": {
         "data": {

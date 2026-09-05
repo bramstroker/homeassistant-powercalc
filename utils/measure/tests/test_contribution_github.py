@@ -162,6 +162,21 @@ def test_github_client_reads_sha_pinned_file_and_creates_ready_pull_request() ->
     assert transport.calls[1]["json"]["maintainer_can_modify"] is True
 
 
+def test_github_client_reads_public_preview_references_without_token() -> None:
+    encoded = base64.b64encode(b'{"ok": true}').decode()
+    transport = FakeTransport(
+        [
+            Response(200, {"object": {"sha": "base-sha"}}),
+            Response(200, {"encoding": "base64", "content": encoded}),
+        ],
+    )
+    client = GitHubClient(transport=transport)
+
+    assert client.get_ref("owner", "repo", "master") == {"object": {"sha": "base-sha"}}
+    assert client.get_file("owner", "repo", "profile_library/library.json", "base-sha") == b'{"ok": true}'
+    assert all("Authorization" not in call["headers"] for call in transport.calls)
+
+
 def test_github_client_fetches_upstream_through_contribution_branch() -> None:
     transport = FakeTransport([Response(200, {"message": "Successfully fetched and fast-forwarded"})])
     client = GitHubClient("token", transport=transport)

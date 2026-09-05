@@ -88,11 +88,21 @@ def test_request_normalizes_profile_metadata() -> None:
     assert request.measure_device == "Test meter"
 
 
-@pytest.mark.parametrize("field", ["product_name", "measure_device"])
+@pytest.mark.parametrize("field", ["measure_device"])
 def test_request_rejects_blank_required_profile_metadata(field: str) -> None:
     payload = valid_request() | {field: "   "}
     with pytest.raises(ValidationError, match=field):
         LightMeasurementRequest.model_validate(payload)
+
+
+def test_request_defers_unknown_product_details_until_preparation() -> None:
+    payload = valid_request()
+    del payload["model_id"]
+    del payload["product_name"]
+    request = LightMeasurementRequest.model_validate(payload | {"session_name": " Desk lamp "})
+    assert request.model_id == ""
+    assert request.product_name == ""
+    assert request.session_name == "Desk lamp"
 
 
 def test_request_accepts_dummy_load_calibration() -> None:
@@ -171,6 +181,7 @@ def test_cli_request_contains_only_resolved_measurement_input(mock_config_factor
     environment = mock_config_factory()
     environment.selected_power_meter = PowerMeterType.DUMMY
     environment.selected_light_controller = LightControllerType.DUMMY
+    environment.resume = True
     answers = {
         QUESTION_ENTITY_ID: "light.hue_test",
         QUESTION_MEASURE_DEVICE: "Test meter",
@@ -182,6 +193,12 @@ def test_cli_request_contains_only_resolved_measurement_input(mock_config_factor
 
     assert request.power_meter.type == PowerMeterType.DUMMY
     assert "hue_group" not in request.model_dump()
+    assert request.model_id == ""
+    assert request.product_name == ""
+    assert request.resume_policy == "new"
+    existing = request_from_answers(MeasureType.LIGHT, answers | {"model_id": "LCT010"}, environment)
+    assert existing.model_id == "LCT010"
+    assert existing.resume_policy == "resume"
 
 
 @pytest.mark.parametrize("model_id", ["../secret", "/unsafe/file", "a/b", ".."])

@@ -192,7 +192,11 @@ class MeasurementCoordinator:
                 snapshot = replace(
                     snapshot,
                     state=SessionState.CANCELLING,
-                    phase="Cancelling measurement",
+                    phase=(
+                        "Stopping measurement"
+                        if snapshot.mode in {"Averaging", "Recording"}
+                        else "Cancelling measurement"
+                    ),
                     confirmation_message=None,
                     confirmation_action=None,
                     updated_at=utc_now(),

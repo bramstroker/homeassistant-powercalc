@@ -3,7 +3,8 @@
     "source_entity": "Forrásentitás",
     "source_device": "Forráseszköz",
     "remarks_smart_switch": "Ez a profil csak készenléti teljesítményértékeket tartalmaz. \n Ha egy eszköz bekapcsolva állandó teljesítményt vesz fel, ezt az értéket a konfiguráció következő lépésében adhatja meg",
-    "remarks_smart_dimmer": "Ez a profil csak készenléti teljesítményértékeket tartalmaz. \n A következő lépésben megadhatja a csatlakoztatott lámpa értékeit"
+    "remarks_smart_dimmer": "Ez a profil csak készenléti teljesítményértékeket tartalmaz. \n A következő lépésben megadhatja a csatlakoztatott lámpa értékeit",
+    "view_measurement_details": "Mérési részletek megtekintése"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Ha úgy dönt, hogy nem erősíti meg, megadhatja saját maga a gyártót és a modellt"
         },
-        "description": "{source}\n\nA készülék automatikusan észlelte a „{manufacturer}” gyártót és a „{model}” modellt.{remarks}",
+        "description": "{source}\n\nA készülék automatikusan észlelte a „{manufacturer}” gyártót és a „{model}” modellt.{remarks}{profile_details}",
         "title": "Könyvtár"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Könyvtári beállítások",
-        "description": "Jelenleg a következő könyvtári profil van kiválasztva: \n gyártó: {manufacturer}\n modell: {model}\n\nHa módosítani szeretné a profilt, kattintson a Tovább gombra."
+        "description": "Jelenleg a következő könyvtári profil van kiválasztva: \n gyártó: {manufacturer}\n modell: {model}\n\nHa módosítani szeretné a profilt, kattintson a Tovább gombra.{profile_details}"
       },
       "select_device": {
         "data": {

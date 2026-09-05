@@ -3,7 +3,8 @@
     "source_entity": "Source entity",
     "source_device": "Source device",
     "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light",
+    "view_measurement_details": "View measurement details"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
         },
-        "description": "{source}\n\nManufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.{remarks}",
+        "description": "{source}\n\nManufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.{remarks}{profile_details}",
         "title": "Library"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Library options",
-        "description": "Currently the following library profile is selected: \n manufacturer: {manufacturer}\n model: {model}\n\nIf you want to change the profile, click next."
+        "description": "Currently the following library profile is selected: \n manufacturer: {manufacturer}\n model: {model}\n\nIf you want to change the profile, click next.{profile_details}"
       },
       "select_device": {
         "data": {

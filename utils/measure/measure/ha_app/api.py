@@ -1,5 +1,5 @@
 import asyncio
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from contextlib import asynccontextmanager
 from dataclasses import replace
 import json
@@ -8,7 +8,7 @@ import mimetypes
 import os
 from pathlib import Path
 import re
-from typing import Annotated, cast
+from typing import Annotated, Literal, cast
 
 from fastapi import APIRouter, Body, FastAPI, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
@@ -21,7 +21,7 @@ from measure.assembler import MeasurementAssembler
 from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.light.const import LutMode
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
-from measure.execution import ImmediateInteraction
+from measure.execution import ImmediateInteraction, OperatingPoint
 from measure.ha_app.contribution import (
     ConnectPatRequest,
     ContributionApiCoordinator,
@@ -38,7 +38,12 @@ from measure.ha_app.contribution import (
 )
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
-from measure.ha_app.library_catalog import LibraryCatalogError, MeasureDeviceCatalog
+from measure.ha_app.library_catalog import (
+    DeviceSpecificationCatalog,
+    LibraryCatalogError,
+    ManufacturerCatalog,
+    MeasureDeviceCatalog,
+)
 from measure.ha_app.light_probe import (
     LightLoadProbe,
     LightLoadProbeError,
@@ -83,6 +88,7 @@ from measure.tuning import MeasurementParameters
 from measure.version import measure_version
 from measure.visualization import PlotSpec, build_session_plots
 
+CACHE_CONTROL_LIBRARY = "public, max-age=600"
 _LOGGER = logging.getLogger("measure")
 
 
@@ -142,6 +148,23 @@ class MeasureDeviceCatalogResponse(BaseModel):
     devices: list[str]
 
 
+class ManufacturerCatalogResponse(BaseModel):
+    manufacturers: list[str]
+
+
+class DeviceSpecificationFieldResponse(BaseModel):
+    name: str
+    label: str
+    description: str
+    value_type: Literal["string", "number", "integer", "boolean"]
+    collection: Literal["scalar", "array", "scalar_or_array"]
+    options: list[str]
+
+
+class DeviceSpecificationCatalogResponse(BaseModel):
+    device_types: dict[str, list[DeviceSpecificationFieldResponse]]
+
+
 class SessionFile(BaseModel):
     name: str
     size: int
@@ -170,6 +193,51 @@ class SessionSummary(BaseModel):
     file_count: int
     size: int
     active: bool
+
+
+class SessionProgressResponse(BaseModel):
+    completed: int
+    total: int
+    skipped: int
+    percent: float
+    estimated_remaining_seconds: int | None
+
+
+class CalibrationSampleResponse(BaseModel):
+    power: float
+    resistance: float
+    voltage: float
+
+
+class SessionSnapshotResponse(BaseModel):
+    """Complete JSON contract returned by session endpoints and embedded in SSE events."""
+
+    session_id: str
+    state: SessionState
+    created_at: str
+    updated_at: str
+    phase: str | None
+    confirmation_message: str | None
+    confirmation_action: str | None
+    mode: str | None
+    progress: SessionProgressResponse
+    warnings: list[str]
+    error: str | None
+    summary: dict[str, str] | None
+    operating_point: OperatingPoint | None
+    calibration_sample: CalibrationSampleResponse | None
+    entity_states: dict[str, str]
+    can_analyse: bool
+    request: MeasurementRequest
+
+
+class SessionEventResponse(BaseModel):
+    """Wire envelope shared by stored session events and SSE heartbeats."""
+
+    sequence: int
+    type: str
+    data: dict[str, object]
+    snapshot: SessionSnapshotResponse | None = None
 
 
 class CapabilitiesResponse(BaseModel):
@@ -252,6 +320,8 @@ class AppContext:
         self.developer_mode = developer_mode
         self.storage = SessionStorage(data_root)
         self.measure_device_catalog = MeasureDeviceCatalog()
+        self.manufacturer_catalog = ManufacturerCatalog()
+        self.device_specification_catalog = DeviceSpecificationCatalog()
         self.power_meter_diagnostics = PowerMeterDiagnostics(self.build_power_meter)
         self.light_load_probe = LightLoadProbe(
             lambda: app_measurement_assembler(
@@ -259,20 +329,51 @@ class AppContext:
                 shelly_password=self.shelly_password(),
             ),
         )
-        self.contribution = ContributionApiCoordinator(self.storage, resolve_integration=self.entity_integration)
+        self.contribution = ContributionApiCoordinator(
+            self.storage,
+            resolve_integration=self.entity_integrations,
+            resolve_manufacturer=self.entity_manufacturers,
+            resolve_model_id=self.entity_model_ids,
+        )
         self.coordinator = MeasurementCoordinator(
             self.storage,
             self._measurement_service,
         )
 
-    def entity_integration(self, entity_id: str) -> str | None:
-        """Look up which integration provides an entity; contribution details stay usable without it."""
+    def entity_integrations(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
+        """Look up which integration provides each entity; contribution details stay usable without it."""
+        entities = self._entity_descriptors(entity_ids, "integration")
+        return {entity_id: entity.integration if entity is not None else None for entity_id, entity in entities.items()}
+
+    def entity_manufacturers(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
+        """Look up HA's device manufacturer per entity and normalize known aliases to the library name."""
+        entities = self._entity_descriptors(entity_ids, "manufacturer")
+        return {
+            entity_id: self._canonical_manufacturer(entity.manufacturer) if entity is not None else None
+            for entity_id, entity in entities.items()
+        }
+
+    def entity_model_ids(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
+        entities = self._entity_descriptors(entity_ids, "model ID")
+        return {entity_id: entity.model_id if entity is not None else None for entity_id, entity in entities.items()}
+
+    def _entity_descriptors(self, entity_ids: Sequence[str], purpose: str) -> dict[str, EntityDescriptor | None]:
+        """Read one entity snapshot for the whole batch, rather than one per entity."""
         try:
-            entity = HomeAssistantEntityCatalog(self.home_assistant).load_snapshot().get(entity_id)
-        except Exception as error:  # noqa: BLE001 - the integration is optional context for a pull request
-            _LOGGER.warning("Could not resolve the integration for %s: %s", entity_id, error)
+            snapshot = HomeAssistantEntityCatalog(self.home_assistant).load_snapshot()
+        except Exception as error:  # noqa: BLE001 - this metadata is optional context for a pull request
+            _LOGGER.warning("Could not resolve the %s for %s: %s", purpose, ", ".join(entity_ids), error)
+            return dict.fromkeys(entity_ids)
+        return {entity_id: snapshot.get(entity_id) for entity_id in entity_ids}
+
+    def _canonical_manufacturer(self, manufacturer: str | None) -> str | None:
+        if not manufacturer:
             return None
-        return entity.integration if entity is not None else None
+        try:
+            return self.manufacturer_catalog.canonical_name(manufacturer)
+        except LibraryCatalogError as error:
+            _LOGGER.warning("Could not normalize manufacturer %s: %s", manufacturer, error)
+            return manufacturer
 
     def _measurement_service(self) -> MeasurementService:
         return MeasurementService(
@@ -461,8 +562,41 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
             devices = await run_in_threadpool(_context(request).measure_device_catalog.devices)
         except LibraryCatalogError as error:
             raise HTTPException(status_code=503, detail=str(error)) from error
-        response.headers["Cache-Control"] = "public, max-age=600"
+        response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
         return MeasureDeviceCatalogResponse(devices=list(devices))
+
+    @router.get("/library/manufacturers", responses={503: _ERROR})
+    async def manufacturers(request: Request, response: Response) -> ManufacturerCatalogResponse:
+        try:
+            values = await run_in_threadpool(_context(request).manufacturer_catalog.manufacturers)
+        except LibraryCatalogError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+        response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
+        return ManufacturerCatalogResponse(manufacturers=list(values))
+
+    @router.get("/library/device-specifications", responses={503: _ERROR})
+    async def device_specifications(request: Request, response: Response) -> DeviceSpecificationCatalogResponse:
+        try:
+            values = await run_in_threadpool(_context(request).device_specification_catalog.fields)
+        except LibraryCatalogError as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+        response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
+        return DeviceSpecificationCatalogResponse(
+            device_types={
+                device_type: [
+                    DeviceSpecificationFieldResponse(
+                        name=field.name,
+                        label=field.label,
+                        description=field.description,
+                        value_type=field.value_type,
+                        collection=field.collection,
+                        options=list(field.options),
+                    )
+                    for field in fields
+                ]
+                for device_type, fields in values.items()
+            },
+        )
 
     @router.get("/settings")
     async def get_settings(request: Request) -> AppSettingsResponse:
@@ -521,7 +655,7 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
 
 def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
     @router.post("/sessions", status_code=201, responses={409: _ERROR, 422: _ERROR})
-    async def start_session(payload: MeasurementRequestPayload, request: Request) -> dict[str, object]:
+    async def start_session(payload: MeasurementRequestPayload, request: Request) -> SessionSnapshotResponse:
         context = _context(request)
         prepared = await run_in_threadpool(_apply_fast_test_mode, context, payload)
         await run_in_threadpool(_preflight, context, prepared)
@@ -539,7 +673,7 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
         return sorted(summaries, key=lambda item: not item.active)
 
     @router.get("/sessions/{session_id}", responses={404: _ERROR})
-    async def session(session_id: str, request: Request) -> dict[str, object]:
+    async def session(session_id: str, request: Request) -> SessionSnapshotResponse:
         context = _context(request)
         return _snapshot_response(context, _require_session(context, session_id))
 
@@ -554,19 +688,19 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
         return Response(status_code=204)
 
     @router.post("/sessions/{session_id}/cancel", status_code=202, responses={404: _ERROR, 409: _ERROR})
-    async def cancel_session(session_id: str, request: Request) -> dict[str, object]:
+    async def cancel_session(session_id: str, request: Request) -> SessionSnapshotResponse:
         return _cancel_session(_context(request), session_id)
 
     @router.post("/sessions/{session_id}/confirm", responses={404: _ERROR, 409: _ERROR})
-    async def confirm_session(session_id: str, request: Request) -> dict[str, object]:
+    async def confirm_session(session_id: str, request: Request) -> SessionSnapshotResponse:
         return _confirm_session(_context(request), session_id)
 
     @router.post("/sessions/{session_id}/resume", responses={404: _ERROR, 409: _ERROR, 422: _ERROR})
-    async def resume_session(session_id: str, request: Request) -> dict[str, object]:
+    async def resume_session(session_id: str, request: Request) -> SessionSnapshotResponse:
         return await _resume_session(_context(request), session_id)
 
     @router.post("/sessions/{session_id}/analyse", responses={404: _ERROR, 409: _ERROR})
-    async def analyse_session(session_id: str, request: Request) -> dict[str, object]:
+    async def analyse_session(session_id: str, request: Request) -> SessionSnapshotResponse:
         context = _context(request)
         _require_session(context, session_id)
         try:
@@ -603,7 +737,7 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
         return StreamingResponse(_event_stream(request, context, session_id), media_type="text/event-stream")
 
 
-def _register_contribution_routes(router: APIRouter) -> None:
+def _register_contribution_routes(router: APIRouter) -> None:  # noqa: C901
     @router.get("/contribution/auth")
     async def contribution_auth_status(request: Request) -> ContributionAuthStatus:
         return await run_in_threadpool(_context(request).contribution.auth_status)
@@ -665,6 +799,23 @@ def _register_contribution_routes(router: APIRouter) -> None:
             payload,
         )
 
+    @router.get(
+        "/sessions/{session_id}/contribution/{job_id}/profile.zip",
+        responses={404: _ERROR, 409: _ERROR},
+    )
+    async def contribution_profile_archive(session_id: str, job_id: str, request: Request) -> Response:
+        context = _context(request)
+        content = await run_in_threadpool(
+            context.contribution.prepared_archive,
+            _require_session(context, session_id),
+            job_id,
+        )
+        return Response(
+            content=content,
+            media_type="application/zip",
+            headers={"Content-Disposition": 'attachment; filename="powercalc-profile.zip"'},
+        )
+
 
 def _context(request: Request) -> AppContext:
     return cast(AppContext, request.app.state.context)
@@ -677,7 +828,7 @@ def _require_session(context: AppContext, session_id: str) -> SessionSnapshot:
         raise HTTPException(status_code=404, detail="Measurement session not found") from error
 
 
-def _cancel_session(context: AppContext, session_id: str) -> dict[str, object]:
+def _cancel_session(context: AppContext, session_id: str) -> SessionSnapshotResponse:
     try:
         snapshot = context.coordinator.cancel(session_id)
     except SessionConflictError as error:
@@ -685,7 +836,7 @@ def _cancel_session(context: AppContext, session_id: str) -> dict[str, object]:
     return _snapshot_response(context, snapshot)
 
 
-def _confirm_session(context: AppContext, session_id: str) -> dict[str, object]:
+def _confirm_session(context: AppContext, session_id: str) -> SessionSnapshotResponse:
     try:
         snapshot = context.coordinator.confirm(session_id)
     except SessionConflictError as error:
@@ -693,7 +844,7 @@ def _confirm_session(context: AppContext, session_id: str) -> dict[str, object]:
     return _snapshot_response(context, snapshot)
 
 
-async def _resume_session(context: AppContext, session_id: str) -> dict[str, object]:
+async def _resume_session(context: AppContext, session_id: str) -> SessionSnapshotResponse:
     snapshot = _require_session(context, session_id)
     await run_in_threadpool(_preflight, context, context.storage.load_request(snapshot.id))
     try:
@@ -979,33 +1130,36 @@ def _is_active(snapshot: SessionSnapshot | None) -> bool:
     return snapshot is not None and snapshot.state in ACTIVE_SESSION_STATES
 
 
-def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> dict[str, object]:
-    request = context.storage.load_request(snapshot.id).model_dump(mode="json")
-    return {
-        "session_id": snapshot.id,
-        "state": snapshot.state,
-        "created_at": snapshot.created_at,
-        "updated_at": snapshot.updated_at,
-        "phase": snapshot.phase,
-        "confirmation_message": snapshot.confirmation_message,
-        "confirmation_action": snapshot.confirmation_action,
-        "mode": snapshot.mode,
-        "progress": {
-            "completed": snapshot.completed,
-            "total": snapshot.total,
-            "skipped": snapshot.skipped,
-            "percent": snapshot.progress,
-            "estimated_remaining_seconds": _duration_seconds(snapshot.estimated_remaining),
-        },
-        "warnings": list(snapshot.warnings),
-        "error": snapshot.error,
-        "summary": snapshot.summary,
-        "operating_point": snapshot.operating_point,
-        "calibration_sample": snapshot.calibration_sample,
-        "entity_states": snapshot.entity_states,
-        "can_analyse": snapshot.state not in ACTIVE_SESSION_STATES and context.storage.can_analyse(snapshot.id),
-        "request": request,
-    }
+def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> SessionSnapshotResponse:
+    return SessionSnapshotResponse(
+        session_id=snapshot.id,
+        state=snapshot.state,
+        created_at=snapshot.created_at,
+        updated_at=snapshot.updated_at,
+        phase=snapshot.phase,
+        confirmation_message=snapshot.confirmation_message,
+        confirmation_action=snapshot.confirmation_action,
+        mode=snapshot.mode,
+        progress=SessionProgressResponse(
+            completed=snapshot.completed,
+            total=snapshot.total,
+            skipped=snapshot.skipped,
+            percent=snapshot.progress,
+            estimated_remaining_seconds=_duration_seconds(snapshot.estimated_remaining),
+        ),
+        warnings=list(snapshot.warnings),
+        error=snapshot.error,
+        summary=snapshot.summary,
+        operating_point=snapshot.operating_point,
+        calibration_sample=(
+            CalibrationSampleResponse(**snapshot.calibration_sample)
+            if snapshot.calibration_sample is not None
+            else None
+        ),
+        entity_states=snapshot.entity_states,
+        can_analyse=snapshot.state not in ACTIVE_SESSION_STATES and context.storage.can_analyse(snapshot.id),
+        request=context.storage.load_request(snapshot.id),
+    )
 
 
 def _session_summary(context: AppContext, snapshot: SessionSnapshot) -> SessionSummary:
@@ -1018,7 +1172,9 @@ def _session_summary(context: AppContext, snapshot: SessionSnapshot) -> SessionS
         updated_at=snapshot.updated_at,
         measure_type=request.measure_type,
         model_id=request.model_id,
-        product_name=request.product_name,
+        product_name=(
+            request.session_name or request.product_name or ", ".join(request.controlled_entity_ids) or "Measurement"
+        ),
         measure_device=request.measure_device,
         completed=snapshot.completed,
         total=snapshot.total,
@@ -1065,13 +1221,13 @@ async def _event_stream(request: Request, context: AppContext, session_id: str) 
                 snapshot = context.coordinator.get(session_id)
             except SESSION_LOAD_ERRORS:
                 return
-            heartbeat = {
-                "sequence": snapshot.event_sequence,
-                "type": "heartbeat",
-                "data": {},
-                "snapshot": _snapshot_response(context, snapshot),
-            }
-            yield f"event: heartbeat\ndata: {json.dumps(heartbeat, default=str)}\n\n"
+            heartbeat = SessionEventResponse(
+                sequence=snapshot.event_sequence,
+                type="heartbeat",
+                data={},
+                snapshot=_snapshot_response(context, snapshot),
+            )
+            yield f"event: heartbeat\ndata: {heartbeat.model_dump_json()}\n\n"
         await asyncio.sleep(1)
 
 
@@ -1080,11 +1236,11 @@ def _encode_event(context: AppContext, event: SessionEvent, session_id: str) -> 
         snapshot = context.coordinator.get(session_id)
     except SESSION_LOAD_ERRORS:
         snapshot = None
-    payload: dict[str, object] = {
-        "sequence": event.sequence,
-        "type": event.type,
-        "data": event.data,
-    }
-    if snapshot is not None:
-        payload["snapshot"] = _snapshot_response(context, snapshot)
-    return f"id: {event.sequence}\nevent: {event.type}\ndata: {json.dumps(payload, default=str)}\n\n"
+    payload = SessionEventResponse(
+        sequence=event.sequence,
+        type=event.type,
+        data=event.data,
+        snapshot=_snapshot_response(context, snapshot) if snapshot is not None else None,
+    )
+    exclude = {"snapshot"} if snapshot is None else None
+    return f"id: {event.sequence}\nevent: {event.type}\ndata: {payload.model_dump_json(exclude=exclude)}\n\n"

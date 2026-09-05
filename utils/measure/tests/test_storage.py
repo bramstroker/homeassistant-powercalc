@@ -55,6 +55,15 @@ def test_storage_round_trips_current_session(tmp_path: Path) -> None:
     assert persisted_state["state"] == loaded.state
 
 
+def test_unknown_model_uses_a_session_scoped_artifact_directory(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    first = storage.artifact_directory("first", "")
+    second = storage.artifact_directory("second", "")
+    assert first == storage.output_directory("first") / "measurement"
+    assert first != second
+    assert storage.artifact_directory("first", "LCT010") == storage.output_directory("first") / "LCT010"
+
+
 def test_storage_lists_retained_sessions_and_clears_deleted_current_pointer(tmp_path: Path) -> None:
     storage = SessionStorage(tmp_path)
     first = SessionSnapshot(

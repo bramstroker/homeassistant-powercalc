@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -8,6 +8,13 @@ from measure.powermeter.spec import POWER_ENTITY_PATTERN
 from measure.tuning import MeasurementParameters
 
 _DEFAULTS = MeasurementParameters()
+
+type AppPowerMeterType = Literal[
+    PowerMeterType.HASS,
+    PowerMeterType.SHELLY,
+    PowerMeterType.KASA,
+    PowerMeterType.DUMMY,
+]
 
 
 def _bounded_field(name: str, default: float) -> Any:  # noqa: ANN401  # typed as Any so assignments match the field's type, like pydantic's Field()
@@ -34,7 +41,11 @@ class AppPreferences(BaseModel):
 
     default_power_entity_id: str | None = Field(default=None, pattern=POWER_ENTITY_PATTERN)
     default_measure_device: str | None = Field(default=None, max_length=200)
-    power_meter: PowerMeterType = PowerMeterType.HASS
+    default_measure_device_firmware: str | None = Field(default=None, max_length=200)
+    default_contributor_name: str | None = Field(default=None, max_length=200)
+    default_contributor_github: str | None = Field(default=None, max_length=100)
+    default_contributor_email: str | None = Field(default=None, max_length=200)
+    power_meter: AppPowerMeterType = PowerMeterType.HASS
     shelly_ip: str | None = Field(default=None, max_length=255)
     shelly_username: str = Field(default="admin", min_length=1, max_length=50)
     kasa_ip: str | None = Field(default=None, max_length=255)

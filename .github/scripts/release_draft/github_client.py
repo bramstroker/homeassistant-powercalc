@@ -1,4 +1,4 @@
-"""Minimal GitHub REST client used by the draft entry points.
+"""Minimal GitHub API client used by the draft entry points.
 
 Standard library only, so the entry points run with a bare ``python3`` on the
 runner without any dependency install, exactly like the previous scripts.
@@ -11,7 +11,9 @@ from typing import Any, cast
 import urllib.request
 
 API_ROOT = "https://api.github.com"
+GRAPHQL_URL = f"{API_ROOT}/graphql"
 PAGE_SIZE = 100
+COMMIT_LOOKUP_BATCH_SIZE = 50
 type JsonObject = dict[str, Any]
 type JsonResponse = JsonObject | list[JsonObject] | None
 
@@ -56,17 +58,84 @@ class GitHubClient:
             page += 1
 
     def merged_pull_requests(self, commit_shas: list[str]) -> list[dict[str, Any]]:
-        """Resolve pushed commits to the merged pull requests they belong to."""
+        """Resolve pushed commits to merged pull requests in batched queries."""
         pull_requests: dict[int, dict[str, Any]] = {}
-        for sha in commit_shas:
-            for pull_request in self._request_list("GET", f"/repos/{self.repository}/commits/{sha}/pulls"):
-                if pull_request.get("merged_at") is not None:
-                    pull_requests.setdefault(int(pull_request["number"]), pull_request)
+        owner, name = self.repository.split("/", maxsplit=1)
+        for offset in range(0, len(commit_shas), COMMIT_LOOKUP_BATCH_SIZE):
+            batch = commit_shas[offset : offset + COMMIT_LOOKUP_BATCH_SIZE]
+            commit_fields = "\n".join(
+                f"""
+                commit{index}: object(oid: {json.dumps(sha)}) {{
+                  ... on Commit {{
+                    associatedPullRequests(first: 10) {{
+                      nodes {{
+                        number
+                        title
+                        mergedAt
+                        author {{ login }}
+                        labels(first: 100) {{ nodes {{ name }} }}
+                      }}
+                    }}
+                  }}
+                }}
+                """
+                for index, sha in enumerate(batch)
+            )
+            response = self._request(
+                "POST",
+                GRAPHQL_URL,
+                {
+                    "query": f"""
+                        query($owner: String!, $name: String!) {{
+                          repository(owner: $owner, name: $name) {{
+                            {commit_fields}
+                          }}
+                        }}
+                    """,
+                    "variables": {"owner": owner, "name": name},
+                },
+            )
+            if not isinstance(response, dict):
+                raise RuntimeError("GitHub GraphQL commit lookup returned no data")
+            if response.get("errors"):
+                raise RuntimeError(f"GitHub GraphQL commit lookup failed: {response['errors']}")
+            data = response.get("data")
+            if not isinstance(data, dict) or not isinstance(repository := data.get("repository"), dict):
+                raise RuntimeError("GitHub GraphQL commit lookup returned no repository data")
+            for index in range(len(batch)):
+                git_object = repository.get(f"commit{index}")
+                if not isinstance(git_object, dict):
+                    continue
+                associated = git_object.get("associatedPullRequests")
+                if not isinstance(associated, dict) or not isinstance(nodes := associated.get("nodes"), list):
+                    continue
+                for node in nodes:
+                    if not isinstance(node, dict) or node.get("mergedAt") is None:
+                        continue
+                    labels = node.get("labels")
+                    label_nodes = labels.get("nodes", []) if isinstance(labels, dict) else []
+                    author = node.get("author")
+                    pull_request = {
+                        "number": int(node["number"]),
+                        "title": str(node["title"]),
+                        "merged_at": node["mergedAt"],
+                        "user": {"login": str(author.get("login", "ghost")) if isinstance(author, dict) else "ghost"},
+                        "labels": [
+                            {"name": str(label["name"])}
+                            for label in label_nodes
+                            if isinstance(label, dict) and "name" in label
+                        ],
+                    }
+                    pull_requests.setdefault(pull_request["number"], pull_request)
         return [pull_requests[number] for number in sorted(pull_requests)]
 
     def pull_request_files(self, number: int) -> list[str]:
-        files = self._paginate(f"/repos/{self.repository}/pulls/{number}/files")
+        files = self.pull_request_file_details(number)
         return [changed_file["filename"] for changed_file in files]
+
+    def pull_request_file_details(self, number: int) -> list[dict[str, Any]]:
+        """Return changed files including their GitHub status metadata."""
+        return self._paginate(f"/repos/{self.repository}/pulls/{number}/files")
 
     def commit_sha(self, ref: str) -> str:
         """Resolve a tag, branch or sha to its commit sha."""

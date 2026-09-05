@@ -113,8 +113,9 @@ class BaseMeasurementRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     measure_type: MeasureType
-    model_id: str = Field(default="measurement", min_length=1, max_length=120)
-    product_name: str = Field(default="Measurement", min_length=1, max_length=200)
+    model_id: str = Field(default="", max_length=120)
+    product_name: str = Field(default="", max_length=200)
+    session_name: str = Field(default="", max_length=200)
     measure_device: str = Field(default="", max_length=200)
     power_meter: PowerMeterSpec
     parameters: MeasurementParameters = Field(default_factory=MeasurementParameters)
@@ -130,11 +131,13 @@ class BaseMeasurementRequest(BaseModel):
     @classmethod
     def validate_model_id(cls, value: str) -> str:
         value = value.strip()
+        if not value:
+            return value
         if value in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", value):
             raise ValueError("model_id contains unsafe characters")
         return value
 
-    @field_validator("product_name", "measure_device", mode="before")
+    @field_validator("product_name", "measure_device", "session_name", mode="before")
     @classmethod
     def normalize_profile_metadata(cls, value: str) -> str:
         return value.strip()
@@ -168,8 +171,6 @@ class BaseMeasurementRequest(BaseModel):
 
 class LightMeasurementRequest(BaseMeasurementRequest):
     measure_type: Literal[MeasureType.LIGHT] = MeasureType.LIGHT
-    model_id: str = Field(min_length=1, max_length=120)
-    product_name: str = Field(min_length=1, max_length=200)
     measure_device: str = Field(min_length=1, max_length=200)
     controller: LightControllerSpec
     modes: set[LutMode] = Field(default_factory=lambda: {LutMode.BRIGHTNESS}, min_length=1)

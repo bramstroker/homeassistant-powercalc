@@ -253,7 +253,7 @@ class SessionStorage:
     def artifact_directory(self, session_id: str, model_id: str) -> Path:
         """Return the confined output directory for one session model."""
 
-        return self._contained(self.output_directory(session_id) / model_id)
+        return self._contained(self.output_directory(session_id) / (model_id or "measurement"))
 
     def load_settings(self) -> AppPreferences:
         path = self.data_root / "settings.json"

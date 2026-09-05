@@ -17,20 +17,19 @@
   "mains_voltage": 230,
   "name": "Smart Air Purifier",
   "product_url": "https://levoit.com/products/core-200s-p-smart-air-purifier",
-  "standby_power": 0.6,
-  "fixed_config": {
-    "states_power": {
-      "preset_mode|sleep": 17,
-      "percentage|33": 21,
-      "percentage|66": 27,
-      "percentage|100": 39
-    }
+  "config_flow_sub_profile_remarks": "Levoit ships more than one hardware rating as Core 200S (also branded Core 200S-P) and Home Assistant reports all of them as Core200S. Check the Rated Power on the label on the back of the unit:\n\"rated_37w\": 37 W (US) or 38 W (EU), units from at least 2021 on.\n\"rated_45w\": 45 W, Core 200S-P units made from late 2025.",
+  "sub_profile_select": {
+    "default": "rated_37w"
   },
   "authors": [
     {
       "name": "SH1FT-W",
       "github": "SH1FT-W",
       "email": "danielvizzino@outlook.com"
+    },
+    {
+      "name": "Ryan Ronnander",
+      "github": "ryan-ronnander"
     }
   ]
 }

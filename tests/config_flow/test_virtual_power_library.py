@@ -1,4 +1,5 @@
 import logging
+from unittest.mock import MagicMock
 
 from homeassistant import data_entry_flow
 from homeassistant.components.sensor import SensorDeviceClass
@@ -252,6 +253,12 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
     )
 
     result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+
+    assert result["description_placeholders"] == {
+        "manufacturer": "ikea",
+        "model": "LED1545G12",
+        "profile_details": ("\n\n[View measurement details](https://library.powercalc.nl/profiles/ikea/led1545g12)"),
+    }
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
@@ -837,6 +844,14 @@ async def test_discovery_flow_documentation_url_in_remarks(hass: HomeAssistant) 
     assert result["step_id"] == Step.LIBRARY
     remarks = result["description_placeholders"]["remarks"]
     assert "[Documentation](https://docs.powercalc.nl/cookbook/ups/)" in remarks
+
+
+def test_custom_profile_has_no_public_library_link() -> None:
+    """Custom profiles are not available in the public library."""
+    flow = MagicMock()
+    profile = MagicMock(is_custom_profile=True)
+
+    assert LibraryConfigFlow(flow)._build_profile_details(profile) == ""  # noqa: SLF001
 
 
 async def test_custom_fields_documentation_url_placeholder(

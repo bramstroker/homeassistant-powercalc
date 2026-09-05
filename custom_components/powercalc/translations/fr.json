@@ -3,7 +3,8 @@
     "source_entity": "Entité source",
     "source_device": "Appareil source",
     "remarks_smart_switch": "Ce profil ne fournit que des valeurs de puissance en veille. \n Si vous avez un appareil qui consomme une quantité fixe de puissance lorsqu'il est allumé, vous pouvez fournir cette valeur à l'étape suivante du flux de configuration",
-    "remarks_smart_dimmer": "Ce profil ne fournit que des valeurs de puissance en veille. \n À l'étape suivante, vous pouvez éventuellement fournir les valeurs de la lampe connectée"
+    "remarks_smart_dimmer": "Ce profil ne fournit que des valeurs de puissance en veille. \n À l'étape suivante, vous pouvez éventuellement fournir les valeurs de la lampe connectée",
+    "view_measurement_details": "Voir les détails de mesure"
   },
   "config": {
     "abort": {
@@ -335,7 +336,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Si vous choisissez de ne pas confirmer, vous pouvez entrer vous-même le fabricant et le modèle"
         },
-        "description": "{source}\n\nLe fabricant \"{manufacturer}\" et le modèle \"{model}\" ont été automatiquement détectés pour votre appareil.{remarks}",
+        "description": "{source}\n\nLe fabricant \"{manufacturer}\" et le modèle \"{model}\" ont été automatiquement détectés pour votre appareil.{remarks}{profile_details}",
         "title": "Bibliothèque"
       },
       "library_custom_fields": {
@@ -1000,7 +1001,7 @@
       },
       "library_options": {
         "title": "Options de bibliothèque",
-        "description": "Le profil de bibliothèque suivant est actuellement sélectionné : \n fabricant : {manufacturer}\n modèle : {model}\n\nSi vous souhaitez changer de profil, cliquez sur Suivant."
+        "description": "Le profil de bibliothèque suivant est actuellement sélectionné : \n fabricant : {manufacturer}\n modèle : {model}\n\nSi vous souhaitez changer de profil, cliquez sur Suivant.{profile_details}"
       },
       "select_device": {
         "data": {

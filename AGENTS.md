@@ -15,6 +15,9 @@ Keep unrelated working-tree changes intact.
 Use [Conventional Commits](https://www.conventionalcommits.org/) for commit
 messages, for example: `refactor: simplify discovery flow`.
 
+Write PR titles as concise, human-readable titles without Conventional Commit
+prefixes such as `feat:` or `fix:`.
+
 ## Change-specific rules
 
 ### Translations

@@ -1,0 +1,38 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2026-08-09T18:41:44Z",
+  "device_type": "light",
+  "device_specs": {
+    "socket": "E14",
+    "form_factor": "candle",
+    "lumens": 470,
+    "rated_power": 6.5,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "ean": [
+    "4280012239193"
+  ],
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug M Gen3",
+  "measure_method": "script",
+  "mains_voltage": 230,
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.3.0:app"
+  },
+  "name": "LIGHTWAY smart home LED-lamp - candle",
+  "standby_power": 0.35,
+  "voltage_range": {
+    "min": 233.9,
+    "max": 237.0
+  },
+  "authors": [
+    {
+      "github": "rugk",
+      "name": "rugk"
+    }
+  ]
+}

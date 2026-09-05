@@ -1,7 +1,8 @@
 from enum import StrEnum
-import re
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from measure.profile.models import ProfileAuthor, ProfileMetadata
 
 
 class ContributionErrorCode(StrEnum):
@@ -35,68 +36,17 @@ class ContributionError(BaseModel):
     detail: str | None = None
 
 
-class ContributionAuthor(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    name: str = Field(min_length=1, max_length=200)
-    github: str = Field(min_length=1, max_length=100)
-    email: str | None = Field(default=None, max_length=200)
-
-    @field_validator("name", "github")
-    @classmethod
-    def normalize_required_text(cls, value: str) -> str:
-        normalized = value.strip()
-        if not normalized:
-            raise ValueError("value is required")
-        return normalized
-
-    @field_validator("email")
-    @classmethod
-    def normalize_email(cls, value: str | None) -> str | None:
-        if value is None:
-            return None
-        return value.strip() or None
+ContributionAuthor = ProfileAuthor
 
 
-class ContributionMetadata(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+class ContributionMetadata(ProfileMetadata):
+    """Profile metadata plus context used only while creating a pull request."""
 
-    manufacturer: str = Field(min_length=1, max_length=200)
-    manufacturer_directory: str | None = Field(default=None, min_length=1, max_length=120)
-    model_id: str = Field(min_length=1, max_length=120)
-    product_name: str | None = Field(default=None, min_length=1, max_length=200)
     measure_type: str | None = Field(default=None, max_length=50)
-    measure_device: str | None = Field(default=None, max_length=200)
     #: Home Assistant integration the measured entity is provided by.
     integration: str | None = Field(default=None, max_length=100)
     notes: str = Field(default="", max_length=2_000)
     author: ContributionAuthor
-
-    @field_validator("manufacturer", "manufacturer_directory", "model_id", "product_name")
-    @classmethod
-    def normalize_required_text(cls, value: str | None) -> str | None:
-        if value is None:
-            return None
-        normalized = value.strip()
-        if not normalized:
-            raise ValueError("value is required")
-        return normalized
-
-    @field_validator("model_id")
-    @classmethod
-    def validate_model_id(cls, value: str) -> str:
-        if value in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", value):
-            raise ValueError("model_id contains unsafe characters")
-        return value
-
-    @field_validator("manufacturer_directory")
-    @classmethod
-    def validate_manufacturer_directory(cls, value: str | None) -> str | None:
-        if value is None:
-            return None
-        if value in {".", ".."} or not re.fullmatch(r"[a-z0-9][a-z0-9 ._()+-]*", value):
-            raise ValueError("manufacturer_directory contains unsafe characters")
-        return value
 
     @field_validator("notes")
     @classmethod

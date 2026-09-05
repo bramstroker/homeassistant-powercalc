@@ -3,8 +3,10 @@
 import logging
 import os
 from pathlib import Path
+import re
 import sys
 from typing import Any, cast
+from uuid import uuid4
 
 import inquirer
 from inquirer.errors import ValidationError
@@ -98,6 +100,7 @@ class Measure:
             entity_catalog = self._home_assistant_entity_catalog() if self._uses_home_assistant() else None
             specific_questions = measurement_questions(self.measure_type, self.config, entity_catalog)
             answers = self.ask_questions(self.get_questions(specific_questions))
+            self._prefill_device_metadata(answers)
             interaction = ConsoleInteraction()
             request = request_from_answers(self.measure_type, answers, self.config)
             request = apply_dummy_load_answers(request, answers, self._dummy_load_calibration_store)
@@ -114,7 +117,11 @@ class Measure:
                     self.config.shelly_password if self.config.selected_power_meter == PowerMeterType.SHELLY else None
                 ),
             ).assemble(request)
-            model_id = str(answers.get(QUESTION_MODEL_ID, "generic"))
+            model_id = request.model_id or (
+                "generic"
+                if self.measure_type in (MeasureType.AVERAGE, MeasureType.RECORDER)
+                else f"session-{uuid4().hex}"
+            )
             execution = MeasurementExecution(
                 measurement=prepared,
                 output_directory=Path(PROJECT_DIR) / "export" / model_id,
@@ -179,13 +186,13 @@ class Measure:
                     name=QUESTION_MODEL_ID,
                     message=f"Specify the model id. e.g. {MODEL_ID_EXAMPLES.get(self.measure_type, 'LED1837R5')}",
                     default=self._default_model_id,
-                    validate=validate_required,
+                    # Keep environment overrides compatible; metadata is edited in Prepare.
+                    ignore=True,
                 ),
                 inquirer.Text(
                     name=QUESTION_MODEL_NAME,
                     message=f"Specify the full {self.measure_type} model name",
-                    ignore=lambda answers: not answers.get(QUESTION_GENERATE_MODEL_JSON),
-                    validate=validate_required,
+                    ignore=True,
                 ),
                 inquirer.Text(
                     name=QUESTION_MEASURE_DEVICE,
@@ -215,6 +222,28 @@ class Measure:
                 _LOGGER.warning("Could not prefill model ID for %s: %s", entity_id, error)
                 self._model_id_defaults[entity_id] = None
         return self._model_id_defaults[entity_id]
+
+    def _prefill_device_metadata(self, answers: dict[str, Any]) -> None:
+        """Retain known HA product details without prompting for library metadata."""
+        entity_id = str(answers.get(QUESTION_ENTITY_ID, "")).strip()
+        if not entity_id or not self._uses_home_assistant():
+            return
+        try:
+            entity = self._home_assistant_entity_catalog().load_snapshot().get(entity_id)
+        except Exception as error:  # noqa: BLE001 - metadata must not prevent measurement
+            _LOGGER.warning("Could not prefill device details for %s: %s", entity_id, error)
+            return
+        if entity is None:
+            return
+        model_id = entity.model_id or ""
+        if (
+            not answers.get(QUESTION_MODEL_ID)
+            and len(model_id) <= 120
+            and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", model_id)
+        ):
+            answers[QUESTION_MODEL_ID] = model_id
+        if not answers.get(QUESTION_MODEL_NAME):
+            answers[QUESTION_MODEL_NAME] = entity.product_name or ""
 
     def _home_assistant_manager(self) -> HomeAssistantManager:
         if self._home_assistant is None:

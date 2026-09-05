@@ -1,7 +1,8 @@
 import { ApiError } from "./api-client";
 import type { MeasureApiClient } from "./api-client";
-import { entityDomains, requestFormData } from "./measure-definition";
-import { meterFor } from "./power-meter";
+import { AuthController } from "./contribution/auth";
+import { entityDomains, requestFormData } from "./measurement/definition";
+import { meterFor } from "./power-meter/registry";
 import { emptyPlots } from "./types";
 import type {
   AppSettings,
@@ -10,12 +11,14 @@ import type {
   ContributionAuthDeviceStatus,
   ContributionAuthState,
   ContributionDeviceFlow,
+  ContributionFormValues,
   ContributionPreview,
   ContributionPreviewRequest,
   ContributionResult,
   ContributionStatus,
   ContributionSubmitRequest,
   DummyLoadCalibration,
+  DeviceSpecificationField,
   EntityDescriptor,
   ErrorHelp,
   MeasureDefinition,
@@ -33,7 +36,7 @@ import type {
   ShellyDiscoveryDevice,
 } from "./types";
 
-export type AppView = "loading" | "sessions" | "setup" | "review" | "running" | "result" | "settings";
+export type AppView = "loading" | "sessions" | "setup" | "review" | "running" | "result" | "profile" | "share" | "settings";
 
 export interface MeasureAppState {
   view: AppView;
@@ -62,10 +65,13 @@ export interface MeasureAppState {
   measureDevices: string[];
   measureDevicesLoading: boolean;
   measureDevicesError: string;
+  manufacturers?: string[];
+  deviceSpecificationFields: Record<string, DeviceSpecificationField[]>;
   contributionAuth?: ContributionAuthState;
   contributionDeviceFlow?: ContributionDeviceFlow;
   contributionDeviceStatus?: ContributionAuthDeviceStatus;
   contributionDraft?: ContributionPreview;
+  contributionFormValues?: ContributionFormValues;
   contributionPreview?: ContributionPreview;
   contributionResult?: ContributionResult;
   contributionBusy: boolean;
@@ -89,7 +95,10 @@ export interface MeasureAppState {
  * Everything the controller calls on the API client. Derived from the client itself so the two
  * cannot drift; the URL builders are excluded because only the shell hands those to its views.
  */
-export type MeasureAppApi = Omit<MeasureApiClient, "fileUrl" | "diagnosticsUrl" | "eventsUrl">;
+export type MeasureAppApi = Omit<
+  MeasureApiClient,
+  "fileUrl" | "diagnosticsUrl" | "eventsUrl" | "preparedProfileUrl"
+>;
 
 export interface EventConnection {
   connect(): void;
@@ -110,17 +119,17 @@ export class MeasureAppController {
   private settingsReturnView: AppView = "setup";
   private powerMeterTestVersion = 0;
   private shellyDiscoveryVersion = 0;
-  private contributionDeviceFlowVersion = 0;
-  private contributionDevicePollInterval = 0;
-  private contributionDeviceExpiresAt = 0;
-  private contributionDevicePollTimer?: ReturnType<typeof setTimeout>;
+  private readonly contributionAuthController: AuthController;
+  private readonly contributionTouchedFields = new Set<string>();
 
   constructor(
     private readonly state: MeasureAppState,
     private readonly api: () => MeasureAppApi,
     private readonly createEventConnection: EventConnectionFactory,
     private readonly changed: () => void,
-  ) {}
+  ) {
+    this.contributionAuthController = new AuthController(state, api, changed);
+  }
 
   private clearError(): void {
     this.state.errorMessage = "";
@@ -134,8 +143,7 @@ export class MeasureAppController {
 
   dispose(): void {
     this.shellyDiscoveryVersion += 1;
-    this.stopContributionDevicePolling();
-    this.state.contributionAuthBusy = false;
+    this.contributionAuthController.dispose();
     this.eventConnection?.close();
   }
 
@@ -246,6 +254,38 @@ export class MeasureAppController {
   newMeasurement(): void {
     this.resetDraft();
     this.state.view = "setup";
+    this.changed();
+  }
+
+  openProfile(): void {
+    if (this.state.snapshot?.state !== "completed" || this.isAverageMeasurement()) return;
+    this.clearError();
+    this.state.view = "profile";
+    this.changed();
+  }
+
+  openShare(): void {
+    if (this.state.snapshot?.state !== "completed" || !this.state.contributionPreview || this.isAverageMeasurement()) return;
+    if (Object.keys(this.state.contributionFormValues ?? {}).length) return;
+    this.clearError();
+    this.state.view = "share";
+    this.changed();
+  }
+
+  backToProfile(): void {
+    if (this.isAverageMeasurement()) return;
+    this.clearError();
+    this.state.view = "profile";
+    this.changed();
+  }
+
+  private isAverageMeasurement(): boolean {
+    return (this.state.snapshot?.request?.measure_type ?? this.state.request?.measure_type ?? this.state.selectedMeasureType) === "average";
+  }
+
+  backToResult(): void {
+    this.clearError();
+    this.state.view = "result";
     this.changed();
   }
 
@@ -406,163 +446,55 @@ export class MeasureAppController {
       [this.state.capabilities] = await Promise.all([
         this.api().getCapabilities(),
         this.refreshDummyLoadCalibration(),
+        this.refreshContributionDefaults(),
       ]);
       this.state.view = this.settingsReturnView;
     });
   }
 
+  private async refreshContributionDefaults(): Promise<void> {
+    const previous = this.state.contributionDraft;
+    const sessionId = this.state.snapshot?.session_id;
+    if (!previous || !sessionId) return;
+    const defaults = await this.api().getContributionDraft(sessionId);
+    if (this.state.snapshot?.session_id !== sessionId) return;
+    const current = this.state.contributionPreview ?? previous;
+    const merged = { ...current };
+    let changed = false;
+    for (const field of ["contributor", "contributor_github", "contributor_email", "measure_device_firmware"] as const) {
+      // Keep both edits made here (including explicit blanks) and overrides in a restored preview.
+      if ((current[field] ?? "") !== (previous[field] ?? "")) this.contributionTouchedFields.add(field);
+      if (this.contributionTouchedFields.has(field)) continue;
+      if ((current[field] ?? "") === (defaults[field] ?? "")) continue;
+      merged[field] = defaults[field] ?? "";
+      changed = true;
+    }
+    if (changed) {
+      this.state.contributionDraft = merged;
+      this.state.contributionPreview = undefined;
+      this.state.contributionResult = undefined;
+      this.state.contributionError = "";
+      this.state.contributionErrorField = undefined;
+      if (this.settingsReturnView === "share") this.settingsReturnView = "profile";
+    }
+  }
+
+  editContribution(values: ContributionFormValues): void {
+    this.state.contributionFormValues = values;
+    for (const field of Object.keys(values)) this.contributionTouchedFields.add(field);
+    this.changed();
+  }
+
   async startContributionDeviceAuth(): Promise<void> {
-    this.stopContributionDevicePolling();
-    const version = this.contributionDeviceFlowVersion;
-    this.state.contributionAuthBusy = true;
-    this.state.contributionAuthError = "";
-    this.state.contributionDeviceFlow = undefined;
-    this.state.contributionDeviceStatus = undefined;
-    this.changed();
-    try {
-      const flow = await this.api().startContributionDeviceAuth();
-      if (version !== this.contributionDeviceFlowVersion) return;
-      this.state.contributionDeviceFlow = flow;
-      this.state.contributionDeviceStatus = {
-        status: "pending",
-        message: "Waiting for GitHub authorization…",
-      };
-      this.contributionDevicePollInterval = Math.max(1, flow.interval);
-      this.contributionDeviceExpiresAt = Date.now() + Math.max(0, flow.expires_in) * 1_000;
-      this.scheduleContributionDevicePoll(version);
-    } catch (error) {
-      if (version !== this.contributionDeviceFlowVersion) return;
-      this.state.contributionAuthError = message(error);
-    } finally {
-      if (version === this.contributionDeviceFlowVersion) {
-        this.state.contributionAuthBusy = false;
-        this.changed();
-      }
-    }
-  }
-
-  private async pollContributionDeviceAuth(version: number): Promise<void> {
-    const flowId = this.state.contributionDeviceFlow?.flow_id;
-    if (!flowId || version !== this.contributionDeviceFlowVersion) return;
-    if (Date.now() >= this.contributionDeviceExpiresAt) {
-      this.expireContributionDeviceFlow();
-      return;
-    }
-    try {
-      const status = await this.api().getContributionDeviceAuth(flowId);
-      if (this.isStaleContributionDevicePoll(version, flowId)) return;
-      this.applyContributionDeviceStatus(status, version);
-    } catch (error) {
-      if (this.isStaleContributionDevicePoll(version, flowId)) return;
-      this.handleContributionDevicePollError(error, version);
-    } finally {
-      if (version === this.contributionDeviceFlowVersion) this.changed();
-    }
-  }
-
-  /** A poll result is stale when the flow was restarted or replaced while the request was in flight. */
-  private isStaleContributionDevicePoll(version: number, flowId: string): boolean {
-    return version !== this.contributionDeviceFlowVersion || flowId !== this.state.contributionDeviceFlow?.flow_id;
-  }
-
-  private applyContributionDeviceStatus(status: ContributionAuthDeviceStatus, version: number): void {
-    this.state.contributionDeviceStatus = status;
-    if (status.auth) this.state.contributionAuth = status.auth;
-    this.state.contributionAuthError = "";
-
-    if (status.status === "authorized") {
-      this.state.contributionDeviceFlow = undefined;
-      this.stopContributionDevicePolling();
-      this.changed();
-      return;
-    }
-
-    if (status.status !== "pending" && status.status !== "slow_down") return;
-
-    if (status.status === "slow_down") {
-      this.contributionDevicePollInterval = validRetryAfter(status.retry_after)
-        ? Math.max(this.contributionDevicePollInterval, status.retry_after)
-        : this.contributionDevicePollInterval + 5;
-    }
-    this.scheduleContributionDevicePoll(version);
-  }
-
-  private handleContributionDevicePollError(error: unknown, version: number): void {
-    if (error instanceof ApiError && error.status === 404) {
-      this.expireContributionDeviceFlow();
-      return;
-    }
-    this.state.contributionAuthError = message(error);
-    this.scheduleContributionDevicePoll(version);
-  }
-
-  private scheduleContributionDevicePoll(version: number): void {
-    this.clearContributionDevicePollTimer();
-    if (version !== this.contributionDeviceFlowVersion || !this.state.contributionDeviceFlow) return;
-    const remaining = this.contributionDeviceExpiresAt - Date.now();
-    if (remaining <= 0) {
-      this.expireContributionDeviceFlow();
-      return;
-    }
-    const delay = Math.min(this.contributionDevicePollInterval * 1_000, remaining);
-    this.contributionDevicePollTimer = setTimeout(() => {
-      this.contributionDevicePollTimer = undefined;
-      void this.pollContributionDeviceAuth(version);
-    }, delay);
-  }
-
-  private expireContributionDeviceFlow(): void {
-    this.clearContributionDevicePollTimer();
-    this.state.contributionDeviceStatus = {
-      status: "expired",
-      message: "This GitHub code expired. Request a new code to continue.",
-    };
-    this.changed();
-  }
-
-  private stopContributionDevicePolling(): void {
-    this.contributionDeviceFlowVersion += 1;
-    this.clearContributionDevicePollTimer();
-  }
-
-  private clearContributionDevicePollTimer(): void {
-    if (this.contributionDevicePollTimer === undefined) return;
-    clearTimeout(this.contributionDevicePollTimer);
-    this.contributionDevicePollTimer = undefined;
+    await this.contributionAuthController.startDeviceFlow();
   }
 
   async saveContributionToken(token: string): Promise<void> {
-    this.state.contributionAuthBusy = true;
-    this.state.contributionAuthError = "";
-    this.changed();
-    try {
-      this.state.contributionAuth = await this.api().saveContributionToken(token);
-      this.stopContributionDevicePolling();
-      this.state.contributionDeviceFlow = undefined;
-      this.state.contributionDeviceStatus = undefined;
-    } catch (error) {
-      this.state.contributionAuthError = message(error);
-    } finally {
-      this.state.contributionAuthBusy = false;
-      this.changed();
-    }
+    await this.contributionAuthController.saveToken(token);
   }
 
   async disconnectContributionAuth(): Promise<void> {
-    this.state.contributionAuthBusy = true;
-    this.state.contributionAuthError = "";
-    this.changed();
-    try {
-      this.state.contributionAuth = await this.api().disconnectContributionAuth();
-      this.stopContributionDevicePolling();
-      this.state.contributionDeviceFlow = undefined;
-      this.state.contributionDeviceStatus = undefined;
-    } catch (error) {
-      this.state.contributionAuthError = message(error);
-    } finally {
-      this.state.contributionAuthBusy = false;
-      this.changed();
-    }
+    await this.contributionAuthController.disconnect();
   }
 
   async previewContribution(request: ContributionPreviewRequest): Promise<void> {
@@ -570,6 +502,7 @@ export class MeasureAppController {
     if (!sessionId) return;
     await this.runContribution(async () => {
       this.state.contributionPreview = await this.api().previewContribution(sessionId, request);
+      this.state.contributionFormValues = undefined;
       this.state.contributionResult = undefined;
     });
   }
@@ -703,6 +636,8 @@ export class MeasureAppController {
     this.state.logs = [];
     this.state.samples = [];
     this.state.contributionDraft = undefined;
+    this.state.contributionFormValues = undefined;
+    this.contributionTouchedFields.clear();
     this.state.contributionPreview = undefined;
     this.state.contributionResult = undefined;
     this.state.contributionError = "";
@@ -773,13 +708,18 @@ export class MeasureAppController {
   private async loadResultArtifacts(): Promise<void> {
     const sessionId = this.state.snapshot?.session_id;
     if (!sessionId) return;
-    const [files, plots, calibration, auth, contribution, contributionStatus] = await Promise.allSettled([
+    this.state.contributionFormValues = undefined;
+    this.contributionTouchedFields.clear();
+    const [files, plots, calibration, auth, contribution, contributionStatus, manufacturers, deviceSpecifications, measureDevices] = await Promise.allSettled([
       this.api().getFiles(sessionId),
       this.api().getPlots(sessionId),
       this.api().getDummyLoadCalibration(),
       this.api().getContributionAuth(),
       this.api().getContributionDraft(sessionId),
       this.api().getContributionStatus(),
+      this.api().getManufacturers(),
+      this.api().getDeviceSpecifications(),
+      this.api().getMeasureDevices(),
     ]);
     this.state.files = files.status === "fulfilled" ? files.value : [];
     this.state.plotCollection = plots.status === "fulfilled" ? plots.value : emptyPlots(["Plots could not be loaded."]);
@@ -795,6 +735,12 @@ export class MeasureAppController {
       this.state.contributionPreview = undefined;
     }
     if (contributionStatus.status === "fulfilled") this.restoreContributionStatus(contributionStatus.value);
+    this.state.manufacturers = manufacturers.status === "fulfilled" ? manufacturers.value.manufacturers : [];
+    this.state.deviceSpecificationFields = deviceSpecifications.status === "fulfilled"
+      ? deviceSpecifications.value.device_types
+      : {};
+    this.state.measureDevices = measureDevices.status === "fulfilled" ? measureDevices.value.devices : [];
+    this.state.measureDevicesError = measureDevices.status === "rejected" ? message(measureDevices.reason) : "";
   }
 
   /** Recover persisted contribution progress (e.g. after a reload or dropped connection mid-submit). */
@@ -834,8 +780,4 @@ function isTerminal(state: SessionState): boolean {
 
 function message(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong. Try again.";
-}
-
-function validRetryAfter(value: number | null | undefined): value is number {
-  return typeof value === "number" && Number.isFinite(value) && value > 0;
 }

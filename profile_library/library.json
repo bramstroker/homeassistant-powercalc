@@ -291,7 +291,7 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
+            "min": 0.7,
             "max": 0.8
           },
           "hash": "219c27a60105b2524ae8eb524a71f417"
@@ -1564,7 +1564,7 @@
           "max_power": 0.46,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.46,
+            "min": 0.17,
             "max": 0.46
           },
           "hash": "19a0539e50a4e970608aac5b27668677"
@@ -1895,7 +1895,7 @@
           "max_power": 1.144,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.144,
+            "min": 0.267,
             "max": 1.144
           },
           "hash": "535e27771bcef16465a59e3ce6c1dc0a"
@@ -1933,7 +1933,7 @@
           "max_power": 1.596,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.596,
+            "min": 0.66,
             "max": 1.596
           },
           "hash": "43a522c384d5644fc6ae32f3f3f79317"
@@ -1971,7 +1971,7 @@
           "max_power": 2.565,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 2.565,
+            "min": 0.29,
             "max": 2.565
           },
           "hash": "e8ce0994e9152855750f4afd376eb01b"
@@ -2092,7 +2092,7 @@
           "max_power": 1.03,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.03,
+            "min": 0.66,
             "max": 1.03
           },
           "hash": "053a69df3904ea84d50568c0cdacfbfc"
@@ -2273,7 +2273,7 @@
           "max_power": 1.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.0,
+            "min": 0.45,
             "max": 1.0
           },
           "hash": "868e1a737f5c3404a3f2550cc9005595"
@@ -2314,7 +2314,7 @@
           "max_power": 1.1,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.1,
+            "min": 0.35,
             "max": 1.1
           },
           "hash": "8d5d54f6cbaeb7ed9bf3fbe39d00b17d"
@@ -2879,7 +2879,7 @@
           "max_power": 1.3,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.3,
+            "min": 0.75,
             "max": 1.3
           },
           "hash": "4145980b5d26f3a4435790e3e34706e8"
@@ -2931,7 +2931,7 @@
           "max_power": 0.85,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.85,
+            "min": 0.5,
             "max": 0.85
           },
           "hash": "2ad8454c5b7fca7c696236cbadea3ee7"
@@ -2968,7 +2968,7 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
+            "min": 0.4,
             "max": 0.8
           },
           "hash": "09d2f775afe441d03422426e040bf0a8"
@@ -3077,7 +3077,7 @@
           "max_power": 0.6,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.6,
+            "min": 0.24,
             "max": 0.6
           },
           "hash": "7d3c07dc39927f0397778dbe48031ade"
@@ -3247,7 +3247,7 @@
           "max_power": 0.89,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.89,
+            "min": 0.59,
             "max": 0.89
           },
           "hash": "b6a95be9cdbdf2e8fb1de695ac39ca76"
@@ -3286,7 +3286,7 @@
           "max_power": 0.3,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.3,
+            "min": 0.1,
             "max": 0.3
           },
           "hash": "0ef37de239590db59addd37a382edc4d"
@@ -5243,7 +5243,7 @@
           "max_power": 0.73,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.73,
+            "min": 0.37,
             "max": 0.73
           },
           "hash": "35f4723081003cbdbdcb775a62677b58"
@@ -5287,7 +5287,7 @@
           "max_power": 0.52,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.52,
+            "min": 0.32,
             "max": 0.52
           },
           "hash": "ca1591d878ee0940b2e176bdc6ee42d0"
@@ -5332,7 +5332,7 @@
           "max_power": 1.42,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.42,
+            "min": 0.83,
             "max": 1.42
           },
           "hash": "0fe8638a45fd8ee6d4c04d2ba5283fae"
@@ -5463,7 +5463,7 @@
           "max_power": 0.3,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.3,
+            "min": 0.25,
             "max": 0.3
           },
           "hash": "053a20577e501f51eb38eddacac9332e"
@@ -5541,7 +5541,7 @@
           "max_power": 0.68,
           "sub_profile_count": 3,
           "power_range": {
-            "min": 0.2,
+            "min": 0.12,
             "max": 0.68
           },
           "hash": "4d760d07f5ab8e59490bd27e886f1194"
@@ -5587,7 +5587,7 @@
           "max_power": 0.74,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.74,
+            "min": 0.2,
             "max": 0.74
           },
           "hash": "ada302385d944a2d32791374749773e2"
@@ -5679,7 +5679,7 @@
           "max_power": 0.78,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.78,
+            "min": 0.21,
             "max": 0.78
           },
           "hash": "c9f81bd32b894947eb7c651e430e9f21"
@@ -5832,7 +5832,7 @@
           "max_power": 0.9,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.9,
+            "min": 0.4,
             "max": 0.9
           },
           "hash": "c6953f80ffe9da9900e83f8cea1369ff"
@@ -5883,7 +5883,7 @@
           "max_power": 0.5,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.5,
+            "min": 0.3,
             "max": 0.5
           },
           "hash": "03da2b790810a233a05adc43c6d94f73"
@@ -6053,7 +6053,7 @@
           "max_power": 1.191,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.191,
+            "min": 0.378,
             "max": 1.191
           },
           "hash": "ded3f054768118c1e430b363d57e29a7"
@@ -6118,7 +6118,7 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
+            "min": 0.5,
             "max": 0.8
           },
           "hash": "74433429c24f3f07228617ce70ff24d1"
@@ -6179,7 +6179,7 @@
           "max_power": 1.06,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.06,
+            "min": 0.52,
             "max": 1.06
           },
           "hash": "b0aa1785dff9c9f40f8ef4a847bf44c1"
@@ -8409,7 +8409,7 @@
           "max_power": 1.1,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.1,
+            "min": 0.3,
             "max": 1.1
           },
           "hash": "89f1a598df1434f3d0e6c8441350b3b9"
@@ -8838,7 +8838,7 @@
           "max_power": 0.98,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.98,
+            "min": 0.23,
             "max": 0.98
           },
           "hash": "79abde60f4474ee44402e86b27c3b600"
@@ -8917,7 +8917,7 @@
           "max_power": 0.78,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.78,
+            "min": 0.21,
             "max": 0.78
           },
           "hash": "f836cec792a5bf5326a33dbf7e956396"
@@ -9001,7 +9001,7 @@
           "max_power": 0.73,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.73,
+            "min": 0.13,
             "max": 0.73
           },
           "hash": "0098da10db5b9660d899554a841bf0d7"
@@ -9044,7 +9044,7 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
+            "min": 0.23,
             "max": 0.8
           },
           "hash": "f896c41066c1fb678d4ef2f6a7f259ad"
@@ -9083,7 +9083,7 @@
           "max_power": 0.7,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.7,
+            "min": 0.2,
             "max": 0.7
           },
           "hash": "7c1fa311c7cda8c4441e966753a831c9"
@@ -9124,7 +9124,7 @@
           "max_power": 0.47,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.47,
+            "min": 0.22,
             "max": 0.47
           },
           "hash": "d7e6fcdf5ce51a546c082396eb5ed960"
@@ -10137,6 +10137,9 @@
           "hash": "7a278574d414398e0eb037e9c1ecbe80"
         },
         {
+          "aliases": [
+            "TRADFRI bulb GU10 WS 400lm"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2024-11-20T11:28:25Z",
           "device_type": "light",
@@ -10168,7 +10171,7 @@
           ],
           "id": "LED1739R5",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-03T07:28:19",
           "max_power": 5.36,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-11-20T11:34:38",
@@ -10183,7 +10186,7 @@
             "score": 97.4,
             "color_temp": 97.4
           },
-          "hash": "b767b4a0d06a9d4dfff91601b4a55163"
+          "hash": "9b9d5602a1316a249deb2f12b3f9bcb4"
         },
         {
           "calculation_strategy": "lut",
@@ -11831,7 +11834,7 @@
             "36869"
           ],
           "calculation_strategy": "lut",
-          "created_at": "2026-01-29T22:14:00Z",
+          "created_at": "2026-09-01T12:01:22Z",
           "device_type": "light",
           "device_specs": {
             "socket": "E27",
@@ -11844,43 +11847,51 @@
             ]
           },
           "measure_description": "Measured with utils/measure script",
-          "measure_device": "Shelly PM Mini Gen3",
+          "measure_device": "OWON OWH9811",
           "measure_method": "script",
           "mains_voltage": 230,
           "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.20.3:docker"
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "master"
           },
           "name": "KAJPLATS E27 CWS globe 1055lm",
           "product_url": "https://www.ikea.com/se/en/p/kajplats-led-bulb-e27-1055-lumen-smart-colour-and-white-spectrum-globe-opal-white-70608575/",
-          "standby_power": 0.17,
+          "standby_power": 0.21,
+          "voltage_range": {
+            "max": 238.49,
+            "min": 227.8
+          },
           "authors": [
             {
               "name": "Linus Nordin",
               "github": "gribber",
               "email": "linus.nordin@gmail.com"
+            },
+            {
+              "name": "MartinJM",
+              "github": "MartinJM"
             }
           ],
           "id": "LED2405G8",
           "manufacturer": "ikea",
-          "updated_at": "2026-08-31T12:33:32",
-          "max_power": 7.78,
+          "updated_at": "2026-09-01T17:36:37",
+          "max_power": 7.75,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2026-01-30T18:32:06",
+          "measurement_updated_at": "2026-09-01T16:10:31",
           "power_range": {
-            "min": 0.14,
-            "max": 7.78
+            "min": 0.2,
+            "max": 7.75
           },
           "color_modes": [
             "color_temp",
             "hs"
           ],
           "lut_quality": {
-            "score": 98.9,
-            "color_temp": 98.9
+            "score": 99.4,
+            "color_temp": 99.4
           },
-          "hash": "287536ee3490f0186c9e3de304b99d05"
+          "hash": "c43845c3c1a897d6cacbd6daef26222e"
         },
         {
           "aliases": [
@@ -12807,7 +12818,7 @@
           "max_power": 0.8,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
+            "min": 0.3,
             "max": 0.8
           },
           "hash": "e214ebd303d74f826e3c32c6d5c8a8ef"
@@ -13973,7 +13984,7 @@
           "max_power": 0.61,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.61,
+            "min": 0.41,
             "max": 0.61
           },
           "hash": "0c85f601afb1acbd284bf1967deb5902"
@@ -14015,7 +14026,7 @@
           "max_power": 1.25,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.25,
+            "min": 0.5,
             "max": 1.25
           },
           "hash": "35f8716106bb6c3d9208274387f708de"
@@ -14052,7 +14063,7 @@
           "max_power": 0.83,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.83,
+            "min": 0.18,
             "max": 0.83
           },
           "hash": "1864ed4bfd2b0dc3d466d13664f269bf"
@@ -14095,7 +14106,7 @@
           "max_power": 0.75,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.75,
+            "min": 0.2,
             "max": 0.75
           },
           "hash": "6c7bbcb2a9ee0ab04e21362bc41fc616"
@@ -14149,7 +14160,7 @@
           "max_power": 0.29,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.29,
+            "min": 0.26,
             "max": 0.29
           },
           "hash": "b0a654e180a277a0084e70655ba998f6"
@@ -14188,7 +14199,7 @@
           "max_power": 1.59,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.59,
+            "min": 1.54,
             "max": 1.59
           },
           "hash": "33a25c2d4bef85bc70d3c4b406be7f66"
@@ -15348,7 +15359,7 @@
           "max_power": 37.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 37.0,
+            "min": 2.2,
             "max": 37.0
           },
           "hash": "76f4c59cb80a27e68e3d740dbd3e4030"
@@ -15625,7 +15636,7 @@
           "device_specs": {
             "form_factor": "fixture",
             "socket": "integrated",
-            "lumens": 1000,
+            "lumens": 900,
             "rated_power": 14,
             "connectivity": [
               "zigbee"
@@ -15654,7 +15665,7 @@
           ],
           "id": "14158804L",
           "manufacturer": "lidl",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-02T14:34:55",
           "max_power": 10.54,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-06-13T14:19:28",
@@ -15670,7 +15681,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "3c18aeec385fcdac5d11971e25c926fb"
+          "hash": "e5026cac4a9fe31459570c3567a31a18"
         },
         {
           "calculation_strategy": "lut",
@@ -16837,7 +16848,7 @@
           "max_power": 1.071,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.071,
+            "min": 0.595,
             "max": 1.071
           },
           "hash": "9b44685a72aff90f5c1591b3644e37ee"
@@ -17708,6 +17719,64 @@
             "color_temp": 98.5
           },
           "hash": "c30444238b07ed13743e6091d73d1e6e"
+        },
+        {
+          "authors": [
+            {
+              "github": "nathanzm",
+              "name": "nathanzm"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-08-25T23:53:59Z",
+          "device_specs": {
+            "socket": "E12",
+            "form_factor": "bulb",
+            "lumens": 500,
+            "rated_power": 6.0,
+            "connectivity": [
+              "matter",
+              "wifi"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Tapo P110M",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.4.1:app"
+          },
+          "name": "Matter Candelabra Smart Light 6W 500LM E12 RGBCW",
+          "standby_power": 0.27,
+          "voltage_range": {
+            "max": 122.09,
+            "min": 120.06
+          },
+          "aliases": [
+            "4100"
+          ],
+          "id": "LI-E12-B11-6W-MT",
+          "manufacturer": "lightinginside",
+          "updated_at": "2026-09-01T13:04:20",
+          "max_power": 4.98,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-01T00:14:47",
+          "power_range": {
+            "min": 0.2,
+            "max": 4.98
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.2,
+            "color_temp": 97.2
+          },
+          "hash": "fe47cc24e7f11602bec21afbc80e6e71"
         },
         {
           "calculation_strategy": "lut",
@@ -18591,6 +18660,77 @@
     },
     {
       "aliases": [
+        "Aldi"
+      ],
+      "name": "megos",
+      "full_name": "Megos",
+      "dir_name": "megos",
+      "models": [
+        {
+          "calculation_strategy": "lut",
+          "created_at": "2026-08-09T18:41:44Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E14",
+            "form_factor": "candle",
+            "lumens": 470,
+            "rated_power": 6.5,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "4280012239193"
+          ],
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Shelly Plug M Gen3",
+          "measure_method": "script",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.3.0:app"
+          },
+          "name": "LIGHTWAY smart home LED-lamp - candle",
+          "standby_power": 0.35,
+          "voltage_range": {
+            "min": 233.9,
+            "max": 237.0
+          },
+          "authors": [
+            {
+              "github": "rugk",
+              "name": "rugk"
+            }
+          ],
+          "id": "L122AA63H11A6.5W",
+          "manufacturer": "megos",
+          "updated_at": "2026-09-01T16:27:46",
+          "max_power": 6.73,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-01T13:11:06",
+          "power_range": {
+            "min": 0.39,
+            "max": 6.73
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.5,
+            "color_temp": 98.5
+          },
+          "hash": "0fb21d04c7c28b96ff7aaa760c6eae4a"
+        }
+      ],
+      "device_types": [
+        "light"
+      ]
+    },
+    {
+      "aliases": [
         "LightZone"
       ],
       "name": "melitec",
@@ -18939,6 +19079,66 @@
             "brightness": 98.1
           },
           "hash": "e05380ac873a9324a16b932a56ad6c75"
+        },
+        {
+          "authors": [
+            {
+              "github": "rugk",
+              "name": "rugk"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-04T15:59:35Z",
+          "mains_voltage": 230,
+          "device_specs": {
+            "socket": "GU10",
+            "form_factor": "spot",
+            "lumens": 345,
+            "rated_power": 4.7,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "6974246476735"
+          ],
+          "product_url": "https://moeshouse.com/products/zigbee-smart-bulb-zb-td5-rcw-gu10-ms",
+          "device_type": "light",
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Shelly Plug M Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "NUM_LIGHTS": 3,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.6.0:app"
+          },
+          "name": "Zigbee RGB+CCT LED Bulb (GU10, 5W)",
+          "standby_power": 0.4,
+          "voltage_range": {
+            "max": 236.8,
+            "min": 232.1
+          },
+          "id": "ZB-TD5-RCW-GU10",
+          "manufacturer": "moes",
+          "updated_at": "2026-09-05T10:53:39",
+          "max_power": 4.93,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-04T17:56:37",
+          "power_range": {
+            "min": 0.47,
+            "max": 4.93
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "74d5619cf59f14631ffc7513625522b3"
         }
       ],
       "device_types": [
@@ -19639,7 +19839,7 @@
           "max_power": 0.58,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.58,
+            "min": 0.31,
             "max": 0.58
           },
           "hash": "c62f17e265350e65d1ae4149a6575bf1"
@@ -19812,7 +20012,7 @@
           "max_power": 0.96,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.96,
+            "min": 0.67,
             "max": 0.96
           },
           "hash": "9ee743b926b023658d90e369e9ee1b7b"
@@ -19875,7 +20075,7 @@
           "max_power": 0.54,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.54,
+            "min": 0.29,
             "max": 0.54
           },
           "hash": "aa444be20148a84ccbdea2b1597ca51f"
@@ -19921,7 +20121,7 @@
           "max_power": 0.4,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.4,
+            "min": 0.1,
             "max": 0.4
           },
           "hash": "4791f1e6d48ff24e74ce597a999590ff"
@@ -20156,7 +20356,7 @@
           "max_power": 1.04,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.04,
+            "min": 0.44,
             "max": 1.04
           },
           "hash": "6244dde663e0b86f70597a2ec8edfeaf"
@@ -21100,7 +21300,7 @@
           "max_power": 0.5,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.5,
+            "min": 0.3,
             "max": 0.5
           },
           "hash": "982d1e567cd5588b7af53e777a021c84"
@@ -21332,7 +21532,7 @@
           "max_power": 0.65,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.65,
+            "min": 0.2,
             "max": 0.65
           },
           "hash": "4db6abaebb6e1386c77b1921c9196266"
@@ -21591,7 +21791,7 @@
           ],
           "calculation_strategy": "fixed",
           "compatible_integrations": [
-            "cast"
+            "androidtv_remote"
           ],
           "created_at": "2026-08-31T14:18:12Z",
           "device_type": "set_top_box",
@@ -21605,7 +21805,7 @@
           "measure_device": "Zhurui PR10",
           "measure_method": "manual",
           "mains_voltage": 230,
-          "min_version": "v1.26.0",
+          "min_version": "v1.25.3",
           "name": "KPN TV Box+",
           "authors": [
             {
@@ -21616,15 +21816,15 @@
           ],
           "id": "DIW7022",
           "manufacturer": "sagemcom",
-          "updated_at": "2026-08-31T14:35:22",
+          "updated_at": "2026-09-04T07:49:37",
           "max_power": 3.22,
           "sub_profile_count": 2,
           "power_range": {
-            "min": 3.22,
+            "min": 0.3,
             "max": 3.22
           },
           "standby_power": 2.45,
-          "hash": "e1fdd46395cf0b540e99d5b24c238b09"
+          "hash": "5fe6efb1cdd965ca26696fb7d6c32bb5"
         }
       ],
       "device_types": [
@@ -21868,7 +22068,7 @@
           "max_power": 0.69,
           "sub_profile_count": 2,
           "power_range": {
-            "min": 0.51,
+            "min": 0.22,
             "max": 0.69
           },
           "standby_power": 0.4,
@@ -21968,6 +22168,56 @@
         },
         {
           "aliases": [
+            "Shelly 1PM Gen3"
+          ],
+          "calculation_strategy": "fixed",
+          "description": "Compact Smart Wi-Fi Relay with Power Monitoring",
+          "created_at": "2026-09-02T22:00:25Z",
+          "device_type": "smart_switch",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 3680,
+            "power_monitoring": true,
+            "rated_power": 1.2,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "matter"
+            ]
+          },
+          "ean": [
+            "3800235261798"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 60 seconds. Multiple combinations of settings were tested. Firmware version 2.0.0.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.6.0:app"
+          },
+          "name": "1PM Gen3",
+          "only_self_usage": true,
+          "product_url": "https://www.shelly.com/products/shelly-1pm-gen3",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S3SW-001P16EU",
+          "manufacturer": "shelly",
+          "updated_at": "2026-09-03T18:00:19",
+          "max_power": 0.87,
+          "sub_profile_count": 4,
+          "power_range": {
+            "min": 0.29,
+            "max": 0.87
+          },
+          "standby_power": 0.62,
+          "hash": "2ba5a8f18e50cfbcc581d638129d6c9f"
+        },
+        {
+          "aliases": [
             "Shelly 1PM Mini Gen3"
           ],
           "legacy_ids": [
@@ -22012,7 +22262,7 @@
           "max_power": 0.86,
           "sub_profile_count": 3,
           "power_range": {
-            "min": 0.51,
+            "min": 0.19,
             "max": 0.86
           },
           "standby_power": 0.58,
@@ -22067,7 +22317,7 @@
           "max_power": 1.332,
           "sub_profile_count": 16,
           "power_range": {
-            "min": 0.5845,
+            "min": 0.3045,
             "max": 1.332
           },
           "standby_power": 1.087,
@@ -22117,7 +22367,7 @@
           "max_power": 0.81,
           "sub_profile_count": 3,
           "power_range": {
-            "min": 0.46,
+            "min": 0.16,
             "max": 0.81
           },
           "standby_power": 0.53,
@@ -22172,7 +22422,7 @@
           "max_power": 2.366,
           "sub_profile_count": 5,
           "power_range": {
-            "min": 2.008,
+            "min": 0.1,
             "max": 2.366
           },
           "standby_power": 0.15,
@@ -22228,7 +22478,7 @@
           "max_power": 0.996,
           "sub_profile_count": 4,
           "power_range": {
-            "min": 0.5815,
+            "min": 0.294,
             "max": 0.996
           },
           "standby_power": 0.732,
@@ -22283,7 +22533,7 @@
           "max_power": 0.94,
           "sub_profile_count": 4,
           "power_range": {
-            "min": 0.585,
+            "min": 0.23,
             "max": 0.94
           },
           "standby_power": 0.655,
@@ -22449,7 +22699,7 @@
           "max_power": 0.923,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.923,
+            "min": 0.598,
             "max": 0.923
           },
           "hash": "4eab15da6244cabc9e0f76d85b3e2e43"
@@ -22598,7 +22848,7 @@
           "max_power": 0.8,
           "sub_profile_count": 2,
           "power_range": {
-            "min": 0.55,
+            "min": 0.25,
             "max": 0.8
           },
           "standby_power": 0.5,
@@ -22654,7 +22904,7 @@
           "max_power": 0.618,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.618,
+            "min": 0.376,
             "max": 0.618
           },
           "hash": "20fa6f936d86771eb78d514ee8b688da"
@@ -22763,7 +23013,7 @@
           "max_power": 0.85,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.85,
+            "min": 0.589,
             "max": 0.85
           },
           "hash": "1ba62c398a72b8744bcc863d8a7616c1"
@@ -22816,7 +23066,7 @@
           "max_power": 1.01,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.01,
+            "min": 0.74,
             "max": 1.01
           },
           "hash": "63b8a9b53e68f4bd74b47d087a330d63"
@@ -22914,7 +23164,7 @@
           "max_power": 1.0,
           "sub_profile_count": 3,
           "power_range": {
-            "min": 0.54,
+            "min": 0.31,
             "max": 1.0
           },
           "standby_power": 0.78,
@@ -30093,7 +30343,7 @@
           "max_power": 0.91,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.91,
+            "min": 0.23,
             "max": 0.91
           },
           "hash": "6dba11a669e5242b1709eebeb1cb887a"
@@ -30137,7 +30387,7 @@
           "max_power": 0.91,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.91,
+            "min": 0.23,
             "max": 0.91
           },
           "hash": "7d782ded237883395edc9a1663ef1e88"
@@ -30179,7 +30429,7 @@
           "max_power": 0.85,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.85,
+            "min": 0.15,
             "max": 0.85
           },
           "hash": "2997ed64e2542ff36bd99dfbe03758a7"
@@ -30218,7 +30468,7 @@
           "max_power": 0.5,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.5,
+            "min": 0.2,
             "max": 0.5
           },
           "hash": "3fcc43dd2518e1339c1c25695c8de695"
@@ -32628,7 +32878,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.12.1:docker"
           },
-          "name": "Hue White Ambiance A19 E26 (75W)",
+          "name": "Hue White Ambiance A19 E26",
           "standby_power": 0.35,
           "authors": [
             {
@@ -32638,7 +32888,7 @@
           ],
           "id": "LTW015",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-04T17:22:49",
           "max_power": 7.86,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:02:50",
@@ -32653,7 +32903,7 @@
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "e1659745eae45c441d465b7bb5689acb"
+          "hash": "bc202e059346d6370acce642c0e8ce99"
         },
         {
           "aliases": [
@@ -34962,7 +35212,7 @@
           "max_power": 1.14,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.14,
+            "min": 0.29,
             "max": 1.14
           },
           "hash": "5016dc2f5e6915d20de792eeea86a47a"
@@ -35005,7 +35255,7 @@
           "max_power": 0.49,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.49,
+            "min": 0.33,
             "max": 0.49
           },
           "hash": "df205088c812a2c8a6fe7c537553e8f1"
@@ -35048,7 +35298,7 @@
           "max_power": 1.56,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.56,
+            "min": 0.8,
             "max": 1.56
           },
           "hash": "91816698fa868263d898cb6a555922ab"
@@ -35217,6 +35467,9 @@
           "hash": "2f8136e877446469f87a0c6e7fd75f60"
         },
         {
+          "aliases": [
+            "S31"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2024-06-07T12:11:13Z",
           "device_type": "smart_speaker",
@@ -35247,14 +35500,14 @@
           ],
           "id": "beam",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-04T05:01:01",
           "max_power": 23.6,
           "sub_profile_count": 0,
           "power_range": {
             "min": 7.3,
             "max": 23.6
           },
-          "hash": "58d41f126bdf5056c45df36edbaec54f"
+          "hash": "541c4c26e69746e08eec73b3cd678ac4"
         },
         {
           "calculation_strategy": "fixed",
@@ -35290,7 +35543,7 @@
           "max_power": 5.33,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 5.33,
+            "min": 5.0,
             "max": 5.33
           },
           "hash": "972778ad946b9625c47841922cad5c60"
@@ -36154,6 +36407,62 @@
       ]
     },
     {
+      "aliases": [],
+      "name": "switchbot",
+      "full_name": "Switchbot",
+      "dir_name": "switchbot",
+      "website": "https://www.switch-bot.com",
+      "country": "CN",
+      "description": "Smart-home brand known for retrofit devices that automate existing switches, curtains and door locks.",
+      "models": [
+        {
+          "aliases": [
+            "plug-mini-eu"
+          ],
+          "calculation_strategy": "fixed",
+          "created_at": "2026-09-01T01:00:25Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "bluetooth"
+            ],
+            "form_factor": "plug",
+            "power_monitoring": true
+          },
+          "ean": [
+            "810150544817"
+          ],
+          "measure_description": "Manually measured standby and relay-on power for SwitchBot Plug Mini (EU).",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "name": "Plug Mini (EU)",
+          "standby_power": 0.72,
+          "standby_power_on": 1.11,
+          "only_self_usage": true,
+          "device_type": "smart_switch",
+          "authors": [
+            {
+              "github": "Maxik933",
+              "name": "Maxik933"
+            }
+          ],
+          "id": "W7732300",
+          "manufacturer": "switchbot",
+          "updated_at": "2026-09-02T09:17:25",
+          "max_power": 1.11,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.72,
+            "max": 1.11
+          },
+          "hash": "62f531bb9458ae625e56983b51cf5e7f"
+        }
+      ],
+      "device_types": [
+        "smart_switch"
+      ]
+    },
+    {
       "aliases": [
         "Tuya"
       ],
@@ -36401,7 +36710,7 @@
           "max_power": 0.54,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.54,
+            "min": 0.29,
             "max": 0.54
           },
           "hash": "a8ea5748781706652a3af4fa996fc96f"
@@ -36447,7 +36756,7 @@
           "max_power": 0.4,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.4,
+            "min": 0.1,
             "max": 0.4
           },
           "hash": "5635a18de9b5768bc7cbcd6189856832"
@@ -36495,7 +36804,7 @@
           "max_power": 0.8,
           "sub_profile_count": 2,
           "power_range": {
-            "min": 0.55,
+            "min": 0.25,
             "max": 0.8
           },
           "standby_power": 0.5,
@@ -36549,7 +36858,7 @@
           "max_power": 1.01,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.01,
+            "min": 0.74,
             "max": 1.01
           },
           "hash": "b517985339d9acfbcd3ce7670812cfe1"
@@ -36802,7 +37111,7 @@
           "max_power": 1.09,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.09,
+            "min": 0.58,
             "max": 1.09
           },
           "hash": "08c99fe4e492af093fa4e047c80d5062"
@@ -36847,7 +37156,7 @@
           "max_power": 1.461,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.461,
+            "min": 0.89,
             "max": 1.461
           },
           "hash": "7c37c4b7e9828d067fc66b69be5338a8"
@@ -36888,7 +37197,7 @@
           "max_power": 1.07,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.07,
+            "min": 0.5,
             "max": 1.07
           },
           "hash": "a40a26ec0bff8c9b58a437b8f79119e7"
@@ -36929,7 +37238,7 @@
           "max_power": 0.72,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.72,
+            "min": 0.23,
             "max": 0.72
           },
           "hash": "529034f03abcef6c700c688efecae7b0"
@@ -36974,7 +37283,7 @@
           "max_power": 2.19,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 2.19,
+            "min": 1.54,
             "max": 2.19
           },
           "hash": "7736e858e8770405dba70fb0add3a81c"
@@ -37120,7 +37429,7 @@
           "max_power": 0.9,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.9,
+            "min": 0.5,
             "max": 0.9
           },
           "hash": "2638b901dfb5b130301e803434e85006"
@@ -37158,7 +37467,7 @@
           "max_power": 0.92,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.92,
+            "min": 0.475,
             "max": 0.92
           },
           "hash": "38f1f3aae5af42cb8a282e52238a49f6"
@@ -37409,7 +37718,7 @@
           "max_power": 1.39,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.39,
+            "min": 0.633,
             "max": 1.39
           },
           "hash": "7370c8884b605b200377e94b1b7ea214"
@@ -37454,7 +37763,7 @@
           "max_power": 1.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.0,
+            "min": 0.6,
             "max": 1.0
           },
           "hash": "acb15cc0874993081d09068d40d67a03"
@@ -37500,7 +37809,7 @@
           "max_power": 1.2,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.2,
+            "min": 0.3,
             "max": 1.2
           },
           "hash": "bcf90892579c272a081c95b6c66335d2"
@@ -37541,7 +37850,7 @@
           "max_power": 1.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.0,
+            "min": 0.6,
             "max": 1.0
           },
           "hash": "19affd9437b772e17cd28f48a93118d9"
@@ -37900,7 +38209,7 @@
           "max_power": 3000.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 430.0,
+            "min": 0.1,
             "max": 3000.0
           },
           "hash": "dcb827af3217fa0795cf59dd1b097e48"
@@ -37941,7 +38250,7 @@
           "max_power": 0.39,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.39,
+            "min": 0.13,
             "max": 0.39
           },
           "hash": "0f2c2c495a7988ec812cc50a7433ef7a"
@@ -37978,7 +38287,7 @@
           "max_power": 0.866,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.866,
+            "min": 0.404,
             "max": 0.866
           },
           "hash": "e1adf98c2f6288c82181a2526e128860"
@@ -38171,24 +38480,28 @@
           "mains_voltage": 230,
           "name": "Smart Air Purifier",
           "product_url": "https://levoit.com/products/core-200s-p-smart-air-purifier",
-          "standby_power": 0.6,
           "authors": [
             {
               "name": "SH1FT-W",
               "github": "SH1FT-W",
               "email": "danielvizzino@outlook.com"
+            },
+            {
+              "name": "Ryan Ronnander",
+              "github": "ryan-ronnander"
             }
           ],
           "id": "Core200S",
           "manufacturer": "vesync",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-04T14:45:50",
           "max_power": 39.0,
-          "sub_profile_count": 0,
+          "sub_profile_count": 2,
           "power_range": {
-            "min": 17.0,
+            "min": 0.6,
             "max": 39.0
           },
-          "hash": "5af7261c6b178995689ff49bdd7c9ff4"
+          "standby_power": 0.6,
+          "hash": "ca483a7e67fbd20085af56e4621cc09c"
         },
         {
           "calculation_strategy": "fixed",
@@ -38223,7 +38536,7 @@
           "max_power": 37.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 3.0,
+            "min": 0.5,
             "max": 37.0
           },
           "hash": "96901a0acde0760328e5f76c7c31f2d9"
@@ -38260,14 +38573,59 @@
           "max_power": 37.0,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 3.3,
+            "min": 1.2,
             "max": 37.0
           },
           "hash": "11ba9bbb98a847e0638505fb4673d253"
+        },
+        {
+          "calculation_strategy": "fixed",
+          "created_at": "2026-09-03T00:00:00Z",
+          "device_type": "air_purifier",
+          "min_version": "v1.25.3",
+          "device_specs": {
+            "form_factor": "air_purifier",
+            "rated_power": 51,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "measure_device": "Sonoff S31",
+          "measure_method": "manual",
+          "measure_description": "Vital 200S-P, US 120 V, measured at the wall with a Tasmota Sonoff S31; three minute averages per state. Display draws 0.6 W and is subtracted when display_status is off. Manual speeds and sleep are measured directly. Auto maps the air_quality sensor state (excellent/good/moderate/poor, the manual's Very Good/Good/Moderate/Bad) to sleep/low/medium/high speed per the manual; only excellent was measured (PM2.5 1). Pet alternates 15 min high and 60 min medium per the manual (cycle not measured); value is the cycle average. Both presets assume light detection is off or the room is lit. With light detection on, the unit caps them at medium (50 %) in the dark, a state HA cannot see. Standby is below the S31's floor and comes from corrected Shelly Plug history.",
+          "mains_voltage": 120,
+          "name": "Smart Air Purifier",
+          "aliases": [
+            "LAP-V201S-WUS",
+            "LAP-V201S-WEU",
+            "LAP-V201S-WJP",
+            "LAP-V201S-AASR",
+            "LAP-V201S-AUSR",
+            "LAP-V201S-AEUR"
+          ],
+          "product_url": "https://levoit.com/products/vital-200s-p-smart-air-purifier",
+          "standby_power": 0.25,
+          "authors": [
+            {
+              "name": "Ryan Ronnander",
+              "github": "ryan-ronnander"
+            }
+          ],
+          "id": "Vital 200S",
+          "manufacturer": "vesync",
+          "updated_at": "2026-09-04T14:45:41",
+          "max_power": 2.91,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.25,
+            "max": 2.91
+          },
+          "hash": "c17f47eef6d1aac1cce578739b37a5be"
         }
       ],
       "device_types": [
-        "fan"
+        "fan",
+        "air_purifier"
       ]
     },
     {
@@ -39372,7 +39730,7 @@
           "max_power": 1.6,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 1.6,
+            "min": 1.4,
             "max": 1.6
           },
           "hash": "dbe5620e1da3abb2d3a1471e14d59160"

@@ -1,3 +1,4 @@
+from collections.abc import Callable
 import csv
 import json
 from pathlib import Path
@@ -22,6 +23,27 @@ def test_average_reports_start_phase_after_confirmation() -> None:
 
     interaction.confirm.assert_called_once_with("Ready to start the average measurement.")
     interaction.phase.assert_called_once_with("Starting averaging")
+    assert measure_util.take_average_measurement.call_args.kwargs["finish_on_interrupt"] is True
+
+
+def test_average_summary_uses_elapsed_duration() -> None:
+    measure_util = MagicMock(spec=MeasureUtil)
+
+    def average(
+        duration: int,
+        *,
+        on_progress: Callable[[float, float], None],
+        finish_on_interrupt: bool,
+    ) -> MeasurementResult:
+        assert duration == 60
+        assert finish_on_interrupt is True
+        on_progress(6.5, duration)
+        return MeasurementResult(power=4.2, voltages=[230.0, 232.0])
+
+    measure_util.take_average_measurement.side_effect = average
+    runner = AverageRunner(measure_util, MagicMock(spec=RunInteraction))
+    result = runner.run(AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), duration=60), "")
+    assert result.summary == {"Average power": "4.2 W", "Duration": "6.5 s", "Average voltage": "231.0 V"}
 
 
 def test_recorder_treats_app_stop_as_successful_completion(tmp_path: Path) -> None:

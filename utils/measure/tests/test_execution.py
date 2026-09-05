@@ -12,7 +12,7 @@ from measure.execution import (
     PreparedMeasurement,
     RunInteraction,
 )
-from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
     DummyLoadCalibrationRequest,
@@ -89,8 +89,99 @@ def test_execution_writes_model_from_prepared_measurement(
     assert model["device_type"] == "generic"
     assert model["voltage_range"]["min"] == pytest.approx(229.9)
     assert model["voltage_range"]["max"] == pytest.approx(231.2)
+    assert model["mains_voltage"] == 230
     assert model["measure_settings"]["SAMPLE_COUNT"] == 3
     assert model["measure_settings"]["VERSION"] == measure_version
+    assert model["measure_settings"]["DUMMY_LOAD"] is False
+    assert "NUM_LIGHTS" not in model["measure_settings"]
+
+
+def test_execution_records_enabled_dummy_load_in_measure_settings(tmp_path: Path) -> None:
+    request = AverageMeasurementRequest(
+        product_name="Test device",
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power", voltage_entity_id="sensor.voltage"),
+        generate_model=True,
+        dummy_load=DummyLoadReuseRequest(description="Test load", resistance=812.4),
+    )
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.run.return_value = RunnerResult(model_json_data={"device_type": "generic"}, voltages=[230.0])
+    runner.measure_standby_power.return_value = MeasurementResult(power=0.3, voltages=[230.0])
+
+    MeasurementExecution(
+        measurement=PreparedMeasurement(request=request, runner=runner),
+        output_directory=tmp_path,
+    ).run()
+
+    model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
+    assert model["measure_settings"]["DUMMY_LOAD"] is True
+    assert model["measure_settings"]["DUMMY_LOAD_RESISTANCE"] == pytest.approx(812.4)
+    assert model["measure_settings"]["DUMMY_LOAD_POWER"] == pytest.approx(65.12)
+
+
+def test_execution_records_new_dummy_load_calibration_in_measure_settings(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request = AverageMeasurementRequest(
+        product_name="Test device",
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power", voltage_entity_id="sensor.voltage"),
+        generate_model=True,
+        dummy_load=DummyLoadCalibrationRequest(description="Test load"),
+    )
+    measure_util = MagicMock(spec=MeasureUtil)
+    measure_util.dummy_load_value = None
+    measure_util.set_dummy_load_resistance.side_effect = lambda resistance: setattr(
+        measure_util,
+        "dummy_load_value",
+        resistance,
+    )
+    preparation = DummyLoadPreparation(request=request, spec=request.dummy_load, measure_util=measure_util)
+    monkeypatch.setattr(DummyLoadPreparation, "_calibrate", lambda self, interaction: 529.0)
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.run.return_value = RunnerResult(model_json_data={"device_type": "generic"}, voltages=[230.0])
+    runner.measure_standby_power.return_value = MeasurementResult(power=0.3, voltages=[230.0])
+
+    MeasurementExecution(
+        measurement=PreparedMeasurement(
+            request=request,
+            runner=runner,
+            preparations=[preparation],
+            interaction=MagicMock(spec=RunInteraction),
+        ),
+        output_directory=tmp_path,
+    ).run()
+
+    model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
+    assert model["measure_settings"]["DUMMY_LOAD_RESISTANCE"] == pytest.approx(529.0)
+    assert model["measure_settings"]["DUMMY_LOAD_POWER"] == pytest.approx(100.0)
+
+
+@pytest.mark.parametrize("num_lights", [1, 3])
+def test_execution_records_number_of_lights_in_measure_settings(tmp_path: Path, num_lights: int) -> None:
+    request = LightMeasurementRequest(
+        model_id="test-light",
+        product_name="Test light",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyLightControllerSpec(),
+        multiple_light_count=num_lights,
+    )
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.run.return_value = RunnerResult(
+        model_json_data={"device_type": "light", "calculation_strategy": "lut"},
+        voltages=[230.0],
+    )
+    runner.measure_standby_power.return_value = MeasurementResult(power=0.3, voltages=[230.0])
+
+    MeasurementExecution(
+        measurement=PreparedMeasurement(request=request, runner=runner),
+        output_directory=tmp_path,
+    ).run()
+
+    model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
+    assert model["measure_settings"]["NUM_LIGHTS"] == num_lights
 
 
 def test_execution_cleans_up_runner_after_failure(tmp_path: Path) -> None:

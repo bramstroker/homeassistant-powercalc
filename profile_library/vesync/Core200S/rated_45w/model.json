@@ -1,0 +1,22 @@
+{
+  "name": "Rated 45 W (Core 200S-P, late 2025 units)",
+  "device_specs": {
+    "form_factor": "air_purifier",
+    "rated_power": 45,
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "measure_device": "P3 P4400 Kill A Watt Usage Monitor",
+  "measure_description": "US 120 V Core 200S-P, label rated 45 W, date code 1225. Night light adds 0.08 W (dim) or 0.23 W (on) in any mode: three minute averages on a Tasmota Sonoff S31 with the fan off gave 0.83 W off, 0.91 W dim, 1.06 W bright.",
+  "mains_voltage": 120,
+  "standby_power": "{{ 0.83 + {'dim': 0.08, 'on': 0.23}.get(states('[[entity_by_translation_key:night_light_level]]'), 0) }}",
+  "fixed_config": {
+    "states_power": {
+      "preset_mode|sleep": "{{ 7.7 + {'dim': 0.08, 'on': 0.23}.get(states('[[entity_by_translation_key:night_light_level]]'), 0) }}",
+      "percentage|33": "{{ 16.1 + {'dim': 0.08, 'on': 0.23}.get(states('[[entity_by_translation_key:night_light_level]]'), 0) }}",
+      "percentage|66": "{{ 23.7 + {'dim': 0.08, 'on': 0.23}.get(states('[[entity_by_translation_key:night_light_level]]'), 0) }}",
+      "percentage|100": "{{ 45.4 + {'dim': 0.08, 'on': 0.23}.get(states('[[entity_by_translation_key:night_light_level]]'), 0) }}"
+    }
+  }
+}
