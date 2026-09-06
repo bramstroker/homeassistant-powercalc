@@ -2,6 +2,7 @@ import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 import type { PlotSpec } from "../../types";
 import { sharedStyles } from "../../styles";
+import { THEME_CHANGE_EVENT } from "../../theme";
 
 interface PlotPalette {
   background: string;
@@ -38,6 +39,7 @@ export class ResultPlot extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+    window.addEventListener(THEME_CHANGE_EVENT, this.themeChanged);
     if (this.hasUpdated) {
       this.observeCanvas();
       this.draw();
@@ -53,6 +55,7 @@ export class ResultPlot extends LitElement {
   }
 
   disconnectedCallback(): void {
+    window.removeEventListener(THEME_CHANGE_EVENT, this.themeChanged);
     this.resizeObserver?.disconnect();
     this.resizeObserver = undefined;
     super.disconnectedCallback();
@@ -63,6 +66,8 @@ export class ResultPlot extends LitElement {
     this.resizeObserver = new ResizeObserver(() => this.draw());
     this.resizeObserver.observe(this.canvas);
   }
+
+  private readonly themeChanged = (): void => this.draw();
 
   render() {
     return html`

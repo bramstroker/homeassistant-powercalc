@@ -3,6 +3,13 @@ import { AppShell } from "./shell";
 import type { ResultView } from "../result/view";
 import type { ProfileSubmitView } from "../profile/submit-view";
 import { capabilities, controllerOf, defaultSettings, goodPowerMeterDiagnostic } from "../testing/fixtures";
+import { THEME_STORAGE_KEY } from "../../theme";
+
+afterEach(() => {
+  document.body.replaceChildren();
+  document.documentElement.removeAttribute("data-theme");
+  localStorage.clear();
+});
 
 describe("app shell device entities", () => {
   it("loads device entities only after their measurement type is selected", async () => {
@@ -86,6 +93,29 @@ describe("app shell device entities", () => {
 });
 
 describe("app shell", () => {
+  it("cycles and persists the color theme independently from backend settings", async () => {
+    const element = new AppShell();
+    vi.spyOn(controllerOf(element), "boot").mockResolvedValue();
+    document.body.append(element);
+    await element.updateComplete;
+
+    const themeButton = () => element.shadowRoot!.querySelector<HTMLButtonElement>(".theme-toggle")!;
+    expect(element.dataset.theme).toBe("system");
+    expect(themeButton().getAttribute("aria-label")).toContain("Color theme: System");
+
+    themeButton().click();
+    await element.updateComplete;
+    expect(element.dataset.theme).toBe("light");
+    expect(document.documentElement.dataset.theme).toBe("light");
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
+    expect(themeButton().title).toBe("Color theme: Light");
+
+    themeButton().click();
+    await element.updateComplete;
+    expect(element.dataset.theme).toBe("dark");
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("dark");
+  });
+
   it("keeps download callbacks stable while using the current session", async () => {
     const element = new AppShell();
     vi.spyOn(controllerOf(element), "boot").mockResolvedValue();

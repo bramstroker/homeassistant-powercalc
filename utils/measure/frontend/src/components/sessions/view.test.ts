@@ -32,6 +32,8 @@ describe("sessions view", () => {
 
     const labels = [...element.shadowRoot.querySelectorAll("button")].map((button) => button.textContent?.trim());
     expect(labels).toEqual(expect.arrayContaining(["New measurement", "Open", "Resume", "Measure again", "Delete"]));
+    expect([...element.shadowRoot.querySelectorAll(".primary-actions button")].map((button) => button.textContent?.trim())).toEqual(["Open", "Resume", "Measure again"]);
+    expect([...element.shadowRoot.querySelectorAll(".secondary-actions :is(a, button)")].map((action) => action.textContent?.trim())).toEqual(["Diagnostics", "Delete"]);
     const measureAgain = [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.trim() === "Measure again");
     const tooltip = element.shadowRoot.querySelector<HTMLElement>('[role="tooltip"]');
     expect(tooltip?.textContent).toBe("Start a new measurement using these settings");

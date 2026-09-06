@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ResultPlot } from "./plot";
 import type { PlotSpec } from "../../types";
+import { THEME_CHANGE_EVENT } from "../../theme";
 
 const plot: PlotSpec = {
   id: "brightness", title: "Brightness", kind: "scatter", source: "brightness.csv",
@@ -52,6 +53,16 @@ describe("result plot lifecycle", () => {
     await element.updateComplete;
     expect(canvas.getContext).toHaveBeenCalledTimes(3);
     expect(canvas.getAttribute("aria-label")).toBe("Updated brightness: Power (W) by Brightness");
+  });
+
+  it("redraws for theme changes only while connected", async () => {
+    const element = await mount();
+    const canvas = element.shadowRoot!.querySelector("canvas")!;
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
+    expect(canvas.getContext).toHaveBeenCalledTimes(2);
+    element.remove();
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
+    expect(canvas.getContext).toHaveBeenCalledTimes(2);
   });
 
   it("disconnects the observer and resumes drawing after reattachment", async () => {
