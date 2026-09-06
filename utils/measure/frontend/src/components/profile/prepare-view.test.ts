@@ -1,5 +1,6 @@
 import { ProfilePrepareView } from "./prepare-view";
 import type { Combobox } from "../shared/combobox";
+import type { StringListInput } from "../shared/string-list-input";
 import type { ContributionPreview } from "../../types";
 
 const preview: ContributionPreview = {
@@ -76,22 +77,27 @@ describe("profile validation", () => {
     const element = await mount();
     element.contributionPreview = { ...preview };
     await element.updateComplete;
-    input(element, "aliases").value = "Alias, Alias";
-    input(element, "aliases").dispatchEvent(new Event("input", { bubbles: true }));
+    const aliases = element.shadowRoot!.querySelector<StringListInput>('measure-string-list-input[name="aliases"]')!;
+    aliases.value = [" Alias ", "Second alias"];
+    aliases.dispatchEvent(new CustomEvent("list-input-change", { bubbles: true, composed: true }));
     await element.updateComplete;
     expect(element.shadowRoot!.textContent).toContain("Your changes have not been validated yet");
     expect(element.shadowRoot!.querySelector<HTMLButtonElement>('button[type="submit"]')?.textContent).toContain("Validate changes");
     expect(element.shadowRoot!.querySelector(".validation-status.valid")).toBeNull();
     expect(element.shadowRoot!.querySelector(".prepared-preview")).toBeNull();
     expect(element.shadowRoot!.textContent).not.toContain("Continue to submit profile");
+    const onPreview = vi.fn();
+    element.addEventListener("contribution-preview", onPreview);
     submit(element);
+    expect(onPreview.mock.calls[0]![0].detail.aliases).toEqual(["Alias", "Second alias"]);
     element.contributionBusy = true;
     await element.updateComplete;
     expect(element.shadowRoot!.querySelector("fieldset")!.disabled).toBe(true);
     element.contributionPreview = { ...preview };
     element.contributionBusy = false;
     await element.updateComplete;
-    expect(input(element, "aliases").value).toBe("Alias");
+    const normalizedAliases = element.shadowRoot!.querySelector<StringListInput>('measure-string-list-input[name="aliases"]')!;
+    expect(normalizedAliases.value).toEqual(["Alias"]);
   });
 
   it("preserves boolean and enum specification values and highlights schema errors on the exact field", async () => {

@@ -1,6 +1,7 @@
 import type { AppSettings, ContributionPreview } from "../../types";
 import { AppShell } from "../app/shell";
 import type { Combobox } from "../shared/combobox";
+import type { StringListInput } from "../shared/string-list-input";
 import type { ProfilePrepareView } from "./prepare-view";
 import { capabilities, controllerOf, defaultSettings } from "../testing/fixtures";
 
@@ -18,6 +19,10 @@ function view(app: AppShell): ProfilePrepareView {
 
 function field(app: AppShell, name: string): HTMLInputElement {
   return view(app).shadowRoot!.querySelector(`[name="${name}"]`)!;
+}
+
+function listField(app: AppShell, name: "aliases" | "gtins"): StringListInput {
+  return view(app).shadowRoot!.querySelector(`measure-string-list-input[name="${name}"]`)!;
 }
 
 async function rendered(app: AppShell): Promise<void> {
@@ -73,10 +78,12 @@ async function backAndForward(app: AppShell): Promise<void> {
 afterEach(() => document.body.replaceChildren());
 
 describe("profile draft navigation", () => {
-  it("keeps unfinished text, empty overrides and multiselect tags when returning from Result", async () => {
+  it("keeps unfinished text, list rows and multiselect tags when returning from Result", async () => {
     const { app } = await mount();
     await edit(app, "product_name", "Edited product ");
-    await edit(app, "aliases", "First alias, ");
+    const aliases = listField(app, "aliases");
+    aliases.value = ["First alias ", ""];
+    aliases.dispatchEvent(new CustomEvent("list-input-change", { bubbles: true, composed: true }));
     await edit(app, "contributor_github", "");
     const connectivity = field(app, "device_specs.connectivity") as unknown as Combobox;
     connectivity.value = ["zigbee", "wifi"];
@@ -86,7 +93,7 @@ describe("profile draft navigation", () => {
     await backAndForward(app);
 
     expect(field(app, "product_name").value).toBe("Edited product ");
-    expect(field(app, "aliases").value).toBe("First alias, ");
+    expect(listField(app, "aliases").value).toEqual(["First alias ", ""]);
     expect(field(app, "contributor_github").value).toBe("");
     expect(field(app, "device_specs.connectivity").value).toEqual(["zigbee", "wifi"]);
     expect(view(app).previewDirty).toBe(true);

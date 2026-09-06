@@ -29,7 +29,7 @@ export function validateMetadata(values: ContributionPreviewRequest): Record<str
   }
   if (values.product_url && !values.product_url.startsWith("https://")) errors.product_url = "Enter a URL starting with https://.";
   if (values.gtins?.some((value) => !/^(?:\d{8}|\d{12,14})$/.test(value))) {
-    errors.gtins = "Enter barcodes of 8, 12, 13 or 14 digits, separated by commas.";
+    errors.gtins = "Enter an 8, 12, 13 or 14 digit barcode in each field.";
   }
   if (values.contributor_email && !validEmail(values.contributor_email)) {
     errors.contributor_email = "Enter a valid email address, for example name@example.com.";

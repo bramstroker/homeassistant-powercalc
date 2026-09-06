@@ -302,17 +302,19 @@ for (const width of [1280, 390]) {
   });
 }
 
-test("preserves unfinished profile fields and tags when navigating back to Result", async ({ page }) => {
+test("preserves unfinished profile fields, list rows and tags when navigating back to Result", async ({ page }) => {
   await page.route("**/api/sessions/session-completed/contribution/preview", (route) => route.fulfill({
     json: { ...contributionPreview, product_name: "Edited lamp" },
   }));
   await page.getByRole("button", { name: "Open", exact: true }).click();
   await page.getByRole("button", { name: "Prepare profile" }).click();
   const product = page.locator('input[name="product_name"]');
-  const aliases = page.locator('input[name="aliases"]');
+  const aliases = page.locator('measure-string-list-input[name="aliases"]');
+  const aliasInputs = aliases.locator("input");
   const meter = page.getByRole("combobox", { name: "Measurement device", exact: true });
   await product.fill("Edited lamp ");
-  await aliases.fill("Alias one, ");
+  await aliasInputs.first().fill("Alias one ");
+  await aliases.getByRole("button", { name: "Add another alias" }).click();
   await meter.fill("Custom meter");
   await page.getByRole("combobox", { name: "Connectivity", exact: true }).click();
   await page.getByRole("option", { name: "Zigbee", exact: true }).click();
@@ -322,7 +324,9 @@ test("preserves unfinished profile fields and tags when navigating back to Resul
   await page.getByRole("button", { name: "Prepare profile" }).click();
 
   await expect(product).toHaveValue("Edited lamp ");
-  await expect(aliases).toHaveValue("Alias one, ");
+  await expect(aliasInputs).toHaveCount(2);
+  await expect(aliasInputs.first()).toHaveValue("Alias one ");
+  await expect(aliasInputs.nth(1)).toHaveValue("");
   await expect(meter).toHaveValue("Custom meter");
   await expect(page.getByRole("button", { name: "Remove Zigbee" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Continue to submit profile" })).toBeHidden();
@@ -342,6 +346,34 @@ test("preserves unfinished profile fields and tags when navigating back to Resul
   await page.keyboard.press("Space");
   await expect(page.getByRole("heading", { name: "Measurement complete" })).toBeVisible();
   await expect(progress.getByRole("button")).toHaveCount(0);
+});
+
+test("submits aliases and barcodes as individual metadata rows", async ({ page }) => {
+  let submitted: Record<string, unknown> | undefined;
+  await page.route("**/api/sessions/session-completed/contribution/preview", async (route) => {
+    submitted = route.request().postDataJSON() as Record<string, unknown>;
+    await route.fulfill({ json: contributionPreview });
+  });
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+
+  const aliases = page.locator('measure-string-list-input[name="aliases"]');
+  await aliases.locator("input").first().fill("LWA017-A");
+  await aliases.getByRole("button", { name: "Add another alias" }).click();
+  await aliases.locator("input").nth(1).fill("LWA017-B");
+
+  const barcodes = page.locator('measure-string-list-input[name="gtins"]');
+  await expect(barcodes.locator("input").first()).toHaveAttribute("inputmode", "numeric");
+  await barcodes.locator("input").first().fill("12345678");
+  await barcodes.getByRole("button", { name: "Add another barcode" }).click();
+  await barcodes.locator("input").nth(1).fill("1234567890123");
+  await page.getByRole("button", { name: "Validate changes" }).click();
+
+  await expect.poll(() => submitted).toMatchObject({
+    aliases: ["LWA017-A", "LWA017-B"],
+    gtins: ["12345678", "1234567890123"],
+  });
+  await expect(page.locator(".validation-status")).toContainText("Profile validated");
 });
 
 test("keeps profile metadata controls aligned at a consistent height", async ({ page }) => {
@@ -373,8 +405,8 @@ test("keeps profile metadata controls aligned at a consistent height", async ({ 
     page.locator('input[name="model_id"]'),
     page.locator('input[name="product_name"]'),
     page.locator('input[name="product_url"]'),
-    page.locator('input[name="aliases"]'),
-    page.locator('input[name="gtins"]'),
+    page.locator('measure-string-list-input[name="aliases"] input').first(),
+    page.locator('measure-string-list-input[name="gtins"] input').first(),
   ];
   const contributorControls = [
     page.locator('input[name="contributor"]'),
