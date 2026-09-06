@@ -106,16 +106,6 @@ export function recorderPurpose(state: FieldState): string | undefined {
   return state.definition.fields.find((field) => field.name === "recorder_purpose")?.default?.toString();
 }
 
-/** Return the recorder export filename implied by the selected purpose. */
-export function recorderExportFilename(purpose: string | undefined, name: string): string {
-  const wanted = purpose === "complex_profile" ? "jsonl" : "csv";
-  if (!name) return `record.${wanted}`;
-  const dot = name.lastIndexOf(".");
-  const current = dot === -1 ? "" : name.slice(dot + 1).toLowerCase();
-  if (current !== "csv" && current !== "jsonl") return name;
-  return current === wanted ? name : `${name.slice(0, dot)}.${wanted}`;
-}
-
 function narrowedModes(field: FormField, state: FieldState): LutMode[] | undefined {
   const source = field.narrowed_by
     ? state.definition.fields.find((candidate) => candidate.name === field.narrowed_by)

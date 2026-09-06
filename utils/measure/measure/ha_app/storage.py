@@ -26,7 +26,13 @@ from measure.ha_app.session import (
     SessionState,
 )
 from measure.ha_app.shelly_credentials import ShellyCredentials, ShellyCredentialStore
-from measure.request import LightMeasurementRequest, MeasurementRequest, parse_measurement_request
+from measure.request import (
+    LightMeasurementRequest,
+    MeasurementRequest,
+    RecorderMeasurementRequest,
+    RecorderPurpose,
+    parse_measurement_request,
+)
 from measure.runner.light_plan import (
     CSV_HEADERS,
     ColorTempVariation,
@@ -325,6 +331,20 @@ class SessionStorage:
             if self._has_complete_measurement_row(path, mode, request):
                 return True
         return False
+
+    def can_analyse(self, session_id: str) -> bool:
+        """Return whether a retained complex-profile recording can be analysed again."""
+
+        try:
+            request = self.load_request(session_id)
+        except SESSION_LOAD_ERRORS:
+            return False
+        if not isinstance(request, RecorderMeasurementRequest):
+            return False
+        if request.recorder_purpose != RecorderPurpose.COMPLEX_PROFILE:
+            return False
+        path = self.artifact_directory(session_id, request.model_id) / request.export_filename
+        return path.is_file() and not path.is_symlink()
 
     def verify_writable(self) -> None:
         """Exercise the same create/fsync/remove operations used by session persistence."""

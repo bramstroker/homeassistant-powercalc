@@ -309,6 +309,33 @@ def test_preparer_allows_generated_linear_profile_without_csv(tmp_path: Path) ->
     assert [file.path for file in preview.files] == ["profile_library/signify/Speaker 1/model.json"]
 
 
+def test_preparer_packages_recorder_model_without_source_artifacts(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_library(tmp_path)
+    artifacts.mkdir()
+    (artifacts / "model.json").write_text(
+        json.dumps(
+            {
+                "name": "",
+                "calculation_strategy": "fixed",
+                "fixed_config": {"states_power": {"off": 0.4, "on": 9.8}},
+            },
+        ),
+        encoding="utf-8",
+    )
+    (artifacts / "record.jsonl").write_text('{"record_type":"sample"}\n', encoding="utf-8")
+    (artifacts / "analyser.json").write_text('{"status":"model_ready"}', encoding="utf-8")
+    contribution_metadata = metadata(model_id="Heater 1", product_name="Smart heater")
+    preparer = make_preparer(tmp_path)
+
+    preview = preparer.prepare(artifacts, contribution_metadata)
+    contents = dict(preparer.render_contents(artifacts, contribution_metadata, preview))
+
+    assert [file.path for file in preview.files] == ["profile_library/signify/Heater 1/model.json"]
+    assert list(contents) == ["profile_library/signify/Heater 1/model.json"]
+    assert json.loads(contents[preview.files[0].path])["name"] == "Smart heater"
+
+
 def test_preparer_blocks_collisions_and_warns_on_duplicates(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
     write_library(tmp_path)

@@ -102,7 +102,9 @@ export function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     cancel: async () => ({ state: "cancelled" }),
     confirm: async () => ({ state: "running" }),
     resume: async () => ({ state: "running" }),
+    analyse: async () => ({ state: "completed" }),
     getFiles: async () => [],
+    getJsonFile: async () => ({}),
     getPlots: async () => ({ partial: false, plots: [], warnings: [] }),
     getContributionDraft: async () => ({
       eligible: false,

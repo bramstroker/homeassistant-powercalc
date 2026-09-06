@@ -60,8 +60,8 @@ export function prepareRequest(options: RequestOptions): RequestResult {
   }
   const defaults = profileDefaults(options);
   const previous = previousRequest(options.initialRequest, definition, request);
-  request.model_id = previous?.model_id || defaults.model_id;
-  request.product_name = previous?.product_name || defaults.product_name;
+  request.model_id ||= previous?.model_id || defaults.model_id;
+  request.product_name ||= previous?.product_name || defaults.product_name;
   request.session_name ||= previous?.session_name || defaults.session_name || definition.label;
   request.dummy_load = meterFor(options.meter.type).supportsDummyLoad
     ? dummyLoadSpec(form, options.calibration)

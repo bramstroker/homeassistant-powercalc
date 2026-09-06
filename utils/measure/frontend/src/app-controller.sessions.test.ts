@@ -122,5 +122,29 @@ describe("measure app controller: sessions", () => {
     expect(appState.contributionError).toBe("");
   });
 
+  it("analyses a saved recording again and refreshes its result artifacts", async () => {
+    const appState = state();
+    appState.view = "result";
+    appState.snapshot = { state: "completed", session_id: "session-1", can_analyse: true };
+    const analyse = vi.fn(async () => ({
+      state: "completed" as const,
+      session_id: "session-1",
+      can_analyse: true,
+      summary: { "Recording analysis": "Fixed power profile created" },
+    }));
+    const getFiles = vi.fn(async () => [{ name: "model.json", size: 10, media_type: "application/json" }]);
+    const controller = new MeasureAppController(appState, () => api({ analyse, getFiles }), () => connection(), () => undefined);
+
+    await controller.analyseRecording();
+
+    expect(analyse).toHaveBeenCalledWith("session-1");
+    expect(appState.snapshot.summary?.["Recording analysis"]).toBe("Fixed power profile created");
+    expect(getFiles).toHaveBeenCalledWith("session-1");
+    expect(appState.files).toHaveLength(1);
+    expect(appState.lastAnalysedSessionId).toBe("session-1");
+    expect(appState.view).toBe("result");
+    expect(appState.busy).toBe(false);
+  });
+
 
 });

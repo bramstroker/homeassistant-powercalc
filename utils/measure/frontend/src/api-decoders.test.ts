@@ -1,4 +1,4 @@
-import { decodePreflight, isMeasurementRequest } from "./api-decoders";
+import { decodePreflight, decodeSessionSnapshot, isMeasurementRequest } from "./api-decoders";
 import { capabilities } from "./components/testing/fixtures";
 
 const averageRequest = {
@@ -65,5 +65,32 @@ describe("response boundary", () => {
     };
 
     expect(decodePreflight(response)).toBe(response);
+  });
+
+  it("requires the recorder-analysis capability flag on session snapshots", () => {
+    const response = {
+      session_id: "session-1",
+      state: "completed",
+      can_analyse: true,
+      created_at: "2026-09-05T10:00:00Z",
+      updated_at: "2026-09-05T10:05:00Z",
+      phase: null,
+      confirmation_message: null,
+      confirmation_action: null,
+      mode: null,
+      progress: { completed: 1, total: 1, skipped: 0, percent: 100, estimated_remaining_seconds: 0 },
+      warnings: [],
+      error: null,
+      summary: null,
+      request: averageRequest,
+      operating_point: null,
+      calibration_sample: null,
+      entity_states: {},
+    };
+
+    expect(decodeSessionSnapshot(response)).toBe(response);
+    const { can_analyse: _missing, ...withoutCapability } = response;
+    expect(() => decodeSessionSnapshot(withoutCapability)).toThrow("Invalid session snapshot response");
+    expect(() => decodeSessionSnapshot({ ...response, can_analyse: "yes" })).toThrow("Invalid session snapshot response");
   });
 });

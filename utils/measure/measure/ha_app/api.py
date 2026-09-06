@@ -227,6 +227,7 @@ class SessionSnapshotResponse(BaseModel):
     operating_point: OperatingPoint | None
     calibration_sample: CalibrationSampleResponse | None
     entity_states: dict[str, str]
+    can_analyse: bool
     request: MeasurementRequest
 
 
@@ -698,6 +699,16 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
     async def resume_session(session_id: str, request: Request) -> SessionSnapshotResponse:
         return await _resume_session(_context(request), session_id)
 
+    @router.post("/sessions/{session_id}/analyse", responses={404: _ERROR, 409: _ERROR})
+    async def analyse_session(session_id: str, request: Request) -> SessionSnapshotResponse:
+        context = _context(request)
+        _require_session(context, session_id)
+        try:
+            snapshot = await run_in_threadpool(context.coordinator.analyse, session_id)
+        except SessionConflictError as error:
+            raise HTTPException(status_code=409, detail=str(error)) from error
+        return _snapshot_response(context, snapshot)
+
     @router.get("/sessions/{session_id}/files", responses={404: _ERROR})
     async def session_files(session_id: str, request: Request) -> list[SessionFile]:
         context = _context(request)
@@ -1146,6 +1157,7 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> Sessio
             else None
         ),
         entity_states=snapshot.entity_states,
+        can_analyse=snapshot.state not in ACTIVE_SESSION_STATES and context.storage.can_analyse(snapshot.id),
         request=context.storage.load_request(snapshot.id),
     )
 

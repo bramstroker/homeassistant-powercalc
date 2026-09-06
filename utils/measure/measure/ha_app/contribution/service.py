@@ -36,7 +36,7 @@ from measure.contribution.pull_request import (
     pull_request_title,
 )
 from measure.ha_app.contribution.models import (
-    SUPPORTED_MEASURE_TYPES,
+    AUTOMATIC_CONTRIBUTION_MESSAGE,
     ContributionApiError,
     ContributionApiErrorCode,
     ContributionAuthMethod,
@@ -49,6 +49,8 @@ from measure.ha_app.contribution.models import (
     ContributionSubmissionResult,
     DeviceFlowPollResponse,
     DeviceFlowStart,
+    contribution_entity_ids,
+    supports_automatic_contribution,
 )
 from measure.model import mains_voltage_from_range
 from measure.profile.output import prepared_profile_archive
@@ -565,8 +567,8 @@ def _contribution_ineligibility_reason(
     artifact_root: Path,
     files: list[ContributionFile],
 ) -> str | None:
-    if request.measure_type not in SUPPORTED_MEASURE_TYPES:
-        return "Automatic contribution is available for light, speaker, fan, and charging profiles"
+    if not supports_automatic_contribution(request):
+        return AUTOMATIC_CONTRIBUTION_MESSAGE
     has_model = artifact_root.is_dir() and any(Path(file.path).name == MODEL_FILENAME for file in files)
     return None if has_model else f"Contribution requires a generated {MODEL_FILENAME} artifact"
 
@@ -652,7 +654,7 @@ def _build_preview_response(
     }
     home_assistant_info: dict[str, str | int | float | bool | None] = {
         "measure_type": request.measure_type.value,
-        "controlled_entity": ", ".join(request.controlled_entity_ids) or None,
+        "controlled_entity": ", ".join(contribution_entity_ids(request)) or None,
         "integration": content.integration,
     }
     return ContributionPreviewResponse(

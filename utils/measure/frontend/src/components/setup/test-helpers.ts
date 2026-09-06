@@ -40,7 +40,7 @@ export const recorderDefinition: MeasureDefinition = {
         {
           value: "complex_profile",
           label: "Data for a complex power profile (experimental)",
-          description: "This workflow is not feature complete and does not create a profile model.json yet.",
+          description: "This workflow is not feature complete and only creates fixed states_power models.",
         },
       ],
     },
@@ -73,6 +73,5 @@ export const recorderDefinition: MeasureDefinition = {
       control: "entity", required: false, multiple: true, all_entities: true, related_to: "vacuum_entity_id",
       visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["vacuum_robot"] }, options: [], review: true,
     },
-    { name: "export_filename", role: "attribute", label: "Export filename", control: "text", required: true, default: "record.csv", options: [] },
   ],
 };

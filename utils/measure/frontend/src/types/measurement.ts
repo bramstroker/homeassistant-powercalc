@@ -227,7 +227,7 @@ export interface RecorderMeasurementRequest extends BaseMeasurementRequest {
   vacuum_entity_id?: string | null;
   battery_entity_id?: string | null;
   additional_entity_ids?: string[];
-  export_filename: string;
+  export_filename?: string;
 }
 export interface SpeakerMeasurementRequest extends BaseMeasurementRequest { measure_type: "speaker"; controller: MediaControllerSpec; disable_streaming: boolean; }
 export interface ChargingMeasurementRequest extends BaseMeasurementRequest { measure_type: "charging"; controller: ChargingControllerSpec; charging_device_type: ChargingDeviceType; }

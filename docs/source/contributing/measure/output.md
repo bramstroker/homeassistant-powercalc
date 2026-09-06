@@ -16,7 +16,7 @@ The result page shows the measured summary, available plots, and generated files
 Some measurement types only produce a value or a recording:
 
 - **Average** shows the measured average power. Use this value when creating a fixed-power profile or configuring Powercalc manually.
-- **Recorder** produces either a headerless two-column Playbook CSV or an experimental complex-profile JSON Lines (`.jsonl`) recording. Each JSON object contains one power sample and the state and attributes of every selected entity. Complex-profile recording is not feature complete and does not create a profile `model.json` yet.
+- **Recorder** produces either a headerless two-column Playbook CSV or an experimental complex-profile JSON Lines (`.jsonl`) recording. A complex recording also produces `analysis.json`; when one state or scalar attribute credibly explains the power, it produces a fixed `states_power` `model.json`. The source recording is retained when there is not enough evidence, and composite model generation is not supported yet.
 
 ## Find CLI output
 
@@ -41,6 +41,12 @@ utils/measure/export/
 ## Understand the generated files
 
 Lookup-table measurements can create CSV files for brightness, color temperature, color, white, or effect modes. Linear measurements store their calibration in `model.json`.
+
+Experimental complex-profile recorder sessions keep three distinct artifacts:
+
+- `record.jsonl` is the original typed metadata and sample stream;
+- `analysis.json` records the winning strategy and validation evidence, or why no model was created;
+- `model.json` is present only when the analyser accepts a fixed `states_power` candidate.
 
 When model generation is enabled, `model.json` contains available metadata such as:
 

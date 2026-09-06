@@ -24,6 +24,9 @@ EMPTY_OPTIONAL_MODEL_FIELDS = (
     "measure_device_firmware",
     "measure_description",
 )
+# Recorder analysis keeps its evidence beside the generated model. These files are
+# useful for re-analysis and diagnostics, but are not part of a profile-library entry.
+RECORDER_SOURCE_ARTIFACTS = frozenset({"analyser.json", "record.jsonl"})
 
 
 class ProfilePreparationError(ValueError):
@@ -130,7 +133,7 @@ class ProfilePreparer:
         if MODEL_JSON not in names:
             raise ProfilePreparationError("model.json is required")
         csv_names = {name for name in names if name.endswith((".csv", ".csv.gz"))}
-        unexpected = sorted(names - csv_names - {MODEL_JSON, MANUFACTURER_JSON})
+        unexpected = sorted(names - csv_names - {MODEL_JSON, MANUFACTURER_JSON} - RECORDER_SOURCE_ARTIFACTS)
         if unexpected:
             raise ProfilePreparationError(f"Unexpected artifact file(s): {', '.join(unexpected)}")
         return tuple(sorted({f"{name.removesuffix('.gz')}.gz" for name in csv_names}))

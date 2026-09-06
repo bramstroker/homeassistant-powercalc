@@ -309,7 +309,8 @@ def test_builds_recorder_time_series_and_ignores_invalid_rows(tmp_path: Path) ->
 def test_builds_complex_recorder_time_series_from_json_lines(tmp_path: Path) -> None:
     recording = tmp_path / "record.jsonl"
     recording.write_text(
-        """{"elapsed_seconds":0.0,"power":1.2,"entities":{"switch.plug":{"state":"on","attributes":{}}}}
+        """{"record_type":"metadata","format_version":1,"primary_entity_id":"switch.plug","entities":[]}
+{"record_type":"sample","elapsed_seconds":0.0,"power":1.2,"entities":{"switch.plug":{"state":"on","attributes":{}}}}
 incomplete
 {"elapsed_seconds":2.0,"power":3.4,"entities":{}}
 {"elapsed_seconds":3.0,"power":"nan","entities":{}}

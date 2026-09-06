@@ -11,7 +11,7 @@ from pydantic import SecretStr
 
 from measure.clock import utc_now
 from measure.ha_app.contribution.models import (
-    SUPPORTED_MEASURE_TYPES,
+    AUTOMATIC_CONTRIBUTION_MESSAGE,
     ContributionApiError,
     ContributionApiErrorCode,
     ContributionAuthStatus,
@@ -24,6 +24,8 @@ from measure.ha_app.contribution.models import (
     ContributionSubmitRequest,
     DeviceFlowPollResponse,
     DeviceFlowStartResponse,
+    contribution_entity_ids,
+    supports_automatic_contribution,
 )
 from measure.ha_app.contribution.service import create_contribution_service, draft_from_request
 from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionSnapshot, SessionState
@@ -268,7 +270,7 @@ class ContributionApiCoordinator:
         request: MeasurementRequest,
         resolver: EntityValueResolver | None,
     ) -> str | None:
-        entity_ids = tuple(request.controlled_entity_ids)
+        entity_ids = contribution_entity_ids(request)
         if resolver is None or not entity_ids:
             return None
         # Resolved in one call: a resolver reads a Home Assistant snapshot and the published
@@ -313,10 +315,10 @@ class ContributionApiCoordinator:
 
     @staticmethod
     def _require_supported_request(request: MeasurementRequest) -> None:
-        if request.measure_type not in SUPPORTED_MEASURE_TYPES:
+        if not supports_automatic_contribution(request):
             raise ContributionApiError(
                 ContributionApiErrorCode.ARTIFACTS_REQUIRED,
-                "Automatic contribution is available for light, speaker, fan, and charging profiles",
+                AUTOMATIC_CONTRIBUTION_MESSAGE,
             )
 
 

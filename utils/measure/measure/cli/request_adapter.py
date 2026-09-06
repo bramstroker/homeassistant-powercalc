@@ -41,13 +41,11 @@ from measure.request import (
     RecorderMeasurementRequest,
     ResumePolicy,
     SpeakerMeasurementRequest,
-    validate_export_filename,
 )
 from measure.runner.const import (
     QUESTION_CHARGING_DEVICE_TYPE,
     QUESTION_DISABLE_STREAMING,
     QUESTION_DURATION,
-    QUESTION_EXPORT_FILENAME,
     QUESTION_GZIP,
     QUESTION_MODE,
     QUESTION_NUM_LIGHTS,
@@ -86,10 +84,7 @@ def request_from_answers(
             duration=int(answers[QUESTION_DURATION]),
         )
     if measure_type == MeasureType.RECORDER:
-        return RecorderMeasurementRequest(
-            **common,
-            export_filename=validate_export_filename(str(answers[QUESTION_EXPORT_FILENAME])),
-        )
+        return RecorderMeasurementRequest(**common)
     if measure_type == MeasureType.SPEAKER:
         return SpeakerMeasurementRequest(
             **common,

@@ -6,14 +6,42 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from measure.const import MeasureType
 from measure.contribution.github import UPSTREAM_BRANCH, UPSTREAM_OWNER, UPSTREAM_REPO
-from measure.request import MeasurementRequest
+from measure.request import MeasurementRequest, RecorderMeasurementRequest, RecorderPurpose
 
 SUPPORTED_MEASURE_TYPES = {
     MeasureType.LIGHT,
     MeasureType.SPEAKER,
     MeasureType.FAN,
     MeasureType.CHARGING,
+    MeasureType.RECORDER,
 }
+
+AUTOMATIC_CONTRIBUTION_MESSAGE = (
+    "Automatic contribution is available for light, speaker, fan, charging, and analysed recorder profiles"
+)
+
+
+def supports_automatic_contribution(request: MeasurementRequest) -> bool:
+    """Return whether this request can produce a profile-library contribution."""
+
+    if request.measure_type not in SUPPORTED_MEASURE_TYPES:
+        return False
+    return not isinstance(request, RecorderMeasurementRequest) or (
+        request.recorder_purpose is RecorderPurpose.COMPLEX_PROFILE
+    )
+
+
+def contribution_entity_ids(request: MeasurementRequest) -> tuple[str, ...]:
+    """Return the entities which identify the contributed device.
+
+    Recorder analysis intentionally models the first recorded entity. Other recorded
+    entities are explanatory inputs and may belong to a different Home Assistant
+    device, so they must not dilute the integration or device metadata defaults.
+    """
+
+    if isinstance(request, RecorderMeasurementRequest):
+        return request.recorded_entity_ids[:1]
+    return tuple(request.controlled_entity_ids)
 
 
 class ContributionAuthMethod(StrEnum):

@@ -47,3 +47,32 @@ test("submits a required multi-select through ElementInternals and updates nativ
   expect(await validity()).toBe(true);
   await expect(picker).toBeDisabled();
 });
+
+test("updates FormData before dispatching a single-select change event", async ({ page }) => {
+  await mockApi(page);
+  await page.goto("/");
+  await page.getByRole("heading", { name: "Your measurements" }).waitFor();
+  await page.evaluate(async () => {
+    const form = document.createElement("form");
+    form.id = "single-combobox-test";
+    const picker = document.createElement("measure-combobox");
+    picker.setAttribute("name", "purpose");
+    picker.label = "Purpose";
+    picker.options = [{ value: "playbook", label: "Playbook" }, { value: "profile", label: "Profile" }];
+    picker.value = "playbook";
+    const value = document.createElement("input");
+    value.type = "hidden";
+    value.name = "purpose";
+    value.slot = "value";
+    value.addEventListener("change", () => form.dataset.valueAtChange = String(new FormData(form).get("purpose")));
+    picker.append(value);
+    form.append(picker);
+    document.body.append(form);
+    await picker.updateComplete;
+  });
+
+  await page.getByRole("combobox", { name: "Purpose" }).click();
+  await page.getByRole("option", { name: "Profile" }).click();
+
+  await expect(page.locator("#single-combobox-test")).toHaveAttribute("data-value-at-change", "profile");
+});

@@ -165,7 +165,7 @@ export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is
         && optionalNullable(isString)(value.vacuum_entity_id)
         && optionalNullable(isString)(value.battery_entity_id)
         && optional(isStringArray)(value.additional_entity_ids)
-        && isString(value.export_filename);
+        && optional(isString)(value.export_filename);
   }
 };
 
@@ -366,6 +366,7 @@ const isSessionProgress = objectOf({
 const isSessionSnapshot: Guard<SessionSnapshot> = objectOf({
   session_id: isString,
   state: isSessionState,
+  can_analyse: isBoolean,
   created_at: isString, updated_at: isString, phase: nullable(isString),
   confirmation_message: nullable(isString), confirmation_action: nullable(isString), mode: nullable(isString),
   progress: isSessionProgress, warnings: isStringArray, error: nullable(isString),

@@ -45,6 +45,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   errorMessage = "";
   errorHelp?: ErrorHelp;
   busy = false;
+  lastAnalysedSessionId?: string;
   connectedToEvents = false;
   snapshot?: SessionSnapshot;
   sessions: SessionSummary[] = [];
@@ -278,9 +279,13 @@ export class AppShell extends LitElement implements MeasureAppState {
         .snapshot=${snapshot} .files=${this.files} .plotCollection=${this.plotCollection}
         .canPrepareProfile=${this.measurementType() !== "average"}
         .fileUrl=${this.resultFileUrl} .downloadAll=${this.downloadAllFiles}
+        .inspectJsonFile=${this.inspectResultJsonFile}
         .diagnosticsUrl=${this.api.diagnosticsUrl(sessionId)}
-        .busy=${this.busy} .canResume=${this.canResumeSession()} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
+        .busy=${this.busy} .canResume=${this.canResumeSession()} .canAnalyse=${Boolean(snapshot.can_analyse)}
+        .analysisComplete=${this.lastAnalysedSessionId === sessionId}
+        .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         @sessions=${this.showSessions} @new=${() => this.controller.newMeasurement()} @resume=${() => void this.controller.resume()}
+        @analyse=${() => void this.controller.analyseRecording()}
         @prepare=${() => this.controller.openProfile()}
       ></measure-result-view>`;
   }
@@ -396,6 +401,9 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
 
   private readonly resultFileUrl = (name: string): string => this.api.fileUrl(this.snapshot?.session_id ?? "", name);
+
+  private readonly inspectResultJsonFile = (name: string): Promise<unknown> =>
+    this.api.getJsonFile(this.snapshot?.session_id ?? "", name);
 
   private readonly preparedProfileUrl = (jobId: string): string => this.api.preparedProfileUrl(this.snapshot?.session_id ?? "", jobId);
 

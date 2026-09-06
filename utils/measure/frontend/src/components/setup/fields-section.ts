@@ -24,8 +24,6 @@ import {
   availableOptions,
   entityChoices,
   entityRows,
-  recorderExportFilename,
-  recorderPurpose,
   selectedEntityId,
   selectedEntityIds,
   selectedOptions,
@@ -250,9 +248,6 @@ export class SetupFieldsSection extends LitElement {
         required: field.required,
         onChange: affectsAnother ? this.selectChanged : null,
       })}${this.optionGuidance(selectedOption)}</div>`;
-    }
-    if (name === "export_filename" && definition.measure_type === "recorder") {
-      return this.valueField(field, recorderExportFilename(recorderPurpose(this.fieldState), (stored ?? field.default ?? "").toString()));
     }
     return this.valueField(field, (stored ?? field.default ?? "").toString());
   }
