@@ -72,6 +72,20 @@ test("selects a Home Assistant light with the shared combobox", async ({ page })
   await expect(page.getByText("Desk lamp", { exact: true })).toBeVisible();
 });
 
+test("loads tracked recorder entities after choosing the complex-profile flow", async ({ page }) => {
+  await page.getByRole("button", { name: "New measurement" }).click();
+  await page.getByRole("button", { name: /Recorder/ }).click();
+
+  await page.getByRole("combobox", { name: "What do you want to create?" }).click();
+  await page.getByRole("option", { name: "Data for a complex power profile (experimental)" }).click();
+
+  const tracked = page.getByRole("combobox", { name: "Tracked entities" });
+  await tracked.click();
+  await expect(page.getByRole("option", { name: "Living room thermostat · climate.living_room" })).toBeVisible();
+  await expect(page.locator('input[name="model_id"]')).toHaveCount(0);
+  await expect(page.locator('input[name="product_name"]')).toHaveCount(0);
+});
+
 for (const width of [1280, 390]) {
   test(`keeps light setup compact and reveals contextual help at ${width}px`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 900 });

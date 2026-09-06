@@ -348,11 +348,11 @@ export class Combobox extends LitElement {
   private commit(value: string, emitChange: boolean) {
     this.value = value;
     const hidden = this.hiddenInput();
-    if (hidden) {
-      hidden.value = value;
-      if (emitChange) hidden.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
-    }
+    if (hidden) hidden.value = value;
+    // Match native controls: change listeners must observe the newly committed
+    // value when they synchronously construct FormData from the owning form.
     this.syncFormControl();
+    if (hidden && emitChange) hidden.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
     emit(this, "combobox-change", { value });
   }
 

@@ -126,6 +126,42 @@ const lightDefinition: MeasureDefinition = {
   supports_resume: true,
 };
 
+const recorderDefinition: MeasureDefinition = {
+  measure_type: "recorder",
+  label: "Recorder",
+  description: "Record power and entity states.",
+  icon: "⏺",
+  model_id_example: "",
+  product_name_example: "",
+  parameters: [],
+  fields: [
+    { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, options: [] },
+    {
+      name: "recorder_purpose", role: "attribute", label: "What do you want to create?", control: "select",
+      required: true, default: "playbook", options: [
+        { value: "playbook", label: "A Playbook CSV" },
+        { value: "complex_profile", label: "Data for a complex power profile (experimental)" },
+      ],
+    },
+    {
+      name: "profile_recipe", role: "attribute", label: "Device type", control: "select", required: true,
+      default: "generic", visible_when: { recorder_purpose: ["complex_profile"] },
+      options: [{ value: "generic", label: "Generic device" }],
+    },
+    {
+      name: "tracked_entity_ids", role: "attribute", label: "Tracked entity", plural_label: "Tracked entities",
+      control: "entity", required: true, multiple: true, all_entities: true, options: [],
+      visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["generic"] },
+    },
+  ],
+  supports_profile: false,
+  supports_resume: false,
+};
+
+const allEntities: EntityDescriptor[] = [
+  { entity_id: "climate.living_room", name: "Living room thermostat", domain: "climate", state: "heat" },
+];
+
 const completedSession: SessionSummary = {
   session_id: "session-completed",
   state: "completed",
@@ -338,7 +374,7 @@ const fixedRoutes = new Map<string, unknown>([
   ["settings", settings],
   ["contribution/auth", { connected: false }],
   ["contribution/status", { submitted: false }],
-  ["measure-definitions", [averageDefinition, lightDefinition]],
+  ["measure-definitions", [averageDefinition, lightDefinition, recorderDefinition]],
   ["library/measure-devices", measureDevices],
   ["library/manufacturers", manufacturers],
   ["library/device-specifications", deviceSpecifications],
@@ -354,7 +390,10 @@ const fixedRoutes = new Map<string, unknown>([
 
 /** Paths whose payload depends on the request or on the sessions the test asked for. */
 const dynamicRoutes = new Map<string, (context: RequestContext) => unknown>([
-  ["entities", ({ url }) => (url.searchParams.get("domain") === "light" ? lights : powers)],
+  ["entities", ({ url }) => {
+    if (url.searchParams.get("all") === "true") return allEntities;
+    return url.searchParams.get("domain") === "light" ? lights : powers;
+  }],
   ["sessions", ({ method, sessions }) => (method === "POST" ? startedSnapshot : sessions)],
 ]);
 
