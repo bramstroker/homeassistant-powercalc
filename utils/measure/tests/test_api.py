@@ -1,3 +1,4 @@
+from collections.abc import Callable, Sequence
 from dataclasses import replace
 from datetime import UTC, datetime
 import json
@@ -1101,6 +1102,127 @@ def test_completed_recording_can_be_analysed_again(tmp_path: Path) -> None:
     model = json.loads((output / "model.json").read_text(encoding="utf-8"))
     assert model["fixed_config"] == {"power": 5.2}
     assert model["voltage_range"] == {"min": 229.5, "max": 231.0}
+
+
+def test_analysed_recorder_profile_can_be_prepared(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    service = FakeContributionService()
+    resolved_entities: list[tuple[str, ...]] = []
+
+    def resolve(value: str) -> Callable[[Sequence[str]], dict[str, str]]:
+        def resolver(entity_ids: Sequence[str]) -> dict[str, str]:
+            resolved_entities.append(tuple(entity_ids))
+            return dict.fromkeys(entity_ids, value)
+
+        return resolver
+
+    context.contribution = ContributionApiCoordinator(
+        context.storage,
+        service_factory=lambda: service,
+        resolve_integration=resolve("tplink"),
+        resolve_manufacturer=resolve("Acme"),
+        resolve_model_id=resolve("HEATER-1"),
+    )
+    request = RecorderMeasurementRequest(
+        session_name="Smart heater recording",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
+        tracked_entity_ids=("switch.heater", "sensor.heater_mode"),
+    )
+    now = "2026-09-06T08:00:00Z"
+    snapshot = SessionSnapshot(
+        id="recorder-profile",
+        state=SessionState.COMPLETED,
+        created_at=now,
+        updated_at=now,
+    )
+    context.storage.create(snapshot, request)
+    artifacts = context.storage.artifact_directory(snapshot.id, request.model_id)
+    artifacts.mkdir()
+    (artifacts / "record.jsonl").write_text('{"record_type":"sample"}\n', encoding="utf-8")
+    (artifacts / "analyser.json").write_text('{"status":"model_ready"}', encoding="utf-8")
+    (artifacts / "model.json").write_text(
+        json.dumps(
+            {
+                "name": "",
+                "device_type": "generic_iot",
+                "measure_device": "Test meter",
+                "calculation_strategy": "fixed",
+                "fixed_config": {"states_power": {"off": 0.4, "on": 9.8}},
+            },
+        ),
+        encoding="utf-8",
+    )
+
+    draft = test_client.get(f"/api/sessions/{snapshot.id}/contribution")
+
+    assert draft.status_code == 200
+    assert draft.json()["eligible"] is True
+    assert draft.json()["manufacturer_name"] == "Acme"
+    assert draft.json()["model_id"] == "HEATER-1"
+    assert draft.json()["product_name"] == ""
+    assert draft.json()["home_assistant"] == {
+        "measure_type": "recorder",
+        "controlled_entity": "switch.heater",
+        "integration": "tplink",
+    }
+    assert resolved_entities == [("switch.heater",)] * 3
+
+    preview = test_client.post(
+        f"/api/sessions/{snapshot.id}/contribution/preview",
+        json={
+            "manufacturer_name": "Acme",
+            "model_id": "HEATER-1",
+            "product_name": "Smart heater",
+            "contributor": "Test User",
+        },
+    )
+
+    assert preview.status_code == 200
+    assert preview.json()["eligible"] is True
+    assert service.preview_calls == 1
+
+
+def test_playbook_recorder_is_not_a_profile_contribution(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose=RecorderPurpose.PLAYBOOK,
+    )
+    now = "2026-09-06T08:00:00Z"
+    snapshot = SessionSnapshot(
+        id="recorder-playbook",
+        state=SessionState.COMPLETED,
+        created_at=now,
+        updated_at=now,
+    )
+    context.storage.create(snapshot, request)
+    artifacts = context.storage.artifact_directory(snapshot.id, request.model_id)
+    artifacts.mkdir()
+    (artifacts / "model.json").write_text("{}", encoding="utf-8")
+
+    draft = test_client.get(f"/api/sessions/{snapshot.id}/contribution")
+
+    assert draft.status_code == 200
+    assert draft.json()["eligible"] is False
+    assert "analysed recorder profiles" in draft.json()["reason"]
+
+    preview = test_client.post(
+        f"/api/sessions/{snapshot.id}/contribution/preview",
+        json={
+            "manufacturer_name": "Acme",
+            "model_id": "PLAYBOOK-1",
+            "product_name": "Playbook recording",
+            "contributor": "Test User",
+        },
+    )
+
+    assert preview.status_code == 422
+    assert preview.json()["code"] == "artifacts_required"
 
 
 def test_analyse_rejects_a_session_without_a_profile_recording(tmp_path: Path) -> None:
