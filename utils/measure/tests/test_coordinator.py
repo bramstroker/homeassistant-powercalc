@@ -441,7 +441,7 @@ def test_coordinator_deduplicates_warnings_when_resuming(tmp_path: Path) -> None
         state=SessionState.CANCELLED,
         created_at="2026-07-12T12:00:00Z",
         updated_at="2026-07-12T12:05:00Z",
-        warnings=("Repeated warning",),
+        warnings=("Repeated warning", "Repeated warning", "Repeated warning"),
     )
     storage.create(snapshot, light_request())
     output = storage.artifact_directory(snapshot.id, "LCT010")

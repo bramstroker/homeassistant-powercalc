@@ -435,9 +435,7 @@ class MeasurementCoordinator:
     def _append_warning(warnings: tuple[str, ...], warning: str) -> tuple[str, ...]:
         """Append a new user-facing warning while preserving distinct prior warnings."""
 
-        if warning in warnings:
-            return warnings
-        return (*warnings[-19:], warning)
+        return tuple(dict.fromkeys((*warnings, warning)))[-20:]
 
     def _notify_checkpoint(self, event: SessionEvent) -> None:
         """Publish the state transition caused by an operator checkpoint."""
