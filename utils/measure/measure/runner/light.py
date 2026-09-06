@@ -121,11 +121,9 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             effects=list(self.plan.effects),
         )
 
-        all_variations: list[Variation] = []
-        for measurement in measurements_to_run:
-            all_variations.extend(measurement.variations)
+        all_variations = self.plan.variations
         _LOGGER.info("Total number of variations: %d", len(all_variations))
-        remaining_variations = all_variations.copy()
+        remaining_variations = self.active_plan.variations.copy()
         voltages: list[float] = []
 
         for measurement_info in measurements_to_run:
@@ -185,7 +183,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
 
         _LOGGER.info(
             "Starting measurements. Estimated duration: %s",
-            self.calculate_time_left(mode, all_variations, remaining_variations),
+            self.calculate_time_left(mode, remaining_variations),
         )
 
         with open(measurement_info.csv_file, file_write_mode, newline="") as csv_file:
@@ -273,7 +271,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         if count % 10 != 0:
             return
 
-        time_left = self.calculate_time_left(mode, all_variations, remaining_variations, variation)
+        time_left = self.calculate_time_left(mode, remaining_variations, variation)
         progress_percentage = ((len(all_variations) - len(remaining_variations)) / len(all_variations)) * 100
         _LOGGER.info("Progress: %d%%, Estimated time left: %s", progress_percentage, time_left)
 
@@ -291,7 +289,6 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             phase=mode.value,
             remaining_seconds=self.calculate_time_left_seconds(
                 mode,
-                all_variations,
                 remaining_variations,
                 current_variation,
             ),
@@ -363,7 +360,6 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
     def calculate_time_left(
         self,
         current_mode: LutMode,
-        all_variations: list[Variation],
         remaining_variations: list[Variation],
         current_variation: Variation | None = None,
     ) -> str:
@@ -371,7 +367,6 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         return self.format_time_left(
             self.calculate_time_left_seconds(
                 current_mode,
-                all_variations,
                 remaining_variations,
                 current_variation,
             ),
@@ -380,13 +375,11 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
     def calculate_time_left_seconds(
         self,
         current_mode: LutMode,
-        all_variations: list[Variation],
         remaining_variations: list[Variation],
         current_variation: Variation | None = None,
     ) -> float:
         """Return the shared remaining-time estimate for progress consumers."""
         assert self.active_plan is not None
-        assert all_variations == self.active_plan.variations
         return estimate_light_time_left(
             self.active_plan,
             self.config,
