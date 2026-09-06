@@ -162,6 +162,51 @@ def test_run(export_path: str) -> None:
     assert points[-1] == {"type": "light", "on": True, "brightness": 255}
 
 
+@pytest.mark.parametrize("completed_brightnesses", [[1], [1, 128]])
+def test_resume_reports_progress_against_the_full_plan(
+    tmp_path: Path,
+    completed_brightnesses: list[int],
+) -> None:
+    parameters = replace(_zero_sleep_parameters(), bri_bri_steps=127)
+    measure_util = MagicMock(MeasureUtil)
+    measure_util.take_measurement.return_value = MeasurementResult(power=1, voltages=[])
+    interaction = MagicMock(spec=RunInteraction)
+    runner = LightRunner(
+        measure_util,
+        parameters,
+        DummyLightController(),
+        interaction,
+        resume=True,
+    )
+    request = LightMeasurementRequest(
+        model_id="measurement",
+        product_name="Measurement",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyLightControllerSpec(),
+        modes={LutMode.BRIGHTNESS},
+        parameters=parameters,
+        gzip=False,
+    )
+    csv_path = tmp_path / "brightness.csv"
+    with csv_path.open("w", newline="") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["bri", "watt"])
+        writer.writerows([brightness, 1.0] for brightness in completed_brightnesses)
+
+    runner.run(request, str(tmp_path))
+
+    initial_progress = interaction.progress.call_args_list[0].kwargs
+    assert initial_progress["completed"] == len(completed_brightnesses)
+    assert initial_progress["total"] == 3
+    final_progress = interaction.progress.call_args_list[-1].kwargs
+    assert final_progress["completed"] == 3
+    assert final_progress["total"] == 3
+    with csv_path.open(newline="") as csv_file:
+        rows = list(csv.reader(csv_file))
+    assert [int(row[0]) for row in rows[1:]] == [1, 128, 255]
+
+
 def test_initial_wait_happens_after_selecting_first_measurement_point(tmp_path: Path) -> None:
     events: list[tuple[str, object]] = []
     variation = Variation(1)
