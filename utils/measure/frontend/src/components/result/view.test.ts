@@ -2,6 +2,11 @@ import type { SessionSnapshot } from "../../types";
 import "./view";
 
 describe("result view", () => {
+  // jsdom does not implement native modal behavior; keyboard/inert behavior is covered in e2e.
+  beforeAll(() => {
+    HTMLDialogElement.prototype.showModal = function () { this.open = true; };
+    HTMLDialogElement.prototype.close = function () { this.open = false; };
+  });
   it.each(["completed", "failed", "cancelled", "resumable"] as const)("offers diagnostics for a %s session without generated files", async (state) => {
     const element = document.createElement("measure-result-view") as HTMLElement & {
       snapshot: SessionSnapshot;
@@ -20,12 +25,13 @@ describe("result view", () => {
     expect(element.shadowRoot.querySelector(".diagnostics-download")?.textContent).toContain("snapshot and logs");
   });
 
-  it("keeps failed results focused on the actionable error", async () => {
+  it("keeps failure guidance alongside partial downloads and recovery", async () => {
     const element = document.createElement("measure-result-view") as HTMLElement & {
       snapshot: SessionSnapshot;
       files: { name: string; size: number; media_type: string }[];
       plotCollection: { partial: boolean; plots: never[]; warnings: string[] };
       diagnosticsUrl: string;
+      canResume: boolean;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
@@ -34,6 +40,9 @@ describe("result view", () => {
       error: "Aborting measurement session after repeated 0 W readings. The power meter may not resolve this low load. See https://docs.powercalc.nl/contributing/measure/troubleshooting/ for troubleshooting guidance.",
     };
     element.files = [{ name: "brightness.csv", size: 10, media_type: "text/csv" }];
+    element.canResume = true;
+    const resume = vi.fn();
+    element.addEventListener("resume", resume);
     element.plotCollection = { partial: true, plots: [], warnings: ["Could not plot brightness.csv"] };
     element.diagnosticsUrl = "http://ha.local/ingress/api/sessions/session-1/diagnostics";
     document.body.append(element);
@@ -44,9 +53,13 @@ describe("result view", () => {
     expect(troubleshootingLink.textContent).toBe("Troubleshooting guide");
     expect(troubleshootingLink.href).toBe("https://docs.powercalc.nl/contributing/measure/troubleshooting/");
     expect(element.shadowRoot.textContent).toContain("correct the problem");
-    expect(element.shadowRoot.textContent).not.toContain("Could not plot");
-    expect(element.shadowRoot.textContent).not.toContain("Generated files");
-    expect(element.shadowRoot.textContent).not.toContain("Download all");
+    expect(element.shadowRoot.textContent).toContain("Could not plot");
+    expect(element.shadowRoot.textContent).toContain("Saved partial files");
+    expect(element.shadowRoot.textContent).toContain("Download all");
+    const resumeButton = [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Resume"));
+    expect(resumeButton).toBeTruthy();
+    resumeButton!.click();
+    expect(resume).toHaveBeenCalledOnce();
     expect(element.shadowRoot.querySelector(".diagnostics-download a")).toBeTruthy();
   });
 
@@ -217,6 +230,7 @@ describe("result view", () => {
     (element.shadowRoot.querySelector(".json-dialog-header button") as HTMLButtonElement).click();
     await element.updateComplete;
     expect(element.shadowRoot.querySelector('[role="dialog"]')).toBeNull();
+    expect(element.shadowRoot.activeElement).toBe(buttons[0]);
   });
 
   it("shows JSON inspection failures inside the viewer", async () => {
@@ -233,6 +247,34 @@ describe("result view", () => {
     await element.updateComplete;
     (element.shadowRoot.querySelector(".inspect-file") as HTMLButtonElement).click();
     await vi.waitFor(() => expect(element.shadowRoot.querySelector('.json-dialog [role="alert"]')?.textContent).toContain("File could not be read"));
+  });
+
+  it.each(["cancel", "backdrop"])("closes a loading inspector via %s and ignores its late response", async (action) => {
+    const element = document.createElement("measure-result-view") as import("./view").ResultView;
+    element.snapshot = { state: "completed" };
+    element.files = [{ name: "model.json", size: 100, media_type: "application/json" }];
+    let resolve!: (value: unknown) => void;
+    element.inspectJsonFile = () => new Promise((done) => { resolve = done; });
+    document.body.append(element);
+    await element.updateComplete;
+    const trigger = element.shadowRoot!.querySelector<HTMLButtonElement>(".inspect-file")!;
+    trigger.click();
+    await element.updateComplete;
+    const dialog = element.shadowRoot!.querySelector<HTMLDialogElement>("dialog")!;
+    expect(dialog.textContent).toContain("Loading JSON");
+    if (action === "cancel") {
+      const event = new Event("cancel", { cancelable: true });
+      dialog.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(true);
+    } else {
+      dialog.dispatchEvent(new MouseEvent("click", { clientX: -1, clientY: -1 }));
+    }
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector("dialog")).toBeNull();
+    expect(element.shadowRoot!.activeElement).toBe(trigger);
+    resolve({ name: "Late response" });
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector("dialog")).toBeNull();
   });
 
   it("renders partial plots and offers a PNG download", async () => {

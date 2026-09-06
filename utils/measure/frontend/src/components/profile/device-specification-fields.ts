@@ -14,6 +14,8 @@ export class ProfileDeviceSpecificationFields extends ProfileFormSection {
     const fields = deviceType ? this.specificationFields[deviceType] ?? [] : [];
     const typeLabel = deviceType ? optionLabel(deviceType) : "this device type";
     return html`
+      <details class="profile-details">
+        <summary>Device specifications (optional)</summary>
       <fieldset class="metadata-group" ?disabled=${this.busy}>
         <legend>Device specifications</legend>
         <div class="metadata-group-body">
@@ -23,7 +25,8 @@ export class ProfileDeviceSpecificationFields extends ProfileFormSection {
             : html`<p class="muted">Specification fields are currently unavailable. Existing values will be kept.</p>`}
           ${this.renderFieldError("device_specs")}
         </div>
-      </fieldset>`;
+      </fieldset>
+      </details>`;
   }
 
   private renderSpecification(field: DeviceSpecificationField) {

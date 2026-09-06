@@ -21,6 +21,56 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/");
 });
 
+test("preserves unfinished setup through settings and resets it for a new measurement", async ({ page }) => {
+  await startAverageSetup(page);
+  const duration = page.getByRole("spinbutton", { name: "Duration (seconds)", exact: true });
+  const sessionName = page.locator('input[name="session_name"]');
+  await duration.fill("300");
+  await sessionName.fill("Living room standby");
+  await page.getByRole("button", { name: "Change power meter" }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await expect(duration).toHaveValue("300");
+  await expect(sessionName).toHaveValue("Living room standby");
+  await duration.fill("");
+  await page.getByRole("button", { name: /Settings/ }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await expect(duration).toHaveValue("");
+  await page.getByRole("button", { name: "All sessions", exact: true }).click();
+  await startAverageSetup(page);
+  await expect(duration).toHaveValue("60");
+  await expect(sessionName).toHaveValue("");
+});
+
+test("keeps keyboard focus in the JSON inspector and restores its trigger on Escape", async ({ page }) => {
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  const trigger = page.getByRole("button", { name: "View model.json", exact: true });
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "model.json" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Close" })).toBeFocused();
+  for (let index = 0; index < 4; index++) {
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("button", { name: "Prepare profile", exact: true })).not.toBeFocused();
+  }
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
+test("keeps profile validation visible on mobile with optional fields collapsed", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+  const validate = page.getByRole("button", { name: "Validate profile", exact: true });
+  await expect(validate).toBeInViewport();
+  await expect(page.getByRole("textbox", { name: "Notes", exact: true })).toBeHidden();
+  await expect(page.getByRole("spinbutton", { name: "Rated power (W)", exact: true })).toBeHidden();
+  await page.getByText("Device specifications (optional)", { exact: true }).click();
+  await expect(page.getByRole("spinbutton", { name: "Rated power (W)", exact: true })).toBeVisible();
+  await expect(validate).toBeInViewport();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});
+
 test("boots and lists the stored measurement sessions", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Your measurements" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Hue White Ambiance A60" })).toBeVisible();
@@ -386,6 +436,7 @@ test("preserves unfinished profile fields, list rows and tags when navigating ba
   await aliasInputs.first().fill("Alias one ");
   await aliases.getByRole("button", { name: "Add another alias" }).click();
   await meter.fill("Custom meter");
+  await page.getByText("Device specifications (optional)", { exact: true }).click();
   await page.getByRole("combobox", { name: "Connectivity", exact: true }).click();
   await page.getByRole("option", { name: "Zigbee", exact: true }).click();
   const progress = page.getByRole("navigation", { name: "Measurement progress" });
@@ -398,6 +449,7 @@ test("preserves unfinished profile fields, list rows and tags when navigating ba
   await expect(aliasInputs.first()).toHaveValue("Alias one ");
   await expect(aliasInputs.nth(1)).toHaveValue("");
   await expect(meter).toHaveValue("Custom meter");
+  await page.getByText("Device specifications (optional)", { exact: true }).click();
   await expect(page.getByRole("button", { name: "Remove Zigbee" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Continue to submit profile" })).toBeHidden();
   await page.getByRole("button", { name: "Validate changes" }).click();
@@ -460,6 +512,7 @@ test("keeps profile metadata controls aligned at a consistent height", async ({ 
   await measureDevice.press("ArrowDown");
   await measureDevice.press("Enter");
   await expect(measureDevice).toHaveValue("Kasa EP25");
+  await page.getByText("Device specifications (optional)", { exact: true }).click();
   const connectivity = page.getByRole("combobox", { name: "Connectivity", exact: true });
   await connectivity.click();
   await page.getByRole("option", { name: "Zigbee", exact: true }).click();

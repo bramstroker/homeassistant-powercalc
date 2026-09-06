@@ -40,6 +40,8 @@ export type AppView = "loading" | "sessions" | "setup" | "review" | "running" | 
 
 export interface MeasureAppState {
   view: AppView;
+  setupDraftVersion?: number;
+  lastEventReceivedAt?: string;
   settingsSection?: SettingsSection;
   errorMessage: string;
   errorHelp?: ErrorHelp;
@@ -583,6 +585,7 @@ export class MeasureAppController {
   }
 
   private consumeEvent(event: SessionEvent): void {
+    this.state.lastEventReceivedAt = new Date().toISOString();
     if ((event.type === "log" || event.type === "warning" || event.type === "checkpoint") && event.data.message) {
       this.state.logs = [...this.state.logs.slice(-39), event.data.message];
     }
@@ -625,6 +628,8 @@ export class MeasureAppController {
   }
 
   private resetDraft(request?: MeasurementRequest): void {
+    this.state.setupDraftVersion = (this.state.setupDraftVersion ?? 0) + 1;
+    this.state.lastEventReceivedAt = undefined;
     this.eventConnection?.close();
     this.state.connectedToEvents = false;
     this.state.snapshot = { state: "idle" };
@@ -682,11 +687,14 @@ export class MeasureAppController {
 
   /** Adopt the configuration a stored session was started with, so the draft and forms match it. */
   private async adoptRequest(request?: MeasurementRequest): Promise<void> {
+    this.state.setupDraftVersion = (this.state.setupDraftVersion ?? 0) + 1;
+    this.state.lastEventReceivedAt = undefined;
     this.state.request = request;
     if (request) await this.loadTypeEntities(request.measure_type, request);
   }
 
   private async enterRunning(): Promise<void> {
+    this.state.lastEventReceivedAt = undefined;
     await this.refreshSessions();
     this.state.view = "running";
     this.connectEvents();

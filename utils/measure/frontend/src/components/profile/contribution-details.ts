@@ -8,6 +8,8 @@ export class ProfileContributionDetails extends ProfileFormSection {
   render() {
     const context = Object.entries(this.draft.home_assistant).filter(([, value]) => value !== null && value !== "");
     return html`
+      <details class="profile-details">
+        <summary>Contribution notes (optional)</summary>
       <fieldset class="metadata-group" ?disabled=${this.busy}>
         <legend>Contribution notes</legend>
         <div class="metadata-group-body">
@@ -15,6 +17,7 @@ export class ProfileContributionDetails extends ProfileFormSection {
           ${this.renderTextarea("notes", "Notes", this.draft.notes)}
         </div>
       </fieldset>
+      </details>
       ${context.length ? html`
         <details class="profile-details">
           <summary>Measurement context</summary>

@@ -2,7 +2,7 @@ import { LitElement, css, html, nothing, svg } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { SessionProgress, SessionSnapshot } from "../../types";
 import { emit } from "../../utils/events";
-import { remaining } from "../../utils/format";
+import { remaining, timestamp } from "../../utils/format";
 import { diagnosticsDownload, sharedStyles } from "../../styles";
 import "./chart";
 import "./log";
@@ -21,6 +21,9 @@ export class RunningView extends LitElement {
 
   @property({ type: Boolean })
   connected = false;
+
+  @property({ type: String })
+  lastEventReceivedAt?: string;
 
   @property({ attribute: false })
   logs: string[] = [];
@@ -102,6 +105,10 @@ export class RunningView extends LitElement {
   /** Warnings, the log drawer, diagnostics and the stop control — the same on both screens. */
   private renderFooter(openEnded: boolean) {
     return html`
+      ${!this.connected ? html`<p class="notice" role="status">
+        Reconnecting to live updates. The measurement may still be running in Home Assistant.
+        ${this.lastEventReceivedAt ? html`Last update received: <time datetime=${this.lastEventReceivedAt}>${timestamp(this.lastEventReceivedAt)}</time>.` : "Waiting for a live update."}
+      </p>` : nothing}
       ${this.renderLatestWarning()}
       ${diagnosticsDownload(this.diagnosticsUrl)}
       <div class="actions">${this.renderStopButton(openEnded)}</div>

@@ -86,7 +86,7 @@ export class ProfilePrepareView extends LitElement {
     measure-profile-device-specification-fields,
     measure-profile-contribution-details,
     measure-profile-prepared-preview { display: contents; }
-    .validation-footer { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-top: 1.5rem; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb, var(--field) 72%, transparent); }
+    .validation-footer { position: sticky; bottom: 0.5rem; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-top: 1.5rem; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: 0 4px 20px rgb(0 0 0 / 0.2); }
     .validation-status { margin: 0; color: var(--muted); line-height: 1.45; }
     .validation-status.pending { color: var(--ink); }
     .validation-status.valid { color: var(--good); font-weight: 650; }
@@ -122,8 +122,9 @@ export class ProfilePrepareView extends LitElement {
     a { color: var(--signal-strong); font-weight: 700; }
     @media (max-width: 520px) {
       .contribution-grid, .contribution-grid.contributor-grid { grid-template-columns: 1fr; }
-      .validation-footer { align-items: stretch; flex-direction: column; }
-      .validation-footer button { width: 100%; }
+      .validation-footer { gap: 0.75rem; padding: 0.75rem; }
+      .validation-footer .validation-status { font-size: 0.75rem; }
+      .validation-footer button { max-width: 55%; padding: 0.7rem; }
     }
   `];
 
@@ -310,6 +311,8 @@ export class ProfilePrepareView extends LitElement {
 
   private focusField(name: string): void {
     const control = this.fieldControl(name);
+    const details = control?.closest("details");
+    if (details) details.open = true;
     const input = control?.shadowRoot?.querySelector<HTMLElement>("input, select") ?? control;
     input?.focus();
     input?.scrollIntoView?.({ block: "center", behavior: "smooth" });

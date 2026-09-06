@@ -4,6 +4,7 @@ import logging
 import os
 from pathlib import Path
 import re
+import shlex
 import sys
 from typing import Any, cast
 from uuid import uuid4
@@ -126,7 +127,21 @@ class Measure:
                 measurement=prepared,
                 output_directory=Path(PROJECT_DIR) / "export" / model_id,
             )
-            execution.run()
+            if execution.output_directory is not None:
+                _LOGGER.info("Measurement output directory: %s", execution.output_directory)
+            try:
+                execution.run()
+            except KeyboardInterrupt, Exception:
+                if execution.output_directory is not None:
+                    _LOGGER.warning("Measurement stopped. Any saved output is kept in %s", execution.output_directory)
+                    if self.measure_type == MeasureType.LIGHT:
+                        _LOGGER.warning(
+                            "To resume, run from the measure directory with the same device and settings, "
+                            "then accept the resume prompt if saved rows are found:\n"
+                            "RESUME=true MODEL_ID=%s uv run --extra cli python -m measure.measure",
+                            shlex.quote(model_id),
+                        )
+                raise
         finally:
             if self._home_assistant is not None:
                 self._home_assistant.close()
@@ -138,6 +153,11 @@ class Measure:
                 "Measurement session finished. Files exported to %s",
                 execution.output_directory,
             )
+            if request.generate_model_json:
+                _LOGGER.info(
+                    "Next, add product metadata and validate the profile:\nuv run powercalc-profile prepare %s",
+                    shlex.quote(str(execution.output_directory)),
+                )
 
     def _select_measure_type(self) -> None:
         if self.config.selected_measure_type:

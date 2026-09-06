@@ -37,10 +37,12 @@ label and prefills known device details in Prepare. For measurements without a
 controlled entity, you can supply an optional session name.
 
 CLI profile measurements without a `MODEL_ID` use a unique `export/session-<id>`
-directory, printed when the run finishes. Existing `MODEL_ID` and `MODEL_NAME`
+directory, printed before the run starts and when it finishes. Existing `MODEL_ID` and `MODEL_NAME`
 environment settings remain supported; a supplied ID keeps `export/<model-id>`
 as the output directory. To resume a CLI measurement, set `MODEL_ID` to its export
-directory name.
+directory name. Interrupted light measurements print a command to return to the
+same directory; use the same device and settings and accept the resume prompt.
+Successful profile measurements print the next `powercalc-profile prepare` command.
 
 Prepare validates the metadata and creates a profile-library-shaped package in
 `<artifact-directory>/prepared` without changing the raw artifacts. Use the

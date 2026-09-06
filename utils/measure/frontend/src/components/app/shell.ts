@@ -1,5 +1,7 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import { cache } from "lit/directives/cache.js";
+import { keyed } from "lit/directives/keyed.js";
 import { MeasureApiClient, SessionEventStream } from "../../api-client";
 import { MeasureAppController } from "../../app-controller";
 import type { AppView, MeasureAppState } from "../../app-controller";
@@ -42,6 +44,8 @@ const MEASUREMENT_STEPS: readonly { view: AppView; label: string }[] = [
 @customElement("powercalc-measure-app")
 export class AppShell extends LitElement implements MeasureAppState {
   view: AppView = "loading";
+  setupDraftVersion = 0;
+  lastEventReceivedAt?: string;
   settingsSection?: SettingsSection;
   loadingMessage = "Connecting to Home Assistant…";
   errorMessage = "";
@@ -123,6 +127,9 @@ export class AppShell extends LitElement implements MeasureAppState {
     .intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 0.78fr); gap: 1.25rem clamp(1.5rem, 5vw, 4rem); align-items: end; padding-top: clamp(1.5rem, 4vw, 2.5rem); }
     h1 { grid-column: 1 / -1; margin: 0; font-size: clamp(2rem, 3.4vw, 3rem); line-height: 1; letter-spacing: -0.04em; }
     .subtitle { max-width: 540px; margin: 0.8rem 0 0; color: var(--muted); font-size: 1rem; line-height: 1.6; }
+    .intro.compact { display: block; padding-top: 1rem; }
+    .intro.compact h1, .intro.compact .subtitle { display: none; }
+    .intro.compact .sequence { max-width: 620px; }
     .topbar-actions { display: flex; align-items: center; gap: 0.55rem; }
     .topbar-action { min-height: 36px; padding: 0.4rem 0.8rem; border-radius: 999px; font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.45rem; }
     .theme-toggle { width: 36px; padding: 0; justify-content: center; font-size: 1rem; letter-spacing: normal; }
@@ -193,7 +200,7 @@ export class AppShell extends LitElement implements MeasureAppState {
               <button class="topbar-action settings-toggle" type="button" @click=${this.openSettings} ?disabled=${this.view === "loading" || this.view === "settings"}>Settings</button>
             </div>
           </div>
-          <div class="intro">
+          <div class="intro ${this.view === "sessions" ? "" : "compact"}">
             <h1>Turn real watts into a precise profile.</h1>
             <div>
             <p class="subtitle">Configure, validate, and monitor a power measurement without leaving Home Assistant.</p>
@@ -207,8 +214,9 @@ export class AppShell extends LitElement implements MeasureAppState {
             <button type="button" @click=${() => void this.controller.retryDummyLoadCalibration()}>Retry</button>
           </div>
         ` : nothing}
-        ${this.renderView()}
-        <footer>Keep this app running while the measurement is in progress.</footer>
+        ${keyed(this.setupDraftVersion, html`${cache(this.view === "setup" ? this.renderSetup() : nothing)}`)}
+        ${this.view === "setup" ? nothing : this.renderView()}
+        <footer>You can close this page during a measurement. Keep the Powercalc Measure app running in Home Assistant.</footer>
       </main>
     `;
   }
@@ -291,6 +299,7 @@ export class AppShell extends LitElement implements MeasureAppState {
       <measure-running-view
         .snapshot=${snapshot} .confirmationAction=${this.confirmationAction()} .warningConfirmation=${this.confirmationIsWarning()}
         .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples}
+        .lastEventReceivedAt=${this.lastEventReceivedAt}
         .diagnosticsUrl=${this.api.diagnosticsUrl(snapshot.session_id ?? "")} .busy=${this.busy}
         @cancel=${() => void this.controller.cancel()} @confirm=${() => void this.controller.confirm()}
       ></measure-running-view>`;

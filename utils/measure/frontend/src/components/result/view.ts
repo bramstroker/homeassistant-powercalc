@@ -57,7 +57,7 @@ const OUTCOMES: Partial<Record<SessionState, ResultOutcome>> = {
   failed: {
     mark: "!",
     title: "Measurement stopped with an error",
-    description: "Review the guidance below, correct the problem, and start a new measurement.",
+    description: "Review the guidance below and correct the problem before continuing.",
   },
   resumable: {
     mark: "↻",
@@ -85,6 +85,12 @@ export class ResultView extends LitElement {
   @property({ attribute: false }) errorHelp?: ErrorHelp;
 
   @state() private jsonInspector?: JsonInspectorState;
+  private inspectorTrigger?: HTMLElement;
+
+  protected updated(): void {
+    const dialog = this.shadowRoot?.querySelector<HTMLDialogElement>(".json-dialog");
+    if (dialog && !dialog.open) dialog.showModal();
+  }
 
   static readonly styles = [sharedStyles, css`
     .result-summary { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1rem; align-items: start; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
@@ -122,8 +128,9 @@ export class ResultView extends LitElement {
     .file-actions { display: flex; align-items: center; gap: 0.55rem; }
     .inspect-file { display: grid; place-items: center; width: 38px; min-height: 38px; padding: 0; color: var(--signal-strong); }
     .inspect-file svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-    .json-backdrop { position: fixed; z-index: 1000; inset: 0; display: grid; place-items: center; padding: clamp(1rem, 4vw, 3rem); background: rgb(0 0 0 / 0.72); }
-    .json-dialog { display: grid; grid-template-rows: auto minmax(0, 1fr); width: min(900px, 100%); max-height: min(82vh, 900px); padding: 1rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 24px 80px rgb(0 0 0 / 0.45); }
+    .json-dialog::backdrop { background: rgb(0 0 0 / 0.72); }
+    .json-dialog { grid-template-rows: auto minmax(0, 1fr); width: min(900px, calc(100% - 2rem)); max-height: min(82vh, 900px); padding: 1rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: 0 24px 80px rgb(0 0 0 / 0.45); }
+    .json-dialog[open] { display: grid; }
     .json-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 0.8rem; }
     .json-dialog-header h3 { margin: 0; overflow-wrap: anywhere; }
     .json-dialog-header button { min-height: 38px; padding: 0.4rem 0.7rem; }
@@ -152,7 +159,7 @@ export class ResultView extends LitElement {
     const state = this.snapshot.state;
     const outcome = this.outcome(state);
     const error = typeof this.snapshot.error === "string" ? this.snapshot.error : this.snapshot.error?.message;
-    const showArtifacts = state !== "failed";
+    const showArtifacts = state !== "failed" || this.files.length > 0;
     return html`
       <section class="panel" aria-labelledby="result-title">
         <p class="eyebrow">04 / Result</p>
@@ -161,6 +168,10 @@ export class ResultView extends LitElement {
           <div><h2 id="result-title">${outcome.title}</h2><p class="muted">${outcome.description}</p></div>
         </div>
         ${error ? html`<p class="notice error" role="alert">${this.renderError(error)}</p>` : nothing}
+        ${state !== "completed" && this.files.length ? html`<p class="notice" role="status">
+          Saved output is available below. This measurement is incomplete; these files are partial results.
+          ${this.canResume ? "Resume to continue from the last complete variation." : "You can download the saved data before starting again."}
+        </p>` : nothing}
         ${showArtifacts ? this.renderSummary() : nothing}
         ${showArtifacts || this.canAnalyse ? this.renderAnalysis() : nothing}
         ${showArtifacts ? this.renderWarnings() : nothing}
@@ -204,13 +215,13 @@ export class ResultView extends LitElement {
     if (this.files.length) {
       return html`
         <div class="files-header">
-          <h3>Generated files</h3>
+          <h3>${this.snapshot.state === "completed" ? "Generated files" : "Saved partial files"}</h3>
           <button class="download-all" type="button" @click=${() => this.downloadAll()}>Download all</button>
         </div>
         <ul>${this.files.map((file) => html`
           <li><span>${file.name}</span><small>${fileSize(file.size)}</small><div class="file-actions">
             ${this.isInspectableJson(file) ? html`
-              <button class="inspect-file" type="button" title=${`View ${file.name}`} aria-label=${`View ${file.name}`} @click=${() => void this.openJsonInspector(file.name)}>
+              <button class="inspect-file" type="button" title=${`View ${file.name}`} aria-label=${`View ${file.name}`} @click=${(event: MouseEvent) => void this.openJsonInspector(file.name, event.currentTarget as HTMLElement)}>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
               </button>
             ` : nothing}
@@ -228,7 +239,8 @@ export class ResultView extends LitElement {
     return file.media_type === "application/json" && INSPECTABLE_JSON_FILES.has(basename);
   }
 
-  private async openJsonInspector(name: string): Promise<void> {
+  private async openJsonInspector(name: string, trigger: HTMLElement): Promise<void> {
+    this.inspectorTrigger = trigger;
     this.jsonInspector = { name };
     try {
       const content = await this.inspectJsonFile(name);
@@ -240,21 +252,30 @@ export class ResultView extends LitElement {
     }
   }
 
+  private closeJsonInspector(): void {
+    this.shadowRoot?.querySelector<HTMLDialogElement>(".json-dialog")?.close();
+    this.jsonInspector = undefined;
+    this.inspectorTrigger?.focus();
+  }
+
   private renderJsonInspector() {
     const inspector = this.jsonInspector;
     if (!inspector) return nothing;
     return html`
-      <div class="json-backdrop" role="presentation" @click=${(event: MouseEvent) => {
-        if (event.target === event.currentTarget) this.jsonInspector = undefined;
-      }}>
-        <section class="json-dialog" role="dialog" aria-modal="true" aria-labelledby="json-dialog-title">
+        <dialog class="json-dialog" role="dialog" aria-labelledby="json-dialog-title"
+          @cancel=${(event: Event) => { event.preventDefault(); this.closeJsonInspector(); }}
+          @click=${(event: MouseEvent) => {
+            const dialog = event.currentTarget as HTMLDialogElement;
+            const bounds = dialog.getBoundingClientRect();
+            if (event.target === dialog && (event.clientX < bounds.left || event.clientX > bounds.right
+              || event.clientY < bounds.top || event.clientY > bounds.bottom)) this.closeJsonInspector();
+          }}>
           <div class="json-dialog-header">
             <h3 id="json-dialog-title">${inspector.name}</h3>
-            <button type="button" autofocus @click=${() => { this.jsonInspector = undefined; }}>Close</button>
+            <button type="button" autofocus @click=${() => this.closeJsonInspector()}>Close</button>
           </div>
           ${this.renderJsonInspectorContent(inspector)}
-        </section>
-      </div>
+        </dialog>
     `;
   }
 
@@ -378,7 +399,7 @@ export class ResultView extends LitElement {
   }
 
   private renderResume(state: SessionState) {
-    if (!this.canResume || (state !== "resumable" && state !== "cancelled")) return nothing;
+    if (!this.canResume || !["resumable", "cancelled", "failed"].includes(state)) return nothing;
     return html`<button class="primary" type="button" @click=${() => this.emit("resume")} ?disabled=${this.busy}>${this.busy ? "Resuming…" : "Resume measurement"}</button>`;
   }
 
