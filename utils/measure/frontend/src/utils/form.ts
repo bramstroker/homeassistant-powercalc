@@ -58,7 +58,7 @@ interface FormValueElement extends Element {
  */
 export function submittedForm(form: HTMLFormElement): FormData {
   const data = new FormData(form);
-  for (const control of form.querySelectorAll<FormValueElement>("measure-combobox")) {
+  for (const control of form.querySelectorAll<FormValueElement>("measure-combobox, measure-string-list-input")) {
     if (!control.name) continue;
     data.delete(control.name);
     if (control.disabled) continue;

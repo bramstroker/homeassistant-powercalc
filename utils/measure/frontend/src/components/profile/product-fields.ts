@@ -2,6 +2,7 @@ import { html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { ProfileFormSection } from "./form-section";
 import "../shared/combobox";
+import "../shared/string-list-input";
 
 @customElement("measure-profile-product-fields")
 export class ProfileProductFields extends ProfileFormSection {
@@ -38,14 +39,27 @@ export class ProfileProductFields extends ProfileFormSection {
             required: false,
             placeholder: "https://…",
           })}
-          ${this.renderInput("aliases", "Model aliases", (this.draft.aliases ?? []).join(", "), {
-            required: false,
-            placeholder: "Comma separated",
-          })}
-          ${this.renderInput("gtins", "GTIN / barcodes", (this.draft.gtins ?? []).join(", "), {
-            required: false,
-            placeholder: "Comma separated",
-          })}
+          <measure-string-list-input
+            name="aliases"
+            label="Model aliases"
+            itemLabel="Alias"
+            .value=${this.fieldValues("aliases", this.draft.aliases ?? [])}
+            .error=${this.fieldError("aliases")}
+            ?disabled=${this.busy}
+            placeholder="Enter a model alias"
+            hint="Add each alternative model identifier separately."
+          ></measure-string-list-input>
+          <measure-string-list-input
+            name="gtins"
+            label="GTIN / barcodes"
+            itemLabel="Barcode"
+            .inputMode=${"numeric"}
+            .value=${this.fieldValues("gtins", this.draft.gtins ?? [])}
+            .error=${this.fieldError("gtins")}
+            ?disabled=${this.busy}
+            placeholder="Enter a barcode"
+            hint="Add one 8, 12, 13 or 14 digit barcode per field."
+          ></measure-string-list-input>
         </div>
       </div>
     </fieldset>`;

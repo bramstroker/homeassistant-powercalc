@@ -160,7 +160,8 @@ export class ProfilePrepareView extends LitElement {
         <form class="contribution-form" novalidate @submit=${this.previewContribution}
           @input=${this.metadataChanged} @change=${this.metadataChanged}
           @focusout=${this.validateField}
-          @combobox-change=${this.metadataChanged}>
+          @combobox-change=${this.metadataChanged}
+          @list-input-change=${this.metadataChanged}>
           ${this.renderValidationSummary()}
           <p class="muted required-guidance">Fields marked <span class="required-marker" aria-hidden="true">*</span><span class="sr-only">with an asterisk</span> are required.</p>
           <measure-profile-product-fields
@@ -375,7 +376,7 @@ export class ProfilePrepareView extends LitElement {
 }
 
 function formList(data: FormData, name: string): string[] {
-  return formText(data, name).split(",").map((value) => value.trim()).filter(Boolean);
+  return data.getAll(name).map(String).map((value) => value.trim()).filter(Boolean);
 }
 
 function collectDeviceSpecifications(data: FormData, fields: DeviceSpecificationField[]): Record<string, unknown> {

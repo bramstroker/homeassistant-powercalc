@@ -23,6 +23,11 @@ export abstract class ProfileFormSection extends LitElement {
     return formValue(this.values[name] ?? fallback);
   }
 
+  protected fieldValues(name: string, fallback: string[]): string[] {
+    const value = this.values[name];
+    return Array.isArray(value) ? value : fallback;
+  }
+
   protected fieldError(name: string): string {
     return this.errors[name] ?? "";
   }

@@ -23,7 +23,7 @@ describe("metadata validation", () => {
   it("explains invalid formats and length limits", () => {
     expect(validateMetadata({ ...valid, model_id: "../model", product_url: "http://example.com", gtins: ["123"], notes: "a".repeat(2001) })).toMatchObject({
       model_id: expect.stringContaining("Start with a letter"), product_url: expect.stringContaining("https://"),
-      gtins: expect.stringContaining("digits"), notes: "Use 2000 characters or fewer.",
+      gtins: expect.stringContaining("digit"), notes: "Use 2000 characters or fewer.",
     });
   });
 
