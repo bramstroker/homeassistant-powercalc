@@ -2,6 +2,19 @@ import type { SessionSnapshot } from "../../types";
 import "./view";
 
 describe("running view", () => {
+  it("explains a disconnected stream and labels the last received update", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = { state: "running", phase: "Measuring" };
+    element.connected = false;
+    element.lastEventReceivedAt = "2026-09-06T10:00:00Z";
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toContain("may still be running in Home Assistant");
+    expect(element.shadowRoot?.querySelector("time")?.dateTime).toBe(element.lastEventReceivedAt);
+    element.connected = true;
+    await element.updateComplete;
+    expect(element.shadowRoot?.querySelector("time")).toBeNull();
+  });
   it("stops averaging through the same action as recording and disables repeated requests", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot; busy: boolean; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;

@@ -2,6 +2,19 @@ import { MeasureAppController } from "./app-controller";
 import { api, connection, state } from "./testing/controller";
 
 describe("measure app controller: sessions", () => {
+  it("clears the previous live-update timestamp when resuming a session", async () => {
+    const appState = state();
+    appState.snapshot = { state: "failed", session_id: "session-1" };
+    appState.lastEventReceivedAt = "2026-08-13T10:00:00Z";
+    const controller = new MeasureAppController(appState, () => api({
+      resume: async () => ({ state: "running", session_id: "session-1" }),
+    }), () => connection(), () => undefined);
+
+    await controller.resume();
+
+    expect(appState.view).toBe("running");
+    expect(appState.lastEventReceivedAt).toBeUndefined();
+  });
   it("loads files and plots for a persisted terminal session", async () => {
     const appState = state();
     let calibrationCalls = 0;

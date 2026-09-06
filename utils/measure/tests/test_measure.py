@@ -110,12 +110,16 @@ def test_wizard(mock_config_factory: MockConfigFactory) -> None:
     assert (output / "model.json").is_file()
 
 
-def test_run_light(mock_config_factory: MockConfigFactory) -> None:
+def test_run_light(mock_config_factory: MockConfigFactory, caplog: pytest.LogCaptureFixture) -> None:
     """Simulate a full run of the light measure using brightness mode"""
+    caplog.set_level(logging.INFO, logger="measure")
     mock_config = mock_config_factory()
 
     measure = _create_measure_instance(config=mock_config)
     measure.start()
+
+    assert "Measurement output directory:" in caplog.text
+    assert f"uv run powercalc-profile prepare {PROJECT_DIR / 'export/LCT010'}" in caplog.text
 
     assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/brightness.csv.gz"))
     model_json_path = os.path.join(PROJECT_DIR, "export/LCT010/model.json")
@@ -127,6 +131,29 @@ def test_run_light(mock_config_factory: MockConfigFactory) -> None:
         MODEL_JSON_VOLTAGE_RANGE_MAX: 233.0,
     }
     assert model_json["mains_voltage"] == 230
+
+
+@pytest.mark.parametrize("error", [KeyboardInterrupt(), RuntimeError("Meter disconnected")])
+def test_interrupted_light_prints_recovery(
+    mock_config_factory: MockConfigFactory,
+    caplog: pytest.LogCaptureFixture,
+    error: BaseException,
+) -> None:
+    caplog.set_level(logging.INFO, logger="measure")
+    measure = _create_measure_instance(config=mock_config_factory())
+
+    def interrupt() -> None:
+        assert "Measurement output directory:" in caplog.text
+        raise error
+
+    with patch("measure.cli.main.MeasurementExecution.run", side_effect=interrupt), pytest.raises(type(error)):
+        measure.start()
+
+    assert f"Any saved output is kept in {PROJECT_DIR / 'export/LCT010'}" in caplog.text
+    assert "RESUME=true MODEL_ID=LCT010 uv run --extra cli python -m measure.measure" in caplog.text
+    assert "same device and settings" in caplog.text
+    assert "Files exported to" not in caplog.text
+    assert "powercalc-profile prepare" not in caplog.text
 
 
 def test_take_measurement_tracks_voltage_range(mock_config_factory: MockConfigFactory) -> None:
