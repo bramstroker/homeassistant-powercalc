@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { ProfileUseView } from "./use-view";
+import { ProfileSubmitView } from "./submit-view";
 
-describe("profile delivery method keyboard navigation", () => {
+describe("profile submission method keyboard navigation", () => {
   afterEach(() => document.body.replaceChildren());
 
   it.each(["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"])("selects and focuses available methods with %s", async (key) => {
-    const element = new ProfileUseView();
+    const element = new ProfileSubmitView();
     element.snapshot = { state: "completed" };
     element.contributionDraft = {
       eligible: true, repository: "bramstroker/homeassistant-powercalc", base_branch: "master",
@@ -35,7 +35,7 @@ describe("profile delivery method keyboard navigation", () => {
   });
 
   it("keeps the only available method selected and leaves Tab navigation to the browser", async () => {
-    const element = new ProfileUseView();
+    const element = new ProfileSubmitView();
     element.snapshot = { state: "completed" };
     document.body.append(element);
     await element.updateComplete;

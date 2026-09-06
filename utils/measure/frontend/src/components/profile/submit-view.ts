@@ -25,8 +25,8 @@ interface ContributionMethod {
   unavailableReason?: string;
 }
 
-@customElement("measure-profile-use-view")
-export class ProfileUseView extends LitElement {
+@customElement("measure-profile-submit-view")
+export class ProfileSubmitView extends LitElement {
   @property({ attribute: false }) snapshot!: SessionSnapshot;
   @property({ attribute: false }) preparedProfileUrl: (jobId: string) => string = () => "";
   @property({ attribute: false }) contributionAuth?: ContributionAuthState;
@@ -70,11 +70,11 @@ export class ProfileUseView extends LitElement {
 
   render() {
     return html`
-      <section class="panel" aria-labelledby="share-title">
-        <p class="eyebrow">06 / Use profile</p>
-        <h2 id="share-title">Choose how to use the profile</h2>
+      <section class="panel" aria-labelledby="submit-title">
+        <p class="eyebrow">06 / Submit profile</p>
+        <h2 id="submit-title">Choose how to submit the profile</h2>
         <p class="muted">The enriched profile is validated and ready. Choose where it should go.</p>
-        ${this.renderDeliverySection()}
+        ${this.renderSubmissionSection()}
         <div class="actions"><button type="button" @click=${() => emit(this, "back")}>Back to preparation</button></div>
       </section>`;
   }
@@ -111,15 +111,15 @@ export class ProfileUseView extends LitElement {
     return methods.find((method) => method.available)?.id ?? "manual";
   }
 
-  private renderDeliverySection() {
+  private renderSubmissionSection() {
     if (this.snapshot.state !== "completed") return nothing;
     const methods = this.contributionMethods();
     const selected = this.selectedMethod(methods);
     return html`
-      <section class="contribution profile-delivery" aria-labelledby="delivery-title">
-        <h3 id="delivery-title">Available options</h3>
+      <section class="contribution profile-submission" aria-labelledby="submission-title">
+        <h3 id="submission-title">Available options</h3>
         <p class="muted">You can return to preparation without losing the validated metadata.</p>
-        <div class="contribution-methods" role="radiogroup" aria-label="Profile delivery method" @keydown=${this.methodKeydown}>
+        <div class="contribution-methods" role="radiogroup" aria-label="Profile submission method" @keydown=${this.methodKeydown}>
           ${methods.map((method) => this.renderMethodCard(method, selected))}
         </div>
         ${this.renderMethodPanel(selected)}

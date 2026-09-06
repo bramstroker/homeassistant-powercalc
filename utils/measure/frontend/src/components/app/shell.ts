@@ -11,7 +11,7 @@ import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDevi
 import { sharedStyles } from "../../styles";
 import "../preflight/view";
 import "../profile/prepare-view";
-import "../profile/use-view";
+import "../profile/submit-view";
 import "../result/view";
 import "../running/view";
 import "../settings/view";
@@ -30,7 +30,7 @@ const MEASUREMENT_STEPS: readonly { view: AppView; label: string }[] = [
   { view: "running", label: "Measure" },
   { view: "result", label: "Result" },
   { view: "profile", label: "Prepare" },
-  { view: "share", label: "Use profile" },
+  { view: "submit", label: "Submit profile" },
 ];
 
 /**
@@ -211,7 +211,7 @@ export class AppShell extends LitElement implements MeasureAppState {
       case "running": return this.snapshot ? this.renderRunning(this.snapshot) : this.renderSetup();
       case "result": return this.snapshot ? this.renderResult(this.snapshot) : this.renderSetup();
       case "profile": return this.snapshot ? this.renderProfile(this.snapshot) : this.renderSetup();
-      case "share": return this.snapshot ? this.renderShare(this.snapshot) : this.renderSetup();
+      case "submit": return this.snapshot ? this.renderSubmit(this.snapshot) : this.renderSetup();
       default: return this.renderSetup();
     }
   }
@@ -303,15 +303,15 @@ export class AppShell extends LitElement implements MeasureAppState {
         .measureDevices=${this.measureDevices} .measureDevicesLoading=${this.measureDevicesLoading} .measureDevicesError=${this.measureDevicesError}
         .deviceSpecificationFields=${this.deviceSpecificationFields}
         @back=${() => this.controller.backToResult()}
-        @share=${() => this.controller.openShare()}
+        @profile-submit=${() => this.controller.openSubmit()}
         @contribution-edit=${(event: CustomEvent<ContributionFormValues>) => this.controller.editContribution(event.detail)}
         @contribution-preview=${(event: CustomEvent<ContributionPreviewRequest>) => void this.controller.previewContribution(event.detail)}
       ></measure-profile-prepare-view>`;
   }
 
-  private renderShare(snapshot: SessionSnapshot) {
+  private renderSubmit(snapshot: SessionSnapshot) {
     return html`
-      <measure-profile-use-view
+      <measure-profile-submit-view
         .snapshot=${snapshot}
         .preparedProfileUrl=${this.preparedProfileUrl}
         .contributionAuth=${this.contributionAuth} .contributionDraft=${this.contributionDraft}
@@ -320,7 +320,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         @back=${() => this.controller.backToProfile()}
         @open-settings=${this.openSettings}
         @contribution-submit=${(event: CustomEvent<ContributionSubmitRequest>) => void this.controller.submitContribution(event.detail)}
-      ></measure-profile-use-view>`;
+      ></measure-profile-submit-view>`;
   }
 
   private renderSetup() {
@@ -444,8 +444,8 @@ export class AppShell extends LitElement implements MeasureAppState {
         <ol class="sequence">
           ${steps.map(({ view, label }, index) => {
             const content = html`<span class="step-number">${index < current ? "✓" : index + 1}</span><span>${label}</span>`;
-            const canGoBack = (view === "result" && (this.view === "profile" || this.view === "share"))
-              || (view === "profile" && this.view === "share");
+            const canGoBack = (view === "result" && (this.view === "profile" || this.view === "submit"))
+              || (view === "profile" && this.view === "submit");
             return html`
             <li class=${stepClass(index, current)} aria-current=${index === current ? "step" : nothing}>
               ${canGoBack

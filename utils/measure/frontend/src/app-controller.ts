@@ -36,7 +36,7 @@ import type {
   ShellyDiscoveryDevice,
 } from "./types";
 
-export type AppView = "loading" | "sessions" | "setup" | "review" | "running" | "result" | "profile" | "share" | "settings";
+export type AppView = "loading" | "sessions" | "setup" | "review" | "running" | "result" | "profile" | "submit" | "settings";
 
 export interface MeasureAppState {
   view: AppView;
@@ -264,11 +264,11 @@ export class MeasureAppController {
     this.changed();
   }
 
-  openShare(): void {
+  openSubmit(): void {
     if (this.state.snapshot?.state !== "completed" || !this.state.contributionPreview || this.isAverageMeasurement()) return;
     if (Object.keys(this.state.contributionFormValues ?? {}).length) return;
     this.clearError();
-    this.state.view = "share";
+    this.state.view = "submit";
     this.changed();
   }
 
@@ -475,7 +475,7 @@ export class MeasureAppController {
       this.state.contributionResult = undefined;
       this.state.contributionError = "";
       this.state.contributionErrorField = undefined;
-      if (this.settingsReturnView === "share") this.settingsReturnView = "profile";
+      if (this.settingsReturnView === "submit") this.settingsReturnView = "profile";
     }
   }
 

@@ -83,7 +83,7 @@ describe("profile validation", () => {
     expect(element.shadowRoot!.querySelector<HTMLButtonElement>('button[type="submit"]')?.textContent).toContain("Validate changes");
     expect(element.shadowRoot!.querySelector(".validation-status.valid")).toBeNull();
     expect(element.shadowRoot!.querySelector(".prepared-preview")).toBeNull();
-    expect(element.shadowRoot!.textContent).not.toContain("Continue to use profile");
+    expect(element.shadowRoot!.textContent).not.toContain("Continue to submit profile");
     submit(element);
     element.contributionBusy = true;
     await element.updateComplete;

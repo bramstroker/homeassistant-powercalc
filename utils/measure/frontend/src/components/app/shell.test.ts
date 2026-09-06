@@ -1,7 +1,7 @@
 import type { MeasureDefinition, MeasureParameter, MeasurementRequest } from "../../types";
 import { AppShell } from "./shell";
 import type { ResultView } from "../result/view";
-import type { ProfileUseView } from "../profile/use-view";
+import type { ProfileSubmitView } from "../profile/submit-view";
 import { capabilities, controllerOf, defaultSettings, goodPowerMeterDiagnostic } from "../testing/fixtures";
 
 describe("app shell device entities", () => {
@@ -113,15 +113,15 @@ describe("app shell", () => {
     expect(result.fileUrl).toBe(fileUrl);
     expect(fileUrl("model.json")).toContain("/api/sessions/second/files/model.json");
 
-    element.view = "share";
+    element.view = "submit";
     element.requestUpdate();
     await element.updateComplete;
-    const share = element.shadowRoot!.querySelector<ProfileUseView>("measure-profile-use-view")!;
-    const preparedUrl = share.preparedProfileUrl;
+    const submit = element.shadowRoot!.querySelector<ProfileSubmitView>("measure-profile-submit-view")!;
+    const preparedUrl = submit.preparedProfileUrl;
     element.snapshot = { state: "completed", session_id: "third" };
     element.requestUpdate();
     await element.updateComplete;
-    expect(share.preparedProfileUrl).toBe(preparedUrl);
+    expect(submit.preparedProfileUrl).toBe(preparedUrl);
     expect(preparedUrl("job-1")).toContain("/api/sessions/third/contribution/job-1/profile.zip");
     element.remove();
   });
@@ -382,7 +382,7 @@ describe("app shell", () => {
     expect(topbar?.querySelector(".brand")?.getAttribute("aria-label")).toBe("Open all measurement sessions");
     expect(topbar?.querySelector(".sessions-toggle")?.textContent).toContain("All sessions");
     expect(topbar?.querySelector(".settings-toggle")?.textContent).toContain("Settings");
-    expect(steps.map((step) => step.textContent?.trim())).toEqual(["✓Set up", "✓Review", "3Measure", "4Result", "5Prepare", "6Use profile"]);
+    expect(steps.map((step) => step.textContent?.trim())).toEqual(["✓Set up", "✓Review", "3Measure", "4Result", "5Prepare", "6Submit profile"]);
     expect(steps.at(2)?.getAttribute("aria-current")).toBe("step");
     expect(new URL(running.diagnosticsUrl).pathname).toContain("/api/sessions/session-1/diagnostics");
   });
@@ -418,7 +418,7 @@ describe("app shell", () => {
   it("allows backward navigation to Result and Prepare only, without leaving a busy operation", async () => {
     vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
     const element = new AppShell();
-    element.view = "share";
+    element.view = "submit";
     element.snapshot = { state: "completed", session_id: "session-1" };
     document.body.append(element);
     await element.updateComplete;
