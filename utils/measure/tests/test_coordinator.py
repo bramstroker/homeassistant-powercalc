@@ -12,7 +12,7 @@ from measure.ha_app.coordinator import (
     SessionMeasurementService,
 )
 from measure.ha_app.interaction import SessionInteraction
-from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
+from measure.ha_app.session import SessionControl, SessionEventType, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.powermeter.spec import DummyPowerMeterSpec
@@ -113,6 +113,17 @@ class SamplingService(SessionMeasurementService):
         context: SessionExecutionContext,
     ) -> RunnerResult:
         control.sample(4.2)
+        return RunnerResult(model_json_data={})
+
+
+class WarningService(SessionMeasurementService):
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        control.log("Repeated warning", warning=True)
         return RunnerResult(model_json_data={})
 
 
@@ -421,6 +432,31 @@ def test_coordinator_resumes_a_retained_historical_session(tmp_path: Path) -> No
     assert "old-session" in (tmp_path / "current.json").read_text(encoding="utf-8")
     coordinator.cancel(old.id)
     wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_coordinator_deduplicates_warnings_when_resuming(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    snapshot = SessionSnapshot(
+        id="resumable-session",
+        state=SessionState.CANCELLED,
+        created_at="2026-07-12T12:00:00Z",
+        updated_at="2026-07-12T12:05:00Z",
+        warnings=("Repeated warning",),
+    )
+    storage.create(snapshot, light_request())
+    output = storage.artifact_directory(snapshot.id, "LCT010")
+    output.mkdir()
+    (output / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
+    coordinator = MeasurementCoordinator(storage, WarningService)
+
+    coordinator.resume(snapshot.id)
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    assert coordinator.get(snapshot.id).warnings == ("Repeated warning",)
+    warning_events = [
+        event for event in coordinator.events_since(0, snapshot.id) if event.type == SessionEventType.WARNING
+    ]
+    assert [event.data["message"] for event in warning_events] == ["Repeated warning"]
 
 
 def test_coordinator_deletes_only_terminal_sessions(tmp_path: Path) -> None:

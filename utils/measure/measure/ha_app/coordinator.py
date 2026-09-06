@@ -398,7 +398,10 @@ class MeasurementCoordinator:
                     self._snapshot,
                     event_sequence=event.sequence,
                     updated_at=event.created_at,
-                    warnings=(*self._snapshot.warnings[-19:], str(event.data["message"])),
+                    warnings=self._append_warning(
+                        self._snapshot.warnings,
+                        str(event.data["message"]),
+                    ),
                 )
             elif event.type == SessionEventType.CHECKPOINT:
                 self._snapshot = replace(
@@ -427,6 +430,14 @@ class MeasurementCoordinator:
                 self.storage.write_snapshot(self._snapshot)
                 self._last_snapshot_write = time.monotonic()
         self._notify_checkpoint(event)
+
+    @staticmethod
+    def _append_warning(warnings: tuple[str, ...], warning: str) -> tuple[str, ...]:
+        """Append a new user-facing warning while preserving distinct prior warnings."""
+
+        if warning in warnings:
+            return warnings
+        return (*warnings[-19:], warning)
 
     def _notify_checkpoint(self, event: SessionEvent) -> None:
         """Publish the state transition caused by an operator checkpoint."""
