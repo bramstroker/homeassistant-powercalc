@@ -22,7 +22,7 @@ function field(app: AppShell, name: string): HTMLInputElement {
 
 async function rendered(app: AppShell): Promise<void> {
   await app.updateComplete;
-  const current = app.shadowRoot!.querySelector("measure-profile-prepare-view, measure-profile-use-view") as
+  const current = app.shadowRoot!.querySelector("measure-profile-prepare-view, measure-profile-submit-view") as
     | ProfilePrepareView
     | (HTMLElement & { updateComplete: Promise<boolean> })
     | null;
@@ -98,15 +98,15 @@ describe("profile draft navigation", () => {
     await backAndForward(app);
 
     expect(view(app).previewDirty).toBe(true);
-    controller.openShare();
+    controller.openSubmit();
     expect(app.view).toBe("profile");
 
     await controller.previewContribution({ ...draft, contributor: "Tester", product_name: "Updated lamp" });
     await rendered(app);
     expect(app.contributionFormValues).toBeUndefined();
     expect(view(app).previewDirty).toBe(false);
-    controller.openShare();
-    expect(app.view).toBe("share");
+    controller.openSubmit();
+    expect(app.view).toBe("submit");
   });
 
   it("discards session drafts when starting a new measurement", async () => {
@@ -152,9 +152,9 @@ describe("profile defaults after saving settings", () => {
     expect(app.contributionPreview).toBe(preview);
   });
 
-  it("returns from Use profile to Prepare if updated defaults invalidate the preview", async () => {
+  it("returns from Submit profile to Prepare if updated defaults invalidate the preview", async () => {
     const { app, api, controller } = await mount({ ...draft, product_name: "Validated name" });
-    controller.openShare();
+    controller.openSubmit();
     await rendered(app);
     controller.openSettings("profile");
     await app.updateComplete;

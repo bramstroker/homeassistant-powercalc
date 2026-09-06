@@ -1,6 +1,6 @@
 import type { ContributionPreview, SessionSnapshot } from "../../types";
 import "./prepare-view";
-import "./use-view";
+import "./submit-view";
 
 describe("profile flow components", () => {
   it("defaults to the GitHub method for an eligible draft and offers manual as an alternative", async () => {
@@ -130,11 +130,11 @@ describe("profile flow components", () => {
     expect(element.shadowRoot.textContent).toContain("Calculated from the measured 229.9–231.2 V range");
     expect(element.shadowRoot.querySelector('button[type="submit"]')).toBeNull();
     const nextButton = element.shadowRoot.querySelector<HTMLButtonElement>(".validation-footer button.primary");
-    expect(nextButton?.textContent).toContain("Continue to use profile");
-    const onShare = vi.fn();
-    element.addEventListener("share", onShare);
+    expect(nextButton?.textContent).toContain("Continue to submit profile");
+    const onSubmit = vi.fn();
+    element.addEventListener("profile-submit", onSubmit);
     nextButton?.click();
-    expect(onShare).toHaveBeenCalledOnce();
+    expect(onSubmit).toHaveBeenCalledOnce();
 
     const connectivity = element.shadowRoot.querySelector('measure-combobox[name="device_specs.connectivity"]') as HTMLElement & {
       value: string[];
@@ -163,16 +163,16 @@ describe("profile flow components", () => {
     // The backend responds with a newly validated, normalized preview.
     element.contributionPreview = { ...element.contributionPreview, device_specs: { rated_power: 9.5, connectivity: ["zigbee", "wifi"] } };
 
-    const useElement = document.createElement("measure-profile-use-view") as typeof element;
-    useElement.snapshot = element.snapshot;
-    useElement.contributionAuth = element.contributionAuth;
-    useElement.contributionPreview = element.contributionPreview;
-    useElement.contributionResult = element.contributionResult;
-    useElement.preparedProfileUrl = element.preparedProfileUrl;
-    element.replaceWith(useElement);
-    element = useElement;
+    const submitElement = document.createElement("measure-profile-submit-view") as typeof element;
+    submitElement.snapshot = element.snapshot;
+    submitElement.contributionAuth = element.contributionAuth;
+    submitElement.contributionPreview = element.contributionPreview;
+    submitElement.contributionResult = element.contributionResult;
+    submitElement.preparedProfileUrl = element.preparedProfileUrl;
+    element.replaceWith(submitElement);
+    element = submitElement;
     await element.updateComplete;
-    expect(element.shadowRoot.textContent).toContain("Choose how to use the profile");
+    expect(element.shadowRoot.textContent).toContain("Choose how to submit the profile");
     const cards = Array.from(element.shadowRoot.querySelectorAll(".method-card")) as HTMLButtonElement[];
     expect(cards.map((card) => card.textContent)).toEqual([
       expect.stringContaining("GitHub pull request"),
@@ -197,10 +197,10 @@ describe("profile flow components", () => {
     expect(await submitted).toMatchObject({ confirmed: true, manufacturer_name: "Signify" });
     expect((element.shadowRoot.querySelector(".success-link") as HTMLAnchorElement).href).toBe(element.contributionResult.pull_request_url);
 
-    // Switching delivery method keeps the shared profile metadata and preview in place.
+    // Switching submission method keeps the shared profile metadata and preview in place.
     manualCard.click();
     await element.updateComplete;
-    expect(element.shadowRoot.querySelector(".profile-delivery")).toBeTruthy();
+    expect(element.shadowRoot.querySelector(".profile-submission")).toBeTruthy();
     expect(element.shadowRoot.querySelector(".auth-shortcut")).toBeNull();
     expect(element.shadowRoot.querySelector(".contribution-next")?.textContent).toContain("Read the contribution guide");
     const preparedDownload = element.shadowRoot.querySelector(".contribution-next a[download]") as HTMLAnchorElement;
@@ -250,7 +250,7 @@ describe("profile flow components", () => {
   });
 
   it("asks to open settings on the GitHub section when GitHub is not connected", async () => {
-    const element = document.createElement("measure-profile-use-view") as HTMLElement & {
+    const element = document.createElement("measure-profile-submit-view") as HTMLElement & {
       snapshot: SessionSnapshot;
       contributionAuth: { connected: boolean };
       contributionDraft: { eligible: boolean; manufacturer_name: string; manufacturer_directory: string; model_id: string; product_name: string; contributor: string; notes: string; device_info: Record<string, string>; home_assistant: Record<string, string> };

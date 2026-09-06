@@ -213,7 +213,7 @@ export class ProfilePrepareView extends LitElement {
   }
 
   private renderContinueButton() {
-    return html`<button class="primary" type="button" @click=${() => { if (this.canContinue()) emit(this, "share"); }}>Continue to use profile</button>`;
+    return html`<button class="primary" type="button" @click=${() => { if (this.canContinue()) emit(this, "profile-submit"); }}>Continue to submit profile</button>`;
   }
 
   private renderValidateButton() {

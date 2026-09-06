@@ -15,7 +15,7 @@ describe("measure app controller: navigation", () => {
     const controller = new MeasureAppController(appState, () => api(), () => connection(), () => undefined);
     controller.openProfile();
     expect(appState.view).toBe("result");
-    controller.openShare();
+    controller.openSubmit();
     expect(appState.view).toBe("result");
     controller.backToProfile();
     expect(appState.view).toBe("result");

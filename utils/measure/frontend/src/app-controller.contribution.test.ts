@@ -54,8 +54,8 @@ describe("measure app controller: contribution", () => {
 
     controller.openProfile();
     expect(appState.view).toBe("profile");
-    controller.openShare();
-    expect(appState.view).toBe("share");
+    controller.openSubmit();
+    expect(appState.view).toBe("submit");
     controller.backToProfile();
     expect(appState.view).toBe("profile");
     controller.backToResult();
