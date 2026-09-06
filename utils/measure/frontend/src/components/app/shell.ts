@@ -1,5 +1,5 @@
 import { LitElement, css, html, nothing } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
 import { MeasureApiClient, SessionEventStream } from "../../api-client";
 import { MeasureAppController } from "../../app-controller";
 import type { AppView, MeasureAppState } from "../../app-controller";
@@ -8,7 +8,9 @@ import { reviewMetrics, reviewSummary } from "../preflight/summary";
 import { isAddressed, specFromRequest, specFromSettings } from "../../power-meter/registry";
 import type { MeterContext } from "../../power-meter/registry";
 import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionFormValues, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SettingsSection, ShellyDiscoveryDevice } from "../../types";
-import { sharedStyles } from "../../styles";
+import { sharedStyles, themeStyles } from "../../styles";
+import { THEME_CHANGE_EVENT, applyDocumentTheme, nextThemePreference, readThemePreference, saveThemePreference } from "../../theme";
+import type { ThemePreference } from "../../theme";
 import "../preflight/view";
 import "../profile/prepare-view";
 import "../profile/submit-view";
@@ -93,6 +95,13 @@ export class AppShell extends LitElement implements MeasureAppState {
 
   private renderedView?: AppView;
 
+  @state()
+  private themePreference: ThemePreference = readThemePreference();
+
+  private readonly systemColorScheme = typeof matchMedia === "function"
+    ? matchMedia("(prefers-color-scheme: dark)")
+    : undefined;
+
   private readonly api: MeasureApiClient = new MeasureApiClient();
   private readonly controller = new MeasureAppController(
     this,
@@ -101,7 +110,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     () => this.requestUpdate(),
   );
 
-  static readonly styles = [sharedStyles, css`
+  static readonly styles = [themeStyles, sharedStyles, css`
     :host { display: block; min-height: 100vh; background: var(--canvas); }
     .shell { width: min(1320px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(1rem, 3vw, 2rem) 0 4rem; }
     header { margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
@@ -116,6 +125,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     .subtitle { max-width: 540px; margin: 0.8rem 0 0; color: var(--muted); font-size: 1rem; line-height: 1.6; }
     .topbar-actions { display: flex; align-items: center; gap: 0.55rem; }
     .topbar-action { min-height: 36px; padding: 0.4rem 0.8rem; border-radius: 999px; font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.45rem; }
+    .theme-toggle { width: 36px; padding: 0; justify-content: center; font-size: 1rem; letter-spacing: normal; }
     .settings-toggle::before { content: "⚙"; font-size: 0.95rem; }
     .sequence { margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0.45rem; list-style: none; }
     .sequence > li { position: relative; display: grid; gap: 0.45rem; min-width: 0; color: var(--muted); font: 700 0.68rem/1.15 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -138,8 +148,18 @@ export class AppShell extends LitElement implements MeasureAppState {
     @media (max-width: 460px) { .shell { width: min(100% - 1.25rem, 980px); } .brand .version { display: none; } .topbar-action { padding-inline: 0.65rem; font-size: 0.66rem; } .sequence { gap: 0.3rem; } .sequence > li { font-size: 0.58rem; letter-spacing: 0.04em; } .sequence > li:not(:last-child)::after { left: calc(20px + 0.3rem); width: calc(100% - 40px - 0.3rem); } }
   `];
 
-  connectedCallback(): void { super.connectedCallback(); void this.boot(); }
-  disconnectedCallback(): void { this.controller.dispose(); super.disconnectedCallback(); }
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.applyTheme();
+    this.systemColorScheme?.addEventListener("change", this.systemThemeChanged);
+    void this.boot();
+  }
+
+  disconnectedCallback(): void {
+    this.systemColorScheme?.removeEventListener("change", this.systemThemeChanged);
+    this.controller.dispose();
+    super.disconnectedCallback();
+  }
 
   protected updated(): void {
     const previousView = this.renderedView;
@@ -165,6 +185,10 @@ export class AppShell extends LitElement implements MeasureAppState {
                 : nothing}
             </button>
             <div class="topbar-actions">
+              <button class="topbar-action theme-toggle" type="button" @click=${this.cycleTheme}
+                aria-label=${this.themeButtonLabel()} title=${this.themeButtonTitle()}>
+                <span aria-hidden="true">${themeIcon(this.themePreference)}</span>
+              </button>
               <button class="topbar-action sessions-toggle" type="button" @click=${this.showSessions} ?disabled=${this.view === "loading" || this.view === "sessions"}>All sessions</button>
               <button class="topbar-action settings-toggle" type="button" @click=${this.openSettings} ?disabled=${this.view === "loading" || this.view === "settings"}>Settings</button>
             </div>
@@ -426,6 +450,31 @@ export class AppShell extends LitElement implements MeasureAppState {
     void this.controller.showSessions();
   }
 
+  private readonly cycleTheme = (): void => {
+    this.themePreference = nextThemePreference(this.themePreference);
+    saveThemePreference(this.themePreference);
+    this.applyTheme();
+  };
+
+  private readonly systemThemeChanged = (): void => {
+    if (this.themePreference === "system") this.applyTheme();
+  };
+
+  private applyTheme(): void {
+    this.dataset.theme = this.themePreference;
+    applyDocumentTheme(this.themePreference, this.systemColorScheme?.matches ?? false);
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
+  }
+
+  private themeButtonLabel(): string {
+    const next = nextThemePreference(this.themePreference);
+    return `Color theme: ${themeLabel(this.themePreference)}. Switch to ${themeLabel(next).toLowerCase()} theme.`;
+  }
+
+  private themeButtonTitle(): string {
+    return `Color theme: ${themeLabel(this.themePreference)}`;
+  }
+
   /** Settings can be opened bare from the top bar, or aimed at a section by a view that links into it. */
   private openSettings(event?: Event): void {
     const detail = (event as CustomEvent | undefined)?.detail;
@@ -473,4 +522,14 @@ function stepClass(index: number, current: number): string {
   if (index === current) return "active";
   if (index < current) return "done";
   return "";
+}
+
+function themeLabel(preference: ThemePreference): string {
+  return preference[0]!.toUpperCase() + preference.slice(1);
+}
+
+function themeIcon(preference: ThemePreference): string {
+  if (preference === "light") return "☀";
+  if (preference === "dark") return "☾";
+  return "◐";
 }

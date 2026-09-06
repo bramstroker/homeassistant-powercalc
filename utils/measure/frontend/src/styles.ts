@@ -1,26 +1,94 @@
 import { css, html } from "lit";
 
+/** Theme tokens live on the app shell and inherit through every nested shadow root. */
+export const themeStyles = css`
+  :host {
+    --measure-ink: #eef2f7;
+    --measure-muted: #93a1b5;
+    --measure-canvas: #0d1119;
+    --measure-surface: #151b24;
+    --measure-surface-raised: #1e2632;
+    --measure-well: #0a0e15;
+    --measure-field: #111925;
+    --measure-line: #2c3644;
+    --measure-track: #2a3444;
+    --measure-grid: #55647a;
+    --measure-signal: #5488e8;
+    --measure-signal-deep: #3f74d6;
+    --measure-signal-strong: #93b5f4;
+    --measure-on-signal: #ffffff;
+    --measure-good: #61d4a3;
+    --measure-warning: #f2b84b;
+    --measure-danger: #ff7b72;
+    --measure-color-scheme: dark;
+  }
+
+  :host([data-theme="light"]) {
+    --measure-ink: #1b2634;
+    --measure-muted: #586779;
+    --measure-canvas: #f4f7fb;
+    --measure-surface: #ffffff;
+    --measure-surface-raised: #edf2f7;
+    --measure-well: #e8eef5;
+    --measure-field: #f8fafc;
+    --measure-line: #c5cfda;
+    --measure-track: #d6dee8;
+    --measure-grid: #9aa8b8;
+    --measure-signal: #326bc4;
+    --measure-signal-deep: #2459a6;
+    --measure-signal-strong: #174b91;
+    --measure-on-signal: #ffffff;
+    --measure-good: #147455;
+    --measure-warning: #8a5b00;
+    --measure-danger: #bc332d;
+    --measure-color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :host([data-theme="system"]) {
+      --measure-ink: #1b2634;
+      --measure-muted: #586779;
+      --measure-canvas: #f4f7fb;
+      --measure-surface: #ffffff;
+      --measure-surface-raised: #edf2f7;
+      --measure-well: #e8eef5;
+      --measure-field: #f8fafc;
+      --measure-line: #c5cfda;
+      --measure-track: #d6dee8;
+      --measure-grid: #9aa8b8;
+      --measure-signal: #326bc4;
+      --measure-signal-deep: #2459a6;
+      --measure-signal-strong: #174b91;
+      --measure-on-signal: #ffffff;
+      --measure-good: #147455;
+      --measure-warning: #8a5b00;
+      --measure-danger: #bc332d;
+      --measure-color-scheme: light;
+    }
+  }
+`;
+
 export const sharedStyles = css`
   :host {
-    --ink: #eef2f7;
-    --muted: #93a1b5;
-    --canvas: #0d1119;
-    --surface: #151b24;
-    --surface-raised: #1e2632;
-    --well: #0a0e15;
-    --field: #111925;
-    --line: #2c3644;
-    --track: #2a3444;
-    --grid: #55647a;
-    --signal: #5488e8;
-    --signal-deep: #3f74d6;
-    --signal-strong: #93b5f4;
-    --on-signal: #ffffff;
-    --good: #61d4a3;
-    --warning: #f2b84b;
-    --danger: #ff7b72;
+    --ink: var(--measure-ink, #eef2f7);
+    --muted: var(--measure-muted, #93a1b5);
+    --canvas: var(--measure-canvas, #0d1119);
+    --surface: var(--measure-surface, #151b24);
+    --surface-raised: var(--measure-surface-raised, #1e2632);
+    --well: var(--measure-well, #0a0e15);
+    --field: var(--measure-field, #111925);
+    --line: var(--measure-line, #2c3644);
+    --track: var(--measure-track, #2a3444);
+    --grid: var(--measure-grid, #55647a);
+    --signal: var(--measure-signal, #5488e8);
+    --signal-deep: var(--measure-signal-deep, #3f74d6);
+    --signal-strong: var(--measure-signal-strong, #93b5f4);
+    --on-signal: var(--measure-on-signal, #ffffff);
+    --good: var(--measure-good, #61d4a3);
+    --warning: var(--measure-warning, #f2b84b);
+    --danger: var(--measure-danger, #ff7b72);
     --radius: 14px;
-    color-scheme: dark;
+    color-scheme: var(--measure-color-scheme, dark);
     color: var(--ink);
     font-family: "Avenir Next", "Segoe UI", sans-serif;
   }

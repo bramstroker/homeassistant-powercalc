@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { contributionPreview, mockApi, startedSnapshot } from "./mock-api";
-import type { SessionSnapshot } from "../src/types";
+import type { SessionSnapshot, SessionSummary } from "../src/types";
 
 /**
  * Happy-flow smoke tests in a real browser.
@@ -33,6 +33,76 @@ test("boots and lists the stored measurement sessions", async ({ page }) => {
   await measureAgain.hover();
   await expect(tooltip).toBeVisible();
   await expect(tooltip).toHaveText("Start a new measurement using these settings");
+});
+
+test("follows the system color scheme and persists an explicit theme", async ({ page }, testInfo) => {
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.reload();
+  const app = page.locator("powercalc-measure-app");
+  const theme = app.getByRole("button", { name: /Color theme:/ });
+  const sessions = page.locator("measure-sessions-view");
+
+  await app.evaluate((element) => {
+    const shell = element as HTMLElement & { sessions: SessionSummary[]; requestUpdate: () => void };
+    const completed = shell.sessions[0];
+    if (!completed) return;
+    shell.sessions = [
+      completed,
+      { ...completed, session_id: "session-completed-2", product_name: "Recorder", model_id: "" },
+      { ...completed, session_id: "session-completed-3", product_name: "Recorder", model_id: "" },
+      {
+        ...completed,
+        session_id: "session-cancelled",
+        state: "cancelled",
+        product_name: "Bedroom",
+        model_id: "Room",
+        can_resume: true,
+        completed: 2,
+        total: 4,
+        percent: 50,
+      },
+    ];
+    shell.requestUpdate();
+  });
+  await expect(sessions.locator("article")).toHaveCount(4);
+
+  await expect(app).toHaveAttribute("data-theme", "system");
+  await expect(theme).toHaveAttribute("aria-label", /Color theme: System/);
+  await expect(app).toHaveCSS("background-color", "rgb(244, 247, 251)");
+  expect(await sessions.locator(".sessions").evaluate((grid) => getComputedStyle(grid).gridTemplateColumns.split(" "))).toHaveLength(3);
+  expect(await sessions.locator(".primary-actions").first().evaluate((grid) => getComputedStyle(grid).gridTemplateColumns.split(" "))).toHaveLength(3);
+  expect(await sessions.locator(".primary-actions button").evaluateAll((buttons) => buttons.every((button) => button.scrollWidth <= button.clientWidth))).toBe(true);
+  expect(await sessions.locator("article").first().evaluate((card) => getComputedStyle(card).backgroundColor))
+    .not.toBe(await sessions.locator(".panel").evaluate((panel) => getComputedStyle(panel).backgroundColor));
+  await page.screenshot({ path: testInfo.outputPath("sessions-light.png"), fullPage: true });
+
+  await theme.click();
+  await expect(app).toHaveAttribute("data-theme", "light");
+  await expect(theme).toHaveAttribute("title", "Color theme: Light");
+  await theme.click();
+  await expect(app).toHaveAttribute("data-theme", "dark");
+  await expect(app).toHaveCSS("background-color", "rgb(13, 17, 25)");
+  expect(await sessions.locator("article").first().evaluate((card) => getComputedStyle(card).backgroundColor))
+    .not.toBe(await sessions.locator(".panel").evaluate((panel) => getComputedStyle(panel).backgroundColor));
+  await page.screenshot({ path: testInfo.outputPath("sessions-dark.png"), fullPage: true });
+
+  await page.reload();
+  await expect(app).toHaveAttribute("data-theme", "dark");
+  await expect(theme).toHaveAttribute("aria-label", /Color theme: Dark/);
+  await theme.click();
+  await expect(app).toHaveAttribute("data-theme", "system");
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect(app).toHaveCSS("background-color", "rgb(13, 17, 25)");
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#0d1119");
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await expect(app).toHaveCSS("background-color", "rgb(244, 247, 251)");
+  await expect(page.getByRole("button", { name: "Settings" })).toHaveCSS("background-color", "rgb(237, 242, 247)");
+  await expect(page.getByRole("button", { name: "Measure again" })).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await expect(page.getByRole("button", { name: "Open", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Diagnostics" })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("sessions-light-mobile.png"), fullPage: true });
 });
 
 test("configures a measurement and reaches the setup check", async ({ page }) => {
@@ -426,7 +496,14 @@ test("shows required field errors inline with red borders and keeps edited previ
   await expect(manufacturer).toBeFocused();
   for (const control of [manufacturer, model, product]) {
     await expect(control).toHaveAttribute("aria-invalid", "true");
-    await expect(control).toHaveCSS("border-top-color", "rgb(255, 123, 114)");
+    expect(await control.evaluate((element) => {
+      const marker = document.createElement("span");
+      marker.style.color = "var(--danger)";
+      element.getRootNode().appendChild(marker);
+      const matchesTheme = getComputedStyle(element).borderTopColor === getComputedStyle(marker).color;
+      marker.remove();
+      return matchesTheme;
+    })).toBe(true);
   }
   await expect(page.getByText("Fields marked")).toBeVisible();
   await expect(page.locator("measure-profile-prepare-view .required-marker")).toHaveCount(7);
