@@ -102,12 +102,15 @@ See the [measurement tool architecture](../../docs/source/contributing/measure/a
 **Terminal 1 — backend** (from `utils/measure`):
 ```
 uv run --extra app python -m measure.ha_app.main \
+  --allow-local-access \
   --host 127.0.0.1 --port 8099 \
   --data-root .dev-data \
   --hass-url ws://127.0.0.1:8123/api/websocket \
   --hass-token <LONG_LIVED_TOKEN>
 ```
 Use the full Home Assistant WebSocket endpoint: `ws://<host>:8123/api/websocket` for a direct connection, or `ws://supervisor/core/websocket` from a Home Assistant add-on. `--hass-token` may be omitted if `SUPERVISOR_TOKEN` is exported instead. Session state and settings are written to `--data-root` (here `.dev-data`).
+
+The backend binds to `127.0.0.1` by default and requires Home Assistant ingress access. `--allow-local-access` explicitly enables unauthenticated local development: the bind address and incoming clients must both be loopback IP addresses. Setting `MEASURE_TRUSTED_INGRESS_ONLY=false` selects the same local access policy. `--hass-token` authenticates outgoing Home Assistant requests; it does not authenticate incoming API requests. The Home Assistant app keeps ingress protection enabled and listens on the container interface through its Docker command.
 
 GitHub device login requires a GitHub OAuth App with Device Flow enabled. Set its public client ID in `POWERCALC_GITHUB_CLIENT_ID` before starting the backend. Device login requests `public_repo` and `workflow`; the latter is needed to base a clean contribution branch on an upstream commit when the user's fork has stale workflow files. Without a client ID, the UI disables device login and retains the personal-access-token fallback.
 
@@ -120,7 +123,7 @@ npm run dev
 ```
 Open http://localhost:5173. The Vite dev server proxies `/api` (including the SSE event stream) to the backend on port 8099, mirroring the single-origin ingress deployment.
 
-To run the app the way it ships (single origin, no hot-reload), build the frontend with `npm run build` and start the backend with `create_app(..., static_root=Path("frontend/dist"))`; the UI is then served by FastAPI on port 8099.
+To run the app locally with a single origin and no hot-reload, build the frontend with `npm run build` and start the backend with `create_app(..., static_root=Path("frontend/dist"), trusted_ingress_only=False)` on `127.0.0.1:8099`, with Uvicorn proxy headers disabled. The UI is then served by FastAPI on port 8099, and requests must come from loopback.
 
 ### Checks
 
