@@ -22,6 +22,7 @@ from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.light.const import LutMode
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import ImmediateInteraction, OperatingPoint
+from measure.ha_app.access import is_loopback_address, trusted_ingress_only_enabled
 from measure.ha_app.contribution import (
     ConnectPatRequest,
     ContributionApiCoordinator,
@@ -419,7 +420,7 @@ def create_app(
     if not token:
         raise RuntimeError("SUPERVISOR_TOKEN is required to start the Home Assistant app")
     if trusted_ingress_only is None:
-        trusted_ingress_only = os.environ.get("MEASURE_TRUSTED_INGRESS_ONLY", "false").lower() == "true"
+        trusted_ingress_only = trusted_ingress_only_enabled()
     context = AppContext(
         data_root=data_root,
         hass_url=hass_url,
@@ -442,15 +443,21 @@ def create_app(
         return {"status": "ok"}
 
     @app.middleware("http")
-    async def restrict_to_ingress(
+    async def restrict_access(
         request: Request,
         call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
         client_host = request.client.host if request.client else None
+        if context.trusted_ingress_only:
+            allowed = client_host == "172.30.32.2"
+            code, message = "ingress_required", "Ingress access required"
+        else:
+            allowed = is_loopback_address(client_host)
+            code, message = "local_access_required", "Local access required"
         # /health is probed by the container HEALTHCHECK from localhost and
         # exposes no data, so it bypasses the ingress source check.
-        if context.trusted_ingress_only and request.url.path != "/health" and client_host != "172.30.32.2":
-            error = ErrorResponse(code="ingress_required", message="Ingress access required")
+        if request.url.path != "/health" and not allowed:
+            error = ErrorResponse(code=code, message=message)
             return JSONResponse(status_code=403, content=error.model_dump())
         return await call_next(request)
 
