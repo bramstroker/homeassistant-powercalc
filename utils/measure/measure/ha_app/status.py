@@ -73,10 +73,13 @@ class MeasureStatusPublisher:
 
     def _publish(self) -> None:
         snapshot = self._coordinator.current
+        request = self._coordinator.storage.load_request(snapshot.id) if snapshot is not None else None
+        controlled_entity_ids = request.controlled_entity_ids if request is not None else ()
         self._home_assistant.fire_event(
             HASS_EVENT_MEASURE_STATUS,
             app_version=measure_version(),
             state=snapshot.state if snapshot is not None else SessionState.IDLE,
             session_id=snapshot.id if snapshot is not None else None,
+            controlled_entity=", ".join(controlled_entity_ids) or None,
             error=snapshot.error if snapshot is not None else None,
         )

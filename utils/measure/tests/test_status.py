@@ -4,7 +4,12 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from measure.const import HASS_EVENT_MEASURE_STATUS
-from measure.controller.light.spec import DummyLightControllerSpec
+from measure.controller.light.spec import (
+    DummyLightControllerSpec,
+    HassLightControllerSpec,
+    HassMultiLightControllerSpec,
+    LightControllerSpec,
+)
 from measure.ha_app.coordinator import MeasurementCoordinator
 from measure.ha_app.session import SessionSnapshot, SessionState
 from measure.ha_app.status import MeasureStatusPublisher
@@ -38,11 +43,27 @@ def test_status_publisher_announces_idle_app(tmp_path: Path) -> None:
         app_version=measure_version(),
         state=SessionState.IDLE,
         session_id=None,
+        controlled_entity=None,
         error=None,
     )
 
 
-def test_status_publisher_announces_retained_session(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "controller,controlled_entity",
+    [
+        (DummyLightControllerSpec(), None),
+        (HassLightControllerSpec(entity_id="light.test"), "light.test"),
+        (
+            HassMultiLightControllerSpec(entity_ids=["light.one", "light.two"]),
+            "light.one, light.two",
+        ),
+    ],
+)
+def test_status_publisher_announces_retained_session(
+    tmp_path: Path,
+    controller: LightControllerSpec,
+    controlled_entity: str | None,
+) -> None:
     storage = SessionStorage(tmp_path)
     snapshot = SessionSnapshot(
         id="failed-session",
@@ -51,7 +72,7 @@ def test_status_publisher_announces_retained_session(tmp_path: Path) -> None:
         updated_at="2026-08-15T12:01:00Z",
         error="Meter disconnected",
     )
-    storage.create(snapshot, light_request())
+    storage.create(snapshot, light_request().model_copy(update={"controller": controller}))
     home_assistant = MagicMock(spec=HomeAssistantManager)
     publisher = MeasureStatusPublisher(home_assistant, MeasurementCoordinator(storage, MagicMock()))
 
@@ -62,6 +83,7 @@ def test_status_publisher_announces_retained_session(tmp_path: Path) -> None:
         app_version=measure_version(),
         state=SessionState.FAILED,
         session_id="failed-session",
+        controlled_entity=controlled_entity,
         error="Meter disconnected",
     )
 

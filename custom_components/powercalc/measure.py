@@ -40,6 +40,7 @@ class MeasureStatus:
     state: str
     session_id: str | None
     error: str | None
+    controlled_entity: str | None = None
 
 
 class MeasureAppCoordinator:
@@ -86,11 +87,13 @@ class MeasureAppCoordinator:
         app_version = event_data.get("app_version")
         session_id = event_data.get("session_id")
         error = event_data.get("error")
+        controlled_entity = event_data.get("controlled_entity")
         if (
             state not in MEASURE_SESSION_STATES
             or not isinstance(app_version, str)
             or (session_id is not None and not isinstance(session_id, str))
             or (error is not None and not isinstance(error, str))
+            or (controlled_entity is not None and not isinstance(controlled_entity, str))
         ):
             _LOGGER.debug("Ignoring invalid Powercalc Measure status event: %s", event_data)
             return False
@@ -100,6 +103,7 @@ class MeasureAppCoordinator:
             state=str(state),
             session_id=session_id,
             error=error,
+            controlled_entity=controlled_entity,
         )
         self.available = True
         if self._cancel_stale_timer is not None:
