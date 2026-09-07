@@ -4,7 +4,6 @@ import csv
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
-import gzip
 import logging
 import os
 
@@ -25,6 +24,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 
+from .profile_data import open_profile_csv
 from .strategy_interface import PowerCalculationStrategyInterface
 
 CONFIG_SCHEMA = vol.All(
@@ -222,8 +222,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
                     f"Playbook file '{file_path}' does not exist",
                 )
             actual_path = file_path if os.path.exists(file_path) else f"{file_path}.gz"
-            open_func = gzip.open if actual_path.endswith(".gz") else open
-            with open_func(actual_path, mode="rt") as csv_file:
+            with open_profile_csv(actual_path) as csv_file:
                 csv_reader = csv.reader(csv_file)
                 entries = []
                 for row in csv_reader:
