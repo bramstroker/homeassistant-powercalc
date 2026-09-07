@@ -20,7 +20,7 @@
   "mains_voltage": 230,
   "measure_settings": {
     "SAMPLE_COUNT": 1,
-    "SLEEP_TIME": 2.0, 
+    "SLEEP_TIME": 2.0,
     "NUM_LIGHTS": 2,
     "DUMMY_LOAD": true,
     "DUMMY_LOAD_POWER": 45,
