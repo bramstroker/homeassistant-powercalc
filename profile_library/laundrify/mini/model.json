@@ -9,7 +9,7 @@
       "wifi"
     ]
   },
-  "measure_description": "measured via the PowerCalc HA app"
+  "measure_description": "measured via the PowerCalc HA app",
   "measure_device": "IKEA GRILLPLATS",
   "measure_method": "script",
   "mains_voltage": 230,
