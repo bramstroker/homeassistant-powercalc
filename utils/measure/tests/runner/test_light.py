@@ -323,11 +323,11 @@ def test_controller_close_failure_does_not_mask_measurement_result(caplog: pytes
     assert "Could not close the light controller during measurement cleanup: close unavailable" in caplog.text
 
 
-def _flaky_light_controller(failures_after_startup: int) -> MagicMock:
-    """A light controller that drops its connection once the measurement loop starts.
+def _flaky_light_controller(failures_after_startup: int, *, start_failing_at: int = 2) -> MagicMock:
+    """A light controller that drops its connection after ``start_failing_at`` calls.
 
     The first two calls belong to set_light_to_maximum_brightness, which runs before
-    any variation is measured.
+    any variation is measured; ``start_failing_at=0`` targets that initial turn-on.
     """
 
     light_controller = MagicMock(spec=DummyLightController)
@@ -335,7 +335,7 @@ def _flaky_light_controller(failures_after_startup: int) -> MagicMock:
 
     def change_light_state(*_: object, **__: object) -> None:
         index = next(calls)
-        if index >= 2 and index - 2 < failures_after_startup:
+        if index >= start_failing_at and index - start_failing_at < failures_after_startup:
             raise HassApiConnectionError("Failed to change light state: Connection broken")
 
     light_controller.change_light_state.side_effect = change_light_state
@@ -370,6 +370,37 @@ def test_change_light_state_gives_up_after_five_failed_retries(tmp_path: Path) -
     variations = [Variation(1)]
     run = _brightness_run(tmp_path, variations)
     run.runner.light_controller = _flaky_light_controller(failures_after_startup=5)
+
+    with pytest.raises(RunnerError, match="Failed to change light state after 5 retries"):
+        run.execute()
+
+
+def test_initial_maximum_brightness_is_retried_after_a_dropped_connection(tmp_path: Path) -> None:
+    """A dropped connection during the initial turn-on must not abort the session.
+
+    The retry only covered the per-variation loop, so a single broken frame during
+    set_light_to_maximum_brightness still killed the run before any measurement was
+    written.
+    """
+
+    variations = [Variation(1), Variation(2)]
+    run = _brightness_run(tmp_path, variations)
+    run.runner.light_controller = _flaky_light_controller(failures_after_startup=1, start_failing_at=0)
+    run.measure_util.take_measurement.side_effect = [
+        MeasurementResult(power=1, voltages=[]),
+        MeasurementResult(power=2, voltages=[]),
+    ]
+
+    run.execute()
+
+    with open(run.measurement_info.csv_file, newline="") as csv_file:
+        rows = list(csv.reader(csv_file))
+    assert rows == [["bri", "watt"], ["1", "1.0"], ["2", "2.0"]]
+
+
+def test_initial_maximum_brightness_gives_up_after_five_failed_retries(tmp_path: Path) -> None:
+    run = _brightness_run(tmp_path, [Variation(1)])
+    run.runner.light_controller = _flaky_light_controller(failures_after_startup=5, start_failing_at=0)
 
     with pytest.raises(RunnerError, match="Failed to change light state after 5 retries"):
         run.execute()
