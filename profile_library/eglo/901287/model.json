@@ -14,7 +14,7 @@
     "form_factor": "fixture",
     "socket": "integrated",
     "lumens": 1350,
-    "rated_power": 12,
+    "rated_power": 14,
     "connectivity": [
       "bluetooth",
       "zigbee"
@@ -24,11 +24,8 @@
   "ean": [
     "9008606312887"
   ],
-  "legacy_ids": [
-    "REGELLO-Z"
-  ],
   "mains_voltage": 230,
-  "measure_description": "Measured with utils/measure script (v0.6.0:cli) using a resistive dummy load (60W incandescent bulb, calibrated at 923 ohm) attached in parallel, because the power meter reads a flat 0.00W below roughly 1W without it.",
+  "measure_description": "Measured with utils/measure script (v0.6.0:cli) using a resistive dummy load attached in parallel, because the power meter reads a flat 0.00W below roughly 1W without it. Dummy load: 25W incandescent bulb, calibrated at 2239 ohm (~24W draw). This replaces an earlier run that used a 60W/923 ohm dummy load; the smaller load reduces the error introduced by subtracting the dummy-load consumption from the combined reading.",
   "measure_device": "Shelly 1PM Gen3",
   "measure_method": "script",
   "measure_settings": {
@@ -38,9 +35,9 @@
   },
   "name": "REGELLO-Z Mirror Light (600mm)",
   "product_url": "https://www.eglo.com/en/mirror-light-regello-z-901287.html",
-  "standby_power": 0.79,
+  "standby_power": 0.39,
   "voltage_range": {
-    "max": 237.3,
-    "min": 228.5
+    "max": 238.4,
+    "min": 231.7
   }
 }
