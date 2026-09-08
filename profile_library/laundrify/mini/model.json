@@ -1,0 +1,27 @@
+{
+  "calculation_strategy": "fixed",
+  "created_at": "2026-09-08T19:59:21Z",
+  "device_type": "smart_switch",
+  "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "measure_description": "measured via the PowerCalc HA app"
+  "measure_device": "IKEA GRILLPLATS",
+  "measure_method": "script",
+  "mains_voltage": 230,
+  "name": "mini",
+  "product_url": "https://laundrify.de/blog/laundrify-wlan-adapter-mini",
+  "only_self_usage": true,
+  "standby_power": 0.9,
+  "standby_power_on": 0.9,
+  "authors": [
+    {
+      "name": "ps1noob",
+      "github": "ps1noob"
+    }
+  ]
+}
