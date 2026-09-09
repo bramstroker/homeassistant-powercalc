@@ -732,7 +732,10 @@ def test_tapo_credentials_are_kept_out_of_preferences_and_are_available_to_the_k
     settings = test_client.app.state.context.storage.load_settings()
     assert _power_meter_spec(settings) == KasaPowerMeterSpec(device_ip="192.0.2.31")
 
-    cleared = test_client.put("/api/settings", json=payload | {"tapo_username": None, "tapo_password": None, "clear_tapo_credentials": True})
+    cleared = test_client.put(
+        "/api/settings",
+        json=payload | {"tapo_username": None, "tapo_password": None, "clear_tapo_credentials": True},
+    )
     assert cleared.json()["tapo_credentials_configured"] is False
     assert not (tmp_path / "tapo_credentials.json").exists()
 

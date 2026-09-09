@@ -2,6 +2,7 @@ import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from kasa import Module
+from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.kasa import KasaPowerMeter
 from measure.powermeter.powermeter import PowerMeasurementResult
 import pytest
@@ -28,9 +29,11 @@ def test_disconnects_when_a_reading_fails() -> None:
     plug.disconnect = AsyncMock()
 
     meter = KasaPowerMeter("192.0.2.1")
-    with patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)):
-        with pytest.raises(OSError, match="device unreachable"):
-            asyncio.run(meter.async_read_power_meter())
+    with (
+        patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)),
+        pytest.raises(OSError, match="device unreachable"),
+    ):
+        asyncio.run(meter.async_read_power_meter())
     plug.disconnect.assert_awaited_once_with()
 
 
@@ -56,5 +59,12 @@ def test_get_power_creates_its_own_event_loop() -> None:
 def test_passes_credentials_for_newer_tapo_devices() -> None:
     meter = KasaPowerMeter("192.0.2.1", credentials=("user@example.com", "account-password"))
 
-    assert meter._credentials is not None
-    assert meter._credentials.username == "user@example.com"
+    discover = AsyncMock(return_value=None)
+    with (
+        patch("measure.powermeter.kasa.Discover.discover_single", discover),
+        pytest.raises(PowerMeterError, match="No Kasa or Tapo device"),
+    ):
+        asyncio.run(meter.async_read_power_meter())
+
+    credentials = discover.await_args.kwargs["credentials"]
+    assert credentials.username == "user@example.com"

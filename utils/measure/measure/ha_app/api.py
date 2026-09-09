@@ -63,10 +63,10 @@ from measure.ha_app.session import (
     SessionState,
 )
 from measure.ha_app.shelly_credentials import ShellyCredentials
-from measure.ha_app.tapo_credentials import TapoCredentials
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
 from measure.ha_app.status import MeasureStatusPublisher
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
+from measure.ha_app.tapo_credentials import TapoCredentials
 from measure.home_assistant import HomeAssistantManager
 from measure.home_assistant_entities import (
     DeviceClass,
@@ -996,7 +996,9 @@ def _save_settings(context: AppContext, update: AppSettingsUpdate) -> AppSetting
     if update.clear_tapo_credentials:
         context.storage.clear_tapo_credentials()
     elif update.tapo_username and update.tapo_password:
-        context.storage.save_tapo_credentials(TapoCredentials(username=update.tapo_username, password=update.tapo_password))
+        context.storage.save_tapo_credentials(
+            TapoCredentials(username=update.tapo_username, password=update.tapo_password),
+        )
     context.storage.save_settings(update.preferences())
     return _settings_response(context)
 
