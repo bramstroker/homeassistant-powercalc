@@ -1,7 +1,7 @@
 {
   "aliases": [
-    "S60ZBTPF",
-    "S60ZBTPG"
+    "Zigbee smart plug (S60ZBTPF)",
+    "Zigbee smart plug (S60ZBTPG)",
   ],
   "calculation_strategy": "fixed",
   "created_at": "2026-09-06T08:26:19Z",
