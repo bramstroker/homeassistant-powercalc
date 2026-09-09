@@ -15,10 +15,9 @@ def test_reads_power_and_voltage_from_energy_module() -> None:
         Module.Energy: MagicMock(current_consumption=12.5, voltage=230.4),
     }
 
-    with patch("measure.powermeter.kasa.IotPlug", return_value=plug):
-        meter = KasaPowerMeter("192.0.2.1")
-
-    assert asyncio.run(meter.async_read_power_meter()) == (12.5, 230.4)
+    meter = KasaPowerMeter("192.0.2.1")
+    with patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)):
+        assert asyncio.run(meter.async_read_power_meter()) == (12.5, 230.4)
     plug.update.assert_awaited_once_with()
     plug.disconnect.assert_awaited_once_with()
 
@@ -28,12 +27,10 @@ def test_disconnects_when_a_reading_fails() -> None:
     plug.update = AsyncMock(side_effect=OSError("device unreachable"))
     plug.disconnect = AsyncMock()
 
-    with patch("measure.powermeter.kasa.IotPlug", return_value=plug):
-        meter = KasaPowerMeter("192.0.2.1")
-
-    read_power_meter = meter.async_read_power_meter()
-    with pytest.raises(OSError, match="device unreachable"):
-        asyncio.run(read_power_meter)
+    meter = KasaPowerMeter("192.0.2.1")
+    with patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)):
+        with pytest.raises(OSError, match="device unreachable"):
+            asyncio.run(meter.async_read_power_meter())
     plug.disconnect.assert_awaited_once_with()
 
 
@@ -46,7 +43,7 @@ def test_get_power_creates_its_own_event_loop() -> None:
     }
 
     with (
-        patch("measure.powermeter.kasa.IotPlug", return_value=plug),
+        patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)),
         patch("measure.powermeter.kasa.asyncio.get_event_loop", side_effect=RuntimeError("no current event loop")),
         patch("measure.powermeter.kasa.time.time", return_value=123.0),
     ):
@@ -54,3 +51,10 @@ def test_get_power_creates_its_own_event_loop() -> None:
         result = meter.get_power(include_voltage=True)
 
     assert result == PowerMeasurementResult(power=12.5, voltage=230.4, updated=123.0)
+
+
+def test_passes_credentials_for_newer_tapo_devices() -> None:
+    meter = KasaPowerMeter("192.0.2.1", credentials=("user@example.com", "account-password"))
+
+    assert meter._credentials is not None
+    assert meter._credentials.username == "user@example.com"

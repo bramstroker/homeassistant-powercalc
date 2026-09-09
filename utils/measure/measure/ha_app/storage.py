@@ -26,6 +26,7 @@ from measure.ha_app.session import (
     SessionState,
 )
 from measure.ha_app.shelly_credentials import ShellyCredentials, ShellyCredentialStore
+from measure.ha_app.tapo_credentials import TapoCredentials, TapoCredentialStore
 from measure.request import (
     LightMeasurementRequest,
     MeasurementRequest,
@@ -48,6 +49,7 @@ _CURRENT_SESSION_FILENAME = "current.json"
 _DUMMY_LOAD_CALIBRATION_FILENAME = "dummy_load_calibration.json"
 _CONTRIBUTION_STATUS_FILENAME = "contribution_status.json"
 _SHELLY_CREDENTIALS_FILENAME = "shelly_credentials.json"
+_TAPO_CREDENTIALS_FILENAME = "tapo_credentials.json"
 
 #: Everything reading a persisted session document can raise: the directory is gone or
 #: unreadable, or the JSON no longer matches the model that wrote it. Callers treat all of
@@ -68,6 +70,7 @@ class SessionStorage:
         # do not re-read and re-validate the JSON document from disk.
         self._request_cache: dict[str, MeasurementRequest] = {}
         self._shelly_credentials = ShellyCredentialStore(self.data_root / _SHELLY_CREDENTIALS_FILENAME)
+        self._tapo_credentials = TapoCredentialStore(self.data_root / _TAPO_CREDENTIALS_FILENAME)
 
     def session_directory(self, session_id: str) -> Path:
         if not session_id or not session_id.replace("-", "").isalnum():
@@ -276,6 +279,19 @@ class SessionStorage:
 
     def clear_shelly_credentials(self) -> None:
         self._shelly_credentials.clear()
+
+    def load_tapo_credentials(self) -> TapoCredentials | None:
+        try:
+            return self._tapo_credentials.load()
+        except (OSError, ValueError) as error:
+            _LOGGER.warning("Could not load persisted Tapo credentials: %s", error)
+            return None
+
+    def save_tapo_credentials(self, credentials: TapoCredentials) -> None:
+        self._tapo_credentials.save(credentials)
+
+    def clear_tapo_credentials(self) -> None:
+        self._tapo_credentials.clear()
 
     def load_dummy_load_calibration(self) -> DummyLoadCalibration | None:
         return self._load_model(
