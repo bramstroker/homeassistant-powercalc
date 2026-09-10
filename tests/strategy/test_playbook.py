@@ -1,3 +1,7 @@
+import gzip
+from pathlib import Path
+from unittest.mock import patch
+
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     CONF_ENTITY_ID,
@@ -8,7 +12,7 @@ from homeassistant.const import (
     STATE_PAUSED,
     STATE_PLAYING,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, State
 from homeassistant.exceptions import ServiceValidationError
 import pytest
 
@@ -29,6 +33,7 @@ from custom_components.powercalc.const import (
     SERVICE_STOP_PLAYBOOK,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.strategy import profile_data
 from custom_components.powercalc.strategy.playbook import PlaybookStrategy
 from tests.common import (
     assert_entity_state,
@@ -257,6 +262,27 @@ async def test_lazy_load_playbook(hass: HomeAssistant) -> None:
     strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "test.csv"}})
     await strategy.activate_playbook("program1")
     await strategy.activate_playbook("program1")
+
+
+@pytest.mark.parametrize("compressed", [False, True])
+async def test_oversized_playbook_is_rejected(hass: HomeAssistant, tmp_path: Path, compressed: bool) -> None:
+    path = tmp_path / ("test.csv.gz" if compressed else "test.csv")
+    data = b"0,1\n" * 100
+    path.write_bytes(gzip.compress(data) if compressed else data)
+    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "test.csv"}}, str(tmp_path))
+
+    with patch.object(profile_data, "MAX_UNCOMPRESSED_SIZE", 64):
+        with pytest.raises(StrategyConfigurationError, match="uncompressed size limit"):
+            await strategy.activate_playbook("program1")
+        assert strategy.get_active_playbook() is None
+
+        # A failed load must not leave partial data in the playbook cache.
+        valid_data = b"0,2\n60,2\n"
+        path.write_bytes(gzip.compress(valid_data) if compressed else valid_data)
+        await strategy.activate_playbook("program1")
+        await async_advance_time(hass, 1)
+        assert await strategy.calculate(State("sensor.test", STATE_ON)) == 2
+        await strategy.stop_playbook()
 
 
 async def test_load_csv_from_subdirectory(hass: HomeAssistant) -> None:

@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
 from functools import partial
-import gzip
 import logging
 import os
 from typing import Any, TextIO, cast
@@ -30,6 +29,7 @@ from custom_components.powercalc.errors import (
 )
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
+from .profile_data import open_profile_csv
 from .strategy_interface import PowerCalculationStrategyInterface
 
 _LOGGER = logging.getLogger(__name__)
@@ -184,11 +184,11 @@ class LutRegistry:
         gzip_path = f"{path}.gz"
         if os.path.exists(gzip_path):
             _LOGGER.debug("Loading LUT data file: %s", gzip_path)
-            return gzip.open(gzip_path, "rt")
+            return open_profile_csv(gzip_path)
 
         if os.path.exists(path):
             _LOGGER.debug("Loading LUT data file: %s", path)
-            return open(path)
+            return open_profile_csv(path)
 
         raise LutFileNotFoundError(f"Data file not found: {path}")
 

@@ -110,8 +110,11 @@ When both the Powercalc integration and the Measure app are running, Powercalc c
 installations that do not use the Measure app.
 
 The sensor reports the current session state, such as `idle`, `running`, `completed`, or `failed`. Its attributes
-include the Measure app version and, when available, the session ID and error message. The sensor becomes unavailable
-when the app stops sending status updates, for example when the app is stopped.
+include the Measure app version and, when available, the session ID, controlled entity, and error message.
+The `controlled_entity` attribute contains the Home Assistant entity ID controlled by the session, or a comma-separated
+list for measurements controlling multiple lights. It remains available after the session finishes and is omitted for
+measurements without a controlled Home Assistant entity. The sensor becomes unavailable when the app stops sending
+status updates, for example when the app is stopped.
 
 You can use the sensor in an automation to be notified when a long-running measurement completes. Replace the notify
 action with the one for your device:

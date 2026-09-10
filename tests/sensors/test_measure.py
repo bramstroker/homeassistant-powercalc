@@ -34,6 +34,53 @@ async def test_measure_sensor_is_only_created_after_app_announcement(hass: HomeA
     assert state.state == "running"
     assert state.attributes["app_version"] == "1.2.3"
     assert state.attributes["session_id"] == "session-1"
+    assert "controlled_entity" not in state.attributes
+
+
+@pytest.mark.parametrize("controlled_entity", ["light.test", "light.one, light.two"])
+async def test_measure_sensor_controlled_entity_is_retained_and_cleared(
+    hass: HomeAssistant,
+    controlled_entity: str,
+) -> None:
+    await run_powercalc_setup(hass)
+    for session_state in ("running", "completed"):
+        hass.bus.async_fire(
+            MEASURE_STATUS_EVENT,
+            {
+                "app_version": "1.2.3",
+                "state": session_state,
+                "session_id": "session-1",
+                "controlled_entity": controlled_entity,
+            },
+        )
+        await hass.async_block_till_done()
+
+        state = hass.states.get("sensor.measure_session_status")
+        assert state is not None
+        assert state.state == session_state
+        assert state.attributes["controlled_entity"] == controlled_entity
+
+    hass.bus.async_fire(
+        MEASURE_STATUS_EVENT,
+        {"app_version": "1.2.3", "state": "running", "session_id": "session-2", "controlled_entity": None},
+    )
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.measure_session_status")
+    assert state is not None
+    assert state.attributes["session_id"] == "session-2"
+    assert "controlled_entity" not in state.attributes
+
+
+@pytest.mark.parametrize("controlled_entity", [123, ["light.test"], {"entity_id": "light.test"}])
+def test_measure_status_rejects_invalid_controlled_entity(hass: HomeAssistant, controlled_entity: object) -> None:
+    coordinator = MeasureAppCoordinator(hass, {})
+
+    assert not coordinator.async_process_event(
+        {"app_version": "1.2.3", "state": "running", "controlled_entity": controlled_entity},
+    )
+    assert coordinator.data is None
+    assert not coordinator.available
 
 
 async def test_measure_sensor_updates_and_becomes_unavailable_without_heartbeat(hass: HomeAssistant) -> None:

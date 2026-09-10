@@ -356,7 +356,7 @@ def client(tmp_path: Path, *, trusted_ingress_only: bool = False, developer_mode
         points=(LightLoadProbePoint(label="Brightness 1", mode=LutMode.BRIGHTNESS, power_w=1.25),),
     )
     app.state.context.coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
-    return TestClient(app)
+    return TestClient(app, client=("127.0.0.1", 50000))
 
 
 def test_app_metadata_uses_the_runtime_measure_version(tmp_path: Path) -> None:
@@ -493,7 +493,9 @@ def test_index_is_not_cached(tmp_path: Path) -> None:
             data_root=tmp_path,
             hass_token="test-token",  # noqa: S106
             static_root=static_root,
+            trusted_ingress_only=False,
         ),
+        client=("127.0.0.1", 50000),
     )
 
     response = test_client.get("/")
@@ -715,7 +717,7 @@ def test_app_closes_home_assistant_manager_at_shutdown(tmp_path: Path) -> None:
     home_assistant = MagicMock(spec=HomeAssistantManager)
     app.state.context.home_assistant = home_assistant
 
-    with TestClient(app) as test_client:
+    with TestClient(app, client=("127.0.0.1", 50000)) as test_client:
         assert test_client.get("/api/capabilities").status_code == 200
 
     home_assistant.close.assert_called_once_with()
@@ -1658,6 +1660,66 @@ def test_trusted_ingress_mode_rejects_other_source(tmp_path: Path) -> None:
 
     assert response.status_code == 403
     assert response.json()["code"] == "ingress_required"
+
+
+@pytest.mark.parametrize(
+    "trusted_ingress_only,source,expected_status",
+    [
+        (None, "198.51.100.10", 403),
+        (None, "127.0.0.1", 403),
+        (None, "172.30.32.2", 200),
+        (True, "172.30.32.2", 200),
+        (True, "::1", 403),
+        (False, "127.0.0.1", 200),
+        (False, "::1", 200),
+        (False, "198.51.100.10", 403),
+        (False, "172.30.32.2", 403),
+        (False, "localhost", 403),
+        (False, None, 403),
+    ],
+)
+def test_settings_access_policy(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    trusted_ingress_only: bool | None,
+    source: str | None,
+    expected_status: int,
+) -> None:
+    monkeypatch.delenv("MEASURE_TRUSTED_INGRESS_ONLY", raising=False)
+    app = create_app(
+        data_root=tmp_path,
+        hass_token="test-token",  # noqa: S106
+        trusted_ingress_only=trusted_ingress_only,
+    )
+    test_client = TestClient(app, client=(source, 50000) if source else None)
+
+    assert test_client.get("/api/settings").status_code == expected_status
+    response = test_client.put("/api/settings", json={"default_measure_device": "Test meter"})
+    assert response.status_code == expected_status
+
+
+@pytest.mark.parametrize("setting", [None, "true", "false", "", "invalid"])
+@pytest.mark.parametrize("path", ["/", "/openapi.json", "/api/settings", "/api/sessions", "/api/contribution/auth"])
+def test_external_requests_cannot_disable_access_policy(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    setting: str | None,
+    path: str,
+) -> None:
+    if setting is None:
+        monkeypatch.delenv("MEASURE_TRUSTED_INGRESS_ONLY", raising=False)
+    else:
+        monkeypatch.setenv("MEASURE_TRUSTED_INGRESS_ONLY", setting)
+    app = create_app(data_root=tmp_path, hass_token="test-token")  # noqa: S106
+    test_client = TestClient(app, client=("198.51.100.10", 50000))
+
+    response = test_client.get(
+        path,
+        headers={"X-Forwarded-For": "172.30.32.2", "X-Real-IP": "127.0.0.1"},
+    )
+
+    assert response.status_code == 403
+    assert response.json()["code"] == ("local_access_required" if setting == "false" else "ingress_required")
 
 
 def test_health_endpoint_for_container_healthcheck(tmp_path: Path) -> None:

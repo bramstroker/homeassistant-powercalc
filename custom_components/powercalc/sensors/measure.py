@@ -39,6 +39,8 @@ class MeasureSessionStatusSensor(SensorEntity):
         attributes: dict[str, Any] = {"app_version": status.app_version}
         if status.session_id is not None:
             attributes["session_id"] = status.session_id
+        if status.controlled_entity is not None:
+            attributes["controlled_entity"] = status.controlled_entity
         if status.error is not None:
             attributes["error"] = status.error
         return attributes

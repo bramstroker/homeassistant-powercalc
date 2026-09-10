@@ -5,12 +5,13 @@ from pathlib import Path
 
 import uvicorn
 
+from measure.ha_app.access import is_loopback_address, trusted_ingress_only_enabled
 from measure.ha_app.api import create_app
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Powercalc Measure Home Assistant app")
-    parser.add_argument("--host", default="0.0.0.0")  # noqa: S104
+    parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8099)
     parser.add_argument("--data-root", type=Path, default=Path("/data"))
     parser.add_argument(
@@ -24,11 +25,19 @@ def main() -> None:
         help="Home Assistant access token. Defaults to the SUPERVISOR_TOKEN environment variable.",
     )
     parser.add_argument(
+        "--allow-local-access",
+        action="store_true",
+        help="Allow unauthenticated local development access. Requires a loopback bind address.",
+    )
+    parser.add_argument(
         "--developer-mode",
         action="store_true",
         help="Show developer testing options in the app, such as virtual (dummy) device controllers.",
     )
     args = parser.parse_args()
+    trusted_ingress_only = not args.allow_local_access and trusted_ingress_only_enabled()
+    if not trusted_ingress_only and not is_loopback_address(args.host):
+        parser.error("Local access requires a loopback IP address for --host (127.0.0.1 or ::1)")
     options = _read_options(args.data_root)
     debug = bool(options.get("debug_logging", False))
     _configure_logging(debug)
@@ -36,6 +45,7 @@ def main() -> None:
         data_root=args.data_root,
         hass_url=args.hass_url,
         hass_token=args.hass_token,
+        trusted_ingress_only=trusted_ingress_only,
         developer_mode=args.developer_mode or bool(options.get("developer_mode", False)),
     )
     uvicorn.run(
