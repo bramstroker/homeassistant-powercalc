@@ -27,7 +27,7 @@
     "VERSION": "v1.10.0:docker"
   },
   "name": "SMART+ Wi-Fi Full Color Clear Filament A19 LED Bulb (7W)",
-  "standby_power": 0.5,
+  "standby_power": 0.41,
   "authors": [
     {
       "name": "Ryan Ronnander",

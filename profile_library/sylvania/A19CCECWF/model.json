@@ -28,7 +28,7 @@
     "VERSION": "v1.10.0:docker"
   },
   "name": "SMART+ Wi-Fi Full Color A19 LED Bulb (8.5W, 2700–6500K)",
-  "standby_power": 0.52,
+  "standby_power": 0.43,
   "authors": [
     {
       "name": "Ryan Ronnander",
