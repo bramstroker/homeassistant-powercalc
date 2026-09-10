@@ -16,7 +16,7 @@ from measure.request import (
     RecorderPurpose,
     parse_measurement_request,
 )
-from measure.runner.const import QUESTION_EXPORT_FILENAME, QUESTION_MODE
+from measure.runner.const import QUESTION_MODE
 from pydantic import ValidationError
 import pytest
 
@@ -88,11 +88,21 @@ def test_request_normalizes_profile_metadata() -> None:
     assert request.measure_device == "Test meter"
 
 
-@pytest.mark.parametrize("field", ["product_name", "measure_device"])
+@pytest.mark.parametrize("field", ["measure_device"])
 def test_request_rejects_blank_required_profile_metadata(field: str) -> None:
     payload = valid_request() | {field: "   "}
     with pytest.raises(ValidationError, match=field):
         LightMeasurementRequest.model_validate(payload)
+
+
+def test_request_defers_unknown_product_details_until_preparation() -> None:
+    payload = valid_request()
+    del payload["model_id"]
+    del payload["product_name"]
+    request = LightMeasurementRequest.model_validate(payload | {"session_name": " Desk lamp "})
+    assert request.model_id == ""
+    assert request.product_name == ""
+    assert request.session_name == "Desk lamp"
 
 
 def test_request_accepts_dummy_load_calibration() -> None:
@@ -171,6 +181,7 @@ def test_cli_request_contains_only_resolved_measurement_input(mock_config_factor
     environment = mock_config_factory()
     environment.selected_power_meter = PowerMeterType.DUMMY
     environment.selected_light_controller = LightControllerType.DUMMY
+    environment.resume = True
     answers = {
         QUESTION_ENTITY_ID: "light.hue_test",
         QUESTION_MEASURE_DEVICE: "Test meter",
@@ -182,6 +193,12 @@ def test_cli_request_contains_only_resolved_measurement_input(mock_config_factor
 
     assert request.power_meter.type == PowerMeterType.DUMMY
     assert "hue_group" not in request.model_dump()
+    assert request.model_id == ""
+    assert request.product_name == ""
+    assert request.resume_policy == "new"
+    existing = request_from_answers(MeasureType.LIGHT, answers | {"model_id": "LCT010"}, environment)
+    assert existing.model_id == "LCT010"
+    assert existing.resume_policy == "resume"
 
 
 @pytest.mark.parametrize("model_id", ["../secret", "/unsafe/file", "a/b", ".."])
@@ -199,25 +216,10 @@ def test_request_rejects_unknown_fields() -> None:
         LightMeasurementRequest.model_validate(payload)
 
 
-@pytest.mark.parametrize(
-    "export_filename",
-    ["../record.csv", "folder/record.csv", r"folder\record.csv", "..", "bad:name.csv"],
-)
-def test_recorder_request_rejects_unsafe_export_filename(export_filename: str) -> None:
-    power_meter = DummyPowerMeterSpec()
+def test_playbook_recorder_uses_a_fixed_export_filename() -> None:
+    request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec(), export_filename="custom.csv")
 
-    with pytest.raises(ValidationError):
-        RecorderMeasurementRequest(
-            power_meter=power_meter,
-            export_filename=export_filename,
-        )
-
-
-def test_playbook_recorder_rejects_a_jsonl_export_filename() -> None:
-    """Plotting picks its reader by extension, so a CSV under a .jsonl name reads as empty."""
-
-    with pytest.raises(ValidationError, match=r"must use a \.csv export filename"):
-        RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec(), export_filename="record.jsonl")
+    assert request.export_filename == "record.csv"
 
 
 def test_recorder_defaults_to_legacy_playbook_recording() -> None:
@@ -239,16 +241,16 @@ def test_generic_recorder_preserves_tracked_entity_order() -> None:
     assert request.export_filename == "record.jsonl"
 
 
-def test_complex_recorder_rejects_non_json_lines_filename() -> None:
-    power_meter = DummyPowerMeterSpec()
-    with pytest.raises(ValidationError, match=r"must use a \.jsonl"):
-        RecorderMeasurementRequest(
-            power_meter=power_meter,
-            recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
-            profile_recipe=RecorderProfileRecipe.GENERIC,
-            tracked_entity_ids=("switch.plug",),
-            export_filename="custom.csv",
-        )
+def test_complex_recorder_uses_a_fixed_export_filename() -> None:
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
+        tracked_entity_ids=("switch.plug",),
+        export_filename="custom.csv",
+    )
+
+    assert request.export_filename == "record.jsonl"
 
 
 def test_vacuum_recorder_orders_required_roles_before_additional_entities() -> None:
@@ -331,15 +333,12 @@ def test_recorder_rejects_more_than_one_hundred_combined_entities() -> None:
         )
 
 
-def test_cli_recorder_request_rejects_unsafe_export_filename(mock_config_factory: MockConfigFactory) -> None:
+def test_cli_recorder_request_uses_fixed_export_filename(mock_config_factory: MockConfigFactory) -> None:
     environment = mock_config_factory()
     environment.selected_power_meter = PowerMeterType.DUMMY
-    with pytest.raises(ValueError, match="without directory components"):
-        request_from_answers(
-            MeasureType.RECORDER,
-            {QUESTION_EXPORT_FILENAME: "../record.csv"},
-            environment,
-        )
+    request = request_from_answers(MeasureType.RECORDER, {}, environment)
+
+    assert request.export_filename == "record.csv"
 
 
 def test_request_preserves_subsecond_sleep_time() -> None:

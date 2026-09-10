@@ -1,3 +1,4 @@
+from bisect import bisect_left, bisect_right
 from decimal import Decimal
 import logging
 from typing import Any
@@ -24,6 +25,7 @@ from custom_components.powercalc.const import (
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_POWER,
+    CONF_POWER_CURVE,
     CONF_VALUE,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
@@ -41,6 +43,11 @@ CONFIG_SCHEMA = vol.Schema(
         vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
         vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
+        vol.Optional(CONF_POWER_CURVE): vol.All(
+            cv.ensure_list,
+            [vol.Match(r"^(?:0(?:\.\d+)?|1(?:\.0+)?) -> (?:0(?:\.\d+)?|1(?:\.0+)?)$")],
+            vol.Length(min=2),
+        ),
         vol.Optional(CONF_ATTRIBUTE): cv.string,
     },
 )
@@ -71,11 +78,13 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._initialized: bool = False
         self._missing_attribute_warned: bool = False
         self._calibration: list[tuple[int, float]] | None = None
+        self._power_curve: list[tuple[float, float]] | None = None
 
     async def initialize(self) -> None:
         """Initialize the strategy, called once on creation."""
         self._value_entity = await self.get_value_entity()
         self._calibration = self.create_calibrate_list()
+        self._power_curve = self.create_power_curve_list()
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate the current power consumption."""
@@ -89,8 +98,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if value is None:
             return None
 
-        min_calibrate = self.get_min_calibrate(value)
-        max_calibrate = self.get_max_calibrate(value)
+        min_calibrate, max_calibrate = self.get_calibration_segment(value)
         min_value = min_calibrate[0]
         max_value = max_calibrate[0]
 
@@ -108,11 +116,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         value_range = max_value - min_value
         power_range = max_power - min_power
 
-        gamma_curve = self._config.get(CONF_GAMMA_CURVE) or 1
-
         relative_value = (value - min_value) / value_range
-
-        power = power_range * relative_value**gamma_curve + min_power
+        power = power_range * self.apply_curve(relative_value) + min_power
 
         return Decimal(power)
 
@@ -120,13 +125,22 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         """Return if this strategy is enabled based on entity state."""
         return not (self._source_entity.domain == media_player.DOMAIN and entity_state.state != STATE_PLAYING)
 
-    def get_min_calibrate(self, value: int) -> tuple[int, float]:
-        """Get closest lower value from calibration table."""
-        return min(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
+    def get_calibration_segment(self, value: int) -> tuple[tuple[int, float], tuple[int, float]]:
+        """Get the two calibration points to interpolate between, in ascending order.
 
-    def get_max_calibrate(self, value: int) -> tuple[int, float]:
-        """Get closest higher value from calibration table."""
-        return max(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
+        Values inside the table use the segment they fall in. Values outside it are
+        extrapolated along the chord between the first and the last point.
+        """
+        calibration = self._calibration
+        if not calibration:
+            raise StrategyConfigurationError("Linear strategy has not been initialized")
+
+        if value < calibration[0][0] or value > calibration[-1][0]:
+            return calibration[0], calibration[-1]
+
+        index = bisect_right(calibration, value, key=lambda point: point[0])
+        index = min(max(index, 1), len(calibration) - 1)
+        return calibration[index - 1], calibration[index]
 
     def create_calibrate_list(self) -> list[tuple[int, float]]:
         """Build a table of calibration values."""
@@ -155,6 +169,43 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             calibration_list.append((int(parts[0]), float(parts[1])))
 
         return sorted(calibration_list, key=lambda tup: tup[0])
+
+    def create_power_curve_list(self) -> list[tuple[float, float]] | None:
+        """Build a table of normalized power curve values."""
+        power_curve = self._config.get(CONF_POWER_CURVE)
+        if not power_curve:
+            return None
+
+        points = []
+        for line in power_curve:
+            value, power = line.split(" -> ")
+            points.append((float(value), float(power)))
+        return sorted(points, key=lambda point: point[0])
+
+    def apply_curve(self, relative_value: float) -> float:
+        """Apply a configured gamma or normalized power curve."""
+        gamma_curve = self._config.get(CONF_GAMMA_CURVE)
+        if gamma_curve:
+            if relative_value < 0:
+                # A negative base raised to a fractional exponent is complex. Below the
+                # calibrated range there is no curve to apply, so stay linear.
+                return relative_value
+            return float(relative_value ** float(gamma_curve))
+
+        if self._power_curve:
+            if relative_value <= self._power_curve[0][0]:
+                return self._power_curve[0][1]
+            if relative_value >= self._power_curve[-1][0]:
+                return self._power_curve[-1][1]
+
+            max_index = bisect_left(self._power_curve, relative_value, key=lambda point: point[0])
+            min_point = self._power_curve[max_index - 1]
+            max_point = self._power_curve[max_index]
+            value_range = max_point[0] - min_point[0]
+            curve_range = max_point[1] - min_point[1]
+            return curve_range * ((relative_value - min_point[0]) / value_range) + min_point[1]
+
+        return relative_value
 
     def get_entity_value_range(self) -> tuple[int, int]:
         """Get the min/max range for a given entity domain."""

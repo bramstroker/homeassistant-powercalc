@@ -448,10 +448,6 @@
         }
       }
     },
-    "is_dumb_bulb": {
-      "type": "boolean",
-      "description": "The profile is for a dumb light bulb, not having smart capabilities"
-    },
     "name": {
       "type": "string",
       "description": "The full name"
@@ -528,6 +524,19 @@
         },
         "max_power": {
           "type": "number"
+        },
+        "gamma_curve": {
+          "type": "number",
+          "description": "Exponent applied to the normalized entity value before scaling it between min_power and max_power"
+        },
+        "power_curve": {
+          "type": "array",
+          "description": "Normalized input-to-power curve scaled between min_power and max_power",
+          "minItems": 2,
+          "items": {
+            "type": "string",
+            "pattern": "^(?:0(?:\\.\\d+)?|1(?:\\.0+)?) -> (?:0(?:\\.\\d+)?|1(?:\\.0+)?)$"
+          }
         },
         "calibrate": {
           "type": "array",

@@ -94,7 +94,7 @@ Notes:
 
 When standby power is too low for your meter, measuring multiple identical lights in parallel can make the total load measurable. In the Home Assistant app, enable **Measure multiple lights**, then use **Add another light** to select two or three individual light entities directly. The app sends each operating point to all selected entities and divides the measured power by **Number of lights**.
 
-For larger sets, prefer a native Zigbee or Hue group: it sends one command over the lighting network. A Home Assistant light group also works, but Home Assistant may fan the command out to every member. The app automatically counts the entities you select directly. When selecting a group as one entity, enter its total number of physical lights manually.
+For larger sets, prefer a native Zigbee or Hue group: it sends one command over the lighting network. A [Home Assistant light group](https://www.home-assistant.io/integrations/group/) also works, but Home Assistant may fan the command out to every member. The app automatically counts the entities you select directly. When selecting a group as one entity, enter its total number of physical lights manually.
 
 Only use this when every connected light is the same model and receives the same commands. The app rejects different known model IDs and warns when Home Assistant does not provide enough model metadata to verify this. See [Measuring low-power devices](low-power-measurements.md) for details.
 

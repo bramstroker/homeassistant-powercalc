@@ -1,5 +1,7 @@
+from collections.abc import Callable, Sequence
 from dataclasses import replace
 from datetime import UTC, datetime
+import json
 from pathlib import Path
 import time
 from types import SimpleNamespace
@@ -28,15 +30,15 @@ from measure.ha_app.contribution import (
     SharedContributionService,
 )
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionExecutionContext, SessionMeasurementService
-from measure.ha_app.library_catalog import MeasureDeviceCatalog
+from measure.ha_app.library_catalog import DeviceSpecificationCatalog, ManufacturerCatalog, MeasureDeviceCatalog
 from measure.ha_app.light_probe import LightLoadProbeError, LightLoadProbePoint, LightLoadProbeResult
 from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
 from measure.powermeter.diagnostics import PowerMeterDiagnostics
 from measure.powermeter.powermeter import PowerMeter, PowerMeterDiagnosticSample
-from measure.powermeter.spec import HassPowerMeterSpec, KasaPowerMeterSpec
-from measure.request import MeasurementRequest
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, KasaPowerMeterSpec
+from measure.request import MeasurementRequest, RecorderMeasurementRequest, RecorderProfileRecipe, RecorderPurpose
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
 from measure.version import measure_version
@@ -267,7 +269,7 @@ class FakeContributionService(ContributionService):
             eligible=True,
             home_assistant={"integration": integration},
             manufacturer_name=payload.manufacturer_name,
-            manufacturer_directory=payload.manufacturer_directory or "signify",
+            manufacturer_directory="signify",
             model_id=payload.model_id,
             product_name=payload.product_name,
             contributor=payload.contributor,
@@ -299,6 +301,10 @@ class FakeContributionService(ContributionService):
             pull_request_url="https://github.com/example/pull/1",
             message="Contribution submitted",
         )
+
+    def prepared_archive(self, job_id: str) -> bytes:
+        assert job_id == "job-1"
+        return b"PK\x03\x04prepared-profile"
 
 
 def payload() -> dict[str, object]:
@@ -388,6 +394,94 @@ def test_measure_device_catalog_failure_returns_service_unavailable(tmp_path: Pa
 
     assert response.status_code == 503
     assert response.json()["message"] == "Could not load measurement devices from the Powercalc library"
+
+
+def test_manufacturer_catalog_uses_canonical_names_and_http_caching(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    test_client.app.state.context.manufacturer_catalog = ManufacturerCatalog(
+        loader=lambda: {
+            "manufacturers": [
+                {"name": "signify", "full_name": "Signify", "models": []},
+                {"name": "ikea", "full_name": "IKEA", "models": []},
+            ],
+        },
+    )
+
+    response = test_client.get("/api/library/manufacturers")
+
+    assert response.status_code == 200
+    assert response.json() == {"manufacturers": ["IKEA", "Signify"]}
+    assert response.headers["cache-control"] == "public, max-age=600"
+
+
+def test_device_specification_catalog_exposes_schema_fields_by_device_type(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    test_client.app.state.context.device_specification_catalog = DeviceSpecificationCatalog(
+        loader=lambda: {
+            "properties": {
+                "device_type": {"enum": ["light"]},
+                "device_specs": {
+                    "type": "object",
+                    "properties": {
+                        "connectivity": {
+                            "type": "array",
+                            "items": {"type": "string", "enum": ["zigbee", "wifi"]},
+                            "description": "Communication protocols",
+                        },
+                    },
+                },
+            },
+        },
+    )
+
+    response = test_client.get("/api/library/device-specifications")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "device_types": {
+            "light": [
+                {
+                    "name": "connectivity",
+                    "label": "Connectivity",
+                    "description": "Communication protocols",
+                    "value_type": "string",
+                    "collection": "array",
+                    "options": ["zigbee", "wifi"],
+                },
+            ],
+        },
+    }
+    assert response.headers["cache-control"] == "public, max-age=600"
+
+
+def test_entity_manufacturer_normalizes_a_library_alias(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    context.home_assistant = FakeClient()
+    context.manufacturer_catalog = ManufacturerCatalog(
+        loader=lambda: {
+            "manufacturers": [
+                {
+                    "name": "signify",
+                    "full_name": "Signify",
+                    "aliases": ["Signify Netherlands B.V."],
+                },
+            ],
+        },
+    )
+
+    with patch.object(
+        FakeClient,
+        "get_device_registry",
+        return_value=[
+            {
+                "id": "light-device",
+                "manufacturer": "Signify Netherlands B.V.",
+                "model": "Test light",
+            },
+        ],
+    ):
+        assert context.entity_manufacturers(["light.test"]) == {"light.test": "Signify"}
 
 
 def test_index_is_not_cached(tmp_path: Path) -> None:
@@ -486,12 +580,11 @@ def test_entity_catalog_categorizes_one_fresh_snapshot(tmp_path: Path) -> None:
 def test_entity_integration_is_resolved_and_stays_optional(tmp_path: Path) -> None:
     context = client(tmp_path).app.state.context
 
-    assert context.entity_integration("light.test") == "hue"
-    assert context.entity_integration("light.unknown") is None
+    assert context.entity_integrations(["light.test", "light.unknown"]) == {"light.test": "hue", "light.unknown": None}
 
     context.home_assistant = MagicMock(spec=HomeAssistantManager)
     context.home_assistant.get_entity_data.side_effect = OSError("Home Assistant is unreachable")
-    assert context.entity_integration("light.test") is None
+    assert context.entity_integrations(["light.test"]) == {"light.test": None}
 
 
 def test_dummy_load_calibration_is_returned_only_for_the_configured_meter(tmp_path: Path) -> None:
@@ -946,6 +1039,211 @@ def test_session_summary_is_exposed(tmp_path: Path) -> None:
     assert current["summary"] == {"Average power": "42.3 W", "Duration": "30 s"}
 
 
+def test_completed_recording_can_be_analysed_again(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    request = RecorderMeasurementRequest(
+        model_id="test-switch",
+        product_name="Test switch",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
+        tracked_entity_ids=("switch.device",),
+    )
+    now = "2026-09-04T08:00:00Z"
+    snapshot = SessionSnapshot(
+        id="recorder-session",
+        state=SessionState.COMPLETED,
+        created_at=now,
+        updated_at=now,
+        summary={
+            "Samples recorded": "20",
+            "Recording analysis": "Failed",
+            "Recording analysis reason": "Old analyser failed",
+        },
+    )
+    context.storage.create(snapshot, request)
+    output = context.storage.artifact_directory(snapshot.id, request.model_id)
+    output.mkdir()
+    records = [
+        {
+            "record_type": "sample",
+            "elapsed_seconds": index,
+            "power": 0.2 if index % 2 == 0 else 5.2,
+            "entities": {"switch.device": {"state": "off" if index % 2 == 0 else "on", "attributes": {}}},
+        }
+        for index in range(20)
+    ]
+    (output / "record.jsonl").write_text(
+        "".join(f"{json.dumps(record)}\n" for record in records),
+        encoding="utf-8",
+    )
+    (output / "model.json").write_text(
+        json.dumps({"voltage_range": {"min": 229.5, "max": 231.0}}),
+        encoding="utf-8",
+    )
+
+    before = test_client.get(f"/api/sessions/{snapshot.id}")
+    response = test_client.post(f"/api/sessions/{snapshot.id}/analyse")
+
+    assert before.json()["can_analyse"] is True
+    assert response.status_code == 200
+    body = response.json()
+    assert body["state"] == "completed"
+    assert body["can_analyse"] is True
+    assert body["summary"] == {
+        "Samples recorded": "20",
+        "Recording analysis": "Fixed power profile created",
+        "Analysed feature": "switch.device.state",
+        "Validation MAE": "0.00 W",
+        "Validation coverage": "100%",
+    }
+    model = json.loads((output / "model.json").read_text(encoding="utf-8"))
+    assert model["fixed_config"] == {"power": 5.2}
+    assert model["voltage_range"] == {"min": 229.5, "max": 231.0}
+
+
+def test_analysed_recorder_profile_can_be_prepared(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    service = FakeContributionService()
+    resolved_entities: list[tuple[str, ...]] = []
+
+    def resolve(value: str) -> Callable[[Sequence[str]], dict[str, str]]:
+        def resolver(entity_ids: Sequence[str]) -> dict[str, str]:
+            resolved_entities.append(tuple(entity_ids))
+            return dict.fromkeys(entity_ids, value)
+
+        return resolver
+
+    context.contribution = ContributionApiCoordinator(
+        context.storage,
+        service_factory=lambda: service,
+        resolve_integration=resolve("tplink"),
+        resolve_manufacturer=resolve("Acme"),
+        resolve_model_id=resolve("HEATER-1"),
+    )
+    request = RecorderMeasurementRequest(
+        session_name="Smart heater recording",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
+        tracked_entity_ids=("switch.heater", "sensor.heater_mode"),
+    )
+    now = "2026-09-06T08:00:00Z"
+    snapshot = SessionSnapshot(
+        id="recorder-profile",
+        state=SessionState.COMPLETED,
+        created_at=now,
+        updated_at=now,
+    )
+    context.storage.create(snapshot, request)
+    artifacts = context.storage.artifact_directory(snapshot.id, request.model_id)
+    artifacts.mkdir()
+    (artifacts / "record.jsonl").write_text('{"record_type":"sample"}\n', encoding="utf-8")
+    (artifacts / "analyser.json").write_text('{"status":"model_ready"}', encoding="utf-8")
+    (artifacts / "model.json").write_text(
+        json.dumps(
+            {
+                "name": "",
+                "device_type": "generic_iot",
+                "measure_device": "Test meter",
+                "calculation_strategy": "fixed",
+                "fixed_config": {"states_power": {"off": 0.4, "on": 9.8}},
+            },
+        ),
+        encoding="utf-8",
+    )
+
+    draft = test_client.get(f"/api/sessions/{snapshot.id}/contribution")
+
+    assert draft.status_code == 200
+    assert draft.json()["eligible"] is True
+    assert draft.json()["manufacturer_name"] == "Acme"
+    assert draft.json()["model_id"] == "HEATER-1"
+    assert draft.json()["product_name"] == ""
+    assert draft.json()["home_assistant"] == {
+        "measure_type": "recorder",
+        "controlled_entity": "switch.heater",
+        "integration": "tplink",
+    }
+    assert resolved_entities == [("switch.heater",)] * 3
+
+    preview = test_client.post(
+        f"/api/sessions/{snapshot.id}/contribution/preview",
+        json={
+            "manufacturer_name": "Acme",
+            "model_id": "HEATER-1",
+            "product_name": "Smart heater",
+            "contributor": "Test User",
+        },
+    )
+
+    assert preview.status_code == 200
+    assert preview.json()["eligible"] is True
+    assert service.preview_calls == 1
+
+
+def test_playbook_recorder_is_not_a_profile_contribution(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose=RecorderPurpose.PLAYBOOK,
+    )
+    now = "2026-09-06T08:00:00Z"
+    snapshot = SessionSnapshot(
+        id="recorder-playbook",
+        state=SessionState.COMPLETED,
+        created_at=now,
+        updated_at=now,
+    )
+    context.storage.create(snapshot, request)
+    artifacts = context.storage.artifact_directory(snapshot.id, request.model_id)
+    artifacts.mkdir()
+    (artifacts / "model.json").write_text("{}", encoding="utf-8")
+
+    draft = test_client.get(f"/api/sessions/{snapshot.id}/contribution")
+
+    assert draft.status_code == 200
+    assert draft.json()["eligible"] is False
+    assert "analysed recorder profiles" in draft.json()["reason"]
+
+    preview = test_client.post(
+        f"/api/sessions/{snapshot.id}/contribution/preview",
+        json={
+            "manufacturer_name": "Acme",
+            "model_id": "PLAYBOOK-1",
+            "product_name": "Playbook recording",
+            "contributor": "Test User",
+        },
+    )
+
+    assert preview.status_code == 422
+    assert preview.json()["code"] == "artifacts_required"
+
+
+def test_analyse_rejects_a_session_without_a_profile_recording(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    now = "2026-09-04T08:00:00Z"
+    snapshot = SessionSnapshot(
+        id="playbook-session",
+        state=SessionState.COMPLETED,
+        created_at=now,
+        updated_at=now,
+    )
+    context.storage.create(snapshot, request)
+
+    response = test_client.post(f"/api/sessions/{snapshot.id}/analyse")
+
+    assert response.status_code == 409
+    assert "no recording" in response.json()["message"]
+
+
 def test_validation_errors_have_stable_shape(tmp_path: Path) -> None:
     response = client(tmp_path).post("/api/preflight", json=payload() | {"model_id": "../secret"})
 
@@ -957,24 +1255,45 @@ def test_validation_errors_have_stable_shape(tmp_path: Path) -> None:
 def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -> None:
     app = create_app(data_root=tmp_path, hass_token="test-token", trusted_ingress_only=False)  # noqa: S106
 
-    paths = app.openapi()["paths"]
+    contract = app.openapi()
+    paths = contract["paths"]
 
     assert set(paths["/api/sessions"]) == {"get", "post"}
     assert set(paths["/api/library/measure-devices"]) == {"get"}
+    assert set(paths["/api/library/device-specifications"]) == {"get"}
     assert set(paths["/api/sessions/{session_id}"]) == {"get", "delete"}
     assert set(paths["/api/sessions/{session_id}/cancel"]) == {"post"}
     assert set(paths["/api/sessions/{session_id}/confirm"]) == {"post"}
     assert set(paths["/api/sessions/{session_id}/resume"]) == {"post"}
+    assert set(paths["/api/sessions/{session_id}/analyse"]) == {"post"}
     assert set(paths["/api/sessions/{session_id}/diagnostics"]) == {"get"}
     assert set(paths["/api/sessions/{session_id}/plots"]) == {"get"}
     assert set(paths["/api/sessions/{session_id}/files/{name}"]) == {"get"}
     assert set(paths["/api/sessions/{session_id}/contribution"]) == {"get", "post"}
     assert set(paths["/api/sessions/{session_id}/contribution/preview"]) == {"post"}
+    assert set(paths["/api/sessions/{session_id}/contribution/{job_id}/profile.zip"]) == {"get"}
     assert set(paths["/api/dummy-load/calibration"]) == {"get"}
     assert set(paths["/api/contribution/auth"]) == {"get", "put", "delete"}
     assert set(paths["/api/contribution/auth/device"]) == {"post"}
     assert set(paths["/api/contribution/auth/device/{flow_id}"]) == {"post"}
     assert set(paths["/api/contribution/status"]) == {"get"}
+
+    snapshot_ref = {"$ref": "#/components/schemas/SessionSnapshotResponse"}
+    assert paths["/api/sessions"]["post"]["responses"]["201"]["content"]["application/json"]["schema"] == snapshot_ref
+    for path, method, status in (
+        ("/api/sessions/{session_id}", "get", "200"),
+        ("/api/sessions/{session_id}/cancel", "post", "202"),
+        ("/api/sessions/{session_id}/confirm", "post", "200"),
+        ("/api/sessions/{session_id}/resume", "post", "200"),
+    ):
+        assert paths[path][method]["responses"][status]["content"]["application/json"]["schema"] == snapshot_ref
+
+    snapshot_schema = contract["components"]["schemas"]["SessionSnapshotResponse"]
+    assert set(snapshot_schema["required"]) == set(snapshot_schema["properties"])
+    assert snapshot_schema["properties"]["operating_point"] == {
+        "anyOf": [{"$ref": "#/components/schemas/OperatingPoint"}, {"type": "null"}],
+    }
+    assert contract["components"]["schemas"]["AppPowerMeterType"]["enum"] == ["hass", "shelly", "kasa", "dummy"]
 
 
 def test_contribution_device_flow_reports_configuration_and_uses_injected_service(tmp_path: Path) -> None:
@@ -1032,7 +1351,7 @@ def test_contribution_integration_requires_every_light_to_share_the_integration(
     request = TypeAdapter(MeasurementRequest).validate_python(request_payload)
     coordinator = ContributionApiCoordinator(
         SessionStorage(tmp_path),
-        resolve_integration=integrations.get,
+        resolve_integration=lambda entity_ids: {entity_id: integrations.get(entity_id) for entity_id in entity_ids},
     )
 
     assert coordinator._integration(request) == expected  # noqa: SLF001
@@ -1112,6 +1431,30 @@ def test_contribution_device_flow_pending_or_invalid_slow_down_has_no_retry_afte
     assert polled.retry_after is None
 
 
+def test_measurement_can_complete_without_product_identity(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    context.contribution = ContributionApiCoordinator(
+        context.storage,
+        service_factory=FakeContributionService,
+        resolve_model_id=context.entity_model_ids,
+    )
+    request = payload() | {"model_id": "", "product_name": "", "session_name": "Desk lamp"}
+    started = test_client.post("/api/sessions", json=request)
+    assert started.status_code == 201
+    session_id = started.json()["session_id"]
+    assert context.coordinator._worker is not None  # noqa: SLF001
+    context.coordinator._worker.join(timeout=5)  # noqa: SLF001
+    assert context.storage.load_snapshot(session_id).state == SessionState.COMPLETED
+    assert (context.storage.artifact_directory(session_id, "") / "brightness.csv").is_file()
+    sessions = test_client.get("/api/sessions").json()
+    assert sessions[0]["product_name"] == "Desk lamp"
+    draft = test_client.get(f"/api/sessions/{session_id}/contribution")
+    assert draft.status_code == 200
+    assert draft.json()["model_id"] == "Hue White Ambiance"
+    assert draft.json()["product_name"] == ""
+
+
 def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("POWERCALC_GITHUB_REPOSITORY", "test-owner/powercalc-sandbox")
     monkeypatch.setenv("POWERCALC_GITHUB_BRANCH", "main")
@@ -1121,7 +1464,8 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     context.contribution = ContributionApiCoordinator(
         context.storage,
         service_factory=lambda: service,
-        resolve_integration=context.entity_integration,
+        resolve_integration=context.entity_integrations,
+        resolve_manufacturer=lambda entity_ids: dict.fromkeys(entity_ids, "Signify"),
     )
 
     started = test_client.post("/api/sessions", json=payload())
@@ -1137,6 +1481,18 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     settings_path = tmp_path / "settings.json"
     if settings_path.exists():
         assert "github_pat_test" not in settings_path.read_text(encoding="utf-8")
+    assert (
+        test_client.put(
+            "/api/settings",
+            json={
+                "default_measure_device_firmware": "1.2.3",
+                "default_contributor_name": "Test User",
+                "default_contributor_github": "test-user",
+                "default_contributor_email": "test@example.com",
+            },
+        ).status_code
+        == 200
+    )
 
     draft = test_client.get(f"/api/sessions/{session_id}/contribution")
     assert draft.status_code == 200
@@ -1144,13 +1500,17 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     assert draft.json()["repository"] == "test-owner/powercalc-sandbox"
     assert draft.json()["base_branch"] == "main"
     assert draft.json()["home_assistant"]["integration"] == "hue"
+    assert draft.json()["manufacturer_name"] == "Signify"
+    assert draft.json()["measure_device_firmware"] == "1.2.3"
+    assert draft.json()["contributor"] == "Test User"
+    assert draft.json()["contributor_github"] == "test-user"
+    assert draft.json()["contributor_email"] == "test@example.com"
     assert "- Integration: hue" in draft.json()["pr_body"]
 
     preview = test_client.post(
         f"/api/sessions/{session_id}/contribution/preview",
         json={
             "manufacturer_name": "Signify",
-            "manufacturer_directory": "signify",
             "model_id": "LCT010",
             "product_name": "Test light",
             "contributor": "measure-user",
@@ -1165,11 +1525,20 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     assert service.preview_calls == 1
     assert service.submit_calls == 0
 
+    archive = test_client.get(f"/api/sessions/{session_id}/contribution/job-1/profile.zip")
+    assert archive.status_code == 200
+    assert archive.content == b"PK\x03\x04prepared-profile"
+    assert archive.headers["content-type"] == "application/zip"
+    assert archive.headers["content-disposition"] == 'attachment; filename="powercalc-profile.zip"'
+
+    stale_archive = test_client.get(f"/api/sessions/{session_id}/contribution/stale-job/profile.zip")
+    assert stale_archive.status_code == 409
+    assert stale_archive.json()["code"] == "preview_required"
+
     unconfirmed = test_client.post(
         f"/api/sessions/{session_id}/contribution",
         json={
             "manufacturer_name": "Signify",
-            "manufacturer_directory": "signify",
             "model_id": "LCT010",
             "product_name": "Test light",
             "contributor": "measure-user",
@@ -1184,7 +1553,6 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
         f"/api/sessions/{session_id}/contribution",
         json={
             "manufacturer_name": "Signify",
-            "manufacturer_directory": "signify",
             "model_id": "LCT010",
             "product_name": "Test light",
             "contributor": "measure-user",
@@ -1233,7 +1601,6 @@ def test_contribution_preview_rejects_unsupported_generated_session(tmp_path: Pa
         f"/api/sessions/{context.coordinator.current.id}/contribution/preview",
         json={
             "manufacturer_name": "Acme",
-            "manufacturer_directory": "acme",
             "model_id": "average-device",
             "product_name": "Average device",
             "contributor": "measure-user",
@@ -1312,6 +1679,10 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
     assert test_client.get("/api/settings").json() == {
         "default_power_entity_id": None,
         "default_measure_device": None,
+        "default_measure_device_firmware": None,
+        "default_contributor_name": None,
+        "default_contributor_github": None,
+        "default_contributor_email": None,
         "power_meter": "hass",
         "shelly_ip": None,
         "shelly_username": "admin",
@@ -1332,6 +1703,10 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
         json={
             "default_power_entity_id": "sensor.test_power",
             "default_measure_device": "Shelly Plug S",
+            "default_measure_device_firmware": "1.2.3",
+            "default_contributor_name": "Test User",
+            "default_contributor_github": "test-user",
+            "default_contributor_email": "test@example.com",
             "measurement_defaults": {
                 "sleep_time": 3.5,
                 "sample_count": 4,
@@ -1344,10 +1719,13 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
     assert updated.status_code == 200
     assert updated.json()["default_power_entity_id"] == "sensor.test_power"
     assert updated.json()["default_measure_device"] == "Shelly Plug S"
+    assert updated.json()["default_measure_device_firmware"] == "1.2.3"
+    assert updated.json()["default_contributor_github"] == "test-user"
 
     reloaded = test_client.get("/api/settings").json()
     assert reloaded["default_power_entity_id"] == "sensor.test_power"
     assert reloaded["default_measure_device"] == "Shelly Plug S"
+    assert reloaded["default_contributor_name"] == "Test User"
     assert reloaded["kasa_ip"] is None
     assert reloaded["measurement_defaults"]["sample_count"] == 4
     effective_defaults = test_client.get("/api/capabilities").json()["defaults"]

@@ -24,7 +24,7 @@ No port, host networking, Home Assistant configuration mapping, or API credentia
 | Fan | `fan` | Linear percentage calibration and optional `model.json` |
 | Charging device | `vacuum` or `lawn_mower` | Battery-level charging calibration and optional `model.json` |
 | Average | No controlled device required | Average power over a configured duration |
-| Recorder | Optional tracked entities from any domain; guided vacuum and battery selection | Playbook CSV or power plus entity-state JSON Lines until stopped |
+| Recorder | Optional tracked entities from any domain; guided vacuum and battery selection | Playbook CSV, or entity-state JSON Lines with automatic experimental fixed-profile analysis |
 
 The app supports these power-meter types:
 

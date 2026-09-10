@@ -204,9 +204,9 @@
         "title": "Energie opties",
         "data": {
           "energy_integration_method": "Energie-integratiemethode",
-          "energy_sensor_category": "Energie sensor categorie",
-          "energy_sensor_friendly_naming": "Energie sensor vriendelijk naampatroon",
-          "energy_sensor_naming": "Energie sensor naampatroon",
+          "energy_sensor_category": "Energiesensor categorie",
+          "energy_sensor_friendly_naming": "Energiesensor vriendelijk naampatroon",
+          "energy_sensor_naming": "Energiesensor naampatroon",
           "energy_sensor_precision": "Nauwkeurigheid energiesensor",
           "energy_sensor_unit_prefix": "Voorvoegsel van de energiesensor eenheid"
         }
@@ -243,7 +243,7 @@
           "members": {
             "name": "Leden",
             "data": {
-              "group_member_sensors": "Individuele Powercalc sensoren",
+              "group_member_sensors": "Individuele Powercalc-sensoren",
               "group_member_devices": "Apparaten",
               "group_power_entities": "Additionele vermogen entiteiten",
               "group_energy_entities": "Additionele energie entiteiten",
@@ -252,13 +252,13 @@
               "floor": "Verdieping"
             },
             "data_description": {
-              "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
+              "group_member_sensors": "Powercalc-sensoren die je wil toevoegen aan de groep",
               "group_member_devices": "Energie- en stroomentiteiten van de geselecteerde apparaten toevoegen aan de groep",
               "group_power_entities": "Additionele vermogen entiteiten (W)",
               "group_energy_entities": "Additionele energie entiteiten (kWh)",
               "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd",
-              "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
-              "floor": "Voeg alle powercalc sensoren van de gespecificeerde verdieping toe"
+              "area": "Voeg alle Powercalc-sensoren van de gespecificeerde ruimte toe",
+              "floor": "Voeg alle Powercalc-sensoren van de gespecificeerde verdieping toe"
             }
           },
           "options": {
@@ -449,7 +449,7 @@
           "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de sensor 0 tonen",
           "energy_filter_outlier_enabled": "Schakel filtering van uitschieters in de energiesensor in",
           "energy_filter_outlier_max_step": "Maximale verwachte stap in vermogenswaarden (in watt) voor het uitschieter filter",
-          "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
+          "ignore_unavailable_state": "Zet dit aan wanneer je de vermogensensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is",
           "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
           "multiply_factor_standby": "Pas vermenigvuldigingsfactor toe op standby vermogen",
           "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is"
@@ -467,7 +467,7 @@
         "data_description": {
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "name": "Basisnaam voor de gegenereerde vermogen- en utiliteitsmeter. Volledige entiteit naam zal worden ingesteld afhankelijk van de energy_sensor_naming instelling",
-          "device": "Voeg de gecreëerde energiesensor toe aan een specifiek apparaat"
+          "device": "Voeg de aangemaakte energiesensor toe aan een specifiek apparaat"
         },
         "description": "Momenteel kunnen specifieke instellingen alleen globaal worden geconfigureerd",
         "title": "Energiesensor voor een bestaande stroomsensor aanmaken"
@@ -538,7 +538,7 @@
           "global_configuration": "Globale configuratie",
           "menu_group": "Groep",
           "menu_library": "Virtueel vermogen (bibliotheek)",
-          "real_power": "Energie gebaseerd op bestaande vermogen sensor",
+          "real_power": "Energie gebaseerd op bestaande vermogensensor",
           "virtual_power": "Virtueel vermogen (handmatig)"
         },
         "title": "Kies het gewenste sensor type"
@@ -699,16 +699,16 @@
         },
         "data_description": {
           "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de energiesensor 0 tonen",
-          "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
+          "ignore_unavailable_state": "Zet dit aan wanneer je de vermogensensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is",
           "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
           "multiply_factor_standby": "Pas vermenigvuldigingsfactor toe op standby vermogen",
-          "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is"
+          "unavailable_power": "Vermogen in W wanneer de bronsensor onbeschikbaar is"
         }
       },
       "basic_options": {
         "title": "Basisopties",
         "data": {
-          "create_energy_sensor": "Energie sensoren aanmaken",
+          "create_energy_sensor": "Energiesensoren aanmaken",
           "create_standby_energy_sensor": "Stand-by-energiesensor aanmaken",
           "create_cost_sensor": "Kostensensor aanmaken",
           "create_utility_meters": "Utiliteit meters aanmaken",
@@ -771,16 +771,16 @@
           "power_options": {
             "name": "Vermogenssensor",
             "data": {
-              "power_sensor_naming": "Vermogen sensor naampatroon",
-              "power_sensor_friendly_naming": "Vermogen sensor vriendelijke naampatroon",
-              "power_sensor_category": "Vermogen sensor categorie",
+              "power_sensor_naming": "Vermogensensor naampatroon",
+              "power_sensor_friendly_naming": "Vermogensensor vriendelijke naampatroon",
+              "power_sensor_category": "Vermogensensor categorie",
               "power_sensor_precision": "Precisie van vermogenssensor"
             }
           },
           "features": {
             "name": "Sensoren aanmaken",
             "data": {
-              "create_energy_sensors": "Energie sensoren aanmaken",
+              "create_energy_sensors": "Energiesensoren aanmaken",
               "create_cost_sensors": "Kostensensoren aanmaken",
               "create_standby_group": "Standby-groep aanmaken",
               "create_utility_meters": "Utiliteit meters aanmaken"
@@ -871,10 +871,10 @@
         "description": "Definieer hier de standaardinstellingen voor energiesensoren. Zie [documentatie]({docs_uri}) voor meer informatie",
         "data": {
           "energy_integration_method": "Energie integratie methode",
-          "energy_sensor_category": "Energie sensor categorie",
-          "energy_sensor_friendly_naming": "Energie sensor vriendelijk naampatroon",
-          "energy_sensor_naming": "Energie sensor naampatroon",
-          "energy_sensor_precision": "Energie sensor nauwkeurigheid",
+          "energy_sensor_category": "Energiesensor categorie",
+          "energy_sensor_friendly_naming": "Energiesensor vriendelijk naampatroon",
+          "energy_sensor_naming": "Energiesensor naampatroon",
+          "energy_sensor_precision": "Energiesensor nauwkeurigheid",
           "energy_sensor_unit_prefix": "Voorvoegsel van de energiesensor eenheid"
         }
       },
@@ -958,7 +958,7 @@
         "data": {
           "main_power_sensor": "Hoofd vermogen sensor (P1)",
           "group_tracked_auto": "Entiteiten automatisch toegevoegd",
-          "create_energy_sensor": "Energie sensor aanmaken",
+          "create_energy_sensor": "Energiesensor aanmaken",
           "create_cost_sensor": "Kostensensor aanmaken",
           "create_utility_meters": "Utiliteit meters aanmaken"
         },

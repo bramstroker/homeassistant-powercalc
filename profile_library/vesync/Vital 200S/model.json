@@ -1,0 +1,45 @@
+{
+  "calculation_strategy": "fixed",
+  "created_at": "2026-09-03T00:00:00Z",
+  "device_type": "air_purifier",
+  "min_version": "v1.25.3",
+  "device_specs": {
+    "form_factor": "air_purifier",
+    "rated_power": 51,
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "measure_device": "Sonoff S31",
+  "measure_method": "manual",
+  "measure_description": "Vital 200S-P, US 120 V, measured at the wall with a Tasmota Sonoff S31; three minute averages per state. Display draws 0.6 W and is subtracted when display_status is off. Manual speeds and sleep are measured directly. Auto maps the air_quality sensor state (excellent/good/moderate/poor, the manual's Very Good/Good/Moderate/Bad) to sleep/low/medium/high speed per the manual; only excellent was measured (PM2.5 1). Pet alternates 15 min high and 60 min medium per the manual (cycle not measured); value is the cycle average. Both presets assume light detection is off or the room is lit. With light detection on, the unit caps them at medium (50 %) in the dark, a state HA cannot see. Standby is below the S31's floor and comes from corrected Shelly Plug history.",
+  "mains_voltage": 120,
+  "name": "Smart Air Purifier",
+  "aliases": [
+    "LAP-V201S-WUS",
+    "LAP-V201S-WEU",
+    "LAP-V201S-WJP",
+    "LAP-V201S-AASR",
+    "LAP-V201S-AUSR",
+    "LAP-V201S-AEUR"
+  ],
+  "product_url": "https://levoit.com/products/vital-200s-p-smart-air-purifier",
+  "standby_power": 0.25,
+  "fixed_config": {
+    "states_power": {
+      "preset_mode|sleep": 2.91,
+      "preset_mode|pet": "{{ 10.0 - (0.6 if state_attr('[[entity]]', 'display_status') == 'off' else 0) }}",
+      "preset_mode|auto": "{{ {'good': 4.92, 'moderate': 6.45, 'poor': 24.24}.get(states('[[entity_by_translation_key:air_quality]]'), 3.53) - (0.6 if state_attr('[[entity]]', 'display_status') == 'off' else 0) }}",
+      "percentage|25": "{{ 4.92 - (0.6 if state_attr('[[entity]]', 'display_status') == 'off' else 0) }}",
+      "percentage|50": "{{ 6.45 - (0.6 if state_attr('[[entity]]', 'display_status') == 'off' else 0) }}",
+      "percentage|75": "{{ 24.24 - (0.6 if state_attr('[[entity]]', 'display_status') == 'off' else 0) }}",
+      "percentage|100": "{{ 40.62 - (0.6 if state_attr('[[entity]]', 'display_status') == 'off' else 0) }}"
+    }
+  },
+  "authors": [
+    {
+      "name": "Ryan Ronnander",
+      "github": "ryan-ronnander"
+    }
+  ]
+}

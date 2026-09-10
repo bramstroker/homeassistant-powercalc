@@ -23,13 +23,13 @@ from measure.const import (
 )
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.light.const import LutMode
+from measure.model import mains_voltage_from_range
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.runner.const import (
     QUESTION_CHARGING_DEVICE_TYPE,
     QUESTION_COLOR_MODE,
     QUESTION_DISABLE_STREAMING,
     QUESTION_DURATION,
-    QUESTION_EXPORT_FILENAME,
     QUESTION_GZIP,
     QUESTION_MODE,
 )
@@ -87,12 +87,6 @@ def test_wizard(mock_config_factory: MockConfigFactory) -> None:
             "y",
             # DUMMY_LOAD
             "n",
-            # MODEL_ID
-            "m",
-            key.ENTER,
-            # MODEL_NAME
-            "a",
-            key.ENTER,
             # MEASURE_DEVICE
             "a",
             key.ENTER,
@@ -107,18 +101,25 @@ def test_wizard(mock_config_factory: MockConfigFactory) -> None:
         ),
     )
 
-    measure.start()
+    with patch("measure.cli.main.uuid4") as session_id:
+        session_id.return_value.hex = "a" * 32
+        measure.start()
 
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/m/brightness.csv.gz"))
-    assert os.path.exists(os.path.join(PROJECT_DIR, "export/m/model.json"))
+    output = PROJECT_DIR / "export" / f"session-{'a' * 32}"
+    assert (output / "brightness.csv.gz").is_file()
+    assert (output / "model.json").is_file()
 
 
-def test_run_light(mock_config_factory: MockConfigFactory) -> None:
+def test_run_light(mock_config_factory: MockConfigFactory, caplog: pytest.LogCaptureFixture) -> None:
     """Simulate a full run of the light measure using brightness mode"""
+    caplog.set_level(logging.INFO, logger="measure")
     mock_config = mock_config_factory()
 
     measure = _create_measure_instance(config=mock_config)
     measure.start()
+
+    assert "Measurement output directory:" in caplog.text
+    assert f"uv run powercalc-profile prepare {PROJECT_DIR / 'export/LCT010'}" in caplog.text
 
     assert os.path.exists(os.path.join(PROJECT_DIR, "export/LCT010/brightness.csv.gz"))
     model_json_path = os.path.join(PROJECT_DIR, "export/LCT010/model.json")
@@ -129,6 +130,30 @@ def test_run_light(mock_config_factory: MockConfigFactory) -> None:
         MODEL_JSON_VOLTAGE_RANGE_MIN: 233.0,
         MODEL_JSON_VOLTAGE_RANGE_MAX: 233.0,
     }
+    assert model_json["mains_voltage"] == 230
+
+
+@pytest.mark.parametrize("error", [KeyboardInterrupt(), RuntimeError("Meter disconnected")])
+def test_interrupted_light_prints_recovery(
+    mock_config_factory: MockConfigFactory,
+    caplog: pytest.LogCaptureFixture,
+    error: BaseException,
+) -> None:
+    caplog.set_level(logging.INFO, logger="measure")
+    measure = _create_measure_instance(config=mock_config_factory())
+
+    def interrupt() -> None:
+        assert "Measurement output directory:" in caplog.text
+        raise error
+
+    with patch("measure.cli.main.MeasurementExecution.run", side_effect=interrupt), pytest.raises(type(error)):
+        measure.start()
+
+    assert f"Any saved output is kept in {PROJECT_DIR / 'export/LCT010'}" in caplog.text
+    assert "RESUME=true MODEL_ID=LCT010 uv run --extra cli python -m measure.measure" in caplog.text
+    assert "same device and settings" in caplog.text
+    assert "Files exported to" not in caplog.text
+    assert "powercalc-profile prepare" not in caplog.text
 
 
 def test_take_measurement_tracks_voltage_range(mock_config_factory: MockConfigFactory) -> None:
@@ -149,6 +174,18 @@ def test_take_measurement_tracks_voltage_range(mock_config_factory: MockConfigFa
     result = measure_util.take_measurement()
     assert result.power == 2.0
     assert result.voltages == [231.2, 229.9, 230.4]
+
+
+@pytest.mark.parametrize(
+    "voltage_range, expected",
+    [
+        ({"min": 110, "max": 125}, 120),
+        ({"min": 220, "max": 240}, 230),
+        ({"min": 230, "max": 120}, None),
+    ],
+)
+def test_mains_voltage_from_range(voltage_range: dict[str, int], expected: int | None) -> None:
+    assert mains_voltage_from_range(voltage_range) == expected
 
 
 @pytest.mark.parametrize(
@@ -230,7 +267,6 @@ def test_run_recorder(mock_config_factory: MockConfigFactory) -> None:
     mock_config = mock_config_factory(
         question_defaults={
             QUESTION_SELECTED_MEASURE_TYPE: MeasureType.RECORDER,
-            QUESTION_EXPORT_FILENAME: "test.csv",
         },
     )
 
@@ -247,7 +283,7 @@ def test_run_recorder(mock_config_factory: MockConfigFactory) -> None:
         measure = _create_measure_instance(config=mock_config)
         measure.start()
 
-    csv_filepath = os.path.join(PROJECT_DIR, "export/generic/test.csv")
+    csv_filepath = os.path.join(PROJECT_DIR, "export/generic/record.csv")
     assert os.path.exists(csv_filepath)
 
     with open(csv_filepath, newline="") as csv_file:

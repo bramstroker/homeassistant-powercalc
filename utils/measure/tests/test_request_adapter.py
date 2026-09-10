@@ -71,6 +71,10 @@ def test_cli_resume_setting_becomes_request_policy(mock_config_factory: MockConf
     environment = mock_config_factory()
     environment.resume = True
 
-    request = request_from_answers(MeasureType.AVERAGE, {QUESTION_DURATION: 60}, environment)
+    request = request_from_answers(
+        MeasureType.AVERAGE,
+        {QUESTION_DURATION: 60, "model_id": "existing-run"},
+        environment,
+    )
 
     assert request.resume_policy == ResumePolicy.RESUME

@@ -18,6 +18,7 @@ When you use the GUI select `linear` in the calculation_strategy dropdown.
 | max_power   | float  | **Optional** | Power usage for highest brightness level                                                                                                              |
 | calibrate   | string | **Optional** | Calibration values                                                                                                                                    |
 | gamma_curve | float  | **Optional** | Apply a gamma correction, for example 2.8                                                                                                             |
+| power_curve | list   | **Optional** | Normalized input-to-power points, with both values between 0 and 1                                                                                    |
 
 **Example configuration**
 
@@ -33,6 +34,29 @@ powercalc:
 !!! note
 
     defining only `min_power` and `max_power` is only allowed for light and fan entities, when you are using another entity (for example a `sensor` or `input_number`) you must use the calibrate mode.
+
+## Normalized power curve
+
+The `power_curve` option describes a reusable non-linear curve independently of a device's minimum and maximum power.
+Powercalc interpolates between the points and scales the normalized output between `min_power` and `max_power`.
+This is useful for profiles such as smart dimmers, where the curve is supplied by the profile and the connected load determines the power range.
+
+```yaml
+powercalc:
+  sensors:
+    - entity_id: light.dimmer
+      linear:
+        min_power: 1
+        max_power: 10
+        power_curve:
+          - 0.00 -> 0.00
+          - 0.25 -> 0.05
+          - 0.50 -> 0.20
+          - 0.75 -> 0.55
+          - 1.00 -> 1.00
+```
+
+`power_curve`, `gamma_curve`, and `calibrate` are alternative ways to shape the calculation and should not be combined.
 
 ## Advanced precision calibration
 

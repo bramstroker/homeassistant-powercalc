@@ -94,7 +94,7 @@ Examples:
 Use `Recorder` to capture an open-ended power time series. In the Home Assistant app, first choose what the recording is for:
 
 - **A Playbook CSV** writes the existing headerless `elapsed time,power` format used by the [Playbook strategy](../../strategies/playbook.md).
-- **Data for a complex power profile (experimental)** records power together with the state and complete attributes of selected Home Assistant entities. This workflow is not feature complete: it produces source data for later profile development, but does not analyze the recording or generate a profile `model.json` yet.
+- **Data for a complex power profile (experimental)** records power together with the state and complete attributes of selected Home Assistant entities. After recording, the analyser can create a fixed `states_power` profile when one state or scalar attribute clearly explains the measured power. Composite models are not supported yet, so this workflow is not feature complete.
 
 The CLI always creates a Playbook CSV and stops when you press `CTRL+C`. The app stops the recorder from the running-session screen.
 
@@ -113,11 +113,14 @@ Choose **Robot vacuum** for a guided recording. Select the `vacuum` entity and i
 
 Measure the complete dock or base station at the wall outlet. Start with a low battery and capture charging, idle, and cleaning. Also capture washing, drying, and dust-emptying when the dock supports those operations.
 
-Complex recordings use JSON Lines (`.jsonl`): every sample is stored as one complete JSON object containing the power reading and an entity map. This lets the recorder stream samples safely without holding the complete recording in memory:
+Complex recordings use JSON Lines (`.jsonl`). The first record describes the recording and selected entities; every following sample contains a power reading and entity map. This lets the recorder stream samples safely without holding the complete recording in memory:
 
 ```json
-{"elapsed_seconds":0.0,"power":4.2,"entities":{"vacuum.robot":{"state":"cleaning","attributes":{"battery_level":42}},"sensor.robot_battery":{"state":"42","attributes":{"unit_of_measurement":"%"}}}}
+{"record_type":"metadata","format_version":1,"recipe":"vacuum_robot","primary_entity_id":"vacuum.robot","entities":[{"entity_id":"vacuum.robot","domain":"vacuum","role":"primary"},{"entity_id":"sensor.robot_battery","domain":"sensor","role":"battery"}]}
+{"record_type":"sample","elapsed_seconds":0.0,"power":4.2,"entities":{"vacuum.robot":{"state":"cleaning","attributes":{"battery_level":42}},"sensor.robot_battery":{"state":"42","attributes":{"unit_of_measurement":"%"}}}}
 ```
+
+Stopping the recording starts analysis automatically. The result always includes `analysis.json`. A `model.json` is added only when the selected feature covers at least 90% of validation samples and improves mean absolute error enough over a constant-power baseline. Each learned value needs at least five recorded samples. If those checks fail, the recording still completes and the result explains that more representative data—or a future composite strategy—is needed.
 
 Because this includes complete entity attributes, inspect the file for installation-specific or sensitive values before sharing it.
 While recording, the measurement screen shows the latest state of every tracked entity beneath the live power chart. Complete attributes remain in the JSON Lines file rather than the live view.

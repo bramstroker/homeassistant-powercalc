@@ -108,11 +108,12 @@ async def test_download(
     mock_aioresponse: aioresponses,
     remote_loader: RemoteLoader,
     mock_download_profile_endpoints: list[dict],
+    tmp_path: Path,
 ) -> None:
     """Mock the API response for the download of a profile."""
     remote_files = mock_download_profile_endpoints
 
-    storage_dir = get_test_profile_dir("download")
+    storage_dir = str(tmp_path / "download")
     await remote_loader.download_profile("signify", "LCA001", storage_dir, "test_download")
 
     for remote_file in remote_files:
@@ -186,7 +187,11 @@ def test_save_resource_flushes_to_disk_before_renaming(tmp_path: Path) -> None:
     assert not list(tmp_path.glob(".model.json.*"))
 
 
-async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aioresponse: aioresponses) -> None:
+async def test_download_with_parenthesis(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
     remote_files = [
         {
             "path": "model.json",
@@ -210,7 +215,7 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
                 repeat=True,
             )
 
-    storage_dir = get_test_profile_dir("download")
+    storage_dir = str(tmp_path / "download")
     await remote_loader.download_profile("google", "Home Mini (HOA)", storage_dir, "test_download")
 
     for remote_file in remote_files:
@@ -761,6 +766,7 @@ async def test_load_model_raises_library_exception_on_non_existing_model(remote_
 async def test_download_profile_exception_unexpected_status_code(
     mock_aioresponse: aioresponses,
     remote_loader: RemoteLoader,
+    tmp_path: Path,
 ) -> None:
     mock_aioresponse.get(
         f"{ENDPOINT_DOWNLOAD}/signify/LCA001?hash=test_download",
@@ -768,7 +774,7 @@ async def test_download_profile_exception_unexpected_status_code(
         repeat=True,
     )
 
-    profile_dir = get_test_profile_dir("download")
+    profile_dir = str(tmp_path / "download")
     with pytest.raises(ProfileDownloadError):
         await remote_loader.download_profile("signify", "LCA001", profile_dir, "test_download")
 
@@ -776,10 +782,11 @@ async def test_download_profile_exception_unexpected_status_code(
 async def test_exception_is_raised_on_connection_error(
     mock_aioresponse: aioresponses,
     remote_loader: RemoteLoader,
+    tmp_path: Path,
 ) -> None:
     mock_aioresponse.get(f"{ENDPOINT_DOWNLOAD}/signify/LCA001?hash=test_download", exception=ClientError("test"))
 
-    profile_dir = get_test_profile_dir("download")
+    profile_dir = str(tmp_path / "download")
     with pytest.raises(ProfileDownloadError):
         await remote_loader.download_profile("signify", "LCA001", profile_dir, "test_download")
 

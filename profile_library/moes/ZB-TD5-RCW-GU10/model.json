@@ -1,0 +1,40 @@
+{
+  "authors": [
+    {
+      "github": "rugk",
+      "name": "rugk"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-04T15:59:35Z",
+  "mains_voltage": 230,
+  "device_specs": {
+    "socket": "GU10",
+    "form_factor": "spot",
+    "lumens": 345,
+    "rated_power": 4.7,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "ean": [
+    "6974246476735"
+  ],
+  "product_url": "https://moeshouse.com/products/zigbee-smart-bulb-zb-td5-rcw-gu10-ms",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug M Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "NUM_LIGHTS": 3,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.6.0:app"
+  },
+  "name": "Zigbee RGB+CCT LED Bulb (GU10, 5W)",
+  "standby_power": 0.4,
+  "voltage_range": {
+    "max": 236.8,
+    "min": 232.1
+  }
+}

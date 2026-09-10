@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
+from jsonschema import validate
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
 from measure.execution import (
@@ -11,12 +12,13 @@ from measure.execution import (
     PreparedMeasurement,
     RunInteraction,
 )
-from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
     DummyLoadCalibrationRequest,
     DummyLoadReuseRequest,
     LightMeasurementRequest,
+    RecorderMeasurementRequest,
 )
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasurementResult, MeasureUtil
@@ -87,8 +89,99 @@ def test_execution_writes_model_from_prepared_measurement(
     assert model["device_type"] == "generic"
     assert model["voltage_range"]["min"] == pytest.approx(229.9)
     assert model["voltage_range"]["max"] == pytest.approx(231.2)
+    assert model["mains_voltage"] == 230
     assert model["measure_settings"]["SAMPLE_COUNT"] == 3
     assert model["measure_settings"]["VERSION"] == measure_version
+    assert model["measure_settings"]["DUMMY_LOAD"] is False
+    assert "NUM_LIGHTS" not in model["measure_settings"]
+
+
+def test_execution_records_enabled_dummy_load_in_measure_settings(tmp_path: Path) -> None:
+    request = AverageMeasurementRequest(
+        product_name="Test device",
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power", voltage_entity_id="sensor.voltage"),
+        generate_model=True,
+        dummy_load=DummyLoadReuseRequest(description="Test load", resistance=812.4),
+    )
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.run.return_value = RunnerResult(model_json_data={"device_type": "generic"}, voltages=[230.0])
+    runner.measure_standby_power.return_value = MeasurementResult(power=0.3, voltages=[230.0])
+
+    MeasurementExecution(
+        measurement=PreparedMeasurement(request=request, runner=runner),
+        output_directory=tmp_path,
+    ).run()
+
+    model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
+    assert model["measure_settings"]["DUMMY_LOAD"] is True
+    assert model["measure_settings"]["DUMMY_LOAD_RESISTANCE"] == pytest.approx(812.4)
+    assert model["measure_settings"]["DUMMY_LOAD_POWER"] == pytest.approx(65.12)
+
+
+def test_execution_records_new_dummy_load_calibration_in_measure_settings(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request = AverageMeasurementRequest(
+        product_name="Test device",
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power", voltage_entity_id="sensor.voltage"),
+        generate_model=True,
+        dummy_load=DummyLoadCalibrationRequest(description="Test load"),
+    )
+    measure_util = MagicMock(spec=MeasureUtil)
+    measure_util.dummy_load_value = None
+    measure_util.set_dummy_load_resistance.side_effect = lambda resistance: setattr(
+        measure_util,
+        "dummy_load_value",
+        resistance,
+    )
+    preparation = DummyLoadPreparation(request=request, spec=request.dummy_load, measure_util=measure_util)
+    monkeypatch.setattr(DummyLoadPreparation, "_calibrate", lambda self, interaction: 529.0)
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.run.return_value = RunnerResult(model_json_data={"device_type": "generic"}, voltages=[230.0])
+    runner.measure_standby_power.return_value = MeasurementResult(power=0.3, voltages=[230.0])
+
+    MeasurementExecution(
+        measurement=PreparedMeasurement(
+            request=request,
+            runner=runner,
+            preparations=[preparation],
+            interaction=MagicMock(spec=RunInteraction),
+        ),
+        output_directory=tmp_path,
+    ).run()
+
+    model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
+    assert model["measure_settings"]["DUMMY_LOAD_RESISTANCE"] == pytest.approx(529.0)
+    assert model["measure_settings"]["DUMMY_LOAD_POWER"] == pytest.approx(100.0)
+
+
+@pytest.mark.parametrize("num_lights", [1, 3])
+def test_execution_records_number_of_lights_in_measure_settings(tmp_path: Path, num_lights: int) -> None:
+    request = LightMeasurementRequest(
+        model_id="test-light",
+        product_name="Test light",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyLightControllerSpec(),
+        multiple_light_count=num_lights,
+    )
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.run.return_value = RunnerResult(
+        model_json_data={"device_type": "light", "calculation_strategy": "lut"},
+        voltages=[230.0],
+    )
+    runner.measure_standby_power.return_value = MeasurementResult(power=0.3, voltages=[230.0])
+
+    MeasurementExecution(
+        measurement=PreparedMeasurement(request=request, runner=runner),
+        output_directory=tmp_path,
+    ).run()
+
+    model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
+    assert model["measure_settings"]["NUM_LIGHTS"] == num_lights
 
 
 def test_execution_cleans_up_runner_after_failure(tmp_path: Path) -> None:
@@ -124,6 +217,147 @@ def test_execution_cleans_up_runner_after_standby_failure(tmp_path: Path) -> Non
         execution.run()
 
     runner.cleanup.assert_called_once_with()
+
+
+def test_execution_analyses_complex_recording_and_writes_schema_valid_model(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (tmp_path / ".VERSION").write_text("v0.1.0:test", encoding="utf-8")
+    monkeypatch.setattr("measure.version.PROJECT_DIR", str(tmp_path))
+    request = RecorderMeasurementRequest(
+        product_name="Test switch",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("switch.device",),
+    )
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.writes_export_files.return_value = True
+
+    def write_recording(_: RecorderMeasurementRequest, export_directory: str) -> RunnerResult:
+        records = [
+            {
+                "elapsed_seconds": index,
+                "power": 0.2 if index % 2 == 0 else 5.2,
+                "entities": {"switch.device": {"state": "off" if index % 2 == 0 else "on", "attributes": {}}},
+            }
+            for index in range(20)
+        ]
+        Path(export_directory, "record.jsonl").write_text(
+            "".join(f"{json.dumps(record)}\n" for record in records),
+            encoding="utf-8",
+        )
+        return RunnerResult(model_json_data={}, voltages=[229.5, 231.0], summary={"Samples recorded": "20"})
+
+    runner.run.side_effect = write_recording
+    interaction = MagicMock(spec=RunInteraction)
+    prepared = PreparedMeasurement(request=request, runner=runner, interaction=interaction)
+    (tmp_path / "analysis.json").write_text('{"status": "stale"}', encoding="utf-8")
+
+    result = MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
+
+    analysis = json.loads((tmp_path / "analyser.json").read_text(encoding="utf-8"))
+    model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
+    schema_path = Path(__file__).parents[3] / "profile_library" / "model_schema.json"
+    validate(model, json.loads(schema_path.read_text(encoding="utf-8")))
+    assert analysis["status"] == "model_ready"
+    assert not (tmp_path / "analysis.json").exists()
+    assert analysis["feature"] == "switch.device.state"
+    assert model["device_type"] == "generic_iot"
+    assert model["calculation_strategy"] == "fixed"
+    assert model["fixed_config"] == {"power": 5.2}
+    assert model["standby_power"] == pytest.approx(0.2)
+    assert result.summary is not None
+    assert result.summary["Recording analysis"] == "Fixed power profile created"
+    interaction.phase.assert_called_once_with("Analysing recording")
+    runner.measure_standby_power.assert_not_called()
+
+
+def test_execution_preserves_recording_when_analysis_fails(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("switch.device",),
+    )
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.writes_export_files.return_value = True
+
+    def write_recording(_: RecorderMeasurementRequest, export_directory: str) -> RunnerResult:
+        Path(export_directory, "record.jsonl").write_text("raw recording\n", encoding="utf-8")
+        return RunnerResult(model_json_data={}, summary={"Samples recorded": "1"})
+
+    runner.run.side_effect = write_recording
+    analyser = MagicMock()
+    analyser.analyse.side_effect = RuntimeError("broken analyser")
+    prepared = PreparedMeasurement(request=request, runner=runner)
+    (tmp_path / "model.json").write_text('{"stale": true}', encoding="utf-8")
+
+    result = MeasurementExecution(measurement=prepared, output_directory=tmp_path, analyser=analyser).run()
+
+    assert (tmp_path / "record.jsonl").read_text(encoding="utf-8") == "raw recording\n"
+    analysis = json.loads((tmp_path / "analyser.json").read_text(encoding="utf-8"))
+    assert analysis["status"] == "insufficient_data"
+    assert "broken analyser" in analysis["reason"]
+    assert not (tmp_path / "model.json").exists()
+    assert result.summary == {
+        "Samples recorded": "1",
+        "Recording analysis": "Failed",
+        "Recording analysis reason": "Recording analysis failed: broken analyser",
+    }
+    assert "Recording analysis failed: broken analyser" in caplog.text
+
+
+def test_execution_completes_without_model_when_recording_is_insufficient(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("switch.device",),
+    )
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.writes_export_files.return_value = True
+
+    def write_recording(_: RecorderMeasurementRequest, export_directory: str) -> RunnerResult:
+        records = [
+            {
+                "elapsed_seconds": index,
+                "power": 3,
+                "entities": {"switch.device": {"state": "on", "attributes": {}}},
+            }
+            for index in range(10)
+        ]
+        Path(export_directory, "record.jsonl").write_text(
+            "invalid line\n" + "".join(f"{json.dumps(record)}\n" for record in records),
+            encoding="utf-8",
+        )
+        return RunnerResult(model_json_data={}, summary={"Samples recorded": "10"})
+
+    runner.run.side_effect = write_recording
+    prepared = PreparedMeasurement(request=request, runner=runner)
+
+    result = MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
+
+    analysis = json.loads((tmp_path / "analyser.json").read_text(encoding="utf-8"))
+    assert analysis["status"] == "insufficient_data"
+    assert analysis["warnings"] == [
+        "Skipped 1 invalid recorder line(s); first was line 1: Expecting value: line 1 column 1 (char 0)",
+    ]
+    assert not (tmp_path / "model.json").exists()
+    assert result.summary == {
+        "Samples recorded": "10",
+        "Recording analysis": "More data needed",
+        "Recording analysis reason": (
+            "No state or scalar attribute had 2-20 usable values with at least 4 training samples per value"
+        ),
+    }
+    assert "Profile was not created" in caplog.text
+    assert "Skipped 1 invalid recorder line(s)" in caplog.text
 
 
 def test_execution_runs_preparations_before_runner(tmp_path: Path) -> None:

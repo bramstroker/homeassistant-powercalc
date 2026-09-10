@@ -340,8 +340,10 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                         value=RecorderPurpose.COMPLEX_PROFILE,
                         label="Data for a complex power profile (experimental)",
                         description=(
-                            "This workflow is not feature complete. It records power with entity states and attributes "
-                            "as JSON Lines source data, but does not create a profile model.json yet."
+                            "This experimental workflow records JSON Lines source data and can create a fixed "
+                            "states_power model when one state or attribute clearly explains power. Composite models "
+                            "are not supported yet, so the workflow is not feature complete. Hold every relevant "
+                            "device state for at least five samples."
                         ),
                     ),
                 ),
@@ -434,13 +436,6 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                     "Entities from the vacuum's device are listed first. You can also choose an entity from elsewhere."
                 ),
                 review=True,
-            ),
-            FormFieldDefinition(
-                name="export_filename",
-                label="Export filename",
-                control=FieldControl.TEXT,
-                default="record.csv",
-                hint="Playbook recordings use CSV; complex-profile recordings use JSON Lines (.jsonl).",
             ),
         ),
         supports_profile=False,

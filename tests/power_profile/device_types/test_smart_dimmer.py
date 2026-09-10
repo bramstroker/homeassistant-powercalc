@@ -6,10 +6,13 @@ from homeassistant.data_entry_flow import FlowResultType
 from custom_components.powercalc import CONF_IGNORE_UNAVAILABLE_STATE, async_setup_entry
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
+    CONF_CALIBRATE,
     CONF_CUSTOM_MODEL_DIRECTORY,
+    CONF_GAMMA_CURVE,
     CONF_LINEAR,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_POWER_CURVE,
     DOMAIN,
 )
 from tests.common import (
@@ -79,6 +82,177 @@ async def test_smart_dimmer_power_input_yaml_omit_linear_config(
     assert_entity_state(hass, power_sensor_id, "0.30")
 
 
+async def test_smart_dimmer_profile_gamma_combined_with_user_power_input(
+    hass: HomeAssistant,
+) -> None:
+    """Test profile gamma is combined with user supplied min and max power."""
+    light_entity_id = "light.test"
+    power_sensor_id = "sensor.test_power"
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: light_entity_id,
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_dimmer_gamma"),
+            CONF_LINEAR: {CONF_MIN_POWER: 1.5, CONF_MAX_POWER: 50},
+        },
+    )
+
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 128})])
+    assert_entity_state(hass, power_sensor_id, "14.22")
+
+
+async def test_smart_dimmer_user_gamma_overrides_profile_gamma(
+    hass: HomeAssistant,
+) -> None:
+    """Test an explicitly supplied gamma overrides the profile gamma."""
+    light_entity_id = "light.test"
+    power_sensor_id = "sensor.test_power"
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: light_entity_id,
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_dimmer_gamma"),
+            CONF_LINEAR: {
+                CONF_MIN_POWER: 1.5,
+                CONF_MAX_POWER: 50,
+                CONF_GAMMA_CURVE: 1,
+            },
+        },
+    )
+
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 128})])
+    assert_entity_state(hass, power_sensor_id, "26.35")
+
+
+async def test_smart_dimmer_user_calibration_ignores_profile_gamma(
+    hass: HomeAssistant,
+) -> None:
+    """Test an existing user calibration is not modified by profile gamma."""
+    light_entity_id = "light.test"
+    power_sensor_id = "sensor.test_power"
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: light_entity_id,
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_dimmer_gamma"),
+            CONF_LINEAR: {CONF_CALIBRATE: ["0 -> 1.5", "255 -> 50"]},
+        },
+    )
+
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 128})])
+    assert_entity_state(hass, power_sensor_id, "26.35")
+
+
+async def test_smart_dimmer_profile_gamma_without_user_power_input(
+    hass: HomeAssistant,
+) -> None:
+    """Test profile gamma keeps the self-usage-only YAML configuration valid."""
+    light_entity_id = "light.test"
+    power_sensor_id = "sensor.test_power"
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: light_entity_id,
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_dimmer_gamma"),
+        },
+    )
+
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 255})])
+    assert_entity_state(hass, power_sensor_id, "0.50")
+
+
+async def test_smart_dimmer_profile_power_curve_combined_with_user_power_input(
+    hass: HomeAssistant,
+) -> None:
+    """Test a profile power curve is scaled with user supplied min and max power."""
+    light_entity_id = "light.test"
+    power_sensor_id = "sensor.test_power"
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: light_entity_id,
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_dimmer_power_curve"),
+            CONF_LINEAR: {CONF_MIN_POWER: 2, CONF_MAX_POWER: 12},
+        },
+    )
+
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 128})])
+    assert_entity_state(hass, power_sensor_id, "4.53")
+
+
+async def test_smart_dimmer_user_gamma_overrides_profile_power_curve(
+    hass: HomeAssistant,
+) -> None:
+    """Test an explicitly supplied gamma overrides the profile power curve."""
+    light_entity_id = "light.test"
+    power_sensor_id = "sensor.test_power"
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: light_entity_id,
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_dimmer_power_curve"),
+            CONF_LINEAR: {
+                CONF_MIN_POWER: 2,
+                CONF_MAX_POWER: 12,
+                CONF_GAMMA_CURVE: 1,
+            },
+        },
+    )
+
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 128})])
+    assert_entity_state(hass, power_sensor_id, "7.52")
+
+
+async def test_smart_dimmer_user_calibration_ignores_profile_power_curve(
+    hass: HomeAssistant,
+) -> None:
+    """Test user calibration is not modified by a profile power curve."""
+    light_entity_id = "light.test"
+    power_sensor_id = "sensor.test_power"
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: light_entity_id,
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_dimmer_power_curve"),
+            CONF_LINEAR: {CONF_CALIBRATE: ["0 -> 2", "255 -> 12"]},
+        },
+    )
+
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 128})])
+    assert_entity_state(hass, power_sensor_id, "7.52")
+
+
+async def test_smart_dimmer_user_power_curve_overrides_profile_gamma(
+    hass: HomeAssistant,
+) -> None:
+    """Test an explicitly supplied power curve overrides the profile gamma."""
+    light_entity_id = "light.test"
+    power_sensor_id = "sensor.test_power"
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: light_entity_id,
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_dimmer_gamma"),
+            CONF_LINEAR: {
+                CONF_MIN_POWER: 2,
+                CONF_MAX_POWER: 12,
+                CONF_POWER_CURVE: ["0 -> 0", "0.5 -> 0.2", "1 -> 1"],
+            },
+        },
+    )
+
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 128})])
+    assert_entity_state(hass, power_sensor_id, "4.53")
+
+
 async def test_smart_dimmer_power_input_gui_config_flow(
     hass: HomeAssistant,
 ) -> None:
@@ -138,3 +312,37 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     # Set the switch on again and see if it has the updated power value
     await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 255})])
     assert_entity_state(hass, power_sensor_id, "40.50")
+
+
+async def test_smart_dimmer_profile_gamma_gui_config_flow(
+    hass: HomeAssistant,
+) -> None:
+    """Test a partial profile linear config still requests the lamp power values."""
+    light_entity_id = "light.test"
+    power_sensor_id = "sensor.test_power"
+
+    mock_device_with_entities(
+        hass,
+        entity_ids=light_entity_id,
+        manufacturer="test",
+        model="smart_dimmer_gamma",
+    )
+
+    await run_powercalc_setup(hass)
+
+    flow = hass.config_entries.flow.async_progress_by_handler(DOMAIN)[0]
+    result = await confirm_auto_discovered_model(hass, flow)
+
+    assert result["step_id"] == Step.LINEAR
+    result = await hass.config_entries.flow.async_configure(
+        flow["flow_id"],
+        {CONF_MIN_POWER: 1.5, CONF_MAX_POWER: 50},
+    )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_LINEAR] == {CONF_MIN_POWER: 1.5, CONF_MAX_POWER: 50}
+
+    await async_setup_entry(hass, result["result"])
+    await hass.async_block_till_done()
+
+    await set_states(hass, [(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 128})])
+    assert_entity_state(hass, power_sensor_id, "14.22")

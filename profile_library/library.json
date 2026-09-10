@@ -19079,6 +19079,66 @@
             "brightness": 98.1
           },
           "hash": "e05380ac873a9324a16b932a56ad6c75"
+        },
+        {
+          "authors": [
+            {
+              "github": "rugk",
+              "name": "rugk"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-04T15:59:35Z",
+          "mains_voltage": 230,
+          "device_specs": {
+            "socket": "GU10",
+            "form_factor": "spot",
+            "lumens": 345,
+            "rated_power": 4.7,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "ean": [
+            "6974246476735"
+          ],
+          "product_url": "https://moeshouse.com/products/zigbee-smart-bulb-zb-td5-rcw-gu10-ms",
+          "device_type": "light",
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Shelly Plug M Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "NUM_LIGHTS": 3,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.6.0:app"
+          },
+          "name": "Zigbee RGB+CCT LED Bulb (GU10, 5W)",
+          "standby_power": 0.4,
+          "voltage_range": {
+            "max": 236.8,
+            "min": 232.1
+          },
+          "id": "ZB-TD5-RCW-GU10",
+          "manufacturer": "moes",
+          "updated_at": "2026-09-05T10:53:39",
+          "max_power": 4.93,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-04T17:56:37",
+          "power_range": {
+            "min": 0.47,
+            "max": 4.93
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "74d5619cf59f14631ffc7513625522b3"
         }
       ],
       "device_types": [
@@ -21731,7 +21791,7 @@
           ],
           "calculation_strategy": "fixed",
           "compatible_integrations": [
-            "androidtv"
+            "androidtv_remote"
           ],
           "created_at": "2026-08-31T14:18:12Z",
           "device_type": "set_top_box",
@@ -21756,7 +21816,7 @@
           ],
           "id": "DIW7022",
           "manufacturer": "sagemcom",
-          "updated_at": "2026-09-02T16:12:58",
+          "updated_at": "2026-09-04T07:49:37",
           "max_power": 3.22,
           "sub_profile_count": 2,
           "power_range": {
@@ -21764,7 +21824,7 @@
             "max": 3.22
           },
           "standby_power": 2.45,
-          "hash": "792b5ac29f9e03bc9a89a89269d278da"
+          "hash": "5fe6efb1cdd965ca26696fb7d6c32bb5"
         }
       ],
       "device_types": [
@@ -32818,7 +32878,7 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.12.1:docker"
           },
-          "name": "Hue White Ambiance A19 E26 (75W)",
+          "name": "Hue White Ambiance A19 E26",
           "standby_power": 0.35,
           "authors": [
             {
@@ -32828,7 +32888,7 @@
           ],
           "id": "LTW015",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-04T17:22:49",
           "max_power": 7.86,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-29T13:02:50",
@@ -32843,7 +32903,7 @@
             "score": 97.8,
             "color_temp": 97.8
           },
-          "hash": "e1659745eae45c441d465b7bb5689acb"
+          "hash": "bc202e059346d6370acce642c0e8ce99"
         },
         {
           "aliases": [
@@ -35407,6 +35467,9 @@
           "hash": "2f8136e877446469f87a0c6e7fd75f60"
         },
         {
+          "aliases": [
+            "S31"
+          ],
           "calculation_strategy": "linear",
           "created_at": "2024-06-07T12:11:13Z",
           "device_type": "smart_speaker",
@@ -35437,14 +35500,14 @@
           ],
           "id": "beam",
           "manufacturer": "sonos",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-04T05:01:01",
           "max_power": 23.6,
           "sub_profile_count": 0,
           "power_range": {
             "min": 7.3,
             "max": 23.6
           },
-          "hash": "58d41f126bdf5056c45df36edbaec54f"
+          "hash": "541c4c26e69746e08eec73b3cd678ac4"
         },
         {
           "calculation_strategy": "fixed",
@@ -38430,7 +38493,7 @@
           ],
           "id": "Core200S",
           "manufacturer": "vesync",
-          "updated_at": "2026-09-03T16:14:47",
+          "updated_at": "2026-09-04T14:45:50",
           "max_power": 39.0,
           "sub_profile_count": 2,
           "power_range": {
@@ -38438,7 +38501,7 @@
             "max": 39.0
           },
           "standby_power": 0.6,
-          "hash": "c48a72b50c7bb6ccc8fb2fe9e0f2a718"
+          "hash": "ca483a7e67fbd20085af56e4621cc09c"
         },
         {
           "calculation_strategy": "fixed",
@@ -38514,10 +38577,55 @@
             "max": 37.0
           },
           "hash": "11ba9bbb98a847e0638505fb4673d253"
+        },
+        {
+          "calculation_strategy": "fixed",
+          "created_at": "2026-09-03T00:00:00Z",
+          "device_type": "air_purifier",
+          "min_version": "v1.25.3",
+          "device_specs": {
+            "form_factor": "air_purifier",
+            "rated_power": 51,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "measure_device": "Sonoff S31",
+          "measure_method": "manual",
+          "measure_description": "Vital 200S-P, US 120 V, measured at the wall with a Tasmota Sonoff S31; three minute averages per state. Display draws 0.6 W and is subtracted when display_status is off. Manual speeds and sleep are measured directly. Auto maps the air_quality sensor state (excellent/good/moderate/poor, the manual's Very Good/Good/Moderate/Bad) to sleep/low/medium/high speed per the manual; only excellent was measured (PM2.5 1). Pet alternates 15 min high and 60 min medium per the manual (cycle not measured); value is the cycle average. Both presets assume light detection is off or the room is lit. With light detection on, the unit caps them at medium (50 %) in the dark, a state HA cannot see. Standby is below the S31's floor and comes from corrected Shelly Plug history.",
+          "mains_voltage": 120,
+          "name": "Smart Air Purifier",
+          "aliases": [
+            "LAP-V201S-WUS",
+            "LAP-V201S-WEU",
+            "LAP-V201S-WJP",
+            "LAP-V201S-AASR",
+            "LAP-V201S-AUSR",
+            "LAP-V201S-AEUR"
+          ],
+          "product_url": "https://levoit.com/products/vital-200s-p-smart-air-purifier",
+          "standby_power": 0.25,
+          "authors": [
+            {
+              "name": "Ryan Ronnander",
+              "github": "ryan-ronnander"
+            }
+          ],
+          "id": "Vital 200S",
+          "manufacturer": "vesync",
+          "updated_at": "2026-09-04T14:45:41",
+          "max_power": 2.91,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.25,
+            "max": 2.91
+          },
+          "hash": "c17f47eef6d1aac1cce578739b37a5be"
         }
       ],
       "device_types": [
-        "fan"
+        "fan",
+        "air_purifier"
       ]
     },
     {

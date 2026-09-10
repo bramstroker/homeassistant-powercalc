@@ -26,10 +26,11 @@ If any representative point repeatedly reads `0` W, use one of the approaches be
 Measuring several identical devices in parallel raises the aggregate load above the meter's measurement floor. For
 example, four bulbs that each use approximately 0.2 W in standby produce a combined load of approximately 0.8 W.
 
-In the Home Assistant app, enable **Measure multiple lights** and select the individual light entities. For larger
-sets, prefer a native Zigbee or Hue group because it sends one lighting-network command. A Home Assistant light group
-also works but may send a separate command to each member. Enter the total number of physical lights in **Number of
-lights**; Powercalc divides the aggregate reading by that number.
+In the Home Assistant app, enable **Measure multiple lights** and select up to three individual light entities. For
+larger sets, prefer a native Zigbee or Hue group because it sends one lighting-network command. A
+[Home Assistant light group](https://www.home-assistant.io/integrations/group/) also works but may send a separate
+command to each member. Enter the total number of physical lights in **Number of lights**; Powercalc divides the
+aggregate reading by that number.
 
 Only combine devices when all of them:
 

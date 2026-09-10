@@ -7,7 +7,14 @@
     <meta name="color-scheme" content="dark light" />
     <base href="./" />
     <title>Powercalc Measure</title>
-    <style>html, body { margin: 0; min-height: 100%; background: #101418; }</style>
+    <style>
+      :root { color-scheme: dark; background: #0d1119; }
+      :root[data-theme="light"] { color-scheme: light; background: #f4f7fb; }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme="dark"]) { color-scheme: light; background: #f4f7fb; }
+      }
+      html, body { margin: 0; min-height: 100%; background: inherit; }
+    </style>
   </head>
   <body>
     <powercalc-measure-app></powercalc-measure-app>

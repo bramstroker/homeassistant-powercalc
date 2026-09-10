@@ -28,6 +28,16 @@ def light_request(*modes: str) -> MeasurementRequest:
     )
 
 
+def test_plots_work_before_model_id_is_known(tmp_path: Path) -> None:
+    source = tmp_path / "brightness.csv"
+    source.write_text("bri,watt\n1,0.5\n255,8.2\n", encoding="utf-8")
+    result = build_session_plots(
+        request=light_request("brightness").model_copy(update={"model_id": ""}),
+        files={"measurement/brightness.csv": source},
+    )
+    assert result.plots[0].source == "measurement/brightness.csv"
+
+
 def test_builds_all_light_plot_modes_from_plain_and_gzip_csv(tmp_path: Path) -> None:
     files = {
         "LCT010/brightness.csv": tmp_path / "brightness.csv",
@@ -299,7 +309,8 @@ def test_builds_recorder_time_series_and_ignores_invalid_rows(tmp_path: Path) ->
 def test_builds_complex_recorder_time_series_from_json_lines(tmp_path: Path) -> None:
     recording = tmp_path / "record.jsonl"
     recording.write_text(
-        """{"elapsed_seconds":0.0,"power":1.2,"entities":{"switch.plug":{"state":"on","attributes":{}}}}
+        """{"record_type":"metadata","format_version":1,"primary_entity_id":"switch.plug","entities":[]}
+{"record_type":"sample","elapsed_seconds":0.0,"power":1.2,"entities":{"switch.plug":{"state":"on","attributes":{}}}}
 incomplete
 {"elapsed_seconds":2.0,"power":3.4,"entities":{}}
 {"elapsed_seconds":3.0,"power":"nan","entities":{}}

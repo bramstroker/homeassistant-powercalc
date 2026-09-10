@@ -41,13 +41,11 @@ from measure.request import (
     RecorderMeasurementRequest,
     ResumePolicy,
     SpeakerMeasurementRequest,
-    validate_export_filename,
 )
 from measure.runner.const import (
     QUESTION_CHARGING_DEVICE_TYPE,
     QUESTION_DISABLE_STREAMING,
     QUESTION_DURATION,
-    QUESTION_EXPORT_FILENAME,
     QUESTION_GZIP,
     QUESTION_MODE,
     QUESTION_NUM_LIGHTS,
@@ -62,13 +60,15 @@ def request_from_answers(
 ) -> MeasurementRequest:
     """Adapt CLI/Inquirer answers once at the transport boundary."""
     common: dict[str, Any] = {
-        "model_id": str(answers.get(QUESTION_MODEL_ID, "measurement")),
-        "product_name": str(answers.get(QUESTION_MODEL_NAME, "Measurement")),
+        "model_id": str(answers.get(QUESTION_MODEL_ID) or ""),
+        "product_name": str(answers.get(QUESTION_MODEL_NAME) or ""),
         "measure_device": str(answers.get(QUESTION_MEASURE_DEVICE, "")),
         "generate_model": bool(answers.get(QUESTION_GENERATE_MODEL_JSON, False)),
         "power_meter": _power_meter_spec(environment, answers),
         "parameters": _parameters_from_environment(environment),
-        "resume_policy": ResumePolicy.RESUME if environment.resume else ResumePolicy.NEW,
+        "resume_policy": (
+            ResumePolicy.RESUME if environment.resume and answers.get(QUESTION_MODEL_ID) else ResumePolicy.NEW
+        ),
     }
     if measure_type == MeasureType.LIGHT:
         return LightMeasurementRequest(
@@ -84,10 +84,7 @@ def request_from_answers(
             duration=int(answers[QUESTION_DURATION]),
         )
     if measure_type == MeasureType.RECORDER:
-        return RecorderMeasurementRequest(
-            **common,
-            export_filename=validate_export_filename(str(answers[QUESTION_EXPORT_FILENAME])),
-        )
+        return RecorderMeasurementRequest(**common)
     if measure_type == MeasureType.SPEAKER:
         return SpeakerMeasurementRequest(
             **common,

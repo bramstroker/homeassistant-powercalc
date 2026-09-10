@@ -13,6 +13,7 @@ from measure.home_assistant import HomeAssistantManager
 from measure.powermeter.errors import ZeroReadingError
 from measure.request import LightMeasurementRequest
 from measure.runner.light_plan import Variation, build_light_plan, low_load_probe_variations
+from measure.runner.light_setup import set_light_to_maximum_brightness
 from measure.util.measure_util import MeasureUtil
 
 LIGHT_LOAD_PROBE_CACHE_SECONDS = 600
@@ -93,13 +94,29 @@ class LightLoadProbe:
             meter = assembler.build_power_meter(request.power_meter)
             measure_util = MeasureUtil(meter, request.parameters, wait=self._wait)
             light_driven = True
+            set_light_to_maximum_brightness(
+                controller,
+                light_info,
+                variations[0].mode,
+                sleep_time=request.parameters.sleep_time,
+                wait=self._wait,
+            )
             points = [
                 LightLoadProbePoint(
                     label=light_load_probe_label(variation),
                     mode=variation.mode,
-                    power_w=round(self._measure_variation(controller, measure_util, request, variation), 3),
+                    power_w=round(
+                        self._measure_variation(
+                            controller,
+                            measure_util,
+                            request,
+                            variation,
+                            initial=index == 0,
+                        ),
+                        3,
+                    ),
                 )
-                for variation in variations
+                for index, variation in enumerate(variations)
             ]
             return LightLoadProbeResult(
                 checked_variations=len(points),
@@ -135,10 +152,14 @@ class LightLoadProbe:
         measure_util: MeasureUtil,
         request: LightMeasurementRequest,
         variation: Variation,
+        *,
+        initial: bool,
     ) -> float:
         start_timestamp = self._now()
         controller.change_light_state(variation.mode, on=True, **asdict(variation))
         self._wait(request.parameters.sleep_time)
+        if initial:
+            self._wait(request.parameters.sleep_initial)
         return measure_util.take_measurement(start_timestamp=start_timestamp).power
 
     @staticmethod
