@@ -1,0 +1,26 @@
+{
+  "aliases": [
+    "E27 smart filament LED light bulb (RF 262)"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-09T11:12:37Z",
+  "device_type": "light",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Sonoff S60",
+  "measure_method": "script",
+  "ean": [
+      "8718781555580",
+      "8718781556303"
+  ],
+  "measure_settings": {
+    "SAMPLE_COUNT": 3,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.6.0:app"
+  },
+  "name": "Smart Filament Bulb Warm-White E27",
+  "standby_power": 0.58,
+  "voltage_range": {
+    "max": 230.85,
+    "min": 229.96
+  }
+}
