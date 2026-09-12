@@ -1,0 +1,38 @@
+{
+  "calculation_strategy": "linear",
+  "created_at": "2026-09-12T00:00:00Z",
+  "device_type": "fan",
+  "device_specs": {
+    "form_factor": "pedestal",
+    "connectivity": [
+      "wifi"
+    ],
+    "rated_power": 36
+  },
+  "linear_config": {
+    "attribute": "percentage",
+    "calibrate": [
+      "8 -> 3.2",
+      "25 -> 6.7",
+      "33 -> 8.05",
+      "50 -> 11.6",
+      "58 -> 13.7",
+      "75 -> 18.3",
+      "83 -> 21.6",
+      "100 -> 31.0"
+    ]
+  },
+  "measure_description": "Measured with a Shelly Plug S Gen3 at 2-second sampling, holding each fan-speed step for 25 seconds and discarding the initial transient before recording. Standby (fan off, 45 s hold) read a constant 0.0 W / 0.000 A, which is below the Shelly's measurement resolution rather than a true zero. standby_power below is a fallback estimate (not a direct measurement), based on the 0.87-1.57 W standby range measured across other Dreo fan/purifier profiles in this library.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "manual",
+  "mains_voltage": 230,
+  "name": "Smart TurboPoly Fan 517S",
+  "product_url": "https://www.dreo.com/products/turbopoly%E2%84%A2-fan-517s",
+  "standby_power": 0.9,
+  "authors": [
+    {
+      "name": "zuranihenry",
+      "github": "zuranihenry"
+    }
+  ]
+}
