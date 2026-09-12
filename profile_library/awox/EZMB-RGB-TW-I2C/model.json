@@ -1,0 +1,18 @@
+{
+    "name": "AwoX EZMB-RGB-TW-I2C Extended Color Light",
+    "device_type": "light",
+    "calculation_strategy": "lut",
+    "linked_profile": "signify/LCT015",
+    "created_at": "2026-09-12T00:00:00Z",
+    "measure_method": "script",
+    "measure_device": "AVM Fritz!DECT 200",
+    "measure_description": "No measurements available for this device. Power usage is linked to the measurements of the Signify LCT015 (Hue White and Color Ambiance A19), the closest measured equivalent for this RGB + tunable white bulb.",
+    "mains_voltage": 230,
+    "standby_power": 0.47,
+    "authors": [
+        {
+            "name": "Locodice67",
+            "github": "Locodice67"
+        }
+    ]
+}

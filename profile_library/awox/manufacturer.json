@@ -1,0 +1,5 @@
+{
+    "name": "AwoX",
+    "country": "FR",
+    "description": "French smart home manufacturer. Its Zigbee bulbs can be paired to a Philips Hue bridge and are reported by Home Assistant with the AwoX manufacturer name."
+}
