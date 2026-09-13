@@ -43,18 +43,15 @@
         }
       },
       {
+        "entity_id": "[[entity_by_translation_key:rgb_light]]",
         "condition": {
           "condition": "state",
-          "entity_id": "[[entity_by_translation_key:rgb_light]]",
           "state": "on"
         },
-        "fixed": {
-          "power": 3.0
-        }
+        "lut": {}
       }
     ]
   },
-  "config_flow_discovery_remarks": "The RGB light is counted as a fixed 3.0 W while it is on. Depending on colour and brightness it actually uses between 0.6 and 5.9 W.",
   "created_at": "2026-09-12T00:00:00Z",
   "device_type": "fan",
   "device_specs": {
@@ -64,10 +61,11 @@
     ],
     "rated_power": 36
   },
-  "measure_description": "Fan: Shelly Plug S Gen3 polled every 2 s while a Home Assistant automation stepped through all 12 speeds. Oscillation: on/off delta at the same speed. RGB light (hs.csv.gz): fan at lowest speed, one light command per step, each verified in HA before reading, fan-only baseline re-measured before every saturation row and subtracted. The light only has 3 brightness levels (51/102/153). The composite uses a fixed 3.0 W for the light, its measured range is 0.55-5.88 W. Standy power is an estimate.",
+  "measure_description": "Fan: Shelly Plug S Gen3 polled every 2 s while a Home Assistant automation stepped through all 12 speeds. Oscillation: on/off delta at the same speed. RGB light (hs.csv.gz): fan at lowest speed, one light command per step, each verified in HA before reading, fan-only baseline re-measured before every saturation row and subtracted. The light only has 3 brightness levels (51/102/153). Its measured range is 0.55-5.88 W. Standby power is an estimate.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "mains_voltage": 230,
+  "min_version": "1.25.5",
   "name": "Smart TurboPoly Fan 517S",
   "product_url": "https://www.dreo.com/products/turbopoly%E2%84%A2-fan-517s",
   "standby_power": 0.9,
