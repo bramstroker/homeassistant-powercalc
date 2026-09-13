@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+## 0.7.0 - 2026-09-13
+
+- #4724 Clean up measure frontend components @bramstroker
+- #4725 Rename Use profile step to Submit profile @bramstroker
+- #4726 Use repeatable inputs for profile aliases and barcodes @bramstroker
+- #4729 Improve measurement setup, recovery, and profile preparation @bramstroker
+- #4736 Restrict standalone measurement API access @bramstroker
+- #4741 Retry the initial turn-on in set_light_to_maximum_brightness @philscottydev
+
+### 🚀 Features
+
+- #4668 Add recorder profile analyser @bramstroker
+- #4711 Explain grouping for larger light measurements @bramstroker
+- #4721 Improve measurement setup and profile preparation @bramstroker
+- #4727 Add light mode and refine measurement session cards @bramstroker
+- #4730 Add controlled entity to the Measure session status sensor @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4702 Clarify repeat measurement action @bramstroker
+- #4710 Improve light discovery guidance and preflight stabilization @bramstroker
+- #4728 Preserve progress across resumed measurements @bramstroker
+
 ## 0.6.0 - 2026-09-02
 
 ### 🚀 Features
