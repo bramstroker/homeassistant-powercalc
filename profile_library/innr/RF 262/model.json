@@ -9,8 +9,8 @@
   "measure_device": "Sonoff S60",
   "measure_method": "script",
   "ean": [
-      "8718781555580",
-      "8718781556303"
+    "8718781555580",
+    "8718781556303"
   ],
   "measure_settings": {
     "SAMPLE_COUNT": 3,
