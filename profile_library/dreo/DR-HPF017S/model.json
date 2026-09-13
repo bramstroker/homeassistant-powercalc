@@ -1,5 +1,59 @@
 {
-  "calculation_strategy": "linear",
+  "calculation_strategy": "composite",
+  "composite_config": {
+    "mode": "sum_all",
+    "strategies": [
+      {
+        "linear": {
+          "attribute": "percentage",
+          "calibrate": [
+            "8 -> 3.3",
+            "16 -> 5.8",
+            "25 -> 6.8",
+            "33 -> 8.2",
+            "41 -> 10.0",
+            "50 -> 11.7",
+            "58 -> 13.8",
+            "66 -> 15.9",
+            "75 -> 18.4",
+            "83 -> 21.7",
+            "91 -> 25.8",
+            "100 -> 31.0"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:horizontally_oscillating]]",
+          "state": "on"
+        },
+        "fixed": {
+          "power": 2.2
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:vertically_oscillating]]",
+          "state": "on"
+        },
+        "fixed": {
+          "power": 2.2
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:rgb_light]]",
+          "state": "on"
+        },
+        "fixed": {
+          "power": 3.0
+        }
+      }
+    ]
+  },
   "created_at": "2026-09-12T00:00:00Z",
   "device_type": "fan",
   "device_specs": {
@@ -9,20 +63,7 @@
     ],
     "rated_power": 36
   },
-  "linear_config": {
-    "attribute": "percentage",
-    "calibrate": [
-      "8 -> 3.2",
-      "25 -> 6.7",
-      "33 -> 8.05",
-      "50 -> 11.6",
-      "58 -> 13.7",
-      "75 -> 18.3",
-      "83 -> 21.6",
-      "100 -> 31.0"
-    ]
-  },
-  "measure_description": "Measured with a Shelly Plug S Gen3 at 2-second sampling, holding each fan-speed step for 25 seconds and discarding the initial transient before recording. Standby (fan off, 45 s hold) read a constant 0.0 W / 0.000 A, which is below the Shelly's measurement resolution rather than a true zero. standby_power below is a fallback estimate (not a direct measurement), based on the 0.87-1.57 W standby range measured across other Dreo fan/purifier profiles in this library.",
+  "measure_description": "Measured with a Shelly Plug S Gen3 polled every 2 s while a Home Assistant automation stepped through all 12 fan speeds (30 s hold per step, transition samples discarded, median per step). Oscillation and RGB light measured as on/off deltas against a baseline at the same fan speed. The RGB light draws +1.0 to +5.6 W depending on brightness and colour, so a representative fixed value is used. Standby_power is an estimate.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "mains_voltage": 230,
