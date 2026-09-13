@@ -14,7 +14,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "8718291480310"
   ],
   "measure_description": "Measured with script made by smonesi (steps: bri 50/sat 60/hue 2000) and linearly interpolated to provide more data",

@@ -13,7 +13,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "4052899290877"
   ],
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",

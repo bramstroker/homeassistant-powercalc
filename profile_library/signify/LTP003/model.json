@@ -14,7 +14,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "8718696159156"
   ],
   "measure_description": "Measure Script for Tasmota",

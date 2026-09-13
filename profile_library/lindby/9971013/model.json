@@ -11,7 +11,7 @@
     "lumens": 1050,
     "rated_power": 10.0
   },
-  "ean": [
+  "gtin": [
     "4251096538380"
   ],
   "measure_description": "Measured with utils/measure script",

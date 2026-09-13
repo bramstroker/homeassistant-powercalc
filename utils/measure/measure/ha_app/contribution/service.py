@@ -522,7 +522,7 @@ def draft_from_request(
         contributor_github=str(author.get("github") or default_contributor_github or auth.username or ""),
         contributor_email=str(author.get("email") or default_contributor_email or ""),
         aliases=_string_list(artifact_model.get("aliases")),
-        gtins=_string_list(artifact_model.get("ean")),
+        gtins=_string_list(artifact_model.get("gtin")),
         product_url=str(artifact_model.get("product_url") or ""),
         mains_voltage=_model_mains_voltage(artifact_model),
         voltage_range=voltage_range,

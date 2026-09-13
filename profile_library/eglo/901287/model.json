@@ -21,7 +21,7 @@
     ]
   },
   "device_type": "light",
-  "ean": [
+  "gtin": [
     "9008606312887"
   ],
   "mains_voltage": 230,

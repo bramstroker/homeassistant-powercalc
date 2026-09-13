@@ -17,7 +17,7 @@
       "thread"
     ]
   },
-  "ean": [
+  "gtin": [
     "6975833357109"
   ],
   "measure_description": "Measured with utils/measure script",

@@ -14,7 +14,7 @@
     ]
   },
   "discovery_by": "entity",
-  "ean": [
+  "gtin": [
     "810667025366"
   ],
   "measure_description": "Measured standby power with LED off using a Shelly Plus Plug.",

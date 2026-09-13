@@ -15,7 +15,7 @@
       "zwave"
     ]
   },
-  "ean": [
+  "gtin": [
     "3858890733464"
   ],
   "measure_description": "Measured with utils/measure script",

@@ -1,5 +1,5 @@
 {
-  "ean": [
+  "gtin": [
     "4000870798089"
   ],
   "calculation_strategy": "lut",

@@ -14,7 +14,7 @@
       "wifi"
     ]
   },
-  "ean": [
+  "gtin": [
     "6920075776171"
   ],
   "measure_description": "Took several readings on every 10% of the lamp and did a linear regression to estimate the correct consumptions. Standby power is assumed",

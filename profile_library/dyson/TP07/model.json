@@ -200,7 +200,7 @@
       "bluetooth"
     ]
   },
-  "ean": [
+  "gtin": [
     "885609021744"
   ],
   "measure_description": "Four calibration curves measured with utils/measure script: forward and reverse direction, each with oscillation on and off",

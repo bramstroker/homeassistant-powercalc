@@ -5,7 +5,7 @@
   "legacy_ids": [
     "IAN-365267_2101"
   ],
-  "ean": [
+  "gtin": [
     "4055334301848"
   ],
   "calculation_strategy": "lut",

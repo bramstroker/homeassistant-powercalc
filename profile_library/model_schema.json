@@ -194,7 +194,7 @@
       },
       "description": "List of compatible integrations for this model"
     },
-    "ean": {
+    "gtin": {
       "type": "array",
       "uniqueItems": true,
       "items": {

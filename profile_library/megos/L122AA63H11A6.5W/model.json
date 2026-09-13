@@ -11,7 +11,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "4280012239193"
   ],
   "measure_description": "Measured with utils/measure script",

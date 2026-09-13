@@ -14,7 +14,7 @@
       "wifi"
     ]
   },
-  "ean": [
+  "gtin": [
     "046677556136"
   ],
   "measure_description": "Measured 5 bulbs with utils/measure script with no dummy load",

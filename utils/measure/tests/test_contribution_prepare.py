@@ -154,7 +154,7 @@ def test_preparer_applies_delivery_independent_profile_metadata(tmp_path: Path) 
     model = json.loads(dict(preparer.render_contents(artifacts, contribution_metadata, preview))[preview.files[0].path])
 
     assert model["aliases"] == ["Hue test"]
-    assert model["ean"] == ["12345678", "1234567890123"]
+    assert model["gtin"] == ["12345678", "1234567890123"]
     assert model["product_url"] == "https://example.com/hue-test"
     assert model["device_specs"] == {"rated_power": 9.5}
     assert model["measure_device"] == "Shelly PM Mini Gen3"
@@ -197,7 +197,7 @@ def test_preparer_omits_empty_optional_profile_metadata(tmp_path: Path) -> None:
     artifact_model.update(
         {
             "aliases": [],
-            "ean": [],
+            "gtin": [],
             "product_url": "",
             "device_specs": {},
             "measure_device_firmware": " ",
@@ -215,7 +215,7 @@ def test_preparer_omits_empty_optional_profile_metadata(tmp_path: Path) -> None:
 
     assert not {
         "aliases",
-        "ean",
+        "gtin",
         "product_url",
         "device_specs",
         "measure_device_firmware",
@@ -262,7 +262,7 @@ def test_preparer_clears_explicitly_blank_optional_text_but_preserves_omitted_fi
     "instance,schema,field",
     [
         ({"name": 123}, {"properties": {"name": {"type": "string"}}}, "product_name"),
-        ({"ean": [123]}, {"properties": {"ean": {"items": {"type": "string"}}}}, "gtins"),
+        ({"gtin": [123]}, {"properties": {"gtin": {"items": {"type": "string"}}}}, "gtins"),
         (
             {"device_specs": {"rated_power": -1}},
             {"properties": {"device_specs": {"properties": {"rated_power": {"minimum": 0}}}}},

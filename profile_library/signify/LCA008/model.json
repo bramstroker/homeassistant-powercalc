@@ -15,7 +15,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "8719514288157"
   ],
   "measure_description": "Measured 1 bulb with utils/measure script using an additional dummy load (IKEA LED1457C3 E14 bulb measured at 2.61 W)",

@@ -18,7 +18,7 @@
       "bluetooth"
     ]
   },
-  "ean": [
+  "gtin": [
     "046677548728"
   ],
   "measure_description": "LUT measured with utils/measure script using a resistive dummy load under former profile 548727. Standby power measured separately for LCB001 using a TP-Link Kasa KP115.",

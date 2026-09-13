@@ -14,7 +14,7 @@
       "wifi"
     ]
   },
-  "ean": [
+  "gtin": [
     "046677555474"
   ],
   "measure_description": "Measured with utils/measure script. Controller: hass, Bulbs: 1, Dummy Load: None",

@@ -11,7 +11,7 @@
     ]
   },
   "discovery_by": "device",
-  "ean": [
+  "gtin": [
     "4023125031359"
   ],
   "fixed_config": {

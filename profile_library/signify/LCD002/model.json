@@ -15,7 +15,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "046677802929"
   ],
   "measure_description": "Measured with utils/measure script. Controller: hue, Bulbs: 2, Dummy Load: None",
