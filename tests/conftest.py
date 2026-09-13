@@ -139,9 +139,7 @@ def mock_remote_loader(request: SubRequest) -> Generator:
 
     def side_effect(manufacturer: str, model: str, storage_path: str, _: str) -> None:
         source_dir = get_library_path(f"{manufacturer}/{model}")
-        if os.path.exists(storage_path):
-            return
-        shutil.copytree(source_dir, storage_path)
+        shutil.copytree(source_dir, storage_path, dirs_exist_ok=True)
 
     remote_loader_class = "custom_components.powercalc.power_profile.loader.remote.RemoteLoader"
     with (
