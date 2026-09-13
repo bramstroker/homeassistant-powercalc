@@ -3912,14 +3912,14 @@
           ],
           "id": "DR-HPF017S",
           "manufacturer": "dreo",
-          "updated_at": "2026-09-13T19:12:50",
+          "updated_at": "2026-09-13T19:18:44",
           "max_power": null,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-13T17:44:37",
           "color_modes": [
             "hs"
           ],
-          "hash": "c77dd96345c159a9523bd4b4ddadd642"
+          "hash": "9ff0c3437ba02db06fc605fc3bd8b653"
         },
         {
           "calculation_strategy": "linear",
