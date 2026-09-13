@@ -36671,7 +36671,7 @@
           "gtin": [
             "046135758072"
           ],
-          "measure_description": "Measured with utils/measure script",
+          "measure_description": "Originally measured with utils/measure script on 2024-01-28, with a Shelly Plug US from a bad batch that inflates power readings by a constant factor of 1.22x. Corrected on 2026-09-10 by dividing every LUT value and the standby power by 1.22. The correction factor was determined on 2026-09-06 on the sister profile sylvania/A19CCECWF, by remeasuring on a Sonoff S31 and cross-checking the bad Shelly Plug US against a Kill-A-Watt (1.22x at 1 W, 1.22x at 100 W, 1.20x at 950 W); this model was not remeasured. The corrected 8.05 W -> 6.60 W peak now sits underneath the lamp's 7 W rating.",
           "measure_device": "Shelly Plug US",
           "measure_method": "script",
           "mains_voltage": 120,
@@ -36681,7 +36681,7 @@
             "VERSION": "v1.10.0:docker"
           },
           "name": "SMART+ Wi-Fi Full Color Clear Filament A19 LED Bulb (7W)",
-          "standby_power": 0.5,
+          "standby_power": 0.41,
           "authors": [
             {
               "name": "Ryan Ronnander",
@@ -36691,13 +36691,13 @@
           ],
           "id": "40A19FILCCLWIFI",
           "manufacturer": "sylvania",
-          "updated_at": "2026-09-13T09:41:49",
-          "max_power": 8.05,
+          "updated_at": "2026-09-13T14:56:57",
+          "max_power": 6.6,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
+          "measurement_updated_at": "2026-09-13T14:46:55",
           "power_range": {
-            "min": 0.7,
-            "max": 8.05
+            "min": 0.57,
+            "max": 6.6
           },
           "color_modes": [
             "color_temp",
@@ -36707,7 +36707,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "19bb2286a220561ad2cfa00436ddce6f"
+          "hash": "c364554fc255eb8dbec73c08109cd83d"
         },
         {
           "aliases": [
@@ -36719,7 +36719,7 @@
           "device_specs": {
             "socket": "E26",
             "form_factor": "bulb",
-            "rated_power": 8.5,
+            "rated_power": 9,
             "lumens": 800,
             "connectivity": [
               "wifi"
@@ -36729,7 +36729,7 @@
             "046135756634",
             "046135756740"
           ],
-          "measure_description": "Measured with utils/measure script",
+          "measure_description": "Originally measured with utils/measure script on 2024-01-27, with a Shelly Plug US from a bad batch that inflates power readings by a constant factor of 1.22x. Corrected on 2026-09-10 by dividing every LUT value and the standby power by 1.22. The correction factor was determined on 2026-09-06 by remeasuring three bulbs on a Sonoff S31 and cross-checking the bad Shelly Plug US against a Kill-A-Watt (1.22x at 1 W, 1.22x at 100 W, 1.20x at 950 W). The corrected 11.43 W -> 9.37 W peak now sits just above the lamp's 9 W rating.",
           "measure_device": "Shelly Plug US",
           "measure_method": "script",
           "mains_voltage": 120,
@@ -36738,8 +36738,8 @@
             "SLEEP_TIME": 3,
             "VERSION": "v1.10.0:docker"
           },
-          "name": "SMART+ Wi-Fi Full Color A19 LED Bulb (8.5W, 2700\u20136500K)",
-          "standby_power": 0.52,
+          "name": "SMART+ Wi-Fi Full Color A19 LED Bulb (9W, 2700\u20136500K)",
+          "standby_power": 0.43,
           "authors": [
             {
               "name": "Ryan Ronnander",
@@ -36749,13 +36749,13 @@
           ],
           "id": "A19CCECWF",
           "manufacturer": "sylvania",
-          "updated_at": "2026-09-13T09:41:49",
-          "max_power": 11.43,
+          "updated_at": "2026-09-13T14:56:57",
+          "max_power": 9.37,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2024-05-03T07:11:32",
+          "measurement_updated_at": "2026-09-13T14:46:55",
           "power_range": {
-            "min": 0.55,
-            "max": 11.43
+            "min": 0.45,
+            "max": 9.37
           },
           "color_modes": [
             "color_temp",
@@ -36765,7 +36765,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "30043d084d122e6a9e367924352c8832"
+          "hash": "ae48d4a205cfde57898856568f5092b3"
         }
       ],
       "device_types": [
