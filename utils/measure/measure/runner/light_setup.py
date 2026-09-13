@@ -1,10 +1,15 @@
 from collections.abc import Callable
 import logging
 
+from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController, LightInfo
+from measure.runner.errors import RunnerError
 
 _LOGGER = logging.getLogger("measure")
+
+MAX_RETRIES = 5
+RETRY_DELAY = 5
 
 
 def set_light_to_maximum_brightness(
@@ -30,5 +35,26 @@ def set_light_to_maximum_brightness(
     for _ in range(2):
         if checkpoint is not None:
             checkpoint()
-        controller.change_light_state(mode, on=True, **kwargs)
+        _change_light_state_with_retry(controller, mode, wait, **kwargs)
         wait(sleep_time)
+
+
+def _change_light_state_with_retry(
+    controller: LightController,
+    mode: LutMode,
+    wait: Callable[[float], None],
+    **kwargs: int,
+) -> None:
+    """Retry the initial turn-on the same way the measurement loop retries variations.
+
+    This call runs before any variation is measured, so an unhandled ApiConnectionError
+    here aborts the whole session before a single row is written.
+    """
+    for _ in range(MAX_RETRIES):
+        try:
+            controller.change_light_state(mode, on=True, **kwargs)
+            return
+        except ApiConnectionError as error:
+            _LOGGER.warning("Failed to change light state: %s. Retrying...", error)
+            wait(RETRY_DELAY)
+    raise RunnerError(f"Failed to change light state after {MAX_RETRIES} retries")
