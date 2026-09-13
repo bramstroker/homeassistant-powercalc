@@ -78,7 +78,7 @@ class LutRegistry:
         self._hass = hass
         self._lut_entries: dict[_CacheKey, _LutEntry] = {}
         self._effect_entries: dict[_CacheKey, _EffectEntry] = {}
-        self._supported_modes: dict[tuple[str, str, str], set[LookupMode]] = {}
+        self._supported_modes: dict[tuple[str, str, str | None, str], set[LookupMode]] = {}
 
     async def get_lookup_entry(
         self,
@@ -107,7 +107,7 @@ class LutRegistry:
 
     async def get_supported_modes(self, power_profile: PowerProfile) -> set[LookupMode]:
         """Return the LUT modes supported by the profile."""
-        cache_key = (power_profile.manufacturer, power_profile.model, "supported_modes")
+        cache_key = (power_profile.manufacturer, power_profile.model, power_profile.sub_profile, "supported_modes")
         supported_modes = self._supported_modes.get(cache_key)
         if supported_modes is None:
             supported_modes = set()
