@@ -20,7 +20,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "3800238070748"
   ],
   "measure_description": "Measured with 33.7 W dummy load, averaged over 60 seconds. Multiple combinations of settings were tested. Firmware version 2.0.0.",
