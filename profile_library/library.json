@@ -35284,6 +35284,53 @@
         },
         {
           "aliases": [
+            "Zigbee smart plug (S60ZBTPF)",
+            "Zigbee smart plug (S60ZBTPG)",
+            "S60ZBTPG"
+          ],
+          "calculation_strategy": "fixed",
+          "created_at": "2026-09-06T08:26:19Z",
+          "device_type": "smart_switch",
+          "device_specs": {
+            "form_factor": "plug",
+            "max_load_watts": 4000,
+            "power_monitoring": true,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "gtin": [
+            "6920075743005",
+            "6920075740462"
+          ],
+          "measure_description": "Manually measured.",
+          "measure_device": "Trotec BX09",
+          "measure_method": "manual",
+          "mains_voltage": 231,
+          "name": "iPlug Zigbee Smart Plug S60",
+          "only_self_usage": true,
+          "standby_power": 0.3,
+          "standby_power_on": 0.8,
+          "product_url": "https://sonoff.tech/en-us/products/sonoff-iplug-zigbee-smart-plug-s60-series",
+          "authors": [
+            {
+              "name": "Nino",
+              "github": "TheLexus"
+            }
+          ],
+          "id": "S60ZBTPF",
+          "manufacturer": "sonoff",
+          "updated_at": "2026-09-13T12:57:03",
+          "max_power": 0.8,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.3,
+            "max": 0.8
+          },
+          "hash": "e45e253778d4ddc2caee53a367ec6d9c"
+        },
+        {
+          "aliases": [
             "Zigbee two way smart switch (ZBMINI)",
             "01MINIZB"
           ],
