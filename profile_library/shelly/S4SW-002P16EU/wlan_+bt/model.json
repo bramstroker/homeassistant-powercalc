@@ -1,5 +1,7 @@
 {
   "name": "WLAN + Bluetooth",
   "standby_power": 0.62,
-  "standby_power_on": 0.87
+  "multi_switch_config": {
+    "power": 0.25
+  }
 }
