@@ -257,6 +257,10 @@
           "items": {
             "type": "object",
             "properties": {
+              "entity_id": {
+                "type": "string",
+                "description": "Source entity for this strategy and conditions which omit entity_id. Defaults to the parent source entity."
+              },
               "condition": {
                 "$ref": "#/definitions/condition"
               }
@@ -279,6 +283,10 @@
               "items": {
                 "type": "object",
                 "properties": {
+                  "entity_id": {
+                    "type": "string",
+                    "description": "Source entity for this strategy and conditions which omit entity_id. Defaults to the parent source entity."
+                  },
                   "condition": {
                     "$ref": "#/definitions/condition"
                   }
