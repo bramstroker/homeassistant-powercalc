@@ -11,7 +11,7 @@
       "proprietary"
     ]
   },
-  "ean": [
+  "gtin": [
     "4023125025723"
   ],
   "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/files/11778846/measurements.xlsx",

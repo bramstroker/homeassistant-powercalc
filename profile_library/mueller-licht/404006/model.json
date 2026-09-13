@@ -6,7 +6,7 @@
     "43961",
     "ZBT-ColorTemperature"
   ],
-  "ean": [
+  "gtin": [
     "4018412343246"
   ],
   "calculation_strategy": "lut",

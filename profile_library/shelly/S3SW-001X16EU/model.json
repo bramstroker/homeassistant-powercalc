@@ -26,7 +26,7 @@
       "bluetooth"
     ]
   },
-  "ean": [
+  "gtin": [
     "3800235261767"
   ],
   "calculation_strategy": "fixed",

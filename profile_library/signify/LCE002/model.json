@@ -6,7 +6,7 @@
   "calculation_strategy": "lut",
   "created_at": "2021-08-18T20:12:14Z",
   "device_type": "light",
-  "ean": [
+  "gtin": [
     "8718699726232"
   ],
   "device_specs": {

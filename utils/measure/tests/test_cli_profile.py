@@ -105,7 +105,7 @@ def test_non_interactive_cli_prepares_enriched_package_without_changing_artifact
         "authors": [{"github": "test-user", "name": "Test User"}],
         "calculation_strategy": "linear",
         "device_specs": {"rated_power": 8.5},
-        "ean": ["12345678", "1234567890123"],
+        "gtin": ["12345678", "1234567890123"],
         "measure_description": "Measured at 230 V",
         "measure_device": "Shelly PM Mini Gen3",
         "measure_device_firmware": "1.7.0",

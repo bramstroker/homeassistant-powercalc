@@ -11,7 +11,7 @@
       "wifi"
     ]
   },
-  "ean": [
+  "gtin": [
     "728458730453"
   ],
   "measure_description": "Measured with utils/measure script",

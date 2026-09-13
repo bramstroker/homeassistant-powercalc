@@ -12,7 +12,7 @@
     ],
     "lumens": 85
   },
-  "ean": [
+  "gtin": [
     "850008271212"
   ],
   "measure_description": "Measured with utils/measure script",

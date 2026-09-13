@@ -12,7 +12,7 @@
       "ethernet"
     ]
   },
-  "ean": [
+  "gtin": [
     "4057749314475"
   ],
   "discovery_by": "device",

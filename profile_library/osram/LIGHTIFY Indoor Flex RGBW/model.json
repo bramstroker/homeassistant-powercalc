@@ -4,7 +4,7 @@
     "Flex RGBW",
     "LIGHTIFY Flex RGBW"
   ],
-  "ean": [
+  "gtin": [
     "4052899926110"
   ],
   "calculation_strategy": "lut",

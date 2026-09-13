@@ -14,7 +14,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "8720169371590"
   ],
   "description": "This device was powered with the Hue 100w outdoor PSU and not the bundled 30w PSU. All other lights were physically disconnected from the chain.",

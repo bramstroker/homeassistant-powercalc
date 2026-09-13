@@ -16,7 +16,7 @@
       "bluetooth"
     ]
   },
-  "ean": [
+  "gtin": [
     "8719514250888"
   ],
   "measure_description": "Measured with utils/measure script; 2 bulbs, no dummy load",

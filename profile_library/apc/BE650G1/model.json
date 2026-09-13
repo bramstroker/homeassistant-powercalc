@@ -11,7 +11,7 @@
       "usb"
     ]
   },
-  "ean": [
+  "gtin": [
     "731304285434"
   ],
   "calculation_strategy": "fixed",
