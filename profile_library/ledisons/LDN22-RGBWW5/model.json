@@ -11,7 +11,7 @@
       "zigbee"
     ]
   },
-	"measure_description": "Measured with utils/measure script",
+  "measure_description": "Measured with utils/measure script",
   "measure_device": "Sonoff S60",
   "measure_method": "script",
   "measure_settings": {
