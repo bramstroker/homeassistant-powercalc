@@ -1,0 +1,35 @@
+{
+  "calculation_strategy": "composite",
+  "device_type": "fan",
+  "standby_power": 0.9,
+  "composite_config": {
+    "mode": "sum_all",
+    "strategies": [
+      {
+        "linear": {
+          "calibrate": [
+            "0 -> 0",
+            "100 -> 10"
+          ]
+        }
+      },
+      {
+        "entity_id": "[[entity_by_translation_key:rgb_light]]",
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "state": "on"
+            },
+            {
+              "condition": "template",
+              "value_template": "{{ state.attributes.brightness > 0 }}"
+            }
+          ]
+        },
+        "lut": {}
+      }
+    ]
+  }
+}

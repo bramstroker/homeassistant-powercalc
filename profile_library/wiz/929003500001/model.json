@@ -5,7 +5,7 @@
   "legacy_ids": [
     "SHRGB"
   ],
-  "ean": [
+  "gtin": [
     "8719514554634"
   ],
   "calculation_strategy": "lut",

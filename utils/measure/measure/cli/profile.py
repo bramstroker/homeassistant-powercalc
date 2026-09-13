@@ -120,7 +120,7 @@ def _metadata_defaults(artifact_directory: Path, model: dict[str, Any]) -> dict[
         "measure_device_firmware": model.get("measure_device_firmware"),
         "measure_description": model.get("measure_description"),
         "aliases": model.get("aliases"),
-        "gtins": model.get("ean"),
+        "gtins": model.get("gtin"),
         "product_url": model.get("product_url"),
         "mains_voltage": mains_voltage if mains_voltage in (120, 230) else None,
         "device_specs": model.get("device_specs"),

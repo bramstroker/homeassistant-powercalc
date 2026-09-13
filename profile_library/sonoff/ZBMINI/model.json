@@ -3,7 +3,7 @@
     "Zigbee two way smart switch (ZBMINI)",
     "01MINIZB"
   ],
-  "ean": [
+  "gtin": [
     "6920075776133"
   ],
   "calculation_strategy": "fixed",

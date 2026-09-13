@@ -14,10 +14,10 @@
       "wifi"
     ]
   },
-  "ean": [
+  "gtin": [
     "046135758072"
   ],
-  "measure_description": "Measured with utils/measure script",
+  "measure_description": "Originally measured with utils/measure script on 2024-01-28, with a Shelly Plug US from a bad batch that inflates power readings by a constant factor of 1.22x. Corrected on 2026-09-10 by dividing every LUT value and the standby power by 1.22. The correction factor was determined on 2026-09-06 on the sister profile sylvania/A19CCECWF, by remeasuring on a Sonoff S31 and cross-checking the bad Shelly Plug US against a Kill-A-Watt (1.22x at 1 W, 1.22x at 100 W, 1.20x at 950 W); this model was not remeasured. The corrected 8.05 W -> 6.60 W peak now sits underneath the lamp's 7 W rating.",
   "measure_device": "Shelly Plug US",
   "measure_method": "script",
   "mains_voltage": 120,
@@ -27,7 +27,7 @@
     "VERSION": "v1.10.0:docker"
   },
   "name": "SMART+ Wi-Fi Full Color Clear Filament A19 LED Bulb (7W)",
-  "standby_power": 0.5,
+  "standby_power": 0.41,
   "authors": [
     {
       "name": "Ryan Ronnander",

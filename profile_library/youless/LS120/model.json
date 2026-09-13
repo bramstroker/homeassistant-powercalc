@@ -8,7 +8,7 @@
       "ethernet"
     ]
   },
-  "ean": [
+  "gtin": [
     "4260224172426"
   ],
   "discovery_by": "config_entry",

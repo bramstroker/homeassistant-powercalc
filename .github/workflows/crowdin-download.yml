@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
 
       - name: Download from Crowdin
-        uses: crowdin/github-action@71fdb8814261dd703be4ca7c6450d21b1868da4b # v3
+        uses: crowdin/github-action@0d5670f539973aea2f01abce61a8989934df0025 # v3
         with:
           upload_sources: false
           upload_translations: false

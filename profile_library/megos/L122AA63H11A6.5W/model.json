@@ -11,7 +11,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "4280012239193"
   ],
   "measure_description": "Measured with utils/measure script",
@@ -21,6 +21,9 @@
   "measure_settings": {
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 2.0,
+    "NUM_LIGHTS": 2,
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 45,
     "VERSION": "v0.3.0:app"
   },
   "name": "LIGHTWAY smart home LED-lamp - candle",

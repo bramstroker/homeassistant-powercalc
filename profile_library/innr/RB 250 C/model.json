@@ -11,7 +11,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "8718781552077"
   ],
   "measure_description": "Measured 3 bulbs simultaneously with utils/measure script",

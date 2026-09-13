@@ -15,7 +15,7 @@
       "matter"
     ]
   },
-  "ean": [
+  "gtin": [
     "5902135164174"
   ],
   "measure_description": "Measured with utils/measure script",

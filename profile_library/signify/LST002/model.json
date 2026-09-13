@@ -14,7 +14,7 @@
       "zigbee"
     ]
   },
-  "ean": [
+  "gtin": [
     "8718696129388"
   ],
   "measure_description": "Measured by custom script with all lightstrip extensions detached. Measured standby power with ELV Energy Master Profi 2",

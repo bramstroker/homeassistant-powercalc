@@ -10,7 +10,7 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
-from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
     CONF_CALIBRATE,
     CONF_COMPOSITE,
@@ -258,10 +258,12 @@ class PowerCalculatorStrategyFactory:
             sub_strategies = composite_config
 
         async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy:
+            entity_id = strategy_config.get(CONF_ENTITY_ID)
+            sub_source_entity = create_source_entity(entity_id, self._hass) if entity_id is not None else source_entity
             condition_instance = None
             condition_config = strategy_config.get(CONF_CONDITION)
             if condition_config:
-                condition_config = resolve_condition_entity_ids(condition_config, source_entity)
+                condition_config = resolve_condition_entity_ids(condition_config, sub_source_entity)
                 condition_config = await condition.async_validate_condition_config(self._hass, condition_config)
                 condition_instance = await condition.async_from_config(
                     self._hass,
@@ -273,9 +275,9 @@ class PowerCalculatorStrategyFactory:
                 strategy_config,
                 strategy,
                 power_profile,
-                source_entity,
+                sub_source_entity,
             )
-            return SubStrategy(condition_config, condition_instance, strategy_instance)  # type: ignore
+            return SubStrategy(condition_config, condition_instance, strategy_instance, entity_id)  # type: ignore
 
         if not sub_strategies:
             raise StrategyConfigurationError("No strategies configured for composite strategy")

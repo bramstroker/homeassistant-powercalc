@@ -12,7 +12,7 @@
     "form_factor": "plug",
     "power_monitoring": true
   },
-  "ean": [
+  "gtin": [
     "810150544817"
   ],
   "measure_description": "Manually measured standby and relay-on power for SwitchBot Plug Mini (EU).",

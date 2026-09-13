@@ -16,7 +16,7 @@
       "bluetooth"
     ]
   },
-  "ean": [
+  "gtin": [
     "8719514291119"
   ],
   "measure_description": "Measured with utils/measure script",

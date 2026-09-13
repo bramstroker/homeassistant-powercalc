@@ -18,7 +18,7 @@ MANUFACTURER_JSON = "manufacturer.json"
 LIBRARY_URL = "https://library.powercalc.nl"
 EMPTY_OPTIONAL_MODEL_FIELDS = (
     "aliases",
-    "ean",
+    "gtin",
     "product_url",
     "device_specs",
     "measure_device_firmware",
@@ -144,7 +144,7 @@ class ProfilePreparer:
             model["name"] = metadata.product_name
         optional_values: tuple[tuple[str, Any], ...] = (
             ("aliases", list(metadata.aliases) if metadata.aliases is not None else None),
-            ("ean", list(metadata.gtins) if metadata.gtins is not None else None),
+            ("gtin", list(metadata.gtins) if metadata.gtins is not None else None),
             ("product_url", metadata.product_url),
             ("mains_voltage", metadata.mains_voltage),
             ("device_specs", metadata.device_specs),
@@ -415,4 +415,4 @@ def _schema_error_field(path: tuple[str | int, ...]) -> str | None:
         return {"name": "contributor", "github": "contributor_github", "email": "contributor_email"}.get(str(path[2]))
     if root == "device_specs":
         return ".".join(str(part) for part in path[:2])
-    return {"name": "product_name", "ean": "gtins"}.get(root, root)
+    return {"name": "product_name", "gtin": "gtins"}.get(root, root)

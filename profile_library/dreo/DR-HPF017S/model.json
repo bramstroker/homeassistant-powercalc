@@ -1,0 +1,79 @@
+{
+  "calculation_strategy": "composite",
+  "composite_config": {
+    "mode": "sum_all",
+    "strategies": [
+      {
+        "linear": {
+          "attribute": "percentage",
+          "calibrate": [
+            "8 -> 3.3",
+            "16 -> 5.8",
+            "25 -> 6.8",
+            "33 -> 8.2",
+            "41 -> 10.0",
+            "50 -> 11.7",
+            "58 -> 13.8",
+            "66 -> 15.9",
+            "75 -> 18.4",
+            "83 -> 21.7",
+            "91 -> 25.8",
+            "100 -> 31.0"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:horizontally_oscillating]]",
+          "state": "on"
+        },
+        "fixed": {
+          "power": 2.2
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:vertically_oscillating]]",
+          "state": "on"
+        },
+        "fixed": {
+          "power": 2.2
+        }
+      },
+      {
+        "entity_id": "[[entity_by_translation_key:rgb_light]]",
+        "condition": {
+          "condition": "state",
+          "state": "on"
+        },
+        "lut": {}
+      }
+    ]
+  },
+  "created_at": "2026-09-12T00:00:00Z",
+  "device_type": "fan",
+  "device_specs": {
+    "form_factor": "pedestal",
+    "connectivity": [
+      "wifi"
+    ],
+    "rated_power": 36
+  },
+  "measure_description": "Fan: Shelly Plug S Gen3 polled every 2 s while a Home Assistant automation stepped through all 12 speeds. Oscillation: on/off delta at the same speed. RGB light (hs.csv.gz): fan at lowest speed, one light command per step, each verified in HA before reading, fan-only baseline re-measured before every saturation row and subtracted. The light only has 3 brightness levels (51/102/153). Its measured range is 0.55-5.88 W. Standby power is an estimate.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "manual",
+  "mains_voltage": 230,
+  "min_version": "1.25.5",
+  "name": "Smart TurboPoly Fan 517S",
+  "product_url": "https://www.dreo.com/products/turbopoly%E2%84%A2-fan-517s",
+  "standby_power": 0.9,
+  "standby_power_estimated": true,
+  "authors": [
+    {
+      "name": "zuranihenry",
+      "github": "zuranihenry"
+    }
+  ]
+}

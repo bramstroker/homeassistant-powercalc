@@ -2,7 +2,7 @@
   "aliases": [
     "500.46"
   ],
-  "ean": [
+  "gtin": [
     "4000870930441"
   ],
   "calculation_strategy": "lut",

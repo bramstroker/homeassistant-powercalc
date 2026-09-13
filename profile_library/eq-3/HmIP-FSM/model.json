@@ -12,7 +12,7 @@
       "proprietary"
     ]
   },
-  "ean": [
+  "gtin": [
     "4047976427215"
   ],
   "measure_description": "Measured repeatedly using Powercalc average mode for 300 seconds with a 7.7W dummy load, then averaged.",
