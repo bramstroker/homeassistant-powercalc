@@ -1,4 +1,4 @@
-from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ATTR_EFFECT, ColorMode
+from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ATTR_EFFECT, ATTR_HS_COLOR, ColorMode
 from homeassistant.const import (
     CONF_CONDITION,
     CONF_ENTITIES,
@@ -9,8 +9,11 @@ from homeassistant.const import (
     STATE_PAUSED,
     STATE_PLAYING,
     STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
 )
 from homeassistant.core import HomeAssistant
+import pytest
+import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_COMPOSITE,
@@ -30,12 +33,14 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CONF_STRATEGIES,
 )
-from custom_components.powercalc.strategy.composite import CompositeMode
+from custom_components.powercalc.strategy.composite import CONFIG_SCHEMA, CompositeMode
 from tests.common import (
     assert_entity_state,
     async_advance_time,
     get_test_profile_dir,
     mock_device_with_entities,
+    mock_devices,
+    mock_entities_in_registry,
     run_powercalc_setup,
     set_states,
 )
@@ -581,3 +586,108 @@ async def test_lut(hass: HomeAssistant) -> None:
 
     await set_states(hass, [(light_entity, STATE_ON, {ATTR_BRIGHTNESS: 128, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS})])
     assert_entity_state(hass, power_entity, "128.00")
+
+
+async def test_lut_entity_override_from_library_profile(hass: HomeAssistant) -> None:
+    """A fan profile adds a related light's LUT and follows that light's attributes."""
+    mock_devices(hass, {"fan_device": {}})
+    mock_entities_in_registry(
+        hass,
+        {
+            "fan.test": {"device_id": "fan_device"},
+            "light.renamed": {"device_id": "fan_device", "translation_key": "rgb_light"},
+        },
+    )
+    light_attrs = {ATTR_BRIGHTNESS: 51, ATTR_COLOR_MODE: ColorMode.HS, ATTR_HS_COLOR: (0, 100)}
+    await set_states(hass, [("fan.test", STATE_ON, {"percentage": 50}), ("light.renamed", STATE_ON, light_attrs)])
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "fan.test",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("composite_entity_lut"),
+        },
+    )
+    assert_entity_state(hass, "sensor.test_power", "6.00")
+
+    light_attrs = {**light_attrs, ATTR_BRIGHTNESS: 153}
+    await set_states(hass, [("light.renamed", STATE_ON, light_attrs)])
+    assert_entity_state(hass, "sensor.test_power", "8.00")
+
+    light_attrs = {**light_attrs, ATTR_HS_COLOR: (240, 100)}
+    await set_states(hass, [("light.renamed", STATE_ON, light_attrs)])
+    assert_entity_state(hass, "sensor.test_power", "9.00")
+
+    await set_states(hass, [("fan.test", STATE_ON, {"percentage": 100})])
+    assert_entity_state(hass, "sensor.test_power", "14.00")
+
+    await set_states(hass, [("light.renamed", STATE_OFF, light_attrs)])
+    assert_entity_state(hass, "sensor.test_power", "10.00")
+
+    await set_states(hass, [("fan.test", STATE_OFF)])
+    assert_entity_state(hass, "sensor.test_power", "0.90")
+    await set_states(hass, [("light.renamed", STATE_ON, light_attrs)])
+    assert_entity_state(hass, "sensor.test_power", "0.90")
+
+
+@pytest.mark.parametrize("mode", [CompositeMode.SUM_ALL, CompositeMode.STOP_AT_FIRST])
+async def test_entity_override_without_condition(hass: HomeAssistant, mode: CompositeMode) -> None:
+    """The override itself must track changes and avoid using attributes retained while off."""
+    await set_states(hass, [("fan.test", STATE_ON, {"percentage": 100}), ("fan.child", STATE_OFF)])
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "fan.test",
+            CONF_COMPOSITE: {
+                CONF_MODE: mode,
+                CONF_STRATEGIES: [
+                    {
+                        CONF_ENTITY_ID: "fan.child",
+                        CONF_LINEAR: {CONF_MIN_POWER: 0, CONF_MAX_POWER: 10},
+                    },
+                    {CONF_FIXED: {CONF_POWER: 2}},
+                ],
+            },
+        },
+    )
+    assert_entity_state(hass, "sensor.test_power", "2.00")
+
+    await set_states(hass, [("fan.child", STATE_ON, {"percentage": 50})])
+    assert_entity_state(hass, "sensor.test_power", "7.00" if mode == CompositeMode.SUM_ALL else "5.00")
+
+    await set_states(hass, [("fan.child", STATE_OFF, {"percentage": 50})])
+    assert_entity_state(hass, "sensor.test_power", "2.00")
+
+
+@pytest.mark.parametrize("child_state", [None, STATE_UNKNOWN, STATE_UNAVAILABLE])
+async def test_entity_override_unavailable(hass: HomeAssistant, child_state: str | None) -> None:
+    """Do not report a partial total when the overridden source cannot be read."""
+    if child_state is not None:
+        await set_states(hass, [("switch.child", child_state)])
+    await set_states(hass, [("fan.test", STATE_ON, {"percentage": 50})])
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "fan.test",
+            CONF_COMPOSITE: {
+                CONF_MODE: CompositeMode.SUM_ALL,
+                CONF_STRATEGIES: [
+                    {CONF_FIXED: {CONF_POWER: 10}},
+                    {CONF_ENTITY_ID: "switch.child", CONF_FIXED: {CONF_POWER: 2}},
+                ],
+            },
+        },
+    )
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
+
+    # A parent update must not replace unavailable with the known portion of the sum.
+    await set_states(hass, [("fan.test", STATE_ON, {"percentage": 100})])
+    assert_entity_state(hass, "sensor.test_power", STATE_UNAVAILABLE)
+
+    await set_states(hass, [("switch.child", STATE_ON)])
+    assert_entity_state(hass, "sensor.test_power", "12.00")
+
+
+@pytest.mark.parametrize("entity_id", ["invalid", ["light.test"], None])
+def test_invalid_entity_override(entity_id: object) -> None:
+    with pytest.raises(vol.Invalid):
+        CONFIG_SCHEMA([{CONF_ENTITY_ID: entity_id, CONF_FIXED: {CONF_POWER: 1}}])

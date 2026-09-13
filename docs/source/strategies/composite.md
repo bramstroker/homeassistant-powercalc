@@ -109,6 +109,44 @@ In this example the power sensor will be 1500 when `input_boolean.motor1` is on 
 
     When using the `sum_all` mode the power sensor will become `0` when no strategy matches the condition.
 
+## Using a different source entity
+
+Set `entity_id` on a strategy entry to calculate that contribution from another entity. For example, a fan with a
+separate light entity can combine its motor's linear curve with the light's LUT. Entries without `entity_id` continue
+to use the parent source entity.
+
+The child entity supplies the state and attributes used for calculation. Conditions that omit `entity_id` also use
+the child entity, including nested conditions, and template conditions receive its state as `state`. An explicit
+`entity_id` inside a condition only selects the entity to test; it does not change the strategy's source.
+
+Powercalc tracks the child entity automatically, so a brightness or colour change updates the total even when the
+fan's state has not changed. An off child is skipped unless its strategy supports standby calculation. A missing,
+unknown or unavailable child makes the calculation unavailable when its entry is reached, rather than producing a
+partial total. In `stop_at_first` mode, entries after a matching strategy are not evaluated.
+
+The parent sensor's standby handling still applies. This is suitable for devices whose light only operates while the
+fan is on. The override does not make the child an independent power sensor or give it separate standby power.
+
+For a library profile, replace the fixed light contribution with this entry in `composite_config.strategies`:
+
+```json
+{
+  "entity_id": "[[entity_by_translation_key:rgb_light]]",
+  "condition": {
+    "condition": "state",
+    "state": "on"
+  },
+  "lut": {}
+}
+```
+
+Keep the light's `hs.csv.gz` alongside `model.json`. The LUT uses the same profile directory as the composite and reads
+brightness and colour attributes from the selected light entity. Its measurements must contain only the additional
+light consumption; subtract any motor consumption already included by another strategy.
+
+In YAML, use the actual child entity ID, for example `entity_id: light.fan_rgb`. Library profiles can use the
+`entity_by_translation_key` placeholder to find the related entity without depending on its user-assigned name.
+
 ## Usage in library profiles
 
 You can also use the composite strategy in library profiles. For example:
