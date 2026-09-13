@@ -26,7 +26,7 @@ from custom_components.powercalc.power_profile.library import ModelInfo, Profile
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.strategy import profile_data
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
-from custom_components.powercalc.strategy.lut import LookupMode, LutRegistry
+from custom_components.powercalc.strategy.lut import LookupMode, LutRegistry, LutStrategy
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
@@ -66,6 +66,50 @@ async def test_color_temp_lut(hass: HomeAssistant) -> None:
         strategy,
         state=_create_light_color_temp_state(brightness=300, color_temp=400),
         expected_power=7.4,
+    )
+
+
+@pytest.mark.parametrize("sub_profiles", [("nightlight", "default"), ("default", "nightlight")])
+async def test_supported_modes_are_cached_per_sub_profile(
+    hass: HomeAssistant,
+    tmp_path: Path,
+    sub_profiles: tuple[str, str],
+) -> None:
+    """Sibling profiles with different LUT modes must work in either initialization order."""
+    profile_data = {
+        "default": (LookupMode.COLOR_TEMP, "brightness,color_temp,power\n100,300,3.2\n"),
+        "nightlight": (LookupMode.BRIGHTNESS, "brightness,power\n100,1.5\n"),
+    }
+    registry = LutRegistry(hass)
+    strategies = {}
+    for sub_profile in sub_profiles:
+        mode, csv_data = profile_data[sub_profile]
+        directory = tmp_path / sub_profile
+        directory.mkdir()
+        (directory / f"{mode}.csv").write_text(csv_data)
+        profile = PowerProfile(
+            hass,
+            "test",
+            "light_with_nightlight",
+            str(tmp_path),
+            {},
+            sub_profiles=[(name, {}) for name in sub_profiles],
+        )
+        await profile.select_sub_profile(sub_profile)
+        strategy = LutStrategy(create_source_entity(LIGHT_DOMAIN), registry, profile)
+        await strategy.initialize()
+        assert await registry.get_supported_modes(profile) == {mode}
+        strategies[sub_profile] = strategy
+
+    await _calculate_and_assert_power(
+        strategies["default"],
+        state=_create_light_color_temp_state(100, 300),
+        expected_power=3.2,
+    )
+    await _calculate_and_assert_power(
+        strategies["nightlight"],
+        state=_create_light_brightness_state(100),
+        expected_power=1.5,
     )
 
 
