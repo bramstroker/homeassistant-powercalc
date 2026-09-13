@@ -4408,7 +4408,7 @@
           },
           "id": "901287",
           "manufacturer": "eglo",
-          "updated_at": "2026-09-08T13:49:18",
+          "updated_at": "2026-09-13T07:00:04",
           "max_power": 13.69,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-08T13:49:18",
@@ -4424,7 +4424,7 @@
             "score": 98.4,
             "color_temp": 98.4
           },
-          "hash": "de8a43545889d967439fddd193c631e3"
+          "hash": "c6178e2779e53e95016399227d0bf78d"
         },
         {
           "aliases": [
@@ -18751,6 +18751,9 @@
           "measure_settings": {
             "SAMPLE_COUNT": 1,
             "SLEEP_TIME": 2.0,
+            "NUM_LIGHTS": 2,
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 45,
             "VERSION": "v0.3.0:app"
           },
           "name": "LIGHTWAY smart home LED-lamp - candle",
@@ -18767,7 +18770,7 @@
           ],
           "id": "L122AA63H11A6.5W",
           "manufacturer": "megos",
-          "updated_at": "2026-09-01T16:27:46",
+          "updated_at": "2026-09-07T12:59:54",
           "max_power": 6.73,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-01T13:11:06",
@@ -18784,7 +18787,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "0fb21d04c7c28b96ff7aaa760c6eae4a"
+          "hash": "ff7cd349443e799d808284a39c7102f2"
         }
       ],
       "device_types": [
