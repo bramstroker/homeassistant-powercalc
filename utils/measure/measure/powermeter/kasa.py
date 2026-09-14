@@ -46,9 +46,12 @@ class KasaPowerMeter(PowerMeter):
             energy = device.modules.get(Module.Energy)
             if energy is None:
                 raise PowerMeterError("The Kasa or Tapo device does not provide energy monitoring")
+            power = energy.current_consumption
+            if power is None:
+                raise PowerMeterError("The Kasa or Tapo device did not return a power measurement")
             voltage = getattr(energy, "voltage", None)
             self._voltage_supported = voltage is not None
-            return float(energy.current_consumption), float(voltage) if voltage is not None else None
+            return float(power), float(voltage) if voltage is not None else None
         finally:
             if device is not None:
                 await device.disconnect()

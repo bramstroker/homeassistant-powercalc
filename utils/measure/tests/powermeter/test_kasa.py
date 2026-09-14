@@ -24,6 +24,25 @@ def test_reads_power_and_voltage_from_energy_module() -> None:
     plug.disconnect.assert_awaited_once_with()
 
 
+def test_rejects_missing_power_measurements() -> None:
+    plug = MagicMock()
+    plug.update = AsyncMock()
+    plug.disconnect = AsyncMock()
+    plug.modules = {
+        Module.Energy: MagicMock(current_consumption=None, voltage=230.4),
+    }
+    plug.config = DeviceConfig(host="192.0.2.1")
+
+    meter = KasaPowerMeter("192.0.2.1")
+    with (
+        patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)),
+        pytest.raises(PowerMeterError, match="did not return a power measurement"),
+    ):
+        asyncio.run(meter.async_read_power_meter())
+
+    plug.disconnect.assert_awaited_once_with()
+
+
 def test_disconnects_when_a_reading_fails() -> None:
     plug = MagicMock()
     plug.update = AsyncMock(side_effect=OSError("device unreachable"))
