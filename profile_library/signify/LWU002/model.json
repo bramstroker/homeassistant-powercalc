@@ -12,6 +12,8 @@
       "zigbee"
     ],
     "form_factor": "bulb",
+    "rated_power": 5.7,
+    "lumens": 470,
     "socket": "E14"
   },
   "device_type": "light",
