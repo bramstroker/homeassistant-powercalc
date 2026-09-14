@@ -2,6 +2,7 @@ import asyncio
 import time
 
 from kasa import AuthenticationError, Credentials, Device, DeviceConfig, Discover, Module
+from kasa.iot import IotPlug
 
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
@@ -49,7 +50,12 @@ class KasaPowerMeter(PowerMeter):
         if self._device_config is not None:
             return await Device.connect(config=self._device_config)
 
-        device = await Discover.discover_single(self._device_ip, credentials=self._credentials)
+        try:
+            device = await Discover.discover_single(self._device_ip, credentials=self._credentials)
+        except TimeoutError:
+            # Legacy Kasa devices use a direct TCP connection. Keep this fallback for
+            # networks that permit TCP to the plug but block UDP discovery broadcasts.
+            device = IotPlug(self._device_ip)
         if device is None:
             raise PowerMeterError(f"No Kasa or Tapo device was discovered at {self._device_ip}")
         # A DeviceConfig is independent of the live connection and can safely cross the

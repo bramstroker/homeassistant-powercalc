@@ -329,6 +329,7 @@ class AppContext:
             lambda: app_measurement_assembler(
                 home_assistant=self.home_assistant,
                 shelly_password=self.shelly_password(),
+                kasa_credentials=self.tapo_credentials(),
             ),
         )
         self.contribution = ContributionApiCoordinator(

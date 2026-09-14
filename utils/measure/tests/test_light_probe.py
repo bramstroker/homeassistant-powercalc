@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from dataclasses import replace
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from measure.assembler import MeasurementAssembler
 from measure.controller.light.const import LutMode
@@ -13,7 +13,7 @@ from measure.ha_app.light_probe import (
     light_load_probe_label,
 )
 from measure.powermeter.powermeter import PowerMeasurementResult
-from measure.powermeter.spec import HassPowerMeterSpec
+from measure.powermeter.spec import HassPowerMeterSpec, KasaPowerMeterSpec
 from measure.request import LightMeasurementRequest
 from measure.runner.light_plan import (
     ColorTempVariation,
@@ -274,6 +274,17 @@ def test_active_probe_wraps_controller_errors_and_cleanup_errors_do_not_mask_suc
 
 
 def test_app_measurement_assembler_builds_non_interactive_adapter_graph() -> None:
-    assembler = app_measurement_assembler(home_assistant=MagicMock(), shelly_password="secret")  # noqa: S106
+    assembler = app_measurement_assembler(
+        home_assistant=MagicMock(),
+        shelly_password="secret",  # noqa: S106
+        kasa_credentials=("user@example.com", "account-password"),
+    )
 
     assert isinstance(assembler, MeasurementAssembler)
+    with patch("measure.powermeter.kasa.KasaPowerMeter") as meter:
+        assembler.build_power_meter(KasaPowerMeterSpec(device_ip="192.0.2.1"))
+
+    meter.assert_called_once_with(
+        "192.0.2.1",
+        credentials=("user@example.com", "account-password"),
+    )

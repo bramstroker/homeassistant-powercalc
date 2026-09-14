@@ -99,6 +99,24 @@ def test_reuses_the_discovered_connection_configuration() -> None:
     assert connect.await_args.kwargs["config"].host == "192.0.2.1"
 
 
+def test_falls_back_to_a_direct_legacy_connection_when_udp_discovery_times_out() -> None:
+    plug = MagicMock()
+    plug.update = AsyncMock()
+    plug.disconnect = AsyncMock()
+    plug.modules = {Module.Energy: MagicMock(current_consumption=12.5, voltage=230.4)}
+    plug.config = DeviceConfig(host="192.0.2.1")
+    meter = KasaPowerMeter("192.0.2.1")
+
+    with (
+        patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(side_effect=TimeoutError)),
+        patch("measure.powermeter.kasa.IotPlug", return_value=plug) as direct_connection,
+    ):
+        assert asyncio.run(meter.async_read_power_meter()) == (12.5, 230.4)
+
+    direct_connection.assert_called_once_with("192.0.2.1")
+    plug.update.assert_awaited_once_with()
+
+
 def test_detects_when_the_device_does_not_support_voltage() -> None:
     plug = MagicMock()
     plug.update = AsyncMock()

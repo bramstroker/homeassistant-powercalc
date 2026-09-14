@@ -173,6 +173,7 @@ def app_measurement_assembler(
     *,
     home_assistant: HomeAssistantManager,
     shelly_password: str | None,
+    kasa_credentials: tuple[str, str] | None = None,
 ) -> MeasurementAssembler:
     """Build the non-interactive adapter graph used by an app preflight probe."""
 
@@ -180,6 +181,7 @@ def app_measurement_assembler(
         ImmediateInteraction(),
         home_assistant=home_assistant,
         shelly_password=shelly_password,
+        kasa_credentials=kasa_credentials,
     )
 
 
