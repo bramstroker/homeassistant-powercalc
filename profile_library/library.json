@@ -28822,7 +28822,6 @@
         },
         {
           "aliases": [
-            "8718699703424",
             "9290022691",
             "LCL006"
           ],
@@ -28861,7 +28860,7 @@
           ],
           "id": "LCL001",
           "manufacturer": "signify",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 21.14,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-13T08:03:22",
@@ -28877,7 +28876,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "8621eb49401c7293da4cd911425d1146"
+          "hash": "920f0ed9a30b60a611f71e395fc8ea80"
         },
         {
           "aliases": [
@@ -29110,6 +29109,9 @@
           "hash": "43038485677485823e8913b00387cff6"
         },
         {
+          "aliases": [
+            "9290012573A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2021-09-01T18:40:45Z",
           "device_type": "light",
@@ -29137,7 +29139,7 @@
           ],
           "id": "LCT001",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 7.6,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29153,7 +29155,7 @@
             "score": 94.3,
             "color_temp": 94.3
           },
-          "hash": "425b67d6238fe6e74edcee95fbab3c09"
+          "hash": "1c3789841295417c203d220fb18a9f11"
         },
         {
           "aliases": [
@@ -29261,6 +29263,9 @@
           "hash": "636d0f46704bb85ec6fe7c9c0c43ad35"
         },
         {
+          "aliases": [
+            "9290012573A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2021-09-29T18:18:54Z",
           "device_type": "light",
@@ -29295,7 +29300,7 @@
           ],
           "id": "LCT007",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 10.3,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29311,9 +29316,12 @@
             "score": 96.3,
             "color_temp": 96.3
           },
-          "hash": "76b1fd4e9f13756736b5e7f668279e0a"
+          "hash": "21d2bc11f1d9754779b660510b6d5b5d"
         },
         {
+          "aliases": [
+            "9290012573A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2021-06-11T22:01:53Z",
           "device_type": "light",
@@ -29341,7 +29349,7 @@
           ],
           "id": "LCT010",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 9.7,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-15T06:11:24",
@@ -29358,9 +29366,12 @@
             "score": 96.9,
             "color_temp": 96.9
           },
-          "hash": "991925a8d4f3385f8bae3e2a8747bcc6"
+          "hash": "033104ee89838fd143d842d38f2f631f"
         },
         {
+          "aliases": [
+            "9290012573A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2021-06-11T22:01:53Z",
           "device_type": "light",
@@ -29391,7 +29402,7 @@
           ],
           "id": "LCT012",
           "manufacturer": "signify",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 5.43,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29407,9 +29418,12 @@
             "score": 54.6,
             "color_temp": 54.6
           },
-          "hash": "a1c4b78a5ed8714dd3fc4bbd64f8a19c"
+          "hash": "1aeb377f61278d66d3186cf75f006301"
         },
         {
+          "aliases": [
+            "9290012573A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2022-05-25T11:29:34Z",
           "device_type": "light",
@@ -29442,7 +29456,7 @@
           ],
           "id": "LCT014",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 9.61,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29458,7 +29472,7 @@
             "score": 97.7,
             "color_temp": 97.7
           },
-          "hash": "3f4a92e45a9fada7b1f901357300c77f"
+          "hash": "493bfc694cc1ccd19d4f390475624c94"
         },
         {
           "aliases": [
@@ -29519,7 +29533,8 @@
         },
         {
           "aliases": [
-            "9290012575"
+            "9290012575",
+            "9290012573A"
           ],
           "calculation_strategy": "lut",
           "created_at": "2022-05-26T10:34:54Z",
@@ -29553,7 +29568,7 @@
           ],
           "id": "LCT016",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 9.06,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29569,7 +29584,7 @@
             "score": 97.6,
             "color_temp": 97.6
           },
-          "hash": "b3f216438ac9ecba25e51d04860a0ed7"
+          "hash": "6acae5d151239eb344ffa226c7daad2e"
         },
         {
           "aliases": [
@@ -34946,7 +34961,7 @@
           },
           "id": "LWU002",
           "manufacturer": "signify",
-          "updated_at": "2026-09-14T17:31:38",
+          "updated_at": "2026-09-14T17:40:55",
           "max_power": 5.3,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-14T14:48:20",
@@ -34962,7 +34977,7 @@
             "score": 98.4,
             "brightness": 98.4
           },
-          "hash": "0c911c4f69a37c2228282f68aabdb1b0"
+          "hash": "f49ee9bc4ac43e9a6cf0c79a59e3328d"
         },
         {
           "aliases": [
