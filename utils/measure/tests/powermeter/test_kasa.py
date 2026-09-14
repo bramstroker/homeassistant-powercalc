@@ -1,7 +1,7 @@
 import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from kasa import AuthenticationError, DeviceConfig, Module
+from kasa import AuthenticationError, DeviceConfig, KasaException, Module
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
 from measure.powermeter.kasa import KasaPowerMeter
 from measure.powermeter.powermeter import PowerMeasurementResult
@@ -36,6 +36,22 @@ def test_disconnects_when_a_reading_fails() -> None:
         pytest.raises(OSError, match="device unreachable"),
     ):
         asyncio.run(meter.async_read_power_meter())
+    plug.disconnect.assert_awaited_once_with()
+
+
+def test_converts_transport_failures_to_retryable_power_meter_errors() -> None:
+    plug = MagicMock()
+    plug.update = AsyncMock(side_effect=KasaException("Invalid padding bytes."))
+    plug.disconnect = AsyncMock()
+    plug.config = DeviceConfig(host="192.0.2.1")
+
+    meter = KasaPowerMeter("192.0.2.1")
+    with (
+        patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)),
+        pytest.raises(PowerMeterError, match="Unable to read power from Kasa or Tapo device: Invalid padding bytes"),
+    ):
+        asyncio.run(meter.async_read_power_meter())
+
     plug.disconnect.assert_awaited_once_with()
 
 

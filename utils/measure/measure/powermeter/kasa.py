@@ -1,7 +1,7 @@
 import asyncio
 import time
 
-from kasa import AuthenticationError, Credentials, Device, DeviceConfig, Discover, Module
+from kasa import AuthenticationError, Credentials, Device, DeviceConfig, Discover, KasaException, Module
 from kasa.iot import IotPlug
 
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
@@ -26,9 +26,10 @@ class KasaPowerMeter(PowerMeter):
         return PowerMeasurementResult(power=power, updated=time.time())
 
     async def async_read_power_meter(self) -> tuple[float, float | None]:
-        device = await self._connect()
+        device: Device | None = None
         try:
             try:
+                device = await self._connect()
                 await device.update()
             except AuthenticationError as error:
                 if self._credentials is None:
@@ -36,6 +37,12 @@ class KasaPowerMeter(PowerMeter):
                 else:
                     message = "TP-Link account authentication failed; verify the configured credentials"
                 raise PowerMeterError(message) from error
+            except KasaException as error:
+                # Encrypted Tapo/Kasa transports can occasionally return a response from
+                # a stale session (for example, an invalid-padding decryption error).
+                # Normalize it so the measurement engine can retry with a new connection.
+                raise PowerMeterError(f"Unable to read power from Kasa or Tapo device: {error}") from error
+            assert device is not None
             energy = device.modules.get(Module.Energy)
             if energy is None:
                 raise PowerMeterError("The Kasa or Tapo device does not provide energy monitoring")
@@ -43,7 +50,8 @@ class KasaPowerMeter(PowerMeter):
             self._voltage_supported = voltage is not None
             return float(energy.current_consumption), float(voltage) if voltage is not None else None
         finally:
-            await device.disconnect()
+            if device is not None:
+                await device.disconnect()
 
     async def _connect(self) -> Device:
         """Discover once, then reconnect directly with the discovered protocol settings."""
