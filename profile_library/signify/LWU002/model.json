@@ -1,0 +1,44 @@
+{
+  "aliases": [
+    "9290024406A"
+  ],
+  "authors": [
+    {
+      "github": "alf.mathias.lindqvist",
+      "name": "Mathias Lindqvist"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-14T10:01:33Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ],
+    "form_factor": "bulb",
+    "rated_power": 5.7,
+    "lumens": 470,
+    "socket": "E14"
+  },
+  "device_type": "light",
+  "gtin": [
+    "8719514356696",
+    "8719514356771"
+  ],
+  "mains_voltage": 230,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "IKEA INSPELNING smart plug",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.7.0:app"
+  },
+  "name": "Hue white luster",
+  "standby_power": 0.1,
+  "voltage_range": {
+    "max": 236.0,
+    "min": 231.0
+  }
+}
