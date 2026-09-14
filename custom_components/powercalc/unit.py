@@ -47,7 +47,7 @@ def parse_decimal(value: object) -> Decimal | None:
         return None
     try:
         return Decimal(value)
-    except DecimalException, ValueError:
+    except (DecimalException, ValueError):
         return None
 
 

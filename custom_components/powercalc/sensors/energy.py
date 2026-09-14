@@ -63,7 +63,7 @@ def _numeric_state_value(state: State | None) -> float | None:
         return None
     try:
         return float(state.state)
-    except TypeError, ValueError:
+    except (TypeError, ValueError):
         return None
 
 
