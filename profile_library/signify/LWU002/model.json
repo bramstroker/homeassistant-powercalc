@@ -17,6 +17,10 @@
     "socket": "E14"
   },
   "device_type": "light",
+  "gtin": [
+    "8719514356696",
+    "8719514356771"
+  ],
   "mains_voltage": 230,
   "measure_description": "Measured with utils/measure script",
   "measure_device": "IKEA INSPELNING smart plug",
