@@ -1,0 +1,29 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-14T19:34:27Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ],
+    "form_factor": "bulb",
+    "socket": "E14"
+  },
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "IKEA INSPELNING",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.7.0:cli"
+  },
+  "name": "Hue ambiance luster",
+  "standby_power": 0.1,
+  "voltage_range": {
+    "max": 237.0,
+    "min": 228.1
+  }
+}
