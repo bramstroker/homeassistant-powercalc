@@ -22643,6 +22643,54 @@
         },
         {
           "aliases": [
+            "Shelly 2PM Gen4"
+          ],
+          "calculation_strategy": "multi_switch",
+          "description": "Compact Smart Wi-Fi Relay with Power Monitoring",
+          "discovery_by": "device",
+          "created_at": "2026-09-10T23:00:25Z",
+          "device_type": "smart_switch",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 2300,
+            "power_monitoring": true,
+            "rated_power": 1.4,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "matter",
+              "zigbee"
+            ]
+          },
+          "gtin": [
+            "3800238070748"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 60 seconds. Multiple combinations of settings were tested. Firmware version 2.0.0.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.6.0:app"
+          },
+          "name": "2PM Gen4",
+          "only_self_usage": true,
+          "product_url": "https://www.shelly.com/products/shelly-2pm-gen4",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S4SW-002P16EU",
+          "manufacturer": "shelly",
+          "updated_at": "2026-09-13T22:57:57",
+          "max_power": null,
+          "sub_profile_count": 4,
+          "standby_power": 0.62,
+          "hash": "e3d9bfd34e63150abcb439043b141e18"
+        },
+        {
+          "aliases": [
             "Shelly Bulb RGBW"
           ],
           "gtin": [
