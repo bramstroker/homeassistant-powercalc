@@ -16,13 +16,13 @@
   "measure_device": "Tapo P110M",
   "measure_method": "script",
   "measure_settings": {
-	"DUMMY_LOAD": true,
+    "DUMMY_LOAD": true,
     "DUMMY_LOAD_POWER": 25.44,
     "DUMMY_LOAD_RESISTANCE": 2076.86,
-	"NUM_LIGHTS": 1,
+    "NUM_LIGHTS": 1,
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 2.0,
-	"VERSION": "v0.6.0:app"
+    "VERSION": "v0.6.0:app"
   },
   "name": "Vivaro 5 W IP54 RGBWW Zigbee",
   "standby_power": 1.06,
