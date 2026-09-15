@@ -10,7 +10,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.6.0:cli"
   },
-  "name": "Govee Outdoor spotlights 2",
+  "name": "Outdoor spotlights 2",
   "standby_power": 0,
   "voltage_range": {
     "max": 234.3,
