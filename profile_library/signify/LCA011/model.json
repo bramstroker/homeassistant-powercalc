@@ -1,0 +1,44 @@
+{
+  "authors": [
+    {
+      "email": "rens@renssies.nl",
+      "github": "renssies",
+      "name": "Rens Verhoeven"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-15T23:43:42Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee",
+      "matter",
+      "bluetooth"
+    ],
+    "form_factor": "bulb",
+    "lumens": 1100,
+    "rated_power": 8.1,
+    "socket": "E27"
+  },
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_device_firmware": "2.0.0",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 7.11,
+    "DUMMY_LOAD_RESISTANCE": 7808.2,
+    "NUM_LIGHTS": 2,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.7.0:app"
+  },
+  "name": "Hue White and Color Ambiance E27 1100lm",
+  "product_url": "https://www.philips-hue.com/nl-nl/p/hue-white-and-color-ambiance-a60-e27-slimme-lamp-1100/8720169364066",
+  "standby_power": 0.1,
+  "voltage_range": {
+    "max": 238.9,
+    "min": 230.7
+  }
+}
