@@ -206,6 +206,7 @@ describe("MeasureApiClient", () => {
 
   it("loads the entity catalog with one request", async () => {
     const catalog = {
+      home_assistant_ready: true,
       lights: [{
         entity_id: "light.desk",
         name: "Desk",

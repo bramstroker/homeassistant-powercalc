@@ -33,6 +33,7 @@ export interface EntityDescriptor {
 }
 
 export interface EntityCatalog {
+  home_assistant_ready: boolean;
   lights: EntityDescriptor[];
   powers: EntityDescriptor[];
   voltages: EntityDescriptor[];
