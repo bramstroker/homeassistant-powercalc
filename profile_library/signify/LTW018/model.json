@@ -1,0 +1,36 @@
+{
+  "aliases": [
+    "3435731P7"
+  ],
+  "authors": [
+    {
+      "github": "arnepluhar",
+      "name": "Arne Pluhar"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-15T07:00:00Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ],
+    "form_factor": "fixture",
+    "lumens": 2400,
+    "rated_power": 40,
+    "socket": "integrated"
+  },
+  "device_type": "light",
+  "gtin": [
+    "8718696168028"
+  ],
+  "mains_voltage": 230,
+  "measure_description": "Measured on a Shelly Pro 3EM phase (differential: each brightness row between two light-off baselines, row repeated on baseline drift; 2.5 s median per point). Full grid bri 1-251 step 5 plus 255 x mired 153-453 step 10 plus 454; smoothed over neighbouring brightness rows (+-2) and mired (1-2-1), made monotonic in brightness. Standby measured by cutting mains power at the wall switch (4 cycles).",
+  "measure_device": "Shelly Pro 3EM",
+  "measure_method": "script",
+  "name": "Hue Adore Bathroom Mirror",
+  "standby_power": 0.53,
+  "voltage_range": {
+    "max": 239.5,
+    "min": 233.3
+  }
+}
