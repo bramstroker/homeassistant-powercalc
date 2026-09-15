@@ -3,7 +3,8 @@
   "created_at": "2026-09-15T17:00:49Z",
   "device_type": "light",
   "aliases": [
-    "9290038535H"
+    "9290038535H",
+    "8720169364066"
   ],
   "authors": [
     {
@@ -13,6 +14,7 @@
   ],
   "device_specs": {
     "connectivity": [
+      "bluetooth",
       "zigbee"
     ],
     "form_factor": "bulb",
@@ -22,7 +24,7 @@
   },
   "mains_voltage": 230,
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "IKEA INSPELNING",
+  "measure_device": "IKEA INSPELNING smart plug",
   "measure_method": "script",
   "measure_settings": {
     "DUMMY_LOAD": false,
@@ -31,10 +33,14 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.7.0:cli"
   },
-  "name": "Hue White and Color Ambiance 1100",
+  "name": "Hue White and Color Ambiance A60 E27 1100 lm",
   "standby_power": 0.1,
   "voltage_range": {
     "max": 237.8,
     "min": 223.5
-  }
+  },
+  "gtin": [
+    "8720169364066",
+    "8720169365735"
+  ]
 }
