@@ -12,6 +12,7 @@ describe("measure app controller: boot", () => {
       getEntityCatalog: async () => {
         catalogCalls += 1;
         return {
+          home_assistant_ready: true,
           lights: [{ entity_id: "light.desk", name: "Desk" }],
           powers: [{ entity_id: "sensor.plug_power", name: "Plug power" }],
           voltages: [{ entity_id: "sensor.plug_voltage", name: "Plug voltage" }],
@@ -49,6 +50,50 @@ describe("measure app controller: boot", () => {
     expect(appState.selectedMeasureType).toBe("fan");
     await vi.waitFor(() => expect(appState.deviceEntities.fan?.[0]?.entity_id).toBe("fan.bedroom"));
     expect(requestedDomains).toEqual(["fan"]);
+  });
+
+  it("keeps loading and retries the entity catalog until Home Assistant is ready", async () => {
+    let catalogCalls = 0;
+    let continueRetry: () => void = () => undefined;
+    const retryDelays: number[] = [];
+    const retry = new Promise<void>((resolve) => { continueRetry = resolve; });
+    const appState = state();
+    const appApi = api({
+      getEntityCatalog: async () => {
+        catalogCalls += 1;
+        return catalogCalls === 1
+          ? { home_assistant_ready: false, lights: [], powers: [], voltages: [] }
+          : {
+              home_assistant_ready: true,
+              lights: [{ entity_id: "light.desk", name: "Desk" }],
+              powers: [],
+              voltages: [],
+            };
+      },
+    });
+    const controller = new MeasureAppController(
+      appState,
+      () => appApi,
+      () => connection(),
+      () => undefined,
+      async (delayMs) => {
+        retryDelays.push(delayMs);
+        await retry;
+      },
+    );
+
+    const boot = controller.boot();
+    await vi.waitFor(() => expect(retryDelays).toEqual([1_000]));
+
+    expect(appState.view).toBe("loading");
+    expect(appState.lights).toEqual([]);
+
+    continueRetry();
+    await boot;
+
+    expect(catalogCalls).toBe(2);
+    expect(appState.view).toBe("sessions");
+    expect(appState.lights).toEqual([{ entity_id: "light.desk", name: "Desk" }]);
   });
 
   it("loads the complete entity catalog for a recorder definition that requests it", async () => {
