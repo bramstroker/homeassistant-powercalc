@@ -1,5 +1,6 @@
 import logging
 import os.path
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
@@ -152,7 +153,8 @@ async def test_get_profile(
     assert profile
     assert profile.manufacturer == expected_manufacturer
     assert profile.model == expected_model
-    assert profile.get_model_directory().endswith(f"{expected_manufacturer}/{expected_model}")
+    storage_path = RemoteLoader(hass).get_storage_path(expected_manufacturer, expected_model)
+    assert Path(profile.get_model_directory()).is_relative_to(storage_path)
 
 
 async def test_get_non_existing_profile_raises_exception(hass: HomeAssistant) -> None:
@@ -272,7 +274,8 @@ async def test_linked_profile_loading(hass: HomeAssistant) -> None:
     profile = await library.get_profile(ModelInfo("signify", "LCA007"))
     assert profile.linked_profile == "signify/LCA006"
 
-    assert profile.get_model_directory().endswith("signify/LCA006")
+    storage_path = RemoteLoader(hass).get_storage_path("signify", "LCA006")
+    assert Path(profile.get_model_directory()).is_relative_to(storage_path)
 
     assert await hass.async_add_executor_job(
         os.path.exists,
