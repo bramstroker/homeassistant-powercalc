@@ -38837,21 +38837,25 @@
               "email": "danielvizzino@outlook.com"
             },
             {
+              "name": "Daniel Zedler",
+              "github": "dzedler"
+            },
+            {
               "name": "Ryan Ronnander",
               "github": "ryan-ronnander"
             }
           ],
           "id": "Core200S",
           "manufacturer": "vesync",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-09-15T10:52:34",
           "max_power": 39.0,
-          "sub_profile_count": 2,
+          "sub_profile_count": 3,
           "power_range": {
             "min": 0.6,
             "max": 39.0
           },
-          "standby_power": 0.6,
-          "hash": "b84ec9e66c03801a2f30148db1de10e2"
+          "standby_power": 1.06,
+          "hash": "f0e4a103f5f6d778448d3d15b8207bc4"
         },
         {
           "calculation_strategy": "fixed",
