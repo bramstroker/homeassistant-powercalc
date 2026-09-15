@@ -23524,59 +23524,6 @@
       "description": "Dutch lighting company, formerly Philips Lighting, and the maker of Philips Hue.",
       "models": [
         {
-          "gtin": [
-            "8719514491106"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2025-11-25T11:51:58Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "bulb",
-            "socket": "E14",
-            "lumens": 470,
-            "rated_power": 5.1,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "measure_description": "Measured with utils/measure script",
-          "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "script",
-          "mains_voltage": 230,
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.2:docker"
-          },
-          "name": "Hue White Ambiance E14 Luster Bulb",
-          "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-ambiance-lustre-e14-smart-bulb/8719514491106",
-          "standby_power": 0.2,
-          "authors": [
-            {
-              "name": "Macstar1601",
-              "github": "Macstar1601"
-            }
-          ],
-          "id": "8719514491106",
-          "manufacturer": "signify",
-          "updated_at": "2026-09-13T09:41:49",
-          "max_power": 4.8,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2025-11-25T12:12:37",
-          "power_range": {
-            "min": 0.25,
-            "max": 4.8
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 98.0,
-            "color_temp": 98.0
-          },
-          "hash": "4be771f09c794140dcdba98b67c7e832"
-        },
-        {
           "aliases": [
             "1740193P0",
             "9150055612",
@@ -32601,6 +32548,70 @@
             "color_temp": 97.5
           },
           "hash": "e3397b35714d314939674fab737850b7"
+        },
+        {
+          "aliases": [
+            "8719514491106"
+          ],
+          "legacy_ids": [
+            "8719514491106"
+          ],
+          "gtin": [
+            "8719514491106"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-11-25T11:51:58Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E14",
+            "lumens": 470,
+            "rated_power": 5.1,
+            "connectivity": [
+              "zigbee",
+              "bluetooth"
+            ]
+          },
+          "measure_description": "Measured with utils/measure script and independently validated against a second LUT measured with an IKEA INSPELNING smart plug",
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.2:docker"
+          },
+          "name": "Hue White Ambiance E14 Luster Bulb",
+          "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-ambiance-lustre-e14-smart-bulb/8719514491106",
+          "standby_power": 0.2,
+          "authors": [
+            {
+              "name": "Macstar1601",
+              "github": "Macstar1601"
+            },
+            {
+              "name": "Mathias Lindqvist",
+              "github": "alf-mathias-lindqvist"
+            }
+          ],
+          "id": "LTU001",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-15T16:31:15",
+          "max_power": 4.8,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-15T16:31:15",
+          "power_range": {
+            "min": 0.25,
+            "max": 4.8
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "35aa977b2c7a2cf5ce154a47b15f57be"
         },
         {
           "aliases": [
