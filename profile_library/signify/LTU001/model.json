@@ -1,4 +1,10 @@
 {
+  "aliases": [
+    "8719514491106"
+  ],
+  "legacy_ids": [
+    "8719514491106"
+  ],
   "gtin": [
     "8719514491106"
   ],
@@ -11,10 +17,11 @@
     "lumens": 470,
     "rated_power": 5.1,
     "connectivity": [
-      "zigbee"
+      "zigbee",
+      "bluetooth"
     ]
   },
-  "measure_description": "Measured with utils/measure script",
+  "measure_description": "Measured with utils/measure script and independently validated against a second LUT measured with an IKEA INSPELNING smart plug",
   "measure_device": "Shelly PM Mini Gen3",
   "measure_method": "script",
   "mains_voltage": 230,
@@ -30,6 +37,10 @@
     {
       "name": "Macstar1601",
       "github": "Macstar1601"
+    },
+    {
+      "name": "Mathias Lindqvist",
+      "github": "alf-mathias-lindqvist"
     }
   ]
 }
