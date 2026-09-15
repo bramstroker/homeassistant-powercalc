@@ -24,9 +24,9 @@
     "8718696168028"
   ],
   "mains_voltage": 230,
-  "measure_description": "Measured on a Shelly Pro 3EM phase (differential: each brightness row between two light-off baselines, row repeated on baseline drift; 2.5 s median per point). Full grid bri 1-251 step 5 plus 255 x mired 153-453 step 10 plus 454; smoothed over neighbouring brightness rows (+-2) and mired (1-2-1), made monotonic in brightness. Standby measured by cutting mains power at the wall switch (4 cycles).",
-  "measure_device": "Shelly Pro 3EM",
-  "measure_method": "script",
+  "measure_description": "Measured on a Shelly Pro 3EM phase with a custom script (differential: each brightness row between two light-off baselines, row repeated on baseline drift; 2.5 s median per point). Full grid bri 1-251 step 5 plus 255 x mired 153-453 step 10 plus 454; smoothed over neighbouring brightness rows (+-2) and mired (1-2-1), made monotonic in brightness, clipped at 0 W, then standby added. The phase noise is ~1.1 W per point, so below bri ~26 the light is not resolvable: those rows are flat at ~0.9 W (pooled average, not measured per point). Standby measured by cutting mains power at the wall switch (4 cycles).",
+  "measure_device": "Shelly Pro 3EM (SPEM-003CEBEU)",
+  "measure_method": "manual",
   "name": "Hue Adore Bathroom Mirror",
   "standby_power": 0.53,
   "voltage_range": {
