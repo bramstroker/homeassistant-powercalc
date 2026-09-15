@@ -712,6 +712,34 @@ def test_kasa_preflight_builds_and_probes_the_meter(tmp_path: Path) -> None:
     assert builder.call_args.args[0] == KasaPowerMeterSpec(device_ip="192.0.2.1")
 
 
+def test_tapo_credentials_are_kept_out_of_preferences_and_are_available_to_the_kasa_meter(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    payload = {
+        "power_meter": "kasa",
+        "kasa_ip": "192.0.2.31",
+        "tapo_username": "user@example.com",
+        "tapo_password": "account-password",
+    }
+
+    stored = test_client.put("/api/settings", json=payload)
+
+    assert stored.status_code == 200
+    assert stored.json()["tapo_credentials_configured"] is True
+    assert "tapo_username" not in stored.json()
+    assert "tapo_password" not in stored.json()
+    assert "account-password" not in (tmp_path / "settings.json").read_text(encoding="utf-8")
+    assert (tmp_path / "tapo_credentials.json").stat().st_mode & 0o777 == 0o600
+    settings = test_client.app.state.context.storage.load_settings()
+    assert _power_meter_spec(settings) == KasaPowerMeterSpec(device_ip="192.0.2.31")
+
+    cleared = test_client.put(
+        "/api/settings",
+        json=payload | {"tapo_username": None, "tapo_password": None, "clear_tapo_credentials": True},
+    )
+    assert cleared.json()["tapo_credentials_configured"] is False
+    assert not (tmp_path / "tapo_credentials.json").exists()
+
+
 def test_app_closes_home_assistant_manager_at_shutdown(tmp_path: Path) -> None:
     app = create_app(data_root=tmp_path, hass_token="test-token", trusted_ingress_only=False)  # noqa: S106
     home_assistant = MagicMock(spec=HomeAssistantManager)
@@ -1750,6 +1778,7 @@ def test_settings_default_and_update(tmp_path: Path) -> None:
         "shelly_username": "admin",
         "shelly_password_configured": False,
         "kasa_ip": None,
+        "tapo_credentials_configured": False,
         "fast_test_mode": False,
         "measurement_defaults": {
             "sleep_time": 2.0,

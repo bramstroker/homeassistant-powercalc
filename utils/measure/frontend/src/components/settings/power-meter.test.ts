@@ -93,6 +93,36 @@ describe("settings power meter test", () => {
     expect(settings.shelly_ip).toBeNull();
   });
 
+  it("collects Tapo credentials without exposing saved credentials", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      powers: EntityDescriptor[]; settings: AppSettings; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.powers = [];
+    element.settings = { ...defaultSettings, tapo_credentials_configured: true };
+    const saved = new Promise<AppSettingsUpdate>((resolve) => {
+      element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettingsUpdate>).detail));
+    });
+    document.body.append(element);
+    await element.updateComplete;
+
+    chooseOption(settingsCombobox(element.shadowRoot, "power_meter"), "kasa");
+    await element.updateComplete;
+    for (const [name, value] of [["kasa_ip", "192.0.2.40"], ["tapo_username", "user@example.com"], ["tapo_password", "account-password"]] as const) {
+      const input = element.shadowRoot.querySelector(`input[name="${name}"]`) as HTMLInputElement;
+      input.value = value;
+      input.dispatchEvent(new Event("input"));
+    }
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+
+    await expect(saved).resolves.toMatchObject({
+      power_meter: "kasa",
+      kasa_ip: "192.0.2.40",
+      tapo_username: "user@example.com",
+      tapo_password: "account-password",
+      clear_tapo_credentials: false,
+    });
+  });
+
   it("discovers Shellys automatically and selects only compatible devices", async () => {
     const element = document.createElement("measure-settings-view") as HTMLElement & {
       powers: EntityDescriptor[]; settings: AppSettings; shellyDiscoveryDevices: import("../../types").ShellyDiscoveryDevice[];

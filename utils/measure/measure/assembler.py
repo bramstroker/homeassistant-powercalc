@@ -88,6 +88,7 @@ class MeasurementAssembler:
         home_assistant: HomeAssistantManager | None = None,
         tuya_device_key: str | None = None,
         shelly_password: str | None = None,
+        kasa_credentials: tuple[str, str] | None = None,
         on_sample: Callable[[float], None] | None = None,
         on_calibration_sample: Callable[[float, float, float], None] | None = None,
         dummy_load_calibration_store: DummyLoadCalibrationStore | None = None,
@@ -96,6 +97,7 @@ class MeasurementAssembler:
         self._home_assistant_manager = home_assistant
         self._tuya_device_key = tuya_device_key
         self._shelly_password = shelly_password
+        self._kasa_credentials = kasa_credentials
         self._on_sample = on_sample
         self._on_calibration_sample = on_calibration_sample
         self._dummy_load_calibration_store = dummy_load_calibration_store
@@ -151,7 +153,7 @@ class MeasurementAssembler:
         if isinstance(spec, KasaPowerMeterSpec):
             from measure.powermeter.kasa import KasaPowerMeter
 
-            return KasaPowerMeter(spec.device_ip)
+            return KasaPowerMeter(spec.device_ip, credentials=self._kasa_credentials)
         if isinstance(spec, ManualPowerMeterSpec):
             return ManualPowerMeter()
         if isinstance(spec, MyStromPowerMeterSpec):
