@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, call, patch
 
 from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError
 from measure.powermeter.shelly import ShellyPowerMeter
@@ -218,3 +218,35 @@ def test_connection_error_is_raised_on_invalid_status_code(mock_requests_get_fac
 
     with pytest.raises(ApiConnectionError):
         ShellyPowerMeter(DEFAULT_SHELLY_IP)
+
+
+def test_rate_limited_request_is_retried() -> None:
+    responses = [
+        MagicMock(status_code=200, json=lambda: {"gen": 3}),
+        MagicMock(status_code=429),
+        MagicMock(status_code=200, json=lambda: {"switch:0": {"apower": 20.0}}),
+    ]
+
+    with patch("requests.get", side_effect=responses) as requests_get, patch("time.sleep") as sleep:
+        ShellyPowerMeter(DEFAULT_SHELLY_IP)
+
+    assert requests_get.call_count == 3
+    assert sleep.mock_calls == [call(2)]
+
+
+def test_rate_limited_request_fails_after_one_retry() -> None:
+    responses = [
+        MagicMock(status_code=200, json=lambda: {"gen": 3}),
+        MagicMock(status_code=429),
+        MagicMock(status_code=429),
+    ]
+
+    with (
+        patch("requests.get", side_effect=responses) as requests_get,
+        patch("time.sleep") as sleep,
+        pytest.raises(ApiConnectionError, match="RPC status endpoint returned HTTP 429"),
+    ):
+        ShellyPowerMeter(DEFAULT_SHELLY_IP)
+
+    assert requests_get.call_count == 3
+    assert sleep.mock_calls == [call(2)]
