@@ -20,6 +20,11 @@
     "socket": "E27"
   },
   "device_type": "light",
+  "gtin": [
+    "8720169364349",
+    "8720169364363",
+    "8720169364486"
+  ],
   "mains_voltage": 230,
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S Gen3",
