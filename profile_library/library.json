@@ -13654,9 +13654,15 @@
             "max": 230.85,
             "min": 229.96
           },
+          "authors": [
+            {
+              "name": "TheLexus",
+              "github": "TheLexus"
+            }
+          ],
           "id": "RF 262",
           "manufacturer": "innr",
-          "updated_at": "2026-09-16T12:56:22",
+          "updated_at": "2026-09-16T14:17:27",
           "max_power": 6.63,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-13T11:38:18",
@@ -13672,7 +13678,7 @@
             "score": 98.7,
             "brightness": 98.7
           },
-          "hash": "c105557039e696a29e11534826f20267"
+          "hash": "970181e94f24ee15a9afab9d2e7da3ec"
         },
         {
           "calculation_strategy": "lut",
@@ -27767,6 +27773,83 @@
             "color_temp": 97.3
           },
           "hash": "ae03df113a47313d3e43bd0339c45ba1"
+        },
+        {
+          "aliases": [
+            "9290038535H",
+            "8720169364066"
+          ],
+          "authors": [
+            {
+              "email": "rens@renssies.nl",
+              "github": "renssies",
+              "name": "Rens Verhoeven"
+            },
+            {
+              "github": "alf-mathias-lindqvist",
+              "name": "Mathias Lindqvist"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-15T23:43:42Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "matter",
+              "bluetooth",
+              "thread"
+            ],
+            "form_factor": "bulb",
+            "lumens": 1100,
+            "rated_power": 8.1,
+            "socket": "E27"
+          },
+          "device_type": "light",
+          "gtin": [
+            "8720169364066",
+            "8720169365735"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_device_firmware": "2.0.0",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 7.11,
+            "DUMMY_LOAD_RESISTANCE": 7808.2,
+            "NUM_LIGHTS": 2,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.7.0:app"
+          },
+          "name": "Hue White and Color Ambiance E27 1100lm",
+          "product_url": "https://www.philips-hue.com/nl-nl/p/hue-white-and-color-ambiance-a60-e27-slimme-lamp-1100/8720169364066",
+          "standby_power": 0.1,
+          "voltage_range": {
+            "max": 238.9,
+            "min": 230.7
+          },
+          "id": "LCA011",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-16T06:55:25",
+          "max_power": 8.04,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-15T23:57:10",
+          "power_range": {
+            "min": 0.27,
+            "max": 8.04
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "37c22a3774843e1f83996c0fa2b9911a"
         },
         {
           "aliases": [
