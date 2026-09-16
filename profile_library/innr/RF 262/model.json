@@ -30,5 +30,11 @@
   "voltage_range": {
     "max": 230.85,
     "min": 229.96
-  }
+  },
+  "authors": [
+    {
+      "name": "TheLexus",
+      "github": "TheLexus"
+    }
+  ]
 }
