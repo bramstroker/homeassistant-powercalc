@@ -4,6 +4,10 @@
       "email": "rens@renssies.nl",
       "github": "renssies",
       "name": "Rens Verhoeven"
+    },
+    {
+      "github": "alf-mathias-lindqvist",
+      "name": "Mathias Lindqvist"
     }
   ],
   "calculation_strategy": "lut",
