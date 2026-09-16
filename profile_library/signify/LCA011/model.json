@@ -20,7 +20,8 @@
     "connectivity": [
       "zigbee",
       "matter",
-      "bluetooth"
+      "bluetooth",
+      "thread"
     ],
     "form_factor": "bulb",
     "lumens": 1100,
