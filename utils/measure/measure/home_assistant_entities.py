@@ -53,10 +53,13 @@ class EntityDescriptor(BaseModel):
     entity_id: str
     name: str
     domain: str
-    device_class: DeviceClass | None = None
+    device_class: str | None = None
     device_id: str | None = None
     #: Home Assistant integration providing the entity, as shown on the device page.
     integration: str | None = None
+    translation_key: str | None = None
+    disabled_by: str | None = None
+    has_live_state: bool = True
     manufacturer: str | None = None
     model_id: str | None = None
     product_name: str | None = None
@@ -143,7 +146,11 @@ class EntityCatalogSnapshot:
 
     @staticmethod
     def _is_available(entity: EntityDescriptor) -> bool:
-        return entity.state.casefold() not in {"unavailable", "unknown", "none"}
+        return (
+            entity.disabled_by is None
+            and entity.has_live_state
+            and entity.state.casefold() not in {"unavailable", "unknown", "none"}
+        )
 
     @classmethod
     def _is_domain_selectable(cls, entity: EntityDescriptor) -> bool:
@@ -190,6 +197,24 @@ class HomeAssistantEntityCatalog:
             descriptors.extend(
                 _describe_entity(entity, domain_value, registry.get(entity.entity_id), devices)
                 for entity in group.entities.values()
+            )
+        live_ids = {descriptor.entity_id for descriptor in descriptors}
+        for entity_id, entry in registry.items():
+            if entity_id in live_ids:
+                continue
+            descriptors.append(
+                EntityDescriptor(
+                    entity_id=entity_id,
+                    name=getattr(entry, "name", None) or getattr(entry, "original_name", None) or entity_id,
+                    domain=entity_id.partition(".")[0],
+                    device_id=entry.device_id,
+                    integration=entry.platform,
+                    translation_key=getattr(entry, "translation_key", None),
+                    disabled_by=getattr(entry, "disabled_by", None),
+                    has_live_state=False,
+                    state="unavailable",
+                    attribute_names=[],
+                ),
             )
         by_id = {descriptor.entity_id: descriptor for descriptor in descriptors}
         return EntityCatalogSnapshot([_with_group_device_metadata(descriptor, by_id) for descriptor in descriptors])
@@ -266,6 +291,8 @@ def _describe_entity(
         device_class=device_class,
         device_id=device_id,
         integration=str(registry_entry.platform) if registry_entry is not None and registry_entry.platform else None,
+        translation_key=getattr(registry_entry, "translation_key", None),
+        disabled_by=getattr(registry_entry, "disabled_by", None),
         manufacturer=str(manufacturer) if manufacturer else None,
         model_id=str(model_id) if model_id else None,
         product_name=str(device[HASS_DEVICE_REGISTRY_MODEL]) if device.get(HASS_DEVICE_REGISTRY_MODEL) else None,
@@ -280,11 +307,8 @@ def _describe_entity(
     )
 
 
-def _device_class(value: object) -> DeviceClass | None:
-    try:
-        return DeviceClass(str(value))
-    except ValueError:
-        return None
+def _device_class(value: object) -> str | None:
+    return value if isinstance(value, str) and value else None
 
 
 def _is_finite_number(value: str) -> bool:

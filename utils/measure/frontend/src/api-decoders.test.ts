@@ -1,4 +1,4 @@
-import { decodePreflight, decodeSessionSnapshot, isMeasurementRequest } from "./api-decoders";
+import { decodeEntities, decodePreflight, decodeSessionSnapshot, isMeasurementRequest } from "./api-decoders";
 import { capabilities } from "./components/testing/fixtures";
 
 const averageRequest = {
@@ -51,6 +51,17 @@ describe("measurement request boundary", () => {
 });
 
 describe("response boundary", () => {
+  it("accepts recording metadata and arbitrary Home Assistant device classes", () => {
+    const entities = [{
+      entity_id: "binary_sensor.robot_problem", name: "Robot problem", domain: "binary_sensor",
+      device_class: "problem", translation_key: "problem", disabled_by: "integration", has_live_state: false,
+    }];
+    expect(decodeEntities(entities)).toBe(entities);
+    expect(decodeEntities([{ entity_id: "sensor.legacy", name: "Legacy" }])).toHaveLength(1);
+    expect(() => decodeEntities([{ ...entities[0], has_live_state: "false" }])).toThrow();
+    expect(() => decodeEntities([{ ...entities[0], device_class: 42 }])).toThrow();
+  });
+
   it("accepts nullable estimates emitted by an incomplete preflight", () => {
     const response = {
       valid: true,

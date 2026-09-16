@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
+from measure.analyser.models import AnalysisContext, RecordedEntity
 from measure.execution import MeasurementCancelledError, RunInteraction
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import AverageMeasurementRequest, RecorderMeasurementRequest
@@ -103,6 +104,23 @@ def test_recorder_writes_entity_states_as_json_lines(tmp_path: Path) -> None:
     records = [json.loads(line) for line in (tmp_path / "record.jsonl").read_text().splitlines()]
     metadata, *samples = records
     assert metadata == {
+        "attribute_policy": {
+            "types": ["string", "boolean", "integer", "finite_float"],
+            "max_string_length": 512,
+            "excluded_attributes": [
+                "access_token",
+                "ap",
+                "bssid",
+                "entity_picture",
+                "friendly_name",
+                "ip",
+                "latitude",
+                "longitude",
+                "ssid",
+                "token",
+            ],
+            "exclude_url_values": True,
+        },
         "entities": [
             {"domain": "vacuum", "entity_id": "vacuum.robot", "role": "primary"},
             {"domain": "sensor", "entity_id": "sensor.robot_battery", "role": "battery"},
@@ -162,6 +180,63 @@ def test_recorder_skips_unreadable_samples_and_keeps_recording(tmp_path: Path) -
     assert [sample["entities"]["switch.plug"]["state"] for sample in samples] == ["on", "off"]
     assert result.summary is not None
     assert result.summary["Samples recorded"] == "2"
+
+
+def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    measure_util = MagicMock(spec=MeasureUtil)
+    measure_util.take_measurement.return_value = MeasurementResult(power=22, voltages=[])
+    interaction = MagicMock(spec=RunInteraction)
+    interaction.wait.side_effect = [None, None, None, KeyboardInterrupt]
+    base_states = {
+        "vacuum.robot": RecorderEntityState("docked", {"washing": True, "ap": {"ssid": "private"}}),
+        "sensor.battery": RecorderEntityState("100", {}),
+    }
+    state_reader = MagicMock(
+        side_effect=[
+            {},
+            base_states,
+            base_states,
+            base_states | {"sensor.state": RecorderEntityState("washing", {})},
+        ]
+    )
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id="vacuum.robot",
+        battery_entity_id="sensor.battery",
+        additional_entity_ids=("sensor.state",),
+    )
+    primary = RecordedEntity("vacuum.robot", "vacuum", "primary", integration="dreame_vacuum", translation_key="vacuum")
+    context = AnalysisContext(
+        "vacuum_robot",
+        "vacuum.robot",
+        "vacuum_robot",
+        (
+            primary,
+            RecordedEntity("sensor.battery", "sensor", "battery"),
+            RecordedEntity("sensor.state", "sensor", "tracked"),
+        ),
+        (RecordedEntity("sensor.disabled", "sensor", "disabled", disabled_by="integration", has_live_state=False),),
+    )
+    result = RecorderRunner(measure_util, interaction, state_reader, context).run(request, str(tmp_path))
+    metadata = json.loads((tmp_path / "record.jsonl").read_text().splitlines()[0])
+    assert metadata["entities"][0] == primary.to_dict()
+    assert metadata["device_entities"][0]["has_live_state"] is False
+    samples = [
+        row
+        for row in map(json.loads, (tmp_path / "record.jsonl").read_text().splitlines())
+        if row["record_type"] == "sample"
+    ]
+    assert result.summary["Samples recorded"] == "3"
+    assert result.summary["Optional entities missing during recording"] == "sensor.state"
+    assert [row["entities"]["sensor.state"]["state"] for row in samples] == ["unavailable", "unavailable", "washing"]
+    assert samples[0]["entities"]["vacuum.robot"]["attributes"] == {"washing": True}
+    assert "sensor.disabled" not in samples[0]["entities"]
+    assert caplog.text.count("Optional recording entity disappeared") == 1
+    assert "Required recording entities not found" in caplog.text
 
 
 def test_recorder_stops_when_cancelled_while_reading_states(tmp_path: Path) -> None:

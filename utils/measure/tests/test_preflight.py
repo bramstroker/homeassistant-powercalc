@@ -39,7 +39,9 @@ class Entity(EntityRecord):
     model_id: str | None = None
     member_entity_ids: list[str] = field(default_factory=list)
     domain: str = ""
-    device_class: DeviceClass | None = None
+    device_class: str | None = None
+    disabled_by: str | None = None
+    has_live_state: bool = True
 
 
 def preflight(
@@ -84,6 +86,26 @@ def base_entities() -> dict[tuple[str | None, str | None], list[Entity]]:
         ("lawn_mower", None): [Entity("lawn_mower.test", attribute_names=["battery_level"])],
         ("sensor", None): [Entity("sensor.battery", state="75")],
     }
+
+
+@pytest.mark.parametrize(
+    "entity, message",
+    [
+        (Entity("sensor.disabled", disabled_by="integration"), "Selected recorder entity is disabled"),
+        (Entity("sensor.disabled", has_live_state=False), "Selected recorder entity has no live state"),
+    ],
+)
+def test_preflight_rejects_inactive_recorder_entity(entity: Entity, message: str) -> None:
+    entities = base_entities()
+    entities[("sensor", None)] = [entity]
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("sensor.disabled",),
+    )
+    with pytest.raises(PreflightError, match=message):
+        preflight(entities).validate(request)
 
 
 @pytest.mark.parametrize(

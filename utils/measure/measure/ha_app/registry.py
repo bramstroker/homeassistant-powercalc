@@ -433,7 +433,8 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                     ("profile_recipe", (RecorderProfileRecipe.VACUUM_ROBOT,)),
                 ),
                 hint=(
-                    "Entities from the vacuum's device are listed first. You can also choose an entity from elsewhere."
+                    "Available device entities are selected automatically in the app. You can remove them or add "
+                    "entities from a separately exposed dock."
                 ),
                 review=True,
             ),

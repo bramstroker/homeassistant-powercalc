@@ -16,6 +16,10 @@ class RecordedEntity:
     device_class: str | None = None
     integration: str | None = None
     translation_key: str | None = None
+    device_id: str | None = None
+    unit: str | None = None
+    disabled_by: str | None = None
+    has_live_state: bool | None = None
 
     def to_dict(self) -> dict[str, object]:
         value: dict[str, object] = {
@@ -23,7 +27,15 @@ class RecordedEntity:
             "domain": self.domain,
             "role": self.role,
         }
-        for key in ("device_class", "integration", "translation_key"):
+        for key in (
+            "device_class",
+            "integration",
+            "translation_key",
+            "device_id",
+            "unit",
+            "disabled_by",
+            "has_live_state",
+        ):
             item = getattr(self, key)
             if item is not None:
                 value[key] = item
@@ -49,15 +61,19 @@ class AnalysisContext:
     primary_entity_id: str
     device_type: str
     entities: tuple[RecordedEntity, ...]
+    device_entities: tuple[RecordedEntity, ...] = ()
 
     def metadata_record(self) -> dict[str, object]:
-        return {
+        record: dict[str, object] = {
             "record_type": "metadata",
             "format_version": 1,
             "recipe": self.recipe,
             "primary_entity_id": self.primary_entity_id,
             "entities": [entity.to_dict() for entity in self.entities],
         }
+        if self.device_entities:
+            record["device_entities"] = [entity.to_dict() for entity in self.device_entities]
+        return record
 
 
 @dataclass(frozen=True)

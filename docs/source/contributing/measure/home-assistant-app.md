@@ -24,7 +24,7 @@ No port, host networking, Home Assistant configuration mapping, or API credentia
 | Fan | `fan` | Linear percentage calibration and optional `model.json` |
 | Charging device | `vacuum` or `lawn_mower` | Battery-level charging calibration and optional `model.json` |
 | Average | No controlled device required | Average power over a configured duration |
-| Recorder | Optional tracked entities from any domain; guided vacuum and battery selection | Playbook CSV, or entity-state JSON Lines with automatic experimental fixed-profile analysis |
+| Recorder | Optional tracked entities from any domain; guided vacuum and battery selection with automatic device-entity capture | Playbook CSV, or entity-state JSON Lines with automatic experimental fixed-profile analysis |
 
 The app supports these power-meter types:
 
@@ -102,6 +102,32 @@ During the actual run, live and saved power readings show the target device cons
 8. Review plots and download generated CSV, model, or recording files from the result view. For generated profiles, either prepare a GitHub pull request in the app or use the permanent manual-contribution option.
 
 The PowerCalc logo and the **All sessions** action in the top bar return to the session dashboard. Only one measurement runs at a time; while one is active, its dashboard entry provides the monitor action and starting or resuming another session is disabled.
+
+### Recording a vacuum and dock
+
+Choose **Recorder**, **Complex profile**, and the vacuum recipe. Select the vacuum and its battery percentage
+sensor. The app preselects the other enabled entities with live states on the same Home Assistant device. You can
+remove entities or add dock entities belonging to another device. Camera and image entities are not selected
+automatically. Changing the selected vacuum resets these defaults; reopening a saved configuration preserves your
+selections.
+
+Measure the entire dock at the wall outlet. Record idle, cleaning, charging through completion, mop washing,
+auto-emptying, and drying where supported. Prefer repeated cycles so a future analyser can check a profile against
+independent runs rather than nearby samples from the same cycle.
+
+The selected entity list is fixed for the run. `record.jsonl` includes entity roles, integration, translation keys,
+device classes, units, and device associations when available. Its device inventory also lists disabled entities
+without recording their states or enabling them. Enable any useful missing entities in Home Assistant before
+starting a new recording.
+
+Vacuum recordings keep bounded scalar attributes, omitting nested payloads, long strings, URL values, and common
+network, location, and credential attributes. The metadata describes this filtering policy. Recordings still contain
+entity IDs and other device data: review them before sharing. If an optional entity disappears, its state is recorded
+as `unavailable`, with a warning, while power readings continue. Missing required vacuum or battery entities cause
+that sample to be skipped.
+
+Automatic profile analysis currently supports experimental fixed `states_power` models only. Capturing additional
+entities prepares the data for a future vacuum/composite analyser; it does not yet generate composite profiles.
 
 ## Measure session status sensor
 

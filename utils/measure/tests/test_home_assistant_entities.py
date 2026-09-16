@@ -140,6 +140,58 @@ def test_catalog_loads_entity_data_once_per_instance() -> None:
     assert fresh[0].state == "2.0"
 
 
+def test_catalog_includes_registry_inventory_without_exposing_disabled_choices() -> None:
+    data = _entity_data()
+    data.entity_registry.extend(
+        [
+            SimpleNamespace(
+                entity_id="vacuum.robot", device_id="robot-device", platform="dreame_vacuum", translation_key="vacuum"
+            ),
+            SimpleNamespace(
+                entity_id="sensor.robot_state",
+                device_id="robot-device",
+                platform="dreame_vacuum",
+                translation_key="state",
+                disabled_by="integration",
+                name=None,
+                original_name="Robot state",
+            ),
+            SimpleNamespace(entity_id="sensor.pending", device_id=None, platform="test"),
+            SimpleNamespace(
+                entity_id="sensor.desk_voltage", device_id="meter-device", platform="shelly", disabled_by="user"
+            ),
+        ]
+    )
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+    snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
+    assert snapshot.get("vacuum.robot").translation_key == "vacuum"
+    disabled = snapshot.get("sensor.robot_state")
+    assert disabled.name == "Robot state"
+    assert disabled.device_id == "robot-device"
+    assert disabled.translation_key == "state"
+    assert disabled.disabled_by == "integration"
+    assert disabled.has_live_state is False
+    assert snapshot.get("sensor.pending").name == "sensor.pending"
+    assert snapshot.get("sensor.pending").disabled_by is None
+    assert snapshot.get("sensor.pending").has_live_state is False
+    selectable_ids = {entity.entity_id for entity in snapshot.select(domain="sensor")}
+    assert "sensor.robot_state" not in selectable_ids
+    assert "sensor.pending" not in selectable_ids
+    assert "sensor.desk_voltage" not in selectable_ids
+    assert snapshot.get("sensor.desk_voltage").has_live_state is True
+
+
+@pytest.mark.parametrize("device_class", ["temperature", "problem", "battery", "", None, 42])
+def test_catalog_preserves_arbitrary_string_device_classes(device_class: object) -> None:
+    data = _entity_data()
+    data.entities["sensor"].entities["power"].state.attributes["device_class"] = device_class
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+    descriptor = HomeAssistantEntityCatalog(home_assistant).load_snapshot().get("sensor.desk_power")
+    assert descriptor.device_class == (device_class if isinstance(device_class, str) and device_class else None)
+
+
 def test_catalog_all_includes_arbitrary_domains_and_unavailable_entities() -> None:
     data = _entity_data()
     data.entities["climate"] = SimpleNamespace(

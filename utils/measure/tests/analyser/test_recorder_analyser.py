@@ -16,6 +16,7 @@ from measure.analyser.models import (
 )
 from measure.analyser.recording import load_recording
 from measure.analyser.service import RecorderAnalyser, _credibility_reason, _select_candidate, analysis_context_for
+from measure.home_assistant_entities import EntityDescriptor
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, RecorderPurpose
 import pytest
@@ -116,6 +117,65 @@ def test_real_world_recorder_regressions(case: RecorderRegressionCase) -> None:
     assert result.metrics is not None
     assert result.metrics.mae_w == pytest.approx(case.validation_mae_w, abs=0.001)
     assert result.metrics.coverage == pytest.approx(case.validation_coverage)
+
+
+def test_vacuum_context_records_selected_metadata_and_complete_device_inventory() -> None:
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id="vacuum.robot",
+        battery_entity_id="sensor.battery",
+        additional_entity_ids=("sensor.state",),
+    )
+    descriptors = [
+        EntityDescriptor(
+            entity_id="vacuum.robot",
+            name="Robot",
+            domain="vacuum",
+            device_id="robot",
+            state="docked",
+            attribute_names=[],
+            integration="dreame_vacuum",
+        ),
+        EntityDescriptor(
+            entity_id="sensor.state",
+            name="State",
+            domain="sensor",
+            device_id="robot",
+            state="idle",
+            attribute_names=[],
+            translation_key="state",
+            integration="dreame_vacuum",
+        ),
+        EntityDescriptor(
+            entity_id="sensor.disabled",
+            name="Disabled",
+            domain="sensor",
+            device_id="robot",
+            state="unavailable",
+            attribute_names=[],
+            disabled_by="integration",
+            has_live_state=False,
+        ),
+        EntityDescriptor(
+            entity_id="sensor.unrelated",
+            name="Other",
+            domain="sensor",
+            device_id="other",
+            state="idle",
+            attribute_names=[],
+        ),
+    ]
+    context = analysis_context_for(request, descriptors)
+    assert context.entities[2].translation_key == "state"
+    assert context.entities[2].integration == "dreame_vacuum"
+    assert context.entities[1].role == "battery"
+    inventory = context.metadata_record()["device_entities"]
+    assert [entity["entity_id"] for entity in inventory] == ["vacuum.robot", "sensor.state", "sensor.disabled"]
+    assert inventory[2]["role"] == "disabled"
+    assert inventory[2]["has_live_state"] is False
+    assert inventory[2]["disabled_by"] == "integration"
 
 
 def test_load_recording_accepts_typed_and_legacy_samples_and_reports_bad_lines(tmp_path: Path) -> None:

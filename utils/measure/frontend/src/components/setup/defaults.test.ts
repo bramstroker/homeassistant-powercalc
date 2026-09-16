@@ -79,6 +79,8 @@ describe("setup view defaults", () => {
       { entity_id: "sensor.robot_battery", name: "Robot battery", domain: "sensor", device_id: "robot-device", device_class: "battery", state: "42", unit: "%" },
       { entity_id: "sensor.other_battery", name: "Other battery", domain: "sensor", device_id: "other-device", device_class: "battery", state: "80", unit: "%" },
       { entity_id: "sensor.dock_state", name: "Dock state", domain: "sensor", device_id: "robot-device", state: "idle" },
+      { entity_id: "vacuum.other", name: "Other robot", domain: "vacuum", device_id: "other-device", state: "docked" },
+      { entity_id: "sensor.other_state", name: "Other state", domain: "sensor", device_id: "other-device", state: "idle" },
     ] };
     element.selectedType = "recorder";
     element.meter = { type: "dummy" };
@@ -97,7 +99,23 @@ describe("setup view defaults", () => {
     expect((battery.querySelector('input[slot="value"]') as HTMLInputElement).value).toBe("sensor.robot_battery");
     expect(element.shadowRoot.textContent).toContain("Measure the complete dock at the wall outlet");
     expect(element.shadowRoot.querySelectorAll('select[name="additional_entity_ids"]')).toHaveLength(0);
-    expect(element.shadowRoot.textContent).toContain("Additional entities (optional)");
+    const additional = entityCombobox(element, "additional_entity_ids");
+    expect(additional.label).toBe("Additional entities (optional)");
+    expect(additional.value).toEqual(["sensor.dock_state"]);
+    const submitted = new Promise<MeasurementRequest>((resolve) => element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail)));
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    expect(await submitted).toMatchObject({
+      vacuum_entity_id: "vacuum.robot", battery_entity_id: "sensor.robot_battery", additional_entity_ids: ["sensor.dock_state"],
+    });
+
+    additional.dispatchEvent(new CustomEvent("combobox-change", { detail: { value: [] } }));
+    await element.updateComplete;
+    expect(entityCombobox(element, "additional_entity_ids").value).toEqual([]);
+
+    selectEntity(entityCombobox(element, "vacuum_entity_id"), "vacuum.other");
+    await element.updateComplete;
+    expect(entityCombobox(element, "additional_entity_ids").value).toEqual(["sensor.other_state"]);
+    expect(entityCombobox(element, "battery_entity_id").value).toBe("sensor.other_battery");
   });
 
   it("explains when a vacuum has no usable same-device battery sensor", async () => {

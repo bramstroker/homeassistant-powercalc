@@ -17,6 +17,7 @@ from measure.analyser.models import (
     StrategyNotApplicable,
 )
 from measure.analyser.recording import load_recording
+from measure.home_assistant_entities import EntityDescriptor
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe
 
 MIN_VALIDATION_COVERAGE = 0.9
@@ -79,21 +80,47 @@ class RecorderAnalyser:
         )
 
 
-def analysis_context_for(request: RecorderMeasurementRequest) -> AnalysisContext:
+def analysis_context_for(
+    request: RecorderMeasurementRequest,
+    descriptors: Sequence[EntityDescriptor] = (),
+) -> AnalysisContext:
     entity_ids = request.recorded_entity_ids
     if not entity_ids or request.profile_recipe is None:
         raise ValueError("A complex-profile recorder request is required for analysis")
     roles = ["primary", *("tracked" for _ in entity_ids[1:])]
     if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT:
         roles[1] = "battery"
+    by_id = {entity.entity_id: entity for entity in descriptors}
+
+    def recorded_entity(entity_id: str, role: str) -> RecordedEntity:
+        entity = by_id.get(entity_id)
+        if entity is None:
+            return RecordedEntity(entity_id, entity_id.partition(".")[0], role)
+        return RecordedEntity(
+            entity_id,
+            entity.domain,
+            role,
+            device_class=entity.device_class,
+            integration=entity.integration,
+            translation_key=entity.translation_key,
+            device_id=entity.device_id,
+            unit=entity.unit,
+            disabled_by=entity.disabled_by,
+            has_live_state=entity.has_live_state,
+        )
+
+    primary = by_id.get(entity_ids[0])
+    device_entities = tuple(
+        recorded_entity(entity.entity_id, "available" if entity.disabled_by is None else "disabled")
+        for entity in descriptors
+        if primary is not None and primary.device_id is not None and entity.device_id == primary.device_id
+    )
     return AnalysisContext(
         recipe=request.profile_recipe.value,
         primary_entity_id=entity_ids[0],
         device_type="vacuum_robot" if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT else "generic_iot",
-        entities=tuple(
-            RecordedEntity(entity_id, entity_id.partition(".")[0], role)
-            for entity_id, role in zip(entity_ids, roles, strict=True)
-        ),
+        entities=tuple(recorded_entity(entity_id, role) for entity_id, role in zip(entity_ids, roles, strict=True)),
+        device_entities=device_entities,
     )
 
 

@@ -15,9 +15,12 @@ export interface EntityDescriptor {
   entity_id: string;
   name: string;
   domain?: string;
-  device_class?: DeviceClass | null;
+  device_class?: string | null;
   device_id?: string | null;
   integration?: string | null;
+  translation_key?: string | null;
+  disabled_by?: string | null;
+  has_live_state?: boolean;
   manufacturer?: string | null;
   model_id?: string | null;
   product_name?: string | null;
