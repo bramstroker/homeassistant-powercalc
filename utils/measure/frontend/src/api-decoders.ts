@@ -251,6 +251,7 @@ const isAppSettings: Guard<AppSettings> = objectOf({
   shelly_username: optional(isString),
   shelly_password_configured: optional(isBoolean),
   kasa_ip: nullable(isString),
+  tapo_credentials_configured: optional(isBoolean),
   fast_test_mode: isBoolean,
   measurement_defaults: isAppMeasurementDefaults,
 });

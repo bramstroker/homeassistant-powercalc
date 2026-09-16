@@ -82,10 +82,12 @@ class MeasurementService(SessionMeasurementService):
         storage: SessionStorage | None = None,
         *,
         shelly_password: str | None = None,
+        kasa_credentials: tuple[str, str] | None = None,
     ) -> None:
         self.home_assistant = home_assistant
         self.storage = storage
         self.shelly_password = shelly_password
+        self.kasa_credentials = kasa_credentials
 
     def run(
         self,
@@ -95,7 +97,7 @@ class MeasurementService(SessionMeasurementService):
     ) -> RunnerResult:
         """Run with session logging and redact secrets from surfaced failures."""
 
-        secrets = (self.home_assistant.token, self.shelly_password or "")
+        secrets = (self.home_assistant.token, self.shelly_password or "", *(self.kasa_credentials or ()))
         handler = _SessionLogHandler(control, secrets)
         _LOGGER.addHandler(handler)
         context_token = _SESSION_LOG_CONTROL.set(control)
@@ -130,6 +132,7 @@ class MeasurementService(SessionMeasurementService):
             interaction,
             home_assistant=self.home_assistant,
             shelly_password=self.shelly_password,
+            kasa_credentials=self.kasa_credentials,
             on_sample=control.sample,
             on_calibration_sample=control.calibration_sample,
             dummy_load_calibration_store=calibration_store,

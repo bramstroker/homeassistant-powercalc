@@ -334,6 +334,8 @@ export class SettingsView extends LitElement {
     const meter = settingsFromForm(data);
     // Credentials stay here rather than in the registry: they are only ever entered, never read back.
     const shellyPassword = formRaw(data, "shelly_password");
+    const tapoUsername = formRaw(data, "tapo_username");
+    const tapoPassword = formRaw(data, "tapo_password");
     return {
       ...meter,
       default_measure_device: formTextOrNull(data, "default_measure_device"),
@@ -345,6 +347,10 @@ export class SettingsView extends LitElement {
       shelly_password_configured: this.settings?.shelly_password_configured ?? false,
       shelly_password: meter.power_meter === "shelly" ? shellyPassword || null : null,
       clear_shelly_password: formChecked(data, "clear_shelly_password"),
+      tapo_credentials_configured: this.settings?.tapo_credentials_configured ?? false,
+      tapo_username: meter.power_meter === "kasa" ? tapoUsername || null : null,
+      tapo_password: meter.power_meter === "kasa" ? tapoPassword || null : null,
+      clear_tapo_credentials: formChecked(data, "clear_tapo_credentials"),
       fast_test_mode: formChecked(data, "fast_test_mode"),
       measurement_defaults: {
         sleep_time: formNumber(data, "sleep_time"),
