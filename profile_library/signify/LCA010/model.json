@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "929003853404"
+  ],
   "authors": [
     {
       "email": "rens@renssies.nl",
@@ -17,6 +20,7 @@
     ],
     "form_factor": "bulb",
     "lumens": 810,
+    "rated_power": 6,
     "socket": "E27"
   },
   "device_type": "light",
@@ -40,6 +44,7 @@
     "VERSION": "v0.7.0:app"
   },
   "name": "Hue White and Color Ambiance E27 810lm",
+  "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-a60-e27-smart-bulb-810/8720169364349",
   "standby_power": 0.08,
   "voltage_range": {
     "max": 240.8,
