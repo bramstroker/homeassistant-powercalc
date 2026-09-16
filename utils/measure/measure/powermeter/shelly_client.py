@@ -85,6 +85,7 @@ class ShellyProbeError(Exception):
 
 
 _INVALID_GENERATION_MESSAGE = "The Shelly generation was invalid"
+_RATE_LIMIT_RETRY_DELAY_SECONDS = 2
 
 
 class ShellyClient:
@@ -185,18 +186,10 @@ class ShellyClient:
         return components[0]
 
     def _request_json(self, endpoint: str, description: str) -> object:
-        try:
-            response = self._http_get(
-                f"{self._base_url}{endpoint}",
-                timeout=self._timeout,
-                allow_redirects=False,
-                auth=self._authentication,
-            )
-        except requests.RequestException as error:
-            raise ShellyProbeError(
-                ShellyProbeFailure.UNREACHABLE,
-                "The Shelly device could not be reached",
-            ) from error
+        response = self._get(endpoint)
+        if response.status_code == 429:
+            time.sleep(_RATE_LIMIT_RETRY_DELAY_SECONDS)
+            response = self._get(endpoint)
 
         if response.status_code in {401, 403}:
             authenticated = self._authentication is not None
@@ -218,6 +211,20 @@ class ShellyClient:
             return response.json()
         except ValueError as error:
             raise self._invalid_response(f"The Shelly {description} response was invalid") from error
+
+    def _get(self, endpoint: str) -> requests.Response:
+        try:
+            return self._http_get(
+                f"{self._base_url}{endpoint}",
+                timeout=self._timeout,
+                allow_redirects=False,
+                auth=self._authentication,
+            )
+        except requests.RequestException as error:
+            raise ShellyProbeError(
+                ShellyProbeFailure.UNREACHABLE,
+                "The Shelly device could not be reached",
+            ) from error
 
     def _parse_gen1_reading(self, data: object) -> PowerMeasurementResult:
         meter = self._gen1_meter(data)
