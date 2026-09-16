@@ -22,6 +22,7 @@ import { renderEntityList } from "./entity-list-field";
 import {
   activeParameters,
   availableOptions,
+  disabledVacuumEntityCount,
   entityChoices,
   entityRows,
   selectedEntityId,
@@ -290,27 +291,11 @@ export class SetupFieldsSection extends LitElement {
 
   private renderMultiEntity(field: FormField, entities: EntityDescriptor[]) {
     const vacuumAdditional = this.definition?.measure_type === "recorder" && field.name === "additional_entity_ids";
-    if ((this.definition?.measure_type === "light" && field.role === "controller") || vacuumAdditional) {
-      const selected = this.fieldState ? selectedEntityIds(field, this.fieldState) : [];
-      const vacuumField = this.definition?.fields.find((candidate) => candidate.name === "vacuum_entity_id");
-      const vacuumId = vacuumAdditional && vacuumField && this.fieldState
-        ? selectedEntityId(vacuumField, this.fieldState)
-        : "";
-      const deviceId = this.deviceEntities["*"]?.find((entity) => entity.entity_id === vacuumId)?.device_id;
-      const disabled = vacuumAdditional && deviceId
-        ? (this.deviceEntities["*"] ?? []).filter((entity) => entity.device_id === deviceId && entity.disabled_by).length
-        : 0;
-      return html`<div class="field-block"><measure-combobox
-        name=${field.name}
-        label=${field.plural_label || field.label}
-        .value=${selected}
-        .options=${entities.map((entity) => ({ value: entity.entity_id, label: `${entity.name} · ${entity.entity_id}` }))}
-        placeholder=${vacuumAdditional ? "Select additional entities" : "Select lights"}
-        ?required=${field.required}
-        multiple
-        @combobox-change=${(event: CustomEvent<{ value: string[] }>) => this.changeEntities(field.name, event.detail.value)}
-      ></measure-combobox>
-      ${vacuumAdditional ? html`<p class="muted">${selected.length} additional entities selected. Available device entities are selected by default; you can remove them or add dock entities. Camera and image entities are not selected automatically. ${disabled ? `${disabled} disabled entities are listed in recording metadata only.` : ""}</p>` : nothing}
+    const lightController = this.definition?.measure_type === "light" && field.role === "controller";
+    if (vacuumAdditional || lightController) {
+      return html`<div class="field-block">
+        ${this.renderEntityCombobox(field, entities, vacuumAdditional ? "Select additional entities" : "Select lights")}
+        ${vacuumAdditional ? this.renderVacuumRecordingHint(field) : nothing}
       </div>`;
     }
     return renderEntityList({
@@ -319,6 +304,31 @@ export class SetupFieldsSection extends LitElement {
       rows: this.fieldState ? entityRows(field, this.fieldState) : [],
       onChange: (rows) => this.changeEntities(field.name, rows),
     });
+  }
+
+  private renderEntityCombobox(field: FormField, entities: EntityDescriptor[], placeholder: string) {
+    const selected = this.fieldState ? selectedEntityIds(field, this.fieldState) : [];
+    return html`<measure-combobox
+      name=${field.name}
+      label=${field.plural_label || field.label}
+      .value=${selected}
+      .options=${entities.map((entity) => ({ value: entity.entity_id, label: `${entity.name} · ${entity.entity_id}` }))}
+      placeholder=${placeholder}
+      ?required=${field.required}
+      multiple
+      @combobox-change=${(event: CustomEvent<{ value: string[] }>) => this.changeEntities(field.name, event.detail.value)}
+    ></measure-combobox>`;
+  }
+
+  private renderVacuumRecordingHint(field: FormField) {
+    const state = this.fieldState;
+    const selected = state ? selectedEntityIds(field, state).length : 0;
+    const disabled = state ? disabledVacuumEntityCount(state) : 0;
+    return html`<p class="muted">
+      ${selected} additional entities selected. Available device entities are selected by default;
+      you can remove them or add dock entities. Camera and image entities are not selected automatically.
+      ${disabled ? `${disabled} disabled entities are listed in recording metadata only.` : ""}
+    </p>`;
   }
 
   private fieldDomains(field: FormField): string[] {

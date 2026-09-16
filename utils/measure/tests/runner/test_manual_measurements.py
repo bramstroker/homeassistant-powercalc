@@ -186,7 +186,10 @@ def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
     tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     measure_util = MagicMock(spec=MeasureUtil)
-    measure_util.take_measurement.return_value = MeasurementResult(power=22, voltages=[])
+    measure_util.take_measurement.side_effect = [
+        MeasurementResult(power=22, voltages=[199]),
+        *[MeasurementResult(power=22, voltages=[230]) for _ in range(3)],
+    ]
     interaction = MagicMock(spec=RunInteraction)
     interaction.wait.side_effect = [None, None, None, KeyboardInterrupt]
     base_states = {
@@ -231,12 +234,64 @@ def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
         if row["record_type"] == "sample"
     ]
     assert result.summary["Samples recorded"] == "3"
+    assert result.voltages == [230, 230, 230]
+    assert interaction.progress.call_count == 3
+    assert interaction.wait.call_count == 4
+    assert interaction.entity_states.call_args_list[0].args[0]["sensor.state"] == "unavailable"
     assert result.summary["Optional entities missing during recording"] == "sensor.state"
     assert [row["entities"]["sensor.state"]["state"] for row in samples] == ["unavailable", "unavailable", "washing"]
     assert samples[0]["entities"]["vacuum.robot"]["attributes"] == {"washing": True}
     assert "sensor.disabled" not in samples[0]["entities"]
     assert caplog.text.count("Optional recording entity disappeared") == 1
     assert "Required recording entities not found" in caplog.text
+
+
+@pytest.mark.parametrize("is_vacuum", [False, True])
+def test_recorder_separates_recorded_attributes_from_live_states(tmp_path: Path, is_vacuum: bool) -> None:
+    measure_util = MagicMock(spec=MeasureUtil)
+    measure_util.take_measurement.return_value = MeasurementResult(power=22, voltages=[])
+    interaction = MagicMock(spec=RunInteraction)
+    interaction.wait.side_effect = KeyboardInterrupt
+    attributes = {"washing": True, "ap": {"ssid": "private"}}
+    state_reader = MagicMock(
+        return_value={
+            "vacuum.robot": RecorderEntityState("docked", attributes),
+            "sensor.battery": RecorderEntityState("100", {}),
+        }
+    )
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot" if is_vacuum else "generic",
+        vacuum_entity_id="vacuum.robot" if is_vacuum else None,
+        battery_entity_id="sensor.battery" if is_vacuum else None,
+        tracked_entity_ids=() if is_vacuum else ("vacuum.robot", "sensor.battery"),
+    )
+
+    RecorderRunner(measure_util, interaction, state_reader).run(request, str(tmp_path))
+
+    sample = json.loads((tmp_path / "record.jsonl").read_text().splitlines()[1])
+    assert sample["entities"]["vacuum.robot"] == {
+        "state": "docked",
+        "attributes": {"washing": True} if is_vacuum else attributes,
+    }
+    interaction.entity_states.assert_called_once_with({"vacuum.robot": "docked", "sensor.battery": "100"})
+    assert attributes == {"washing": True, "ap": {"ssid": "private"}}
+
+
+def test_recorder_rejects_export_symlink_outside_output_directory(tmp_path: Path) -> None:
+    request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    directory = tmp_path / "recordings"
+    directory.mkdir()
+    (directory / request.export_filename).symlink_to(tmp_path / "outside.csv")
+    runner = RecorderRunner(MagicMock(spec=MeasureUtil), MagicMock(spec=RunInteraction))
+    with pytest.raises(ValueError, match="escapes its output directory"):
+        runner.run(request, str(directory))
+
+
+def test_recorder_has_no_standby_measurement() -> None:
+    runner = RecorderRunner(MagicMock(spec=MeasureUtil))
+    assert runner.measure_standby_power() == MeasurementResult(power=0, voltages=[])
 
 
 def test_recorder_stops_when_cancelled_while_reading_states(tmp_path: Path) -> None:

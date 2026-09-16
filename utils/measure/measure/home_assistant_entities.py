@@ -1,6 +1,6 @@
 from enum import StrEnum
 import math
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -16,6 +16,9 @@ from measure.const import (
 from measure.controller.light.capabilities import light_info_from_attributes, supported_light_modes
 from measure.controller.light.const import LutMode
 from measure.home_assistant import HomeAssistantManager
+
+if TYPE_CHECKING:
+    from homeassistant_api import EntityRegistryEntry
 
 
 class EntityDomain(StrEnum):
@@ -199,25 +202,27 @@ class HomeAssistantEntityCatalog:
                 for entity in group.entities.values()
             )
         live_ids = {descriptor.entity_id for descriptor in descriptors}
-        for entity_id, entry in registry.items():
-            if entity_id in live_ids:
-                continue
-            descriptors.append(
-                EntityDescriptor(
-                    entity_id=entity_id,
-                    name=getattr(entry, "name", None) or getattr(entry, "original_name", None) or entity_id,
-                    domain=entity_id.partition(".")[0],
-                    device_id=entry.device_id,
-                    integration=entry.platform,
-                    translation_key=getattr(entry, "translation_key", None),
-                    disabled_by=getattr(entry, "disabled_by", None),
-                    has_live_state=False,
-                    state="unavailable",
-                    attribute_names=[],
-                ),
-            )
+        descriptors.extend(
+            _describe_registry_entity(entry) for entity_id, entry in registry.items() if entity_id not in live_ids
+        )
         by_id = {descriptor.entity_id: descriptor for descriptor in descriptors}
         return EntityCatalogSnapshot([_with_group_device_metadata(descriptor, by_id) for descriptor in descriptors])
+
+
+def _describe_registry_entity(entry: EntityRegistryEntry) -> EntityDescriptor:
+    """Describe an inventory-only entity with no live Home Assistant state."""
+    return EntityDescriptor(
+        entity_id=entry.entity_id,
+        name=getattr(entry, "name", None) or getattr(entry, "original_name", None) or entry.entity_id,
+        domain=entry.entity_id.partition(".")[0],
+        device_id=entry.device_id,
+        integration=entry.platform,
+        translation_key=getattr(entry, "translation_key", None),
+        disabled_by=getattr(entry, "disabled_by", None),
+        has_live_state=False,
+        state="unavailable",
+        attribute_names=[],
+    )
 
 
 def _with_group_device_metadata(

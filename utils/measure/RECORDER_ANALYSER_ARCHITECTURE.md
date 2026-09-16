@@ -72,7 +72,8 @@ metadata for portable profile references.
 [RecorderRunner](measure/runner/recorder.py) samples power and selected entity states at a
 nominal two-second interval. Reads are sequential, so latency contributes to elapsed time
 and alignment around transitions. `EntityStateReader` batches the selected IDs and returns
-`RecorderEntityState` objects.
+`RecorderEntityState` objects. `CapturedEntities` pairs filtered recording data with the
+state-only values shown in the live session.
 
 The runner streams either:
 
@@ -94,6 +95,7 @@ The analysis types are defined in [models.py](measure/analyser/models.py).
 | Type | Responsibility |
 | --- | --- |
 | `RecordedEntity` | Captured identity: ID, domain, role, device ID, translation key, device class, unit, disabled/live-state information. |
+| `EntityRole` | Named primary, battery, tracked, available, and disabled roles; serialized as strings. |
 | `AnalysisContext` | Recipe, primary ID, device type, selected metadata, and same-device inventory. |
 | `RecordedEntityState` | One recorded state plus attributes. |
 | `RecordingSample` | Elapsed seconds, measured watts, entity map, and source `recording_id`. |

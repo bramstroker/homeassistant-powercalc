@@ -6,6 +6,7 @@ from measure.analyser.fixed import FixedStatesPowerStrategy
 from measure.analyser.models import (
     AnalysisContext,
     AnalysisMetrics,
+    EntityRole,
     EvaluatedCandidate,
     FeatureReference,
     ModelConfigFragment,
@@ -169,6 +170,11 @@ def test_vacuum_context_records_selected_metadata_and_complete_device_inventory(
         ),
     ]
     context = analysis_context_for(request, descriptors)
+    assert context.entities[0].role is EntityRole.PRIMARY
+    assert context.entities[1].role is EntityRole.BATTERY
+    assert context.entities[2].role is EntityRole.TRACKED
+    assert context.device_entities[0].role is EntityRole.AVAILABLE
+    assert context.device_entities[2].role is EntityRole.DISABLED
     assert context.entities[2].translation_key == "state"
     assert context.entities[2].integration == "dreame_vacuum"
     assert context.entities[1].role == "battery"
@@ -177,6 +183,9 @@ def test_vacuum_context_records_selected_metadata_and_complete_device_inventory(
     assert inventory[2]["role"] == "disabled"
     assert inventory[2]["has_live_state"] is False
     assert inventory[2]["disabled_by"] == "integration"
+    serialized = json.loads(json.dumps(context.metadata_record()))
+    assert [entity["role"] for entity in serialized["entities"]] == ["primary", "battery", "tracked"]
+    assert [entity["role"] for entity in serialized["device_entities"]] == ["available", "available", "disabled"]
 
 
 def test_load_recording_accepts_typed_and_legacy_samples_and_reports_bad_lines(tmp_path: Path) -> None:

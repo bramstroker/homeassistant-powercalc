@@ -5,7 +5,14 @@ from dataclasses import dataclass
 from enum import IntEnum, StrEnum
 import json
 
-from measure.analyser.models import AnalysisContext, FeatureReference, RecordedEntity, RecordingSample, ScalarStateValue
+from measure.analyser.models import (
+    AnalysisContext,
+    EntityRole,
+    FeatureReference,
+    RecordedEntity,
+    RecordingSample,
+    ScalarStateValue,
+)
 
 
 class Activity(StrEnum):
@@ -427,7 +434,7 @@ def resolve_activity(sample: RecordingSample, signals: Sequence[ActivitySignal])
 
 
 def battery_feature(samples: Sequence[RecordingSample], context: AnalysisContext) -> FeatureReference | None:
-    battery: RecordedEntity | None = next((entity for entity in context.entities if entity.role == "battery"), None)
+    battery = next((entity for entity in context.entities if entity.role == EntityRole.BATTERY), None)
     if battery is not None and portable_entity(battery.entity_id, context) is not None:
         return FeatureReference(battery.entity_id, "state")
     # Legacy recordings lack registry metadata, but usually expose the same battery

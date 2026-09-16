@@ -1,9 +1,18 @@
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from enum import StrEnum
 import math
 from typing import Literal, Protocol
 
 type ScalarStateValue = str | bool | int | float
+
+
+class EntityRole(StrEnum):
+    PRIMARY = "primary"
+    BATTERY = "battery"
+    TRACKED = "tracked"
+    AVAILABLE = "available"
+    DISABLED = "disabled"
 
 
 @dataclass(frozen=True)
@@ -12,7 +21,7 @@ class RecordedEntity:
 
     entity_id: str
     domain: str
-    role: str
+    role: str  # Known roles use EntityRole; recordings may contain other role names.
     device_class: str | None = None
     integration: str | None = None
     translation_key: str | None = None
