@@ -1,0 +1,43 @@
+{
+  "authors": [
+    {
+      "email": "rens@renssies.nl",
+      "github": "renssies",
+      "name": "Rens Verhoeven"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-16T11:57:54Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee",
+      "thread",
+      "matter",
+      "bluetooth"
+    ],
+    "form_factor": "bulb",
+    "lumens": 810,
+    "socket": "E27"
+  },
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_device_firmware": "2.0.0",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 7.18,
+    "DUMMY_LOAD_RESISTANCE": 7768.79,
+    "NUM_LIGHTS": 2,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.7.0:app"
+  },
+  "name": "Hue White and Color Ambiance E27 810lm",
+  "standby_power": 0.08,
+  "voltage_range": {
+    "max": 240.8,
+    "min": 232.0
+  }
+}
