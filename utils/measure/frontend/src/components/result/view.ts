@@ -16,6 +16,9 @@ const ANALYSIS_SUMMARY_LABELS = new Set([
   "Profile analysis",
   "Profile analysis reason",
   "Analysed feature",
+  "Analysed inputs",
+  "Validation method",
+  "Recorded activities",
   "Validation MAE",
   "Validation coverage",
 ]);
@@ -319,12 +322,15 @@ export class ResultView extends LitElement {
     const reason = entries.find(([label]) => label === "Recording analysis reason")?.[1]
       ?? entries.find(([label]) => label === "Profile analysis reason")?.[1];
     const feature = entries.find(([label]) => label === "Analysed feature")?.[1];
+    const composite = entries.some(([label]) => label === "Analysed inputs");
     const details = entries.filter(([label]) => !label.endsWith("analysis") && !label.endsWith("analysis reason"));
     return html`
       <section class="analysis-panel" aria-labelledby="recording-analysis-title">
         <h3 id="recording-analysis-title">Recording analysis</h3>
         <p class="analysis-explanation">
-          ${feature
+          ${composite
+            ? "PowerCalc combined recorded runtime activity signals with battery-level charging data. It checked the profile against whole episodes or a recording not used for fitting. Per-activity errors and energy estimates are available in analyser.json."
+            : feature
             ? html`PowerCalc analysed how the measured power changed for each value of <code>${this.analysisFeature(feature)}</code>. This creates a profile that can estimate power from that entity data.`
             : "PowerCalc compared the measured power with changes in the recorded entity states to create a suitable power profile."}
         </p>
@@ -364,6 +370,7 @@ export class ResultView extends LitElement {
   }
 
   private analysisResult(result: string): string {
+    if (result === "Composite vacuum profile created") return "A composite vacuum profile was created.";
     if (result === "Fixed power profile created") return "A fixed power profile was created.";
     return result === "Fixed states_power model created" || result === "Fixed states_power profile created"
       ? "A state-based power profile was created."
@@ -372,6 +379,7 @@ export class ResultView extends LitElement {
 
   private analysisDetailLabel(label: string): string {
     if (label === "Analysed feature") return "Model input";
+    if (label === "Analysed inputs") return "Model inputs";
     if (label === "Validation MAE") return "Typical difference";
     if (label === "Validation coverage") return "Data coverage";
     return label;
@@ -386,6 +394,15 @@ export class ResultView extends LitElement {
     }
     if (label === "Validation coverage") {
       return "The share of those measurement samples for which the profile could estimate power. 100% means every sample was covered.";
+    }
+    if (label === "Analysed inputs") {
+      return "Runtime activity and battery inputs used by the composite profile. Enabled settings do not indicate active washing or drying.";
+    }
+    if (label === "Validation method") {
+      return "Whole activity episodes or a separate recording were held out from fitting. Nearby samples in one episode are not independent validation evidence.";
+    }
+    if (label === "Recorded activities") {
+      return "The measured vacuum and dock activities covered by this profile. Unmeasured modes do not get an assumed zero-power fallback.";
     }
     return undefined;
   }

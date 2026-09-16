@@ -53,6 +53,16 @@ class RecordingSample:
     elapsed_seconds: float
     power: float
     entities: Mapping[str, RecordedEntityState]
+    recording_id: int = 0
+
+
+@dataclass(frozen=True)
+class AnalysisSplit:
+    """Samples used to fit a model and independently validate it."""
+
+    training: tuple[RecordingSample, ...]
+    validation: tuple[RecordingSample, ...]
+    method: str | None = None
 
 
 @dataclass(frozen=True)
@@ -120,12 +130,14 @@ class FeatureReference:
 class ModelConfigFragment:
     calculation_strategy: str
     configuration_key: str
-    configuration: Mapping[str, object]
+    configuration: Mapping[str, object] | Sequence[Mapping[str, object]]
 
     def to_dict(self) -> dict[str, object]:
         return {
             "calculation_strategy": self.calculation_strategy,
-            self.configuration_key: dict(self.configuration),
+            self.configuration_key: dict(self.configuration)
+            if isinstance(self.configuration, Mapping)
+            else [dict(branch) for branch in self.configuration],
         }
 
 
@@ -135,6 +147,11 @@ class AnalysisCandidate(Protocol):
 
     @property
     def feature(self) -> FeatureReference: ...
+
+    @property
+    def features(self) -> tuple[FeatureReference, ...]: ...
+
+    def support_key(self, sample: RecordingSample) -> str | None: ...
 
     @property
     def complexity(self) -> int: ...
@@ -184,6 +201,57 @@ class AnalysisMetrics:
 
 
 @dataclass(frozen=True)
+class EnergyMetrics:
+    duration_seconds: float
+    measured_wh: float
+    predicted_wh: float
+    bias_percent: float | None
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "energy_duration_seconds": self.duration_seconds,
+            "measured_energy_wh": self.measured_wh,
+            "predicted_energy_wh": self.predicted_wh,
+            "energy_bias_percent": self.bias_percent,
+        }
+
+
+@dataclass(frozen=True)
+class ActivityReport:
+    """Validation results for one vacuum activity, or unexplained samples."""
+
+    activity: str
+    sample_count: int
+    episode_count: int
+    validation_count: int
+    coverage: float
+    mae_w: float | None
+    transition_mae_w: float | None
+    mean_power_w: float
+    energy: EnergyMetrics
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "activity": self.activity,
+            "sample_count": self.sample_count,
+            "episode_count": self.episode_count,
+            "validation_count": self.validation_count,
+            "coverage": self.coverage,
+            "mae_w": self.mae_w,
+            "transition_mae_w": self.transition_mae_w,
+            "mean_power_w": self.mean_power_w,
+            **self.energy.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
+class EvaluatedCandidate:
+    candidate: AnalysisCandidate
+    metrics: AnalysisMetrics
+    activity_reports: tuple[ActivityReport, ...] = ()
+
+
+@dataclass(frozen=True)
 class RecorderAnalysisResult:
     status: Literal["model_ready", "insufficient_data"]
     sample_count: int
@@ -194,6 +262,9 @@ class RecorderAnalysisResult:
     model_config_fragment: ModelConfigFragment | None = None
     standby_power: float | None = None
     warnings: tuple[str, ...] = ()
+    features: tuple[FeatureReference, ...] = ()
+    validation_method: str | None = None
+    activity_reports: tuple[ActivityReport, ...] = ()
 
     @property
     def model_ready(self) -> bool:
@@ -219,7 +290,18 @@ class RecorderAnalysisResult:
             value["standby_power"] = self.standby_power
         if self.warnings:
             value["warnings"] = list(self.warnings)
+        value.update(self._validation_details())
         return value
+
+    def _validation_details(self) -> dict[str, object]:
+        details: dict[str, object] = {}
+        if self.features:
+            details["features"] = [feature.identifier for feature in self.features]
+        if self.validation_method is not None:
+            details["validation_method"] = self.validation_method
+        if self.activity_reports:
+            details["activities"] = [report.to_dict() for report in self.activity_reports]
+        return details
 
     def summary(self) -> dict[str, str]:
         if not self.model_ready:
@@ -230,6 +312,15 @@ class RecorderAnalysisResult:
         assert self.feature is not None
         assert self.metrics is not None
         assert self.model_config_fragment is not None
+        if self.model_config_fragment.calculation_strategy == "composite":
+            return {
+                "Recording analysis": "Composite vacuum profile created",
+                "Analysed inputs": ", ".join(feature.identifier for feature in self.features),
+                "Validation MAE": f"{self.metrics.mae_w:.2f} W",
+                "Validation coverage": f"{self.metrics.coverage:.0%}",
+                "Validation method": self.validation_method or "held-out episodes",
+                "Recorded activities": ", ".join(report.activity for report in self.activity_reports),
+            }
         fixed_config = self.model_config_fragment.configuration
         profile_type = "Fixed power" if "power" in fixed_config else "Fixed states_power"
         return {

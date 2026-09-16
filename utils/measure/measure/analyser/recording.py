@@ -1,15 +1,24 @@
+from collections.abc import Mapping, Sequence
+from dataclasses import replace
 import json
 import math
 from pathlib import Path
 
-from measure.analyser.models import LoadedRecording, RecordedEntityState, RecordingDataset, RecordingSample
+from measure.analyser.models import (
+    AnalysisContext,
+    LoadedRecording,
+    RecordedEntity,
+    RecordedEntityState,
+    RecordingDataset,
+    RecordingSample,
+)
 
 
 def load_recording(path: Path) -> LoadedRecording:
     """Load typed recorder JSONL while accepting recordings from before format v1."""
 
     samples: list[RecordingSample] = []
-    invalid_records: list[tuple[int, str]] = []
+    invalid_records: list[str] = []
     metadata: dict[str, object] | None = None
     with path.open(encoding="utf-8") as recording:
         for line_number, line in enumerate(recording, start=1):
@@ -24,16 +33,91 @@ def load_recording(path: Path) -> LoadedRecording:
                     continue
                 sample = _parse_sample(record)
             except (KeyError, ValueError, TypeError) as error:
-                invalid_records.append((line_number, str(error)))
+                invalid_records.append(f"line {line_number}: {error}")
                 continue
             samples.append(sample)
     warnings: tuple[str, ...] = ()
     if invalid_records:
-        line_number, failure_reason = invalid_records[0]
-        warnings = (
-            f"Skipped {len(invalid_records)} invalid recorder line(s); first was line {line_number}: {failure_reason}",
-        )
+        warnings = (f"Skipped {len(invalid_records)} invalid recorder line(s); first was {invalid_records[0]}",)
     return LoadedRecording(RecordingDataset(tuple(samples), metadata), warnings)
+
+
+def load_recordings(paths: Sequence[Path]) -> LoadedRecording:
+    if not paths:
+        raise ValueError("Select at least one recording")
+    loaded = [load_recording(path) for path in paths]
+    metadata = loaded[0].dataset.metadata
+    for recording in loaded[1:]:
+        other = recording.dataset.metadata
+        if (
+            metadata is not None
+            and other is not None
+            and any(metadata.get(key) != other.get(key) for key in ("recipe", "primary_entity_id", "entities"))
+        ):
+            raise ValueError("Combined recordings must describe the same recipe and entities")
+    return LoadedRecording(
+        RecordingDataset(
+            tuple(
+                replace(sample, recording_id=index)
+                for index, recording in enumerate(loaded)
+                for sample in recording.dataset.samples
+            ),
+            metadata,
+        ),
+        tuple(warning for recording in loaded for warning in recording.warnings),
+    )
+
+
+def recording_context(fallback: AnalysisContext, metadata: Mapping[str, object] | None) -> AnalysisContext:
+    """Reanalyse using captured registry metadata, without contacting Home Assistant.
+
+    Requests still choose the recipe, primary entity, and roles. A metadata header
+    cannot silently change those choices or promote inventory-only entities.
+    """
+    if (
+        metadata is None
+        or metadata.get("recipe") != fallback.recipe
+        or metadata.get("primary_entity_id") != fallback.primary_entity_id
+    ):
+        return fallback
+    entities = {entity.entity_id: entity for entity in _metadata_entities(metadata.get("entities"))}
+    selected = tuple(
+        replace(entities[entity.entity_id], role=entity.role) if entity.entity_id in entities else entity
+        for entity in fallback.entities
+    )
+    return replace(fallback, entities=selected, device_entities=_metadata_entities(metadata.get("device_entities")))
+
+
+def _metadata_entities(value: object) -> tuple[RecordedEntity, ...]:
+    if not isinstance(value, list):
+        return ()
+    result: list[RecordedEntity] = []
+    for item in value:
+        if not isinstance(item, dict) or not all(
+            isinstance(item.get(key), str) for key in ("entity_id", "domain", "role")
+        ):
+            continue
+        optional: dict[str, str | None] = {
+            key: item.get(key) if isinstance(item.get(key), str) else None
+            for key in (
+                "device_class",
+                "integration",
+                "translation_key",
+                "device_id",
+                "unit",
+                "disabled_by",
+            )
+        }
+        result.append(
+            RecordedEntity(
+                item["entity_id"],
+                item["domain"],
+                item["role"],
+                **optional,
+                has_live_state=item.get("has_live_state") if isinstance(item.get("has_live_state"), bool) else None,
+            )
+        )
+    return tuple(result)
 
 
 def _parse_sample(record: dict[str, object]) -> RecordingSample:

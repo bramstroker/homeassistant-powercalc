@@ -6,6 +6,7 @@ from measure.analyser.fixed import FixedStatesPowerStrategy
 from measure.analyser.models import (
     AnalysisContext,
     AnalysisMetrics,
+    EvaluatedCandidate,
     FeatureReference,
     ModelConfigFragment,
     RecordedEntity,
@@ -468,12 +469,18 @@ def test_selector_only_prefers_complex_candidate_for_material_error_improvement(
     complex_candidate = _Candidate(3)
     base = AnalysisMetrics(20, 4, 1, 1.0, 1.0, 5)
 
-    selected, _ = _select_candidate([(complex_candidate, AnalysisMetrics(20, 4, 1, 0.95, 1, 5)), (simple, base)])
-    assert selected is simple
+    selected = _select_candidate(
+        [EvaluatedCandidate(complex_candidate, AnalysisMetrics(20, 4, 1, 0.95, 1, 5)), EvaluatedCandidate(simple, base)]
+    )
+    assert selected.candidate is simple
 
-    selected, _ = _select_candidate([(simple, base), (complex_candidate, AnalysisMetrics(20, 4, 1, 0.8, 1, 5))])
-    assert selected is complex_candidate
+    selected = _select_candidate(
+        [EvaluatedCandidate(simple, base), EvaluatedCandidate(complex_candidate, AnalysisMetrics(20, 4, 1, 0.8, 1, 5))]
+    )
+    assert selected.candidate is complex_candidate
 
     equal_complexity = _Candidate(2)
-    selected, _ = _select_candidate([(simple, base), (equal_complexity, AnalysisMetrics(20, 4, 1, 0.9, 1, 5))])
-    assert selected is equal_complexity
+    selected = _select_candidate(
+        [EvaluatedCandidate(simple, base), EvaluatedCandidate(equal_complexity, AnalysisMetrics(20, 4, 1, 0.9, 1, 5))]
+    )
+    assert selected.candidate is equal_complexity

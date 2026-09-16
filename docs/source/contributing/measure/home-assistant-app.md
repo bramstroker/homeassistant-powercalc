@@ -24,7 +24,7 @@ No port, host networking, Home Assistant configuration mapping, or API credentia
 | Fan | `fan` | Linear percentage calibration and optional `model.json` |
 | Charging device | `vacuum` or `lawn_mower` | Battery-level charging calibration and optional `model.json` |
 | Average | No controlled device required | Average power over a configured duration |
-| Recorder | Optional tracked entities from any domain; guided vacuum and battery selection with automatic device-entity capture | Playbook CSV, or entity-state JSON Lines with automatic experimental fixed-profile analysis |
+| Recorder | Optional tracked entities from any domain; guided vacuum and battery selection with automatic device-entity capture | Playbook CSV, or entity-state JSON Lines with experimental fixed and vacuum composite analysis |
 
 The app supports these power-meter types:
 
@@ -126,8 +126,27 @@ entity IDs and other device data: review them before sharing. If an optional ent
 as `unavailable`, with a warning, while power readings continue. Missing required vacuum or battery entities cause
 that sample to be skipped.
 
-Automatic profile analysis currently supports experimental fixed `states_power` models only. Capturing additional
-entities prepares the data for a future vacuum/composite analyser; it does not yet generate composite profiles.
+Automatic analysis is experimental. The generic recipe still fits one state or scalar attribute with a fixed
+`states_power` model. The vacuum recipe can generate a small `stop_at_first` composite profile: measured dock
+activities use fixed power, and charging uses a battery-level calibration curve.
+
+Repeat every observed activity in at least two independent episodes, with at least five samples per episode.
+Record washing, drying, auto-emptying, charging, sleep/standby, and operation away from the dock where supported.
+Capture continuous charging over at least 20 battery percentage points. A single run is useful source data but
+does not provide independent evidence for automatic profile generation.
+
+The analyser uses recognised runtime status sensors or active activity flags, not settings such as an
+**auto drying enabled** switch. Related entities need unambiguous same-device registry metadata to produce portable
+profile placeholders. For older recordings, matching `battery_level` attributes can supply charging data.
+Unrecognised modes or unreliable overlaps cause a request for more data; the analyser does not infer an additive
+charging-plus-drying model or insert an unmeasured zero-power fallback.
+
+Validation holds out whole episodes rather than nearby samples from the same episode. The analyser's Python API
+also accepts several compatible recording paths and prefers a whole held-out recording when it contains every
+observed activity. The app currently analyses its session's single recording. Inspect `analyser.json` for per-activity
+coverage, typical and transition errors, and measured versus predicted energy. Energy is integrated only across
+adjacent covered validation samples, without bridging gaps or activity boundaries. Generated profiles still need
+contributor testing before submission.
 
 ## Measure session status sensor
 

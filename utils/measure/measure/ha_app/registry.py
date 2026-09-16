@@ -340,10 +340,10 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                         value=RecorderPurpose.COMPLEX_PROFILE,
                         label="Data for a complex power profile (experimental)",
                         description=(
-                            "This experimental workflow records JSON Lines source data and can create a fixed "
-                            "states_power model when one state or attribute clearly explains power. Composite models "
-                            "are not supported yet, so the workflow is not feature complete. Hold every relevant "
-                            "device state for at least five samples."
+                            "This experimental workflow records JSON Lines source data. Generic devices can create "
+                            "a fixed states_power model; vacuums can create activity-based composite profiles with "
+                            "battery charging calibration. Hold every relevant state for at least five samples. "
+                            "For vacuums, repeat every activity in at least two independent episodes."
                         ),
                     ),
                 ),

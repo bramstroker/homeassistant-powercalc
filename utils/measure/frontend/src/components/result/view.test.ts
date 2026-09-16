@@ -173,6 +173,36 @@ describe("result view", () => {
     expect(element.shadowRoot.querySelector('.notice[role="status"]')?.textContent).toContain("warning");
   });
 
+  it("explains multi-input vacuum profiles and independent validation", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "completed",
+      summary: {
+        "Samples recorded": "142",
+        "Recording analysis": "Composite vacuum profile created",
+        "Analysed inputs": "sensor.activity.state, sensor.battery.state",
+        "Validation MAE": "0.20 W",
+        "Validation coverage": "100%",
+        "Validation method": "held_out_episodes",
+        "Recorded activities": "washing, drying, charging, sleeping",
+      },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+    const analysis = element.shadowRoot.querySelector(".analysis-panel");
+    expect(analysis?.textContent).toContain("A composite vacuum profile was created.");
+    expect(analysis?.textContent).toContain("whole episodes");
+    expect(analysis?.textContent).toContain("analyser.json");
+    expect(analysis?.textContent).toContain("Model inputs");
+    expect(analysis?.textContent).toContain("held_out_episodes");
+    expect(analysis?.textContent).toContain("washing, drying, charging, sleeping");
+    expect(analysis?.querySelectorAll(".analysis-help")).toHaveLength(5);
+    const measurement = element.shadowRoot.querySelector('[aria-label="Measurement result"]');
+    expect(measurement?.textContent).not.toContain("held_out_episodes");
+  });
+
   it("can run the analyser again without starting a new measurement", async () => {
     const element = document.createElement("measure-result-view") as HTMLElement & {
       snapshot: SessionSnapshot; canAnalyse: boolean; analysisComplete: boolean; busy: boolean;

@@ -8,6 +8,7 @@ from measure.analyser.models import (
     AnalysisContext,
     FeatureReference,
     ModelConfigFragment,
+    ProfileAnalysisStrategy,
     RecordingSample,
     ScalarStateValue,
     StrategyNotApplicable,
@@ -23,6 +24,14 @@ class FixedStatesPowerCandidate:
     feature: FeatureReference
     powers: Mapping[str, float]
     strategy_id: str = "fixed_states_power"
+
+    @property
+    def features(self) -> tuple[FeatureReference, ...]:
+        return (self.feature,)
+
+    def support_key(self, sample: RecordingSample) -> str | None:
+        value = self.feature.value(sample)
+        return self.feature.model_key(value) if value is not None else None
 
     @property
     def complexity(self) -> int:
@@ -54,7 +63,7 @@ class FixedStatesPowerCandidate:
         return power if power is not None and power >= 0.05 else None
 
 
-class FixedStatesPowerStrategy:
+class FixedStatesPowerStrategy(ProfileAnalysisStrategy):
     strategy_id = "fixed_states_power"
 
     def build_candidate(
