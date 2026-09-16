@@ -12,6 +12,7 @@ from measure.analyser.models import (
     AnalysisCandidate,
     AnalysisContext,
     AnalysisMetrics,
+    EntityRole,
     EvaluatedCandidate,
     ProfileAnalysisStrategy,
     RecordedEntity,
@@ -143,31 +144,17 @@ def analysis_context_for(
     entity_ids = request.recorded_entity_ids
     if not entity_ids or request.profile_recipe is None:
         raise ValueError("A complex-profile recorder request is required for analysis")
-    roles = ["primary", *("tracked" for _ in entity_ids[1:])]
+    roles = dict.fromkeys(entity_ids, EntityRole.TRACKED)
+    roles[entity_ids[0]] = EntityRole.PRIMARY
     if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT:
-        roles[1] = "battery"
+        roles[entity_ids[1]] = EntityRole.BATTERY
     by_id = {entity.entity_id: entity for entity in descriptors}
-
-    def recorded_entity(entity_id: str, role: str) -> RecordedEntity:
-        entity = by_id.get(entity_id)
-        if entity is None:
-            return RecordedEntity(entity_id, entity_id.partition(".")[0], role)
-        return RecordedEntity(
-            entity_id,
-            entity.domain,
-            role,
-            device_class=entity.device_class,
-            integration=entity.integration,
-            translation_key=entity.translation_key,
-            device_id=entity.device_id,
-            unit=entity.unit,
-            disabled_by=entity.disabled_by,
-            has_live_state=entity.has_live_state,
-        )
 
     primary = by_id.get(entity_ids[0])
     device_entities = [
-        recorded_entity(entity.entity_id, "available" if entity.disabled_by is None else "disabled")
+        _recorded_entity(
+            entity.entity_id, EntityRole.AVAILABLE if entity.disabled_by is None else EntityRole.DISABLED, entity
+        )
         for entity in descriptors
         if primary is not None and primary.device_id is not None and entity.device_id == primary.device_id
     ]
@@ -175,8 +162,26 @@ def analysis_context_for(
         recipe=request.profile_recipe.value,
         primary_entity_id=entity_ids[0],
         device_type="vacuum_robot" if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT else "generic_iot",
-        entities=[recorded_entity(entity_id, role) for entity_id, role in zip(entity_ids, roles, strict=True)],
+        entities=[_recorded_entity(entity_id, roles[entity_id], by_id.get(entity_id)) for entity_id in entity_ids],
         device_entities=device_entities,
+    )
+
+
+def _recorded_entity(entity_id: str, role: EntityRole, descriptor: EntityDescriptor | None) -> RecordedEntity:
+    """Copy registry metadata, or retain just the identity when no descriptor exists."""
+    if descriptor is None:
+        return RecordedEntity(entity_id, entity_id.partition(".")[0], role)
+    return RecordedEntity(
+        entity_id=entity_id,
+        domain=descriptor.domain,
+        role=role,
+        device_class=descriptor.device_class,
+        integration=descriptor.integration,
+        translation_key=descriptor.translation_key,
+        device_id=descriptor.device_id,
+        unit=descriptor.unit,
+        disabled_by=descriptor.disabled_by,
+        has_live_state=descriptor.has_live_state,
     )
 
 

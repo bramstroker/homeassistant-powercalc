@@ -1,4 +1,4 @@
-import { entityChoices, entityRows, vacuumRecordingEntityIds, type FieldState } from "./options";
+import { disabledVacuumEntityCount, entityChoices, entityRows, vacuumRecordingEntityIds, type FieldState } from "./options";
 import { recorderDefinition } from "./test-helpers";
 import type { EntityDescriptor, MeasurementRequest } from "../../types";
 import { capabilities } from "../testing/fixtures";
@@ -46,6 +46,25 @@ describe("vacuum recording defaults", () => {
     expect(choices).toContain("sensor.other");
   });
 
+  it("counts only disabled entities on the selected vacuum device", () => {
+    expect(disabledVacuumEntityCount({
+      ...state,
+      deviceEntities: { "*": [...entities, {
+        entity_id: "sensor.other_disabled", name: "Other disabled", device_id: "other", disabled_by: "user",
+      }] },
+    })).toBe(1);
+    expect(disabledVacuumEntityCount({ ...state, selectedEntities: {} })).toBe(0);
+    expect(disabledVacuumEntityCount({ ...state, deviceEntities: {} })).toBe(0);
+    expect(disabledVacuumEntityCount({ ...state, definition: { ...recorderDefinition, fields: [] } })).toBe(0);
+  });
+
+  it("leaves defaults empty when vacuum selection metadata is absent", () => {
+    expect(entityRows(additional, { selectedEntities: {} })).toEqual([]);
+    expect(entityRows(additional, {
+      ...state, definition: { ...recorderDefinition, fields: [additional] },
+    })).toEqual([]);
+  });
+
   it("retains multiple battery candidates until a required battery is chosen", () => {
     expect(vacuumRecordingEntityIds([...entities, { ...entities[1]!, entity_id: "sensor.second_battery" }], "vacuum.robot"))
       .toEqual(["sensor.battery", "sensor.second_battery", "sensor.state", "sensor.unknown", "switch.drying"]);
@@ -67,5 +86,9 @@ describe("vacuum recording defaults", () => {
       vacuum_entity_id: "vacuum.robot", battery_entity_id: "sensor.battery", additional_entity_ids: selection,
     };
     expect(entityRows(additional, { ...state, request, selectedEntities: {} })).toEqual(selection);
+    expect(entityRows(additional, { ...state, request, selectedEntities: { additional_entity_ids: [] } })).toEqual([]);
+    expect(entityRows(additional, {
+      ...state, request, selectedEntities: { additional_entity_ids: ["sensor.state"] },
+    })).toEqual(["sensor.state"]);
   });
 });
