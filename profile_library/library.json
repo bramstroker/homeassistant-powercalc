@@ -27828,7 +27828,7 @@
           },
           "id": "LCA010",
           "manufacturer": "signify",
-          "updated_at": "2026-09-16T14:38:00",
+          "updated_at": "2026-09-16T14:51:59",
           "max_power": 5.87,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-16T14:08:51",
@@ -27845,7 +27845,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "2d381747b0fe57ff18174d75da22673c"
+          "hash": "7609a216d3d7dc89246d66a0fec73b06"
         },
         {
           "aliases": [
@@ -33421,6 +33421,60 @@
             "color_temp": 96.5
           },
           "hash": "8d6215c2be080dafeab3c746f9185a67"
+        },
+        {
+          "aliases": [
+            "3435731P7"
+          ],
+          "authors": [
+            {
+              "github": "arnepluhar",
+              "name": "Arne Pluhar"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-15T07:00:00Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ],
+            "form_factor": "fixture",
+            "lumens": 2400,
+            "rated_power": 40,
+            "socket": "integrated"
+          },
+          "device_type": "light",
+          "gtin": [
+            "8718696168028"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured on a Shelly Pro 3EM phase with a custom script (differential: each brightness row between two light-off baselines, row repeated on baseline drift; 2.5 s median per point). Full grid bri 1-251 step 5 plus 255 x mired 153-453 step 10 plus 454; smoothed over neighbouring brightness rows (+-2) and mired (1-2-1), made monotonic in brightness, clipped at 0 W, then standby added. The phase noise is ~1.1 W per point, so below bri ~26 the light is not resolvable: those rows are flat at ~0.9 W (pooled average, not measured per point). Standby measured by cutting mains power at the wall switch (4 cycles).",
+          "measure_device": "Shelly Pro 3EM (SPEM-003CEBEU)",
+          "measure_method": "manual",
+          "name": "Hue Adore Bathroom Mirror",
+          "standby_power": 0.53,
+          "voltage_range": {
+            "max": 239.5,
+            "min": 233.3
+          },
+          "id": "LTW018",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-15T09:53:12",
+          "max_power": 31.47,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-15T08:17:23",
+          "power_range": {
+            "min": 0.53,
+            "max": 31.47
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "fce550784a9d1c35212da0685b081627"
         },
         {
           "aliases": [
