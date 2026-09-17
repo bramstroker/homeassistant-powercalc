@@ -18,6 +18,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_TYPE,
+    CONF_HIDE_MEMBERS,
     CONF_ON_TIME,
     CONF_SENSOR_TYPE,
     CONF_UPDATE_FREQUENCY,
@@ -191,6 +192,21 @@ async def test_add_to_group(hass: HomeAssistant) -> None:
 
     group_entry = hass.config_entries.async_get_entry(group_entry.entry_id)
     assert config_entry.entry_id in group_entry.data[CONF_GROUP_MEMBER_SENSORS]
+
+    # Daily energy entries assigned to a group must also be accepted by its editor (#4791).
+    for hide_members in (False, True):
+        result = await handle_options_flow_update(
+            hass,
+            group_entry,
+            Step.GROUP_CUSTOM,
+            {
+                CONF_GROUP_MEMBER_SENSORS: [config_entry.entry_id],
+                CONF_HIDE_MEMBERS: hide_members,
+            },
+        )
+        assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+        assert group_entry.data[CONF_GROUP_MEMBER_SENSORS] == [config_entry.entry_id]
+        assert group_entry.data[CONF_HIDE_MEMBERS] is hide_members
 
 
 async def test_can_set_basic_options(hass: HomeAssistant) -> None:

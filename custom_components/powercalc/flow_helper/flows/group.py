@@ -206,7 +206,8 @@ def create_schema_group_custom(
     member_sensors = [
         selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.title)
         for config_entry in hass.config_entries.async_entries(DOMAIN)
-        if config_entry.data.get(CONF_SENSOR_TYPE) in [SensorType.VIRTUAL_POWER, SensorType.REAL_POWER]
+        if config_entry.data.get(CONF_SENSOR_TYPE)
+        in [SensorType.VIRTUAL_POWER, SensorType.REAL_POWER, SensorType.DAILY_ENERGY]
         and config_entry.unique_id is not None
         and config_entry.title is not None
     ]
