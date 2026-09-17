@@ -8,6 +8,9 @@ from measure.analyser.vacuum import VacuumCompositeCandidate, vacuum_episodes
 
 MAX_RELATIVE_ACTIVITY_MAE = 0.2
 MIN_ACTIVITY_MAE_ALLOWANCE_W = 0.5
+# Mirrors the 90% coverage rule: brief unavailable blips or transient states
+# must not reject a recording whose activities are otherwise identified.
+MAX_UNEXPLAINED_SHARE = 0.1
 
 
 def activity_reports(
@@ -51,9 +54,17 @@ def activity_reports(
 
 
 def credibility_failure(reports: Sequence[ActivityReport]) -> str | None:
+    total = sum(report.sample_count for report in reports)
     for report in reports:
         activity = report.activity
-        if activity == "unexplained" or report.coverage < 0.9:
+        if activity == "unexplained":
+            if report.sample_count <= MAX_UNEXPLAINED_SHARE * total:
+                continue
+            return (
+                f"{report.sample_count} of {total} samples match no known activity; "
+                "record its runtime entities and repeat that cycle"
+            )
+        if report.coverage < 0.9:
             return (
                 f"The vacuum profile cannot reliably identify {activity}; "
                 "record its runtime entities and repeat that cycle"

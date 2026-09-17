@@ -239,8 +239,9 @@ Training and validation use separate episodes, providing a check on repeated-cyc
 [vacuum_validation.py](measure/analyser/vacuum_validation.py) reports each activity's sample
 and episode counts, coverage, MAE, transition MAE, and energy. Each activity must have 90%
 coverage and MAE no greater than the larger of 0.5 W and 20% of its mean validation power.
-Unexplained activities prevent acceptance. These checks keep long low-power periods from
-masking a poor short, high-power dock cycle.
+Samples matching no activity are tolerated up to 10% of the recording, so a brief
+unavailable blip or transient state does not reject it; beyond that acceptance fails.
+These checks keep long low-power periods from masking a poor short, high-power dock cycle.
 
 MAE is average absolute prediction error in watts. RMSE gives larger errors more weight.
 Transition MAE covers the first/last observations of episodes. Per-activity results help
