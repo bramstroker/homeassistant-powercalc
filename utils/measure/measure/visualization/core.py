@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import TextIO, TypeGuard
 
 from measure.controller.light.const import LutMode
+from measure.recorder_files import recording_filenames
 from measure.request import (
     ChargingMeasurementRequest,
     FanMeasurementRequest,
@@ -121,7 +122,12 @@ def _session_plot_candidates(
     if isinstance(request, LightMeasurementRequest):
         return _light_plot_candidates(request, files, model_root, max_scatter_points)
     if isinstance(request, RecorderMeasurementRequest):
-        return _single_plot_candidate(files, f"{model_root}/{request.export_filename}", max_line_points)
+        names = (Path(name).name.removesuffix(".gz") for name in files if Path(name).parent == Path(model_root))
+        return [
+            candidate
+            for name in recording_filenames(names, request.export_filename)
+            for candidate in _single_plot_candidate(files, f"{model_root}/{name}", max_line_points)
+        ]
     if isinstance(request, SpeakerMeasurementRequest | FanMeasurementRequest | ChargingMeasurementRequest):
         return _single_plot_candidate(files, f"{model_root}/model.json", max_line_points)
     return []
@@ -437,7 +443,7 @@ def _recorder_plot(path: Path, *, source: str, max_points: int | None) -> PlotSp
     if not points:
         raise PlotDataError("no valid recorder measurements found")
     return PlotSpec(
-        id="recording",
+        id=f"recording:{source}",
         title="Power recording",
         kind=PlotKind.LINE,
         x_label="Elapsed time (s)",

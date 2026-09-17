@@ -117,8 +117,17 @@ power must be finite. Samples are immutable and retain all recorded entities.
 metadata, preserving recipe, primary selection, and roles for offline reanalysis.
 
 `load_recordings()` combines compatible files and assigns source IDs. Currently, typed
-headers must agree on recipe, primary entity, and selected entity metadata. The Python API
-accepts multiple paths; the app's session flow passes one file.
+headers must agree on recipe, primary entity, and selected entity metadata, apart from
+live availability and disabled status, which can change between runs.
+
+The app's **Record more** action reuses a retained complex-profile session's settings.
+After preflight, the coordinator archives `record.jsonl` as `record-1.jsonl` (then
+`record-2.jsonl`, etc.) and starts another run in the same session. Each file retains its
+own elapsed-time origin. Automatic analysis and **Analyse recording again** combine the
+numbered runs and the latest `record.jsonl`. Archived runs remain analysable if the app
+stops before the next file is created. The result lists total recordings and samples
+analysed alongside the latest run's measurement summary. Each run has its own result plot.
+Raw recordings remain downloadable session evidence and are excluded from prepared profiles.
 
 Artifacts have different lifetimes:
 

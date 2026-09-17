@@ -351,6 +351,8 @@ def test_execution_completes_without_model_when_recording_is_insufficient(
     assert not (tmp_path / "model.json").exists()
     assert result.summary == {
         "Samples recorded": "10",
+        "Recordings analysed": "1",
+        "Samples analysed": "10",
         "Recording analysis": "More data needed",
         "Recording analysis reason": (
             "No state or scalar attribute had 2-20 usable values with at least 4 training samples per value"

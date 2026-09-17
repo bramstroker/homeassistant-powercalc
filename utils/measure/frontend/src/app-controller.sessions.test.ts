@@ -159,5 +159,40 @@ describe("measure app controller: sessions", () => {
     expect(appState.busy).toBe(false);
   });
 
+  it("records another run in the same session with a fresh live chart", async () => {
+    const appState = state();
+    appState.snapshot = { state: "completed", session_id: "session-1" };
+    appState.samples = [1, 2, 3];
+    appState.lastAnalysedSessionId = "session-1";
+    const recordMore = vi.fn(async () => ({ state: "running" as const, session_id: "session-1" }));
+    const controller = new MeasureAppController(appState, () => api({ recordMore }), () => connection(), () => undefined);
+
+    await controller.recordMore();
+
+    expect(recordMore).toHaveBeenCalledWith("session-1");
+    expect(appState.snapshot.session_id).toBe("session-1");
+    expect(appState.view).toBe("running");
+    expect(appState.samples).toEqual([]);
+    expect(appState.lastAnalysedSessionId).toBeUndefined();
+    expect(appState.busy).toBe(false);
+  });
+
+  it("keeps the previous result if another recording cannot start", async () => {
+    const appState = state();
+    appState.view = "result";
+    appState.snapshot = { state: "completed", session_id: "session-1" };
+    appState.samples = [1, 2, 3];
+    const controller = new MeasureAppController(appState, () => api({
+      recordMore: async () => { throw new Error("A measurement session is already active"); },
+    }), () => connection(), () => undefined);
+
+    await controller.recordMore();
+
+    expect(appState.view).toBe("result");
+    expect(appState.snapshot.state).toBe("completed");
+    expect(appState.samples).toEqual([1, 2, 3]);
+    expect(appState.errorMessage).toContain("already active");
+  });
+
 
 });

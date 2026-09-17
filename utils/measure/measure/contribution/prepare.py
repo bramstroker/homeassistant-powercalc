@@ -10,6 +10,7 @@ from typing import Any
 from measure.contribution.models import ContributionPreparedFile, ContributionPreview
 from measure.model import mains_voltage_from_range
 from measure.profile.models import ProfileMetadata
+from measure.recorder_files import recording_filenames
 
 JsonValidator = Callable[[dict[str, Any], dict[str, Any]], None]
 
@@ -26,7 +27,7 @@ EMPTY_OPTIONAL_MODEL_FIELDS = (
 )
 # Recorder analysis keeps its evidence beside the generated model. These files are
 # useful for re-analysis and diagnostics, but are not part of a profile-library entry.
-RECORDER_SOURCE_ARTIFACTS = frozenset({"analyser.json", "record.jsonl"})
+RECORDER_SOURCE_ARTIFACTS = frozenset({"analyser.json"})
 
 
 class ProfilePreparationError(ValueError):
@@ -133,7 +134,8 @@ class ProfilePreparer:
         if MODEL_JSON not in names:
             raise ProfilePreparationError("model.json is required")
         csv_names = {name for name in names if name.endswith((".csv", ".csv.gz"))}
-        unexpected = sorted(names - csv_names - {MODEL_JSON, MANUFACTURER_JSON} - RECORDER_SOURCE_ARTIFACTS)
+        recorder_sources = RECORDER_SOURCE_ARTIFACTS | set(recording_filenames(names))
+        unexpected = sorted(names - csv_names - {MODEL_JSON, MANUFACTURER_JSON} - recorder_sources)
         if unexpected:
             raise ProfilePreparationError(f"Unexpected artifact file(s): {', '.join(unexpected)}")
         return tuple(sorted({f"{name.removesuffix('.gz')}.gz" for name in csv_names}))

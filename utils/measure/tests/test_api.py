@@ -1149,6 +1149,8 @@ def test_completed_recording_can_be_analysed_again(tmp_path: Path) -> None:
         "Analysed feature": "switch.device.state",
         "Validation MAE": "0.00 W",
         "Validation coverage": "100%",
+        "Recordings analysed": "1",
+        "Samples analysed": "20",
     }
     model = json.loads((output / "model.json").read_text(encoding="utf-8"))
     assert model["fixed_config"] == {"power": 5.2}

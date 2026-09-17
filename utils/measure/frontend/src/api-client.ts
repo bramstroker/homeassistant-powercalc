@@ -211,6 +211,10 @@ export class MeasureApiClient {
     return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/analyse`, decodeSessionSnapshot, { method: "POST" });
   }
 
+  recordMore(sessionId: string): Promise<SessionSnapshot> {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/record-more`, decodeSessionSnapshot, { method: "POST" });
+  }
+
   getFiles(sessionId: string): Promise<SessionFile[]> {
     return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/files`, decodeSessionFiles);
   }

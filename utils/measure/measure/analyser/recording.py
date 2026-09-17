@@ -12,6 +12,13 @@ from measure.analyser.models import (
     RecordingDataset,
     RecordingSample,
 )
+from measure.recorder_files import recording_filenames
+
+
+def recording_paths(directory: Path, filename: str) -> tuple[Path, ...]:
+    """Return numbered earlier runs followed by the latest recording."""
+    names = (path.name for path in directory.glob("*") if path.is_file() and not path.is_symlink())
+    return tuple(directory / name for name in recording_filenames(names, filename))
 
 
 def load_recording(path: Path) -> LoadedRecording:
@@ -52,7 +59,10 @@ def load_recordings(paths: Sequence[Path]) -> LoadedRecording:
         if (
             metadata is not None
             and other is not None
-            and any(metadata.get(key) != other.get(key) for key in ("recipe", "primary_entity_id", "entities"))
+            and (
+                any(metadata.get(key) != other.get(key) for key in ("recipe", "primary_entity_id"))
+                or _selected_entity_metadata(metadata) != _selected_entity_metadata(other)
+            )
         ):
             raise ValueError("Combined recordings must describe the same recipe and entities")
     return LoadedRecording(
@@ -66,6 +76,14 @@ def load_recordings(paths: Sequence[Path]) -> LoadedRecording:
         ),
         [warning for recording in loaded for warning in recording.warnings],
     )
+
+
+def _selected_entity_metadata(metadata: Mapping[str, object]) -> list[RecordedEntity]:
+    """Compare entity identities and signal metadata independently of live availability."""
+    return [
+        replace(entity, has_live_state=None, disabled_by=None)
+        for entity in _metadata_entities(metadata.get("entities"))
+    ]
 
 
 def recording_context(fallback: AnalysisContext, metadata: Mapping[str, object] | None) -> AnalysisContext:

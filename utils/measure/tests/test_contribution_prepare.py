@@ -324,6 +324,8 @@ def test_preparer_packages_recorder_model_without_source_artifacts(tmp_path: Pat
         encoding="utf-8",
     )
     (artifacts / "record.jsonl").write_text('{"record_type":"sample"}\n', encoding="utf-8")
+    (artifacts / "record-1.jsonl").write_text('{"record_type":"sample"}\n', encoding="utf-8")
+    (artifacts / "record-2.jsonl").write_text('{"record_type":"sample"}\n', encoding="utf-8")
     (artifacts / "analyser.json").write_text('{"status":"model_ready"}', encoding="utf-8")
     contribution_metadata = metadata(model_id="Heater 1", product_name="Smart heater")
     preparer = make_preparer(tmp_path)
