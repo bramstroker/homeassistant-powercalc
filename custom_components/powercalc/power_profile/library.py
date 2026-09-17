@@ -20,6 +20,7 @@ from custom_components.powercalc.helpers import (
 from .error import LibraryError
 from .loader.composite import CompositeLoader
 from .loader.local import LocalLoader
+from .loader.profile_cache import CACHE_DIRECTORY
 from .loader.protocol import Loader, ModelMetadata
 from .loader.remote import RemoteLoader
 from .power_profile import DeviceType, DiscoveryBy, PowerProfile
@@ -33,6 +34,8 @@ def load_sub_profile_data(base_dir: str) -> list[tuple[str, dict[str, Any]]]:
     sub_dirs = next(os.walk(base_dir))[1]
     result = []
     for sub_dir in sub_dirs:
+        if sub_dir == CACHE_DIRECTORY:
+            continue
         json_path = os.path.join(base_dir, sub_dir, "model.json")
         if os.path.isfile(json_path):
             with open(json_path, encoding="utf-8") as f:

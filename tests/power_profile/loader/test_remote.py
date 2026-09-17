@@ -23,13 +23,13 @@ from custom_components.powercalc.const import LIBRARY_DISCOVERY_LOW_PRIORITY_DOM
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
+from custom_components.powercalc.power_profile.loader.profile_cache import save_resource
 from custom_components.powercalc.power_profile.loader.remote import (
     ENDPOINT_DOWNLOAD,
     ENDPOINT_LIBRARY,
     LibraryModel,
     RemoteLoader,
     _read_capped,
-    _save_resource,
     _validate_library_contents,
 )
 from custom_components.powercalc.power_profile.power_profile import DeviceType, DiscoveryBy
@@ -174,13 +174,13 @@ def test_save_resource_flushes_to_disk_before_renaming(tmp_path: Path) -> None:
         real_replace(cast(str, source), cast(str, target))
 
     with (
-        patch("custom_components.powercalc.power_profile.loader.remote.os.fsync", side_effect=_record_fsync),
+        patch("custom_components.powercalc.power_profile.loader.profile_cache.os.fsync", side_effect=_record_fsync),
         patch(
-            "custom_components.powercalc.power_profile.loader.remote.os.replace",
+            "custom_components.powercalc.power_profile.loader.profile_cache.os.replace",
             side_effect=_record_replace,
         ),
     ):
-        _save_resource(b'{"new": true}', destination)
+        save_resource(b'{"new": true}', destination)
 
     assert destination.read_bytes() == b'{"new": true}'
     assert call_order[: call_order.index("replace")] == ["fsync"]
@@ -1277,7 +1277,7 @@ async def test_profile_redownloaded_when_model_json_missing(
     os.makedirs(local_storage_path)
 
     (__, storage_path) = await remote_loader.load_model("signify", "LCA001")
-    assert storage_path == local_storage_path
+    assert Path(storage_path) == Path(local_storage_path) / ".powercalc" / "current"
 
 
 async def test_concurrent_model_loads_only_download_profile_once(remote_loader: RemoteLoader) -> None:
@@ -1357,7 +1357,7 @@ async def test_profile_redownloaded_when_model_json_corrupt(
 
     await remote_loader.load_model("apple", "A2374")
 
-    recovery_records = [record for record in caplog.records if "model.json is not valid JSON" in record.message]
+    recovery_records = [record for record in caplog.records if "Failed to download, retrying" in record.message]
     assert len(recovery_records) == 1
     assert recovery_records[0].levelno == logging.WARNING
     assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
@@ -1370,7 +1370,7 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
 ) -> None:
     """
     When model.json is corrupt, retry 3 times before giving up.
-    After 3 times it should raise a LibraryLoadingError.
+    After 3 attempts it should raise a ProfileDownloadError without installing corrupt files.
     """
     local_storage_path = remote_loader.get_storage_path("apple", "A2374")
     shutil.rmtree(local_storage_path, ignore_errors=True)
@@ -1397,15 +1397,15 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
         repeat=True,
     )
 
-    with pytest.raises(LibraryLoadingError):
+    with pytest.raises(ProfileDownloadError):
         await remote_loader.load_model("apple", "A2374")
 
-    recovery_records = [record for record in caplog.records if "model.json is not valid JSON" in record.message]
+    recovery_records = [record for record in caplog.records if "Failed to download, retrying" in record.message]
     assert len(recovery_records) == 2
     assert all(record.levelno == logging.WARNING for record in recovery_records)
-    failure_records = [record for record in caplog.records if "model.json remains invalid" in record.message]
-    assert len(failure_records) == 1
-    assert failure_records[0].levelno == logging.ERROR
+    assert not await remote_loader.hass.async_add_executor_job(
+        Path(local_storage_path, ".powercalc", "current").exists,
+    )
 
 
 @pytest.mark.parametrize(

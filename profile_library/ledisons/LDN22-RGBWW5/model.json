@@ -1,0 +1,39 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2026-08-31T15:35:43Z",
+  "device_type": "light",
+  "mains_voltage": 230,
+  "device_specs": {
+    "socket": "integrated",
+    "form_factor": "spot",
+    "lumens": 450,
+    "rated_power": 5.0,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Tapo P110M",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 25.44,
+    "DUMMY_LOAD_RESISTANCE": 2076.86,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.6.0:app"
+  },
+  "name": "Vivaro 5 W IP54 RGBWW Zigbee",
+  "standby_power": 1.06,
+  "voltage_range": {
+    "max": 239.79,
+    "min": 219.36
+  },
+  "authors": [
+    {
+      "name": "Nino",
+      "github": "TheLexus"
+    }
+  ]
+}

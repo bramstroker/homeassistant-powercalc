@@ -90,7 +90,7 @@ export function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     }),
     getShellyDevices: async () => ({ available: true, message: null, devices: [] }),
     getAllEntities: async () => [],
-    getEntityCatalog: async () => ({ lights: [], powers: [], voltages: [] }),
+    getEntityCatalog: async () => ({ home_assistant_ready: true, lights: [], powers: [], voltages: [] }),
     getEntitiesByDomain: async () => [],
     getEntitiesByDeviceClass: async () => [],
     getDummyLoadCalibration: async () => null,

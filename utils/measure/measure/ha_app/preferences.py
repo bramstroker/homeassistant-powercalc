@@ -58,6 +58,9 @@ class AppSettingsUpdate(AppPreferences):
 
     shelly_password: str | None = Field(default=None, max_length=255)
     clear_shelly_password: bool = False
+    tapo_username: str | None = Field(default=None, max_length=255)
+    tapo_password: str | None = Field(default=None, max_length=255)
+    clear_tapo_credentials: bool = False
 
     def preferences(self) -> AppPreferences:
         return AppPreferences.model_validate(self.model_dump())
@@ -67,3 +70,4 @@ class AppSettingsResponse(AppPreferences):
     """Public settings state which never returns the Shelly password."""
 
     shelly_password_configured: bool = False
+    tapo_credentials_configured: bool = False

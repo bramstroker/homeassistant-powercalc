@@ -66,6 +66,7 @@ from measure.ha_app.shelly_credentials import ShellyCredentials
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
 from measure.ha_app.status import MeasureStatusPublisher
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
+from measure.ha_app.tapo_credentials import TapoCredentials
 from measure.home_assistant import HomeAssistantManager
 from measure.home_assistant_entities import (
     DeviceClass,
@@ -140,6 +141,7 @@ class PreflightResponse(BaseModel):
 
 
 class EntityCatalogResponse(BaseModel):
+    home_assistant_ready: bool
     lights: list[EntityDescriptor]
     powers: list[EntityDescriptor]
     voltages: list[EntityDescriptor]
@@ -328,6 +330,7 @@ class AppContext:
             lambda: app_measurement_assembler(
                 home_assistant=self.home_assistant,
                 shelly_password=self.shelly_password(),
+                kasa_credentials=self.tapo_credentials(),
             ),
         )
         self.contribution = ContributionApiCoordinator(
@@ -381,17 +384,23 @@ class AppContext:
             self.home_assistant,
             self.storage,
             shelly_password=self.shelly_password(),
+            kasa_credentials=self.tapo_credentials(),
         )
 
     def shelly_password(self) -> str | None:
         credentials = self.storage.load_shelly_credentials()
         return credentials.password if credentials is not None else None
 
+    def tapo_credentials(self) -> tuple[str, str] | None:
+        credentials = self.storage.load_tapo_credentials()
+        return (credentials.username, credentials.password) if credentials is not None else None
+
     def build_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:
         return MeasurementAssembler(
             ImmediateInteraction(),
             home_assistant=self.home_assistant,
             shelly_password=self.shelly_password(),
+            kasa_credentials=self.tapo_credentials(),
         ).build_power_meter(spec)
 
 
@@ -630,10 +639,20 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
 
     @router.get("/entity-catalog")
     async def entity_catalog(request: Request) -> EntityCatalogResponse:
+        home_assistant = _context(request).home_assistant
+        config = await run_in_threadpool(home_assistant.get_config)
+        if config.get("state") != "RUNNING":
+            return EntityCatalogResponse(
+                home_assistant_ready=False,
+                lights=[],
+                powers=[],
+                voltages=[],
+            )
         snapshot = await run_in_threadpool(
-            HomeAssistantEntityCatalog(_context(request).home_assistant).load_snapshot,
+            HomeAssistantEntityCatalog(home_assistant).load_snapshot,
         )
         return EntityCatalogResponse(
+            home_assistant_ready=True,
             lights=snapshot.select(domain=EntityDomain.LIGHT),
             powers=snapshot.select(device_class=DeviceClass.POWER),
             voltages=snapshot.select(device_class=DeviceClass.VOLTAGE),
@@ -973,7 +992,11 @@ def _measure_definitions() -> list[MeasureDefinition]:
 def _settings_response(context: AppContext) -> AppSettingsResponse:
     settings = context.storage.load_settings()
     return AppSettingsResponse.model_validate(
-        settings.model_dump() | {"shelly_password_configured": context.shelly_password() is not None},
+        settings.model_dump()
+        | {
+            "shelly_password_configured": context.shelly_password() is not None,
+            "tapo_credentials_configured": context.tapo_credentials() is not None,
+        },
     )
 
 
@@ -982,6 +1005,12 @@ def _save_settings(context: AppContext, update: AppSettingsUpdate) -> AppSetting
         context.storage.clear_shelly_credentials()
     elif update.shelly_password:
         context.storage.save_shelly_credentials(ShellyCredentials(password=update.shelly_password))
+    if update.clear_tapo_credentials:
+        context.storage.clear_tapo_credentials()
+    elif update.tapo_username and update.tapo_password:
+        context.storage.save_tapo_credentials(
+            TapoCredentials(username=update.tapo_username, password=update.tapo_password),
+        )
     context.storage.save_settings(update.preferences())
     return _settings_response(context)
 
@@ -1001,6 +1030,12 @@ def _test_power_meter(context: AppContext, settings: AppSettingsUpdate) -> Power
             message=message,
         )
     password = None if settings.clear_shelly_password else settings.shelly_password or context.shelly_password()
+    tapo_credentials = None
+    if not settings.clear_tapo_credentials:
+        if settings.tapo_username and settings.tapo_password:
+            tapo_credentials = (settings.tapo_username, settings.tapo_password)
+        else:
+            tapo_credentials = context.tapo_credentials()
     return context.power_meter_diagnostics.evaluate(
         spec,
         force=True,
@@ -1008,6 +1043,7 @@ def _test_power_meter(context: AppContext, settings: AppSettingsUpdate) -> Power
             ImmediateInteraction(),
             home_assistant=context.home_assistant,
             shelly_password=password,
+            kasa_credentials=tapo_credentials,
         ).build_power_meter(power_meter_spec),
     )
 

@@ -13623,6 +13623,65 @@
         },
         {
           "calculation_strategy": "lut",
+          "created_at": "2026-09-09T11:12:37Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E27",
+            "form_factor": "filament",
+            "lumens": 550,
+            "rated_power": 7,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "gtin": [
+            "8718781555580",
+            "8718781556303"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Sonoff S60",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.6.0:app"
+          },
+          "name": "Smart Filament Bulb Warm-White E27",
+          "product_url": "https://innr.com/products/innr-smart-bulb-warm-white-e27",
+          "standby_power": 0.34,
+          "voltage_range": {
+            "max": 230.85,
+            "min": 229.96
+          },
+          "authors": [
+            {
+              "name": "TheLexus",
+              "github": "TheLexus"
+            }
+          ],
+          "id": "RF 262",
+          "manufacturer": "innr",
+          "updated_at": "2026-09-16T14:17:27",
+          "max_power": 6.63,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-13T11:38:18",
+          "power_range": {
+            "min": 0.3,
+            "max": 6.63
+          },
+          "color_modes": [
+            "brightness",
+            "effect"
+          ],
+          "lut_quality": {
+            "score": 98.7,
+            "brightness": 98.7
+          },
+          "hash": "970181e94f24ee15a9afab9d2e7da3ec"
+        },
+        {
+          "calculation_strategy": "lut",
           "created_at": "2023-02-21T20:39:54Z",
           "device_type": "light",
           "device_specs": {
@@ -14639,6 +14698,81 @@
             "color_temp": 98.6
           },
           "hash": "ed52a27e62b91f30ac3934a63573304f"
+        }
+      ],
+      "device_types": [
+        "light"
+      ]
+    },
+    {
+      "aliases": [
+        "Led Online"
+      ],
+      "name": "ledisons",
+      "full_name": "Ledisons",
+      "dir_name": "ledisons",
+      "website": "https://www.ledisons.com",
+      "country": "NL",
+      "description": "Manufacturer for LED lighting solutions founded 2016 as Led Online.",
+      "models": [
+        {
+          "calculation_strategy": "lut",
+          "created_at": "2026-08-31T15:35:43Z",
+          "device_type": "light",
+          "mains_voltage": 230,
+          "device_specs": {
+            "socket": "integrated",
+            "form_factor": "spot",
+            "lumens": 450,
+            "rated_power": 5.0,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Tapo P110M",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 25.44,
+            "DUMMY_LOAD_RESISTANCE": 2076.86,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.6.0:app"
+          },
+          "name": "Vivaro 5 W IP54 RGBWW Zigbee",
+          "standby_power": 1.06,
+          "voltage_range": {
+            "max": 239.79,
+            "min": 219.36
+          },
+          "authors": [
+            {
+              "name": "Nino",
+              "github": "TheLexus"
+            }
+          ],
+          "id": "LDN22-RGBWW5",
+          "manufacturer": "ledisons",
+          "updated_at": "2026-09-14T17:09:05",
+          "max_power": 5.63,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-14T14:06:01",
+          "power_range": {
+            "min": 0.92,
+            "max": 5.63
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 96.6,
+            "color_temp": 96.6
+          },
+          "hash": "fa77ee39e7f23f28404e9654fbf81a68"
         }
       ],
       "device_types": [
@@ -22643,6 +22777,54 @@
         },
         {
           "aliases": [
+            "Shelly 2PM Gen4"
+          ],
+          "calculation_strategy": "multi_switch",
+          "description": "Compact Smart Wi-Fi Relay with Power Monitoring",
+          "discovery_by": "device",
+          "created_at": "2026-09-10T23:00:25Z",
+          "device_type": "smart_switch",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 2300,
+            "power_monitoring": true,
+            "rated_power": 1.4,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "matter",
+              "zigbee"
+            ]
+          },
+          "gtin": [
+            "3800238070748"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 60 seconds. Multiple combinations of settings were tested. Firmware version 2.0.0.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.6.0:app"
+          },
+          "name": "2PM Gen4",
+          "only_self_usage": true,
+          "product_url": "https://www.shelly.com/products/shelly-2pm-gen4",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S4SW-002P16EU",
+          "manufacturer": "shelly",
+          "updated_at": "2026-09-13T22:57:57",
+          "max_power": null,
+          "sub_profile_count": 4,
+          "standby_power": 0.62,
+          "hash": "e3d9bfd34e63150abcb439043b141e18"
+        },
+        {
+          "aliases": [
             "Shelly Bulb RGBW"
           ],
           "gtin": [
@@ -23400,59 +23582,6 @@
       "country": "NL",
       "description": "Dutch lighting company, formerly Philips Lighting, and the maker of Philips Hue.",
       "models": [
-        {
-          "gtin": [
-            "8719514491106"
-          ],
-          "calculation_strategy": "lut",
-          "created_at": "2025-11-25T11:51:58Z",
-          "device_type": "light",
-          "device_specs": {
-            "form_factor": "bulb",
-            "socket": "E14",
-            "lumens": 470,
-            "rated_power": 5.1,
-            "connectivity": [
-              "zigbee"
-            ]
-          },
-          "measure_description": "Measured with utils/measure script",
-          "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "script",
-          "mains_voltage": 230,
-          "measure_settings": {
-            "SAMPLE_COUNT": 2,
-            "SLEEP_TIME": 3,
-            "VERSION": "v1.17.2:docker"
-          },
-          "name": "Hue White Ambiance E14 Luster Bulb",
-          "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-ambiance-lustre-e14-smart-bulb/8719514491106",
-          "standby_power": 0.2,
-          "authors": [
-            {
-              "name": "Macstar1601",
-              "github": "Macstar1601"
-            }
-          ],
-          "id": "8719514491106",
-          "manufacturer": "signify",
-          "updated_at": "2026-09-13T09:41:49",
-          "max_power": 4.8,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2025-11-25T12:12:37",
-          "power_range": {
-            "min": 0.25,
-            "max": 4.8
-          },
-          "color_modes": [
-            "color_temp"
-          ],
-          "lut_quality": {
-            "score": 98.0,
-            "color_temp": 98.0
-          },
-          "hash": "4be771f09c794140dcdba98b67c7e832"
-        },
         {
           "aliases": [
             "1740193P0",
@@ -27647,6 +27776,156 @@
         },
         {
           "aliases": [
+            "929003853404"
+          ],
+          "authors": [
+            {
+              "email": "rens@renssies.nl",
+              "github": "renssies",
+              "name": "Rens Verhoeven"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-16T11:57:54Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "thread",
+              "matter",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 810,
+            "rated_power": 6,
+            "socket": "E27"
+          },
+          "device_type": "light",
+          "gtin": [
+            "8720169364349",
+            "8720169364363",
+            "8720169364486"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_device_firmware": "2.0.0",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 7.18,
+            "DUMMY_LOAD_RESISTANCE": 7768.79,
+            "NUM_LIGHTS": 2,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.7.0:app"
+          },
+          "name": "Hue White and Color Ambiance E27 810lm",
+          "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-a60-e27-smart-bulb-810/8720169364349",
+          "standby_power": 0.08,
+          "voltage_range": {
+            "max": 240.8,
+            "min": 232.0
+          },
+          "id": "LCA010",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-16T14:51:59",
+          "max_power": 5.87,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-16T14:08:51",
+          "power_range": {
+            "min": 0.24,
+            "max": 5.87
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "7609a216d3d7dc89246d66a0fec73b06"
+        },
+        {
+          "aliases": [
+            "9290038535H",
+            "8720169364066"
+          ],
+          "authors": [
+            {
+              "email": "rens@renssies.nl",
+              "github": "renssies",
+              "name": "Rens Verhoeven"
+            },
+            {
+              "github": "alf-mathias-lindqvist",
+              "name": "Mathias Lindqvist"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-15T23:43:42Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "matter",
+              "bluetooth",
+              "thread"
+            ],
+            "form_factor": "bulb",
+            "lumens": 1100,
+            "rated_power": 8.1,
+            "socket": "E27"
+          },
+          "device_type": "light",
+          "gtin": [
+            "8720169364066",
+            "8720169365735"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_device_firmware": "2.0.0",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 7.11,
+            "DUMMY_LOAD_RESISTANCE": 7808.2,
+            "NUM_LIGHTS": 2,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.7.0:app"
+          },
+          "name": "Hue White and Color Ambiance E27 1100lm",
+          "product_url": "https://www.philips-hue.com/nl-nl/p/hue-white-and-color-ambiance-a60-e27-slimme-lamp-1100/8720169364066",
+          "standby_power": 0.1,
+          "voltage_range": {
+            "max": 238.9,
+            "min": 230.7
+          },
+          "id": "LCA011",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-16T14:22:47",
+          "max_power": 8.04,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-15T23:57:10",
+          "power_range": {
+            "min": 0.27,
+            "max": 8.04
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "d3a15b6a99b8b079a2b952749a410d69"
+        },
+        {
+          "aliases": [
             "9290038536H"
           ],
           "calculation_strategy": "lut",
@@ -28699,7 +28978,6 @@
         },
         {
           "aliases": [
-            "8718699703424",
             "9290022691",
             "LCL006"
           ],
@@ -28738,7 +29016,7 @@
           ],
           "id": "LCL001",
           "manufacturer": "signify",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 21.14,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-13T08:03:22",
@@ -28754,7 +29032,7 @@
             "score": 98.3,
             "color_temp": 98.3
           },
-          "hash": "8621eb49401c7293da4cd911425d1146"
+          "hash": "920f0ed9a30b60a611f71e395fc8ea80"
         },
         {
           "aliases": [
@@ -28987,6 +29265,9 @@
           "hash": "43038485677485823e8913b00387cff6"
         },
         {
+          "aliases": [
+            "9290012573A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2021-09-01T18:40:45Z",
           "device_type": "light",
@@ -29014,7 +29295,7 @@
           ],
           "id": "LCT001",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 7.6,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29030,7 +29311,7 @@
             "score": 94.3,
             "color_temp": 94.3
           },
-          "hash": "425b67d6238fe6e74edcee95fbab3c09"
+          "hash": "1c3789841295417c203d220fb18a9f11"
         },
         {
           "aliases": [
@@ -29138,6 +29419,9 @@
           "hash": "636d0f46704bb85ec6fe7c9c0c43ad35"
         },
         {
+          "aliases": [
+            "9290012573A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2021-09-29T18:18:54Z",
           "device_type": "light",
@@ -29172,7 +29456,7 @@
           ],
           "id": "LCT007",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 10.3,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29188,9 +29472,12 @@
             "score": 96.3,
             "color_temp": 96.3
           },
-          "hash": "76b1fd4e9f13756736b5e7f668279e0a"
+          "hash": "21d2bc11f1d9754779b660510b6d5b5d"
         },
         {
+          "aliases": [
+            "9290012573A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2021-06-11T22:01:53Z",
           "device_type": "light",
@@ -29218,7 +29505,7 @@
           ],
           "id": "LCT010",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 9.7,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-08-15T06:11:24",
@@ -29235,9 +29522,12 @@
             "score": 96.9,
             "color_temp": 96.9
           },
-          "hash": "991925a8d4f3385f8bae3e2a8747bcc6"
+          "hash": "033104ee89838fd143d842d38f2f631f"
         },
         {
+          "aliases": [
+            "9290012573A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2021-06-11T22:01:53Z",
           "device_type": "light",
@@ -29268,7 +29558,7 @@
           ],
           "id": "LCT012",
           "manufacturer": "signify",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 5.43,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29284,9 +29574,12 @@
             "score": 54.6,
             "color_temp": 54.6
           },
-          "hash": "a1c4b78a5ed8714dd3fc4bbd64f8a19c"
+          "hash": "1aeb377f61278d66d3186cf75f006301"
         },
         {
+          "aliases": [
+            "9290012573A"
+          ],
           "calculation_strategy": "lut",
           "created_at": "2022-05-25T11:29:34Z",
           "device_type": "light",
@@ -29319,7 +29612,7 @@
           ],
           "id": "LCT014",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 9.61,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29335,7 +29628,7 @@
             "score": 97.7,
             "color_temp": 97.7
           },
-          "hash": "3f4a92e45a9fada7b1f901357300c77f"
+          "hash": "493bfc694cc1ccd19d4f390475624c94"
         },
         {
           "aliases": [
@@ -29396,7 +29689,8 @@
         },
         {
           "aliases": [
-            "9290012575"
+            "9290012575",
+            "9290012573A"
           ],
           "calculation_strategy": "lut",
           "created_at": "2022-05-26T10:34:54Z",
@@ -29430,7 +29724,7 @@
           ],
           "id": "LCT016",
           "manufacturer": "signify",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-09-14T19:11:34",
           "max_power": 9.06,
           "sub_profile_count": 0,
           "measurement_updated_at": "2024-05-03T07:11:32",
@@ -29446,7 +29740,7 @@
             "score": 97.6,
             "color_temp": 97.6
           },
-          "hash": "b3f216438ac9ecba25e51d04860a0ed7"
+          "hash": "6acae5d151239eb344ffa226c7daad2e"
         },
         {
           "aliases": [
@@ -32466,6 +32760,70 @@
         },
         {
           "aliases": [
+            "8719514491106"
+          ],
+          "legacy_ids": [
+            "8719514491106"
+          ],
+          "gtin": [
+            "8719514491106"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2025-11-25T11:51:58Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "bulb",
+            "socket": "E14",
+            "lumens": 470,
+            "rated_power": 5.1,
+            "connectivity": [
+              "zigbee",
+              "bluetooth"
+            ]
+          },
+          "measure_description": "Measured with utils/measure script and independently validated against a second LUT measured with an IKEA INSPELNING smart plug",
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.17.2:docker"
+          },
+          "name": "Hue White Ambiance E14 Luster Bulb",
+          "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-ambiance-lustre-e14-smart-bulb/8719514491106",
+          "standby_power": 0.2,
+          "authors": [
+            {
+              "name": "Macstar1601",
+              "github": "Macstar1601"
+            },
+            {
+              "name": "Mathias Lindqvist",
+              "github": "alf-mathias-lindqvist"
+            }
+          ],
+          "id": "LTU001",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-15T16:31:15",
+          "max_power": 4.8,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-15T16:31:15",
+          "power_range": {
+            "min": 0.25,
+            "max": 4.8
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "35aa977b2c7a2cf5ce154a47b15f57be"
+        },
+        {
+          "aliases": [
             "8719514301467",
             "9290024777",
             "92900244777"
@@ -33063,6 +33421,60 @@
             "color_temp": 96.5
           },
           "hash": "8d6215c2be080dafeab3c746f9185a67"
+        },
+        {
+          "aliases": [
+            "3435731P7"
+          ],
+          "authors": [
+            {
+              "github": "arnepluhar",
+              "name": "Arne Pluhar"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-15T07:00:00Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ],
+            "form_factor": "fixture",
+            "lumens": 2400,
+            "rated_power": 40,
+            "socket": "integrated"
+          },
+          "device_type": "light",
+          "gtin": [
+            "8718696168028"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured on a Shelly Pro 3EM phase with a custom script (differential: each brightness row between two light-off baselines, row repeated on baseline drift; 2.5 s median per point). Full grid bri 1-251 step 5 plus 255 x mired 153-453 step 10 plus 454; smoothed over neighbouring brightness rows (+-2) and mired (1-2-1), made monotonic in brightness, clipped at 0 W, then standby added. The phase noise is ~1.1 W per point, so below bri ~26 the light is not resolvable: those rows are flat at ~0.9 W (pooled average, not measured per point). Standby measured by cutting mains power at the wall switch (4 cycles).",
+          "measure_device": "Shelly Pro 3EM (SPEM-003CEBEU)",
+          "measure_method": "manual",
+          "name": "Hue Adore Bathroom Mirror",
+          "standby_power": 0.53,
+          "voltage_range": {
+            "max": 239.5,
+            "min": 233.3
+          },
+          "id": "LTW018",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-15T09:53:12",
+          "max_power": 31.47,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-15T08:17:23",
+          "power_range": {
+            "min": 0.53,
+            "max": 31.47
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 99.1,
+            "color_temp": 99.1
+          },
+          "hash": "fce550784a9d1c35212da0685b081627"
         },
         {
           "aliases": [
@@ -34777,6 +35189,69 @@
             "brightness": 98.3
           },
           "hash": "bcda28d0035435f63ab4a4c6adc8bdfe"
+        },
+        {
+          "aliases": [
+            "9290024406A"
+          ],
+          "authors": [
+            {
+              "github": "alf.mathias.lindqvist",
+              "name": "Mathias Lindqvist"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-14T10:01:33Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ],
+            "form_factor": "bulb",
+            "rated_power": 5.7,
+            "lumens": 470,
+            "socket": "E14"
+          },
+          "device_type": "light",
+          "gtin": [
+            "8719514356696",
+            "8719514356771"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "IKEA INSPELNING smart plug",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.7.0:app"
+          },
+          "name": "Hue white luster",
+          "standby_power": 0.1,
+          "voltage_range": {
+            "max": 236.0,
+            "min": 231.0
+          },
+          "id": "LWU002",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-14T17:40:55",
+          "max_power": 5.3,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-14T14:48:20",
+          "power_range": {
+            "min": 0.4,
+            "max": 5.3
+          },
+          "color_modes": [
+            "brightness",
+            "effect"
+          ],
+          "lut_quality": {
+            "score": 98.4,
+            "brightness": 98.4
+          },
+          "hash": "f49ee9bc4ac43e9a6cf0c79a59e3328d"
         },
         {
           "aliases": [
@@ -38636,21 +39111,25 @@
               "email": "danielvizzino@outlook.com"
             },
             {
+              "name": "Daniel Zedler",
+              "github": "dzedler"
+            },
+            {
               "name": "Ryan Ronnander",
               "github": "ryan-ronnander"
             }
           ],
           "id": "Core200S",
           "manufacturer": "vesync",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-09-15T10:52:34",
           "max_power": 39.0,
-          "sub_profile_count": 2,
+          "sub_profile_count": 3,
           "power_range": {
             "min": 0.6,
             "max": 39.0
           },
-          "standby_power": 0.6,
-          "hash": "b84ec9e66c03801a2f30148db1de10e2"
+          "standby_power": 1.06,
+          "hash": "f0e4a103f5f6d778448d3d15b8207bc4"
         },
         {
           "calculation_strategy": "fixed",
