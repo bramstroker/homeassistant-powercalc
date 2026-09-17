@@ -53,7 +53,6 @@ class RecorderAnalyser:
         if len(samples) < 10:
             return _insufficient(samples, loaded.warnings, "Record at least 10 valid samples across device states")
 
-        is_vacuum = context.recipe == "vacuum_robot"
         split = _analysis_split(samples, context)
         if isinstance(split, StrategyNotApplicable):
             return _insufficient(samples, loaded.warnings, split.reason)
@@ -61,11 +60,7 @@ class RecorderAnalyser:
         evaluated: list[EvaluatedCandidate] = []
         reasons: list[str] = []
         reports: tuple[ActivityReport, ...] = ()
-        for strategy in self.strategies:
-            # Do not fall back to adjacent-sample fixed validation when a vacuum
-            # lacks independent cycles or runtime activity signals.
-            if self._default_strategies and (strategy.strategy_id == "vacuum_composite") != is_vacuum:
-                continue
+        for strategy in self._strategies_for(context):
             candidate = strategy.build_candidate(split.training, context)
             if isinstance(candidate, StrategyNotApplicable):
                 reasons.append(candidate.reason)
@@ -102,6 +97,16 @@ class RecorderAnalyser:
             features=selected.features if isinstance(selected, VacuumCompositeCandidate) else (),
             validation_method=split.method,
             activity_reports=evaluation.activity_reports,
+        )
+
+    def _strategies_for(self, context: AnalysisContext) -> tuple[ProfileAnalysisStrategy, ...]:
+        if not self._default_strategies:
+            return self.strategies
+        # Vacuum recipes require independent cycles and runtime signals; they
+        # must not fall back to adjacent-sample fixed validation.
+        is_vacuum = context.recipe == "vacuum_robot"
+        return tuple(
+            strategy for strategy in self.strategies if (strategy.strategy_id == "vacuum_composite") == is_vacuum
         )
 
 

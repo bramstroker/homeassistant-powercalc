@@ -25,16 +25,10 @@ def activity_reports(
     for activity in activities:
         all_samples = [sample for sample in samples if candidate.support_key(sample) == activity]
         held_out = [sample for sample in validation if candidate.support_key(sample) == activity]
-        errors: list[float] = []
-        transition_errors: list[float] = []
-        for sample in held_out:
-            power = candidate.estimate_power(sample)
-            if power is None:
-                continue
-            error = abs(power - sample.power)
-            errors.append(error)
-            if id(sample) in transition_ids:
-                transition_errors.append(error)
+        errors = _prediction_errors(candidate, held_out)
+        transition_errors = _prediction_errors(
+            candidate, [sample for sample in held_out if id(sample) in transition_ids]
+        )
         reports.append(
             ActivityReport(
                 activity=activity.value if activity is not None else "unexplained",
@@ -51,6 +45,10 @@ def activity_reports(
             )
         )
     return tuple(reports)
+
+
+def _prediction_errors(candidate: VacuumCompositeCandidate, samples: Sequence[RecordingSample]) -> list[float]:
+    return [abs(power - sample.power) for sample in samples if (power := candidate.estimate_power(sample)) is not None]
 
 
 def credibility_failure(reports: Sequence[ActivityReport]) -> str | None:

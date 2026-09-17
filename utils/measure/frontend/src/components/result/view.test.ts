@@ -170,6 +170,8 @@ describe("result view", () => {
     expect(details?.textContent).toContain("Typical difference");
     expect(details?.textContent).toContain("Data coverage");
     expect(details?.querySelectorAll(".analysis-help")).toHaveLength(3);
+    expect(details?.querySelector('[aria-label^="Typical difference:"]')?.getAttribute("title"))
+      .toContain("typical difference in watts; lower is better");
     expect(element.shadowRoot.querySelector('.notice[role="status"]')?.textContent).toContain("warning");
   });
 
@@ -199,6 +201,10 @@ describe("result view", () => {
     expect(analysis?.textContent).toContain("held_out_episodes");
     expect(analysis?.textContent).toContain("washing, drying, charging, sleeping");
     expect(analysis?.querySelectorAll(".analysis-help")).toHaveLength(5);
+    expect(analysis?.querySelector('[aria-label^="Model inputs:"]')?.getAttribute("title"))
+      .toContain("Enabled settings do not indicate active washing or drying");
+    expect(analysis?.querySelector('[aria-label^="Validation method:"]')?.getAttribute("title"))
+      .toContain("Whole activity episodes or a separate recording");
     const measurement = element.shadowRoot.querySelector('[aria-label="Measurement result"]');
     expect(measurement?.textContent).not.toContain("held_out_episodes");
   });

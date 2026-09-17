@@ -5,6 +5,8 @@ from typing import Literal, Protocol
 
 type ScalarStateValue = str | bool | int | float
 
+RECORDING_ANALYSIS_LABEL = "Recording analysis"
+
 
 @dataclass(frozen=True)
 class RecordedEntity:
@@ -305,7 +307,7 @@ class RecorderAnalysisResult:
 
     def summary(self) -> dict[str, str]:
         if not self.model_ready:
-            summary = {"Recording analysis": "More data needed"}
+            summary = {RECORDING_ANALYSIS_LABEL: "More data needed"}
             if self.reason is not None:
                 summary["Recording analysis reason"] = self.reason
             return summary
@@ -314,7 +316,7 @@ class RecorderAnalysisResult:
         assert self.model_config_fragment is not None
         if self.model_config_fragment.calculation_strategy == "composite":
             return {
-                "Recording analysis": "Composite vacuum profile created",
+                RECORDING_ANALYSIS_LABEL: "Composite vacuum profile created",
                 "Analysed inputs": ", ".join(feature.identifier for feature in self.features),
                 "Validation MAE": f"{self.metrics.mae_w:.2f} W",
                 "Validation coverage": f"{self.metrics.coverage:.0%}",
@@ -324,7 +326,7 @@ class RecorderAnalysisResult:
         fixed_config = self.model_config_fragment.configuration
         profile_type = "Fixed power" if "power" in fixed_config else "Fixed states_power"
         return {
-            "Recording analysis": f"{profile_type} profile created",
+            RECORDING_ANALYSIS_LABEL: f"{profile_type} profile created",
             "Analysed feature": self.feature.identifier,
             "Validation MAE": f"{self.metrics.mae_w:.2f} W",
             "Validation coverage": f"{self.metrics.coverage:.0%}",

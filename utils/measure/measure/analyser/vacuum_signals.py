@@ -293,15 +293,15 @@ def _add_supplements(
                 tuple(activity for activity in _CHARGING_ACTIVITIES if activity not in status_activities),
                 {"not_charging", "return_to_charge"},
             )
-        elif (
-            entity.domain == "binary_sensor"
-            and Activity.CHARGING not in status_activities
-            and (
-                (entity.translation_key == "charging_state" and entity.integration == "dreame_vacuum")
-                or (entity.device_class == "battery_charging" and entity.integration == "ecovacs")
-            )
-        ):
+        elif Activity.CHARGING not in status_activities and _is_charging_sensor(entity):
             _add_flags(candidates, samples, feature, Activity.CHARGING, _SourcePriority.ACTIVITY_FLAG)
+
+
+def _is_charging_sensor(entity: RecordedEntity) -> bool:
+    return entity.domain == "binary_sensor" and (
+        (entity.translation_key == "charging_state" and entity.integration == "dreame_vacuum")
+        or (entity.device_class == "battery_charging" and entity.integration == "ecovacs")
+    )
 
 
 def _values(samples: Sequence[RecordingSample], feature: FeatureReference) -> tuple[ScalarStateValue, ...]:

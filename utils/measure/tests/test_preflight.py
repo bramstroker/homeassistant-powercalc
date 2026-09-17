@@ -104,8 +104,9 @@ def test_preflight_rejects_inactive_recorder_entity(entity: Entity, message: str
         profile_recipe="generic",
         tracked_entity_ids=("sensor.disabled",),
     )
+    validator = preflight(entities)
     with pytest.raises(PreflightError, match=message):
-        preflight(entities).validate(request)
+        validator.validate(request)
 
 
 @pytest.mark.parametrize(

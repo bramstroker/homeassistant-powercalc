@@ -109,7 +109,7 @@ export function vacuumRecordingEntityIds(entities: EntityDescriptor[], vacuumId:
     && !entity.disabled_by
     && entity.has_live_state !== false
     && !["camera", "image"].includes(entity.domain ?? entity.entity_id.split(".")[0] ?? ""),
-  ).map((entity) => entity.entity_id).sort();
+  ).map((entity) => entity.entity_id).sort((left, right) => left.localeCompare(right));
 }
 
 export function selectedEntityId(field: FormField, state: FieldState): string {

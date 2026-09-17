@@ -85,7 +85,13 @@ def recording_context(fallback: AnalysisContext, metadata: Mapping[str, object] 
         replace(entities[entity.entity_id], role=entity.role) if entity.entity_id in entities else entity
         for entity in fallback.entities
     )
-    return replace(fallback, entities=selected, device_entities=_metadata_entities(metadata.get("device_entities")))
+    return AnalysisContext(
+        recipe=fallback.recipe,
+        primary_entity_id=fallback.primary_entity_id,
+        device_type=fallback.device_type,
+        entities=selected,
+        device_entities=_metadata_entities(metadata.get("device_entities")),
+    )
 
 
 def _metadata_entities(value: object) -> tuple[RecordedEntity, ...]:

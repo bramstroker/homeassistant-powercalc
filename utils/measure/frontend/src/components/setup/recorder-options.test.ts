@@ -25,7 +25,7 @@ const state: FieldState = {
 
 describe("vacuum recording defaults", () => {
   it("captures all enabled same-device states without duplicating the required inputs", () => {
-    expect(vacuumRecordingEntityIds(entities, "vacuum.robot")).toEqual(["sensor.state", "sensor.unknown", "switch.drying"]);
+    expect(vacuumRecordingEntityIds([...entities].reverse(), "vacuum.robot")).toEqual(["sensor.state", "sensor.unknown", "switch.drying"]);
     expect(entityRows(additional, state)).toEqual(["sensor.state", "sensor.unknown", "switch.drying"]);
   });
 
