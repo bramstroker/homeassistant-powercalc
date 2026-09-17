@@ -9,6 +9,7 @@
       "wifi"
     ]
   },
+  "discovery_by": "device",
   "measure_description": "measured via the PowerCalc HA app",
   "measure_device": "IKEA GRILLPLATS",
   "measure_method": "script",
