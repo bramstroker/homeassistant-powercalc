@@ -51,7 +51,7 @@ const lights: EntityDescriptor[] = [
   { entity_id: "light.floor", name: "Floor lamp", supported_modes: ["brightness"] },
 ];
 
-const catalog: EntityCatalog = { lights, powers, voltages };
+const catalog: EntityCatalog = { home_assistant_ready: true, lights, powers, voltages };
 const measureDevices: MeasureDeviceCatalog = {
   devices: ["Aeotec ZWA023", "Kasa EP25", "Shelly Plug S", "Shelly Plus Plug S", "TP-Link Kasa KP115"],
 };

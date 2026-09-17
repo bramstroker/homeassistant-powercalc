@@ -114,6 +114,10 @@ interface EventCallbacks {
 }
 
 type EventConnectionFactory = (sessionId: string, callbacks: EventCallbacks) => EventConnection;
+type Wait = (delayMs: number) => Promise<void>;
+
+const ENTITY_CATALOG_RETRY_DELAY_MS = 1_000;
+const wait: Wait = (delayMs) => new Promise((resolve) => setTimeout(resolve, delayMs));
 
 /** Framework-neutral application controller. Lit only observes the state mutations. */
 export class MeasureAppController {
@@ -129,6 +133,7 @@ export class MeasureAppController {
     private readonly api: () => MeasureAppApi,
     private readonly createEventConnection: EventConnectionFactory,
     private readonly changed: () => void,
+    private readonly waitForRetry: Wait = wait,
   ) {
     this.contributionAuthController = new AuthController(state, api, changed);
   }
@@ -158,7 +163,7 @@ export class MeasureAppController {
       const calibrationPromise = this.refreshDummyLoadCalibration();
       const [capabilities, entities, settings, auth, sessions, definitions] = await Promise.all([
         api.getCapabilities(),
-        api.getEntityCatalog(),
+        this.loadEntityCatalogWhenReady(api),
         api.getSettings(),
         api.getContributionAuth().catch(() => ({ connected: false }) satisfies ContributionAuthState),
         api.getSessions(),
@@ -182,6 +187,15 @@ export class MeasureAppController {
       this.setError(error);
     }
     this.changed();
+  }
+
+  private async loadEntityCatalogWhenReady(api: MeasureAppApi) {
+    let catalog = await api.getEntityCatalog();
+    while (!catalog.home_assistant_ready) {
+      await this.waitForRetry(ENTITY_CATALOG_RETRY_DELAY_MS);
+      catalog = await api.getEntityCatalog();
+    }
+    return catalog;
   }
 
   selectMeasureType(type: MeasureType): void {

@@ -61,6 +61,9 @@ class FakeClient:
     def close(self) -> None:
         return None
 
+    def get_config(self) -> dict[str, str]:
+        return {"state": "RUNNING"}
+
     async def discover_zeroconf(self, collection_window: float = 2.0) -> list[dict[str, object]]:
         return []
 
@@ -570,6 +573,7 @@ def test_entity_catalog_categorizes_one_fresh_snapshot(tmp_path: Path) -> None:
     response = test_client.get("/api/entity-catalog")
 
     assert response.status_code == 200
+    assert response.json()["home_assistant_ready"] is True
     assert home_assistant.entity_data_calls == 1
     assert [item["entity_id"] for item in response.json()["lights"]] == ["light.test"]
     assert [item["entity_id"] for item in response.json()["powers"]] == ["sensor.test_power"]
@@ -577,6 +581,23 @@ def test_entity_catalog_categorizes_one_fresh_snapshot(tmp_path: Path) -> None:
 
     assert test_client.get("/api/entity-catalog").status_code == 200
     assert home_assistant.entity_data_calls == 2
+
+
+def test_entity_catalog_waits_for_home_assistant_startup(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    home_assistant = test_client.app.state.context.home_assistant
+
+    with patch.object(home_assistant, "get_config", return_value={"state": "STARTING"}):
+        response = test_client.get("/api/entity-catalog")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "home_assistant_ready": False,
+        "lights": [],
+        "powers": [],
+        "voltages": [],
+    }
+    assert home_assistant.entity_data_calls == 0
 
 
 def test_entity_integration_is_resolved_and_stays_optional(tmp_path: Path) -> None:

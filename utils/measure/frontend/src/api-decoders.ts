@@ -418,6 +418,7 @@ export const decodeShellyDiscovery: Decoder<ShellyDiscoveryResponse> = decoder("
   available: isBoolean, message: nullable(isString),
 }));
 export const decodeEntityCatalog: Decoder<EntityCatalog> = decoder("entity catalog", objectOf({
+  home_assistant_ready: isBoolean,
   lights: arrayOf(isEntityDescriptor), powers: arrayOf(isEntityDescriptor), voltages: arrayOf(isEntityDescriptor),
 }));
 export const decodeEntities = decoder("entity list", arrayOf(isEntityDescriptor));

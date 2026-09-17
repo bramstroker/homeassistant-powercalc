@@ -141,6 +141,7 @@ class PreflightResponse(BaseModel):
 
 
 class EntityCatalogResponse(BaseModel):
+    home_assistant_ready: bool
     lights: list[EntityDescriptor]
     powers: list[EntityDescriptor]
     voltages: list[EntityDescriptor]
@@ -638,10 +639,20 @@ def _register_measurement_routes(router: APIRouter) -> None:  # noqa: C901
 
     @router.get("/entity-catalog")
     async def entity_catalog(request: Request) -> EntityCatalogResponse:
+        home_assistant = _context(request).home_assistant
+        config = await run_in_threadpool(home_assistant.get_config)
+        if config.get("state") != "RUNNING":
+            return EntityCatalogResponse(
+                home_assistant_ready=False,
+                lights=[],
+                powers=[],
+                voltages=[],
+            )
         snapshot = await run_in_threadpool(
-            HomeAssistantEntityCatalog(_context(request).home_assistant).load_snapshot,
+            HomeAssistantEntityCatalog(home_assistant).load_snapshot,
         )
         return EntityCatalogResponse(
+            home_assistant_ready=True,
             lights=snapshot.select(domain=EntityDomain.LIGHT),
             powers=snapshot.select(device_class=DeviceClass.POWER),
             voltages=snapshot.select(device_class=DeviceClass.VOLTAGE),
