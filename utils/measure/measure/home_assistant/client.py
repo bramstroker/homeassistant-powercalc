@@ -12,7 +12,7 @@ import urllib.parse
 from homeassistant_api import AsyncWebsocketClient, Entity, EntityRegistryEntry, Group, State, WebsocketClient
 from homeassistant_api.errors import WebsocketError
 
-from measure.const import (
+from measure.home_assistant.const import (
     HASS_DEVICE_REGISTRY_LIST,
     HASS_ENTITY_REGISTRY_LIST,
     HASS_ENTITY_REGISTRY_UNIQUE_ID,

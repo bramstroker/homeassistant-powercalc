@@ -2,8 +2,8 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 from measure.controller.light.const import LutMode
-from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
-from measure.home_assistant_entities import DeviceClass, EntityDomain, HomeAssistantEntityCatalog
+from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistantManager
+from measure.home_assistant.entities import DeviceClass, EntityDomain, HomeAssistantEntityCatalog
 import pytest
 
 

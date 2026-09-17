@@ -18,7 +18,7 @@ from measure.controller.light.spec import (
     HueLightControllerSpec,
 )
 from measure.controller.media.spec import HassMediaControllerSpec
-from measure.home_assistant_entities import DeviceClass, EntityDomain
+from measure.home_assistant.entities import DeviceClass, EntityDomain
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
 from measure.powermeter.spec import (
     DummyPowerMeterSpec,

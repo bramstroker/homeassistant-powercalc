@@ -1,5 +1,6 @@
+from measure.cli.const import QUESTION_ENTITY_ID, QUESTION_MEASURE_DEVICE, QUESTION_MODE
 from measure.cli.request_adapter import request_from_answers
-from measure.const import PARAMETER_LIMITS, QUESTION_ENTITY_ID, QUESTION_MEASURE_DEVICE, MeasureType
+from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.controller.light.spec import HassMultiLightControllerSpec
 from measure.powermeter.const import PowerMeterType
@@ -16,7 +17,6 @@ from measure.request import (
     RecorderPurpose,
     parse_measurement_request,
 )
-from measure.runner.const import QUESTION_MODE
 from pydantic import ValidationError
 import pytest
 

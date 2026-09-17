@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Literal
 
-from measure.files import write_json_atomic
+from measure.utils.files import write_json_atomic
 
 CredentialKind = Literal["oauth", "pat"]
 

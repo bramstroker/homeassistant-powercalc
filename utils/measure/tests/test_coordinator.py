@@ -4,7 +4,6 @@ import time
 from unittest.mock import MagicMock, patch
 
 from measure.controller.light.spec import DummyLightControllerSpec
-from measure.execution import LightOperatingPoint
 from measure.ha_app.coordinator import (
     MeasurementCoordinator,
     SessionConflictError,
@@ -25,10 +24,11 @@ from measure.request import (
     RecorderPurpose,
 )
 from measure.runner.average import AverageRunner
+from measure.runner.interaction import LightOperatingPoint
 from measure.runner.recorder import RecorderRunner
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.utils.sampling import MeasurementResult, PowerSampler
 import pytest
 
 
@@ -92,14 +92,14 @@ class RecorderService(SessionMeasurementService):
     ) -> RunnerResult:
         assert isinstance(request, RecorderMeasurementRequest)
         context.artifact_directory.mkdir(parents=True)
-        measure_util = MagicMock(spec=MeasureUtil)
+        sampler = MagicMock(spec=PowerSampler)
 
         def take_measurement(_: float) -> MeasurementResult:
             self.sample_recorded.set()
             return MeasurementResult(power=4.2, voltages=[])
 
-        measure_util.take_measurement.side_effect = take_measurement
-        return RecorderRunner(measure_util, SessionInteraction(control)).run(
+        sampler.take_measurement.side_effect = take_measurement
+        return RecorderRunner(sampler, SessionInteraction(control)).run(
             request,
             str(context.artifact_directory),
         )
@@ -253,7 +253,7 @@ def test_stopping_average_keeps_result_after_sampling(tmp_path: Path, stop_befor
             assert isinstance(request, AverageMeasurementRequest)
             meter = MagicMock(PowerMeter)
             meter.get_power.return_value = PowerMeasurementResult(power=4.2, voltage=230.0, updated=time.time())
-            util = MeasureUtil(
+            util = PowerSampler(
                 meter,
                 MeasurementParameters(),
                 include_voltage=lambda: True,

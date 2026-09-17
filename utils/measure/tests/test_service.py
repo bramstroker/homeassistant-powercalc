@@ -16,7 +16,7 @@ from measure.ha_app.session import (
     utc_now,
 )
 from measure.ha_app.storage import SessionStorage
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.spec import HassPowerMeterSpec
 from measure.request import DummyLoadCalibrationRequest, LightMeasurementRequest

@@ -4,25 +4,28 @@ from typing import Any
 import inquirer
 from inquirer.questions import Question
 
-from measure.const import QUESTION_DUMMY_LOAD, QUESTION_ENTITY_ID, QUESTION_GENERATE_MODEL_JSON
-from measure.controller.charging.const import ChargingDeviceType
-from measure.controller.charging.spec import charging_entity_domain
-from measure.controller.light.const import LutMode
-from measure.home_assistant_entities import (
-    DeviceClass,
-    EntityDescriptor,
-    EntityDomain,
-    HomeAssistantEntityCatalog,
-)
-from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID
-from measure.runner.const import (
+from measure.cli.const import (
     QUESTION_CHARGING_DEVICE_TYPE,
     QUESTION_DISABLE_STREAMING,
+    QUESTION_DUMMY_LOAD,
     QUESTION_DURATION,
+    QUESTION_ENTITY_ID,
+    QUESTION_GENERATE_MODEL_JSON,
     QUESTION_GZIP,
     QUESTION_MODE,
     QUESTION_MULTIPLE_LIGHTS,
     QUESTION_NUM_LIGHTS,
+    QUESTION_POWERMETER_ENTITY_ID,
+    QUESTION_VOLTAGEMETER_ENTITY_ID,
+)
+from measure.controller.charging.const import ChargingDeviceType
+from measure.controller.charging.spec import charging_entity_domain
+from measure.controller.light.const import LutMode
+from measure.home_assistant.entities import (
+    DeviceClass,
+    EntityDescriptor,
+    EntityDomain,
+    HomeAssistantEntityCatalog,
 )
 
 

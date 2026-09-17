@@ -8,13 +8,13 @@ import time
 from measure.assembler import MeasurementAssembler
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController
-from measure.execution import ImmediateInteraction
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.errors import ZeroReadingError
 from measure.request import LightMeasurementRequest
+from measure.runner.interaction import ImmediateInteraction
 from measure.runner.light_plan import Variation, build_light_plan, low_load_probe_variations
 from measure.runner.light_setup import set_light_to_maximum_brightness
-from measure.util.measure_util import MeasureUtil
+from measure.utils.sampling import PowerSampler
 
 LIGHT_LOAD_PROBE_CACHE_SECONDS = 600
 LOW_POWER_MEASUREMENT_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/low-power-measurements/"
@@ -92,7 +92,7 @@ class LightLoadProbe:
                 return LightLoadProbeResult(checked_variations=0, minimum_aggregate_power_w=0, points=())
 
             meter = assembler.build_power_meter(request.power_meter)
-            measure_util = MeasureUtil(meter, request.parameters, wait=self._wait)
+            sampler = PowerSampler(meter, request.parameters, wait=self._wait)
             light_driven = True
             set_light_to_maximum_brightness(
                 controller,
@@ -108,7 +108,7 @@ class LightLoadProbe:
                     power_w=round(
                         self._measure_variation(
                             controller,
-                            measure_util,
+                            sampler,
                             request,
                             variation,
                             initial=index == 0,
@@ -149,7 +149,7 @@ class LightLoadProbe:
     def _measure_variation(
         self,
         controller: LightController,
-        measure_util: MeasureUtil,
+        sampler: PowerSampler,
         request: LightMeasurementRequest,
         variation: Variation,
         *,
@@ -160,7 +160,7 @@ class LightLoadProbe:
         self._wait(request.parameters.sleep_time)
         if initial:
             self._wait(request.parameters.sleep_initial)
-        return measure_util.take_measurement(start_timestamp=start_timestamp).power
+        return sampler.take_measurement(start_timestamp=start_timestamp).power
 
     @staticmethod
     def _cache_key(request: LightMeasurementRequest) -> str:

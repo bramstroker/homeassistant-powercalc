@@ -2,39 +2,6 @@ from enum import StrEnum
 import os
 from pathlib import Path
 
-QUESTION_GENERATE_MODEL_JSON = "generate_model_json"
-QUESTION_DUMMY_LOAD = "dummy_load"
-QUESTION_MODEL_NAME = "model_name"
-QUESTION_MEASURE_DEVICE = "measure_device"
-QUESTION_ENTITY_ID = "entity_id"
-QUESTION_MODEL_ID = "model_id"
-QUESTION_SELECTED_MEASURE_TYPE = "selected_measure_type"
-#: Deprecated, replaced by MODEL_JSON_VOLTAGE_RANGE. Only kept to read older profiles.
-MODEL_JSON_MAX_VOLTAGE = "max_voltage"
-#: Deprecated, replaced by MODEL_JSON_VOLTAGE_RANGE. Only kept to read older profiles.
-MODEL_JSON_MIN_VOLTAGE = "min_voltage"
-MODEL_JSON_VOLTAGE_RANGE = "voltage_range"
-MODEL_JSON_VOLTAGE_RANGE_MIN = "min"
-MODEL_JSON_VOLTAGE_RANGE_MAX = "max"
-HASS_DEVICE_REGISTRY_LIST = "config/device_registry/list"
-HASS_ENTITY_REGISTRY_LIST = "config/entity_registry/list"
-HASS_ZEROCONF_SUBSCRIBE_DISCOVERY = "zeroconf/subscribe_discovery"
-HASS_EVENT_MEASURE_STATUS = "powercalc_measure_status"
-HASS_DEVICE_REGISTRY_ID = "id"
-HASS_DEVICE_REGISTRY_MANUFACTURER = "manufacturer"
-HASS_DEVICE_REGISTRY_MODEL = "model"
-HASS_DEVICE_REGISTRY_MODEL_ID = "model_id"
-HASS_ENTITY_REGISTRY_UNIQUE_ID = "unique_id"
-HASS_ENTITY_DEVICE_CLASS = "device_class"
-HASS_ENTITY_UNIT_OF_MEASUREMENT = "unit_of_measurement"
-#: Light groups list the entities they drive under this state attribute.
-HASS_ENTITY_GROUP_MEMBERS = "entity_id"
-ZEROCONF_HTTP_SERVICE_TYPE = "_http._tcp.local."
-ZEROCONF_SHELLY_SERVICE_TYPE = "_shelly._tcp.local."
-SHELLY_DISCOVERY_COLLECTION_WINDOW_SECONDS = 2.0
-SHELLY_DISCOVERY_PROBE_TIMEOUT_SECONDS = 2
-SHELLY_DISCOVERY_MAX_CONCURRENT_PROBES = 8
-
 script_dir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()
 

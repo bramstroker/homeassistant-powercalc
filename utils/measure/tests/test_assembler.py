@@ -8,8 +8,7 @@ from measure.controller.light.spec import (
     HassLightControllerSpec,
     HassMultiLightControllerSpec,
 )
-from measure.execution import RunInteraction
-from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistantManager
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec, TuyaPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
@@ -20,6 +19,7 @@ from measure.request import (
 )
 from measure.runner.average import AverageRunner
 from measure.runner.fan import FanRunner
+from measure.runner.interaction import RunInteraction
 from measure.runner.light import LightRunner
 from measure.runner.recorder import RecorderEntityState, RecorderRunner
 from pydantic import ValidationError

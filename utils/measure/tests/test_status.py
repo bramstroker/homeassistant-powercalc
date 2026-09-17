@@ -3,7 +3,6 @@ import logging
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from measure.const import HASS_EVENT_MEASURE_STATUS
 from measure.controller.light.spec import (
     DummyLightControllerSpec,
     HassLightControllerSpec,
@@ -14,10 +13,11 @@ from measure.ha_app.coordinator import MeasurementCoordinator
 from measure.ha_app.session import SessionSnapshot, SessionState
 from measure.ha_app.status import MeasureStatusPublisher
 from measure.ha_app.storage import SessionStorage
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
+from measure.home_assistant.const import HASS_EVENT_MEASURE_STATUS
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import LightMeasurementRequest
-from measure.version import measure_version
+from measure.utils.version import measure_version
 import pytest
 
 

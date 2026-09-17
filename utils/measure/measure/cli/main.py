@@ -15,6 +15,14 @@ from inquirer.questions import Question
 from inquirer.render import ConsoleRender
 
 from measure.assembler import MeasurementAssembler
+from measure.cli.const import (
+    QUESTION_ENTITY_ID,
+    QUESTION_GENERATE_MODEL_JSON,
+    QUESTION_MEASURE_DEVICE,
+    QUESTION_MODE,
+    QUESTION_MODEL_ID,
+    QUESTION_MODEL_NAME,
+)
 from measure.cli.dummy_load import (
     CliDummyLoadCalibrationStore,
     apply_dummy_load_answers,
@@ -25,30 +33,19 @@ from measure.cli.environment import CliEnvironment
 from measure.cli.interaction import ConsoleInteraction
 from measure.cli.measurements import measurement_questions
 from measure.cli.request_adapter import request_from_answers
-from measure.const import (
-    MEASURE_TYPE_LABELS,
-    PROJECT_DIR,
-    QUESTION_ENTITY_ID,
-    QUESTION_GENERATE_MODEL_JSON,
-    QUESTION_MEASURE_DEVICE,
-    QUESTION_MODEL_ID,
-    QUESTION_MODEL_NAME,
-    MeasureType,
-    parse_measure_type,
-)
+from measure.const import MEASURE_TYPE_LABELS, PROJECT_DIR, MeasureType, parse_measure_type
 from measure.controller.charging.const import ChargingControllerType
 from measure.controller.errors import ControllerError
 from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.controller.media.const import MediaControllerType
 from measure.execution import MeasurementExecution
-from measure.home_assistant import HomeAssistantManager
-from measure.home_assistant_entities import HomeAssistantEntityCatalog
+from measure.home_assistant.client import HomeAssistantManager
+from measure.home_assistant.entities import HomeAssistantEntityCatalog
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.errors import PowerMeterError
-from measure.runner.const import QUESTION_MODE
 from measure.runner.errors import RunnerError
-from measure.version import measure_version
+from measure.utils.version import measure_version
 
 config = CliEnvironment()
 

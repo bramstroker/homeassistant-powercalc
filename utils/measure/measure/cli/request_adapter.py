@@ -1,15 +1,23 @@
 import dataclasses
 from typing import Any
 
-from measure.cli.environment import CliEnvironment
-from measure.const import (
+from measure.cli.const import (
+    QUESTION_CHARGING_DEVICE_TYPE,
+    QUESTION_DISABLE_STREAMING,
+    QUESTION_DURATION,
     QUESTION_ENTITY_ID,
     QUESTION_GENERATE_MODEL_JSON,
+    QUESTION_GZIP,
     QUESTION_MEASURE_DEVICE,
+    QUESTION_MODE,
     QUESTION_MODEL_ID,
     QUESTION_MODEL_NAME,
-    MeasureType,
+    QUESTION_NUM_LIGHTS,
+    QUESTION_POWERMETER_ENTITY_ID,
+    QUESTION_VOLTAGEMETER_ENTITY_ID,
 )
+from measure.cli.environment import CliEnvironment
+from measure.const import MeasureType
 from measure.controller.charging.const import ChargingControllerType, ChargingDeviceType
 from measure.controller.charging.spec import DummyChargingControllerSpec, HassChargingControllerSpec
 from measure.controller.fan.const import FanControllerType
@@ -18,7 +26,7 @@ from measure.controller.light.const import LightControllerType
 from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec, HueLightControllerSpec
 from measure.controller.media.const import MediaControllerType
 from measure.controller.media.spec import DummyMediaControllerSpec, HassMediaControllerSpec
-from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID, PowerMeterType
+from measure.powermeter.const import PowerMeterType
 from measure.powermeter.spec import (
     DummyPowerMeterSpec,
     HassPowerMeterSpec,
@@ -41,14 +49,6 @@ from measure.request import (
     RecorderMeasurementRequest,
     ResumePolicy,
     SpeakerMeasurementRequest,
-)
-from measure.runner.const import (
-    QUESTION_CHARGING_DEVICE_TYPE,
-    QUESTION_DISABLE_STREAMING,
-    QUESTION_DURATION,
-    QUESTION_GZIP,
-    QUESTION_MODE,
-    QUESTION_NUM_LIGHTS,
 )
 from measure.tuning import MeasurementParameters
 

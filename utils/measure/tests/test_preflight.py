@@ -11,7 +11,7 @@ from measure.controller.light.spec import (
 )
 from measure.controller.media.spec import HassMediaControllerSpec
 from measure.ha_app.preflight import ActiveSessionError, EntityRecord, MeasurementPreflight, PreflightError
-from measure.home_assistant_entities import DeviceClass
+from measure.home_assistant.entities import DeviceClass
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec
 from measure.request import (

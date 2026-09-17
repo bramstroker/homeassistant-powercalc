@@ -5,12 +5,8 @@ from pathlib import Path
 from measure.controller.light.const import LutMode
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
-from measure.ha_app.contribution import (
-    ContributionApiCoordinator,
-    ContributionPreviewResponse,
-    ContributionState,
-    ContributionStatus,
-)
+from measure.ha_app.contribution.coordinator import ContributionApiCoordinator
+from measure.ha_app.contribution.models import ContributionPreviewResponse, ContributionState, ContributionStatus
 from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapshot, SessionState, utc_now
 from measure.ha_app.shelly_credentials import ShellyCredentials
 from measure.ha_app.storage import SessionStorage

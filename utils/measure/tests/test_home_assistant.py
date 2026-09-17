@@ -4,8 +4,8 @@ from time import sleep
 from unittest.mock import MagicMock
 
 from homeassistant_api.errors import WebsocketError
-from measure.const import HASS_ENTITY_REGISTRY_LIST
-from measure.home_assistant import HomeAssistantManager, HomeAssistantWebsocketClient, normalize_hass_url
+from measure.home_assistant.client import HomeAssistantManager, HomeAssistantWebsocketClient, normalize_hass_url
+from measure.home_assistant.const import HASS_ENTITY_REGISTRY_LIST
 import pytest
 from urllib3.exceptions import ProtocolError
 

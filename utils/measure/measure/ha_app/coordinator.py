@@ -8,8 +8,7 @@ from typing import Protocol, cast
 from uuid import uuid4
 
 from measure.analyser.execution import RecorderAnalysisExecution
-from measure.clock import utc_now
-from measure.execution import MeasurementCancelledError, OperatingPoint
+from measure.cancellation import MeasurementCancelledError
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
     RESUMABLE_SESSION_STATES,
@@ -22,7 +21,9 @@ from measure.ha_app.session import (
 )
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
 from measure.request import MeasurementRequest, RecorderMeasurementRequest, ResumePolicy
+from measure.runner.interaction import OperatingPoint
 from measure.runner.runner import RunnerResult
+from measure.utils.clock import utc_now
 
 _LOGGER = logging.getLogger("measure")
 _SNAPSHOT_PERSIST_INTERVAL = 5.0

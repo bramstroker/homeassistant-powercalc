@@ -9,12 +9,13 @@ from typing import TextIO
 
 from measure.analyser.models import AnalysisContext
 from measure.analyser.service import analysis_context_for
-from measure.execution import ImmediateInteraction, MeasurementCancelledError, RunInteraction
-from measure.recorder_capture import vacuum_attribute_policy, vacuum_recording_attributes
+from measure.cancellation import MeasurementCancelledError
+from measure.recording.capture import vacuum_attribute_policy, vacuum_recording_attributes
+from measure.recording.files import DEFAULT_EXPORT_FILENAME
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, validate_export_filename
-from measure.runner.const import DEFAULT_EXPORT_FILENAME
+from measure.runner.interaction import ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.utils.sampling import MeasurementResult, PowerSampler
 
 INTERVAL = 2
 
@@ -46,12 +47,12 @@ type EntityStateReader = Callable[[Sequence[str]], Mapping[str, RecorderEntitySt
 class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
     def __init__(
         self,
-        measure_util: MeasureUtil,
+        sampler: PowerSampler,
         interaction: RunInteraction | None = None,
         entity_state_reader: EntityStateReader | None = None,
         analysis_context: AnalysisContext | None = None,
     ) -> None:
-        self.measure_util = measure_util
+        self.sampler = sampler
         self.filename = DEFAULT_EXPORT_FILENAME
         self.interaction = interaction or ImmediateInteraction()
         self.entity_state_reader = entity_state_reader
@@ -91,7 +92,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
                 while True:
                     timestamp = time.time()
                     self.interaction.notify("Measurement")
-                    measurement = self.measure_util.take_measurement(timestamp)
+                    measurement = self.sampler.take_measurement(timestamp)
                     _LOGGER.info("Measurement %.2f", measurement.power)
                     elapsed_seconds = timestamp - start_time
                     if self._write_sample(output_file, request, elapsed_seconds, measurement.power):

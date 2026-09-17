@@ -1,7 +1,8 @@
 from threading import Event, Thread
 
-from measure.execution import FanOperatingPoint, MeasurementCancelledError
+from measure.cancellation import MeasurementCancelledError
 from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType
+from measure.runner.interaction import FanOperatingPoint
 import pytest
 
 

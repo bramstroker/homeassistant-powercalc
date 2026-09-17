@@ -5,11 +5,11 @@ from collections.abc import Callable
 import contextlib
 import logging
 
-from measure.const import HASS_EVENT_MEASURE_STATUS
 from measure.ha_app.coordinator import MeasurementCoordinator
 from measure.ha_app.session import SessionState
-from measure.home_assistant import HomeAssistantManager
-from measure.version import measure_version
+from measure.home_assistant.client import HomeAssistantManager
+from measure.home_assistant.const import HASS_EVENT_MEASURE_STATUS
+from measure.utils.version import measure_version
 
 _LOGGER = logging.getLogger("measure")
 STATUS_HEARTBEAT_INTERVAL = 60.0

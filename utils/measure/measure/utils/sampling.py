@@ -65,7 +65,7 @@ class AverageMeasurementState:
     interrupted: bool = False
 
 
-class MeasureUtil:
+class PowerSampler:
     def __init__(
         self,
         power_meter: PowerMeter,
@@ -373,8 +373,8 @@ class MeasureUtil:
         first_half = averages[:mid]
         second_half = averages[mid:]
 
-        first_slope = MeasureUtil._linear_slope(first_half)
-        second_slope = MeasureUtil._linear_slope(second_half)
+        first_slope = PowerSampler._linear_slope(first_half)
+        second_slope = PowerSampler._linear_slope(second_half)
 
         threshold = mean(averages) * DUMMY_LOAD_TREND_RELATIVE_THRESHOLD
 

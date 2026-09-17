@@ -8,18 +8,10 @@ from measure.contribution.coordinator import (
 )
 from measure.contribution.credentials import CredentialStore, StoredCredential
 from measure.contribution.github import GitHubClient, GitHubRepository, GitHubUser
-from measure.contribution.models import (
-    ContributionAuthor,
-    ContributionJob,
-    ContributionJobStatus,
-    ContributionMetadata,
-    ContributionPreparedFile,
-    ContributionPreview,
-)
-from measure.contribution.prepare import ProfilePreparer
+from measure.contribution.models import ContributionAuthor, ContributionJob, ContributionJobStatus, ContributionMetadata
 from measure.contribution.pull_request import deterministic_branch_name, pull_request_body
 from measure.controller.light.spec import DummyLightControllerSpec
-from measure.ha_app.contribution import (
+from measure.ha_app.contribution.models import (
     ContributionApiError,
     ContributionApiErrorCode,
     ContributionAuthStatus,
@@ -27,6 +19,8 @@ from measure.ha_app.contribution import (
 )
 from measure.ha_app.contribution.service import _metadata_from_request, _validate_latest_preview
 from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.profile.models import PreparedProfileFile, ProfilePreview
+from measure.profile.prepare import ProfilePreparer
 from measure.request import LightMeasurementRequest
 from pydantic import ValidationError
 import pytest
@@ -103,27 +97,27 @@ class FakeGitHubClient(GitHubClient):
 
 
 class FakePreparer(ProfilePreparer):
-    def __init__(self, preview: ContributionPreview) -> None:
+    def __init__(self, preview: ProfilePreview) -> None:
         self.preview = preview
 
-    def prepare(self, artifact_directory: Path, metadata: ContributionMetadata) -> ContributionPreview:
+    def prepare(self, artifact_directory: Path, metadata: ContributionMetadata) -> ProfilePreview:
         return self.preview
 
     def render_contents(
         self,
         artifact_directory: Path,
         metadata: ContributionMetadata,
-        preview: ContributionPreview,
+        preview: ProfilePreview,
     ) -> tuple[tuple[str, bytes], ...]:
         return tuple((file.path, b"content") for file in preview.files)
 
 
-def make_preview() -> ContributionPreview:
+def make_preview() -> ProfilePreview:
     """The single-file signify/LCT999 preview every coordinator test builds on."""
-    return ContributionPreview(
+    return ProfilePreview(
         manufacturer_directory="signify",
         model_directory="LCT999",
-        files=(ContributionPreparedFile(path="profile_library/signify/LCT999/model.json", size=20),),
+        files=(PreparedProfileFile(path="profile_library/signify/LCT999/model.json", size=20),),
     )
 
 
@@ -144,7 +138,7 @@ def make_credential_store(tmp_path: Path, kind: str = "pat") -> CredentialStore:
 
 def make_coordinator(
     tmp_path: Path,
-    preview: ContributionPreview | None = None,
+    preview: ProfilePreview | None = None,
     credential_store: CredentialStore | None = None,
     github_client: GitHubClient | None = None,
 ) -> ContributionJobCoordinator:
@@ -292,7 +286,7 @@ def test_coordinator_submit_of_unknown_job_reports_expired_preview(tmp_path: Pat
 
 
 def test_deterministic_branch_name_collapses_non_alphanumeric_runs() -> None:
-    preview = ContributionPreview(manufacturer_directory="ajax online", model_directory="AJ-100 (EU)+", files=())
+    preview = ProfilePreview(manufacturer_directory="ajax online", model_directory="AJ-100 (EU)+", files=())
 
     assert deterministic_branch_name(preview) == "powercalc-profile-ajax-online-aj-100-eu"
 
@@ -309,7 +303,7 @@ def test_pull_request_body_reports_the_integration_of_the_measured_entity() -> N
         id="job-1",
         status=ContributionJobStatus.PREVIEWED,
         metadata=metadata,
-        preview=ContributionPreview(manufacturer_directory="signify", model_directory="LCT999", files=()),
+        preview=ProfilePreview(manufacturer_directory="signify", model_directory="LCT999", files=()),
         created_at="2026-07-16T12:00:00Z",
         updated_at="2026-07-16T12:00:00Z",
     )
@@ -392,10 +386,10 @@ def test_contribution_preview_request_rejects_unsupported_mains_voltage(mains_vo
 
 
 def test_submit_preview_validation_rejects_base_or_content_drift() -> None:
-    preview = ContributionPreview(
+    preview = ProfilePreview(
         manufacturer_directory="signify",
         model_directory="LCT999",
-        files=(ContributionPreparedFile(path="profile_library/signify/LCT999/model.json", size=20, sha="one"),),
+        files=(PreparedProfileFile(path="profile_library/signify/LCT999/model.json", size=20, sha="one"),),
     )
     metadata = ContributionMetadata(
         manufacturer="Philips",
@@ -418,7 +412,7 @@ def test_submit_preview_validation_rejects_base_or_content_drift() -> None:
     changed_preview = preview.model_copy(
         update={
             "files": (
-                ContributionPreparedFile(
+                PreparedProfileFile(
                     path="profile_library/signify/LCT999/model.json",
                     size=20,
                     sha="two",

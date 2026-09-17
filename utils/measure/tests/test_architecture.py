@@ -1,5 +1,9 @@
 import ast
 from pathlib import Path
+import subprocess
+import sys
+
+import pytest
 
 MEASURE_ROOT = Path(__file__).parents[1] / "measure"
 CLI_ENTRYPOINTS = {"measure.py"}
@@ -15,6 +19,61 @@ OPTIONAL_ADAPTER_MODULES = {
     "measure.powermeter.kasa",
     "measure.powermeter.tuya",
 }
+
+
+@pytest.mark.parametrize(
+    "module",
+    [
+        "measure.ha_app.storage",
+        "measure.ha_app.coordinator",
+        "measure.ha_app.contribution.models",
+        "measure.ha_app.contribution.coordinator",
+        "measure.ha_app.context",
+        "measure.ha_app.routes.measurement",
+        "measure.ha_app.routes.sessions",
+        "measure.ha_app.routes.contribution",
+        "measure.profile.output",
+        "measure.profile.prepare",
+        "measure.recording.files",
+        "measure.runner.recorder",
+        "measure.home_assistant.entities",
+        "measure.utils.sampling",
+    ],
+)
+def test_modules_import_without_relying_on_import_order(module: str) -> None:
+    """A fresh process exposes cycles otherwise masked by pytest collection order."""
+    result = subprocess.run(  # noqa: S603 - module names are fixed test parameters.
+        [sys.executable, "-c", f"import {module}"],
+        cwd=MEASURE_ROOT.parent,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize(
+    "package,forbidden",
+    [
+        ("profile", ("measure.contribution", "measure.ha_app", "measure.cli")),
+        ("recording", ("measure.analyser", "measure.runner", "measure.ha_app", "measure.cli")),
+        ("runner", ("measure.execution", "measure.assembler", "measure.ha_app", "measure.cli")),
+    ],
+)
+def test_packages_depend_on_shared_contracts_not_orchestrators(package: str, forbidden: tuple[str, ...]) -> None:
+    violations = [
+        f"{path.relative_to(MEASURE_ROOT)}: {imported}"
+        for path in (MEASURE_ROOT / package).rglob("*.py")
+        for imported in _imports(path)
+        if imported.startswith(forbidden)
+    ]
+    assert violations == []
+
+
+@pytest.mark.parametrize("package", ["contribution", "ha_app/contribution", "ha_app/routes"])
+def test_workflow_packages_do_not_eagerly_import_services(package: str) -> None:
+    assert _imports(MEASURE_ROOT / package / "__init__.py") == []
 
 
 def test_shared_modules_do_not_import_transport_packages() -> None:
@@ -71,7 +130,9 @@ def test_transports_do_not_construct_runners_or_device_adapters() -> None:
 
 def test_transports_do_not_write_profile_models() -> None:
     violations = [
-        str(relative) for relative in EXECUTION_BOUNDARIES if "measure.model" in _imports(MEASURE_ROOT / relative)
+        str(relative)
+        for relative in EXECUTION_BOUNDARIES
+        if "measure.profile.model" in _imports(MEASURE_ROOT / relative)
     ]
 
     assert violations == []
@@ -80,7 +141,7 @@ def test_transports_do_not_write_profile_models() -> None:
 def test_only_home_assistant_manager_constructs_websocket_clients() -> None:
     violations: list[str] = []
     for path in MEASURE_ROOT.rglob("*.py"):
-        if path.name == "home_assistant.py":
+        if path == MEASURE_ROOT / "home_assistant/client.py":
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"))
         violations.extend(

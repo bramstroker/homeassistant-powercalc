@@ -63,7 +63,7 @@ available same-device entities and supports changing the selection or adding doc
 [preflight.py](measure/ha_app/preflight.py) checks entity availability and verifies that the
 vacuum battery is a numeric percentage sensor on the same device.
 
-[assembler.py](measure/assembler.py) constructs the concrete power meter, `MeasureUtil`,
+[assembler.py](measure/assembler.py) constructs the concrete power meter, `PowerSampler`,
 batched state reader, `AnalysisContext`, and runner. A registry snapshot supplies identity
 metadata for portable profile references.
 
@@ -84,7 +84,7 @@ Missing optional vacuum entities become `unavailable`, with one warning per enti
 Failed reads or missing required entities skip the sample. Stopping completes the run;
 `RunnerResult` contains sample counts, duration, and voltages.
 
-[recorder_capture.py](measure/recorder_capture.py) retains bounded scalar vacuum attributes
+[recording/capture.py](measure/recording/capture.py) retains bounded scalar vacuum attributes
 and filters known identifiers/secrets, URLs, and nested payloads. Generic recordings retain
 full attributes. Review entity IDs and values before sharing.
 
@@ -269,7 +269,7 @@ provide supplementary diagnostics.
 
 [MeasurementExecution](measure/execution.py) calls analysis after a complex recording stops.
 [RecorderAnalysisExecution](measure/analyser/execution.py) writes `analyser.json` atomically,
-uses [write_model_json](measure/model.py) to add measurement provenance to accepted fragments,
+uses [write_model_json](measure/profile/model.py) to add measurement provenance to accepted fragments,
 and merges an analysis summary into the original sample-count/duration summary.
 
 Reanalysis replaces derived artifacts while retaining observations and existing voltage

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from measure.contribution.models import ContributionAuthor, ContributionMetadata
-from measure.contribution.prepare import JsonValidator, ProfilePreparationError, ProfilePreparer
+from measure.profile.prepare import JsonValidator, ProfilePreparationError, ProfilePreparer
 import pytest
 
 
@@ -276,7 +276,7 @@ def test_preparer_clears_explicitly_blank_optional_text_but_preserves_omitted_fi
     ],
 )
 def test_schema_errors_identify_editable_fields(instance: dict, schema: dict, field: str) -> None:
-    from measure.contribution.prepare import _jsonschema_validate
+    from measure.profile.prepare import _jsonschema_validate
 
     with pytest.raises(ProfilePreparationError) as info:
         _jsonschema_validate(instance, schema)

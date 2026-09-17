@@ -7,15 +7,15 @@ from unittest.mock import MagicMock, patch
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from measure.analyser.execution import RecorderAnalysisExecution
-from measure.analyser.recording import load_recordings, recording_paths
+from measure.analyser.recording import load_recordings
 from measure.analyser.service import analysis_context_for
-from measure.execution import MeasurementCancelledError
+from measure.cancellation import MeasurementCancelledError
 from measure.ha_app.api import create_app
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError, SessionExecutionContext
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
-from measure.recorder_files import recording_filenames
+from measure.recording.files import recording_filenames, recording_paths
 from measure.request import AverageMeasurementRequest, RecorderMeasurementRequest
 from measure.runner.runner import RunnerResult
 import pytest
@@ -290,7 +290,7 @@ def test_record_more_endpoint_runs_preflight_before_archiving(
         lambda: finished.set() if context.coordinator.current.state == SessionState.COMPLETED else None
     )
 
-    with patch("measure.ha_app.api._preflight") as preflight:
+    with patch("measure.ha_app.routes.sessions.run_preflight") as preflight:
         if outcome == "preflight_failure":
             preflight.side_effect = HTTPException(status_code=422, detail="Vacuum unavailable")
         if outcome == "conflict":

@@ -12,13 +12,6 @@ from measure.analyser.models import (
     RecordingDataset,
     RecordingSample,
 )
-from measure.recorder_files import recording_filenames
-
-
-def recording_paths(directory: Path, filename: str) -> tuple[Path, ...]:
-    """Return numbered earlier runs followed by the latest recording."""
-    names = (path.name for path in directory.glob("*") if path.is_file() and not path.is_symlink())
-    return tuple(directory / name for name in recording_filenames(names, filename))
 
 
 def load_recording(path: Path) -> LoadedRecording:

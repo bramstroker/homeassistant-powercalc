@@ -9,7 +9,6 @@ from uuid import uuid4
 
 from pydantic import SecretStr
 
-from measure.clock import utc_now
 from measure.ha_app.contribution.models import (
     AUTOMATIC_CONTRIBUTION_MESSAGE,
     ContributionApiError,
@@ -31,6 +30,7 @@ from measure.ha_app.contribution.service import create_contribution_service, dra
 from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.request import MeasurementRequest
+from measure.utils.clock import utc_now
 
 _LOGGER = logging.getLogger("measure")
 _OAUTH_CLIENT_ID_ENV = "POWERCALC_GITHUB_CLIENT_ID"

@@ -14,7 +14,7 @@ from measure.controller.light.spec import LightControllerSpec
 from measure.controller.media.spec import MediaControllerSpec
 from measure.controller.spec import BaseControllerSpec
 from measure.powermeter.spec import DummyPowerMeterSpec, ManualPowerMeterSpec, PowerMeterSpec
-from measure.runner.const import COMPLEX_PROFILE_EXPORT_FILENAME, DEFAULT_EXPORT_FILENAME
+from measure.recording.files import COMPLEX_PROFILE_EXPORT_FILENAME, DEFAULT_EXPORT_FILENAME
 from measure.tuning import MeasurementParameters
 
 

@@ -6,9 +6,10 @@ from typing import Any
 import inquirer
 from inquirer.questions import Question
 
+from measure.cli.const import QUESTION_DUMMY_LOAD
 from measure.cli.environment import CliEnvironment
 from measure.cli.request_adapter import request_from_answers
-from measure.const import PROJECT_DIR, QUESTION_DUMMY_LOAD, MeasureType
+from measure.const import PROJECT_DIR, MeasureType
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.request import (
     BaseMeasurementRequest,

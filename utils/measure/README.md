@@ -11,6 +11,7 @@ See the [measure documentation](https://docs.powercalc.nl/contributing/measure/)
 
 The sections below cover development of the measure tool itself.
 
+For package ownership and dependency boundaries, see [Package layout](PACKAGE_LAYOUT.md).
 For the Measure app's recorder, offline fitting, validation, generated models, and component
 boundaries, see [Recorder and analyser architecture](RECORDER_ANALYSER_ARCHITECTURE.md).
 

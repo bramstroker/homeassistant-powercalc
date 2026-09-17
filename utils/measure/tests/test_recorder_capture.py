@@ -1,4 +1,4 @@
-from measure.recorder_capture import vacuum_recording_attributes
+from measure.recording.capture import vacuum_recording_attributes
 import pytest
 
 

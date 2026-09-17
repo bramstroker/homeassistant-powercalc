@@ -12,11 +12,10 @@ from typing import Any
 from pydantic import ValidationError
 
 from measure.const import PROJECT_DIR
-from measure.contribution.models import ContributionPreview
-from measure.contribution.prepare import ProfilePreparationError, ProfilePreparer
-from measure.model import mains_voltage_from_range
-from measure.profile.models import ProfileMetadata
+from measure.profile.model import mains_voltage_from_range
+from measure.profile.models import ProfileMetadata, ProfilePreview
 from measure.profile.output import write_prepared_profile
+from measure.profile.prepare import ProfilePreparationError, ProfilePreparer
 from measure.profile.specifications import DeviceSpecField, device_spec_fields
 
 Prompt = Callable[[str], str]
@@ -26,7 +25,7 @@ MODEL_SCHEMA_FILENAME = "model_schema.json"
 @dataclass(frozen=True)
 class ProfilePreparationRun:
     output_directory: Path
-    preview: ContributionPreview
+    preview: ProfilePreview
 
 
 def build_parser() -> argparse.ArgumentParser:

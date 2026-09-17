@@ -28,7 +28,7 @@ from measure.analyser.vacuum_validation import activity_reports, credibility_fai
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe
 
 if TYPE_CHECKING:
-    from measure.home_assistant_entities import EntityDescriptor
+    from measure.home_assistant.entities import EntityDescriptor
 
 MIN_VALIDATION_COVERAGE = 0.9
 MIN_RELATIVE_MAE_IMPROVEMENT = 0.15

@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from measure.cli.profile import _ask_mains_voltage, _metadata_defaults, _prompt_device_specs, prepare_profile
-from measure.contribution.prepare import ProfilePreparationError
+from measure.profile.prepare import ProfilePreparationError
 from measure.profile.specifications import DeviceSpecField
 import pytest
 

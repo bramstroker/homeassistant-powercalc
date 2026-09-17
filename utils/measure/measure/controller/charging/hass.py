@@ -2,8 +2,8 @@ from measure.controller.charging.const import ATTR_BATTERY_LEVEL
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import BatteryLevelRetrievalError
 from measure.controller.hass_controller import HassControllerBase
-from measure.home_assistant import HomeAssistantManager
-from measure.home_assistant_entities import DeviceClass, HomeAssistantEntityCatalog
+from measure.home_assistant.client import HomeAssistantManager
+from measure.home_assistant.entities import DeviceClass, HomeAssistantEntityCatalog
 
 
 class HassChargingController(HassControllerBase, ChargingController):

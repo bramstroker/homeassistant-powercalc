@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 from uuid import uuid4
 
-from measure.clock import utc_now
 from measure.contribution.credentials import CredentialStore
 from measure.contribution.github import GitHubApiError, GitHubClient, missing_required_scopes
 from measure.contribution.models import (
@@ -14,14 +13,15 @@ from measure.contribution.models import (
     ContributionMetadata,
     ContributionSubmission,
 )
-from measure.contribution.prepare import ProfilePreparer
 from measure.contribution.pull_request import (
     conventional_commit_message,
     deterministic_branch_name,
     pull_request_body,
     pull_request_title,
 )
-from measure.files import write_json_atomic
+from measure.profile.prepare import ProfilePreparer
+from measure.utils.clock import utc_now
+from measure.utils.files import write_json_atomic
 
 
 class ContributionJobExpiredError(LookupError):

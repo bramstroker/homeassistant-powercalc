@@ -2,12 +2,12 @@ import logging
 import time
 
 from measure.controller.media.controller import MediaController
-from measure.execution import ImmediateInteraction, RunInteraction, SpeakerOperatingPoint
 from measure.powermeter.errors import ZeroReadingError
 from measure.request import SpeakerMeasurementRequest
+from measure.runner.interaction import ImmediateInteraction, RunInteraction, SpeakerOperatingPoint
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.tuning import MeasurementParameters
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.utils.sampling import MeasurementResult, PowerSampler
 
 DURATION_PER_VOLUME_LEVEL = 20
 STREAM_URL = "https://powercalc.s3.eu-west-1.amazonaws.com/g_pink.mp3"
@@ -22,12 +22,12 @@ _LOGGER = logging.getLogger("measure")
 class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
     def __init__(
         self,
-        measure_util: MeasureUtil,
+        sampler: PowerSampler,
         parameters: MeasurementParameters,
         media_controller: MediaController,
         interaction: RunInteraction | None = None,
     ) -> None:
-        self.measure_util = measure_util
+        self.sampler = sampler
         self.config = parameters
         self.media_controller = media_controller
         self.interaction = interaction or ImmediateInteraction()
@@ -107,8 +107,8 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
     def _measure(self, duration: int, fast_test_mode: bool) -> MeasurementResult:
         """Take an instant sample in fast-test mode, otherwise average over the full duration."""
         if fast_test_mode:
-            return self.measure_util.take_measurement(time.time())
-        return self.measure_util.take_average_measurement(duration)
+            return self.sampler.take_measurement(time.time())
+        return self.sampler.take_average_measurement(duration)
 
     @staticmethod
     def _remaining_seconds(completed_levels: int, total_levels: int, fast_test_mode: bool = False) -> float:
@@ -142,7 +142,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
             )
             self.interaction.wait(self.config.sleep_standby)
         try:
-            return self.measure_util.take_measurement(start_time)
+            return self.sampler.take_measurement(start_time)
         except ZeroReadingError:
             _LOGGER.error("Measured 0 watt as standby power.")
             return MeasurementResult(power=0, voltages=[])

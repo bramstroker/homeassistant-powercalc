@@ -3,17 +3,17 @@ import logging
 import re
 
 from measure.assembler import MeasurementAssembler
-from measure.clock import utc_now
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import DummyLoadCalibrationStore, MeasurementExecution
 from measure.ha_app.coordinator import SessionExecutionContext, SessionMeasurementService
 from measure.ha_app.interaction import SessionInteraction
 from measure.ha_app.session import SessionControl, SessionEventType
 from measure.ha_app.storage import SessionStorage
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
+from measure.utils.clock import utc_now
 
 _LOGGER = logging.getLogger("measure")
 _SESSION_LOG_CONTROL: ContextVar[SessionControl | None] = ContextVar("measure_session_log_control", default=None)

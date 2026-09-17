@@ -20,14 +20,7 @@ from measure.contribution.github import (
     GitHubRepository,
     missing_required_scopes,
 )
-from measure.contribution.models import (
-    ContributionAuthor,
-    ContributionJob,
-    ContributionMetadata,
-    ContributionPreview as ProfileContributionPreview,
-    DeviceInfo,
-)
-from measure.contribution.prepare import ProfilePreparationError, ProfilePreparer
+from measure.contribution.models import ContributionAuthor, ContributionJob, ContributionMetadata, DeviceInfo
 from measure.contribution.pull_request import (
     conventional_commit_message,
     deterministic_branch_name,
@@ -52,8 +45,10 @@ from measure.ha_app.contribution.models import (
     contribution_entity_ids,
     supports_automatic_contribution,
 )
-from measure.model import mains_voltage_from_range
+from measure.profile.model import mains_voltage_from_range
+from measure.profile.models import ProfilePreview
 from measure.profile.output import prepared_profile_archive
+from measure.profile.prepare import ProfilePreparationError, ProfilePreparer
 from measure.request import MeasurementRequest
 
 MODEL_FILENAME = "model.json"
@@ -785,7 +780,7 @@ def _build_preview_file(path: str, content: bytes) -> ContributionFile:
 
 def _validate_latest_preview(
     job: ContributionJob,
-    latest_preview: ProfileContributionPreview,
+    latest_preview: ProfilePreview,
     base_sha: str,
 ) -> None:
     if job.base_sha != base_sha:

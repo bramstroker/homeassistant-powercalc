@@ -7,10 +7,9 @@ from pathlib import Path
 import re
 from typing import Any
 
-from measure.contribution.models import ContributionPreparedFile, ContributionPreview
-from measure.model import mains_voltage_from_range
-from measure.profile.models import ProfileMetadata
-from measure.recorder_files import recording_filenames
+from measure.profile.model import mains_voltage_from_range
+from measure.profile.models import PreparedProfileFile, ProfileMetadata, ProfilePreview
+from measure.recording.files import recording_filenames
 
 JsonValidator = Callable[[dict[str, Any], dict[str, Any]], None]
 
@@ -73,7 +72,7 @@ class ProfilePreparer:
         self.model_schema_path = model_schema_path
         self.validator = validator or _jsonschema_validate
 
-    def prepare(self, artifact_directory: Path, metadata: ProfileMetadata) -> ContributionPreview:
+    def prepare(self, artifact_directory: Path, metadata: ProfileMetadata) -> ProfilePreview:
         artifact_directory = artifact_directory.resolve()
         csv_names = self._artifact_csv_names(artifact_directory)
         model = self._apply_metadata(self._read_object(artifact_directory / MODEL_JSON), metadata)
@@ -102,7 +101,7 @@ class ProfilePreparer:
             relative_files.append(profile_directory.parent / MANUFACTURER_JSON)
         self._block_collisions(relative_files)
 
-        return ContributionPreview(
+        return ProfilePreview(
             manufacturer_directory=manufacturer_directory,
             manufacturer_library_url=manufacturer.library_url,
             model_directory=metadata.model_id,
@@ -117,7 +116,7 @@ class ProfilePreparer:
         self,
         artifact_directory: Path,
         metadata: ProfileMetadata,
-        preview: ContributionPreview,
+        preview: ProfilePreview,
     ) -> tuple[tuple[str, bytes], ...]:
         model = self._apply_metadata(self._read_object(artifact_directory / MODEL_JSON), metadata)
         return tuple(
@@ -317,9 +316,9 @@ class ProfilePreparer:
         artifact_directory: Path,
         model: dict[str, Any],
         metadata: ProfileMetadata,
-    ) -> ContributionPreparedFile:
+    ) -> PreparedProfileFile:
         content = self._render_file_content(relative_path, artifact_directory, model, metadata)
-        return ContributionPreparedFile(
+        return PreparedProfileFile(
             path=relative_path.as_posix(),
             size=len(content),
             sha=hashlib.sha256(content).hexdigest(),

@@ -11,7 +11,6 @@ from typing import Literal, TextIO
 from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController, LightInfo
-from measure.execution import ImmediateInteraction, LightOperatingPoint, RunInteraction
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
@@ -19,6 +18,7 @@ from measure.powermeter.errors import (
 )
 from measure.request import LightMeasurementRequest
 from measure.runner.errors import RunnerError
+from measure.runner.interaction import ImmediateInteraction, LightOperatingPoint, RunInteraction
 from measure.runner.light_plan import (
     CSV_HEADERS,
     ColorTempVariation,
@@ -35,7 +35,7 @@ from measure.runner.light_plan import (
 from measure.runner.light_setup import set_light_to_maximum_brightness
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.tuning import MeasurementParameters
-from measure.util.measure_util import AverageMeasurementConvergence, MeasurementResult, MeasureUtil
+from measure.utils.sampling import AverageMeasurementConvergence, MeasurementResult, PowerSampler
 
 CSV_WRITE_BUFFER = 50
 MAX_CONSECUTIVE_ZERO_READINGS = 5
@@ -54,7 +54,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
 
     def __init__(
         self,
-        measure_util: MeasureUtil,
+        sampler: PowerSampler,
         parameters: MeasurementParameters,
         light_controller: LightController,
         interaction: RunInteraction | None = None,
@@ -62,7 +62,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         resume: bool = False,
     ) -> None:
         self.light_controller = light_controller
-        self.measure_util = measure_util
+        self.sampler = sampler
         self.lut_modes: set[LutMode] | None = None
         self.num_lights: int = 1
         self.num_0_readings: int = 0
@@ -506,7 +506,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
     ) -> MeasurementResult:
         """Take an effect average or a timestamp-validated point reading."""
         if mode == LutMode.EFFECT:
-            result = self.measure_util.take_average_measurement(
+            result = self.sampler.take_average_measurement(
                 self.config.measure_time_effect,
                 convergence=AverageMeasurementConvergence(
                     min_duration=self.config.measure_time_effect_min,
@@ -516,7 +516,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                 ),
             )
         else:
-            result = self.measure_util.take_measurement(start_timestamp, retry_count)
+            result = self.sampler.take_measurement(start_timestamp, retry_count)
 
         # Determine per load power consumption
         power = result.power / self.num_lights

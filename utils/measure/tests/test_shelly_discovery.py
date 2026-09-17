@@ -3,7 +3,11 @@ from collections.abc import Sequence
 from unittest.mock import AsyncMock, MagicMock
 
 from measure.ha_app.shelly_discovery import ShellyDiscoveryService
-from measure.home_assistant import HomeAssistantDiscoveryClient, HomeAssistantDiscoveryError, HomeAssistantManager
+from measure.home_assistant.client import (
+    HomeAssistantDiscoveryClient,
+    HomeAssistantDiscoveryError,
+    HomeAssistantManager,
+)
 import pytest
 import requests
 from requests.auth import AuthBase

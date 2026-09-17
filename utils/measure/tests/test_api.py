@@ -13,10 +13,9 @@ from measure.const import MeasureType
 from measure.contribution.github import GitHubUser
 from measure.controller.light.const import LutMode
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
-from measure.execution import LightOperatingPoint
-from measure.ha_app.api import _power_meter_spec, create_app
-from measure.ha_app.contribution import (
-    ContributionApiCoordinator,
+from measure.ha_app.api import create_app
+from measure.ha_app.contribution.coordinator import ContributionApiCoordinator
+from measure.ha_app.contribution.models import (
     ContributionApiError,
     ContributionAuthMethod,
     ContributionAuthStatus,
@@ -27,21 +26,23 @@ from measure.ha_app.contribution import (
     ContributionSubmissionResult,
     DeviceFlowPollResponse,
     DeviceFlowStart,
-    SharedContributionService,
 )
+from measure.ha_app.contribution.service import SharedContributionService
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionExecutionContext, SessionMeasurementService
 from measure.ha_app.library_catalog import DeviceSpecificationCatalog, ManufacturerCatalog, MeasureDeviceCatalog
 from measure.ha_app.light_probe import LightLoadProbeError, LightLoadProbePoint, LightLoadProbeResult
+from measure.ha_app.routes.measurement import _power_meter_spec
 from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
-from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistantManager
 from measure.powermeter.diagnostics import PowerMeterDiagnostics
 from measure.powermeter.powermeter import PowerMeter, PowerMeterDiagnosticSample
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, KasaPowerMeterSpec
 from measure.request import MeasurementRequest, RecorderMeasurementRequest, RecorderProfileRecipe, RecorderPurpose
+from measure.runner.interaction import LightOperatingPoint
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
-from measure.version import measure_version
+from measure.utils.version import measure_version
 from pydantic import SecretStr, TypeAdapter
 import pytest
 

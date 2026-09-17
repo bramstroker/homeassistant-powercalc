@@ -4,8 +4,9 @@ from enum import StrEnum
 from threading import Event, Lock
 from typing import Any, TypedDict, cast
 
-from measure.clock import utc_now
-from measure.execution import MeasurementCancelledError, OperatingPoint
+from measure.cancellation import MeasurementCancelledError
+from measure.runner.interaction import OperatingPoint
+from measure.utils.clock import utc_now
 
 
 class CalibrationSample(TypedDict):
@@ -217,3 +218,7 @@ class SessionControl:
     def entity_states(self, states: Mapping[str, str]) -> None:
         """Emit the latest recorder entity states for live display."""
         self.emit(SessionEventType.ENTITY_STATES, {"states": dict(states)})
+
+
+def is_active_session(snapshot: SessionSnapshot | None) -> bool:
+    return snapshot is not None and snapshot.state in ACTIVE_SESSION_STATES

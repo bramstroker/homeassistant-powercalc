@@ -4,9 +4,8 @@ from pathlib import Path
 import tempfile
 import zipfile
 
-from measure.contribution.models import ContributionPreview
-from measure.contribution.prepare import ProfilePreparationError, ProfilePreparer
-from measure.profile.models import ProfileMetadata
+from measure.profile.models import ProfileMetadata, ProfilePreview
+from measure.profile.prepare import ProfilePreparationError, ProfilePreparer
 
 
 def prepared_profile_archive(contents: tuple[tuple[str, bytes], ...]) -> bytes:
@@ -28,7 +27,7 @@ def write_prepared_profile(
     artifact_directory: Path,
     metadata: ProfileMetadata,
     output_directory: Path,
-) -> ContributionPreview:
+) -> ProfilePreview:
     """Validate, render, and atomically write a prepared profile package.
 
     Raw measurement artifacts are only read. The returned directory contains the

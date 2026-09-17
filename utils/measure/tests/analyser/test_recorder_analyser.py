@@ -18,7 +18,7 @@ from measure.analyser.models import (
 )
 from measure.analyser.recording import load_recording
 from measure.analyser.service import RecorderAnalyser, _credibility_reason, _select_candidate, analysis_context_for
-from measure.home_assistant_entities import EntityDescriptor
+from measure.home_assistant.entities import EntityDescriptor
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, RecorderPurpose
 import pytest
