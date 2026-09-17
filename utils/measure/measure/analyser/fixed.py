@@ -5,14 +5,13 @@ from statistics import median
 
 from measure.analyser.models import (
     AnalysisCandidate,
-    AnalysisContext,
     FeatureReference,
     ModelConfigFragment,
     ProfileAnalysisStrategy,
-    RecordingSample,
     ScalarStateValue,
     StrategyNotApplicable,
 )
+from measure.recording.models import RecordingContext, RecordingSample
 
 MIN_SAMPLES_PER_VALUE = 4
 MAX_DISTINCT_VALUES = 20
@@ -69,7 +68,7 @@ class FixedStatesPowerStrategy(ProfileAnalysisStrategy):
     def build_candidate(
         self,
         samples: Sequence[RecordingSample],
-        context: AnalysisContext,
+        context: RecordingContext,
     ) -> AnalysisCandidate | StrategyNotApplicable:
         candidates = [
             candidate

@@ -9,11 +9,9 @@ import math
 from statistics import median
 
 from measure.analyser.models import (
-    AnalysisContext,
     FeatureReference,
     ModelConfigFragment,
     ProfileAnalysisStrategy,
-    RecordingSample,
     StrategyNotApplicable,
     TrainingValidationSplit,
     ValidationMethod,
@@ -26,6 +24,7 @@ from measure.analyser.vacuum_signals import (
     portable_entity,
     resolve_activity,
 )
+from measure.recording.models import RecordingContext, RecordingSample
 
 MIN_EPISODE_SAMPLES = 5
 MAX_CHARGING_GAP = 20
@@ -69,7 +68,7 @@ class VacuumCompositeCandidate:
     signals: list[ActivitySignal]
     branches: list[VacuumBranch]
     battery: FeatureReference | None
-    context: AnalysisContext
+    context: RecordingContext
     strategy_id: str = "vacuum_composite"
 
     @property
@@ -155,7 +154,7 @@ class VacuumCompositeStrategy(ProfileAnalysisStrategy):
     def build_candidate(
         self,
         samples: Sequence[RecordingSample],
-        context: AnalysisContext,
+        context: RecordingContext,
     ) -> VacuumCompositeCandidate | StrategyNotApplicable:
         if context.recipe != "vacuum_robot":
             return StrategyNotApplicable("The vacuum analyser requires the vacuum recipe")
@@ -283,7 +282,7 @@ def vacuum_episodes(samples: Sequence[RecordingSample], signals: Sequence[Activi
 
 def split_vacuum_samples(
     samples: Sequence[RecordingSample],
-    context: AnalysisContext,
+    context: RecordingContext,
 ) -> TrainingValidationSplit | StrategyNotApplicable:
     signals = discover_signals(samples, context)
     episodes = vacuum_episodes(samples, signals)

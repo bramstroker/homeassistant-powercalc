@@ -7,11 +7,11 @@ from pathlib import Path
 import time
 from typing import TextIO
 
-from measure.analyser.models import AnalysisContext
-from measure.analyser.service import analysis_context_for
 from measure.cancellation import MeasurementCancelledError
 from measure.recording.capture import vacuum_attribute_policy, vacuum_recording_attributes
+from measure.recording.context import recording_context_for
 from measure.recording.files import DEFAULT_EXPORT_FILENAME
+from measure.recording.models import RecordingContext
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, validate_export_filename
 from measure.runner.interaction import ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
@@ -50,13 +50,13 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         sampler: PowerSampler,
         interaction: RunInteraction | None = None,
         entity_state_reader: EntityStateReader | None = None,
-        analysis_context: AnalysisContext | None = None,
+        recording_context: RecordingContext | None = None,
     ) -> None:
         self.sampler = sampler
         self.filename = DEFAULT_EXPORT_FILENAME
         self.interaction = interaction or ImmediateInteraction()
         self.entity_state_reader = entity_state_reader
-        self.analysis_context = analysis_context
+        self.recording_context = recording_context
         self._missing_optional_entities: set[str] = set()
 
     def writes_export_files(self) -> bool:
@@ -140,7 +140,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         return True
 
     def _metadata(self, request: RecorderMeasurementRequest) -> dict[str, object]:
-        metadata = (self.analysis_context or analysis_context_for(request)).metadata_record()
+        metadata = (self.recording_context or recording_context_for(request)).metadata_record()
         if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT:
             metadata["attribute_policy"] = vacuum_attribute_policy()
         return metadata

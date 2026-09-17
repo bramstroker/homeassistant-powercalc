@@ -1,4 +1,3 @@
-from dataclasses import replace
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -7,7 +6,6 @@ from starlette.concurrency import run_in_threadpool
 
 from measure.assembler import MeasurementAssembler
 from measure.const import PARAMETER_LIMITS
-from measure.controller.light.const import LutMode
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.ha_app.api_models import (
     ERROR_RESPONSE,
@@ -25,19 +23,12 @@ from measure.ha_app.api_models import (
     PreflightResponse,
 )
 from measure.ha_app.context import AppContext, app_context
-from measure.ha_app.errors import DocumentedHTTPException
 from measure.ha_app.library_catalog import (
     LibraryCatalogError,
 )
-from measure.ha_app.light_probe import (
-    LightLoadProbeError,
-)
 from measure.ha_app.preferences import AppPreferences, AppSettingsResponse, AppSettingsUpdate
-from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError
+from measure.ha_app.preparation import apply_fast_test_mode, run_preflight
 from measure.ha_app.registry import measurement_definitions
-from measure.ha_app.session import (
-    is_active_session,
-)
 from measure.ha_app.shelly_credentials import ShellyCredentials
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
 from measure.ha_app.tapo_credentials import TapoCredentials
@@ -57,7 +48,6 @@ from measure.powermeter.spec import (
     PowerMeterSpec,
     ShellyPowerMeterSpec,
 )
-from measure.request import LightMeasurementRequest, MeasurementRequest
 from measure.runner.interaction import ImmediateInteraction
 from measure.tuning import MeasurementParameters
 from measure.utils.version import measure_version
@@ -202,7 +192,19 @@ async def entities(
 async def preflight(payload: MeasurementRequestPayload, request: Request) -> PreflightResponse:
     context = app_context(request)
     prepared = await run_in_threadpool(apply_fast_test_mode, context, payload)
-    return await run_in_threadpool(run_preflight, context, prepared)
+    assessment = await run_in_threadpool(run_preflight, context, prepared)
+    result = assessment.checks
+    return PreflightResponse(
+        valid=True,
+        warnings=list(result.warnings),
+        estimated_variations=result.estimated_variations,
+        estimated_duration_seconds=result.estimated_duration_seconds,
+        supported_modes=list(result.supported_modes) if result.supported_modes is not None else None,
+        power_meter_diagnostic=result.power_meter_diagnostic,
+        battery_level_entity_id=result.battery_level_entity_id,
+        battery_level_attribute=result.battery_level_attribute,
+        light_load_probe=assessment.light_load_probe,
+    )
 
 
 def _measure_definitions() -> list[MeasureDefinition]:
@@ -351,90 +353,3 @@ def _matching_dummy_load_calibration(context: AppContext) -> DummyLoadCalibratio
             },
         )
     return calibration if calibration.power_meter_fingerprint == power_meter_fingerprint(spec) else None
-
-
-def run_preflight(context: AppContext, payload: MeasurementRequest) -> PreflightResponse:
-    catalog = HomeAssistantEntityCatalog(context.home_assistant)
-    snapshot = None
-
-    def load_entities(
-        domain: EntityDomain | None,
-        device_class: DeviceClass | None,
-    ) -> list[EntityDescriptor]:
-        nonlocal snapshot
-        if snapshot is None:
-            snapshot = catalog.load_snapshot()
-        return snapshot.select(domain=domain, device_class=device_class)
-
-    try:
-        result = MeasurementPreflight(
-            has_active_session=lambda: is_active_session(context.coordinator.current),
-            verify_storage=context.storage.verify_writable,
-            load_entities=load_entities,
-            load_all_entities=lambda: catalog.load_snapshot().all(),
-            diagnose_power_meter=context.power_meter_diagnostics.evaluate,
-            developer_mode=context.developer_mode,
-        ).validate(payload)
-        light_load_probe = (
-            context.light_load_probe.evaluate(payload)
-            if isinstance(payload, LightMeasurementRequest)
-            and payload.dummy_load is None
-            and not payload.controller.is_dummy
-            and not isinstance(payload.power_meter, DummyPowerMeterSpec)
-            and bool(payload.modes - {LutMode.EFFECT})
-            else None
-        )
-    except ActiveSessionError as error:
-        raise HTTPException(status_code=409, detail=str(error)) from error
-    except LightLoadProbeError as error:
-        if error.help_url is None or error.help_label is None:
-            raise HTTPException(status_code=422, detail=str(error)) from error
-        raise DocumentedHTTPException(
-            status_code=422,
-            detail=str(error),
-            help_url=error.help_url,
-            help_label=error.help_label,
-        ) from error
-    except PreflightError as error:
-        raise HTTPException(status_code=422, detail=str(error)) from error
-    return PreflightResponse(
-        valid=True,
-        warnings=list(result.warnings),
-        estimated_variations=result.estimated_variations,
-        estimated_duration_seconds=result.estimated_duration_seconds,
-        supported_modes=list(result.supported_modes) if result.supported_modes is not None else None,
-        power_meter_diagnostic=result.power_meter_diagnostic,
-        battery_level_entity_id=result.battery_level_entity_id,
-        battery_level_attribute=result.battery_level_attribute,
-        light_load_probe=light_load_probe,
-    )
-
-
-def apply_fast_test_mode(context: AppContext, request: MeasurementRequest) -> MeasurementRequest:
-    settings = context.storage.load_settings()
-    controller = request.controller
-    supported_dummy_controller = controller is not None and controller.is_dummy
-    enabled = (
-        context.developer_mode
-        and settings.fast_test_mode
-        and isinstance(request.power_meter, DummyPowerMeterSpec)
-        and supported_dummy_controller
-    )
-    parameters = replace(request.parameters, fast_test_mode=False)
-    if enabled:
-        parameters = replace(
-            request.parameters,
-            fast_test_mode=True,
-            sleep_time=0,
-            sleep_time_sample=0,
-            sample_count=1,
-            sleep_initial=0,
-            sleep_standby=0,
-            sleep_time_hue=0,
-            sleep_time_sat=0,
-            sleep_time_ct=0,
-            sleep_time_effect_change=0,
-            measure_time_effect=1,
-            measure_time_effect_min=1,
-        )
-    return request.model_copy(update={"fast_test_mode": enabled, "parameters": parameters})

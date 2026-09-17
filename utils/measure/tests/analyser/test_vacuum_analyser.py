@@ -6,14 +6,10 @@ from measure.analyser.execution import RecorderAnalysisExecution
 from measure.analyser.fixed import FixedStatesPowerCandidate
 from measure.analyser.models import (
     ActivityReport,
-    AnalysisContext,
     EnergyMetrics,
     FeatureReference,
     ModelConfigFragment,
-    RecordedEntity,
-    RecordedEntityState,
     RecorderAnalysisResult,
-    RecordingSample,
     StrategyNotApplicable,
     TrainingValidationSplit,
     ValidationMethod,
@@ -38,6 +34,7 @@ from measure.analyser.vacuum_signals import (
 )
 from measure.analyser.vacuum_validation import activity_reports, credibility_failure
 from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.recording.models import RecordedEntity, RecordedEntityState, RecordingContext, RecordingSample
 from measure.request import RecorderMeasurementRequest
 import pytest
 
@@ -45,7 +42,7 @@ PRIMARY = "vacuum.robot"
 BATTERY = "sensor.battery"
 STATE = "sensor.activity"
 DRYING = "binary_sensor.drying"
-CONTEXT = AnalysisContext(
+CONTEXT = RecordingContext(
     "vacuum_robot",
     PRIMARY,
     "vacuum_robot",
@@ -121,7 +118,7 @@ def repeated() -> list[RecordingSample]:
     return first + [replace(item, elapsed_seconds=item.elapsed_seconds + len(first)) for item in cycle()]
 
 
-def write_recording(path: Path, samples: list[RecordingSample], context: AnalysisContext | None = CONTEXT) -> Path:
+def write_recording(path: Path, samples: list[RecordingSample], context: RecordingContext | None = CONTEXT) -> Path:
     records = [context.metadata_record()] if context is not None else []
     records.extend(
         {
@@ -139,7 +136,7 @@ def write_recording(path: Path, samples: list[RecordingSample], context: Analysi
 
 
 def candidate(
-    samples: list[RecordingSample] | None = None, context: AnalysisContext = CONTEXT
+    samples: list[RecordingSample] | None = None, context: RecordingContext = CONTEXT
 ) -> VacuumCompositeCandidate:
     result = VacuumCompositeStrategy().build_candidate(samples if samples is not None else cycle(), context)
     assert isinstance(result, VacuumCompositeCandidate)

@@ -1,7 +1,6 @@
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
-from measure.analyser.service import analysis_context_for
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.dummy import DummyChargingController
 from measure.controller.charging.hass import HassChargingController
@@ -58,6 +57,7 @@ from measure.powermeter.spec import (
     TuyaPowerMeterSpec,
 )
 from measure.powermeter.tasmota import TasmotaPowerMeter
+from measure.recording.context import recording_context_for
 from measure.request import (
     AverageMeasurementRequest,
     ChargingMeasurementRequest,
@@ -205,7 +205,7 @@ class MeasurementAssembler:
         if isinstance(request, RecorderMeasurementRequest):
             state_reader = self._recorder_state_reader() if request.recorded_entity_ids else None
             context = (
-                analysis_context_for(request, HomeAssistantEntityCatalog(self._home_assistant()).load_snapshot().all())
+                recording_context_for(request, HomeAssistantEntityCatalog(self._home_assistant()).load_snapshot().all())
                 if request.recorded_entity_ids
                 else None
             )

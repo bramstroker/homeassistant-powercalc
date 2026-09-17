@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 from typing import Any
 
-from measure.profile.model import mains_voltage_from_range
+from measure.profile.model_json import mains_voltage_from_range
 from measure.profile.models import PreparedProfileFile, ProfileMetadata, ProfilePreview
 from measure.recording.files import recording_filenames
 

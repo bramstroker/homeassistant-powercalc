@@ -5,7 +5,7 @@ from measure.profile.specifications import device_spec_fields
 
 
 def test_device_spec_fields_follow_model_schema_device_type_conditions() -> None:
-    schema_path = Path(__file__).parents[3] / "profile_library" / "model_schema.json"
+    schema_path = Path(__file__).parents[4] / "profile_library" / "model_schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     fields = device_spec_fields(schema)

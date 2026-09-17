@@ -4,9 +4,9 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from measure.analyser.models import AnalysisContext, RecordedEntity
 from measure.cancellation import MeasurementCancelledError
 from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.recording.models import RecordedEntity, RecordingContext
 from measure.request import AverageMeasurementRequest, RecorderMeasurementRequest
 from measure.runner.average import AverageRunner
 from measure.runner.interaction import RunInteraction
@@ -214,7 +214,7 @@ def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
         additional_entity_ids=("sensor.state",),
     )
     primary = RecordedEntity("vacuum.robot", "vacuum", "primary", integration="dreame_vacuum", translation_key="vacuum")
-    context = AnalysisContext(
+    context = RecordingContext(
         "vacuum_robot",
         "vacuum.robot",
         "vacuum_robot",

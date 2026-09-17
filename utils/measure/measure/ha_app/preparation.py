@@ -1,0 +1,77 @@
+from dataclasses import dataclass, replace
+
+from measure.controller.light.const import LutMode
+from measure.ha_app.context import AppContext
+from measure.ha_app.light_probe import LightLoadProbeResult
+from measure.ha_app.preflight import MeasurementPreflight, PreflightResult
+from measure.ha_app.session import is_active_session
+from measure.home_assistant.entities import DeviceClass, EntityDescriptor, EntityDomain, HomeAssistantEntityCatalog
+from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.request import LightMeasurementRequest, MeasurementRequest
+
+
+@dataclass(frozen=True)
+class PreflightAssessment:
+    checks: PreflightResult
+    light_load_probe: LightLoadProbeResult | None = None
+
+
+def run_preflight(context: AppContext, payload: MeasurementRequest) -> PreflightAssessment:
+    """Validate app dependencies and probe low light loads before starting a run."""
+    catalog = HomeAssistantEntityCatalog(context.home_assistant)
+    snapshot = None
+
+    def load_entities(domain: EntityDomain | None, device_class: DeviceClass | None) -> list[EntityDescriptor]:
+        nonlocal snapshot
+        if snapshot is None:
+            snapshot = catalog.load_snapshot()
+        return snapshot.select(domain=domain, device_class=device_class)
+
+    result = MeasurementPreflight(
+        has_active_session=lambda: is_active_session(context.coordinator.current),
+        verify_storage=context.storage.verify_writable,
+        load_entities=load_entities,
+        load_all_entities=lambda: catalog.load_snapshot().all(),
+        diagnose_power_meter=context.power_meter_diagnostics.evaluate,
+        developer_mode=context.developer_mode,
+    ).validate(payload)
+    light_load_probe = (
+        context.light_load_probe.evaluate(payload)
+        if isinstance(payload, LightMeasurementRequest)
+        and payload.dummy_load is None
+        and not payload.controller.is_dummy
+        and not isinstance(payload.power_meter, DummyPowerMeterSpec)
+        and bool(payload.modes - {LutMode.EFFECT})
+        else None
+    )
+    return PreflightAssessment(result, light_load_probe)
+
+
+def apply_fast_test_mode(context: AppContext, request: MeasurementRequest) -> MeasurementRequest:
+    settings = context.storage.load_settings()
+    controller = request.controller
+    supported_dummy_controller = controller is not None and controller.is_dummy
+    enabled = (
+        context.developer_mode
+        and settings.fast_test_mode
+        and isinstance(request.power_meter, DummyPowerMeterSpec)
+        and supported_dummy_controller
+    )
+    parameters = replace(request.parameters, fast_test_mode=False)
+    if enabled:
+        parameters = replace(
+            request.parameters,
+            fast_test_mode=True,
+            sleep_time=0,
+            sleep_time_sample=0,
+            sample_count=1,
+            sleep_initial=0,
+            sleep_standby=0,
+            sleep_time_hue=0,
+            sleep_time_sat=0,
+            sleep_time_ct=0,
+            sleep_time_effect_change=0,
+            measure_time_effect=1,
+            measure_time_effect_min=1,
+        )
+    return request.model_copy(update={"fast_test_mode": enabled, "parameters": parameters})

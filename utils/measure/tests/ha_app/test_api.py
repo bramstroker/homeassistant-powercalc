@@ -1421,7 +1421,7 @@ def test_contribution_pat_rejects_reported_insufficient_scope(tmp_path: Path) ->
     service = SharedContributionService(tmp_path)
     token = SecretStr("github_pat_test")
     with (
-        patch("measure.ha_app.contribution.service.GitHubClient", return_value=github),
+        patch("measure.ha_app.contribution.auth.GitHubClient", return_value=github),
         pytest.raises(ContributionApiError, match="must grant public repository and workflow access"),
     ):
         service.connect_pat(token)
@@ -1435,7 +1435,7 @@ def test_contribution_device_flow_records_granted_scopes_without_claiming_verifi
         scopes=("public_repo",),
         scopes_reported=True,
     )
-    with patch("measure.ha_app.contribution.service.GitHubClient", return_value=github):
+    with patch("measure.ha_app.contribution.auth.GitHubClient", return_value=github):
         service = SharedContributionService(tmp_path)
         polled = service.poll_device_flow("client-id", "device-code")
         status = service.auth_status()
@@ -1454,7 +1454,7 @@ def test_contribution_device_flow_slow_down_reports_retry_after(tmp_path: Path, 
         "interval": interval,
     }
 
-    with patch("measure.ha_app.contribution.service.GitHubClient", return_value=github):
+    with patch("measure.ha_app.contribution.auth.GitHubClient", return_value=github):
         polled = SharedContributionService(tmp_path).poll_device_flow("client-id", "device-code")
 
     assert polled.status == "slow_down"
@@ -1478,7 +1478,7 @@ def test_contribution_device_flow_pending_or_invalid_slow_down_has_no_retry_afte
     github = MagicMock()
     github.poll_device_flow.return_value = payload
 
-    with patch("measure.ha_app.contribution.service.GitHubClient", return_value=github):
+    with patch("measure.ha_app.contribution.auth.GitHubClient", return_value=github):
         polled = SharedContributionService(tmp_path).poll_device_flow("client-id", "device-code")
 
     assert polled.status == ("slow_down" if payload["error"] == "slow_down" else "pending")

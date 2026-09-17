@@ -2,15 +2,15 @@
 
 from dataclasses import replace
 
-from measure.analyser.models import AnalysisContext, RecordedEntity, RecordedEntityState, RecordingSample
 from measure.analyser.vacuum_signals import ALIASES, Activity, discover_signals, portable_entity, resolve_activity
+from measure.recording.models import RecordedEntity, RecordedEntityState, RecordingContext, RecordingSample
 import pytest
 
 PRIMARY = "vacuum.robot"
 
 
-def context(*entities: RecordedEntity) -> AnalysisContext:
-    return AnalysisContext(
+def context(*entities: RecordedEntity) -> RecordingContext:
+    return RecordingContext(
         "vacuum_robot",
         PRIMARY,
         "vacuum_robot",

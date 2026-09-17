@@ -10,6 +10,8 @@ from measure.ha_app.contribution.models import (
     ContributionApiError,
     ContributionApiErrorCode,
 )
+from measure.ha_app.light_probe import LightLoadProbeError
+from measure.ha_app.preflight import ActiveSessionError, PreflightError
 
 _LOGGER = logging.getLogger("measure")
 
@@ -72,6 +74,25 @@ def register_error_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=error.status_code,
             content=content,
+        )
+
+    @app.exception_handler(PreflightError)
+    async def preflight_error(request: Request, error: PreflightError) -> JSONResponse:
+        status = 409 if isinstance(error, ActiveSessionError) else 422
+        return await http_error(request, HTTPException(status_code=status, detail=str(error)))
+
+    @app.exception_handler(LightLoadProbeError)
+    async def light_load_probe_error(request: Request, error: LightLoadProbeError) -> JSONResponse:
+        if error.help_url is None or error.help_label is None:
+            return await http_error(request, HTTPException(status_code=422, detail=str(error)))
+        return await http_error(
+            request,
+            DocumentedHTTPException(
+                status_code=422,
+                detail=str(error),
+                help_url=error.help_url,
+                help_label=error.help_label,
+            ),
         )
 
     @app.exception_handler(ContributionApiError)

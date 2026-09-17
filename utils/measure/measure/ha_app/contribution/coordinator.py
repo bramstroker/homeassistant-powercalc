@@ -26,7 +26,8 @@ from measure.ha_app.contribution.models import (
     contribution_entity_ids,
     supports_automatic_contribution,
 )
-from measure.ha_app.contribution.service import create_contribution_service, draft_from_request
+from measure.ha_app.contribution.preview import draft_from_request
+from measure.ha_app.contribution.service import create_contribution_service
 from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.request import MeasurementRequest

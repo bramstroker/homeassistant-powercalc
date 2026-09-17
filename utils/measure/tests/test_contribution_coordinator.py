@@ -17,7 +17,8 @@ from measure.ha_app.contribution.models import (
     ContributionAuthStatus,
     ContributionPreviewRequest,
 )
-from measure.ha_app.contribution.service import _metadata_from_request, _validate_latest_preview
+from measure.ha_app.contribution.preview import metadata_from_request
+from measure.ha_app.contribution.service import _validate_latest_preview
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.profile.models import PreparedProfileFile, ProfilePreview
 from measure.profile.prepare import ProfilePreparer
@@ -357,17 +358,17 @@ def test_metadata_from_request_maps_validation_errors_to_invalid_metadata() -> N
     )
 
     with pytest.raises(ContributionApiError, match="invalid GTIN") as info:
-        _metadata_from_request(request, payload, auth)
+        metadata_from_request(request, payload, auth)
     assert info.value.code == ContributionApiErrorCode.INVALID_METADATA
     assert info.value.field == "gtins"
 
     for payload_field in ("contributor", "contributor_github", "manufacturer_name"):
         invalid = payload.model_copy(update={"gtins": [], payload_field: " "})
         with pytest.raises(ContributionApiError) as info:
-            _metadata_from_request(request, invalid, auth)
+            metadata_from_request(request, invalid, auth)
         assert info.value.field == payload_field
 
-    metadata = _metadata_from_request(request, payload.model_copy(update={"gtins": []}), auth, "hue")
+    metadata = metadata_from_request(request, payload.model_copy(update={"gtins": []}), auth, "hue")
     assert metadata.measure_type == "light"
     assert metadata.measure_device == "Test meter"
     assert metadata.integration == "hue"

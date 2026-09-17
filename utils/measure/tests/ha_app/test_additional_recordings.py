@@ -8,13 +8,13 @@ from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from measure.analyser.execution import RecorderAnalysisExecution
 from measure.analyser.recording import load_recordings
-from measure.analyser.service import analysis_context_for
 from measure.cancellation import MeasurementCancelledError
 from measure.ha_app.api import create_app
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictError, SessionExecutionContext
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.recording.context import recording_context_for
 from measure.recording.files import recording_filenames, recording_paths
 from measure.request import AverageMeasurementRequest, RecorderMeasurementRequest
 from measure.runner.runner import RunnerResult
@@ -48,7 +48,7 @@ def test_recording_names_are_ordered_and_exclude_unrelated_files() -> None:
 
 
 def write_recording(path: Path, request: RecorderMeasurementRequest, state: str) -> None:
-    records = [analysis_context_for(request).metadata_record()]
+    records = [recording_context_for(request).metadata_record()]
     records.extend(
         {
             "record_type": "sample",

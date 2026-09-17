@@ -3,8 +3,9 @@
 from collections.abc import Sequence
 from itertools import pairwise
 
-from measure.analyser.models import ActivityReport, EnergyMetrics, RecordingSample
+from measure.analyser.models import ActivityReport, EnergyMetrics
 from measure.analyser.vacuum import VacuumCompositeCandidate, vacuum_episodes
+from measure.recording.models import RecordingSample
 
 MAX_RELATIVE_ACTIVITY_MAE = 0.2
 MIN_ACTIVITY_MAE_ALLOWANCE_W = 0.5

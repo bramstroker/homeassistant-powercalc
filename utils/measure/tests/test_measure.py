@@ -27,7 +27,7 @@ from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.light.const import LutMode
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.profile.const import MODEL_JSON_VOLTAGE_RANGE, MODEL_JSON_VOLTAGE_RANGE_MAX, MODEL_JSON_VOLTAGE_RANGE_MIN
-from measure.profile.model import mains_voltage_from_range
+from measure.profile.model_json import mains_voltage_from_range
 from measure.utils.sampling import (
     AverageMeasurementConvergence,
     AverageMeasurementSnapshot,

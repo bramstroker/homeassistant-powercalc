@@ -4,20 +4,15 @@ import logging
 import math
 from pathlib import Path
 from statistics import median
-from typing import TYPE_CHECKING
 
 from measure.analyser.fixed import FixedStatesPowerStrategy
 from measure.analyser.models import (
     ActivityReport,
     AnalysisCandidate,
-    AnalysisContext,
     AnalysisMetrics,
-    EntityRole,
     EvaluatedCandidate,
     ProfileAnalysisStrategy,
-    RecordedEntity,
     RecorderAnalysisResult,
-    RecordingSample,
     StrategyNotApplicable,
     TrainingValidationSplit,
     ValidationMethod,
@@ -25,10 +20,7 @@ from measure.analyser.models import (
 from measure.analyser.recording import load_recordings, recording_context
 from measure.analyser.vacuum import VacuumCompositeCandidate, VacuumCompositeStrategy, split_vacuum_samples
 from measure.analyser.vacuum_validation import activity_reports, credibility_failure
-from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe
-
-if TYPE_CHECKING:
-    from measure.home_assistant.entities import EntityDescriptor
+from measure.recording.models import RecordingContext, RecordingSample
 
 MIN_VALIDATION_COVERAGE = 0.9
 MIN_RELATIVE_MAE_IMPROVEMENT = 0.15
@@ -48,7 +40,7 @@ class RecorderAnalyser:
             list(strategies) if strategies is not None else [FixedStatesPowerStrategy(), VacuumCompositeStrategy()]
         )
 
-    def analyse(self, recording_path: Path | Sequence[Path], context: AnalysisContext) -> RecorderAnalysisResult:
+    def analyse(self, recording_path: Path | Sequence[Path], context: RecordingContext) -> RecorderAnalysisResult:
         loaded = load_recordings([recording_path] if isinstance(recording_path, Path) else recording_path)
         context = recording_context(context, loaded.dataset.metadata)
         samples = loaded.dataset.samples
@@ -101,7 +93,7 @@ class RecorderAnalyser:
             activity_reports=evaluation.activity_reports,
         )
 
-    def _strategies_for(self, context: AnalysisContext) -> list[ProfileAnalysisStrategy]:
+    def _strategies_for(self, context: RecordingContext) -> list[ProfileAnalysisStrategy]:
         if not self._default_strategies:
             return self.strategies
         # Vacuum recipes require independent cycles and runtime signals; they
@@ -111,7 +103,7 @@ class RecorderAnalyser:
 
 
 def _analysis_split(
-    samples: Sequence[RecordingSample], context: AnalysisContext
+    samples: Sequence[RecordingSample], context: RecordingContext
 ) -> TrainingValidationSplit | StrategyNotApplicable:
     if context.recipe == "vacuum_robot":
         if any(sample.power < 0 for sample in samples):
@@ -135,54 +127,6 @@ def _candidate_failure(
     if not _credible(metrics, baseline, prediction_range):
         return _credibility_reason(candidate.strategy_id, metrics, baseline, prediction_range)
     return None
-
-
-def analysis_context_for(
-    request: RecorderMeasurementRequest,
-    descriptors: Sequence[EntityDescriptor] = (),
-) -> AnalysisContext:
-    entity_ids = request.recorded_entity_ids
-    if not entity_ids or request.profile_recipe is None:
-        raise ValueError("A complex-profile recorder request is required for analysis")
-    roles = dict.fromkeys(entity_ids, EntityRole.TRACKED)
-    roles[entity_ids[0]] = EntityRole.PRIMARY
-    if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT:
-        roles[entity_ids[1]] = EntityRole.BATTERY
-    by_id = {entity.entity_id: entity for entity in descriptors}
-
-    primary = by_id.get(entity_ids[0])
-    device_entities = [
-        _recorded_entity(
-            entity.entity_id, EntityRole.AVAILABLE if entity.disabled_by is None else EntityRole.DISABLED, entity
-        )
-        for entity in descriptors
-        if primary is not None and primary.device_id is not None and entity.device_id == primary.device_id
-    ]
-    return AnalysisContext(
-        recipe=request.profile_recipe.value,
-        primary_entity_id=entity_ids[0],
-        device_type="vacuum_robot" if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT else "generic_iot",
-        entities=[_recorded_entity(entity_id, roles[entity_id], by_id.get(entity_id)) for entity_id in entity_ids],
-        device_entities=device_entities,
-    )
-
-
-def _recorded_entity(entity_id: str, role: EntityRole, descriptor: EntityDescriptor | None) -> RecordedEntity:
-    """Copy registry metadata, or retain just the identity when no descriptor exists."""
-    if descriptor is None:
-        return RecordedEntity(entity_id, entity_id.partition(".")[0], role)
-    return RecordedEntity(
-        entity_id=entity_id,
-        domain=descriptor.domain,
-        role=role,
-        device_class=descriptor.device_class,
-        integration=descriptor.integration,
-        translation_key=descriptor.translation_key,
-        device_id=descriptor.device_id,
-        unit=descriptor.unit,
-        disabled_by=descriptor.disabled_by,
-        has_live_state=descriptor.has_live_state,
-    )
 
 
 def _split_samples(

@@ -4,11 +4,11 @@ import json
 import math
 from pathlib import Path
 
-from measure.analyser.models import (
-    AnalysisContext,
+from measure.recording.models import (
     LoadedRecording,
     RecordedEntity,
     RecordedEntityState,
+    RecordingContext,
     RecordingDataset,
     RecordingSample,
 )
@@ -79,7 +79,7 @@ def _selected_entity_metadata(metadata: Mapping[str, object]) -> list[RecordedEn
     ]
 
 
-def recording_context(fallback: AnalysisContext, metadata: Mapping[str, object] | None) -> AnalysisContext:
+def recording_context(fallback: RecordingContext, metadata: Mapping[str, object] | None) -> RecordingContext:
     """Reanalyse using captured registry metadata, without contacting Home Assistant.
 
     Requests still choose the recipe, primary entity, and roles. A metadata header
@@ -96,7 +96,7 @@ def recording_context(fallback: AnalysisContext, metadata: Mapping[str, object] 
         replace(entities[entity.entity_id], role=entity.role) if entity.entity_id in entities else entity
         for entity in fallback.entities
     ]
-    return AnalysisContext(
+    return RecordingContext(
         recipe=fallback.recipe,
         primary_entity_id=fallback.primary_entity_id,
         device_type=fallback.device_type,

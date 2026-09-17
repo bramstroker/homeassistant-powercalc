@@ -12,7 +12,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from measure.const import PROJECT_DIR
-from measure.profile.model import mains_voltage_from_range
+from measure.profile.model_json import mains_voltage_from_range
 from measure.profile.models import ProfileMetadata, ProfilePreview
 from measure.profile.output import write_prepared_profile
 from measure.profile.prepare import ProfilePreparationError, ProfilePreparer

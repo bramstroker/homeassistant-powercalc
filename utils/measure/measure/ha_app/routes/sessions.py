@@ -23,10 +23,7 @@ from measure.ha_app.api_models import (
 from measure.ha_app.context import AppContext, app_context, require_session
 from measure.ha_app.coordinator import SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
-from measure.ha_app.routes.measurement import (
-    apply_fast_test_mode,
-    run_preflight,
-)
+from measure.ha_app.preparation import apply_fast_test_mode, run_preflight
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
     RESUMABLE_SESSION_STATES,

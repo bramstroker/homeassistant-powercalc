@@ -5,14 +5,8 @@ from dataclasses import dataclass
 from enum import IntEnum, StrEnum
 import json
 
-from measure.analyser.models import (
-    AnalysisContext,
-    EntityRole,
-    FeatureReference,
-    RecordedEntity,
-    RecordingSample,
-    ScalarStateValue,
-)
+from measure.analyser.models import FeatureReference, ScalarStateValue
+from measure.recording.models import EntityRole, RecordedEntity, RecordingContext, RecordingSample
 
 
 class Activity(StrEnum):
@@ -165,7 +159,7 @@ class ActivitySignal:
             return True
         return False if _contains(self.inactive, value) else None
 
-    def condition(self, context: AnalysisContext, *, active: bool = True) -> dict[str, object]:
+    def condition(self, context: RecordingContext, *, active: bool = True) -> dict[str, object]:
         entity = portable_entity(self.feature.entity_id, context)
         assert entity is not None
         values = self.active if active else self.inactive
@@ -190,7 +184,7 @@ class _SignalCandidate:
     signal: ActivitySignal
 
 
-def portable_entity(entity_id: str, context: AnalysisContext) -> str | None:
+def portable_entity(entity_id: str, context: RecordingContext) -> str | None:
     """Map a recorded entity ID to a profile placeholder reusable in other HA installations.
 
     Use [[entity]] for the vacuum, otherwise a unique translation key or supported
@@ -240,7 +234,7 @@ def _entity_signals(
     return candidates
 
 
-def discover_signals(samples: Sequence[RecordingSample], context: AnalysisContext) -> list[ActivitySignal]:
+def discover_signals(samples: Sequence[RecordingSample], context: RecordingContext) -> list[ActivitySignal]:
     """Find recorded states and attributes that identify vacuum and dock activities.
 
     Prefer dedicated activity signals and one authoritative status source, using
@@ -447,7 +441,7 @@ def resolve_activity(sample: RecordingSample, signals: Sequence[ActivitySignal])
     return None
 
 
-def battery_feature(samples: Sequence[RecordingSample], context: AnalysisContext) -> FeatureReference | None:
+def battery_feature(samples: Sequence[RecordingSample], context: RecordingContext) -> FeatureReference | None:
     battery = next((entity for entity in context.entities if entity.role == EntityRole.BATTERY), None)
     if battery is not None and portable_entity(battery.entity_id, context) is not None:
         return FeatureReference(battery.entity_id, "state")

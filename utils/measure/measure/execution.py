@@ -3,11 +3,11 @@ from pathlib import Path
 from statistics import mean
 from typing import Any, Protocol
 
-from measure.analyser import RecorderAnalyser
 from measure.analyser.execution import RecorderAnalysisExecution
+from measure.analyser.service import RecorderAnalyser
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION, Trend
 from measure.dummy_load import DummyLoadCalibration
-from measure.profile.model import write_model_json
+from measure.profile.model_json import write_model_json
 from measure.request import (
     DummyLoadRequest,
     DummyLoadReuseRequest,

@@ -64,7 +64,7 @@ available same-device entities and supports changing the selection or adding doc
 vacuum battery is a numeric percentage sensor on the same device.
 
 [assembler.py](measure/assembler.py) constructs the concrete power meter, `PowerSampler`,
-batched state reader, `AnalysisContext`, and runner. A registry snapshot supplies identity
+batched state reader, `RecordingContext`, and runner. A registry snapshot supplies identity
 metadata for portable profile references.
 
 ## 4. Recorder: collecting observations
@@ -90,13 +90,14 @@ full attributes. Review entity IDs and values before sharing.
 
 ## 5. Data models and artifacts
 
-The analysis types are defined in [models.py](measure/analyser/models.py).
+Observation types live in [recording/models.py](measure/recording/models.py); fitting and
+validation types live in [analyser/models.py](measure/analyser/models.py).
 
 | Type | Responsibility |
 | --- | --- |
 | `RecordedEntity` | Captured identity: ID, domain, role, device ID, translation key, device class, unit, disabled/live-state information. |
 | `EntityRole` | Named primary, battery, tracked, available, and disabled roles; serialized as strings. |
-| `AnalysisContext` | Recipe, primary ID, device type, selected metadata, and same-device inventory. |
+| `RecordingContext` | Recipe, primary ID, device type, selected metadata, and same-device inventory. |
 | `RecordedEntityState` | One recorded state plus attributes. |
 | `RecordingSample` | Elapsed seconds, measured watts, entity map, and source `recording_id`. |
 | `RecordingDataset` / `LoadedRecording` | Parsed sample collection, metadata, and invalid-line warnings. |
@@ -269,7 +270,7 @@ provide supplementary diagnostics.
 
 [MeasurementExecution](measure/execution.py) calls analysis after a complex recording stops.
 [RecorderAnalysisExecution](measure/analyser/execution.py) writes `analyser.json` atomically,
-uses [write_model_json](measure/profile/model.py) to add measurement provenance to accepted fragments,
+uses [write_model_json](measure/profile/model_json.py) to add measurement provenance to accepted fragments,
 and merges an analysis summary into the original sample-count/duration summary.
 
 Reanalysis replaces derived artifacts while retaining observations and existing voltage

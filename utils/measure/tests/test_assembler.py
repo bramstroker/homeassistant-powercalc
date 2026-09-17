@@ -107,9 +107,9 @@ def test_assembler_builds_recorder_state_reader_from_home_assistant() -> None:
 
     assert isinstance(prepared.runner, RecorderRunner)
     assert prepared.runner.entity_state_reader is not None
-    assert prepared.runner.analysis_context is not None
-    assert prepared.runner.analysis_context.entities[0].translation_key == "vacuum"
-    assert prepared.runner.analysis_context.entities[0].integration == "dreame_vacuum"
+    assert prepared.runner.recording_context is not None
+    assert prepared.runner.recording_context.entities[0].translation_key == "vacuum"
+    assert prepared.runner.recording_context.entities[0].integration == "dreame_vacuum"
     assert prepared.runner.entity_state_reader(("vacuum.robot",)) == {
         "vacuum.robot": RecorderEntityState(state="cleaning", attributes={"battery_level": 42}),
     }
