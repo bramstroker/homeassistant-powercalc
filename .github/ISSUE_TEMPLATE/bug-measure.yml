@@ -1,7 +1,7 @@
 ---
 name: "Bug report about measurements"
 description: "Report a measurement bug with Powercalc Measure (CLI or HomeAssistant app)"
-labels: "bug"
+labels: ["bug", "measure-app"]
 body:
 - type: markdown
   attributes:
