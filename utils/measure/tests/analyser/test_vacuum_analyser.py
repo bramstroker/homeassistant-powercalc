@@ -328,12 +328,20 @@ def test_telemetry_gaps_are_not_independent_cycles() -> None:
 
 
 def test_unexplained_episodes_are_held_out_and_reported(tmp_path: Path) -> None:
-    data = repeated() + [sample("unrecognised_mode", 20, len(repeated()) + index) for index in range(5)]
+    data = repeated() + [sample("unrecognised_mode", 20, len(repeated()) + index) for index in range(20)]
     result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", data), CONTEXT)
     assert not result.model_ready
-    assert "unexplained" in str(result.reason)
+    assert "20 of 162 samples match no known activity" in str(result.reason)
     assert result.to_dict()["activities"][-1]["activity"] == "unexplained"
     assert result.activity_reports[-1].mae_w is None
+
+
+def test_brief_unexplained_blip_does_not_reject_recording(tmp_path: Path) -> None:
+    data = repeated()
+    data[15] = replace(sample("unrecognised_mode", 22), elapsed_seconds=data[15].elapsed_seconds)
+    result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", data), CONTEXT)
+    assert result.model_ready
+    assert "unexplained" in {report.activity for report in result.activity_reports}
 
 
 def test_energy_only_integrates_adjacent_held_out_samples() -> None:
