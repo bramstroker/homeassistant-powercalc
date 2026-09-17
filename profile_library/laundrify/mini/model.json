@@ -13,7 +13,7 @@
   "measure_device": "IKEA GRILLPLATS",
   "measure_method": "script",
   "mains_voltage": 230,
-  "name": "mini",
+  "name": "WLAN-Adapter mini",
   "product_url": "https://laundrify.de/blog/laundrify-wlan-adapter-mini",
   "only_self_usage": true,
   "standby_power": 0.9,
