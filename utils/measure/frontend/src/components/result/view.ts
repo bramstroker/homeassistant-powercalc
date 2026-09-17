@@ -21,6 +21,8 @@ const ANALYSIS_SUMMARY_LABELS = new Set([
   "Recorded activities",
   "Validation MAE",
   "Validation coverage",
+  "Recordings analysed",
+  "Samples analysed",
 ]);
 const INSPECTABLE_JSON_FILES = new Set(["analyser.json", "analysis.json", "model.json"]);
 
@@ -358,11 +360,15 @@ export class ResultView extends LitElement {
                 ? "Analysing the saved recording and refreshing the result…"
                 : this.analysisComplete
                   ? "✓ Recording analysed again. The result and generated files are now up to date."
-                  : html`Run the saved <code>record.jsonl</code> through the current analyser again. No new measurement is needed.`}
+                  : "Run all saved recordings through the current analyser again. No new measurement is needed."}
             </p>
             <button type="button" @click=${() => this.emit("analyse")} ?disabled=${this.busy}>
               ${this.busy ? "Analysing…" : "Analyse recording again"}
             </button>
+          </div>
+          <div class="analysis-retry">
+            <p>Record another run using the same entities and settings. Previous recordings are kept and all runs are analysed together.</p>
+            <button type="button" @click=${() => this.emit("record-more")} ?disabled=${this.busy}>Record more</button>
           </div>
         ` : nothing}
       </section>
@@ -426,7 +432,7 @@ export class ResultView extends LitElement {
     return this.summaryEntries().length ? COMPLETED_WITH_READOUT : COMPLETED;
   }
 
-  private emit(name: "sessions" | "new" | "resume" | "analyse" | "prepare"): void {
+  private emit(name: "sessions" | "new" | "resume" | "analyse" | "record-more" | "prepare"): void {
     emit(this, name);
   }
 }

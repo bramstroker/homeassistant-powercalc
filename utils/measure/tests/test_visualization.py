@@ -335,6 +335,35 @@ incomplete
     assert [(point.x, point.y) for point in result.plots[0].series[0].points] == [(0.0, 1.2), (2.0, 3.4)]
 
 
+def test_plots_every_recording_in_run_order(tmp_path: Path) -> None:
+    request = parse_measurement_request(
+        {
+            "measure_type": "recorder",
+            "power_meter": {"type": "dummy"},
+            "recorder_purpose": "complex_profile",
+            "profile_recipe": "generic",
+            "tracked_entity_ids": ["switch.plug"],
+        }
+    )
+    files = {}
+    for name in ["record.jsonl", "record-10.jsonl", "record-2.jsonl", "record-other.jsonl"]:
+        path = tmp_path / name
+        path.write_text('{"elapsed_seconds":0,"power":1}\n{"elapsed_seconds":2,"power":2}\n')
+        files[f"measurement/{name}"] = path
+    files["other-model/record-1.jsonl"] = tmp_path / "record.jsonl"
+
+    result = build_session_plots(request, files)
+
+    assert result.warnings == ()
+    assert [plot.source for plot in result.plots] == [
+        "measurement/record-2.jsonl",
+        "measurement/record-10.jsonl",
+        "measurement/record.jsonl",
+    ]
+    assert len({plot.id for plot in result.plots}) == 3
+    assert all(plot.series[0].points[0].x == 0 for plot in result.plots)
+
+
 def test_downsamples_large_recorder_files_while_streaming(tmp_path: Path) -> None:
     recording = tmp_path / "record.csv"
     recording.write_text(

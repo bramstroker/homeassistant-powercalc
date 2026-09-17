@@ -319,6 +319,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         @sessions=${this.showSessions} @new=${() => this.controller.newMeasurement()} @resume=${() => void this.controller.resume()}
         @analyse=${() => void this.controller.analyseRecording()}
+        @record-more=${() => void this.controller.recordMore()}
         @prepare=${() => this.controller.openProfile()}
       ></measure-result-view>`;
   }

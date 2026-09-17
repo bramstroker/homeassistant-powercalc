@@ -11,6 +11,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel
 
+from measure.analyser.recording import recording_paths
 from measure.clock import utc_now
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
@@ -359,8 +360,22 @@ class SessionStorage:
             return False
         if request.recorder_purpose != RecorderPurpose.COMPLEX_PROFILE:
             return False
-        path = self.artifact_directory(session_id, request.model_id) / request.export_filename
-        return path.is_file() and not path.is_symlink()
+        return bool(recording_paths(self.artifact_directory(session_id, request.model_id), request.export_filename))
+
+    def archive_recording(self, session_id: str, request: RecorderMeasurementRequest) -> None:
+        """Keep the previous run before the recorder opens its fixed output filename."""
+        directory = self.artifact_directory(session_id, request.model_id)
+        current = directory / request.export_filename
+        if current.is_symlink():
+            raise ValueError("A recording cannot be a symbolic link")
+        if not current.exists():
+            return
+        index = 1
+        archived = current.with_stem(f"{current.stem}-{index}")
+        while archived.exists() or archived.is_symlink():
+            index += 1
+            archived = current.with_stem(f"{current.stem}-{index}")
+        current.rename(archived)
 
     def verify_writable(self) -> None:
         """Exercise the same create/fsync/remove operations used by session persistence."""

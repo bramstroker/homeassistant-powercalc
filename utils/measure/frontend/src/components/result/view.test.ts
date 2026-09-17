@@ -1,7 +1,28 @@
 import type { SessionSnapshot } from "../../types";
+import type { ResultView } from "./view";
 import "./view";
 
 describe("result view", () => {
+  it("offers another recording only for retained profile recordings", async () => {
+    const element = document.createElement("measure-result-view") as ResultView;
+    element.snapshot = { state: "completed" };
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).not.toContain("Record more");
+
+    element.canAnalyse = true;
+    const recordMore = vi.fn();
+    element.addEventListener("record-more", recordMore);
+    await element.updateComplete;
+    const button = [...element.shadowRoot!.querySelectorAll("button")].find((item) => item.textContent === "Record more")!;
+    expect(element.shadowRoot?.textContent).toContain("all runs are analysed together");
+    button.click();
+    expect(recordMore).toHaveBeenCalledOnce();
+
+    element.busy = true;
+    await element.updateComplete;
+    expect(button.disabled).toBe(true);
+  });
   // jsdom does not implement native modal behavior; keyboard/inert behavior is covered in e2e.
   beforeAll(() => {
     HTMLDialogElement.prototype.showModal = function () { this.open = true; };

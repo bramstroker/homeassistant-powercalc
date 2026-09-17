@@ -307,6 +307,8 @@ def test_coordinator_rejects_concurrent_start_and_cancels(tmp_path: Path) -> Non
         coordinator.start(duplicate)
     with pytest.raises(SessionConflictError, match="measurement session is already active"):
         coordinator.analyse(session.id)
+    with pytest.raises(SessionConflictError, match="measurement session is already active"):
+        coordinator.record_more(session.id)
 
     coordinator.cancel(session.id)
     wait_for_state(coordinator, SessionState.CANCELLED)
@@ -355,6 +357,8 @@ def test_coordinator_serializes_recording_analysis_with_other_session_actions(tm
             coordinator.start(light_request())
         with pytest.raises(SessionConflictError, match="Recording analysis is already active"):
             coordinator.resume(completed.id)
+        with pytest.raises(SessionConflictError, match="Recording analysis is already active"):
+            coordinator.record_more(completed.id)
         with pytest.raises(SessionConflictError, match="already being analysed"):
             coordinator.analyse(completed.id)
         with pytest.raises(SessionConflictError, match="while its recording is being analysed"):

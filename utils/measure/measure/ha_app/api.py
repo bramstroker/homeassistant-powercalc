@@ -724,6 +724,19 @@ def _register_session_routes(router: APIRouter) -> None:  # noqa: C901
             raise HTTPException(status_code=409, detail=str(error)) from error
         return _snapshot_response(context, snapshot)
 
+    @router.post("/sessions/{session_id}/record-more", responses={404: _ERROR, 409: _ERROR, 422: _ERROR})
+    async def record_more(session_id: str, request: Request) -> SessionSnapshotResponse:
+        context = _context(request)
+        snapshot = _require_session(context, session_id)
+        if snapshot.state in ACTIVE_SESSION_STATES or not context.storage.can_analyse(session_id):
+            raise HTTPException(status_code=409, detail="The requested session has no profile recording to extend")
+        await run_in_threadpool(_preflight, context, context.storage.load_request(session_id))
+        try:
+            snapshot = context.coordinator.record_more(session_id)
+        except SessionConflictError as error:
+            raise HTTPException(status_code=409, detail=str(error)) from error
+        return _snapshot_response(context, snapshot)
+
     @router.get("/sessions/{session_id}/files", responses={404: _ERROR})
     async def session_files(session_id: str, request: Request) -> list[SessionFile]:
         context = _context(request)

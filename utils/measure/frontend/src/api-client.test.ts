@@ -114,6 +114,18 @@ describe("MeasureApiClient", () => {
     );
   });
 
+  it("adds a recording to the existing session below the ingress prefix", async () => {
+    const snapshot = sessionSnapshot({ state: "running" });
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(snapshot));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+
+    await expect(client.recordMore("session 1")).resolves.toEqual(snapshot);
+    expect(fetcher).toHaveBeenCalledWith(
+      new URL("http://ha.local/prefix/api/sessions/session%201/record-more"),
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
   it("uses the contribution auth endpoints below the ingress prefix", async () => {
     const fetcher = vi.fn<typeof fetch>()
       .mockResolvedValueOnce(response({ connected: false }))

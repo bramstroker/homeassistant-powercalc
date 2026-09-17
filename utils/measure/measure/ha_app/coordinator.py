@@ -175,6 +175,41 @@ class MeasurementCoordinator:
         self._notify_listeners()
         return current
 
+    def record_more(self, session_id: str) -> SessionSnapshot:
+        """Capture another run with the session's original recorder settings."""
+        with self._lock:
+            if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
+                raise SessionConflictError("A measurement session is already active")
+            if self._analysing:
+                raise SessionConflictError("Recording analysis is already active")
+            try:
+                snapshot = self._snapshot_locked(session_id)
+            except SESSION_LOAD_ERRORS as error:
+                raise SessionConflictError("The requested session does not exist") from error
+            if snapshot.state in ACTIVE_SESSION_STATES or not self.storage.can_analyse(session_id):
+                raise SessionConflictError("The requested session has no profile recording to extend")
+            request = self.storage.load_request(session_id)
+            assert isinstance(request, RecorderMeasurementRequest)
+            self.storage.archive_recording(session_id, request)
+            self._snapshot = replace(
+                snapshot,
+                completed=0,
+                total=0,
+                skipped=0,
+                estimated_remaining=None,
+                operating_point=None,
+                entity_states={},
+                summary=None,
+                warnings=(),
+            )
+            self._events = list(self.storage.load_events(session_id))
+            self._last_snapshot_write = 0.0
+            self.storage.set_current(session_id)
+            self._launch_locked(request)
+            current = self._snapshot
+        self._notify_listeners()
+        return current
+
     def cancel(self, session_id: str) -> SessionSnapshot:
         """Persist cancellation intent and signal the worker cooperatively."""
 

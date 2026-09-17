@@ -3,6 +3,7 @@ import json
 import logging
 from pathlib import Path
 
+from measure.analyser.recording import recording_paths
 from measure.analyser.service import RecorderAnalyser, analysis_context_for
 from measure.files import write_json_atomic
 from measure.model import write_model_json
@@ -25,6 +26,8 @@ _ANALYSIS_SUMMARY_KEYS = frozenset(
         "Recorded activities",
         "Validation MAE",
         "Validation coverage",
+        "Recordings analysed",
+        "Samples analysed",
     },
 )
 
@@ -46,10 +49,11 @@ class RecorderAnalysisExecution:
         """Analyse the persisted recording while always preserving its raw samples."""
 
         model_path = output_directory / "model.json"
-        retained_voltages = voltages if voltages is not None else _load_existing_voltages(model_path)
+        retained_voltages = [*(_load_existing_voltages(model_path) or []), *(voltages or [])]
         try:
             context = analysis_context_for(request)
-            analysis = self.analyser.analyse(output_directory / request.export_filename, context)
+            paths = recording_paths(output_directory, request.export_filename)
+            analysis = self.analyser.analyse(paths, context)
             write_json_atomic(output_directory / ANALYSER_FILENAME, analysis.to_dict())
             (output_directory / _LEGACY_ANALYSIS_FILENAME).unlink(missing_ok=True)
             if analysis.model_ready and analysis.model_config_fragment is not None:
@@ -71,7 +75,14 @@ class RecorderAnalysisExecution:
                     _LOGGER.warning("Profile was not created: %s", analysis.reason)
             for warning in analysis.warnings:
                 _LOGGER.warning("Recording analysis: %s", warning)
-            return _replace_analysis_summary(summary, analysis.summary())
+            return _replace_analysis_summary(
+                summary,
+                {
+                    **analysis.summary(),
+                    "Recordings analysed": str(len(paths)),
+                    "Samples analysed": str(analysis.sample_count),
+                },
+            )
         except Exception as error:  # noqa: BLE001 - raw recording must survive optional analysis failures
             reason = f"Recording analysis failed: {error}"
             _LOGGER.warning(reason)

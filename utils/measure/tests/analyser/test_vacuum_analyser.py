@@ -2,6 +2,7 @@ from dataclasses import replace
 import json
 from pathlib import Path
 
+from measure.analyser.execution import RecorderAnalysisExecution
 from measure.analyser.fixed import FixedStatesPowerCandidate
 from measure.analyser.models import (
     ActivityReport,
@@ -35,6 +36,8 @@ from measure.analyser.vacuum_signals import (
     resolve_activity,
 )
 from measure.analyser.vacuum_validation import activity_reports, credibility_failure
+from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.request import RecorderMeasurementRequest
 import pytest
 
 PRIMARY = "vacuum.robot"
@@ -53,6 +56,30 @@ CONTEXT = AnalysisContext(
         RecordedEntity("switch.auto_drying", "switch", "tracked", translation_key="auto_drying", device_id="robot"),
     ),
 )
+
+
+def test_session_analysis_uses_archived_vacuum_run_for_fitting(tmp_path: Path) -> None:
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id=PRIMARY,
+        battery_entity_id=BATTERY,
+        additional_entity_ids=(STATE, DRYING, "switch.auto_drying"),
+    )
+    write_recording(tmp_path / "record.jsonl", cycle())
+    execution = RecorderAnalysisExecution()
+    assert execution.run(request, tmp_path)["Recording analysis"] == "More data needed"
+    write_recording(tmp_path / "record-1.jsonl", cycle())
+
+    summary = execution.run(request, tmp_path)
+
+    assert summary["Recording analysis"] == "Composite vacuum profile created"
+    assert summary["Recordings analysed"] == "2"
+    assert summary["Samples analysed"] == str(2 * len(cycle()))
+    result = json.loads((tmp_path / "analyser.json").read_text())
+    assert result["validation_method"] == "held_out_recording"
+    assert json.loads((tmp_path / "model.json").read_text())["calculation_strategy"] == "composite"
 
 
 def sample(activity: str, power: float, index: int = 0, level: object = 50) -> RecordingSample:
