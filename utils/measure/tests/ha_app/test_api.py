@@ -1201,6 +1201,60 @@ def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
     assert test_client.get("/api/sessions").json() == []
 
 
+@pytest.mark.parametrize("state", [SessionState.READY, SessionState.RUNNING])
+def test_delete_rejects_active_session_and_preserves_it(tmp_path: Path, state: SessionState) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    now = "2026-09-18T12:00:00Z"
+    snapshot = SessionSnapshot(id="active-session", state=state, created_at=now, updated_at=now)
+    request = TypeAdapter(MeasurementRequest).validate_python(payload())
+    context.storage.create(snapshot, request)
+
+    response = test_client.delete(f"/api/sessions/{snapshot.id}")
+
+    assert response.status_code == 409
+    assert response.json()["message"] == "An active measurement session cannot be deleted"
+    assert test_client.get(f"/api/sessions/{snapshot.id}").json()["state"] == state.value
+
+
+@pytest.mark.parametrize("name", ["missing.csv", "session.json", "%2e%2e/session.json"])
+def test_download_rejects_missing_and_out_of_scope_files(tmp_path: Path, name: str) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    now = "2026-09-18T12:00:00Z"
+    snapshot = SessionSnapshot(id="download-session", state=SessionState.COMPLETED, created_at=now, updated_at=now)
+    request = TypeAdapter(MeasurementRequest).validate_python(payload())
+    context.storage.create(snapshot, request)
+
+    response = test_client.get(f"/api/sessions/{snapshot.id}/files/{name}")
+
+    assert response.status_code == 404
+    assert response.json()["message"] == "File not found"
+
+
+@pytest.mark.parametrize("estimate, expected_seconds", [(None, None), ("unknown", None), ("1.5m", 90), ("2h", 7200)])
+def test_session_response_converts_saved_time_estimate(
+    tmp_path: Path, estimate: str | None, expected_seconds: int | None
+) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    now = "2026-09-18T12:00:00Z"
+    snapshot = SessionSnapshot(
+        id="estimated-session",
+        state=SessionState.COMPLETED,
+        created_at=now,
+        updated_at=now,
+        estimated_remaining=estimate,
+    )
+    request = TypeAdapter(MeasurementRequest).validate_python(payload())
+    context.storage.create(snapshot, request)
+
+    response = test_client.get(f"/api/sessions/{snapshot.id}")
+
+    assert response.status_code == 200
+    assert response.json()["progress"]["estimated_remaining_seconds"] == expected_seconds
+
+
 def test_diagnostics_retains_only_the_latest_thousand_events(tmp_path: Path) -> None:
     test_client = client(tmp_path)
     assert test_client.post("/api/sessions", json=payload()).status_code == 201
