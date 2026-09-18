@@ -2,7 +2,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from measure.profile.models import ProfileAuthor, ProfileMetadata
+from measure.profile.models import ProfileAuthor, ProfileMetadata, ProfilePreview
 
 
 class ContributionErrorCode(StrEnum):
@@ -66,24 +66,6 @@ class DeviceInfo(BaseModel):
     integration: str | None = None
 
 
-class ContributionPreparedFile(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    path: str = Field(min_length=1)
-    size: int = Field(ge=0)
-    sha: str | None = None
-
-
-class ContributionPreview(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    manufacturer_directory: str
-    manufacturer_library_url: str | None = None
-    model_directory: str
-    files: tuple[ContributionPreparedFile, ...]
-    warnings: tuple[str, ...] = ()
-
-
 class ContributionSubmission(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -99,7 +81,7 @@ class ContributionJob(BaseModel):
     id: str
     status: ContributionJobStatus
     metadata: ContributionMetadata
-    preview: ContributionPreview
+    preview: ProfilePreview
     base_sha: str | None = None
     created_at: str
     updated_at: str

@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 import time
 
-from measure.execution import OperatingPoint, RunInteraction
+from measure.runner.interaction import OperatingPoint, RunInteraction
 
 
 class ConsoleInteraction(RunInteraction):

@@ -2,31 +2,36 @@ from typing import cast
 from unittest.mock import MagicMock, patch
 
 import inquirer
+from measure.cli.const import (
+    QUESTION_CHARGING_DEVICE_TYPE,
+    QUESTION_DISABLE_STREAMING,
+    QUESTION_DUMMY_LOAD,
+    QUESTION_DURATION,
+    QUESTION_ENTITY_ID,
+    QUESTION_GZIP,
+    QUESTION_MODE,
+    QUESTION_MODEL_ID,
+    QUESTION_MULTIPLE_LIGHTS,
+    QUESTION_NUM_LIGHTS,
+    QUESTION_POWERMETER_ENTITY_ID,
+    QUESTION_VOLTAGEMETER_ENTITY_ID,
+)
 from measure.cli.main import Measure
 from measure.cli.measurements import CLI_QUESTION_BUILDERS, measurement_questions
-from measure.const import QUESTION_DUMMY_LOAD, QUESTION_ENTITY_ID, QUESTION_MODEL_ID, MeasureType
+from measure.const import MeasureType
 from measure.controller.charging.const import ChargingControllerType, ChargingDeviceType
 from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.controller.media.const import MediaControllerType
-from measure.home_assistant import HomeAssistantManager
-from measure.home_assistant_entities import (
+from measure.home_assistant.client import HomeAssistantManager
+from measure.home_assistant.entities import (
     DeviceClass,
     EntityCatalogSnapshot,
     EntityDescriptor,
     EntityDomain,
     HomeAssistantEntityCatalog,
 )
-from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID, PowerMeterType
-from measure.runner.const import (
-    QUESTION_CHARGING_DEVICE_TYPE,
-    QUESTION_DISABLE_STREAMING,
-    QUESTION_DURATION,
-    QUESTION_GZIP,
-    QUESTION_MODE,
-    QUESTION_MULTIPLE_LIGHTS,
-    QUESTION_NUM_LIGHTS,
-)
+from measure.powermeter.const import PowerMeterType
 import pytest
 
 from tests.conftest import MockConfigFactory

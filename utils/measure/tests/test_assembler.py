@@ -8,8 +8,7 @@ from measure.controller.light.spec import (
     HassLightControllerSpec,
     HassMultiLightControllerSpec,
 )
-from measure.execution import RunInteraction
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistantManager
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec, TuyaPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
@@ -20,7 +19,8 @@ from measure.request import (
 )
 from measure.runner.average import AverageRunner
 from measure.runner.fan import FanRunner
-from measure.runner.light import LightRunner
+from measure.runner.interaction import RunInteraction
+from measure.runner.light.runner import LightRunner
 from measure.runner.recorder import RecorderEntityState, RecorderRunner
 from pydantic import ValidationError
 import pytest
@@ -72,6 +72,26 @@ def test_assembler_builds_runner_from_request(measurement_request, runner_type) 
 
 def test_assembler_builds_recorder_state_reader_from_home_assistant() -> None:
     home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = HomeAssistantEntityData(
+        entities={
+            "vacuum": SimpleNamespace(
+                entities={
+                    "robot": SimpleNamespace(
+                        entity_id="vacuum.robot", state=SimpleNamespace(state="cleaning", attributes={})
+                    ),
+                }
+            )
+        },
+        entity_registry=[
+            SimpleNamespace(
+                entity_id="vacuum.robot",
+                device_id="robot-device",
+                platform="dreame_vacuum",
+                translation_key="vacuum",
+            )
+        ],
+        device_registry=[],
+    )
     home_assistant.get_states.return_value = (
         SimpleNamespace(entity_id="vacuum.robot", state="cleaning", attributes={"battery_level": 42}),
         SimpleNamespace(entity_id="light.unrelated", state="on", attributes={}),
@@ -87,11 +107,16 @@ def test_assembler_builds_recorder_state_reader_from_home_assistant() -> None:
 
     assert isinstance(prepared.runner, RecorderRunner)
     assert prepared.runner.entity_state_reader is not None
+    assert prepared.runner.recording_context is not None
+    assert prepared.runner.recording_context.entities[0].translation_key == "vacuum"
+    assert prepared.runner.recording_context.entities[0].integration == "dreame_vacuum"
     assert prepared.runner.entity_state_reader(("vacuum.robot",)) == {
         "vacuum.robot": RecorderEntityState(state="cleaning", attributes={"battery_level": 42}),
     }
     # One dump covers every tracked entity, however many there are.
     home_assistant.get_states.assert_called_once_with()
+    assert prepared.runner.entity_state_reader(("sensor.missing",)) == {}
+    home_assistant.get_entity_data.assert_called_once_with()
 
 
 def test_assembler_applies_typed_home_assistant_configuration_at_construction() -> None:

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 from measure.controller.media.hass import HassMediaController
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 
 
 def test_mute_volume_is_not_replayed_after_disconnect() -> None:

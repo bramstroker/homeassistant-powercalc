@@ -1,5 +1,5 @@
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import math
 from typing import Any, Protocol
 
@@ -18,7 +18,7 @@ from measure.controller.light.spec import (
     HueLightControllerSpec,
 )
 from measure.controller.media.spec import HassMediaControllerSpec
-from measure.home_assistant_entities import DeviceClass, EntityDomain
+from measure.home_assistant.entities import DeviceClass, EntityDomain
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
 from measure.powermeter.spec import (
     DummyPowerMeterSpec,
@@ -37,7 +37,7 @@ from measure.request import (
     RecorderProfileRecipe,
     SpeakerMeasurementRequest,
 )
-from measure.runner.light_plan import build_light_plan, estimate_light_time_left
+from measure.runner.light.plan import build_light_plan, estimate_light_time_left
 
 
 class PreflightError(Exception):
@@ -51,7 +51,7 @@ class ActiveSessionError(PreflightError):
 class EntityRecord(Protocol):
     entity_id: str
     domain: str
-    device_class: DeviceClass | None
+    device_class: str | None
     device_id: str | None
     state: str
     attribute_names: list[str]
@@ -61,6 +61,8 @@ class EntityRecord(Protocol):
     max_mired: int | None
     model_id: str | None
     member_entity_ids: list[str]
+    disabled_by: str | None
+    has_live_state: bool
 
 
 EntityLoader = Callable[[EntityDomain | None, DeviceClass | None], Sequence[EntityRecord]]
@@ -69,10 +71,10 @@ AllEntityLoader = Callable[[], Sequence[EntityRecord]]
 
 @dataclass(frozen=True)
 class PreflightResult:
-    warnings: tuple[str, ...] = ()
+    warnings: list[str] = field(default_factory=list)
     estimated_variations: int | None = None
     estimated_duration_seconds: int | None = None
-    supported_modes: tuple[LutMode, ...] | None = None
+    supported_modes: list[LutMode] | None = None
     power_meter_diagnostic: PowerMeterDiagnostic | None = None
     battery_level_entity_id: str | None = None
     battery_level_attribute: str | None = None
@@ -87,66 +89,66 @@ MODEL_UNCONFIRMED_WARNING = (
 class LightSelection:
     """The lights one request drives, reduced to the capabilities they all share."""
 
-    lights: tuple[EntityRecord, ...]
+    lights: list[EntityRecord]
     supported_modes: set[LutMode]
     light_info: LightInfo
     effects: list[str]
 
 
-def _no_group_member_overlap(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_no_group_member_overlap(selection: LightSelection, _: LightMeasurementRequest) -> list[str]:
     """A group already drives its members, so selecting both would measure them twice."""
 
     members = {member for light in selection.lights for member in light.member_entity_ids}
     if members & {light.entity_id for light in selection.lights}:
         raise PreflightError("A light group and one of its members cannot both be selected")
-    return ()
+    return []
 
 
-def _count_covers_selection(selection: LightSelection, request: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_light_count(selection: LightSelection, request: LightMeasurementRequest) -> list[str]:
     """Measured power is divided by the count, so it cannot describe fewer lights than are driven."""
 
     if request.multiple_light_count < len(selection.lights):
         raise PreflightError("Number of lights cannot be lower than the number of selected lights")
-    return ()
+    return []
 
 
-def _models_agree(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_matching_models(selection: LightSelection, _: LightMeasurementRequest) -> list[str]:
     """One profile is produced for all lights, so they must be the same model."""
 
     models = {light.model_id for light in selection.lights}
     if len(models - {None}) > 1:
         raise PreflightError("Selected lights must have the same model ID")
     if len(selection.lights) > 1 and None in models:
-        return (MODEL_UNCONFIRMED_WARNING,)
-    return ()
+        return [MODEL_UNCONFIRMED_WARNING]
+    return []
 
 
-def _modes_supported(selection: LightSelection, request: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_supported_modes(selection: LightSelection, request: LightMeasurementRequest) -> list[str]:
     if not set(request.modes).issubset(selection.supported_modes):
         raise PreflightError("Selected light does not advertise every requested mode")
-    return ()
+    return []
 
 
-def _color_temp_range_overlaps(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_color_temp_range(selection: LightSelection, _: LightMeasurementRequest) -> list[str]:
     if selection.light_info.min_mired > selection.light_info.max_mired:
         raise PreflightError("Selected lights do not share a color temperature range")
-    return ()
+    return []
 
 
-LightRule = Callable[[LightSelection, LightMeasurementRequest], tuple[str, ...]]
+LightRule = Callable[[LightSelection, LightMeasurementRequest], list[str]]
 
 #: Checks applied to a light selection, in order. Each returns warnings or raises a PreflightError,
 #: so a new condition is added here rather than by growing the caller.
 LIGHT_RULES: tuple[LightRule, ...] = (
-    _no_group_member_overlap,
-    _count_covers_selection,
-    _models_agree,
-    _modes_supported,
-    _color_temp_range_overlaps,
+    _validate_no_group_member_overlap,
+    _validate_light_count,
+    _validate_matching_models,
+    _validate_supported_modes,
+    _validate_color_temp_range,
 )
 
 
-def _light_info(light: EntityRecord) -> LightInfo:
+def _build_light_info(light: EntityRecord) -> LightInfo:
     return LightInfo(
         "unknown",
         min_mired=light.min_mired if light.min_mired is not None else MIN_MIRED,
@@ -204,7 +206,7 @@ class MeasurementPreflight:
         diagnostic = self._collect_power_meter_diagnostic(request, diagnostic, warnings)
 
         return PreflightResult(
-            warnings=tuple(warnings),
+            warnings=warnings,
             estimated_variations=result.estimated_variations,
             estimated_duration_seconds=duration,
             supported_modes=result.supported_modes,
@@ -318,6 +320,12 @@ class MeasurementPreflight:
         all_entities = {entity.entity_id: entity for entity in self._load_all_entities()}
         if missing := [entity_id for entity_id in request.recorded_entity_ids if entity_id not in all_entities]:
             raise PreflightError(f"Selected recorder entity does not exist: {missing[0]}")
+        if disabled := [entity_id for entity_id in request.recorded_entity_ids if all_entities[entity_id].disabled_by]:
+            raise PreflightError(f"Selected recorder entity is disabled: {disabled[0]}")
+        if no_state := [
+            entity_id for entity_id in request.recorded_entity_ids if not all_entities[entity_id].has_live_state
+        ]:
+            raise PreflightError(f"Selected recorder entity has no live state: {no_state[0]}")
 
         if request.profile_recipe != RecorderProfileRecipe.VACUUM_ROBOT:
             return PreflightResult()
@@ -403,13 +411,13 @@ class MeasurementPreflight:
             raise PreflightError("Selected light entity is unavailable")
 
         selection = self._resolve_lights(request.controller.entity_ids)
-        warnings = tuple(warning for rule in LIGHT_RULES for warning in rule(selection, request))
+        warnings = [warning for rule in LIGHT_RULES for warning in rule(selection, request)]
         plan = build_light_plan(request.modes, request.parameters, selection.light_info, selection.effects)
         return PreflightResult(
             warnings=warnings,
             estimated_variations=plan.variation_count,
             estimated_duration_seconds=round(estimate_light_time_left(plan, request.parameters)),
-            supported_modes=tuple(sorted(selection.supported_modes, key=str)),
+            supported_modes=sorted(selection.supported_modes, key=str),
         )
 
     def _resolve_lights(self, entity_ids: Sequence[str]) -> LightSelection:
@@ -420,9 +428,9 @@ class MeasurementPreflight:
         if len(selected) != len(entity_ids):
             raise PreflightError("Selected light entity is unavailable")
         return LightSelection(
-            lights=tuple(selected),
+            lights=selected,
             supported_modes=set.intersection(*(set(light.supported_modes or []) for light in selected)),
-            light_info=merge_light_infos([_light_info(light) for light in selected]),
+            light_info=merge_light_infos([_build_light_info(light) for light in selected]),
             effects=common_effects([light.effect_list or [] for light in selected]),
         )
 
@@ -438,7 +446,7 @@ class MeasurementPreflight:
         return PreflightResult(
             estimated_variations=plan.variation_count,
             estimated_duration_seconds=round(estimate_light_time_left(plan, request.parameters)),
-            supported_modes=tuple(sorted(request.modes, key=str)),
+            supported_modes=sorted(request.modes, key=str),
         )
 
     def _require_entity(self, entity_id: str | None, domain: EntityDomain, message: str) -> EntityRecord:

@@ -1,9 +1,9 @@
 import logging
 from statistics import mean
 
-from measure.execution import ImmediateInteraction, RunInteraction
 from measure.request import AverageMeasurementRequest
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.runner.interaction import ImmediateInteraction, RunInteraction
+from measure.utils.sampling import MeasurementResult, PowerSampler
 
 from .runner import MeasurementRunner, RunnerResult
 
@@ -15,10 +15,10 @@ _LOGGER = logging.getLogger("measure")
 class AverageRunner(MeasurementRunner[AverageMeasurementRequest]):
     def __init__(
         self,
-        measure_util: MeasureUtil,
+        sampler: PowerSampler,
         interaction: RunInteraction | None = None,
     ) -> None:
-        self.measure_util = measure_util
+        self.sampler = sampler
         self.duration = 60
         self.elapsed = 0.0
         self.interaction = interaction or ImmediateInteraction()
@@ -33,7 +33,7 @@ class AverageRunner(MeasurementRunner[AverageMeasurementRequest]):
         self.interaction.confirm("Ready to start the average measurement.")
         self.interaction.phase("Starting averaging")
 
-        result = self.measure_util.take_average_measurement(
+        result = self.sampler.take_average_measurement(
             self.duration,
             on_progress=self._report_progress,
             finish_on_interrupt=True,

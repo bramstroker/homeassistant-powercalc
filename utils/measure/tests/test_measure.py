@@ -10,34 +10,29 @@ from unittest.mock import MagicMock, patch
 import inquirer
 from inquirer import events
 from inquirer.render import ConsoleRender
-from measure.cli.environment import CliEnvironment
-from measure.cli.main import Measure
-from measure.const import (
-    MODEL_JSON_VOLTAGE_RANGE,
-    MODEL_JSON_VOLTAGE_RANGE_MAX,
-    MODEL_JSON_VOLTAGE_RANGE_MIN,
-    PROJECT_DIR,
-    QUESTION_MODEL_ID,
-    QUESTION_SELECTED_MEASURE_TYPE,
-    MeasureType,
-)
-from measure.controller.charging.const import ChargingDeviceType
-from measure.controller.light.const import LutMode
-from measure.model import mains_voltage_from_range
-from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
-from measure.runner.const import (
+from measure.cli.const import (
     QUESTION_CHARGING_DEVICE_TYPE,
     QUESTION_COLOR_MODE,
     QUESTION_DISABLE_STREAMING,
     QUESTION_DURATION,
     QUESTION_GZIP,
     QUESTION_MODE,
+    QUESTION_MODEL_ID,
+    QUESTION_SELECTED_MEASURE_TYPE,
 )
-from measure.util.measure_util import (
+from measure.cli.environment import CliEnvironment
+from measure.cli.main import Measure
+from measure.const import PROJECT_DIR, MeasureType
+from measure.controller.charging.const import ChargingDeviceType
+from measure.controller.light.const import LutMode
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
+from measure.profile.const import MODEL_JSON_VOLTAGE_RANGE, MODEL_JSON_VOLTAGE_RANGE_MAX, MODEL_JSON_VOLTAGE_RANGE_MIN
+from measure.profile.model_json import mains_voltage_from_range
+from measure.utils.sampling import (
     AverageMeasurementConvergence,
     AverageMeasurementSnapshot,
     MeasurementResult,
-    MeasureUtil,
+    PowerSampler,
 )
 import pytest
 from readchar import key
@@ -54,7 +49,7 @@ def _mock_input() -> Iterator[None]:
 @pytest.fixture
 def mock_average_measurement() -> Iterator[MagicMock]:
     with patch.object(
-        MeasureUtil,
+        PowerSampler,
         "take_average_measurement",
         return_value=MeasurementResult(power=1.5, voltages=[]),
     ) as mock_take_measurement:
@@ -165,13 +160,13 @@ def test_take_measurement_tracks_voltage_range(mock_config_factory: MockConfigFa
             PowerMeasurementResult(power=3.0, updated=3.0, voltage=230.4),
         ],
     )
-    measure_util = MeasureUtil(
+    sampler = PowerSampler(
         power_meter,
         mock_config,
         include_voltage=lambda: True,
     )
 
-    result = measure_util.take_measurement()
+    result = sampler.take_measurement()
     assert result.power == 2.0
     assert result.voltages == [231.2, 229.9, 230.4]
 
@@ -211,7 +206,7 @@ def test_average_convergence(
     )
     average_snapshots = [AverageMeasurementSnapshot(elapsed=elapsed, average=average) for elapsed, average in snapshots]
 
-    assert MeasureUtil.average_has_converged(average_snapshots, convergence) is expected
+    assert PowerSampler.has_average_converged(average_snapshots, convergence) is expected
 
 
 def test_run_smart_speaker(mock_config_factory: MockConfigFactory, mock_average_measurement: MagicMock) -> None:
@@ -279,7 +274,7 @@ def test_run_recorder(mock_config_factory: MockConfigFactory) -> None:
     side_effect.counter = 0
 
     # Mock take_measurement to call the side_effect function after 5 iterations
-    with patch.object(MeasureUtil, "take_measurement", side_effect=side_effect):
+    with patch.object(PowerSampler, "take_measurement", side_effect=side_effect):
         measure = _create_measure_instance(config=mock_config)
         measure.start()
 

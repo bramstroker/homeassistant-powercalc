@@ -6,27 +6,22 @@ from measure.contribution.coordinator import (
     ContributionJobExpiredError,
     ContributionJobStore,
 )
-from measure.contribution.credentials import CredentialStore, StoredCredential
+from measure.contribution.credentials import CredentialKind, CredentialStore, StoredCredential
 from measure.contribution.github import GitHubClient, GitHubRepository, GitHubUser
-from measure.contribution.models import (
-    ContributionAuthor,
-    ContributionJob,
-    ContributionJobStatus,
-    ContributionMetadata,
-    ContributionPreparedFile,
-    ContributionPreview,
-)
-from measure.contribution.prepare import ProfilePreparer
+from measure.contribution.models import ContributionAuthor, ContributionJob, ContributionJobStatus, ContributionMetadata
 from measure.contribution.pull_request import deterministic_branch_name, pull_request_body
 from measure.controller.light.spec import DummyLightControllerSpec
-from measure.ha_app.contribution import (
+from measure.ha_app.contribution.models import (
     ContributionApiError,
     ContributionApiErrorCode,
     ContributionAuthStatus,
     ContributionPreviewRequest,
 )
-from measure.ha_app.contribution.service import _metadata_from_request, _validate_latest_preview
+from measure.ha_app.contribution.preview import metadata_from_request
+from measure.ha_app.contribution.service import _validate_latest_preview
 from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.profile.models import PreparedProfileFile, ProfilePreview, RenderedProfileFile
+from measure.profile.prepare import ProfilePreparer
 from measure.request import LightMeasurementRequest
 from pydantic import ValidationError
 import pytest
@@ -75,7 +70,7 @@ class FakeGitHubClient(GitHubClient):
         owner: str,
         repo: str,
         base_tree: str,
-        tree: tuple[dict[str, Any], ...],
+        tree: list[dict[str, Any]],
     ) -> str:
         self.calls.append(f"create_tree:{base_tree}:{len(tree)}")
         return "tree-sha"
@@ -103,27 +98,27 @@ class FakeGitHubClient(GitHubClient):
 
 
 class FakePreparer(ProfilePreparer):
-    def __init__(self, preview: ContributionPreview) -> None:
+    def __init__(self, preview: ProfilePreview) -> None:
         self.preview = preview
 
-    def prepare(self, artifact_directory: Path, metadata: ContributionMetadata) -> ContributionPreview:
+    def prepare(self, artifact_directory: Path, metadata: ContributionMetadata) -> ProfilePreview:
         return self.preview
 
     def render_contents(
         self,
         artifact_directory: Path,
         metadata: ContributionMetadata,
-        preview: ContributionPreview,
-    ) -> tuple[tuple[str, bytes], ...]:
-        return tuple((file.path, b"content") for file in preview.files)
+        preview: ProfilePreview,
+    ) -> list[RenderedProfileFile]:
+        return [RenderedProfileFile(path=file.path, content=b"content") for file in preview.files]
 
 
-def make_preview() -> ContributionPreview:
+def make_preview() -> ProfilePreview:
     """The single-file signify/LCT999 preview every coordinator test builds on."""
-    return ContributionPreview(
+    return ProfilePreview(
         manufacturer_directory="signify",
         model_directory="LCT999",
-        files=(ContributionPreparedFile(path="profile_library/signify/LCT999/model.json", size=20),),
+        files=(PreparedProfileFile(path="profile_library/signify/LCT999/model.json", size=20),),
     )
 
 
@@ -135,7 +130,7 @@ def make_metadata(github: str = "test-user") -> ContributionMetadata:
     )
 
 
-def make_credential_store(tmp_path: Path, kind: str = "pat") -> CredentialStore:
+def make_credential_store(tmp_path: Path, kind: CredentialKind = CredentialKind.PAT) -> CredentialStore:
     """A credential store already holding a token for GitHub user `octo`."""
     store = CredentialStore(tmp_path / "credentials.json")
     store.save(StoredCredential(kind=kind, token="secret", github_username="octo"))  # noqa: S106
@@ -144,7 +139,7 @@ def make_credential_store(tmp_path: Path, kind: str = "pat") -> CredentialStore:
 
 def make_coordinator(
     tmp_path: Path,
-    preview: ContributionPreview | None = None,
+    preview: ProfilePreview | None = None,
     credential_store: CredentialStore | None = None,
     github_client: GitHubClient | None = None,
 ) -> ContributionJobCoordinator:
@@ -236,7 +231,7 @@ def test_coordinator_reports_missing_workflow_scope_before_writing_fork(tmp_path
     github.user = GitHubUser(login="octo", scopes=("public_repo",), scopes_reported=True)
     coordinator = make_coordinator(
         tmp_path,
-        credential_store=make_credential_store(tmp_path, kind="oauth"),
+        credential_store=make_credential_store(tmp_path, kind=CredentialKind.OAUTH),
         github_client=github,
     )
     job = coordinator.create_job(tmp_path / "artifacts", make_metadata())
@@ -292,7 +287,7 @@ def test_coordinator_submit_of_unknown_job_reports_expired_preview(tmp_path: Pat
 
 
 def test_deterministic_branch_name_collapses_non_alphanumeric_runs() -> None:
-    preview = ContributionPreview(manufacturer_directory="ajax online", model_directory="AJ-100 (EU)+", files=())
+    preview = ProfilePreview(manufacturer_directory="ajax online", model_directory="AJ-100 (EU)+", files=())
 
     assert deterministic_branch_name(preview) == "powercalc-profile-ajax-online-aj-100-eu"
 
@@ -309,7 +304,7 @@ def test_pull_request_body_reports_the_integration_of_the_measured_entity() -> N
         id="job-1",
         status=ContributionJobStatus.PREVIEWED,
         metadata=metadata,
-        preview=ContributionPreview(manufacturer_directory="signify", model_directory="LCT999", files=()),
+        preview=ProfilePreview(manufacturer_directory="signify", model_directory="LCT999", files=()),
         created_at="2026-07-16T12:00:00Z",
         updated_at="2026-07-16T12:00:00Z",
     )
@@ -363,17 +358,17 @@ def test_metadata_from_request_maps_validation_errors_to_invalid_metadata() -> N
     )
 
     with pytest.raises(ContributionApiError, match="invalid GTIN") as info:
-        _metadata_from_request(request, payload, auth)
+        metadata_from_request(request, payload, auth)
     assert info.value.code == ContributionApiErrorCode.INVALID_METADATA
     assert info.value.field == "gtins"
 
     for payload_field in ("contributor", "contributor_github", "manufacturer_name"):
         invalid = payload.model_copy(update={"gtins": [], payload_field: " "})
         with pytest.raises(ContributionApiError) as info:
-            _metadata_from_request(request, invalid, auth)
+            metadata_from_request(request, invalid, auth)
         assert info.value.field == payload_field
 
-    metadata = _metadata_from_request(request, payload.model_copy(update={"gtins": []}), auth, "hue")
+    metadata = metadata_from_request(request, payload.model_copy(update={"gtins": []}), auth, "hue")
     assert metadata.measure_type == "light"
     assert metadata.measure_device == "Test meter"
     assert metadata.integration == "hue"
@@ -392,10 +387,10 @@ def test_contribution_preview_request_rejects_unsupported_mains_voltage(mains_vo
 
 
 def test_submit_preview_validation_rejects_base_or_content_drift() -> None:
-    preview = ContributionPreview(
+    preview = ProfilePreview(
         manufacturer_directory="signify",
         model_directory="LCT999",
-        files=(ContributionPreparedFile(path="profile_library/signify/LCT999/model.json", size=20, sha="one"),),
+        files=(PreparedProfileFile(path="profile_library/signify/LCT999/model.json", size=20, sha="one"),),
     )
     metadata = ContributionMetadata(
         manufacturer="Philips",
@@ -418,7 +413,7 @@ def test_submit_preview_validation_rejects_base_or_content_drift() -> None:
     changed_preview = preview.model_copy(
         update={
             "files": (
-                ContributionPreparedFile(
+                PreparedProfileFile(
                     path="profile_library/signify/LCT999/model.json",
                     size=20,
                     sha="two",

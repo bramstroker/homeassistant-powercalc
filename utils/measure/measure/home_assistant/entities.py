@@ -1,0 +1,327 @@
+from enum import StrEnum
+import math
+from typing import TYPE_CHECKING, Any
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from measure.controller.light.capabilities import light_info_from_attributes, supported_light_modes
+from measure.controller.light.const import LutMode
+from measure.home_assistant.client import HomeAssistantManager
+from measure.home_assistant.const import (
+    HASS_DEVICE_REGISTRY_ID,
+    HASS_DEVICE_REGISTRY_MANUFACTURER,
+    HASS_DEVICE_REGISTRY_MODEL,
+    HASS_DEVICE_REGISTRY_MODEL_ID,
+    HASS_ENTITY_DEVICE_CLASS,
+    HASS_ENTITY_GROUP_MEMBERS,
+    HASS_ENTITY_UNIT_OF_MEASUREMENT,
+)
+
+if TYPE_CHECKING:
+    from homeassistant_api import EntityRegistryEntry
+
+
+class EntityDomain(StrEnum):
+    LIGHT = "light"
+    MEDIA_PLAYER = "media_player"
+    FAN = "fan"
+    VACUUM = "vacuum"
+    LAWN_MOWER = "lawn_mower"
+    SENSOR = "sensor"
+
+
+#: Domains PowerCalc can measure, and the only ones whose attribute detail is described.
+_MEASURABLE_DOMAINS = frozenset(EntityDomain)
+
+
+class DeviceClass(StrEnum):
+    POWER = "power"
+    VOLTAGE = "voltage"
+    BATTERY = "battery"
+
+    @property
+    def unit_of_measurement(self) -> str:
+        return {
+            DeviceClass.POWER: "W",
+            DeviceClass.VOLTAGE: "V",
+            DeviceClass.BATTERY: "%",
+        }[self]
+
+
+class EntityDescriptor(BaseModel):
+    """Transport-neutral Home Assistant entity metadata used by selectors."""
+
+    model_config = ConfigDict(frozen=True)
+
+    entity_id: str
+    name: str
+    domain: str
+    device_class: str | None = None
+    device_id: str | None = None
+    #: Home Assistant integration providing the entity, as shown on the device page.
+    integration: str | None = None
+    translation_key: str | None = None
+    disabled_by: str | None = None
+    has_live_state: bool = True
+    manufacturer: str | None = None
+    model_id: str | None = None
+    product_name: str | None = None
+    state: str
+    unit: str | None = None
+    attribute_names: list[str]
+    supported_modes: list[LutMode] | None = None
+    effect_list: list[str] | None = None
+    min_mired: int | None = None
+    max_mired: int | None = None
+    related_voltage_entity_id: str | None = None
+    member_entity_ids: list[str] = Field(default_factory=list)
+
+
+class EntityCatalogSnapshot:
+    """Immutable view used for one selector or preflight operation."""
+
+    def __init__(self, entities: list[EntityDescriptor]) -> None:
+        self._entities = tuple(entities)
+        self._by_id = {entity.entity_id: entity for entity in entities}
+
+    def select(
+        self,
+        *,
+        domain: EntityDomain | str | None = None,
+        device_class: DeviceClass | None = None,
+    ) -> list[EntityDescriptor]:
+        if (domain is None) == (device_class is None):
+            raise ValueError("Specify exactly one entity filter")
+
+        if domain is not None:
+            selected = [
+                entity for entity in self._entities if entity.domain == domain and self._is_domain_selectable(entity)
+            ]
+        else:
+            assert device_class is not None
+            selected = self._select_device_class(device_class)
+
+        selected.sort(key=lambda entity: (entity.name.casefold(), entity.entity_id))
+        if device_class == DeviceClass.POWER:
+            selected = [
+                entity.model_copy(
+                    update={"related_voltage_entity_id": self._find_related_entity_id(entity, DeviceClass.VOLTAGE)},
+                )
+                for entity in selected
+            ]
+        return selected
+
+    def get_all(self) -> list[EntityDescriptor]:
+        """Return every registry entity, including unsupported domains and unavailable states."""
+
+        return sorted(self._entities, key=lambda entity: (entity.name.casefold(), entity.entity_id))
+
+    def get_attribute_names(self, entity_id: str) -> list[str]:
+        entity = self._by_id.get(entity_id)
+        return list(entity.attribute_names) if entity is not None else []
+
+    def get(self, entity_id: str) -> EntityDescriptor | None:
+        return self._by_id.get(entity_id)
+
+    def find_related_entity_id(self, entity_id: str, device_class: DeviceClass) -> str | None:
+        entity = self._by_id.get(entity_id)
+        if entity is None:
+            return None
+        return self._find_related_entity_id(entity, device_class)
+
+    def _find_related_entity_id(self, entity: EntityDescriptor, device_class: DeviceClass) -> str | None:
+        if entity.device_id is None:
+            return None
+        return next(
+            (
+                candidate.entity_id
+                for candidate in self._select_device_class(device_class)
+                if candidate.device_id == entity.device_id
+            ),
+            None,
+        )
+
+    def _select_device_class(self, device_class: DeviceClass) -> list[EntityDescriptor]:
+        return sorted(
+            (entity for entity in self._entities if self._is_device_class_selectable(entity, device_class)),
+            key=lambda entity: (entity.name.casefold(), entity.entity_id),
+        )
+
+    @staticmethod
+    def _is_available(entity: EntityDescriptor) -> bool:
+        return (
+            entity.disabled_by is None
+            and entity.has_live_state
+            and entity.state.casefold() not in {"unavailable", "unknown", "none"}
+        )
+
+    @classmethod
+    def _is_domain_selectable(cls, entity: EntityDescriptor) -> bool:
+        return cls._is_available(entity) and (entity.domain != EntityDomain.LIGHT or bool(entity.supported_modes))
+
+    @classmethod
+    def _is_device_class_selectable(cls, entity: EntityDescriptor, device_class: DeviceClass) -> bool:
+        return (
+            cls._is_available(entity)
+            and entity.domain == EntityDomain.SENSOR
+            and entity.device_class == device_class
+            and entity.unit == device_class.unit_of_measurement
+            and _is_finite_number(entity.state)
+        )
+
+
+class HomeAssistantEntityCatalog:
+    """Build reusable selector snapshots from Home Assistant data.
+
+    The snapshot is loaded once per catalog instance; create a new catalog to see fresh data.
+    Interactive question rendering re-evaluates choices on every keypress, so load_snapshot
+    must not hit Home Assistant each call.
+    """
+
+    def __init__(self, home_assistant: HomeAssistantManager) -> None:
+        self._home_assistant = home_assistant
+        self._snapshot: EntityCatalogSnapshot | None = None
+
+    def load_snapshot(self) -> EntityCatalogSnapshot:
+        if self._snapshot is None:
+            self._snapshot = self._build_snapshot()
+        return self._snapshot
+
+    def _build_snapshot(self) -> EntityCatalogSnapshot:
+        data = self._home_assistant.get_entity_data()
+        registry = {entry.entity_id: entry for entry in data.entity_registry}
+        devices = {
+            str(device_id): device
+            for device in data.device_registry
+            if (device_id := device.get(HASS_DEVICE_REGISTRY_ID)) is not None
+        }
+        descriptors: list[EntityDescriptor] = []
+        for domain_value, group in data.entities.items():
+            descriptors.extend(
+                _describe_entity(entity, domain_value, registry.get(entity.entity_id), devices)
+                for entity in group.entities.values()
+            )
+        live_ids = {descriptor.entity_id for descriptor in descriptors}
+        descriptors.extend(
+            _describe_registry_entity(entry) for entity_id, entry in registry.items() if entity_id not in live_ids
+        )
+        by_id = {descriptor.entity_id: descriptor for descriptor in descriptors}
+        return EntityCatalogSnapshot([_enrich_group_device_metadata(descriptor, by_id) for descriptor in descriptors])
+
+
+def _describe_registry_entity(entry: EntityRegistryEntry) -> EntityDescriptor:
+    """Describe an inventory-only entity with no live Home Assistant state."""
+    return EntityDescriptor(
+        entity_id=entry.entity_id,
+        name=getattr(entry, "name", None) or getattr(entry, "original_name", None) or entry.entity_id,
+        domain=entry.entity_id.partition(".")[0],
+        device_id=entry.device_id,
+        integration=entry.platform,
+        translation_key=getattr(entry, "translation_key", None),
+        disabled_by=getattr(entry, "disabled_by", None),
+        has_live_state=False,
+        state="unavailable",
+        attribute_names=[],
+    )
+
+
+def _enrich_group_device_metadata(
+    descriptor: EntityDescriptor,
+    by_id: dict[str, EntityDescriptor],
+) -> EntityDescriptor:
+    """Give a group device metadata shared by all its members."""
+
+    if not descriptor.member_entity_ids:
+        return descriptor
+    update: dict[str, str] = {}
+    if not descriptor.model_id and (model_id := _resolve_group_value(descriptor, by_id, frozenset(), "model_id")):
+        update["model_id"] = model_id
+    if not descriptor.product_name and (
+        product_name := _resolve_group_value(descriptor, by_id, frozenset(), "product_name")
+    ):
+        update["product_name"] = product_name
+    if not descriptor.manufacturer and (
+        manufacturer := _resolve_group_value(descriptor, by_id, frozenset(), "manufacturer")
+    ):
+        update["manufacturer"] = manufacturer
+    return descriptor.model_copy(update=update) if update else descriptor
+
+
+def _resolve_group_value(
+    descriptor: EntityDescriptor,
+    by_id: dict[str, EntityDescriptor],
+    seen: frozenset[str],
+    field: str,
+) -> str | None:
+    """Device-registry value shared by every member of a group."""
+
+    if value := getattr(descriptor, field):
+        return str(value)
+    # Groups can nest, and a malformed one can point back at itself.
+    if descriptor.entity_id in seen or not descriptor.member_entity_ids:
+        return None
+    seen = seen | {descriptor.entity_id}
+    values = {
+        _resolve_group_value(member, by_id, seen, field) if (member := by_id.get(entity_id)) is not None else None
+        for entity_id in descriptor.member_entity_ids
+    }
+    return values.pop() if len(values) == 1 and None not in values else None
+
+
+def _describe_entity(
+    entity: Any,  # noqa: ANN401
+    domain: str,
+    registry_entry: Any | None,  # noqa: ANN401
+    device_registry: dict[str, dict[str, object]],
+) -> EntityDescriptor:
+    """Describe one entity.
+
+    Entities outside the measurable domains only ever populate the "any entity" pickers,
+    which show a name, a domain, a device and a state. Their per-entity attribute detail
+    is neither read nor rendered, so it is left out rather than built and sent for every
+    entity in Home Assistant.
+    """
+
+    attributes = entity.state.attributes
+    detailed = domain in _MEASURABLE_DOMAINS
+    device_id = str(registry_entry.device_id) if registry_entry is not None and registry_entry.device_id else None
+    device = device_registry.get(device_id, {}) if device_id is not None else {}
+    manufacturer = device.get(HASS_DEVICE_REGISTRY_MANUFACTURER)
+    model_id = device.get(HASS_DEVICE_REGISTRY_MODEL_ID) or device.get(HASS_DEVICE_REGISTRY_MODEL)
+    device_class = _parse_device_class(attributes.get(HASS_ENTITY_DEVICE_CLASS))
+    supported_modes = supported_light_modes(attributes) if domain == EntityDomain.LIGHT else None
+    light_info = light_info_from_attributes(attributes) if domain == EntityDomain.LIGHT else None
+    unit = attributes.get(HASS_ENTITY_UNIT_OF_MEASUREMENT)
+    members = attributes.get(HASS_ENTITY_GROUP_MEMBERS)
+    return EntityDescriptor(
+        entity_id=entity.entity_id,
+        name=str(attributes.get("friendly_name", entity.entity_id)),
+        domain=domain,
+        device_class=device_class,
+        device_id=device_id,
+        integration=str(registry_entry.platform) if registry_entry is not None and registry_entry.platform else None,
+        translation_key=getattr(registry_entry, "translation_key", None),
+        disabled_by=getattr(registry_entry, "disabled_by", None),
+        manufacturer=str(manufacturer) if manufacturer else None,
+        model_id=str(model_id) if model_id else None,
+        product_name=str(device[HASS_DEVICE_REGISTRY_MODEL]) if device.get(HASS_DEVICE_REGISTRY_MODEL) else None,
+        state=str(entity.state.state),
+        unit=str(unit) if unit else None,
+        attribute_names=sorted(attributes) if detailed else [],
+        supported_modes=supported_modes,
+        effect_list=[str(effect) for effect in (attributes.get("effect_list") or [])] or None if detailed else None,
+        min_mired=light_info.get_min_mired() if light_info is not None else None,
+        max_mired=light_info.get_max_mired() if light_info is not None else None,
+        member_entity_ids=[str(member) for member in members] if detailed and isinstance(members, list) else [],
+    )
+
+
+def _parse_device_class(value: object) -> str | None:
+    return value if isinstance(value, str) and value else None
+
+
+def _is_finite_number(value: str) -> bool:
+    try:
+        return math.isfinite(float(value))
+    except ValueError, TypeError:
+        return False

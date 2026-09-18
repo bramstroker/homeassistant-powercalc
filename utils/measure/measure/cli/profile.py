@@ -12,11 +12,10 @@ from typing import Any
 from pydantic import ValidationError
 
 from measure.const import PROJECT_DIR
-from measure.contribution.models import ContributionPreview
-from measure.contribution.prepare import ProfilePreparationError, ProfilePreparer
-from measure.model import mains_voltage_from_range
-from measure.profile.models import ProfileMetadata
+from measure.profile.model_json import mains_voltage_from_range
+from measure.profile.models import ProfileMetadata, ProfilePreview
 from measure.profile.output import write_prepared_profile
+from measure.profile.prepare import ProfilePreparationError, ProfilePreparer
 from measure.profile.specifications import DeviceSpecField, device_spec_fields
 
 Prompt = Callable[[str], str]
@@ -26,7 +25,7 @@ MODEL_SCHEMA_FILENAME = "model_schema.json"
 @dataclass(frozen=True)
 class ProfilePreparationRun:
     output_directory: Path
-    preview: ContributionPreview
+    preview: ProfilePreview
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -134,7 +133,7 @@ def _metadata_defaults(artifact_directory: Path, model: dict[str, Any]) -> dict[
 def _prompt_metadata(
     values: dict[str, Any],
     prompt: Prompt,
-    device_specification_fields: tuple[DeviceSpecField, ...] = (),
+    device_specification_fields: Sequence[DeviceSpecField] = (),
     *,
     has_voltage_range: bool = False,
 ) -> dict[str, Any]:
@@ -206,7 +205,7 @@ def _ask(prompt: Prompt, label: str, default: object = None, *, required: bool =
 
 def _prompt_device_specs(
     prompt: Prompt,
-    fields: tuple[DeviceSpecField, ...],
+    fields: Sequence[DeviceSpecField],
     defaults: object,
 ) -> dict[str, Any] | None:
     existing = defaults if isinstance(defaults, dict) else {}

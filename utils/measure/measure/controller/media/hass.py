@@ -4,7 +4,7 @@ from homeassistant_api.errors import InternalServerError
 
 from measure.controller.hass_controller import HassControllerBase
 from measure.controller.media.controller import MediaController
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 
 _LOGGER = logging.getLogger("measure")
 

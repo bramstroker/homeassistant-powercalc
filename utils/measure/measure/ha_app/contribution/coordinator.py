@@ -9,7 +9,6 @@ from uuid import uuid4
 
 from pydantic import SecretStr
 
-from measure.clock import utc_now
 from measure.ha_app.contribution.models import (
     AUTOMATIC_CONTRIBUTION_MESSAGE,
     ContributionApiError,
@@ -23,14 +22,17 @@ from measure.ha_app.contribution.models import (
     ContributionSubmissionResult,
     ContributionSubmitRequest,
     DeviceFlowPollResponse,
+    DeviceFlowPollStatus,
     DeviceFlowStartResponse,
     contribution_entity_ids,
     supports_automatic_contribution,
 )
-from measure.ha_app.contribution.service import create_contribution_service, draft_from_request
+from measure.ha_app.contribution.preview import draft_from_request
+from measure.ha_app.contribution.service import create_contribution_service
 from measure.ha_app.session import ACTIVE_SESSION_STATES, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.request import MeasurementRequest
+from measure.utils.clock import utc_now
 
 _LOGGER = logging.getLogger("measure")
 _OAUTH_CLIENT_ID_ENV = "POWERCALC_GITHUB_CLIENT_ID"
@@ -119,7 +121,11 @@ class ContributionApiCoordinator:
                 "GitHub Device Flow is unknown or expired; start a new login",
             )
         response = self._service_factory().poll_device_flow(client_id, flow.device_code)
-        if response.status in {"authorized", "expired", "denied"}:
+        if response.status in {
+            DeviceFlowPollStatus.AUTHORIZED,
+            DeviceFlowPollStatus.EXPIRED,
+            DeviceFlowPollStatus.DENIED,
+        }:
             with self._lock:
                 self._device_flows.pop(flow_id, None)
         auth = self._with_device_flow(response.auth) if response.auth else None
@@ -222,7 +228,7 @@ class ContributionApiCoordinator:
                     "Preview the current session before submitting it",
                 )
             preview = self._status.preview
-            if _preview_request_values(preview) != _preview_request_values(payload):
+            if _build_preview_comparison(preview) != _build_preview_comparison(payload):
                 raise ContributionApiError(
                     ContributionApiErrorCode.PREVIEW_REQUIRED,
                     "Contribution details changed after preview; refresh the preview before submitting",
@@ -322,21 +328,42 @@ class ContributionApiCoordinator:
             )
 
 
-def _preview_request_values(value: ContributionPreviewResponse | ContributionPreviewRequest) -> tuple[str, ...]:
-    return (
-        value.manufacturer_name,
-        value.model_id,
-        value.product_name,
-        value.contributor,
-        value.contributor_github or "",
-        value.contributor_email or "",
-        "\0".join(value.aliases),
-        "\0".join(value.gtins),
-        value.product_url or "",
-        str(value.mains_voltage or ""),
-        json.dumps(value.device_specs, sort_keys=True) if value.device_specs is not None else "",
-        value.measure_device or "",
-        value.measure_device_firmware or "",
-        value.measure_description or "",
-        value.notes,
+@dataclass(frozen=True)
+class _PreviewComparison:
+    manufacturer_name: str
+    model_id: str
+    product_name: str
+    contributor: str
+    contributor_github: str
+    contributor_email: str
+    aliases: list[str]
+    gtins: list[str]
+    product_url: str
+    mains_voltage: int | None
+    device_specs_json: str | None
+    measure_device: str
+    measure_device_firmware: str
+    measure_description: str
+    notes: str
+
+
+def _build_preview_comparison(value: ContributionPreviewResponse | ContributionPreviewRequest) -> _PreviewComparison:
+    """Normalize optional metadata to check that submission still matches the preview."""
+    return _PreviewComparison(
+        manufacturer_name=value.manufacturer_name,
+        model_id=value.model_id,
+        product_name=value.product_name,
+        contributor=value.contributor,
+        contributor_github=value.contributor_github or "",
+        contributor_email=value.contributor_email or "",
+        aliases=value.aliases,
+        gtins=value.gtins,
+        product_url=value.product_url or "",
+        mains_voltage=value.mains_voltage,
+        # Compare the JSON representation so values like True and 1 remain distinct.
+        device_specs_json=json.dumps(value.device_specs, sort_keys=True) if value.device_specs is not None else None,
+        measure_device=value.measure_device or "",
+        measure_device_firmware=value.measure_device_firmware or "",
+        measure_description=value.measure_description or "",
+        notes=value.notes,
     )

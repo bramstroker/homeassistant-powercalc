@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 import json
 from pathlib import Path
 
+from measure.cli.const import QUESTION_DUMMY_LOAD
 from measure.cli.dummy_load import (
     QUESTION_DUMMY_LOAD_DESCRIPTION,
     QUESTION_DUMMY_LOAD_MODE,
@@ -10,7 +11,7 @@ from measure.cli.dummy_load import (
     dummy_load_questions,
 )
 from measure.cli.main import Measure
-from measure.const import QUESTION_DUMMY_LOAD, MeasureType
+from measure.const import MeasureType
 from measure.powermeter.spec import HassPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,

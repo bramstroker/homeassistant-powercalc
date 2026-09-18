@@ -1,11 +1,11 @@
+from measure.cli.const import QUESTION_DURATION, QUESTION_MEASURE_DEVICE, QUESTION_MODE, QUESTION_POWERMETER_ENTITY_ID
 from measure.cli.request_adapter import request_from_answers
-from measure.const import QUESTION_MEASURE_DEVICE, MeasureType
+from measure.const import MeasureType
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.controller.light.spec import HueLightControllerSpec
-from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, PowerMeterType
+from measure.powermeter.const import PowerMeterType
 from measure.powermeter.spec import HassPowerMeterSpec, ShellyPowerMeterSpec, TuyaPowerMeterSpec
 from measure.request import ResumePolicy
-from measure.runner.const import QUESTION_DURATION, QUESTION_MODE
 
 from tests.conftest import MockConfigFactory
 

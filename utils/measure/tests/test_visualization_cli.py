@@ -215,5 +215,5 @@ def _plot(source: Path) -> PlotSpec:
         x_label="Value",
         y_label="Power (W)",
         source=str(source),
-        series=(),
+        series=[],
     )

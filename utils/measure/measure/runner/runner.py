@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from measure.request import BaseMeasurementRequest
-from measure.util.measure_util import MeasurementResult
+from measure.utils.sampling import MeasurementResult
 
 
 class MeasurementRunner[TRequest: BaseMeasurementRequest](ABC):

@@ -22,6 +22,7 @@ import { renderEntityList } from "./entity-list-field";
 import {
   activeParameters,
   availableOptions,
+  disabledVacuumEntityCount,
   entityChoices,
   entityRows,
   selectedEntityId,
@@ -29,6 +30,7 @@ import {
   selectedOptions,
   selectValue,
   visible,
+  vacuumRecordingEntityIds,
   type FieldState,
 } from "./options";
 import "./tuning-section";
@@ -288,17 +290,13 @@ export class SetupFieldsSection extends LitElement {
   }
 
   private renderMultiEntity(field: FormField, entities: EntityDescriptor[]) {
-    if (this.definition?.measure_type === "light" && field.role === "controller") {
-      return html`<measure-combobox
-        name=${field.name}
-        label=${field.plural_label || field.label}
-        .value=${this.fieldState ? selectedEntityIds(field, this.fieldState) : []}
-        .options=${entities.map((entity) => ({ value: entity.entity_id, label: `${entity.name} · ${entity.entity_id}` }))}
-        placeholder="Select lights"
-        ?required=${field.required}
-        multiple
-        @combobox-change=${(event: CustomEvent<{ value: string[] }>) => this.changeEntities(field.name, event.detail.value)}
-      ></measure-combobox>`;
+    const vacuumAdditional = this.definition?.measure_type === "recorder" && field.name === "additional_entity_ids";
+    const lightController = this.definition?.measure_type === "light" && field.role === "controller";
+    if (vacuumAdditional || lightController) {
+      return html`<div class="field-block">
+        ${this.renderEntityCombobox(field, entities, vacuumAdditional ? "Select additional entities" : "Select lights")}
+        ${vacuumAdditional ? this.renderVacuumRecordingHint(field) : nothing}
+      </div>`;
     }
     return renderEntityList({
       field,
@@ -306,6 +304,32 @@ export class SetupFieldsSection extends LitElement {
       rows: this.fieldState ? entityRows(field, this.fieldState) : [],
       onChange: (rows) => this.changeEntities(field.name, rows),
     });
+  }
+
+  private renderEntityCombobox(field: FormField, entities: EntityDescriptor[], placeholder: string) {
+    const selected = this.fieldState ? selectedEntityIds(field, this.fieldState) : [];
+    return html`<measure-combobox
+      name=${field.name}
+      label=${field.plural_label || field.label}
+      .value=${selected}
+      .options=${entities.map((entity) => ({ value: entity.entity_id, label: `${entity.name} · ${entity.entity_id}` }))}
+      placeholder=${placeholder}
+      ?required=${field.required}
+      multiple
+      @combobox-change=${(event: CustomEvent<{ value: string[] }>) => this.changeEntities(field.name, event.detail.value)}
+    ></measure-combobox>`;
+  }
+
+  private renderVacuumRecordingHint(field: FormField) {
+    const state = this.fieldState;
+    const selected = state ? selectedEntityIds(field, state).length : 0;
+    const disabled = state ? disabledVacuumEntityCount(state) : 0;
+    const disabledHint = disabled ? `${disabled} disabled entities are listed in recording metadata only.` : "";
+    return html`<p class="muted">
+      ${selected} additional entities selected. Available device entities are selected by default;
+      you can remove them or add dock entities. Camera and image entities are not selected automatically.
+      ${disabledHint}
+    </p>`;
   }
 
   private fieldDomains(field: FormField): string[] {
@@ -339,7 +363,13 @@ export class SetupFieldsSection extends LitElement {
     const select = event.currentTarget as HTMLInputElement;
     this.changeEntities(select.name, [select.value]);
     for (const dependent of this.definition?.fields.filter((field) => field.related_to === select.name) ?? []) {
-      this.changeEntities(dependent.name, []);
+      this.changeEntities(dependent.name, dependent.name === "additional_entity_ids"
+        ? vacuumRecordingEntityIds(this.deviceEntities["*"] ?? [], select.value)
+        : []);
+    }
+    if (select.name === "battery_entity_id" && this.fieldState) {
+      const additional = this.definition?.fields.find((field) => field.name === "additional_entity_ids");
+      if (additional) this.changeEntities(additional.name, selectedEntityIds(additional, this.fieldState).filter((id) => id !== select.value));
     }
   };
 

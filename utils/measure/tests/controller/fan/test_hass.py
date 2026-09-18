@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from homeassistant_api.errors import HomeassistantAPIError
 from measure.controller.errors import ApiConnectionError, ControllerError
 from measure.controller.fan.hass import HassFanController
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 import pytest
 
 

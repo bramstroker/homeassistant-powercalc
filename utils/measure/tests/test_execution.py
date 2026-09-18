@@ -3,15 +3,10 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from jsonschema import validate
+from measure.cancellation import MeasurementCancelledError
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
-from measure.execution import (
-    DummyLoadPreparation,
-    MeasurementCancelledError,
-    MeasurementExecution,
-    PreparedMeasurement,
-    RunInteraction,
-)
+from measure.execution import DummyLoadPreparation, MeasurementExecution, PreparedMeasurement
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
@@ -20,8 +15,9 @@ from measure.request import (
     LightMeasurementRequest,
     RecorderMeasurementRequest,
 )
+from measure.runner.interaction import RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.utils.sampling import MeasurementResult, PowerSampler
 import pytest
 
 
@@ -54,7 +50,7 @@ def test_execution_writes_model_from_prepared_measurement(
     measure_version: str,
 ) -> None:
     (tmp_path / ".VERSION").write_text(measure_version, encoding="utf-8")
-    monkeypatch.setattr("measure.version.PROJECT_DIR", str(tmp_path))
+    monkeypatch.setattr("measure.utils.version.PROJECT_DIR", str(tmp_path))
     request = AverageMeasurementRequest(
         product_name="Test device",
         measure_device="Test meter",
@@ -130,14 +126,14 @@ def test_execution_records_new_dummy_load_calibration_in_measure_settings(
         generate_model=True,
         dummy_load=DummyLoadCalibrationRequest(description="Test load"),
     )
-    measure_util = MagicMock(spec=MeasureUtil)
-    measure_util.dummy_load_value = None
-    measure_util.set_dummy_load_resistance.side_effect = lambda resistance: setattr(
-        measure_util,
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.dummy_load_value = None
+    sampler.set_dummy_load_resistance.side_effect = lambda resistance: setattr(
+        sampler,
         "dummy_load_value",
         resistance,
     )
-    preparation = DummyLoadPreparation(request=request, spec=request.dummy_load, measure_util=measure_util)
+    preparation = DummyLoadPreparation(request=request, spec=request.dummy_load, sampler=sampler)
     monkeypatch.setattr(DummyLoadPreparation, "_calibrate", lambda self, interaction: 529.0)
     runner = MagicMock(spec=MeasurementRunner)
     runner.run.return_value = RunnerResult(model_json_data={"device_type": "generic"}, voltages=[230.0])
@@ -224,7 +220,7 @@ def test_execution_analyses_complex_recording_and_writes_schema_valid_model(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     (tmp_path / ".VERSION").write_text("v0.1.0:test", encoding="utf-8")
-    monkeypatch.setattr("measure.version.PROJECT_DIR", str(tmp_path))
+    monkeypatch.setattr("measure.utils.version.PROJECT_DIR", str(tmp_path))
     request = RecorderMeasurementRequest(
         product_name="Test switch",
         measure_device="Test meter",
@@ -351,6 +347,8 @@ def test_execution_completes_without_model_when_recording_is_insufficient(
     assert not (tmp_path / "model.json").exists()
     assert result.summary == {
         "Samples recorded": "10",
+        "Recordings analysed": "1",
+        "Samples analysed": "10",
         "Recording analysis": "More data needed",
         "Recording analysis reason": (
             "No state or scalar attribute had 2-20 usable values with at least 4 training samples per value"
@@ -379,12 +377,12 @@ def test_execution_runs_preparations_before_runner(tmp_path: Path) -> None:
 
 def test_dummy_load_reuse_requires_two_confirmations_and_configures_measure_util() -> None:
     request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
-    measure_util = MagicMock(spec=MeasureUtil)
+    sampler = MagicMock(spec=PowerSampler)
     interaction = MagicMock(spec=RunInteraction)
     preparation = DummyLoadPreparation(
         request=request,
         spec=DummyLoadReuseRequest(description="60 W lamp", resistance=812.4),
-        measure_util=measure_util,
+        sampler=sampler,
     )
 
     preparation.run(interaction)
@@ -394,7 +392,7 @@ def test_dummy_load_reuse_requires_two_confirmations_and_configures_measure_util
     assert interaction.confirm.call_args_list[1].kwargs == {"action": "Start measurement"}
     assert "Connect the target device in parallel" in interaction.confirm.call_args_list[1].args[0]
     assert "calibration is complete" not in interaction.confirm.call_args_list[1].args[0]
-    measure_util.set_dummy_load_resistance.assert_called_once_with(812.4)
+    sampler.set_dummy_load_resistance.assert_called_once_with(812.4)
 
 
 def test_dummy_load_calibration_repeats_until_steady_and_saves_result(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -405,26 +403,26 @@ def test_dummy_load_calibration_repeats_until_steady_and_saves_result(monkeypatc
         power_meter=DummyPowerMeterSpec(),
         controller=DummyLightControllerSpec(),
     )
-    measure_util = MagicMock(spec=MeasureUtil)
+    sampler = MagicMock(spec=PowerSampler)
     interaction = MagicMock(spec=RunInteraction)
     calibration_store = MagicMock()
     calibration_store.load.return_value = None
-    measure_util.take_average_measurement.side_effect = [
+    sampler.take_average_measurement.side_effect = [
         *[MeasurementResult(power=float(index), voltages=[230.0]) for index in range(20)],
         *[MeasurementResult(power=100.0, voltages=[230.0]) for _ in range(20)],
     ]
-    measure_util.dummy_load_trend.side_effect = ["increasing", "steady"]
+    sampler.classify_dummy_load_trend.side_effect = ["increasing", "steady"]
     preparation = DummyLoadPreparation(
         request=request,
         spec=DummyLoadCalibrationRequest(description="60 W lamp"),
-        measure_util=measure_util,
+        sampler=sampler,
         calibration_store=calibration_store,
     )
 
     preparation.run(interaction)
 
-    assert measure_util.take_average_measurement.call_count == 40
-    measure_util.set_dummy_load_resistance.assert_called_once_with(100.0)
+    assert sampler.take_average_measurement.call_count == 40
+    sampler.set_dummy_load_resistance.assert_called_once_with(100.0)
     calibration_store.save.assert_called_once_with(request, 100.0)
     assert interaction.confirm.call_count == 2
     first_confirmation, second_confirmation = interaction.confirm.call_args_list
@@ -438,7 +436,7 @@ def test_dummy_load_calibration_repeats_until_steady_and_saves_result(monkeypatc
 
 def test_dummy_load_cancelled_during_calibration_is_not_saved() -> None:
     request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
-    measure_util = MagicMock(spec=MeasureUtil)
+    sampler = MagicMock(spec=PowerSampler)
     interaction = MagicMock(spec=RunInteraction)
     interaction.checkpoint.side_effect = MeasurementCancelledError
     calibration_store = MagicMock()
@@ -446,21 +444,21 @@ def test_dummy_load_cancelled_during_calibration_is_not_saved() -> None:
     preparation = DummyLoadPreparation(
         request=request,
         spec=DummyLoadCalibrationRequest(description="60 W lamp"),
-        measure_util=measure_util,
+        sampler=sampler,
         calibration_store=calibration_store,
     )
 
     with pytest.raises(MeasurementCancelledError):
         preparation.run(interaction)
 
-    measure_util.take_average_measurement.assert_not_called()
+    sampler.take_average_measurement.assert_not_called()
     calibration_store.save.assert_not_called()
-    measure_util.set_dummy_load_resistance.assert_not_called()
+    sampler.set_dummy_load_resistance.assert_not_called()
 
 
 def test_dummy_load_calibration_uses_resumed_value() -> None:
     request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
-    measure_util = MagicMock(spec=MeasureUtil)
+    sampler = MagicMock(spec=PowerSampler)
     interaction = MagicMock(spec=RunInteraction)
     calibration_store = MagicMock()
     calibration_store.load.return_value = DummyLoadCalibration(
@@ -472,12 +470,12 @@ def test_dummy_load_calibration_uses_resumed_value() -> None:
     preparation = DummyLoadPreparation(
         request=request,
         spec=DummyLoadCalibrationRequest(description="60 W lamp"),
-        measure_util=measure_util,
+        sampler=sampler,
         calibration_store=calibration_store,
     )
 
     preparation.run(interaction)
 
-    measure_util.take_average_measurement.assert_not_called()
-    measure_util.set_dummy_load_resistance.assert_called_once_with(456.7)
+    sampler.take_average_measurement.assert_not_called()
+    sampler.set_dummy_load_resistance.assert_called_once_with(456.7)
     calibration_store.save.assert_not_called()

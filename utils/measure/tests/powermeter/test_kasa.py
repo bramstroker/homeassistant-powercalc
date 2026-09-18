@@ -2,6 +2,7 @@ import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from kasa import AuthenticationError, DeviceConfig, KasaException, Module
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
 from measure.powermeter.kasa import KasaPowerMeter
 from measure.powermeter.powermeter import PowerMeasurementResult
@@ -95,7 +96,8 @@ def test_get_power_creates_its_own_event_loop() -> None:
 
 
 def test_passes_credentials_for_newer_tapo_devices() -> None:
-    meter = KasaPowerMeter("192.0.2.1", credentials=("user@example.com", "account-password"))
+    account = TapoCredentials(username="user@example.com", password="account-password")  # noqa: S106
+    meter = KasaPowerMeter("192.0.2.1", credentials=account)
 
     discover = AsyncMock(return_value=None)
     with (
@@ -106,6 +108,9 @@ def test_passes_credentials_for_newer_tapo_devices() -> None:
 
     credentials = discover.await_args.kwargs["credentials"]
     assert credentials.username == "user@example.com"
+    assert credentials.password == account.password
+    assert account.username not in repr(account)
+    assert account.password not in repr(account)
 
 
 def test_reuses_the_discovered_connection_configuration() -> None:

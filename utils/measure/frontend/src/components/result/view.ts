@@ -9,15 +9,46 @@ import "./plot";
 
 const TROUBLESHOOTING_URL = "https://docs.powercalc.nl/contributing/measure/troubleshooting/";
 const ZERO_READING_ERROR_PREFIX = "Aborting measurement session after repeated 0 W readings.";
+
+interface AnalysisDetailDefinition {
+  label?: string;
+  help: string;
+}
+
+const ANALYSIS_DETAILS: Readonly<Record<string, AnalysisDetailDefinition>> = {
+  "Analysed feature": {
+    label: "Model input",
+    help: "The Home Assistant entity data that best explained the measured power changes. The generated profile will use this as its input.",
+  },
+  "Analysed inputs": {
+    label: "Model inputs",
+    help: "Runtime activity and battery inputs used by the composite profile. Enabled settings do not indicate active washing or drying.",
+  },
+  "Validation MAE": {
+    label: "Typical difference",
+    help: "How closely the profile matched measurement samples it had not used to learn. This is the typical difference in watts; lower is better.",
+  },
+  "Validation coverage": {
+    label: "Data coverage",
+    help: "The share of those measurement samples for which the profile could estimate power. 100% means every sample was covered.",
+  },
+  "Validation method": {
+    help: "Whole activity episodes or a separate recording were held out from fitting. Nearby samples in one episode are not independent validation evidence.",
+  },
+  "Recorded activities": {
+    help: "The measured vacuum and dock activities covered by this profile. Unmeasured modes do not get an assumed zero-power fallback.",
+  },
+};
+
 const ANALYSIS_SUMMARY_LABELS = new Set([
   "Recording analysis",
   "Recording analysis reason",
   // Older sessions used these labels in their persisted summary.
   "Profile analysis",
   "Profile analysis reason",
-  "Analysed feature",
-  "Validation MAE",
-  "Validation coverage",
+  ...Object.keys(ANALYSIS_DETAILS),
+  "Recordings analysed",
+  "Samples analysed",
 ]);
 const INSPECTABLE_JSON_FILES = new Set(["analyser.json", "analysis.json", "model.json"]);
 
@@ -319,21 +350,21 @@ export class ResultView extends LitElement {
     const reason = entries.find(([label]) => label === "Recording analysis reason")?.[1]
       ?? entries.find(([label]) => label === "Profile analysis reason")?.[1];
     const feature = entries.find(([label]) => label === "Analysed feature")?.[1];
+    const composite = entries.some(([label]) => label === "Analysed inputs");
     const details = entries.filter(([label]) => !label.endsWith("analysis") && !label.endsWith("analysis reason"));
     return html`
       <section class="analysis-panel" aria-labelledby="recording-analysis-title">
         <h3 id="recording-analysis-title">Recording analysis</h3>
         <p class="analysis-explanation">
-          ${feature
-            ? html`PowerCalc analysed how the measured power changed for each value of <code>${this.analysisFeature(feature)}</code>. This creates a profile that can estimate power from that entity data.`
-            : "PowerCalc compared the measured power with changes in the recorded entity states to create a suitable power profile."}
+          ${this.analysisExplanation(composite, feature)}
         </p>
         ${result ? html`<p class="analysis-outcome"><span>Result</span><strong>${this.analysisResult(result)}</strong></p>` : nothing}
         ${reason ? html`<p class="analysis-reason"><strong>Why:</strong> ${reason}</p>` : nothing}
         ${details.length ? html`<dl class="analysis-details" aria-label="Recording analysis details">
           ${details.map(([label, value]) => {
-            const displayLabel = this.analysisDetailLabel(label);
-            const help = this.analysisDetailHelp(label);
+            const definition = ANALYSIS_DETAILS[label];
+            const displayLabel = definition?.label ?? label;
+            const help = definition?.help;
             return html`
               <div>
                 <dt>
@@ -352,42 +383,37 @@ export class ResultView extends LitElement {
                 ? "Analysing the saved recording and refreshing the result…"
                 : this.analysisComplete
                   ? "✓ Recording analysed again. The result and generated files are now up to date."
-                  : html`Run the saved <code>record.jsonl</code> through the current analyser again. No new measurement is needed.`}
+                  : "Run all saved recordings through the current analyser again. No new measurement is needed."}
             </p>
             <button type="button" @click=${() => this.emit("analyse")} ?disabled=${this.busy}>
               ${this.busy ? "Analysing…" : "Analyse recording again"}
             </button>
+          </div>
+          <div class="analysis-retry">
+            <p>Record another run using the same entities and settings. Previous recordings are kept and all runs are analysed together.</p>
+            <button type="button" @click=${() => this.emit("record-more")} ?disabled=${this.busy}>Record more</button>
           </div>
         ` : nothing}
       </section>
     `;
   }
 
+  private analysisExplanation(composite: boolean, feature?: string) {
+    if (composite) {
+      return "PowerCalc combined recorded runtime activity signals with battery-level charging data. It checked the profile against whole episodes or a recording not used for fitting. Per-activity errors and energy estimates are available in analyser.json.";
+    }
+    if (feature) {
+      return html`PowerCalc analysed how the measured power changed for each value of <code>${this.analysisFeature(feature)}</code>. This creates a profile that can estimate power from that entity data.`;
+    }
+    return "PowerCalc compared the measured power with changes in the recorded entity states to create a suitable power profile.";
+  }
+
   private analysisResult(result: string): string {
+    if (result === "Composite vacuum profile created") return "A composite vacuum profile was created.";
     if (result === "Fixed power profile created") return "A fixed power profile was created.";
     return result === "Fixed states_power model created" || result === "Fixed states_power profile created"
       ? "A state-based power profile was created."
       : result;
-  }
-
-  private analysisDetailLabel(label: string): string {
-    if (label === "Analysed feature") return "Model input";
-    if (label === "Validation MAE") return "Typical difference";
-    if (label === "Validation coverage") return "Data coverage";
-    return label;
-  }
-
-  private analysisDetailHelp(label: string): string | undefined {
-    if (label === "Analysed feature") {
-      return "The Home Assistant entity data that best explained the measured power changes. The generated profile will use this as its input.";
-    }
-    if (label === "Validation MAE") {
-      return "How closely the profile matched measurement samples it had not used to learn. This is the typical difference in watts; lower is better.";
-    }
-    if (label === "Validation coverage") {
-      return "The share of those measurement samples for which the profile could estimate power. 100% means every sample was covered.";
-    }
-    return undefined;
   }
 
   private analysisFeature(feature: string): string {
@@ -409,7 +435,7 @@ export class ResultView extends LitElement {
     return this.summaryEntries().length ? COMPLETED_WITH_READOUT : COMPLETED;
   }
 
-  private emit(name: "sessions" | "new" | "resume" | "analyse" | "prepare"): void {
+  private emit(name: "sessions" | "new" | "resume" | "analyse" | "record-more" | "prepare"): void {
     emit(this, name);
   }
 }

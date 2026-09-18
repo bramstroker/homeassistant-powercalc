@@ -66,7 +66,7 @@ class MeasureDeviceCatalog:
     ) -> None:
         self._loader = loader or _cached_full_library
 
-    def devices(self) -> tuple[str, ...]:
+    def devices(self) -> list[str]:
         try:
             return extract_measure_devices(self._loader())
         except Exception as error:
@@ -79,7 +79,7 @@ class ManufacturerCatalog:
     def __init__(self, *, loader: LibraryLoader | None = None) -> None:
         self._loader = loader or _cached_library
 
-    def manufacturers(self) -> tuple[str, ...]:
+    def manufacturers(self) -> list[str]:
         try:
             return extract_manufacturers(self._loader())
         except Exception as error:
@@ -99,7 +99,7 @@ class DeviceSpecificationCatalog:
     def __init__(self, *, loader: LibraryLoader | None = None) -> None:
         self._loader = loader or _cached_model_schema
 
-    def fields(self) -> dict[str, tuple[DeviceSpecField, ...]]:
+    def fields(self) -> dict[str, list[DeviceSpecField]]:
         try:
             schema = self._loader()
             if not isinstance(schema, dict):
@@ -109,7 +109,7 @@ class DeviceSpecificationCatalog:
             raise LibraryCatalogError("Could not load device specifications from model_schema.json") from error
 
 
-def extract_manufacturers(library: object) -> tuple[str, ...]:
+def extract_manufacturers(library: object) -> list[str]:
     manufacturers = _manufacturer_entries(library)
     names: dict[str, str] = {}
     for manufacturer in manufacturers:
@@ -117,7 +117,7 @@ def extract_manufacturers(library: object) -> tuple[str, ...]:
         if not isinstance(value, str) or not (name := value.strip()):
             continue
         names.setdefault(name.casefold(), name)
-    return tuple(sorted(names.values(), key=str.casefold))
+    return sorted(names.values(), key=str.casefold)
 
 
 def resolve_manufacturer_name(library: object, value: str) -> str:
@@ -155,14 +155,14 @@ def _canonical_manufacturer_name(manufacturer: dict[str, object]) -> str | None:
     return value.strip() or None if isinstance(value, str) else None
 
 
-def _manufacturer_aliases(manufacturer: dict[str, object]) -> tuple[str, ...]:
+def _manufacturer_aliases(manufacturer: dict[str, object]) -> list[str]:
     values = manufacturer.get("aliases")
     if not isinstance(values, list):
-        return ()
-    return tuple(alias for value in values if isinstance(value, str) and (alias := value.strip()))
+        return []
+    return [alias for value in values if isinstance(value, str) and (alias := value.strip())]
 
 
-def extract_measure_devices(library: object) -> tuple[str, ...]:
+def extract_measure_devices(library: object) -> list[str]:
     manufacturers = _manufacturer_entries(library)
 
     devices: dict[str, str] = {}
@@ -180,7 +180,7 @@ def extract_measure_devices(library: object) -> tuple[str, ...]:
             key = name.casefold()
             if name and key not in _NON_DEVICE_VALUES:
                 devices.setdefault(key, name)
-    return tuple(sorted(devices.values(), key=str.casefold))
+    return sorted(devices.values(), key=str.casefold)
 
 
 def _manufacturer_entries(library: object) -> list[dict[str, object]]:

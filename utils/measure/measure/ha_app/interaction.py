@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 
-from measure.execution import OperatingPoint, RunInteraction
 from measure.ha_app.session import SessionControl
+from measure.runner.interaction import OperatingPoint, RunInteraction
 
 
 class SessionInteraction(RunInteraction):

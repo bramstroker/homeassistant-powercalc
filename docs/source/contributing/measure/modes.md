@@ -94,7 +94,7 @@ Examples:
 Use `Recorder` to capture an open-ended power time series. In the Home Assistant app, first choose what the recording is for:
 
 - **A Playbook CSV** writes the existing headerless `elapsed time,power` format used by the [Playbook strategy](../../strategies/playbook.md).
-- **Data for a complex power profile (experimental)** records power together with the state and complete attributes of selected Home Assistant entities. After recording, the analyser can create a fixed `states_power` profile when one state or scalar attribute clearly explains the measured power. Composite models are not supported yet, so this workflow is not feature complete.
+- **Data for a complex power profile (experimental)** records power together with the state and complete attributes of selected Home Assistant entities. Generic devices can produce fixed profiles from one state or scalar attribute. The vacuum recipe can produce activity-based composite profiles with battery charging calibration when repeated episodes provide sufficient evidence.
 
 The CLI always creates a Playbook CSV and stops when you press `CTRL+C`. The app stops the recorder from the running-session screen.
 
@@ -109,7 +109,7 @@ This is useful for:
 
 Choose **Generic device** to track one or more entities from any Home Assistant domain.
 
-Choose **Robot vacuum** for a guided recording. Select the `vacuum` entity and its battery percentage sensor. The battery sensor must belong to the same Home Assistant device; the app selects it automatically when exactly one usable sensor is available. You can add other entities, including dock controls or status sensors, without having them selected automatically.
+Choose **Robot vacuum** for a guided recording. Select the `vacuum` entity and its battery percentage sensor. The battery sensor must belong to the same Home Assistant device; the app selects it automatically when exactly one usable sensor is available. Available same-device entities are captured automatically; review the selection and add separate dock entities if needed. See [Recording a vacuum and dock](home-assistant-app.md#recording-a-vacuum-and-dock) for analysis requirements and limits.
 
 Measure the complete dock or base station at the wall outlet. Start with a low battery and capture charging, idle, and cleaning. Also capture washing, drying, and dust-emptying when the dock supports those operations.
 
@@ -120,7 +120,7 @@ Complex recordings use JSON Lines (`.jsonl`). The first record describes the rec
 {"record_type":"sample","elapsed_seconds":0.0,"power":4.2,"entities":{"vacuum.robot":{"state":"cleaning","attributes":{"battery_level":42}},"sensor.robot_battery":{"state":"42","attributes":{"unit_of_measurement":"%"}}}}
 ```
 
-Stopping the recording starts analysis automatically. The result always includes `analysis.json`. A `model.json` is added only when the selected feature covers at least 90% of validation samples and improves mean absolute error enough over a constant-power baseline. Each learned value needs at least five recorded samples. If those checks fail, the recording still completes and the result explains that more representative data—or a future composite strategy—is needed.
+Stopping the recording starts analysis automatically. The result includes `analyser.json`. A `model.json` is added only when the candidate covers at least 90% of validation samples and improves mean absolute error enough over a constant-power baseline. Each learned value needs at least five recorded samples. Vacuum analysis additionally holds out whole episodes and checks error and coverage for every activity, so a long idle period cannot hide a bad short dock cycle. If those checks fail, the recording still completes and explains what additional evidence is needed.
 
 Because this includes complete entity attributes, inspect the file for installation-specific or sensitive values before sharing it.
 While recording, the measurement screen shows the latest state of every tracked entity beneath the live power chart. Complete attributes remain in the JSON Lines file rather than the live view.

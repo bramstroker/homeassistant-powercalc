@@ -7,7 +7,7 @@ from measure.controller.charging.const import ATTR_BATTERY_LEVEL
 from measure.controller.charging.errors import BatteryLevelRetrievalError
 from measure.controller.charging.hass import HassChargingController
 from measure.controller.errors import ApiConnectionError
-from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistantManager
 import pytest
 
 

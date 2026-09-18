@@ -5,18 +5,21 @@ from typing import Any, Protocol, cast
 from unittest.mock import MagicMock, patch
 
 from decouple import UndefinedValueError
-from measure.cli.environment import CliEnvironment
-from measure.const import (
-    PROJECT_DIR,
+from measure.cli.const import (
     QUESTION_DUMMY_LOAD,
     QUESTION_GENERATE_MODEL_JSON,
+    QUESTION_GZIP,
     QUESTION_MEASURE_DEVICE,
+    QUESTION_MODE,
     QUESTION_MODEL_ID,
     QUESTION_MODEL_NAME,
+    QUESTION_MULTIPLE_LIGHTS,
+    QUESTION_NUM_LIGHTS,
     QUESTION_SELECTED_MEASURE_TYPE,
 )
+from measure.cli.environment import CliEnvironment
+from measure.const import PROJECT_DIR
 from measure.controller.light.const import LutMode
-from measure.runner.const import QUESTION_GZIP, QUESTION_MODE, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
 import pytest
 
 

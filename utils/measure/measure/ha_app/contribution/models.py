@@ -31,7 +31,7 @@ def supports_automatic_contribution(request: MeasurementRequest) -> bool:
     )
 
 
-def contribution_entity_ids(request: MeasurementRequest) -> tuple[str, ...]:
+def contribution_entity_ids(request: MeasurementRequest) -> list[str]:
     """Return the entities which identify the contributed device.
 
     Recorder analysis intentionally models the first recorded entity. Other recorded
@@ -41,7 +41,7 @@ def contribution_entity_ids(request: MeasurementRequest) -> tuple[str, ...]:
 
     if isinstance(request, RecorderMeasurementRequest):
         return request.recorded_entity_ids[:1]
-    return tuple(request.controlled_entity_ids)
+    return request.controlled_entity_ids
 
 
 class ContributionAuthMethod(StrEnum):
@@ -128,7 +128,12 @@ class DeviceFlowStartResponse(DeviceFlowStart):
     flow_id: str
 
 
-DeviceFlowPollStatus = Literal["pending", "slow_down", "authorized", "expired", "denied"]
+class DeviceFlowPollStatus(StrEnum):
+    PENDING = "pending"
+    SLOW_DOWN = "slow_down"
+    AUTHORIZED = "authorized"
+    EXPIRED = "expired"
+    DENIED = "denied"
 
 
 class DeviceFlowPollResponse(BaseModel):
