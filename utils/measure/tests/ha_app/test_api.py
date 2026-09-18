@@ -33,7 +33,12 @@ from measure.ha_app.contribution.models import (
     DeviceFlowStart,
 )
 from measure.ha_app.contribution.service import SharedContributionService
-from measure.ha_app.coordinator import MeasurementCoordinator, SessionExecutionContext, SessionMeasurementService
+from measure.ha_app.coordinator import (
+    MeasurementCoordinator,
+    SessionConflictError,
+    SessionExecutionContext,
+    SessionMeasurementService,
+)
 from measure.ha_app.library_catalog import (
     DeviceSpecificationCatalog,
     LibraryCatalogError,
@@ -1199,6 +1204,24 @@ def test_preflight_rejects_active_session(tmp_path: Path) -> None:
     response = test_client.post("/api/preflight", json=payload())
 
     assert response.status_code == 409
+
+
+def test_session_start_conflict_after_preflight_returns_http_conflict(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    test_client = client(tmp_path)
+    coordinator = test_client.app.state.context.coordinator
+    message = "A measurement session is already active"
+    start = MagicMock(side_effect=SessionConflictError(message))
+    monkeypatch.setattr(coordinator, "start", start)
+
+    response = test_client.post("/api/sessions", json=payload())
+
+    assert response.status_code == 409
+    assert response.json()["message"] == message
+    start.assert_called_once()
+    assert coordinator.sessions() == []
 
 
 def test_session_lifecycle_and_file_download(tmp_path: Path) -> None:
