@@ -142,15 +142,8 @@ class HueLightController(LightController):
         return app_key
 
     def _load_app_key(self) -> str | None:
-        if not self._config_file_path.exists():
-            return None
-        try:
-            config = json.loads(self._config_file_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as error:
-            raise LightControllerError(f"Could not read Hue bridge configuration: {error}") from error
-        bridge_config = config.get(self._bridge_ip, {})
-        app_key = bridge_config.get("username") if isinstance(bridge_config, dict) else None
-        return str(app_key) if app_key else None
+        config = self._load_bridge_config()
+        return config.get(self._bridge_ip, {}).get("username") or None
 
     def _save_app_key(self, app_key: str) -> None:
         config = self._load_bridge_config()
@@ -170,7 +163,7 @@ class HueLightController(LightController):
         except (OSError, json.JSONDecodeError) as error:
             raise LightControllerError(f"Could not read Hue bridge configuration: {error}") from error
         if not isinstance(loaded, dict):
-            return {}
+            raise LightControllerError("Could not read Hue bridge configuration: expected a JSON object")
         return {
             bridge_ip: {"username": entry["username"]}
             for bridge_ip, entry in loaded.items()

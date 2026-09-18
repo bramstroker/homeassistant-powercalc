@@ -345,7 +345,7 @@ def test_connection_error_is_preserved_when_bridge_cleanup_fails(
     close_bridge.assert_awaited_once()
 
 
-@pytest.mark.parametrize("contents", ["{invalid json", ""])
+@pytest.mark.parametrize("contents", ["{invalid json", "", "[]", "null", '"invalid"', "42"])
 def test_corrupt_registration_file_is_reported(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, contents: str) -> None:
     config = tmp_path / ".python_hue"
     config.write_text(contents, encoding="utf-8")
@@ -398,13 +398,14 @@ def test_registration_save_failure_is_reported(monkeypatch: pytest.MonkeyPatch, 
     assert isinstance(raised.value.__cause__, OSError)
 
 
+@pytest.mark.parametrize("corrupted_contents", ['{"192.0.2.20":', "[]"])
 def test_registration_does_not_overwrite_config_corrupted_during_link_prompt(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
+    corrupted_contents: str,
 ) -> None:
     config = tmp_path / ".python_hue"
     config.write_text("{}", encoding="utf-8")
-    corrupted_contents = '{"192.0.2.20":'
 
     def answer_link_prompt(_message: str) -> str:
         config.write_text(corrupted_contents, encoding="utf-8")
@@ -418,7 +419,8 @@ def test_registration_does_not_overwrite_config_corrupted_during_link_prompt(
         HueLightController("192.0.2.10", config_file_path=config)
 
     registration.assert_awaited_once()
-    assert isinstance(raised.value.__cause__, json.JSONDecodeError)
+    if corrupted_contents != "[]":
+        assert isinstance(raised.value.__cause__, json.JSONDecodeError)
     assert config.read_text(encoding="utf-8") == corrupted_contents
 
 
