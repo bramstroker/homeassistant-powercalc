@@ -233,6 +233,14 @@ def test_recorder_defaults_to_legacy_playbook_recording() -> None:
     assert request.recorded_entity_ids == []
 
 
+@pytest.mark.parametrize("payload", [None, [], "record.jsonl"])
+def test_recorder_rejects_non_object_payloads(payload: object) -> None:
+    with pytest.raises(ValidationError) as error:
+        RecorderMeasurementRequest.model_validate(payload)
+
+    assert error.value.errors()[0]["type"] == "model_type"
+
+
 def test_generic_recorder_preserves_tracked_entity_order() -> None:
     request = RecorderMeasurementRequest(
         power_meter=DummyPowerMeterSpec(),
