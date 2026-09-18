@@ -16,6 +16,7 @@ from measure.request import (
     RecorderProfileRecipe,
     RecorderPurpose,
     parse_measurement_request,
+    validate_export_filename,
 )
 from pydantic import ValidationError
 import pytest
@@ -405,3 +406,32 @@ def test_manual_power_meter_allows_coarser_ct_grid(power_meter: dict[str, str], 
 
 def test_parameter_limits_cover_exactly_the_validated_fields() -> None:
     assert set(_BASE_PARAMETER_FIELDS) | set(_LIGHT_PARAMETER_FIELDS) == set(PARAMETER_LIMITS)
+
+
+def test_reused_dummy_load_description_is_trimmed_and_required() -> None:
+    assert DummyLoadReuseRequest(description="  Calibration bulb  ", resistance=529).description == "Calibration bulb"
+    with pytest.raises(ValidationError, match="dummy-load description is required"):
+        DummyLoadReuseRequest(description="   ", resistance=529)
+
+
+def test_light_request_rejects_white_mode_as_an_unsupported_measurement_mode() -> None:
+    with pytest.raises(ValidationError, match="Unsupported measurement modes: white"):
+        LightMeasurementRequest.model_validate(valid_request() | {"modes": {LutMode.WHITE}})
+
+
+@pytest.mark.parametrize(
+    "filename", ["", " ", ".", "..", "../record.csv", "/record.csv", "folder/record.csv", "folder\\record.csv"]
+)
+def test_export_filename_rejects_directory_components(filename: str) -> None:
+    with pytest.raises(ValueError, match="file name without directory components"):
+        validate_export_filename(filename)
+
+
+@pytest.mark.parametrize("filename", ["record?.csv", "record:1.csv", "record\n.csv", "record*.csv"])
+def test_export_filename_rejects_unsafe_characters(filename: str) -> None:
+    with pytest.raises(ValueError, match="contains unsafe characters"):
+        validate_export_filename(filename)
+
+
+def test_export_filename_preserves_safe_basename_and_trims_whitespace() -> None:
+    assert validate_export_filename("  Record (run-1)+2.csv  ") == "Record (run-1)+2.csv"

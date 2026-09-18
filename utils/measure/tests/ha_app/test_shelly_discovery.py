@@ -256,6 +256,47 @@ def test_duplicate_advertisements_are_probed_once() -> None:
     assert http_get.call_count == 2
 
 
+@pytest.mark.parametrize(
+    "advertisement",
+    [
+        {"name": "shelly-test", "ip_addresses": ["192.168.1.30"]},
+        {"type": "_shelly._tcp.local.", "name": None, "ip_addresses": ["192.168.1.30"]},
+        {"type": "_shelly._tcp.local.", "name": "shelly-test", "ip_addresses": None},
+        {"type": "_shelly._tcp.local.", "name": "shelly-test", "ip_addresses": [None, 42]},
+    ],
+)
+def test_malformed_advertisements_are_ignored_without_probing(advertisement: dict[str, object]) -> None:
+    home_assistant = FakeHomeAssistant([advertisement])
+    http_get = MagicMock()
+
+    result = asyncio.run(ShellyDiscoveryService(home_assistant, http_get=http_get).discover())  # type: ignore[arg-type]
+
+    assert result.available is True
+    assert result.devices == []
+    http_get.assert_not_called()
+
+
+def test_discovery_prefers_ipv4_even_after_invalid_and_ipv6_addresses() -> None:
+    home_assistant = FakeHomeAssistant(
+        [
+            service("shelly-test", "_shelly._tcp.local.", ["invalid-address", "fe80::1", "192.168.1.30"]),
+        ]
+    )
+    http_get = response_map(
+        {
+            "http://192.168.1.30/shelly": FakeResponse({"id": "shelly-test", "gen": 2}),
+            "http://192.168.1.30/rpc/Shelly.GetStatus": FakeResponse({"switch:0": {"apower": 1.0}}),
+        }
+    )
+
+    result = asyncio.run(ShellyDiscoveryService(home_assistant, http_get=http_get).discover())  # type: ignore[arg-type]
+
+    assert len(result.devices) == 1
+    assert result.devices[0].ip_address == "192.168.1.30"
+    assert result.devices[0].supported is True
+    assert http_get.call_count == 2
+
+
 def test_unreachable_device_is_visible_but_disabled() -> None:
     home_assistant = FakeHomeAssistant((service("shelly-offline", "_shelly._tcp.local.", ["192.168.1.40"]),))
     http_get = response_map({"http://192.168.1.40/shelly": requests.ConnectionError("offline")})
