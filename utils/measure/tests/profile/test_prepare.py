@@ -388,6 +388,31 @@ def test_preparer_generates_new_manufacturer_manifest_without_adding_aliases(tmp
     assert json.loads(contents["profile_library/acme/manufacturer.json"]) == {"name": "Acme", "aliases": []}
 
 
+def test_preparer_can_prepare_contribution_without_a_local_library(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    schema = tmp_path / "model_schema.json"
+    schema.write_text("{}", encoding="utf-8")
+    missing_library = tmp_path / "missing-library"
+    preparer = ProfilePreparer(library_root=missing_library, model_schema_path=schema)
+    contribution_metadata = metadata("Acme")
+
+    preview = preparer.prepare(artifacts, contribution_metadata)
+    contents = {file.path: file.content for file in preparer.render_contents(artifacts, contribution_metadata, preview)}
+
+    assert preview.manufacturer_library_url is None
+    assert preview.warnings == ()
+    assert set(contents) == {
+        "profile_library/acme/manufacturer.json",
+        "profile_library/acme/LCT999/model.json",
+        "profile_library/acme/LCT999/brightness.csv.gz",
+    }
+    assert json.loads(contents["profile_library/acme/manufacturer.json"]) == {"name": "Acme", "aliases": []}
+    assert json.loads(contents["profile_library/acme/LCT999/model.json"])["name"] == "New lamp"
+    assert not missing_library.exists()
+    assert (artifacts / "model.json").exists()
+
+
 def test_preparer_allows_generated_linear_profile_without_csv(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
     write_library(tmp_path)
