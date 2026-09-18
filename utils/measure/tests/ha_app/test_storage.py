@@ -35,6 +35,87 @@ def snapshot(state: SessionState = SessionState.READY) -> SessionSnapshot:
     return SessionSnapshot(id="a1b2-c3d4", state=state, created_at=now, updated_at=now)
 
 
+@pytest.mark.parametrize("session_id", ["", "../outside", "nested/session", "session.json"])
+def test_storage_rejects_unsafe_session_ids(tmp_path: Path, session_id: str) -> None:
+    storage = SessionStorage(tmp_path)
+
+    with pytest.raises(ValueError, match="Invalid session id"):
+        storage.session_directory(session_id)
+
+    assert list(storage.sessions_root.iterdir()) == []
+
+
+@pytest.mark.parametrize("contents", ["not json", "[]", "{}"])
+def test_clear_current_removes_corrupt_pointer(tmp_path: Path, contents: str) -> None:
+    storage = SessionStorage(tmp_path)
+    pointer = tmp_path / "current.json"
+    pointer.write_text(contents, encoding="utf-8")
+
+    storage.clear_current("a1b2-c3d4")
+
+    assert not pointer.exists()
+
+
+def test_clear_current_preserves_pointer_to_another_session(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot(SessionState.COMPLETED)
+    storage.create(current, light_request())
+
+    storage.clear_current("other-session")
+
+    assert storage.load_current() == current
+
+
+def test_snapshot_id_must_match_session_directory(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    directory = storage.create(snapshot(), light_request())
+    state_path = directory / "state.json"
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    state["id"] = "other-session"
+    state_path.write_text(json.dumps(state), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Session state id does not match its directory"):
+        storage.load_snapshot("a1b2-c3d4")
+
+
+def test_session_listing_ignores_files_and_symbolic_links(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot()
+    directory = storage.create(current, light_request())
+    (storage.sessions_root / "notes.txt").write_text("notes", encoding="utf-8")
+    (storage.sessions_root / "linked-session").symlink_to(directory, target_is_directory=True)
+
+    assert storage.list_sessions() == [current]
+
+
+def test_missing_session_has_no_outputs_or_resume_data(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+
+    assert storage.list_files("missing-session") == []
+    assert not storage.can_resume("missing-session")
+    with pytest.raises(FileNotFoundError):
+        storage.session_size("missing-session")
+
+
+def test_light_session_cannot_be_analysed_as_a_recording(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    storage.create(snapshot(), light_request())
+
+    assert not storage.can_analyse("a1b2-c3d4")
+
+
+def test_measurement_only_recording_cannot_resume_or_be_analysed(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    storage.create(snapshot(), request)
+    output = storage.artifact_directory("a1b2-c3d4", request.model_id)
+    output.mkdir()
+    (output / request.export_filename).write_text("recording", encoding="utf-8")
+
+    assert not storage.can_resume("a1b2-c3d4")
+    assert not storage.can_analyse("a1b2-c3d4")
+
+
 def test_storage_round_trips_current_session(tmp_path: Path) -> None:
     storage = SessionStorage(tmp_path)
     storage.create(snapshot(), light_request())
