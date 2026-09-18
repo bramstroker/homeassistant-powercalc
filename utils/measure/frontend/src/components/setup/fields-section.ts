@@ -29,6 +29,7 @@ import {
   selectedOptions,
   selectValue,
   visible,
+  vacuumRecordingEntityIds,
   type FieldState,
 } from "./options";
 import "./tuning-section";
@@ -288,17 +289,21 @@ export class SetupFieldsSection extends LitElement {
   }
 
   private renderMultiEntity(field: FormField, entities: EntityDescriptor[]) {
-    if (this.definition?.measure_type === "light" && field.role === "controller") {
-      return html`<measure-combobox
+    const vacuumAdditional = this.definition?.measure_type === "recorder" && field.name === "additional_entity_ids";
+    if ((this.definition?.measure_type === "light" && field.role === "controller") || vacuumAdditional) {
+      const selected = this.fieldState ? selectedEntityIds(field, this.fieldState) : [];
+      return html`<div class="field-block"><measure-combobox
         name=${field.name}
         label=${field.plural_label || field.label}
-        .value=${this.fieldState ? selectedEntityIds(field, this.fieldState) : []}
+        .value=${selected}
         .options=${entities.map((entity) => ({ value: entity.entity_id, label: `${entity.name} · ${entity.entity_id}` }))}
-        placeholder="Select lights"
+        placeholder=${vacuumAdditional ? "Select additional entities" : "Select lights"}
         ?required=${field.required}
         multiple
         @combobox-change=${(event: CustomEvent<{ value: string[] }>) => this.changeEntities(field.name, event.detail.value)}
-      ></measure-combobox>`;
+      ></measure-combobox>
+      ${vacuumAdditional ? this.renderVacuumRecordingHelp(selected.length) : nothing}
+      </div>`;
     }
     return renderEntityList({
       field,
@@ -306,6 +311,18 @@ export class SetupFieldsSection extends LitElement {
       rows: this.fieldState ? entityRows(field, this.fieldState) : [],
       onChange: (rows) => this.changeEntities(field.name, rows),
     });
+  }
+
+  private renderVacuumRecordingHelp(selectedCount: number) {
+    const vacuumField = this.definition?.fields.find((field) => field.name === "vacuum_entity_id");
+    const vacuumId = vacuumField && this.fieldState ? selectedEntityId(vacuumField, this.fieldState) : "";
+    const entities = this.deviceEntities["*"] ?? [];
+    const deviceId = entities.find((entity) => entity.entity_id === vacuumId)?.device_id;
+    const disabled = deviceId
+      ? entities.filter((entity) => entity.device_id === deviceId && entity.disabled_by).length
+      : 0;
+    const disabledHint = disabled ? `${disabled} disabled entities are listed in recording metadata only.` : "";
+    return html`<p class="muted">${selectedCount} additional entities selected. Available device entities are selected by default; you can remove them or add dock entities. Camera and image entities are not selected automatically. ${disabledHint}</p>`;
   }
 
   private fieldDomains(field: FormField): string[] {
@@ -339,7 +356,13 @@ export class SetupFieldsSection extends LitElement {
     const select = event.currentTarget as HTMLInputElement;
     this.changeEntities(select.name, [select.value]);
     for (const dependent of this.definition?.fields.filter((field) => field.related_to === select.name) ?? []) {
-      this.changeEntities(dependent.name, []);
+      this.changeEntities(dependent.name, dependent.name === "additional_entity_ids"
+        ? vacuumRecordingEntityIds(this.deviceEntities["*"] ?? [], select.value)
+        : []);
+    }
+    if (select.name === "battery_entity_id" && this.fieldState) {
+      const additional = this.definition?.fields.find((field) => field.name === "additional_entity_ids");
+      if (additional) this.changeEntities(additional.name, selectedEntityIds(additional, this.fieldState).filter((id) => id !== select.value));
     }
   };
 

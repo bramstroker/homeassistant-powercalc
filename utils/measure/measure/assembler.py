@@ -1,6 +1,7 @@
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
+from measure.analyser.service import analysis_context_for
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.dummy import DummyChargingController
 from measure.controller.charging.hass import HassChargingController
@@ -35,6 +36,7 @@ from measure.execution import (
     RunInteraction,
 )
 from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant_entities import HomeAssistantEntityCatalog
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.hass import HassPowerMeter
@@ -202,7 +204,12 @@ class MeasurementAssembler:
             return SpeakerRunner(measure_util, parameters, media_controller, interaction)
         if isinstance(request, RecorderMeasurementRequest):
             state_reader = self._recorder_state_reader() if request.recorded_entity_ids else None
-            return RecorderRunner(measure_util, interaction, state_reader)
+            context = (
+                analysis_context_for(request, HomeAssistantEntityCatalog(self._home_assistant()).load_snapshot().all())
+                if request.recorded_entity_ids
+                else None
+            )
+            return RecorderRunner(measure_util, interaction, state_reader, context)
         if isinstance(request, AverageMeasurementRequest):
             return AverageRunner(measure_util, interaction=interaction)
         if isinstance(request, ChargingMeasurementRequest):
@@ -225,14 +232,11 @@ class MeasurementAssembler:
             # One dump per sample. `get_state` has no single-entity WebSocket command
             # behind it, so asking per entity refetches every state in Home Assistant.
             wanted = set(entity_ids)
-            states = {
+            return {
                 state.entity_id: RecorderEntityState(state=str(state.state), attributes=state.attributes)
                 for state in home_assistant.get_states()
                 if state.entity_id in wanted
             }
-            if missing := sorted(wanted - states.keys()):
-                raise ValueError(f"Entities not found in Home Assistant: {', '.join(missing)}")
-            return states
 
         return read
 

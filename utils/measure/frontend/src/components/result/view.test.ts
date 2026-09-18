@@ -170,7 +170,43 @@ describe("result view", () => {
     expect(details?.textContent).toContain("Typical difference");
     expect(details?.textContent).toContain("Data coverage");
     expect(details?.querySelectorAll(".analysis-help")).toHaveLength(3);
+    expect(details?.querySelector('[aria-label^="Typical difference:"]')?.getAttribute("title"))
+      .toContain("typical difference in watts; lower is better");
     expect(element.shadowRoot.querySelector('.notice[role="status"]')?.textContent).toContain("warning");
+  });
+
+  it("explains multi-input vacuum profiles and independent validation", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "completed",
+      summary: {
+        "Samples recorded": "142",
+        "Recording analysis": "Composite vacuum profile created",
+        "Analysed inputs": "sensor.activity.state, sensor.battery.state",
+        "Validation MAE": "0.20 W",
+        "Validation coverage": "100%",
+        "Validation method": "held_out_episodes",
+        "Recorded activities": "washing, drying, charging, sleeping",
+      },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+    const analysis = element.shadowRoot.querySelector(".analysis-panel");
+    expect(analysis?.textContent).toContain("A composite vacuum profile was created.");
+    expect(analysis?.textContent).toContain("whole episodes");
+    expect(analysis?.textContent).toContain("analyser.json");
+    expect(analysis?.textContent).toContain("Model inputs");
+    expect(analysis?.textContent).toContain("held_out_episodes");
+    expect(analysis?.textContent).toContain("washing, drying, charging, sleeping");
+    expect(analysis?.querySelectorAll(".analysis-help")).toHaveLength(5);
+    expect(analysis?.querySelector('[aria-label^="Model inputs:"]')?.getAttribute("title"))
+      .toContain("Enabled settings do not indicate active washing or drying");
+    expect(analysis?.querySelector('[aria-label^="Validation method:"]')?.getAttribute("title"))
+      .toContain("Whole activity episodes or a separate recording");
+    const measurement = element.shadowRoot.querySelector('[aria-label="Measurement result"]');
+    expect(measurement?.textContent).not.toContain("held_out_episodes");
   });
 
   it("can run the analyser again without starting a new measurement", async () => {

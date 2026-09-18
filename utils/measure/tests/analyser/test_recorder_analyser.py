@@ -6,6 +6,7 @@ from measure.analyser.fixed import FixedStatesPowerStrategy
 from measure.analyser.models import (
     AnalysisContext,
     AnalysisMetrics,
+    EvaluatedCandidate,
     FeatureReference,
     ModelConfigFragment,
     RecordedEntity,
@@ -16,6 +17,7 @@ from measure.analyser.models import (
 )
 from measure.analyser.recording import load_recording
 from measure.analyser.service import RecorderAnalyser, _credibility_reason, _select_candidate, analysis_context_for
+from measure.home_assistant_entities import EntityDescriptor
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, RecorderPurpose
 import pytest
@@ -24,7 +26,7 @@ CONTEXT = AnalysisContext(
     recipe="generic",
     primary_entity_id="switch.device",
     device_type="generic_iot",
-    entities=(RecordedEntity("switch.device", "switch", "primary"),),
+    entities=[RecordedEntity("switch.device", "switch", "primary")],
 )
 
 
@@ -48,7 +50,7 @@ RECORDER_REGRESSION_CASES = (
             recipe="generic",
             primary_entity_id="media_player.kpn_diw7022",
             device_type="generic_iot",
-            entities=(RecordedEntity("media_player.kpn_diw7022", "media_player", "primary"),),
+            entities=[RecordedEntity("media_player.kpn_diw7022", "media_player", "primary")],
         ),
         strategy="fixed_states_power",
         feature=FeatureReference("media_player.kpn_diw7022", "state"),
@@ -118,6 +120,65 @@ def test_real_world_recorder_regressions(case: RecorderRegressionCase) -> None:
     assert result.metrics.coverage == pytest.approx(case.validation_coverage)
 
 
+def test_vacuum_context_records_selected_metadata_and_complete_device_inventory() -> None:
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id="vacuum.robot",
+        battery_entity_id="sensor.battery",
+        additional_entity_ids=("sensor.state",),
+    )
+    descriptors = [
+        EntityDescriptor(
+            entity_id="vacuum.robot",
+            name="Robot",
+            domain="vacuum",
+            device_id="robot",
+            state="docked",
+            attribute_names=[],
+            integration="dreame_vacuum",
+        ),
+        EntityDescriptor(
+            entity_id="sensor.state",
+            name="State",
+            domain="sensor",
+            device_id="robot",
+            state="idle",
+            attribute_names=[],
+            translation_key="state",
+            integration="dreame_vacuum",
+        ),
+        EntityDescriptor(
+            entity_id="sensor.disabled",
+            name="Disabled",
+            domain="sensor",
+            device_id="robot",
+            state="unavailable",
+            attribute_names=[],
+            disabled_by="integration",
+            has_live_state=False,
+        ),
+        EntityDescriptor(
+            entity_id="sensor.unrelated",
+            name="Other",
+            domain="sensor",
+            device_id="other",
+            state="idle",
+            attribute_names=[],
+        ),
+    ]
+    context = analysis_context_for(request, descriptors)
+    assert context.entities[2].translation_key == "state"
+    assert context.entities[2].integration == "dreame_vacuum"
+    assert context.entities[1].role == "battery"
+    inventory = context.metadata_record()["device_entities"]
+    assert [entity["entity_id"] for entity in inventory] == ["vacuum.robot", "sensor.state", "sensor.disabled"]
+    assert inventory[2]["role"] == "disabled"
+    assert inventory[2]["has_live_state"] is False
+    assert inventory[2]["disabled_by"] == "integration"
+
+
 def test_load_recording_accepts_typed_and_legacy_samples_and_reports_bad_lines(tmp_path: Path) -> None:
     path = tmp_path / "record.jsonl"
     write_recording(path, [sample(0, 1.2, "idle")])
@@ -128,14 +189,14 @@ def test_load_recording_accepts_typed_and_legacy_samples_and_reports_bad_lines(t
     loaded = load_recording(path)
 
     assert loaded.dataset.metadata is not None
-    assert loaded.dataset.samples == (sample(0, 1.2, "idle"),)
+    assert loaded.dataset.samples == [sample(0, 1.2, "idle")]
     assert len(loaded.warnings) == 1
     assert "Skipped 2 invalid recorder line(s)" in loaded.warnings[0]
     assert "line 3" in loaded.warnings[0]
 
     legacy = tmp_path / "legacy.jsonl"
     write_recording(legacy, [sample(1, 2.3, "active")], typed=False)
-    assert load_recording(legacy).dataset.samples == (sample(1, 2.3, "active"),)
+    assert load_recording(legacy).dataset.samples == [sample(1, 2.3, "active")]
 
 
 @pytest.mark.parametrize(
@@ -157,7 +218,7 @@ def test_load_recording_skips_unsupported_and_invalid_records(tmp_path: Path, re
 
     loaded = load_recording(path)
 
-    assert loaded.dataset.samples == ()
+    assert loaded.dataset.samples == []
     assert len(loaded.warnings) == (0 if record == {"record_type": "future"} else 1)
 
 
@@ -223,11 +284,23 @@ def test_recorded_entity_and_analysis_result_include_optional_evidence() -> None
         status="insufficient_data",
         sample_count=3,
         reason="more data",
-        warnings=("bad line",),
+        warnings=["bad line"],
     )
 
     assert entity.to_dict()["translation_key"] == "plug"
     assert result.to_dict()["warnings"] == ["bad line"]
+
+
+def test_analysis_results_do_not_share_default_collections() -> None:
+    first = RecorderAnalysisResult("insufficient_data", 0)
+    second = RecorderAnalysisResult("insufficient_data", 0)
+
+    first.warnings.append("Skipped an invalid sample")
+    first.features.append(FeatureReference("switch.device", "state"))
+
+    assert second.warnings == []
+    assert second.features == []
+    assert second.to_dict() == {"schema_version": 1, "status": "insufficient_data", "sample_count": 0}
 
 
 def test_analyser_selects_scalar_attribute_when_state_is_constant(tmp_path: Path) -> None:
@@ -408,12 +481,18 @@ def test_selector_only_prefers_complex_candidate_for_material_error_improvement(
     complex_candidate = _Candidate(3)
     base = AnalysisMetrics(20, 4, 1, 1.0, 1.0, 5)
 
-    selected, _ = _select_candidate([(complex_candidate, AnalysisMetrics(20, 4, 1, 0.95, 1, 5)), (simple, base)])
-    assert selected is simple
+    selected = _select_candidate(
+        [EvaluatedCandidate(complex_candidate, AnalysisMetrics(20, 4, 1, 0.95, 1, 5)), EvaluatedCandidate(simple, base)]
+    )
+    assert selected.candidate is simple
 
-    selected, _ = _select_candidate([(simple, base), (complex_candidate, AnalysisMetrics(20, 4, 1, 0.8, 1, 5))])
-    assert selected is complex_candidate
+    selected = _select_candidate(
+        [EvaluatedCandidate(simple, base), EvaluatedCandidate(complex_candidate, AnalysisMetrics(20, 4, 1, 0.8, 1, 5))]
+    )
+    assert selected.candidate is complex_candidate
 
     equal_complexity = _Candidate(2)
-    selected, _ = _select_candidate([(simple, base), (equal_complexity, AnalysisMetrics(20, 4, 1, 0.9, 1, 5))])
-    assert selected is equal_complexity
+    selected = _select_candidate(
+        [EvaluatedCandidate(simple, base), EvaluatedCandidate(equal_complexity, AnalysisMetrics(20, 4, 1, 0.9, 1, 5))]
+    )
+    assert selected.candidate is equal_complexity

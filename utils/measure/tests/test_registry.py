@@ -49,9 +49,10 @@ def test_recorder_definition_starts_with_purpose_and_declares_vacuum_relationshi
     assert [option.value for option in fields["recorder_purpose"].options] == ["playbook", "complex_profile"]
     complex_profile = fields["recorder_purpose"].options[1]
     assert "experimental" in complex_profile.label
-    assert "not feature complete" in (complex_profile.description or "")
+    assert "activity-based composite profiles" in (complex_profile.description or "")
+    assert "two independent episodes" in (complex_profile.description or "")
     assert "can create a fixed" in (complex_profile.description or "")
-    assert "Composite models are not supported yet" in (complex_profile.description or "")
+    assert "battery charging calibration" in (complex_profile.description or "")
     assert "at least five samples" in (complex_profile.description or "")
     assert [option.value for option in fields["profile_recipe"].options] == ["generic", "vacuum_robot"]
     assert fields["tracked_entity_ids"].multiple is True

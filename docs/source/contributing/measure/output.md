@@ -16,7 +16,7 @@ The result page shows the measured summary, available plots, and generated files
 Some measurement types only produce a value or a recording:
 
 - **Average** shows the measured average power. Use this value when creating a fixed-power profile or configuring Powercalc manually.
-- **Recorder** produces either a headerless two-column Playbook CSV or an experimental complex-profile JSON Lines (`.jsonl`) recording. A complex recording also produces `analysis.json`; when one state or scalar attribute credibly explains the power, it produces a fixed `states_power` `model.json`. The source recording is retained when there is not enough evidence, and composite model generation is not supported yet.
+- **Recorder** produces either a headerless two-column Playbook CSV or an experimental complex-profile JSON Lines (`.jsonl`) recording. A complex recording also produces `analyser.json`; accepted candidates produce `model.json`. The generic recipe fits fixed profiles, while the vacuum recipe fits measured activity branches and a battery charging curve. The source recording is retained when there is not enough evidence.
 
 ## Find CLI output
 
@@ -45,8 +45,8 @@ Lookup-table measurements can create CSV files for brightness, color temperature
 Experimental complex-profile recorder sessions keep three distinct artifacts:
 
 - `record.jsonl` is the original typed metadata and sample stream;
-- `analysis.json` records the winning strategy and validation evidence, or why no model was created;
-- `model.json` is present only when the analyser accepts a fixed `states_power` candidate.
+- `analyser.json` records the winning strategy and validation evidence, or why no model was created; vacuum reports include per-activity coverage, errors, and energy estimates;
+- `model.json` is present only when the analyser accepts a fixed or vacuum composite candidate.
 
 When model generation is enabled, `model.json` contains available metadata such as:
 

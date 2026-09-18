@@ -51,7 +51,7 @@ class ActiveSessionError(PreflightError):
 class EntityRecord(Protocol):
     entity_id: str
     domain: str
-    device_class: DeviceClass | None
+    device_class: str | None
     device_id: str | None
     state: str
     attribute_names: list[str]
@@ -61,6 +61,8 @@ class EntityRecord(Protocol):
     max_mired: int | None
     model_id: str | None
     member_entity_ids: list[str]
+    disabled_by: str | None
+    has_live_state: bool
 
 
 EntityLoader = Callable[[EntityDomain | None, DeviceClass | None], Sequence[EntityRecord]]
@@ -318,6 +320,12 @@ class MeasurementPreflight:
         all_entities = {entity.entity_id: entity for entity in self._load_all_entities()}
         if missing := [entity_id for entity_id in request.recorded_entity_ids if entity_id not in all_entities]:
             raise PreflightError(f"Selected recorder entity does not exist: {missing[0]}")
+        if disabled := [entity_id for entity_id in request.recorded_entity_ids if all_entities[entity_id].disabled_by]:
+            raise PreflightError(f"Selected recorder entity is disabled: {disabled[0]}")
+        if no_state := [
+            entity_id for entity_id in request.recorded_entity_ids if not all_entities[entity_id].has_live_state
+        ]:
+            raise PreflightError(f"Selected recorder entity has no live state: {no_state[0]}")
 
         if request.profile_recipe != RecorderProfileRecipe.VACUUM_ROBOT:
             return PreflightResult()
