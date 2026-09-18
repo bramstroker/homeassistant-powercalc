@@ -6,7 +6,7 @@ from jsonschema import validate
 from measure.cancellation import MeasurementCancelledError
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
-from measure.execution import DummyLoadPreparation, MeasurementExecution, PreparedMeasurement
+from measure.execution import DummyLoadPreparation, MeasurementExecution, MeasurementPreparation, PreparedMeasurement
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
@@ -479,3 +479,36 @@ def test_dummy_load_calibration_uses_resumed_value() -> None:
     sampler.take_average_measurement.assert_not_called()
     sampler.set_dummy_load_resistance.assert_called_once_with(456.7)
     calibration_store.save.assert_not_called()
+
+
+@pytest.mark.parametrize("generate_model, exports", [(True, False), (False, True)])
+def test_execution_requires_output_directory_before_running(generate_model: bool, exports: bool) -> None:
+    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), generate_model=generate_model)
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.writes_export_files.return_value = exports
+    preparation = MagicMock(spec=MeasurementPreparation)
+    prepared = PreparedMeasurement(request=request, runner=runner, preparations=[preparation])
+
+    with pytest.raises(ValueError, match="output directory is required"):
+        MeasurementExecution(measurement=prepared, output_directory=None).run()
+
+    preparation.run.assert_not_called()
+    runner.run.assert_not_called()
+    runner.measure_standby_power.assert_not_called()
+
+
+def test_execution_cleans_up_after_preparation_failure(tmp_path: Path) -> None:
+    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.writes_export_files.return_value = False
+    preparation = MagicMock(spec=MeasurementPreparation)
+    failure = OSError("Calibration device disconnected")
+    preparation.run.side_effect = failure
+    prepared = PreparedMeasurement(request=request, runner=runner, preparations=[preparation])
+
+    with pytest.raises(OSError, match="Calibration device disconnected") as error:
+        MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
+
+    assert error.value is failure
+    runner.run.assert_not_called()
+    runner.cleanup.assert_called_once_with()

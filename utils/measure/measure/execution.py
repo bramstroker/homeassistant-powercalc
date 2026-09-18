@@ -18,7 +18,7 @@ from measure.request import (
 )
 from measure.runner.interaction import ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.utils.sampling import DummyLoadMeasurementError, PowerSampler
+from measure.utils.sampling import PowerSampler
 
 
 class MeasurementPreparation(Protocol):
@@ -85,8 +85,6 @@ class DummyLoadPreparation(MeasurementPreparation):
         calibration = self.calibration_store.load(self.request)
         if calibration is None:
             return None
-        if calibration.resistance <= 0:
-            raise DummyLoadMeasurementError("Restored dummy-load resistance must be positive")
         return calibration.resistance
 
     def _calibrate(self, interaction: RunInteraction) -> float:
