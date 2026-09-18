@@ -12,7 +12,7 @@ from measure.analyser.models import (
     StrategyNotApplicable,
 )
 from measure.analyser.recording import load_recording
-from measure.analyser.service import RecorderAnalyser, _describe_credibility_failure, _select_candidate
+from measure.analyser.service import RecorderAnalyser, _find_model_credibility_failure, _select_candidate
 from measure.recording.models import RecordedEntity, RecordedEntityState, RecordingContext, RecordingSample
 import pytest
 
@@ -320,7 +320,7 @@ def test_analyser_explains_which_credibility_threshold_was_not_met(tmp_path: Pat
 
 
 def test_credibility_reason_reports_coverage_and_improvement_values() -> None:
-    reason = _describe_credibility_failure(
+    reason = _find_model_credibility_failure(
         "composite",
         AnalysisMetrics(20, 4, 0.5, 0.95, 1.0, 5),
         AnalysisMetrics(20, 4, 1.0, 1.0, 1.0, 5),
@@ -332,6 +332,45 @@ def test_credibility_reason_reports_coverage_and_improvement_values() -> None:
         "is required; it reduced the typical validation difference from 1.00 W to 0.95 W (5%); at least 0.10 W "
         "or 15% improvement is required."
     )
+
+
+@pytest.mark.parametrize(
+    "coverage, prediction_range, baseline_mae, model_mae, expected_issue",
+    [
+        (0.9, 0.1, 1.0, 0.5, None),
+        (0.899, 0.1, 1.0, 0.5, "coverage"),
+        (0.9, 0.099, 1.0, 0.5, "range"),
+        (1.0, 1.0, 10.0, 9.0, None),
+        (1.0, 1.0, 0.5, 0.42, None),
+        (1.0, 1.0, 0.1, 0.0, None),
+        (1.0, 1.0, 1.0, 0.95, "improvement"),
+        (1.0, 1.0, 0.0, 0.0, "improvement"),
+    ],
+)
+def test_model_credibility_thresholds(
+    coverage: float,
+    prediction_range: float,
+    baseline_mae: float,
+    model_mae: float,
+    expected_issue: str | None,
+) -> None:
+    reason = _find_model_credibility_failure(
+        "fixed_states_power",
+        AnalysisMetrics(20, 4, coverage, model_mae, model_mae, 5),
+        AnalysisMetrics(20, 4, 1.0, baseline_mae, baseline_mae, 5),
+        prediction_range,
+    )
+
+    if expected_issue is None:
+        assert reason is None
+    else:
+        messages = {
+            "coverage": "could estimate",
+            "range": "power estimates differed",
+            "improvement": "improvement is required",
+        }
+        assert reason is not None
+        assert messages[expected_issue] in reason
 
 
 def test_analyser_requires_enough_samples(tmp_path: Path) -> None:

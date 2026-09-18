@@ -9,6 +9,7 @@ from measure.cli.const import QUESTION_MODE
 from measure.cli.questions import light_questions
 from measure.controller.errors import ApiConnectionError as HassApiConnectionError
 from measure.controller.light.const import LutMode
+from measure.controller.light.controller import LightController
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.powermeter.errors import ZeroReadingError
@@ -58,10 +59,12 @@ class _BrightnessRun:
         self.runner.run_mode(self.measurement_info, self.progress)
 
 
-def _brightness_run(tmp_path: Path, variations: list[Variation]) -> _BrightnessRun:
+def _brightness_run(
+    tmp_path: Path, variations: list[Variation], controller: LightController | None = None
+) -> _BrightnessRun:
     measure_util_mock = MagicMock(PowerSampler)
     interaction = MagicMock(spec=RunInteraction)
-    runner = LightRunner(measure_util_mock, _zero_sleep_parameters(), DummyLightController(), interaction)
+    runner = LightRunner(measure_util_mock, _zero_sleep_parameters(), controller or DummyLightController(), interaction)
     runner.gzip = False
     runner.light_info = runner.light_controller.get_light_info()
     runner.active_plan = LightMeasurementPlan(
@@ -209,11 +212,10 @@ def test_resume_reports_progress_against_the_full_plan(
 def test_initial_wait_happens_after_selecting_first_measurement_point(tmp_path: Path) -> None:
     events: list[tuple[str, object]] = []
     variation = Variation(1)
-    run = _brightness_run(tmp_path, [variation])
-    run.runner.config = replace(run.runner.config, sleep_time=2, sleep_initial=10)
     light_controller = MagicMock(spec=DummyLightController)
     light_controller.change_light_state.side_effect = lambda *args, **kwargs: events.append(("change", (args, kwargs)))
-    run.runner.light_controller = light_controller
+    run = _brightness_run(tmp_path, [variation], light_controller)
+    run.runner.config = replace(run.runner.config, sleep_time=2, sleep_initial=10)
     run.runner.interaction.wait.side_effect = lambda seconds: events.append(("wait", seconds))
     run.sampler.take_measurement.return_value = MeasurementResult(power=1, voltages=[])
 
@@ -420,8 +422,7 @@ def test_change_light_state_is_retried_after_a_dropped_connection(tmp_path: Path
     """
 
     variations = [Variation(1), Variation(2)]
-    run = _brightness_run(tmp_path, variations)
-    run.runner.light_controller = _flaky_light_controller(failures_after_startup=1)
+    run = _brightness_run(tmp_path, variations, _flaky_light_controller(failures_after_startup=1))
     run.sampler.take_measurement.side_effect = [
         MeasurementResult(power=1, voltages=[]),
         MeasurementResult(power=2, voltages=[]),
@@ -436,8 +437,7 @@ def test_change_light_state_is_retried_after_a_dropped_connection(tmp_path: Path
 
 def test_change_light_state_gives_up_after_five_failed_retries(tmp_path: Path) -> None:
     variations = [Variation(1)]
-    run = _brightness_run(tmp_path, variations)
-    run.runner.light_controller = _flaky_light_controller(failures_after_startup=5)
+    run = _brightness_run(tmp_path, variations, _flaky_light_controller(failures_after_startup=5))
 
     with pytest.raises(RunnerError, match="Failed to change light state after 5 retries"):
         run.execute()
@@ -452,8 +452,7 @@ def test_initial_maximum_brightness_is_retried_after_a_dropped_connection(tmp_pa
     """
 
     variations = [Variation(1), Variation(2)]
-    run = _brightness_run(tmp_path, variations)
-    run.runner.light_controller = _flaky_light_controller(failures_after_startup=1, start_failing_at=0)
+    run = _brightness_run(tmp_path, variations, _flaky_light_controller(failures_after_startup=1, start_failing_at=0))
     run.sampler.take_measurement.side_effect = [
         MeasurementResult(power=1, voltages=[]),
         MeasurementResult(power=2, voltages=[]),
@@ -467,8 +466,8 @@ def test_initial_maximum_brightness_is_retried_after_a_dropped_connection(tmp_pa
 
 
 def test_initial_maximum_brightness_gives_up_after_five_failed_retries(tmp_path: Path) -> None:
-    run = _brightness_run(tmp_path, [Variation(1)])
-    run.runner.light_controller = _flaky_light_controller(failures_after_startup=5, start_failing_at=0)
+    controller = _flaky_light_controller(failures_after_startup=5, start_failing_at=0)
+    run = _brightness_run(tmp_path, [Variation(1)], controller)
 
     with pytest.raises(RunnerError, match="Failed to change light state after 5 retries"):
         run.execute()

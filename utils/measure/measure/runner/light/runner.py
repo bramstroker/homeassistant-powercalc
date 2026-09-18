@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 import logging
 from pathlib import Path
@@ -32,12 +33,13 @@ from measure.runner.light.plan import (
     estimate_light_time_left,
     variations_after,
 )
-from measure.runner.light.setup import set_light_to_maximum_brightness
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.tuning import MeasurementParameters
 from measure.utils.sampling import AverageMeasurementConvergence, MeasurementResult, PowerSampler
 
 MAX_CONSECUTIVE_ZERO_READINGS = 5
+MAX_LIGHT_COMMAND_ATTEMPTS = 5
+LIGHT_COMMAND_RETRY_DELAY = 5
 ZERO_READING_ABORT_MESSAGE = (
     "Aborting measurement session after repeated 0 W readings. The power meter may not resolve this low load. "
     "Verify the device is on and connected, measure multiple identical lights together, "
@@ -84,6 +86,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         self.config = parameters
         self.gzip = True
         self.interaction = interaction or ImmediateInteraction()
+        self._light_control = LightControl(light_controller, wait=self._wait, checkpoint=self._checkpoint)
         self._resume = resume
 
     def _wait(self, seconds: float) -> None:
@@ -210,13 +213,10 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             # Set maximum brightness twice to prevent some lights turning off
             # when starting at low brightness or after repeated off commands (#2598).
             assert self.light_info is not None
-            set_light_to_maximum_brightness(
-                self.light_controller,
+            self._light_control.set_maximum_brightness(
                 self.light_info,
                 mode,
                 sleep_time=self.config.sleep_time,
-                wait=self._wait,
-                checkpoint=self._checkpoint,
             )
 
             _LOGGER.info(
@@ -320,20 +320,8 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             raise RunnerError(ZERO_READING_ABORT_MESSAGE) from error
 
     def _change_light_with_retry(self, mode: LutMode, variation: Variation) -> None:
-        for _ in range(5):
-            try:
-                self._checkpoint()
-                self.light_controller.change_light_state(
-                    mode,
-                    on=True,
-                    **asdict(variation),
-                )
-                self.interaction.operating_point(self._build_operating_point(mode, variation))
-                return
-            except ApiConnectionError as error:
-                _LOGGER.warning("Failed to change light state: %s. Retrying...", error)
-                self._wait(5)
-        raise RunnerError("Failed to change light state after 5 retries")
+        self._light_control.change_state_with_retry(mode, **asdict(variation))
+        self.interaction.operating_point(self._build_operating_point(mode, variation))
 
     def wait(self, variation: Variation, previous_variation: Variation | None) -> None:
         """Wait for the light to process the change"""
@@ -542,3 +530,49 @@ class MeasurementRunInput:
     csv_file: str
     variations: list[Variation]
     is_resuming: bool
+
+
+class LightControl:
+    """Shared light setup and retry behavior for measurements and preflight probes."""
+
+    def __init__(
+        self,
+        controller: LightController,
+        *,
+        wait: Callable[[float], None],
+        checkpoint: Callable[[], None] | None = None,
+    ) -> None:
+        self._controller = controller
+        self._wait = wait
+        self._checkpoint = checkpoint
+
+    def set_maximum_brightness(self, light_info: LightInfo, mode: LutMode, *, sleep_time: float) -> None:
+        """Set maximum brightness twice for lights that turn off after rapid commands."""
+        kwargs: dict[str, int] = {"bri": 255}
+        if mode == LutMode.HS:
+            kwargs.update(hue=0, sat=1)
+        elif mode == LutMode.COLOR_TEMP:
+            kwargs["ct"] = light_info.min_mired
+        else:
+            mode = LutMode.BRIGHTNESS
+
+        _LOGGER.info("Turning on light with maximum brightness")
+        for _ in range(2):
+            self.change_state_with_retry(mode, **kwargs)
+            self._wait(sleep_time)
+
+    def change_state_with_retry(self, mode: LutMode, **kwargs: int | str) -> None:
+        """Retry connection failures, checking for cancellation before each attempt."""
+        for attempt in range(MAX_LIGHT_COMMAND_ATTEMPTS):
+            if self._checkpoint is not None:
+                self._checkpoint()
+            try:
+                self._controller.change_light_state(mode, on=True, **kwargs)
+                return
+            except ApiConnectionError as error:
+                _LOGGER.warning("Failed to change light state: %s. Retrying...", error)
+                self._wait(LIGHT_COMMAND_RETRY_DELAY)
+                if attempt == MAX_LIGHT_COMMAND_ATTEMPTS - 1:
+                    raise RunnerError(
+                        f"Failed to change light state after {MAX_LIGHT_COMMAND_ATTEMPTS} retries"
+                    ) from error

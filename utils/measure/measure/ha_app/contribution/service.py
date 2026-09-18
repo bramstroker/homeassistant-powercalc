@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
 import shutil
-import tempfile
 
 from pydantic import SecretStr
 
@@ -33,6 +32,7 @@ from measure.profile.models import ProfilePreview, RenderedProfileFile
 from measure.profile.output import prepared_profile_archive
 from measure.profile.prepare import ProfilePreparationError, ProfilePreparer
 from measure.request import MeasurementRequest
+from measure.utils.files import write_bytes_atomic
 
 
 @dataclass(frozen=True)
@@ -127,14 +127,7 @@ class SharedContributionService:
         directory.mkdir(parents=True, exist_ok=True)
         path = self._prepared_archive_path(job_id)
         archive = prepared_profile_archive(contents)
-        with tempfile.NamedTemporaryFile(dir=directory, prefix=f".{job_id}.", delete=False) as file:
-            temporary = Path(file.name)
-            file.write(archive)
-        try:
-            temporary.replace(path)
-        except BaseException:
-            temporary.unlink(missing_ok=True)
-            raise
+        write_bytes_atomic(path, archive)
         for existing in directory.glob("*.zip"):
             if existing != path:
                 existing.unlink(missing_ok=True)

@@ -126,9 +126,7 @@ def _find_candidate_failure(
     if not _has_minimum_support(candidate, samples):
         return f"{candidate.strategy_id} needs at least {MIN_SAMPLES_PER_MODEL_VALUE} samples for every value"
     prediction_range = _calculate_prediction_range(candidate, samples)
-    if not _is_credible(metrics, baseline, prediction_range):
-        return _describe_credibility_failure(candidate.strategy_id, metrics, baseline, prediction_range)
-    return None
+    return _find_model_credibility_failure(candidate.strategy_id, metrics, baseline, prediction_range)
 
 
 def _split_samples(
@@ -173,27 +171,17 @@ def _calculate_metrics(
     return AnalysisMetrics(sample_count, len(validation), coverage, mae, rmse, power_range)
 
 
-def _is_credible(metrics: AnalysisMetrics, baseline: AnalysisMetrics, prediction_range: float) -> bool:
-    improvement = baseline.mae_w - metrics.mae_w
-    relative = improvement / baseline.mae_w if baseline.mae_w else 0
-    return (
-        metrics.coverage >= MIN_VALIDATION_COVERAGE
-        and prediction_range >= MIN_PREDICTION_RANGE_W
-        and (improvement >= MIN_ABSOLUTE_MAE_IMPROVEMENT_W or relative >= MIN_RELATIVE_MAE_IMPROVEMENT)
-    )
-
-
 def _calculate_prediction_range(candidate: AnalysisCandidate, samples: Sequence[RecordingSample]) -> float:
     predictions = [estimate for sample in samples if (estimate := candidate.estimate_power(sample)) is not None]
     return max(predictions) - min(predictions) if predictions else 0
 
 
-def _describe_credibility_failure(
+def _find_model_credibility_failure(
     strategy_id: str,
     metrics: AnalysisMetrics,
     baseline: AnalysisMetrics,
     prediction_range: float,
-) -> str:
+) -> str | None:
     label = "The state-based profile" if strategy_id == "fixed_states_power" else f"The {strategy_id} profile"
     issues: list[str] = []
     if metrics.coverage < MIN_VALIDATION_COVERAGE:
@@ -214,7 +202,7 @@ def _describe_credibility_failure(
             f"({relative:.0%}); at least {MIN_ABSOLUTE_MAE_IMPROVEMENT_W:.2f} W or "
             f"{MIN_RELATIVE_MAE_IMPROVEMENT:.0%} improvement is required",
         )
-    return f"{label} was not reliable enough: {'; '.join(issues)}."
+    return f"{label} was not reliable enough: {'; '.join(issues)}." if issues else None
 
 
 def _has_minimum_support(candidate: AnalysisCandidate, samples: Sequence[RecordingSample]) -> bool:

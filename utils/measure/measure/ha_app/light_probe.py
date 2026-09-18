@@ -13,7 +13,7 @@ from measure.powermeter.errors import ZeroReadingError
 from measure.request import LightMeasurementRequest
 from measure.runner.interaction import ImmediateInteraction
 from measure.runner.light.plan import Variation, build_light_plan, low_load_probe_variations
-from measure.runner.light.setup import set_light_to_maximum_brightness
+from measure.runner.light.runner import LightControl
 from measure.utils.sampling import PowerSampler
 
 LIGHT_LOAD_PROBE_CACHE_SECONDS = 600
@@ -94,12 +94,11 @@ class LightLoadProbe:
             meter = assembler.create_power_meter(request.power_meter)
             sampler = PowerSampler(meter, request.parameters, wait=self._wait)
             light_driven = True
-            set_light_to_maximum_brightness(
-                controller,
+            light_control = LightControl(controller, wait=self._wait)
+            light_control.set_maximum_brightness(
                 light_info,
                 variations[0].mode,
                 sleep_time=request.parameters.sleep_time,
-                wait=self._wait,
             )
             points = [
                 LightLoadProbePoint(

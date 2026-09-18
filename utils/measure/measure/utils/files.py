@@ -1,7 +1,21 @@
 import json
 import os
 from pathlib import Path
+import tempfile
 from typing import Any
+
+
+def write_bytes_atomic(path: Path, content: bytes) -> None:
+    """Replace a file via a temporary sibling, cleaning up even if writing fails."""
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=path.parent, prefix=f".{path.name}.", delete=False) as file:
+            temporary = Path(file.name)
+            file.write(content)
+        temporary.replace(path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def write_json_atomic(path: Path, value: dict[str, Any], *, private: bool = False) -> None:
