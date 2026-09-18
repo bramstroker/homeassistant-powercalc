@@ -186,6 +186,19 @@ def test_fixed_strategy_ignores_unavailable_values_and_non_scalar_attributes() -
     assert isinstance(result, StrategyNotApplicable)
 
 
+def test_fixed_strategy_ignores_samples_without_the_primary_entity() -> None:
+    samples = [sample(index, 0.2 if index % 2 == 0 else 5.2, "off" if index % 2 == 0 else "on") for index in range(8)]
+    missing_entity = RecordingSample(8, 50, {})
+
+    candidate = FixedStatesPowerStrategy().build_candidate([*samples, missing_entity], CONTEXT)
+
+    assert not isinstance(candidate, StrategyNotApplicable)
+    assert candidate.feature == FeatureReference("switch.device", FeatureSource.STATE)
+    assert candidate.estimate_power(sample(9, 0, "off")) == pytest.approx(0.2)
+    assert candidate.estimate_power(sample(10, 0, "on")) == pytest.approx(5.2)
+    assert candidate.estimate_power(missing_entity) is None
+
+
 def test_fixed_strategy_keeps_multiple_active_states_as_states_power() -> None:
     samples = [
         sample(index, (2.0, 5.0, 8.0)[index % 3], ("idle", "playing", "recording")[index % 3]) for index in range(12)
