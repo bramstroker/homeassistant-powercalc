@@ -3,6 +3,9 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from jsonschema import validate
+from measure.analyser.execution import RecorderAnalysisExecution
+from measure.analyser.models import AnalysisStatus, RecorderAnalysisResult
+from measure.analyser.service import RecorderAnalyser
 from measure.cancellation import MeasurementCancelledError
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
@@ -304,6 +307,35 @@ def test_execution_preserves_recording_when_analysis_fails(tmp_path: Path, caplo
         "Recording analysis reason": "Recording analysis failed: broken analyser",
     }
     assert "Recording analysis failed: broken analyser" in caplog.text
+
+
+def test_analysis_without_reason_removes_stale_model_and_preserves_recording(tmp_path: Path) -> None:
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=["switch.device"],
+    )
+    recording = tmp_path / "record.jsonl"
+    recording.write_text("{}\n", encoding="utf-8")
+    (tmp_path / "model.json").write_text("{}", encoding="utf-8")
+    analyser = MagicMock(spec=RecorderAnalyser)
+    analyser.analyse.return_value = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 0)
+
+    summary = RecorderAnalysisExecution(analyser).run(request, tmp_path)
+
+    assert summary == {
+        "Recording analysis": "More data needed",
+        "Recordings analysed": "1",
+        "Samples analysed": "0",
+    }
+    assert not (tmp_path / "model.json").exists()
+    assert recording.read_text(encoding="utf-8") == "{}\n"
+    assert json.loads((tmp_path / "analyser.json").read_text(encoding="utf-8")) == {
+        "schema_version": 1,
+        "status": "insufficient_data",
+        "sample_count": 0,
+    }
 
 
 def test_execution_completes_without_model_when_recording_is_insufficient(

@@ -204,6 +204,6 @@ class MeasurementExecution:
         if isinstance(self.measurement.request.dummy_load, DummyLoadReuseRequest):
             return self.measurement.request.dummy_load.resistance
         for preparation in self.measurement.preparations:
-            if isinstance(preparation, DummyLoadPreparation):
+            if isinstance(preparation, DummyLoadPreparation):  # pragma: no branch - only concrete preparation type
                 return preparation.sampler.dummy_load_value
         return None

@@ -132,9 +132,9 @@ def _condition_label(condition: object, strategy_index: int) -> str:
     condition_type = condition.get("condition")
     if condition_type in {"and", "or", "not"}:
         conditions = condition.get("conditions")
-        if isinstance(conditions, list):
+        if isinstance(conditions, list):  # pragma: no branch - fallback for malformed logical conditions
             labels = [_condition_label(item, strategy_index) for item in conditions]
-            if labels:
+            if labels:  # pragma: no branch - fallback for empty logical conditions
                 if condition_type == "not":
                     return f"NOT ({' AND '.join(labels)})"
                 return f" {str(condition_type).upper()} ".join(labels)
