@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import TypeGuard
 
 from measure.visualization.data import POWER_AXIS_LABEL, SERIES_COLORS, finite_float
+from measure.visualization.labels import format_entity_label, format_value_label
 from measure.visualization.models import PlotDataError, PlotKind, PlotPoint, PlotSeries, PlotSpec
 from measure.visualization.sampling import limit_line
 
@@ -138,32 +139,11 @@ def _condition_label(condition: object, strategy_index: int) -> str:
                     return f"NOT ({' AND '.join(labels)})"
                 return f" {str(condition_type).upper()} ".join(labels)
     if condition_type == "state":
-        subject = condition.get("attribute") or _condition_entity_label(condition.get("entity_id"))
+        subject = condition.get("attribute") or format_entity_label(condition.get("entity_id"))
         state = condition.get("state")
         if subject and state is not None:
-            return f"{str(subject).replace('_', ' ')} = {_condition_value_label(state)}"
+            return f"{str(subject).replace('_', ' ')} = {format_value_label(state)}"
     return f"Strategy {strategy_index}"
-
-
-def _condition_entity_label(entity_id: object) -> str | None:
-    if isinstance(entity_id, list):
-        entity_id = entity_id[0] if entity_id else None
-    if not isinstance(entity_id, str):
-        return None
-    if entity_id == "[[entity]]":
-        return "state"
-    if entity_id.startswith("[[") and entity_id.endswith("]]"):
-        entity_id = entity_id[2:-2]
-    _, separator, value = entity_id.partition(":")
-    return (value if separator else entity_id).replace("_", " ")
-
-
-def _condition_value_label(value: object) -> str:
-    if isinstance(value, list):
-        return ", ".join(str(item) for item in value)
-    if isinstance(value, bool):
-        return str(value).lower()
-    return str(value)
 
 
 def _linear_labels(device_type: str | None) -> tuple[str, str]:

@@ -6,6 +6,8 @@ from enum import StrEnum
 import json
 from pathlib import Path
 
+from measure.visualization.labels import format_entity_label, format_value_label
+
 
 class CompositeMode(StrEnum):
     STOP_AT_FIRST = "stop_at_first"
@@ -177,15 +179,15 @@ def _compound_condition_label(condition_type: str, conditions: object) -> str:
 
 
 def _state_condition_label(condition: Mapping[str, object]) -> str:
-    subject = condition.get("attribute") or _entity_label(condition.get("entity_id"))
+    subject = condition.get("attribute") or format_entity_label(condition.get("entity_id"))
     state = condition.get("state")
     if subject and state is not None:
-        return f"{str(subject).replace('_', ' ')} = {_value_label(state)}"
+        return f"{str(subject).replace('_', ' ')} = {format_value_label(state)}"
     return "State condition"
 
 
 def _numeric_condition_label(condition: Mapping[str, object]) -> str:
-    subject = condition.get("attribute") or _entity_label(condition.get("entity_id"))
+    subject = condition.get("attribute") or format_entity_label(condition.get("entity_id"))
     bounds = []
     if "above" in condition:
         bounds.append(f"> {condition['above']}")
@@ -194,24 +196,3 @@ def _numeric_condition_label(condition: Mapping[str, object]) -> str:
     if subject and bounds:
         return f"{str(subject).replace('_', ' ')} {' and '.join(bounds)}"
     return "Numeric state condition"
-
-
-def _entity_label(entity_id: object) -> str | None:
-    if isinstance(entity_id, list):
-        entity_id = entity_id[0] if entity_id else None
-    if not isinstance(entity_id, str):
-        return None
-    if entity_id == "[[entity]]":
-        return "state"
-    if entity_id.startswith("[[") and entity_id.endswith("]]"):
-        entity_id = entity_id[2:-2]
-    _, separator, value = entity_id.partition(":")
-    return (value if separator else entity_id).replace("_", " ")
-
-
-def _value_label(value: object) -> str:
-    if isinstance(value, list):
-        return ", ".join(str(item) for item in value)
-    if isinstance(value, bool):
-        return str(value).lower()
-    return str(value)
