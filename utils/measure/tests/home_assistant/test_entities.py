@@ -311,6 +311,48 @@ def test_nested_group_metadata_respects_registered_groups_and_missing_members(mi
     assert outer.manufacturer == (None if missing_member else "Group manufacturer")
 
 
+@pytest.mark.parametrize("nested", [False, True])
+def test_cyclic_light_groups_remain_selectable_without_inferred_device_metadata(nested: bool) -> None:
+    data = _entity_data()
+    data.entities["light"].entities["group"] = _entity("light.group", "on", supported_color_modes=["brightness"])
+    data.entities["light"].entities["group"].state.attributes["entity_id"] = [
+        "light.inner" if nested else "light.group"
+    ]
+    if nested:
+        data.entities["light"].entities["inner"] = _entity("light.inner", "on", supported_color_modes=["brightness"])
+        data.entities["light"].entities["inner"].state.attributes["entity_id"] = ["light.group"]
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+
+    lights = HomeAssistantEntityCatalog(home_assistant).load_snapshot().select(domain=EntityDomain.LIGHT)
+    group = next(light for light in lights if light.entity_id == "light.group")
+
+    assert group.model_id is None
+    assert group.product_name is None
+    assert group.manufacturer is None
+    assert any(light.entity_id == "light.desk" and light.model_id == "LWA017" for light in lights)
+
+
+def test_mixed_light_group_infers_only_metadata_shared_by_all_members() -> None:
+    data = _entity_data()
+    data.entities["light"].entities["second"] = _entity("light.second", "on", supported_color_modes=["brightness"])
+    data.entity_registry.append(SimpleNamespace(entity_id="light.second", device_id="second-device", platform="hue"))
+    data.device_registry.append(
+        {"id": "second-device", "manufacturer": "Signify", "model_id": "LCT010", "model": "Hue Color"}
+    )
+    data.entities["light"].entities["group"] = _entity("light.group", "on", supported_color_modes=["brightness"])
+    data.entities["light"].entities["group"].state.attributes["entity_id"] = ["light.desk", "light.second"]
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+
+    lights = HomeAssistantEntityCatalog(home_assistant).load_snapshot().select(domain=EntityDomain.LIGHT)
+    group = next(light for light in lights if light.entity_id == "light.group")
+
+    assert group.model_id is None
+    assert group.product_name is None
+    assert group.manufacturer == "Signify"
+
+
 def test_snapshot_requires_exactly_one_entity_filter() -> None:
     home_assistant = MagicMock(spec=HomeAssistantManager)
     home_assistant.get_entity_data.return_value = _entity_data()
