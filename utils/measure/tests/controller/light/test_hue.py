@@ -290,6 +290,61 @@ def test_registration_failure_is_reported(monkeypatch: pytest.MonkeyPatch, tmp_p
     assert not config.exists()
 
 
+def test_unselected_controller_lists_resources_but_cannot_change_state(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    lights, groups = _resources()
+    bridge = _Bridge(lights, groups)
+    monkeypatch.setattr(hue_module, "HueBridgeV1", lambda host, app_key: bridge)
+    config = tmp_path / ".python_hue"
+    config.write_text(json.dumps({"192.0.2.10": {"username": "existing-key"}}), encoding="utf-8")
+
+    with closing(HueLightController("192.0.2.10", config_file_path=config)) as controller:
+        assert controller.lights == {1: "Desk", 2: "Ceiling"}
+        assert controller.groups == {12: "Office"}
+        with pytest.raises(LightControllerError, match="No Hue light or group selected"):
+            controller.change_light_state(LutMode.BRIGHTNESS, bri=100)
+
+    assert lights[0].calls == []
+    assert bridge.closed
+
+
+@pytest.mark.parametrize("resource", ["lights", "groups"])
+def test_missing_bridge_resources_closes_connection(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, resource: str
+) -> None:
+    lights, groups = _resources()
+    bridge = _Bridge(lights, groups)
+    setattr(bridge, resource, None)
+    monkeypatch.setattr(hue_module, "HueBridgeV1", lambda host, app_key: bridge)
+    config = tmp_path / ".python_hue"
+    config.write_text(json.dumps({"192.0.2.10": {"username": "existing-key"}}), encoding="utf-8")
+
+    with pytest.raises(LightControllerError, match=f"did not return any {resource[:-1]} resources"):
+        HueLightController("192.0.2.10", light="light:1", config_file_path=config)
+
+    assert bridge.closed
+
+
+def test_connection_error_is_preserved_when_bridge_cleanup_fails(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    lights, groups = _resources()
+    connection_error = aiohttp.ClientConnectionError("Bridge offline")
+    bridge = _Bridge(lights, groups, initialize_error=connection_error)
+    close_bridge = AsyncMock(side_effect=aiohttp.ClientConnectionError("Cleanup failed"))
+    monkeypatch.setattr(bridge, "close", close_bridge)
+    monkeypatch.setattr(hue_module, "HueBridgeV1", lambda host, app_key: bridge)
+    config = tmp_path / ".python_hue"
+    config.write_text(json.dumps({"192.0.2.10": {"username": "existing-key"}}), encoding="utf-8")
+
+    with pytest.raises(LightControllerError, match="Bridge offline") as raised:
+        HueLightController("192.0.2.10", light="light:1", config_file_path=config)
+
+    assert raised.value.__cause__ is connection_error
+    close_bridge.assert_awaited_once()
+
+
 @pytest.mark.parametrize("contents", ["{invalid json", ""])
 def test_corrupt_registration_file_is_reported(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, contents: str) -> None:
     config = tmp_path / ".python_hue"
