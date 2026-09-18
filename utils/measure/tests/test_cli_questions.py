@@ -9,8 +9,10 @@ from measure.cli.const import (
     QUESTION_DURATION,
     QUESTION_ENTITY_ID,
     QUESTION_GZIP,
+    QUESTION_MEASURE_DEVICE,
     QUESTION_MODE,
     QUESTION_MODEL_ID,
+    QUESTION_MODEL_NAME,
     QUESTION_MULTIPLE_LIGHTS,
     QUESTION_NUM_LIGHTS,
     QUESTION_POWERMETER_ENTITY_ID,
@@ -362,3 +364,93 @@ def test_cli_reuses_and_closes_prefill_manager(mock_config_factory: MockConfigFa
 
     assert assembler.call_args.kwargs["home_assistant"] is home_assistant
     home_assistant.close.assert_called_once_with()
+
+
+@pytest.mark.parametrize(
+    "model_id, explicit_model, explicit_name, expected_model, expected_name",
+    [
+        ("LWA017", None, None, "LWA017", "Hue desk lamp"),
+        ("Model (EU)+1", None, None, "Model (EU)+1", "Hue desk lamp"),
+        ("../unsafe", None, None, "", "Hue desk lamp"),
+        ("a" * 121, None, None, "", "Hue desk lamp"),
+        (None, None, None, "", "Hue desk lamp"),
+        ("LWA017", "manual-model", "Manual lamp", "manual-model", "Manual lamp"),
+    ],
+)
+def test_cli_wizard_prefills_safe_metadata_without_overwriting_answers(
+    mock_config_factory: MockConfigFactory,
+    model_id: str | None,
+    explicit_model: str | None,
+    explicit_name: str | None,
+    expected_model: str,
+    expected_name: str,
+) -> None:
+    environment = mock_config_factory(
+        {"selected_measure_type": MeasureType.LIGHT, "selected_light_controller": LightControllerType.HASS}
+    )
+    descriptor = _entity("light.desk", EntityDomain.LIGHT, model_id=model_id).model_copy(
+        update={"product_name": "Hue desk lamp"}
+    )
+    catalog = _catalog(descriptor)
+    answers = {
+        QUESTION_ENTITY_ID: "light.desk",
+        QUESTION_MODE: {LutMode.BRIGHTNESS},
+        QUESTION_MODEL_ID: explicit_model,
+        QUESTION_MODEL_NAME: explicit_name,
+        QUESTION_MEASURE_DEVICE: "Test meter",
+    }
+    measure = Measure(environment)
+
+    with (
+        patch("measure.cli.main.HomeAssistantManager") as manager,
+        patch("measure.cli.main.HomeAssistantEntityCatalog", return_value=catalog),
+        patch("measure.cli.main.measurement_questions", return_value=[]),
+        patch.object(measure, "ask_questions", return_value=answers),
+        patch("measure.cli.main.MeasurementAssembler") as assembler,
+        patch("measure.cli.main.MeasurementExecution") as execution,
+    ):
+        execution.return_value.output_directory = None
+        measure.start()
+
+    request = assembler.return_value.assemble.call_args.args[0]
+    assert request.model_id == expected_model
+    assert request.product_name == expected_name
+    execution.return_value.run.assert_called_once_with()
+    manager.return_value.close.assert_called_once_with()
+
+
+@pytest.mark.parametrize("lookup_fails", [False, True])
+def test_cli_wizard_continues_without_home_assistant_metadata(
+    mock_config_factory: MockConfigFactory, lookup_fails: bool, caplog: pytest.LogCaptureFixture
+) -> None:
+    environment = mock_config_factory(
+        {"selected_measure_type": MeasureType.LIGHT, "selected_light_controller": LightControllerType.HASS}
+    )
+    catalog = _catalog()
+    if lookup_fails:
+        catalog.load_snapshot.side_effect = OSError("HA unavailable")
+    measure = Measure(environment)
+    answers = {
+        QUESTION_ENTITY_ID: "light.desk",
+        QUESTION_MODE: {LutMode.BRIGHTNESS},
+        QUESTION_MEASURE_DEVICE: "Test meter",
+    }
+
+    with (
+        patch("measure.cli.main.HomeAssistantManager") as manager,
+        patch("measure.cli.main.HomeAssistantEntityCatalog", return_value=catalog),
+        patch("measure.cli.main.measurement_questions", return_value=[]),
+        patch.object(measure, "ask_questions", return_value=answers),
+        patch("measure.cli.main.MeasurementAssembler") as assembler,
+        patch("measure.cli.main.MeasurementExecution") as execution,
+    ):
+        execution.return_value.output_directory = None
+        measure.start()
+
+    request = assembler.return_value.assemble.call_args.args[0]
+    assert request.model_id == ""
+    assert request.product_name == ""
+    execution.return_value.run.assert_called_once_with()
+    manager.return_value.close.assert_called_once_with()
+    if lookup_fails:
+        assert "Could not prefill device details for light.desk: HA unavailable" in caplog.text
