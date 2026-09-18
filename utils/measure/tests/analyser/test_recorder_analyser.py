@@ -12,7 +12,7 @@ from measure.analyser.models import (
     StrategyNotApplicable,
 )
 from measure.analyser.recording import load_recording
-from measure.analyser.service import RecorderAnalyser, _credibility_reason, _select_candidate
+from measure.analyser.service import RecorderAnalyser, _describe_credibility_failure, _select_candidate
 from measure.recording.models import RecordedEntity, RecordedEntityState, RecordingContext, RecordingSample
 import pytest
 
@@ -76,7 +76,7 @@ def sample(
 def write_recording(path: Path, samples: list[RecordingSample], *, typed: bool = True) -> None:
     records: list[dict[str, object]] = []
     if typed:
-        records.append(CONTEXT.metadata_record())
+        records.append(CONTEXT.build_metadata_record())
     records.extend(
         {
             **({"record_type": "sample"} if typed else {}),
@@ -201,9 +201,9 @@ def test_fixed_strategy_keeps_multiple_active_states_as_states_power() -> None:
 def test_feature_reference_accepts_finite_scalar_attributes_only() -> None:
     feature = FeatureReference("switch.device", "attribute", "value")
 
-    assert feature.value(sample(1, 1, "on", {"value": 2.5})) == pytest.approx(2.5)
-    assert feature.value(sample(1, 1, "on", {"value": float("nan")})) is None
-    assert feature.value(sample(1, 1, "on", {"value": float("inf")})) is None
+    assert feature.get_value(sample(1, 1, "on", {"value": 2.5})) == pytest.approx(2.5)
+    assert feature.get_value(sample(1, 1, "on", {"value": float("nan")})) is None
+    assert feature.get_value(sample(1, 1, "on", {"value": float("inf")})) is None
 
 
 def test_recorded_entity_and_analysis_result_include_optional_evidence() -> None:
@@ -298,7 +298,7 @@ def test_analyser_rejects_recordings_without_a_credible_fixed_model(
     assert not result.model_ready
     assert result.status == "insufficient_data"
     assert reason in str(result.reason)
-    assert result.summary() == {
+    assert result.build_summary() == {
         "Recording analysis": "More data needed",
         "Recording analysis reason": result.reason,
     }
@@ -320,7 +320,7 @@ def test_analyser_explains_which_credibility_threshold_was_not_met(tmp_path: Pat
 
 
 def test_credibility_reason_reports_coverage_and_improvement_values() -> None:
-    reason = _credibility_reason(
+    reason = _describe_credibility_failure(
         "composite",
         AnalysisMetrics(20, 4, 0.5, 0.95, 1.0, 5),
         AnalysisMetrics(20, 4, 1.0, 1.0, 1.0, 5),

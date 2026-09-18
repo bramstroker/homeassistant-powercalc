@@ -14,8 +14,8 @@ from measure.ha_app.coordinator import MeasurementCoordinator, SessionConflictEr
 from measure.ha_app.session import SessionControl, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
-from measure.recording.context import recording_context_for
-from measure.recording.files import recording_filenames, recording_paths
+from measure.recording.context import build_recording_context
+from measure.recording.files import find_recording_paths, select_recording_filenames
 from measure.request import AverageMeasurementRequest, RecorderMeasurementRequest
 from measure.runner.runner import RunnerResult
 import pytest
@@ -32,7 +32,7 @@ def recorder_request() -> RecorderMeasurementRequest:
 
 
 def test_recording_names_are_ordered_and_exclude_unrelated_files() -> None:
-    assert recording_filenames(
+    assert select_recording_filenames(
         [
             "record.jsonl",
             "record-10.jsonl",
@@ -48,7 +48,7 @@ def test_recording_names_are_ordered_and_exclude_unrelated_files() -> None:
 
 
 def write_recording(path: Path, request: RecorderMeasurementRequest, state: str) -> None:
-    records = [recording_context_for(request).metadata_record()]
+    records = [build_recording_context(request).build_metadata_record()]
     records.extend(
         {
             "record_type": "sample",
@@ -124,7 +124,7 @@ def test_record_more_keeps_session_and_fits_both_runs(
     assert completed.summary["Samples analysed"] == "20"
     assert completed.summary["Recording analysis"] == "Fixed power profile created"
     assert json.loads((output / "model.json").read_text())["fixed_config"] == {"power": 5.2}
-    loaded = load_recordings(recording_paths(output, recorder_request.export_filename))
+    loaded = load_recordings(find_recording_paths(output, recorder_request.export_filename))
     assert {sample.recording_id for sample in loaded.dataset.samples} == {0, 1}
     assert loaded.dataset.samples[0].elapsed_seconds == loaded.dataset.samples[10].elapsed_seconds == 0
 
@@ -151,7 +151,7 @@ def test_archiving_is_collision_safe_and_recoverable(
     storage.archive_recording(session.id, recorder_request)
     storage.archive_recording(session.id, recorder_request)
 
-    assert [path.name for path in recording_paths(output, "record.jsonl")] == [
+    assert [path.name for path in find_recording_paths(output, "record.jsonl")] == [
         "record-1.jsonl",
         "record-3.jsonl",
         "record-10.jsonl",

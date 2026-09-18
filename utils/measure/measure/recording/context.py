@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from measure.home_assistant.entities import EntityDescriptor
 
 
-def recording_context_for(
+def build_recording_context(
     request: RecorderMeasurementRequest,
     descriptors: Sequence[EntityDescriptor] = (),
 ) -> RecordingContext:
@@ -24,7 +24,7 @@ def recording_context_for(
 
     primary = by_id.get(entity_ids[0])
     device_entities = [
-        _recorded_entity(
+        _build_recorded_entity(
             entity.entity_id, EntityRole.AVAILABLE if entity.disabled_by is None else EntityRole.DISABLED, entity
         )
         for entity in descriptors
@@ -34,12 +34,14 @@ def recording_context_for(
         recipe=request.profile_recipe.value,
         primary_entity_id=entity_ids[0],
         device_type="vacuum_robot" if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT else "generic_iot",
-        entities=[_recorded_entity(entity_id, roles[entity_id], by_id.get(entity_id)) for entity_id in entity_ids],
+        entities=[
+            _build_recorded_entity(entity_id, roles[entity_id], by_id.get(entity_id)) for entity_id in entity_ids
+        ],
         device_entities=device_entities,
     )
 
 
-def _recorded_entity(entity_id: str, role: EntityRole, descriptor: EntityDescriptor | None) -> RecordedEntity:
+def _build_recorded_entity(entity_id: str, role: EntityRole, descriptor: EntityDescriptor | None) -> RecordedEntity:
     """Copy registry metadata, or retain just the identity when no descriptor exists."""
     if descriptor is None:
         return RecordedEntity(entity_id, entity_id.partition(".")[0], role)

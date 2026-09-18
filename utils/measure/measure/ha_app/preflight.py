@@ -95,7 +95,7 @@ class LightSelection:
     effects: list[str]
 
 
-def _no_group_member_overlap(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_no_group_member_overlap(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
     """A group already drives its members, so selecting both would measure them twice."""
 
     members = {member for light in selection.lights for member in light.member_entity_ids}
@@ -104,7 +104,7 @@ def _no_group_member_overlap(selection: LightSelection, _: LightMeasurementReque
     return ()
 
 
-def _count_covers_selection(selection: LightSelection, request: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_light_count(selection: LightSelection, request: LightMeasurementRequest) -> tuple[str, ...]:
     """Measured power is divided by the count, so it cannot describe fewer lights than are driven."""
 
     if request.multiple_light_count < len(selection.lights):
@@ -112,7 +112,7 @@ def _count_covers_selection(selection: LightSelection, request: LightMeasurement
     return ()
 
 
-def _models_agree(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_matching_models(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
     """One profile is produced for all lights, so they must be the same model."""
 
     models = {light.model_id for light in selection.lights}
@@ -123,13 +123,13 @@ def _models_agree(selection: LightSelection, _: LightMeasurementRequest) -> tupl
     return ()
 
 
-def _modes_supported(selection: LightSelection, request: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_supported_modes(selection: LightSelection, request: LightMeasurementRequest) -> tuple[str, ...]:
     if not set(request.modes).issubset(selection.supported_modes):
         raise PreflightError("Selected light does not advertise every requested mode")
     return ()
 
 
-def _color_temp_range_overlaps(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_color_temp_range(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
     if selection.light_info.min_mired > selection.light_info.max_mired:
         raise PreflightError("Selected lights do not share a color temperature range")
     return ()
@@ -140,15 +140,15 @@ LightRule = Callable[[LightSelection, LightMeasurementRequest], tuple[str, ...]]
 #: Checks applied to a light selection, in order. Each returns warnings or raises a PreflightError,
 #: so a new condition is added here rather than by growing the caller.
 LIGHT_RULES: tuple[LightRule, ...] = (
-    _no_group_member_overlap,
-    _count_covers_selection,
-    _models_agree,
-    _modes_supported,
-    _color_temp_range_overlaps,
+    _validate_no_group_member_overlap,
+    _validate_light_count,
+    _validate_matching_models,
+    _validate_supported_modes,
+    _validate_color_temp_range,
 )
 
 
-def _light_info(light: EntityRecord) -> LightInfo:
+def _build_light_info(light: EntityRecord) -> LightInfo:
     return LightInfo(
         "unknown",
         min_mired=light.min_mired if light.min_mired is not None else MIN_MIRED,
@@ -430,7 +430,7 @@ class MeasurementPreflight:
         return LightSelection(
             lights=tuple(selected),
             supported_modes=set.intersection(*(set(light.supported_modes or []) for light in selected)),
-            light_info=merge_light_infos([_light_info(light) for light in selected]),
+            light_info=merge_light_infos([_build_light_info(light) for light in selected]),
             effects=common_effects([light.effect_list or [] for light in selected]),
         )
 

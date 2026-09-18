@@ -28,7 +28,7 @@ from tests.conftest import MockConfigFactory
     ],
 )
 def test_linear_slope_does_not_require_numpy(values: list[float], expected: float) -> None:
-    assert PowerSampler._linear_slope(values) == pytest.approx(expected)  # noqa: SLF001
+    assert PowerSampler._calculate_linear_slope(values) == pytest.approx(expected)  # noqa: SLF001
 
 
 @pytest.mark.parametrize(
@@ -47,17 +47,17 @@ def test_linear_slope_does_not_require_numpy(values: list[float], expected: floa
     ],
 )
 def test_dummy_load_trend_uses_relative_threshold(averages: list[float], expected: Trend) -> None:
-    assert PowerSampler.dummy_load_trend(averages) == expected
+    assert PowerSampler.classify_dummy_load_trend(averages) == expected
 
 
 def test_dummy_load_trend_requires_twenty_samples() -> None:
-    assert PowerSampler.dummy_load_trend([6226.0] * 19) is None
+    assert PowerSampler.classify_dummy_load_trend([6226.0] * 19) is None
 
 
 def test_dummy_load_trend_rejects_opposing_drift_as_unstable() -> None:
     averages = [6000.0 + 10.0 * index for index in range(10)] + [6100.0 - 10.0 * index for index in range(10)]
 
-    assert PowerSampler.dummy_load_trend(averages) is Trend.UNSTABLE
+    assert PowerSampler.classify_dummy_load_trend(averages) is Trend.UNSTABLE
 
 
 def test_no_valid_average_readings_raise_typed_error(mock_config_factory: MockConfigFactory) -> None:

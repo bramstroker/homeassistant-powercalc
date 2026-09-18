@@ -19,10 +19,10 @@ from measure.analyser.models import (
 from measure.analyser.vacuum_signals import (
     Activity,
     ActivitySignal,
-    battery_feature,
     discover_signals,
-    portable_entity,
+    find_battery_feature,
     resolve_activity,
+    resolve_portable_entity,
 )
 from measure.recording.models import RecordingContext, RecordingSample
 
@@ -53,7 +53,7 @@ class VacuumBranch:
     def estimate(self, sample: RecordingSample, battery: FeatureReference | None) -> float | None:
         if self.power is not None:
             return self.power
-        value = battery_level(sample, battery)
+        value = get_battery_level(sample, battery)
         if value is None or not self.calibration[0].battery_level <= value <= self.calibration[-1].battery_level:
             return None
         levels = [point.battery_level for point in self.calibration]
@@ -96,11 +96,11 @@ class VacuumCompositeCandidate:
                     return branch.power
         return None
 
-    def support_key(self, sample: RecordingSample) -> Activity | None:
+    def get_support_key(self, sample: RecordingSample) -> Activity | None:
         return resolve_activity(sample, self.signals)
 
     def estimate_power(self, sample: RecordingSample) -> float | None:
-        activity = self.support_key(sample)
+        activity = self.get_support_key(sample)
         for branch in self.branches:
             # Composite checks an overridden source's availability before its
             # condition, including when it would otherwise skip charging.
@@ -119,22 +119,24 @@ class VacuumCompositeCandidate:
             branch = branches.get(signal.activity)
             if branch is not None:
                 # Include unobserved activity flags when guarding lower-priority branches.
-                strategies.append(self._branch_config(branch, signal, self.signals[:index]))
+                strategies.append(self._build_branch_config(branch, signal, self.signals[:index]))
         return ModelConfigFragment("composite", "composite_config", {"mode": "stop_at_first", "strategies": strategies})
 
-    def _branch_config(
+    def _build_branch_config(
         self, branch: VacuumBranch, signal: ActivitySignal, higher_priority: Sequence[ActivitySignal]
     ) -> dict[str, object]:
         conditions = [
-            guard.condition(self.context, active=False) for guard in higher_priority if guard.feature != signal.feature
+            guard.build_condition(self.context, active=False)
+            for guard in higher_priority
+            if guard.feature != signal.feature
         ]
-        conditions.append(signal.condition(self.context))
+        conditions.append(signal.build_condition(self.context))
         item: dict[str, object] = {}
         if branch.calibration:
             assert self.battery is not None
-            entity_id = portable_entity(self.battery.entity_id, self.context)
+            entity_id = resolve_portable_entity(self.battery.entity_id, self.context)
             assert entity_id is not None
-            conditions.append(_charging_condition(branch, self.battery, entity_id))
+            conditions.append(_build_charging_condition(branch, self.battery, entity_id))
             item["entity_id"] = entity_id
             linear: dict[str, object] = {
                 "calibrate": [f"{point.battery_level} -> {point.power}" for point in branch.calibration]
@@ -167,7 +169,7 @@ class VacuumCompositeStrategy(ProfileAnalysisStrategy):
             return StrategyNotApplicable("Record at least two identifiable vacuum/dock activities")
         if any(sample.power < 0 for sample in samples):
             return StrategyNotApplicable("Vacuum power must be non-negative; check the meter or dummy-load correction")
-        battery = battery_feature(grouped[Activity.CHARGING], context) if Activity.CHARGING in grouped else None
+        battery = find_battery_feature(grouped[Activity.CHARGING], context) if Activity.CHARGING in grouped else None
         branches: list[VacuumBranch] = []
         for signal in signals:
             if not (activity_samples := grouped.get(signal.activity)):
@@ -185,12 +187,12 @@ def _fit_branch(
     if len(samples) < MIN_EPISODE_SAMPLES:
         return StrategyNotApplicable(f"Record at least {MIN_EPISODE_SAMPLES} training samples for {activity}")
     if activity == Activity.CHARGING:
-        return _charging_branch(samples, battery)
+        return _fit_charging_branch(samples, battery)
     return VacuumBranch(activity, round(median(sample.power for sample in samples), 2))
 
 
-def battery_level(sample: RecordingSample, feature: FeatureReference | None) -> int | None:
-    value = feature.value(sample) if feature is not None else None
+def get_battery_level(sample: RecordingSample, feature: FeatureReference | None) -> int | None:
+    value = feature.get_value(sample) if feature is not None else None
     if isinstance(value, bool) or not isinstance(value, str | int | float):
         return None
     try:
@@ -204,7 +206,7 @@ def battery_level(sample: RecordingSample, feature: FeatureReference | None) -> 
         return None
 
 
-def _charging_condition(branch: VacuumBranch, battery: FeatureReference, entity_id: str) -> dict[str, object]:
+def _build_charging_condition(branch: VacuumBranch, battery: FeatureReference, entity_id: str) -> dict[str, object]:
     # Guard the calibrated range: PowerCalc otherwise extrapolates. Reject
     # missing, boolean, non-finite and non-numeric values before integer coercion.
     expression = (
@@ -224,7 +226,7 @@ def _charging_condition(branch: VacuumBranch, battery: FeatureReference, entity_
     return {"condition": "template", "value_template": "{{ " + " and ".join(checks) + " }}"}
 
 
-def _charging_branch(
+def _fit_charging_branch(
     samples: Sequence[RecordingSample], battery: FeatureReference | None
 ) -> VacuumBranch | StrategyNotApplicable:
     if battery is None:
@@ -233,7 +235,7 @@ def _charging_branch(
         )
     bins: dict[int, list[ChargingPoint]] = defaultdict(list)
     for sample in samples:
-        if (level := battery_level(sample, battery)) is not None:
+        if (level := get_battery_level(sample, battery)) is not None:
             bins[level // CHARGING_BIN_WIDTH].append(ChargingPoint(battery_level=level, power=sample.power))
     supported = [values for _, values in sorted(bins.items()) if len(values) >= MIN_SAMPLES_PER_CHARGING_BIN]
     if len(supported) < MIN_CHARGING_BINS:
@@ -262,7 +264,7 @@ class VacuumEpisode:
     samples: list[RecordingSample]
 
 
-def vacuum_episodes(samples: Sequence[RecordingSample], signals: Sequence[ActivitySignal]) -> list[VacuumEpisode]:
+def group_vacuum_episodes(samples: Sequence[RecordingSample], signals: Sequence[ActivitySignal]) -> list[VacuumEpisode]:
     episodes: list[VacuumEpisode] = []
     current: list[RecordingSample] = []
     previous: RecordingSample | None = None
@@ -285,7 +287,7 @@ def split_vacuum_samples(
     context: RecordingContext,
 ) -> TrainingValidationSplit | StrategyNotApplicable:
     signals = discover_signals(samples, context)
-    episodes = vacuum_episodes(samples, signals)
+    episodes = group_vacuum_episodes(samples, signals)
     grouped: dict[Activity, list[VacuumEpisode]] = defaultdict(list)
     for episode in episodes:
         if episode.activity is not None:

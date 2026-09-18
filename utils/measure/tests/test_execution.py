@@ -411,7 +411,7 @@ def test_dummy_load_calibration_repeats_until_steady_and_saves_result(monkeypatc
         *[MeasurementResult(power=float(index), voltages=[230.0]) for index in range(20)],
         *[MeasurementResult(power=100.0, voltages=[230.0]) for _ in range(20)],
     ]
-    sampler.dummy_load_trend.side_effect = ["increasing", "steady"]
+    sampler.classify_dummy_load_trend.side_effect = ["increasing", "steady"]
     preparation = DummyLoadPreparation(
         request=request,
         spec=DummyLoadCalibrationRequest(description="60 W lamp"),

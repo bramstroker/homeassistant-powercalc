@@ -158,12 +158,12 @@ class PowerSampler:
         try:
             result = self._take_average_measurement_reading(measure_resistance)
         except PowerMeterError as error:
-            if self._average_measurement_retry_limit_reached(state, error):
+            if self._record_error_and_check_retry_limit(state, error):
                 raise
             return False
         return self._record_average_measurement_result(state, result, convergence)
 
-    def _average_measurement_retry_limit_reached(self, state: AverageMeasurementState, error: PowerMeterError) -> bool:
+    def _record_error_and_check_retry_limit(self, state: AverageMeasurementState, error: PowerMeterError) -> bool:
         state.consecutive_errors += 1
         _LOGGER.warning(
             "Error during average measurement (attempt %d/%d): %s",
@@ -186,7 +186,7 @@ class PowerSampler:
         state.readings.append(result.power)
         state.voltages.extend(result.voltages)
         self._append_average_snapshot(state.start_time, state.readings, state.snapshots)
-        return bool(convergence and self.average_has_converged(state.snapshots, convergence))
+        return bool(convergence and self.has_average_converged(state.snapshots, convergence))
 
     @staticmethod
     def _append_average_snapshot(
@@ -203,7 +203,7 @@ class PowerSampler:
         )
 
     @staticmethod
-    def average_has_converged(
+    def has_average_converged(
         snapshots: list[AverageMeasurementSnapshot],
         convergence: AverageMeasurementConvergence,
     ) -> bool:
@@ -363,7 +363,7 @@ class PowerSampler:
         return self.take_measurement(start_timestamp, retry_count + 1)
 
     @staticmethod
-    def dummy_load_trend(averages: list[float]) -> Trend | None:
+    def classify_dummy_load_trend(averages: list[float]) -> Trend | None:
         """Classify resistance readings as increasing, decreasing or steady."""
         if len(averages) < 20:
             return None
@@ -373,20 +373,20 @@ class PowerSampler:
         first_half = averages[:mid]
         second_half = averages[mid:]
 
-        first_slope = PowerSampler._linear_slope(first_half)
-        second_slope = PowerSampler._linear_slope(second_half)
+        first_slope = PowerSampler._calculate_linear_slope(first_half)
+        second_slope = PowerSampler._calculate_linear_slope(second_half)
 
         threshold = mean(averages) * DUMMY_LOAD_TREND_RELATIVE_THRESHOLD
 
-        def trend_direction(slope: float) -> Trend:
+        def classify_trend_direction(slope: float) -> Trend:
             if slope > threshold:
                 return Trend.INCREASING
             if slope < -threshold:
                 return Trend.DECREASING
             return Trend.STEADY
 
-        first_trend = trend_direction(first_slope)
-        second_trend = trend_direction(second_slope)
+        first_trend = classify_trend_direction(first_slope)
+        second_trend = classify_trend_direction(second_slope)
 
         if first_trend == second_trend:
             return first_trend
@@ -397,7 +397,7 @@ class PowerSampler:
         return Trend.UNSTABLE
 
     @staticmethod
-    def _linear_slope(values: list[float]) -> float:
+    def _calculate_linear_slope(values: list[float]) -> float:
         """Return the least-squares slope for equally spaced values without NumPy."""
         if len(values) < 2:
             return 0.0

@@ -1,4 +1,4 @@
-from measure.recording.capture import vacuum_recording_attributes
+from measure.recording.capture import filter_vacuum_recording_attributes
 import pytest
 
 
@@ -23,11 +23,11 @@ import pytest
     ],
 )
 def test_vacuum_attributes_keep_only_bounded_analysis_values(value: object, included: bool) -> None:
-    assert vacuum_recording_attributes({"washing": value}) == ({"washing": value} if included else {})
+    assert filter_vacuum_recording_attributes({"washing": value}) == ({"washing": value} if included else {})
 
 
 def test_vacuum_attributes_exclude_identifying_metadata() -> None:
-    assert vacuum_recording_attributes(
+    assert filter_vacuum_recording_attributes(
         {
             "ssid": "private",
             "ip": "private",

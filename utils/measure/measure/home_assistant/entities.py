@@ -105,31 +105,31 @@ class EntityCatalogSnapshot:
         if device_class == DeviceClass.POWER:
             selected = [
                 entity.model_copy(
-                    update={"related_voltage_entity_id": self._related_entity_id(entity, DeviceClass.VOLTAGE)},
+                    update={"related_voltage_entity_id": self._find_related_entity_id(entity, DeviceClass.VOLTAGE)},
                 )
                 for entity in selected
             ]
         return selected
 
-    def all(self) -> list[EntityDescriptor]:
+    def get_all(self) -> list[EntityDescriptor]:
         """Return every registry entity, including unsupported domains and unavailable states."""
 
         return sorted(self._entities, key=lambda entity: (entity.name.casefold(), entity.entity_id))
 
-    def attribute_names(self, entity_id: str) -> list[str]:
+    def get_attribute_names(self, entity_id: str) -> list[str]:
         entity = self._by_id.get(entity_id)
         return list(entity.attribute_names) if entity is not None else []
 
     def get(self, entity_id: str) -> EntityDescriptor | None:
         return self._by_id.get(entity_id)
 
-    def related_entity_id(self, entity_id: str, device_class: DeviceClass) -> str | None:
+    def find_related_entity_id(self, entity_id: str, device_class: DeviceClass) -> str | None:
         entity = self._by_id.get(entity_id)
         if entity is None:
             return None
-        return self._related_entity_id(entity, device_class)
+        return self._find_related_entity_id(entity, device_class)
 
-    def _related_entity_id(self, entity: EntityDescriptor, device_class: DeviceClass) -> str | None:
+    def _find_related_entity_id(self, entity: EntityDescriptor, device_class: DeviceClass) -> str | None:
         if entity.device_id is None:
             return None
         return next(
@@ -206,7 +206,7 @@ class HomeAssistantEntityCatalog:
             _describe_registry_entity(entry) for entity_id, entry in registry.items() if entity_id not in live_ids
         )
         by_id = {descriptor.entity_id: descriptor for descriptor in descriptors}
-        return EntityCatalogSnapshot([_with_group_device_metadata(descriptor, by_id) for descriptor in descriptors])
+        return EntityCatalogSnapshot([_enrich_group_device_metadata(descriptor, by_id) for descriptor in descriptors])
 
 
 def _describe_registry_entity(entry: EntityRegistryEntry) -> EntityDescriptor:
@@ -225,7 +225,7 @@ def _describe_registry_entity(entry: EntityRegistryEntry) -> EntityDescriptor:
     )
 
 
-def _with_group_device_metadata(
+def _enrich_group_device_metadata(
     descriptor: EntityDescriptor,
     by_id: dict[str, EntityDescriptor],
 ) -> EntityDescriptor:
@@ -234,16 +234,20 @@ def _with_group_device_metadata(
     if not descriptor.member_entity_ids:
         return descriptor
     update: dict[str, str] = {}
-    if not descriptor.model_id and (model_id := _group_value(descriptor, by_id, frozenset(), "model_id")):
+    if not descriptor.model_id and (model_id := _resolve_group_value(descriptor, by_id, frozenset(), "model_id")):
         update["model_id"] = model_id
-    if not descriptor.product_name and (product_name := _group_value(descriptor, by_id, frozenset(), "product_name")):
+    if not descriptor.product_name and (
+        product_name := _resolve_group_value(descriptor, by_id, frozenset(), "product_name")
+    ):
         update["product_name"] = product_name
-    if not descriptor.manufacturer and (manufacturer := _group_value(descriptor, by_id, frozenset(), "manufacturer")):
+    if not descriptor.manufacturer and (
+        manufacturer := _resolve_group_value(descriptor, by_id, frozenset(), "manufacturer")
+    ):
         update["manufacturer"] = manufacturer
     return descriptor.model_copy(update=update) if update else descriptor
 
 
-def _group_value(
+def _resolve_group_value(
     descriptor: EntityDescriptor,
     by_id: dict[str, EntityDescriptor],
     seen: frozenset[str],
@@ -258,7 +262,7 @@ def _group_value(
         return None
     seen = seen | {descriptor.entity_id}
     values = {
-        _group_value(member, by_id, seen, field) if (member := by_id.get(entity_id)) is not None else None
+        _resolve_group_value(member, by_id, seen, field) if (member := by_id.get(entity_id)) is not None else None
         for entity_id in descriptor.member_entity_ids
     }
     return values.pop() if len(values) == 1 and None not in values else None
@@ -284,7 +288,7 @@ def _describe_entity(
     device = device_registry.get(device_id, {}) if device_id is not None else {}
     manufacturer = device.get(HASS_DEVICE_REGISTRY_MANUFACTURER)
     model_id = device.get(HASS_DEVICE_REGISTRY_MODEL_ID) or device.get(HASS_DEVICE_REGISTRY_MODEL)
-    device_class = _device_class(attributes.get(HASS_ENTITY_DEVICE_CLASS))
+    device_class = _parse_device_class(attributes.get(HASS_ENTITY_DEVICE_CLASS))
     supported_modes = supported_light_modes(attributes) if domain == EntityDomain.LIGHT else None
     light_info = light_info_from_attributes(attributes) if domain == EntityDomain.LIGHT else None
     unit = attributes.get(HASS_ENTITY_UNIT_OF_MEASUREMENT)
@@ -312,7 +316,7 @@ def _describe_entity(
     )
 
 
-def _device_class(value: object) -> str | None:
+def _parse_device_class(value: object) -> str | None:
     return value if isinstance(value, str) and value else None
 
 

@@ -14,7 +14,7 @@ from measure.ha_app.library_catalog import (
     ManufacturerCatalog,
     MeasureDeviceCatalog,
 )
-from measure.ha_app.light_probe import LightLoadProbe, app_measurement_assembler
+from measure.ha_app.light_probe import LightLoadProbe, create_app_measurement_assembler
 from measure.ha_app.service import MeasurementService
 from measure.ha_app.session import SessionSnapshot
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
@@ -45,43 +45,43 @@ class AppContext:
         self.measure_device_catalog = MeasureDeviceCatalog()
         self.manufacturer_catalog = ManufacturerCatalog()
         self.device_specification_catalog = DeviceSpecificationCatalog()
-        self.power_meter_diagnostics = PowerMeterDiagnostics(self.build_power_meter)
+        self.power_meter_diagnostics = PowerMeterDiagnostics(self.create_power_meter)
         self.light_load_probe = LightLoadProbe(
-            lambda: app_measurement_assembler(
+            lambda: create_app_measurement_assembler(
                 home_assistant=self.home_assistant,
-                shelly_password=self.shelly_password(),
-                kasa_credentials=self.tapo_credentials(),
+                shelly_password=self.get_shelly_password(),
+                kasa_credentials=self.get_tapo_credentials(),
             ),
         )
         self.contribution = ContributionApiCoordinator(
             self.storage,
-            resolve_integration=self.entity_integrations,
-            resolve_manufacturer=self.entity_manufacturers,
-            resolve_model_id=self.entity_model_ids,
+            resolve_integration=self.get_entity_integrations,
+            resolve_manufacturer=self.get_entity_manufacturers,
+            resolve_model_id=self.get_entity_model_ids,
         )
         self.coordinator = MeasurementCoordinator(
             self.storage,
-            self._measurement_service,
+            self._create_measurement_service,
         )
 
-    def entity_integrations(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
+    def get_entity_integrations(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
         """Look up which integration provides each entity; contribution details stay usable without it."""
-        entities = self._entity_descriptors(entity_ids, "integration")
+        entities = self._load_entity_descriptors(entity_ids, "integration")
         return {entity_id: entity.integration if entity is not None else None for entity_id, entity in entities.items()}
 
-    def entity_manufacturers(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
+    def get_entity_manufacturers(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
         """Look up HA's device manufacturer per entity and normalize known aliases to the library name."""
-        entities = self._entity_descriptors(entity_ids, "manufacturer")
+        entities = self._load_entity_descriptors(entity_ids, "manufacturer")
         return {
-            entity_id: self._canonical_manufacturer(entity.manufacturer) if entity is not None else None
+            entity_id: self._resolve_canonical_manufacturer(entity.manufacturer) if entity is not None else None
             for entity_id, entity in entities.items()
         }
 
-    def entity_model_ids(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
-        entities = self._entity_descriptors(entity_ids, "model ID")
+    def get_entity_model_ids(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
+        entities = self._load_entity_descriptors(entity_ids, "model ID")
         return {entity_id: entity.model_id if entity is not None else None for entity_id, entity in entities.items()}
 
-    def _entity_descriptors(self, entity_ids: Sequence[str], purpose: str) -> dict[str, EntityDescriptor | None]:
+    def _load_entity_descriptors(self, entity_ids: Sequence[str], purpose: str) -> dict[str, EntityDescriptor | None]:
         """Read one entity snapshot for the whole batch, rather than one per entity."""
         try:
             snapshot = HomeAssistantEntityCatalog(self.home_assistant).load_snapshot()
@@ -90,7 +90,7 @@ class AppContext:
             return dict.fromkeys(entity_ids)
         return {entity_id: snapshot.get(entity_id) for entity_id in entity_ids}
 
-    def _canonical_manufacturer(self, manufacturer: str | None) -> str | None:
+    def _resolve_canonical_manufacturer(self, manufacturer: str | None) -> str | None:
         if not manufacturer:
             return None
         try:
@@ -99,32 +99,32 @@ class AppContext:
             _LOGGER.warning("Could not normalize manufacturer %s: %s", manufacturer, error)
             return manufacturer
 
-    def _measurement_service(self) -> MeasurementService:
+    def _create_measurement_service(self) -> MeasurementService:
         return MeasurementService(
             self.home_assistant,
             self.storage,
-            shelly_password=self.shelly_password(),
-            kasa_credentials=self.tapo_credentials(),
+            shelly_password=self.get_shelly_password(),
+            kasa_credentials=self.get_tapo_credentials(),
         )
 
-    def shelly_password(self) -> str | None:
+    def get_shelly_password(self) -> str | None:
         credentials = self.storage.load_shelly_credentials()
         return credentials.password if credentials is not None else None
 
-    def tapo_credentials(self) -> tuple[str, str] | None:
+    def get_tapo_credentials(self) -> tuple[str, str] | None:
         credentials = self.storage.load_tapo_credentials()
         return (credentials.username, credentials.password) if credentials is not None else None
 
-    def build_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:
+    def create_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:
         return MeasurementAssembler(
             ImmediateInteraction(),
             home_assistant=self.home_assistant,
-            shelly_password=self.shelly_password(),
-            kasa_credentials=self.tapo_credentials(),
-        ).build_power_meter(spec)
+            shelly_password=self.get_shelly_password(),
+            kasa_credentials=self.get_tapo_credentials(),
+        ).create_power_meter(spec)
 
 
-def app_context(request: Request) -> AppContext:
+def get_app_context(request: Request) -> AppContext:
     return cast(AppContext, request.app.state.context)
 
 

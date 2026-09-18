@@ -57,7 +57,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
             0,
             total_steps,
             phase=VOLUME_MEASUREMENT_PHASE,
-            remaining_seconds=self._remaining_seconds(0, len(volumes), fast_test_mode),
+            remaining_seconds=self._estimate_remaining_seconds(0, len(volumes), fast_test_mode),
         )
 
         disable_streaming = request.disable_streaming
@@ -80,7 +80,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
                 completed_steps,
                 total_steps,
                 phase=VOLUME_MEASUREMENT_PHASE,
-                remaining_seconds=self._remaining_seconds(completed_steps, len(volumes), fast_test_mode),
+                remaining_seconds=self._estimate_remaining_seconds(completed_steps, len(volumes), fast_test_mode),
             )
 
         _LOGGER.info("Muting volume and waiting for %d seconds", SLEEP_MUTE)
@@ -111,7 +111,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
         return self.sampler.take_average_measurement(duration)
 
     @staticmethod
-    def _remaining_seconds(completed_levels: int, total_levels: int, fast_test_mode: bool = False) -> float:
+    def _estimate_remaining_seconds(completed_levels: int, total_levels: int, fast_test_mode: bool = False) -> float:
         """Estimated time for the remaining volume levels plus the muted baseline."""
         if fast_test_mode:
             return 0

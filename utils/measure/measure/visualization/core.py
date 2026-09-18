@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from measure.controller.light.const import LutMode
-from measure.recording.files import recording_filenames
+from measure.recording.files import select_recording_filenames
 from measure.request import (
     ChargingMeasurementRequest,
     FanMeasurementRequest,
@@ -77,7 +77,7 @@ def _session_plot_candidates(
         names = (Path(name).name.removesuffix(".gz") for name in files if Path(name).parent == Path(model_root))
         return [
             candidate
-            for name in recording_filenames(names, request.export_filename)
+            for name in select_recording_filenames(names, request.export_filename)
             for candidate in _single_plot_candidate(files, f"{model_root}/{name}", max_line_points)
         ]
     if isinstance(request, SpeakerMeasurementRequest | FanMeasurementRequest | ChargingMeasurementRequest):

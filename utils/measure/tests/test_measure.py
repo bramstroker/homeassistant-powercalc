@@ -206,7 +206,7 @@ def test_average_convergence(
     )
     average_snapshots = [AverageMeasurementSnapshot(elapsed=elapsed, average=average) for elapsed, average in snapshots]
 
-    assert PowerSampler.average_has_converged(average_snapshots, convergence) is expected
+    assert PowerSampler.has_average_converged(average_snapshots, convergence) is expected
 
 
 def test_run_smart_speaker(mock_config_factory: MockConfigFactory, mock_average_measurement: MagicMock) -> None:

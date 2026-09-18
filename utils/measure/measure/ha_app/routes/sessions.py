@@ -20,7 +20,7 @@ from measure.ha_app.api_models import (
     SessionSnapshotResponse,
     SessionSummary,
 )
-from measure.ha_app.context import AppContext, app_context, require_session
+from measure.ha_app.context import AppContext, get_app_context, require_session
 from measure.ha_app.coordinator import SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
 from measure.ha_app.preparation import apply_fast_test_mode, run_preflight
@@ -40,7 +40,7 @@ router = APIRouter()
 
 @router.post("/sessions", status_code=201, responses={409: ERROR_RESPONSE, 422: ERROR_RESPONSE})
 async def start_session(payload: MeasurementRequestPayload, request: Request) -> SessionSnapshotResponse:
-    context = app_context(request)
+    context = get_app_context(request)
     prepared = await run_in_threadpool(apply_fast_test_mode, context, payload)
     await run_in_threadpool(run_preflight, context, prepared)
     try:
@@ -52,7 +52,7 @@ async def start_session(payload: MeasurementRequestPayload, request: Request) ->
 
 @router.get("/sessions")
 async def sessions(request: Request) -> list[SessionSummary]:
-    context = app_context(request)
+    context = get_app_context(request)
     snapshots = await run_in_threadpool(context.coordinator.sessions)
     summaries = [await run_in_threadpool(_session_summary, context, snapshot) for snapshot in snapshots]
     return sorted(summaries, key=lambda item: not item.active)
@@ -60,13 +60,13 @@ async def sessions(request: Request) -> list[SessionSummary]:
 
 @router.get("/sessions/{session_id}", responses={404: ERROR_RESPONSE})
 async def session(session_id: str, request: Request) -> SessionSnapshotResponse:
-    context = app_context(request)
+    context = get_app_context(request)
     return _snapshot_response(context, require_session(context, session_id))
 
 
 @router.delete("/sessions/{session_id}", status_code=204, responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE})
 async def delete_session(session_id: str, request: Request) -> Response:
-    context = app_context(request)
+    context = get_app_context(request)
     require_session(context, session_id)
     try:
         await run_in_threadpool(context.coordinator.delete, session_id)
@@ -77,22 +77,22 @@ async def delete_session(session_id: str, request: Request) -> Response:
 
 @router.post("/sessions/{session_id}/cancel", status_code=202, responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE})
 async def cancel_session(session_id: str, request: Request) -> SessionSnapshotResponse:
-    return _cancel_session(app_context(request), session_id)
+    return _cancel_session(get_app_context(request), session_id)
 
 
 @router.post("/sessions/{session_id}/confirm", responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE})
 async def confirm_session(session_id: str, request: Request) -> SessionSnapshotResponse:
-    return _confirm_session(app_context(request), session_id)
+    return _confirm_session(get_app_context(request), session_id)
 
 
 @router.post("/sessions/{session_id}/resume", responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE, 422: ERROR_RESPONSE})
 async def resume_session(session_id: str, request: Request) -> SessionSnapshotResponse:
-    return await _resume_session(app_context(request), session_id)
+    return await _resume_session(get_app_context(request), session_id)
 
 
 @router.post("/sessions/{session_id}/analyse", responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE})
 async def analyse_session(session_id: str, request: Request) -> SessionSnapshotResponse:
-    context = app_context(request)
+    context = get_app_context(request)
     require_session(context, session_id)
     try:
         snapshot = await run_in_threadpool(context.coordinator.analyse, session_id)
@@ -105,7 +105,7 @@ async def analyse_session(session_id: str, request: Request) -> SessionSnapshotR
     "/sessions/{session_id}/record-more", responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE, 422: ERROR_RESPONSE}
 )
 async def record_more(session_id: str, request: Request) -> SessionSnapshotResponse:
-    context = app_context(request)
+    context = get_app_context(request)
     snapshot = require_session(context, session_id)
     if snapshot.state in ACTIVE_SESSION_STATES or not context.storage.can_analyse(session_id):
         raise HTTPException(status_code=409, detail="The requested session has no profile recording to extend")
@@ -119,32 +119,32 @@ async def record_more(session_id: str, request: Request) -> SessionSnapshotRespo
 
 @router.get("/sessions/{session_id}/files", responses={404: ERROR_RESPONSE})
 async def session_files(session_id: str, request: Request) -> list[SessionFile]:
-    context = app_context(request)
+    context = get_app_context(request)
     snapshot = require_session(context, session_id)
     return _session_files(context, snapshot)
 
 
 @router.get("/sessions/{session_id}/plots", responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE})
 async def session_plots(session_id: str, request: Request) -> SessionPlots:
-    context = app_context(request)
+    context = get_app_context(request)
     return await _session_plots(context, require_session(context, session_id))
 
 
 @router.get("/sessions/{session_id}/files/{name:path}", responses={404: ERROR_RESPONSE})
 async def session_download(session_id: str, name: str, request: Request) -> FileResponse:
-    context = app_context(request)
+    context = get_app_context(request)
     return _session_download(context, require_session(context, session_id), name)
 
 
 @router.get("/sessions/{session_id}/diagnostics", responses={404: ERROR_RESPONSE})
 async def session_diagnostics(session_id: str, request: Request) -> Response:
-    context = app_context(request)
+    context = get_app_context(request)
     return _session_diagnostics(context, require_session(context, session_id))
 
 
 @router.get("/sessions/{session_id}/events", responses={404: ERROR_RESPONSE})
 async def session_events(session_id: str, request: Request) -> StreamingResponse:
-    context = app_context(request)
+    context = get_app_context(request)
     require_session(context, session_id)
     return StreamingResponse(_event_stream(request, context, session_id), media_type="text/event-stream")
 

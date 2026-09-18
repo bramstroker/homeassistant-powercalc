@@ -152,25 +152,25 @@ class ActivitySignal:
     inactive: list[ScalarStateValue]
 
     def matches(self, sample: RecordingSample) -> bool | None:
-        value = self.feature.value(sample)
+        value = self.feature.get_value(sample)
         if value is None:
             return None
         if _contains(self.active, value):
             return True
         return False if _contains(self.inactive, value) else None
 
-    def condition(self, context: RecordingContext, *, active: bool = True) -> dict[str, object]:
-        entity = portable_entity(self.feature.entity_id, context)
+    def build_condition(self, context: RecordingContext, *, active: bool = True) -> dict[str, object]:
+        entity = resolve_portable_entity(self.feature.entity_id, context)
         assert entity is not None
         values = self.active if active else self.inactive
         if self.feature.source == "state":
             return {"condition": "state", "entity_id": entity, "state": list(values)}
         return {
             "condition": "template",
-            "value_template": self._attribute_template(entity, values),
+            "value_template": self._build_attribute_template(entity, values),
         }
 
-    def _attribute_template(self, entity: str, values: Sequence[ScalarStateValue]) -> str:
+    def _build_attribute_template(self, entity: str, values: Sequence[ScalarStateValue]) -> str:
         expression = f"state_attr({entity!r}, {self.feature.attribute!r})"
         comparisons = [
             expression + (" is sameas " if isinstance(value, bool) else " == ") + json.dumps(value) for value in values
@@ -184,7 +184,7 @@ class _SignalCandidate:
     signal: ActivitySignal
 
 
-def portable_entity(entity_id: str, context: RecordingContext) -> str | None:
+def resolve_portable_entity(entity_id: str, context: RecordingContext) -> str | None:
     """Map a recorded entity ID to a profile placeholder reusable in other HA installations.
 
     Use [[entity]] for the vacuum, otherwise a unique translation key or supported
@@ -208,7 +208,7 @@ def portable_entity(entity_id: str, context: RecordingContext) -> str | None:
     return None
 
 
-def _entity_signals(
+def _discover_entity_signals(
     samples: Sequence[RecordingSample],
     entities: Sequence[RecordedEntity],
     primary: str,
@@ -244,10 +244,10 @@ def discover_signals(samples: Sequence[RecordingSample], context: RecordingConte
     entities = [
         entity
         for entity in context.entities
-        if entity.disabled_by is None and portable_entity(entity.entity_id, context) is not None
+        if entity.disabled_by is None and resolve_portable_entity(entity.entity_id, context) is not None
     ]
     primary = context.primary_entity_id
-    candidates = _entity_signals(samples, entities, primary)
+    candidates = _discover_entity_signals(samples, entities, primary)
     attributes = {key for sample in samples if (state := sample.entities.get(primary)) for key in state.attributes}
     for attribute in sorted(attributes):
         feature = FeatureReference(primary, "attribute", attribute)
@@ -315,10 +315,10 @@ def _is_charging_sensor(entity: RecordedEntity) -> bool:
     )
 
 
-def _values(samples: Sequence[RecordingSample], feature: FeatureReference) -> list[ScalarStateValue]:
+def _collect_feature_values(samples: Sequence[RecordingSample], feature: FeatureReference) -> list[ScalarStateValue]:
     values: list[ScalarStateValue] = []
     for sample in samples:
-        value = feature.value(sample)
+        value = feature.get_value(sample)
         if (
             value is not None
             and _normalise(value) not in {"unknown", "unavailable", "none"}
@@ -335,7 +335,7 @@ def _add_flags(
     activity: Activity,
     priority: _SourcePriority,
 ) -> None:
-    values = _values(samples, feature)
+    values = _collect_feature_values(samples, feature)
     active: list[ScalarStateValue] = [
         value
         for value in values
@@ -354,7 +354,7 @@ def _add_flags(
 def _add_sleep_flag(
     candidates: list[_SignalCandidate], samples: Sequence[RecordingSample], feature: FeatureReference
 ) -> None:
-    values = _values(samples, feature)
+    values = _collect_feature_values(samples, feature)
     active: list[ScalarStateValue] = [
         value for value in values if isinstance(value, str) and _normalise(value) in ALIASES[Activity.SLEEPING]
     ]
@@ -376,7 +376,7 @@ def _add_aux_states(
     activities: Sequence[Activity],
     off_values: set[str],
 ) -> None:
-    values = _values(samples, feature)
+    values = _collect_feature_values(samples, feature)
     recognised = off_values | set().union(*(ALIASES[activity] for activity in activities))
     # Other explicit charging modes are inactive, even when the authoritative
     # source already supplies that activity and we only supplement completion.
@@ -408,7 +408,7 @@ def _add_states(
     feature: FeatureReference,
     priority: _SourcePriority,
 ) -> None:
-    values = _values(samples, feature)
+    values = _collect_feature_values(samples, feature)
     for activity, aliases in ALIASES.items():
         active: list[ScalarStateValue] = [
             value for value in values if isinstance(value, str) and _normalise(value) in aliases
@@ -441,9 +441,9 @@ def resolve_activity(sample: RecordingSample, signals: Sequence[ActivitySignal])
     return None
 
 
-def battery_feature(samples: Sequence[RecordingSample], context: RecordingContext) -> FeatureReference | None:
+def find_battery_feature(samples: Sequence[RecordingSample], context: RecordingContext) -> FeatureReference | None:
     battery = next((entity for entity in context.entities if entity.role == EntityRole.BATTERY), None)
-    if battery is not None and portable_entity(battery.entity_id, context) is not None:
+    if battery is not None and resolve_portable_entity(battery.entity_id, context) is not None:
         return FeatureReference(battery.entity_id, "state")
     # Legacy recordings lack registry metadata, but usually expose the same battery
     # level directly on the vacuum. Never guess a related entity from its name.
@@ -452,9 +452,9 @@ def battery_feature(samples: Sequence[RecordingSample], context: RecordingContex
         battery is not None
         and samples
         and all(
-            feature.value(sample) is not None
+            feature.get_value(sample) is not None
             and (state := sample.entities.get(battery.entity_id)) is not None
-            and str(feature.value(sample)) == state.state
+            and str(feature.get_value(sample)) == state.state
             for sample in samples
         )
     ):

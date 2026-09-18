@@ -312,7 +312,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                     on=True,
                     **asdict(variation),
                 )
-                self.interaction.operating_point(self._operating_point(mode, variation))
+                self.interaction.operating_point(self._build_operating_point(mode, variation))
                 return
             except ApiConnectionError as error:
                 _LOGGER.warning("Failed to change light state: %s. Retrying...", error)
@@ -430,7 +430,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                     on=True,
                     **asdict(variation),
                 )
-                self.interaction.operating_point(self._operating_point(mode, variation))
+                self.interaction.operating_point(self._build_operating_point(mode, variation))
                 # Wait a longer amount of time for the PM to settle
                 self._wait(self.config.sleep_time_nudge)
                 result = self.take_power_measurement(mode, variation_start_time)
@@ -560,7 +560,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             return MeasurementResult(power=0, voltages=[])
 
     @staticmethod
-    def _operating_point(mode: LutMode, variation: Variation) -> LightOperatingPoint:
+    def _build_operating_point(mode: LutMode, variation: Variation) -> LightOperatingPoint:
         point = LightOperatingPoint(type="light", on=True, brightness=variation.bri)
         if mode == LutMode.COLOR_TEMP and isinstance(variation, ColorTempVariation):
             point["color_temp_mired"] = variation.ct

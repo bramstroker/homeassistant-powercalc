@@ -71,7 +71,7 @@ class RecordingContext:
     entities: list[RecordedEntity]
     device_entities: list[RecordedEntity] = field(default_factory=list)
 
-    def metadata_record(self) -> dict[str, object]:
+    def build_metadata_record(self) -> dict[str, object]:
         record: dict[str, object] = {
             "record_type": "metadata",
             "format_version": 1,

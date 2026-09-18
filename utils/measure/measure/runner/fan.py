@@ -42,7 +42,7 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
             0,
             total_steps,
             phase="Measuring fan speeds",
-            remaining_seconds=self._remaining_seconds(0, fast_test_mode),
+            remaining_seconds=self._estimate_remaining_seconds(0, fast_test_mode),
         )
         for completed_steps, percentage in enumerate(percentages, start=1):
             _LOGGER.info("Setting percentage to %d", percentage)
@@ -64,13 +64,13 @@ class FanRunner(MeasurementRunner[FanMeasurementRequest]):
                 completed_steps,
                 total_steps,
                 phase="Measuring fan speeds",
-                remaining_seconds=self._remaining_seconds(completed_steps, fast_test_mode),
+                remaining_seconds=self._estimate_remaining_seconds(completed_steps, fast_test_mode),
             )
 
         return RunnerResult(model_json_data=self._build_model_json_data(measurements), voltages=voltages)
 
     @staticmethod
-    def _remaining_seconds(completed_steps: int, fast_test_mode: bool = False) -> float:
+    def _estimate_remaining_seconds(completed_steps: int, fast_test_mode: bool = False) -> float:
         """Estimated time for the remaining fan-speed steps."""
         if fast_test_mode:
             return 0

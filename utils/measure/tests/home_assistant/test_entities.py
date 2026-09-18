@@ -116,7 +116,7 @@ def test_catalog_applies_one_selection_policy_and_enriches_entities() -> None:
     assert powers[0].related_voltage_entity_id == "sensor.desk_voltage"
     assert powers[0].model_id == "PM-001"
 
-    assert snapshot.attribute_names("vacuum.robot") == ["battery_level", "friendly_name", "status"]
+    assert snapshot.get_attribute_names("vacuum.robot") == ["battery_level", "friendly_name", "status"]
     home_assistant.get_entity_data.assert_called_once_with()
 
 
@@ -200,7 +200,7 @@ def test_catalog_all_includes_arbitrary_domains_and_unavailable_entities() -> No
     home_assistant = MagicMock(spec=HomeAssistantManager)
     home_assistant.get_entity_data.return_value = data
 
-    entities = HomeAssistantEntityCatalog(home_assistant).load_snapshot().all()
+    entities = HomeAssistantEntityCatalog(home_assistant).load_snapshot().get_all()
     thermostat = next(entity for entity in entities if entity.entity_id == "climate.room")
 
     assert thermostat.domain == "climate"
@@ -225,7 +225,7 @@ def test_catalog_omits_attribute_detail_for_unmeasurable_domains() -> None:
     home_assistant = MagicMock(spec=HomeAssistantManager)
     home_assistant.get_entity_data.return_value = data
 
-    entities = HomeAssistantEntityCatalog(home_assistant).load_snapshot().all()
+    entities = HomeAssistantEntityCatalog(home_assistant).load_snapshot().get_all()
     thermostat = next(entity for entity in entities if entity.entity_id == "climate.room")
     light = next(entity for entity in entities if entity.domain == "light")
 

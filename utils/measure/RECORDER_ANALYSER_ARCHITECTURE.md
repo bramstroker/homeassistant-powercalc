@@ -114,7 +114,7 @@ validation types live in [analyser/models.py](measure/analyser/models.py).
 without `record_type`. Malformed samples are skipped with warnings; valid elapsed times and
 power must be finite. Samples are immutable and retain all recorded entities.
 
-`recording_context()` enriches the request's selected entities with captured registry
+`restore_recording_context()` enriches the request's selected entities with captured registry
 metadata, preserving recipe, primary selection, and roles for offline reanalysis.
 
 `load_recordings()` combines compatible files and assigns source IDs. Currently, typed

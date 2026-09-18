@@ -188,7 +188,7 @@ def hass_power_meter_questions(entity_catalog: HomeAssistantEntityCatalog) -> li
         if not power_entity:
             return None
         if power_entity not in related_voltage:
-            related_voltage[power_entity] = entity_catalog.load_snapshot().related_entity_id(
+            related_voltage[power_entity] = entity_catalog.load_snapshot().find_related_entity_id(
                 power_entity,
                 DeviceClass.VOLTAGE,
             )

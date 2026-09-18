@@ -350,7 +350,7 @@ def client(tmp_path: Path, *, trusted_ingress_only: bool = False, developer_mode
     )
     app.state.context.home_assistant = FakeClient()
     app.state.context.power_meter_diagnostics = PowerMeterDiagnostics(
-        app.state.context.build_power_meter,
+        app.state.context.create_power_meter,
         duration=0,
     )
     app.state.context.light_load_probe = MagicMock()
@@ -485,7 +485,7 @@ def test_entity_manufacturer_normalizes_a_library_alias(tmp_path: Path) -> None:
             },
         ],
     ):
-        assert context.entity_manufacturers(["light.test"]) == {"light.test": "Signify"}
+        assert context.get_entity_manufacturers(["light.test"]) == {"light.test": "Signify"}
 
 
 def test_index_is_not_cached(tmp_path: Path) -> None:
@@ -604,11 +604,14 @@ def test_entity_catalog_waits_for_home_assistant_startup(tmp_path: Path) -> None
 def test_entity_integration_is_resolved_and_stays_optional(tmp_path: Path) -> None:
     context = client(tmp_path).app.state.context
 
-    assert context.entity_integrations(["light.test", "light.unknown"]) == {"light.test": "hue", "light.unknown": None}
+    assert context.get_entity_integrations(["light.test", "light.unknown"]) == {
+        "light.test": "hue",
+        "light.unknown": None,
+    }
 
     context.home_assistant = MagicMock(spec=HomeAssistantManager)
     context.home_assistant.get_entity_data.side_effect = OSError("Home Assistant is unreachable")
-    assert context.entity_integrations(["light.test"]) == {"light.test": None}
+    assert context.get_entity_integrations(["light.test"]) == {"light.test": None}
 
 
 def test_dummy_load_calibration_is_returned_only_for_the_configured_meter(tmp_path: Path) -> None:
@@ -696,7 +699,7 @@ def test_shelly_dummy_load_preflight_builds_and_probes_the_meter_once(tmp_path: 
         "dummy_load": {"mode": "calibrate", "description": "40 W incandescent bulb"},
     }
 
-    with patch.object(context, "build_power_meter", builder):
+    with patch.object(context, "create_power_meter", builder):
         response = test_client.post("/api/preflight", json=request)
 
     assert response.status_code == 200
@@ -726,7 +729,7 @@ def test_kasa_preflight_builds_and_probes_the_meter(tmp_path: Path) -> None:
     context.power_meter_diagnostics = PowerMeterDiagnostics(builder, duration=0)
     request = payload() | {"power_meter": {"type": "kasa", "device_ip": "192.0.2.1"}}
 
-    with patch.object(context, "build_power_meter", builder):
+    with patch.object(context, "create_power_meter", builder):
         response = test_client.post("/api/preflight", json=request)
 
     assert response.status_code == 200
@@ -1491,7 +1494,7 @@ def test_measurement_can_complete_without_product_identity(tmp_path: Path) -> No
     context.contribution = ContributionApiCoordinator(
         context.storage,
         service_factory=FakeContributionService,
-        resolve_model_id=context.entity_model_ids,
+        resolve_model_id=context.get_entity_model_ids,
     )
     request = payload() | {"model_id": "", "product_name": "", "session_name": "Desk lamp"}
     started = test_client.post("/api/sessions", json=request)
@@ -1518,7 +1521,7 @@ def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypat
     context.contribution = ContributionApiCoordinator(
         context.storage,
         service_factory=lambda: service,
-        resolve_integration=context.entity_integrations,
+        resolve_integration=context.get_entity_integrations,
         resolve_manufacturer=lambda entity_ids: dict.fromkeys(entity_ids, "Signify"),
     )
 

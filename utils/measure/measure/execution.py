@@ -49,7 +49,7 @@ class DummyLoadPreparation(MeasurementPreparation):
     def run(self, interaction: RunInteraction) -> None:
         self.sampler.validate_dummy_load_support()
         calibrated = False
-        resistance = self._restored_resistance()
+        resistance = self._load_restored_resistance()
         target = "light" if self.request.measure_type == "light" else "target device"
 
         if resistance is None:
@@ -77,7 +77,7 @@ class DummyLoadPreparation(MeasurementPreparation):
             action="Start measurement",
         )
 
-    def _restored_resistance(self) -> float | None:
+    def _load_restored_resistance(self) -> float | None:
         if isinstance(self.spec, DummyLoadReuseRequest):
             return self.spec.resistance
         if self.calibration_store is None:
@@ -115,7 +115,7 @@ class DummyLoadPreparation(MeasurementPreparation):
                 phase="Checking dummy-load stability",
                 remaining_seconds=0,
             )
-            trend = self.sampler.dummy_load_trend(averages)
+            trend = self.sampler.classify_dummy_load_trend(averages)
             if trend is None:
                 raise DummyLoadMeasurementError("No dummy-load resistance trend could be calculated")
             if trend == Trend.STEADY:
@@ -197,13 +197,13 @@ class MeasurementExecution:
                     voltages=voltages,
                     num_lights=request.multiple_light_count if isinstance(request, LightMeasurementRequest) else None,
                     dummy_load=request.dummy_load is not None,
-                    dummy_load_resistance=self._dummy_load_resistance(),
+                    dummy_load_resistance=self._get_dummy_load_resistance(),
                 )
             return result
         finally:
             runner.cleanup()
 
-    def _dummy_load_resistance(self) -> float | None:
+    def _get_dummy_load_resistance(self) -> float | None:
         if isinstance(self.measurement.request.dummy_load, DummyLoadReuseRequest):
             return self.measurement.request.dummy_load.resistance
         for preparation in self.measurement.preparations:

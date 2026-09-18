@@ -9,8 +9,8 @@ from measure.controller.light.spec import HassLightControllerSpec
 from measure.ha_app.light_probe import (
     LightLoadProbe,
     LightLoadProbeError,
-    app_measurement_assembler,
-    light_load_probe_label,
+    create_app_measurement_assembler,
+    format_light_load_probe_label,
 )
 from measure.powermeter.powermeter import PowerMeasurementResult
 from measure.powermeter.spec import HassPowerMeterSpec, KasaPowerMeterSpec
@@ -76,10 +76,10 @@ class FakeAssembler:
         self.controller = controller
         self.meter = meter
 
-    def build_light_controller(self, _: object) -> FakeLightController:
+    def create_light_controller(self, _: object) -> FakeLightController:
         return self.controller
 
-    def build_power_meter(self, _: object) -> FakePowerMeter:
+    def create_power_meter(self, _: object) -> FakePowerMeter:
         return self.meter
 
 
@@ -248,13 +248,13 @@ def test_active_probe_handles_effect_only_plan_and_formats_static_variations() -
     # Nothing was driven, so the light must be left exactly as the user had it.
     assert controller.changes == []
     assert controller.closed
-    assert light_load_probe_label(Variation(1)) == "Brightness 1"
-    assert light_load_probe_label(ColorTempVariation(1, 454)) == "Color temperature 454 mired · brightness 1"
+    assert format_light_load_probe_label(Variation(1)) == "Brightness 1"
+    assert format_light_load_probe_label(ColorTempVariation(1, 454)) == "Color temperature 454 mired · brightness 1"
 
 
 def test_active_probe_wraps_controller_errors_and_cleanup_errors_do_not_mask_success() -> None:
     failing_assembler = MagicMock()
-    failing_assembler.build_light_controller.side_effect = RuntimeError("controller unavailable")
+    failing_assembler.create_light_controller.side_effect = RuntimeError("controller unavailable")
     with pytest.raises(LightLoadProbeError, match="controller unavailable") as error:
         LightLoadProbe(lambda: failing_assembler).evaluate(request())
 
@@ -274,7 +274,7 @@ def test_active_probe_wraps_controller_errors_and_cleanup_errors_do_not_mask_suc
 
 
 def test_app_measurement_assembler_builds_non_interactive_adapter_graph() -> None:
-    assembler = app_measurement_assembler(
+    assembler = create_app_measurement_assembler(
         home_assistant=MagicMock(),
         shelly_password="secret",  # noqa: S106
         kasa_credentials=("user@example.com", "account-password"),
@@ -282,7 +282,7 @@ def test_app_measurement_assembler_builds_non_interactive_adapter_graph() -> Non
 
     assert isinstance(assembler, MeasurementAssembler)
     with patch("measure.powermeter.kasa.KasaPowerMeter") as meter:
-        assembler.build_power_meter(KasaPowerMeterSpec(device_ip="192.0.2.1"))
+        assembler.create_power_meter(KasaPowerMeterSpec(device_ip="192.0.2.1"))
 
     meter.assert_called_once_with(
         "192.0.2.1",

@@ -83,7 +83,7 @@ class LightLoadProbe:
         controller: LightController | None = None
         light_driven = False
         try:
-            controller = assembler.build_light_controller(request.controller)
+            controller = assembler.create_light_controller(request.controller)
             light_info = controller.get_light_info()
             effects = controller.get_effect_list() if LutMode.EFFECT in request.modes else []
             plan = build_light_plan(request.modes, request.parameters, light_info, effects)
@@ -91,7 +91,7 @@ class LightLoadProbe:
             if not variations:
                 return LightLoadProbeResult(checked_variations=0, minimum_aggregate_power_w=0, points=())
 
-            meter = assembler.build_power_meter(request.power_meter)
+            meter = assembler.create_power_meter(request.power_meter)
             sampler = PowerSampler(meter, request.parameters, wait=self._wait)
             light_driven = True
             set_light_to_maximum_brightness(
@@ -103,7 +103,7 @@ class LightLoadProbe:
             )
             points = [
                 LightLoadProbePoint(
-                    label=light_load_probe_label(variation),
+                    label=format_light_load_probe_label(variation),
                     mode=variation.mode,
                     power_w=round(
                         self._measure_variation(
@@ -169,7 +169,7 @@ class LightLoadProbe:
         return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
-def app_measurement_assembler(
+def create_app_measurement_assembler(
     *,
     home_assistant: HomeAssistantManager,
     shelly_password: str | None,
@@ -185,7 +185,7 @@ def app_measurement_assembler(
     )
 
 
-def light_load_probe_label(variation: Variation) -> str:
+def format_light_load_probe_label(variation: Variation) -> str:
     """Describe a probe variation in native values for the preflight review."""
 
     values = asdict(variation)

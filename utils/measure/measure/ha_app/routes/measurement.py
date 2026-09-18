@@ -22,7 +22,7 @@ from measure.ha_app.api_models import (
     MeasureParameter,
     PreflightResponse,
 )
-from measure.ha_app.context import AppContext, app_context
+from measure.ha_app.context import AppContext, get_app_context
 from measure.ha_app.library_catalog import (
     LibraryCatalogError,
 )
@@ -60,7 +60,7 @@ router = APIRouter()
 
 @router.get("/capabilities")
 async def capabilities(request: Request) -> CapabilitiesResponse:
-    context = app_context(request)
+    context = get_app_context(request)
     defaults = MeasurementParameters()
     settings = await run_in_threadpool(context.storage.load_settings)
     return CapabilitiesResponse(
@@ -81,7 +81,7 @@ async def measure_definitions() -> list[MeasureDefinition]:
 @router.get("/library/measure-devices", responses={503: ERROR_RESPONSE})
 async def measure_devices(request: Request, response: Response) -> MeasureDeviceCatalogResponse:
     try:
-        devices = await run_in_threadpool(app_context(request).measure_device_catalog.devices)
+        devices = await run_in_threadpool(get_app_context(request).measure_device_catalog.devices)
     except LibraryCatalogError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
     response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
@@ -91,7 +91,7 @@ async def measure_devices(request: Request, response: Response) -> MeasureDevice
 @router.get("/library/manufacturers", responses={503: ERROR_RESPONSE})
 async def manufacturers(request: Request, response: Response) -> ManufacturerCatalogResponse:
     try:
-        values = await run_in_threadpool(app_context(request).manufacturer_catalog.manufacturers)
+        values = await run_in_threadpool(get_app_context(request).manufacturer_catalog.manufacturers)
     except LibraryCatalogError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
     response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
@@ -101,7 +101,7 @@ async def manufacturers(request: Request, response: Response) -> ManufacturerCat
 @router.get("/library/device-specifications", responses={503: ERROR_RESPONSE})
 async def device_specifications(request: Request, response: Response) -> DeviceSpecificationCatalogResponse:
     try:
-        values = await run_in_threadpool(app_context(request).device_specification_catalog.fields)
+        values = await run_in_threadpool(get_app_context(request).device_specification_catalog.fields)
     except LibraryCatalogError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
     response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
@@ -125,12 +125,12 @@ async def device_specifications(request: Request, response: Response) -> DeviceS
 
 @router.get("/settings")
 async def get_settings(request: Request) -> AppSettingsResponse:
-    return await run_in_threadpool(_settings_response, app_context(request))
+    return await run_in_threadpool(_settings_response, get_app_context(request))
 
 
 @router.put("/settings", responses={400: ERROR_RESPONSE})
 async def update_settings(payload: AppSettingsUpdate, request: Request) -> AppSettingsResponse:
-    context = app_context(request)
+    context = get_app_context(request)
     if payload.fast_test_mode and not context.developer_mode:
         raise HTTPException(status_code=400, detail="Fast test mode requires developer mode")
     return await run_in_threadpool(_save_settings, context, payload)
@@ -138,22 +138,22 @@ async def update_settings(payload: AppSettingsUpdate, request: Request) -> AppSe
 
 @router.post("/settings/test-power-meter")
 async def test_power_meter(payload: AppSettingsUpdate, request: Request) -> PowerMeterDiagnostic:
-    return await run_in_threadpool(_test_power_meter, app_context(request), payload)
+    return await run_in_threadpool(_test_power_meter, get_app_context(request), payload)
 
 
 @router.get("/power-meters/shelly")
 async def discover_shelly_power_meters(request: Request) -> ShellyDiscoveryResponse:
-    return await ShellyDiscoveryService(app_context(request).home_assistant).discover()
+    return await ShellyDiscoveryService(get_app_context(request).home_assistant).discover()
 
 
 @router.get("/dummy-load/calibration")
 async def dummy_load_calibration(request: Request) -> DummyLoadCalibration | None:
-    return await run_in_threadpool(_matching_dummy_load_calibration, app_context(request))
+    return await run_in_threadpool(_matching_dummy_load_calibration, get_app_context(request))
 
 
 @router.get("/entity-catalog")
 async def entity_catalog(request: Request) -> EntityCatalogResponse:
-    home_assistant = app_context(request).home_assistant
+    home_assistant = get_app_context(request).home_assistant
     config = await run_in_threadpool(home_assistant.get_config)
     if config.get("state") != "RUNNING":
         return EntityCatalogResponse(
@@ -183,14 +183,14 @@ async def entities(
     if sum((domain is not None, device_class is not None, all_entities)) != 1:
         raise HTTPException(status_code=400, detail="Specify exactly one entity filter")
     snapshot = await run_in_threadpool(
-        HomeAssistantEntityCatalog(app_context(request).home_assistant).load_snapshot,
+        HomeAssistantEntityCatalog(get_app_context(request).home_assistant).load_snapshot,
     )
-    return snapshot.all() if all_entities else snapshot.select(domain=domain, device_class=device_class)
+    return snapshot.get_all() if all_entities else snapshot.select(domain=domain, device_class=device_class)
 
 
 @router.post("/preflight", responses={409: ERROR_RESPONSE, 422: ERROR_RESPONSE})
 async def preflight(payload: MeasurementRequestPayload, request: Request) -> PreflightResponse:
-    context = app_context(request)
+    context = get_app_context(request)
     prepared = await run_in_threadpool(apply_fast_test_mode, context, payload)
     assessment = await run_in_threadpool(run_preflight, context, prepared)
     result = assessment.checks
@@ -267,8 +267,8 @@ def _settings_response(context: AppContext) -> AppSettingsResponse:
     return AppSettingsResponse.model_validate(
         settings.model_dump()
         | {
-            "shelly_password_configured": context.shelly_password() is not None,
-            "tapo_credentials_configured": context.tapo_credentials() is not None,
+            "shelly_password_configured": context.get_shelly_password() is not None,
+            "tapo_credentials_configured": context.get_tapo_credentials() is not None,
         },
     )
 
@@ -302,22 +302,22 @@ def _test_power_meter(context: AppContext, settings: AppSettingsUpdate) -> Power
             messages=[message],
             message=message,
         )
-    password = None if settings.clear_shelly_password else settings.shelly_password or context.shelly_password()
+    password = None if settings.clear_shelly_password else settings.shelly_password or context.get_shelly_password()
     tapo_credentials = None
     if not settings.clear_tapo_credentials:
         if settings.tapo_username and settings.tapo_password:
             tapo_credentials = (settings.tapo_username, settings.tapo_password)
         else:
-            tapo_credentials = context.tapo_credentials()
+            tapo_credentials = context.get_tapo_credentials()
     return context.power_meter_diagnostics.evaluate(
         spec,
         force=True,
-        build_power_meter=lambda power_meter_spec: MeasurementAssembler(
+        create_power_meter=lambda power_meter_spec: MeasurementAssembler(
             ImmediateInteraction(),
             home_assistant=context.home_assistant,
             shelly_password=password,
             kasa_credentials=tapo_credentials,
-        ).build_power_meter(power_meter_spec),
+        ).create_power_meter(power_meter_spec),
     )
 
 
@@ -349,7 +349,7 @@ def _matching_dummy_load_calibration(context: AppContext) -> DummyLoadCalibratio
         snapshot = HomeAssistantEntityCatalog(context.home_assistant).load_snapshot()
         spec = spec.model_copy(
             update={
-                "voltage_entity_id": snapshot.related_entity_id(spec.entity_id, DeviceClass.VOLTAGE),
+                "voltage_entity_id": snapshot.find_related_entity_id(spec.entity_id, DeviceClass.VOLTAGE),
             },
         )
     return calibration if calibration.power_meter_fingerprint == power_meter_fingerprint(spec) else None

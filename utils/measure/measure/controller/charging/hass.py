@@ -48,7 +48,7 @@ class HassChargingController(HassControllerBase, ChargingController):
         if not self.entity_id:
             return None
         snapshot = HomeAssistantEntityCatalog(self.client).load_snapshot()
-        return snapshot.related_entity_id(self.entity_id, DeviceClass.BATTERY)
+        return snapshot.find_related_entity_id(self.entity_id, DeviceClass.BATTERY)
 
     def _resolve_battery_sensor(self) -> str | None:
         """Resolve and cache the battery source for the lifetime of this controller."""

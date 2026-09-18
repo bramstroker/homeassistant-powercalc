@@ -25,7 +25,7 @@ from measure.ha_app.session import (
 )
 from measure.ha_app.shelly_credentials import ShellyCredentials, ShellyCredentialStore
 from measure.ha_app.tapo_credentials import TapoCredentials, TapoCredentialStore
-from measure.recording.files import recording_paths
+from measure.recording.files import find_recording_paths
 from measure.request import (
     LightMeasurementRequest,
     MeasurementRequest,
@@ -360,7 +360,9 @@ class SessionStorage:
             return False
         if request.recorder_purpose != RecorderPurpose.COMPLEX_PROFILE:
             return False
-        return bool(recording_paths(self.artifact_directory(session_id, request.model_id), request.export_filename))
+        return bool(
+            find_recording_paths(self.artifact_directory(session_id, request.model_id), request.export_filename)
+        )
 
     def archive_recording(self, session_id: str, request: RecorderMeasurementRequest) -> None:
         """Keep the previous run before the recorder opens its fixed output filename."""

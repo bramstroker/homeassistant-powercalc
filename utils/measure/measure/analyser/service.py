@@ -17,9 +17,9 @@ from measure.analyser.models import (
     TrainingValidationSplit,
     ValidationMethod,
 )
-from measure.analyser.recording import load_recordings, recording_context
+from measure.analyser.recording import load_recordings, restore_recording_context
 from measure.analyser.vacuum import VacuumCompositeCandidate, VacuumCompositeStrategy, split_vacuum_samples
-from measure.analyser.vacuum_validation import activity_reports, credibility_failure
+from measure.analyser.vacuum_validation import build_activity_reports, find_credibility_failure
 from measure.recording.models import RecordingContext, RecordingSample
 
 MIN_VALIDATION_COVERAGE = 0.9
@@ -42,19 +42,21 @@ class RecorderAnalyser:
 
     def analyse(self, recording_path: Path | Sequence[Path], context: RecordingContext) -> RecorderAnalysisResult:
         loaded = load_recordings([recording_path] if isinstance(recording_path, Path) else recording_path)
-        context = recording_context(context, loaded.dataset.metadata)
+        context = restore_recording_context(context, loaded.dataset.metadata)
         samples = loaded.dataset.samples
         if len(samples) < 10:
-            return _insufficient(samples, loaded.warnings, "Record at least 10 valid samples across device states")
+            return _build_insufficient_data_result(
+                samples, loaded.warnings, "Record at least 10 valid samples across device states"
+            )
 
-        split = _analysis_split(samples, context)
+        split = _split_analysis_samples(samples, context)
         if isinstance(split, StrategyNotApplicable):
-            return _insufficient(samples, loaded.warnings, split.reason)
-        baseline = _constant_metrics(split.training, split.validation)
+            return _build_insufficient_data_result(samples, loaded.warnings, split.reason)
+        baseline = _calculate_baseline_metrics(split.training, split.validation)
         evaluated: list[EvaluatedCandidate] = []
         reasons: list[str] = []
         reports: list[ActivityReport] = []
-        for strategy in self._strategies_for(context):
+        for strategy in self._select_strategies(context):
             candidate = strategy.build_candidate(split.training, context)
             if isinstance(candidate, StrategyNotApplicable):
                 reasons.append(candidate.reason)
@@ -63,19 +65,19 @@ class RecorderAnalyser:
             metrics = _evaluate(candidate, samples, split.validation)
             _LOGGER.debug("Analyser strategy %s produced %s", strategy.strategy_id, metrics.to_dict())
             reports = (
-                activity_reports(candidate, samples, split.validation)
+                build_activity_reports(candidate, samples, split.validation)
                 if isinstance(candidate, VacuumCompositeCandidate)
                 else []
             )
             evaluation = EvaluatedCandidate(candidate, metrics, reports)
-            if (failure := _candidate_failure(evaluation, samples, baseline)) is None:
+            if (failure := _find_candidate_failure(evaluation, samples, baseline)) is None:
                 evaluated.append(evaluation)
             else:
                 reasons.append(failure)
 
         if not evaluated:
             reason = reasons[0] if reasons else "No analysis strategy could explain the recorded power"
-            return _insufficient(samples, loaded.warnings, reason, split.method, reports)
+            return _build_insufficient_data_result(samples, loaded.warnings, reason, split.method, reports)
 
         evaluation = _select_candidate(evaluated)
         selected = evaluation.candidate
@@ -93,7 +95,7 @@ class RecorderAnalyser:
             activity_reports=evaluation.activity_reports,
         )
 
-    def _strategies_for(self, context: RecordingContext) -> list[ProfileAnalysisStrategy]:
+    def _select_strategies(self, context: RecordingContext) -> list[ProfileAnalysisStrategy]:
         if not self._default_strategies:
             return self.strategies
         # Vacuum recipes require independent cycles and runtime signals; they
@@ -102,7 +104,7 @@ class RecorderAnalyser:
         return [strategy for strategy in self.strategies if (strategy.strategy_id == "vacuum_composite") == is_vacuum]
 
 
-def _analysis_split(
+def _split_analysis_samples(
     samples: Sequence[RecordingSample], context: RecordingContext
 ) -> TrainingValidationSplit | StrategyNotApplicable:
     if context.recipe == "vacuum_robot":
@@ -112,20 +114,20 @@ def _analysis_split(
     return _split_samples(samples)
 
 
-def _candidate_failure(
+def _find_candidate_failure(
     evaluation: EvaluatedCandidate,
     samples: Sequence[RecordingSample],
     baseline: AnalysisMetrics,
 ) -> str | None:
     candidate = evaluation.candidate
     metrics = evaluation.metrics
-    if (failure := credibility_failure(evaluation.activity_reports)) is not None:
+    if (failure := find_credibility_failure(evaluation.activity_reports)) is not None:
         return failure
     if not _has_minimum_support(candidate, samples):
         return f"{candidate.strategy_id} needs at least {MIN_SAMPLES_PER_MODEL_VALUE} samples for every value"
-    prediction_range = _prediction_range(candidate, samples)
-    if not _credible(metrics, baseline, prediction_range):
-        return _credibility_reason(candidate.strategy_id, metrics, baseline, prediction_range)
+    prediction_range = _calculate_prediction_range(candidate, samples)
+    if not _is_credible(metrics, baseline, prediction_range):
+        return _describe_credibility_failure(candidate.strategy_id, metrics, baseline, prediction_range)
     return None
 
 
@@ -137,13 +139,13 @@ def _split_samples(
     return TrainingValidationSplit(training=training, validation=validation)
 
 
-def _constant_metrics(
+def _calculate_baseline_metrics(
     training: Sequence[RecordingSample],
     validation: Sequence[RecordingSample],
 ) -> AnalysisMetrics:
     estimate = median(sample.power for sample in training)
     errors = [estimate - sample.power for sample in validation]
-    return _metrics(len(training) + len(validation), validation, errors, len(validation))
+    return _calculate_metrics(len(training) + len(validation), validation, errors, len(validation))
 
 
 def _evaluate(
@@ -154,10 +156,10 @@ def _evaluate(
     errors = [
         estimate - sample.power for sample in validation if (estimate := candidate.estimate_power(sample)) is not None
     ]
-    return _metrics(len(samples), validation, errors, len(errors))
+    return _calculate_metrics(len(samples), validation, errors, len(errors))
 
 
-def _metrics(
+def _calculate_metrics(
     sample_count: int,
     validation: Sequence[RecordingSample],
     errors: Sequence[float],
@@ -171,7 +173,7 @@ def _metrics(
     return AnalysisMetrics(sample_count, len(validation), coverage, mae, rmse, power_range)
 
 
-def _credible(metrics: AnalysisMetrics, baseline: AnalysisMetrics, prediction_range: float) -> bool:
+def _is_credible(metrics: AnalysisMetrics, baseline: AnalysisMetrics, prediction_range: float) -> bool:
     improvement = baseline.mae_w - metrics.mae_w
     relative = improvement / baseline.mae_w if baseline.mae_w else 0
     return (
@@ -181,12 +183,12 @@ def _credible(metrics: AnalysisMetrics, baseline: AnalysisMetrics, prediction_ra
     )
 
 
-def _prediction_range(candidate: AnalysisCandidate, samples: Sequence[RecordingSample]) -> float:
+def _calculate_prediction_range(candidate: AnalysisCandidate, samples: Sequence[RecordingSample]) -> float:
     predictions = [estimate for sample in samples if (estimate := candidate.estimate_power(sample)) is not None]
     return max(predictions) - min(predictions) if predictions else 0
 
 
-def _credibility_reason(
+def _describe_credibility_failure(
     strategy_id: str,
     metrics: AnalysisMetrics,
     baseline: AnalysisMetrics,
@@ -219,7 +221,7 @@ def _has_minimum_support(candidate: AnalysisCandidate, samples: Sequence[Recordi
     counts = Counter(
         key
         for sample in samples
-        if (key := candidate.support_key(sample)) is not None and candidate.estimate_power(sample) is not None
+        if (key := candidate.get_support_key(sample)) is not None and candidate.estimate_power(sample) is not None
     )
     return bool(counts) and min(counts.values()) >= MIN_SAMPLES_PER_MODEL_VALUE
 
@@ -244,7 +246,7 @@ def _select_candidate(
     return selected
 
 
-def _insufficient(
+def _build_insufficient_data_result(
     samples: Sequence[RecordingSample],
     warnings: Sequence[str],
     reason: str,

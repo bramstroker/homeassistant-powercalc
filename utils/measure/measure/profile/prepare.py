@@ -9,7 +9,7 @@ from typing import Any
 
 from measure.profile.model_json import mains_voltage_from_range
 from measure.profile.models import PreparedProfileFile, ProfileMetadata, ProfilePreview
-from measure.recording.files import recording_filenames
+from measure.recording.files import select_recording_filenames
 
 JsonValidator = Callable[[dict[str, Any], dict[str, Any]], None]
 
@@ -133,7 +133,7 @@ class ProfilePreparer:
         if MODEL_JSON not in names:
             raise ProfilePreparationError("model.json is required")
         csv_names = {name for name in names if name.endswith((".csv", ".csv.gz"))}
-        recorder_sources = RECORDER_SOURCE_ARTIFACTS | set(recording_filenames(names))
+        recorder_sources = RECORDER_SOURCE_ARTIFACTS | set(select_recording_filenames(names))
         unexpected = sorted(names - csv_names - {MODEL_JSON, MANUFACTURER_JSON} - recorder_sources)
         if unexpected:
             raise ProfilePreparationError(f"Unexpected artifact file(s): {', '.join(unexpected)}")

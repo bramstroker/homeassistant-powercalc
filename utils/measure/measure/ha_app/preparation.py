@@ -31,7 +31,7 @@ def run_preflight(context: AppContext, payload: MeasurementRequest) -> Preflight
         has_active_session=lambda: is_active_session(context.coordinator.current),
         verify_storage=context.storage.verify_writable,
         load_entities=load_entities,
-        load_all_entities=lambda: catalog.load_snapshot().all(),
+        load_all_entities=lambda: catalog.load_snapshot().get_all(),
         diagnose_power_meter=context.power_meter_diagnostics.evaluate,
         developer_mode=context.developer_mode,
     ).validate(payload)

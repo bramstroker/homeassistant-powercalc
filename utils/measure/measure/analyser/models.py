@@ -37,7 +37,7 @@ class FeatureReference:
             return f"{self.entity_id}.state"
         return f"{self.entity_id}.attributes.{self.attribute}"
 
-    def value(self, sample: RecordingSample) -> ScalarStateValue | None:
+    def get_value(self, sample: RecordingSample) -> ScalarStateValue | None:
         entity = sample.entities.get(self.entity_id)
         if entity is None:
             return None
@@ -48,7 +48,7 @@ class FeatureReference:
             return value
         return None
 
-    def model_key(self, value: ScalarStateValue) -> str:
+    def format_model_key(self, value: ScalarStateValue) -> str:
         rendered = str(value)
         return rendered if self.source == "state" else f"{self.attribute}|{rendered}"
 
@@ -78,7 +78,7 @@ class AnalysisCandidate(Protocol):
     @property
     def features(self) -> list[FeatureReference]: ...
 
-    def support_key(self, sample: RecordingSample) -> str | None: ...
+    def get_support_key(self, sample: RecordingSample) -> str | None: ...
 
     @property
     def complexity(self) -> int: ...
@@ -217,10 +217,10 @@ class RecorderAnalysisResult:
             value["standby_power"] = self.standby_power
         if self.warnings:
             value["warnings"] = list(self.warnings)
-        value.update(self._validation_details())
+        value.update(self._build_validation_details())
         return value
 
-    def _validation_details(self) -> dict[str, object]:
+    def _build_validation_details(self) -> dict[str, object]:
         details: dict[str, object] = {}
         if self.features:
             details["features"] = [feature.identifier for feature in self.features]
@@ -230,7 +230,7 @@ class RecorderAnalysisResult:
             details["activities"] = [report.to_dict() for report in self.activity_reports]
         return details
 
-    def summary(self) -> dict[str, str]:
+    def build_summary(self) -> dict[str, str]:
         if not self.model_ready:
             summary = {RECORDING_ANALYSIS_LABEL: "More data needed"}
             if self.reason is not None:

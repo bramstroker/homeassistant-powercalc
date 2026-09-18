@@ -8,8 +8,8 @@ import time
 from typing import TextIO
 
 from measure.cancellation import MeasurementCancelledError
-from measure.recording.capture import vacuum_attribute_policy, vacuum_recording_attributes
-from measure.recording.context import recording_context_for
+from measure.recording.capture import build_vacuum_attribute_policy, filter_vacuum_recording_attributes
+from measure.recording.context import build_recording_context
 from measure.recording.files import DEFAULT_EXPORT_FILENAME
 from measure.recording.models import RecordingContext
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, validate_export_filename
@@ -88,7 +88,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         try:
             with output_filepath.open("w", encoding="utf-8", newline="") as output_file:
                 if entity_ids:
-                    _write_jsonl(output_file, self._metadata(request))
+                    _write_jsonl(output_file, self._build_metadata(request))
                 while True:
                     timestamp = time.time()
                     self.interaction.notify("Measurement")
@@ -139,10 +139,10 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         self.interaction.entity_states(captured.live_states)
         return True
 
-    def _metadata(self, request: RecorderMeasurementRequest) -> dict[str, object]:
-        metadata = (self.recording_context or recording_context_for(request)).metadata_record()
+    def _build_metadata(self, request: RecorderMeasurementRequest) -> dict[str, object]:
+        metadata = (self.recording_context or build_recording_context(request)).build_metadata_record()
         if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT:
-            metadata["attribute_policy"] = vacuum_attribute_policy()
+            metadata["attribute_policy"] = build_vacuum_attribute_policy()
         return metadata
 
     def _sample_entities(
@@ -164,7 +164,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
             live_states[entity_id] = entity_state.state
             entities[entity_id] = {
                 "state": entity_state.state,
-                "attributes": vacuum_recording_attributes(entity_state.attributes)
+                "attributes": filter_vacuum_recording_attributes(entity_state.attributes)
                 if is_vacuum
                 else dict(entity_state.attributes),
             }

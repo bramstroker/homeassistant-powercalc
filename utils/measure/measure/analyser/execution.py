@@ -5,8 +5,8 @@ from pathlib import Path
 
 from measure.analyser.service import RecorderAnalyser
 from measure.profile.model_json import write_model_json
-from measure.recording.context import recording_context_for
-from measure.recording.files import recording_paths
+from measure.recording.context import build_recording_context
+from measure.recording.files import find_recording_paths
 from measure.request import RecorderMeasurementRequest
 from measure.utils.files import write_json_atomic
 
@@ -52,8 +52,8 @@ class RecorderAnalysisExecution:
         model_path = output_directory / "model.json"
         retained_voltages = [*(_load_existing_voltages(model_path) or []), *(voltages or [])]
         try:
-            context = recording_context_for(request)
-            paths = recording_paths(output_directory, request.export_filename)
+            context = build_recording_context(request)
+            paths = find_recording_paths(output_directory, request.export_filename)
             analysis = self.analyser.analyse(paths, context)
             write_json_atomic(output_directory / ANALYSER_FILENAME, analysis.to_dict())
             (output_directory / _LEGACY_ANALYSIS_FILENAME).unlink(missing_ok=True)
@@ -79,7 +79,7 @@ class RecorderAnalysisExecution:
             return _replace_analysis_summary(
                 summary,
                 {
-                    **analysis.summary(),
+                    **analysis.build_summary(),
                     "Recordings analysed": str(len(paths)),
                     "Samples analysed": str(analysis.sample_count),
                 },
