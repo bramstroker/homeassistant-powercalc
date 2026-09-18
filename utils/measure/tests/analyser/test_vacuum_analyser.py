@@ -597,6 +597,47 @@ def test_unmeasured_flag_blocks_fallback() -> None:
     assert model.estimate_power(sample("sleeping", 3.5)) == 3.5
 
 
+def test_export_preserves_unmeasured_auto_empty_guard_without_fitting_its_power() -> None:
+    data = [item for item in cycle() if item.entities[STATE].state != "auto_emptying"]
+    fragment = candidate(data).build_model_config_fragment().to_dict()
+    strategies = fragment["composite_config"]["strategies"]
+
+    assert len(strategies) == 5
+    assert not any(branch.get("fixed", {}).get("power") == 600 for branch in strategies)
+    assert all("auto_empty_status" in json.dumps(branch["condition"]) for branch in strategies)
+
+
+def test_profile_without_charging_uses_only_activity_features() -> None:
+    data = [sample("cleaning", 0.3)] * 10 + [sample("washing", 22)] * 10
+    model = candidate(data)
+
+    assert model.battery is None
+    assert FeatureReference(BATTERY, FeatureSource.STATE) not in model.features
+    assert all(branch.power is not None for branch in model.branches)
+    assert model.estimate_power(sample("cleaning", 0)) == 0.3
+    assert model.estimate_power(sample("washing", 0)) == 22
+    fragment = model.build_model_config_fragment().to_dict()
+    assert len(fragment["composite_config"]["strategies"]) == 2
+    assert "linear" not in json.dumps(fragment)
+
+
+def test_unidentified_training_activity_does_not_distort_fitted_branches() -> None:
+    unidentified = sample("new_mode", 999)
+    model = candidate([*cycle(), unidentified])
+
+    assert model.estimate_power(unidentified) is None
+    assert model.build_model_config_fragment() == candidate().build_model_config_fragment()
+
+
+@pytest.mark.parametrize("level", ["bad", "unknown", "unavailable"])
+def test_invalid_training_battery_samples_do_not_distort_charging_curve(level: str) -> None:
+    invalid = sample("charging", 999, level=level)
+    model = candidate([*cycle(), invalid])
+
+    assert model.estimate_power(invalid) is None
+    assert model.build_model_config_fragment() == candidate().build_model_config_fragment()
+
+
 def test_missing_battery_before_a_later_branch_matches_export() -> None:
     model = candidate()
     sleeping = sample("sleeping", 3.5)
