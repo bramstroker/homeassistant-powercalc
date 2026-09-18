@@ -2405,6 +2405,55 @@ def test_fast_test_mode_requires_developer_mode_and_dummy_adapters(tmp_path: Pat
     assert prepared["parameters"]["sleep_standby"] == 0
 
 
+def test_default_app_runs_a_synthetic_light_measurement_and_exports_its_profile(tmp_path: Path) -> None:
+    app = create_app(
+        data_root=tmp_path,
+        hass_token="test-token",  # noqa: S106
+        trusted_ingress_only=False,
+        developer_mode=True,
+    )
+    app.state.context.home_assistant.close()
+    app.state.context.home_assistant = MagicMock(spec=HomeAssistantManager, token="test-token")  # noqa: S106
+    with TestClient(app, client=("127.0.0.1", 50000)) as test_client:
+        assert test_client.put("/api/settings", json={"fast_test_mode": True}).status_code == 200
+        request = payload() | {
+            "controller": {"type": "dummy"},
+            "power_meter": {"type": "dummy"},
+            "parameters": payload()["parameters"] | {"bri_bri_steps": 255},  # type: ignore[operator]
+        }
+        started = test_client.post("/api/sessions", json=request)
+        assert started.status_code == 201
+        session_id = started.json()["session_id"]
+
+        try:
+            deadline = time.monotonic() + 5
+            while time.monotonic() < deadline:
+                snapshot = test_client.get(f"/api/sessions/{session_id}").json()
+                if snapshot["state"] == "awaiting_confirmation":
+                    assert test_client.post(f"/api/sessions/{session_id}/confirm").status_code == 200
+                elif snapshot["state"] in {"completed", "failed", "cancelled"}:
+                    break
+                time.sleep(0.01)
+
+            assert snapshot["state"] == "completed", snapshot
+            files = test_client.get(f"/api/sessions/{session_id}/files").json()
+            assert {file["name"] for file in files} >= {"LCT010/brightness.csv", "LCT010/model.json"}
+            measurements = test_client.get(f"/api/sessions/{session_id}/files/LCT010/brightness.csv")
+            assert measurements.status_code == 200
+            assert len(measurements.text.splitlines()) >= 2
+            model = test_client.get(f"/api/sessions/{session_id}/files/LCT010/model.json")
+            assert model.status_code == 200
+            assert model.json()["calculation_strategy"] == "lut"
+            assert model.json()["device_type"] == "light"
+        finally:
+            if app.state.context.coordinator.current.state in {
+                SessionState.RUNNING,
+                SessionState.AWAITING_CONFIRMATION,
+                SessionState.CANCELLING,
+            }:
+                test_client.post(f"/api/sessions/{session_id}/cancel")
+
+
 def test_fast_test_mode_does_not_modify_real_measurement_requests(tmp_path: Path) -> None:
     test_client = client(tmp_path, developer_mode=True)
     assert test_client.put("/api/settings", json={"fast_test_mode": True}).status_code == 200
