@@ -88,6 +88,11 @@ def test_has_effect_support() -> None:
             {"bri": 100, "effect": "A"},
             {"brightness": 100, "effect": "A"},
         ),
+        (
+            LutMode.WHITE,
+            {"bri": 100},
+            {"white": 100},
+        ),
     ],
 )
 def test_change_light_state(mode: LutMode, call_kwargs: dict, trigger_service_body: dict) -> None:
@@ -154,6 +159,32 @@ def test_multiple_entities_are_targeted_together_with_their_common_capabilities(
     info = controller.get_light_info()
     assert (info.min_mired, info.max_mired) == (200, 400)
     assert controller.get_effect_list() == ["shared"]
+
+
+def test_controller_waits_for_transition_only_after_turning_on() -> None:
+    client = _mock_client()
+    wait = MagicMock()
+    controller = HassLightController(client, 3, entity_ids=["light.test"], wait=wait)
+
+    controller.change_light_state(LutMode.BRIGHTNESS, bri=100)
+    wait.assert_called_once_with(3)
+    controller.change_light_state(LutMode.BRIGHTNESS, on=False)
+    wait.assert_called_once_with(3)
+    controller.close()
+
+
+def test_controller_does_not_wait_when_service_call_fails() -> None:
+    client = _mock_client()
+    failure = OSError("Disconnected")
+    client.trigger_service.side_effect = failure
+    wait = MagicMock()
+    controller = HassLightController(client, 3, entity_ids=["light.test"], wait=wait)
+
+    with pytest.raises(ApiConnectionError, match="Failed to change light state") as error:
+        controller.change_light_state(LutMode.BRIGHTNESS, bri=100)
+
+    assert error.value.__cause__ is failure
+    wait.assert_not_called()
 
 
 def _get_instance(client: MagicMock | None = None) -> HassLightController:
