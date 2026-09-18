@@ -4,12 +4,12 @@ import time
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import ChargingControllerError
-from measure.execution import ChargingOperatingPoint, ImmediateInteraction, RunInteraction
 from measure.request import ChargingMeasurementRequest
 from measure.runner.errors import RunnerError
+from measure.runner.interaction import ChargingOperatingPoint, ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.tuning import MeasurementParameters
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.utils.sampling import MeasurementResult, PowerSampler
 
 _LOGGER = logging.getLogger("measure")
 
@@ -20,13 +20,13 @@ TRICKLE_CHARGING_TIME = 1800
 class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
     def __init__(
         self,
-        measure_util: MeasureUtil,
+        sampler: PowerSampler,
         parameters: MeasurementParameters,
         controller: ChargingController,
         interaction: RunInteraction | None = None,
     ) -> None:
         self.config = parameters
-        self.measure_util = measure_util
+        self.sampler = sampler
         self.controller = controller
         self.charging_device_type: ChargingDeviceType | None = None
         self.interaction = interaction or ImmediateInteraction()
@@ -76,9 +76,9 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         self.interaction.phase("Measuring trickle charging power")
 
         trickle_result = (
-            self.measure_util.take_measurement(time.time())
+            self.sampler.take_measurement(time.time())
             if self.config.fast_test_mode
-            else self.measure_util.take_average_measurement(
+            else self.sampler.take_average_measurement(
                 TRICKLE_CHARGING_TIME,
                 on_progress=self._report_trickle_progress,
             )
@@ -109,7 +109,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         self.interaction.progress(battery_level, 100, phase="Charging")
         _LOGGER.info("Battery level: %d%%", battery_level)
         self.interaction.phase(f"Measuring charging power at {battery_level}% battery")
-        result = self.measure_util.take_measurement(time.time())
+        result = self.sampler.take_measurement(time.time())
         _LOGGER.info("Measured power: %.2f W", result.power)
         measurements.setdefault(battery_level, []).append(result.power)
         voltages.extend(result.voltages)

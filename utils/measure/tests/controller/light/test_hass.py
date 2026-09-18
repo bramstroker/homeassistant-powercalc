@@ -5,7 +5,7 @@ from homeassistant_api.errors import HomeassistantAPIError
 from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.hass import HassLightController
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 import pytest
 
 

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import re
 from typing import Any, Literal
 
@@ -121,3 +122,27 @@ def _valid_email(value: str) -> bool:
     local, domain = value.split("@")
     host, separator, suffix = domain.rpartition(".")
     return bool(local and host and separator and suffix)
+
+
+@dataclass(frozen=True)
+class RenderedProfileFile:
+    path: str
+    content: bytes
+
+
+class PreparedProfileFile(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    path: str = Field(min_length=1)
+    size: int = Field(ge=0)
+    sha: str | None = None
+
+
+class ProfilePreview(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    manufacturer_directory: str
+    manufacturer_library_url: str | None = None
+    model_directory: str
+    files: tuple[PreparedProfileFile, ...]
+    warnings: tuple[str, ...] = ()

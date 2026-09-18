@@ -4,25 +4,21 @@ from pathlib import Path
 
 from measure.analyser.fixed import FixedStatesPowerStrategy
 from measure.analyser.models import (
-    AnalysisContext,
     AnalysisMetrics,
+    AnalysisStatus,
     EvaluatedCandidate,
     FeatureReference,
+    FeatureSource,
     ModelConfigFragment,
-    RecordedEntity,
-    RecordedEntityState,
     RecorderAnalysisResult,
-    RecordingSample,
     StrategyNotApplicable,
 )
 from measure.analyser.recording import load_recording
-from measure.analyser.service import RecorderAnalyser, _credibility_reason, _select_candidate, analysis_context_for
-from measure.home_assistant_entities import EntityDescriptor
-from measure.powermeter.spec import DummyPowerMeterSpec
-from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, RecorderPurpose
+from measure.analyser.service import RecorderAnalyser, _find_model_credibility_failure, _select_candidate
+from measure.recording.models import RecordedEntity, RecordedEntityState, RecordingContext, RecordingSample
 import pytest
 
-CONTEXT = AnalysisContext(
+CONTEXT = RecordingContext(
     recipe="generic",
     primary_entity_id="switch.device",
     device_type="generic_iot",
@@ -33,7 +29,7 @@ CONTEXT = AnalysisContext(
 @dataclass(frozen=True)
 class RecorderRegressionCase:
     fixture: str
-    context: AnalysisContext
+    context: RecordingContext
     strategy: str
     feature: FeatureReference
     model_config_fragment: dict[str, object]
@@ -46,14 +42,14 @@ class RecorderRegressionCase:
 RECORDER_REGRESSION_CASES = (
     RecorderRegressionCase(
         fixture="set_top_box_two_states.jsonl",
-        context=AnalysisContext(
+        context=RecordingContext(
             recipe="generic",
             primary_entity_id="media_player.kpn_diw7022",
             device_type="generic_iot",
             entities=[RecordedEntity("media_player.kpn_diw7022", "media_player", "primary")],
         ),
         strategy="fixed_states_power",
-        feature=FeatureReference("media_player.kpn_diw7022", "state"),
+        feature=FeatureReference("media_player.kpn_diw7022", FeatureSource.STATE),
         model_config_fragment={
             "calculation_strategy": "fixed",
             "fixed_config": {"power": 3.1},
@@ -82,7 +78,7 @@ def sample(
 def write_recording(path: Path, samples: list[RecordingSample], *, typed: bool = True) -> None:
     records: list[dict[str, object]] = []
     if typed:
-        records.append(CONTEXT.metadata_record())
+        records.append(CONTEXT.build_metadata_record())
     records.extend(
         {
             **({"record_type": "sample"} if typed else {}),
@@ -118,65 +114,6 @@ def test_real_world_recorder_regressions(case: RecorderRegressionCase) -> None:
     assert result.metrics is not None
     assert result.metrics.mae_w == pytest.approx(case.validation_mae_w, abs=0.001)
     assert result.metrics.coverage == pytest.approx(case.validation_coverage)
-
-
-def test_vacuum_context_records_selected_metadata_and_complete_device_inventory() -> None:
-    request = RecorderMeasurementRequest(
-        power_meter=DummyPowerMeterSpec(),
-        recorder_purpose="complex_profile",
-        profile_recipe="vacuum_robot",
-        vacuum_entity_id="vacuum.robot",
-        battery_entity_id="sensor.battery",
-        additional_entity_ids=("sensor.state",),
-    )
-    descriptors = [
-        EntityDescriptor(
-            entity_id="vacuum.robot",
-            name="Robot",
-            domain="vacuum",
-            device_id="robot",
-            state="docked",
-            attribute_names=[],
-            integration="dreame_vacuum",
-        ),
-        EntityDescriptor(
-            entity_id="sensor.state",
-            name="State",
-            domain="sensor",
-            device_id="robot",
-            state="idle",
-            attribute_names=[],
-            translation_key="state",
-            integration="dreame_vacuum",
-        ),
-        EntityDescriptor(
-            entity_id="sensor.disabled",
-            name="Disabled",
-            domain="sensor",
-            device_id="robot",
-            state="unavailable",
-            attribute_names=[],
-            disabled_by="integration",
-            has_live_state=False,
-        ),
-        EntityDescriptor(
-            entity_id="sensor.unrelated",
-            name="Other",
-            domain="sensor",
-            device_id="other",
-            state="idle",
-            attribute_names=[],
-        ),
-    ]
-    context = analysis_context_for(request, descriptors)
-    assert context.entities[2].translation_key == "state"
-    assert context.entities[2].integration == "dreame_vacuum"
-    assert context.entities[1].role == "battery"
-    inventory = context.metadata_record()["device_entities"]
-    assert [entity["entity_id"] for entity in inventory] == ["vacuum.robot", "sensor.state", "sensor.disabled"]
-    assert inventory[2]["role"] == "disabled"
-    assert inventory[2]["has_live_state"] is False
-    assert inventory[2]["disabled_by"] == "integration"
 
 
 def test_load_recording_accepts_typed_and_legacy_samples_and_reports_bad_lines(tmp_path: Path) -> None:
@@ -228,7 +165,7 @@ def test_fixed_strategy_builds_a_lookup_candidate_for_primary_state() -> None:
     candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT)
 
     assert not isinstance(candidate, StrategyNotApplicable)
-    assert candidate.feature == FeatureReference("switch.device", "state")
+    assert candidate.feature == FeatureReference("switch.device", FeatureSource.STATE)
     assert candidate.estimate_power(sample(20, 99, "on")) == pytest.approx(5.2)
     assert candidate.estimate_power(sample(21, 99, "unknown")) is None
     assert candidate.standby_power == pytest.approx(0.2)
@@ -264,11 +201,11 @@ def test_fixed_strategy_keeps_multiple_active_states_as_states_power() -> None:
 
 
 def test_feature_reference_accepts_finite_scalar_attributes_only() -> None:
-    feature = FeatureReference("switch.device", "attribute", "value")
+    feature = FeatureReference("switch.device", FeatureSource.ATTRIBUTE, "value")
 
-    assert feature.value(sample(1, 1, "on", {"value": 2.5})) == pytest.approx(2.5)
-    assert feature.value(sample(1, 1, "on", {"value": float("nan")})) is None
-    assert feature.value(sample(1, 1, "on", {"value": float("inf")})) is None
+    assert feature.get_value(sample(1, 1, "on", {"value": 2.5})) == pytest.approx(2.5)
+    assert feature.get_value(sample(1, 1, "on", {"value": float("nan")})) is None
+    assert feature.get_value(sample(1, 1, "on", {"value": float("inf")})) is None
 
 
 def test_recorded_entity_and_analysis_result_include_optional_evidence() -> None:
@@ -281,7 +218,7 @@ def test_recorded_entity_and_analysis_result_include_optional_evidence() -> None
         translation_key="plug",
     )
     result = RecorderAnalysisResult(
-        status="insufficient_data",
+        status=AnalysisStatus.INSUFFICIENT_DATA,
         sample_count=3,
         reason="more data",
         warnings=["bad line"],
@@ -292,11 +229,11 @@ def test_recorded_entity_and_analysis_result_include_optional_evidence() -> None
 
 
 def test_analysis_results_do_not_share_default_collections() -> None:
-    first = RecorderAnalysisResult("insufficient_data", 0)
-    second = RecorderAnalysisResult("insufficient_data", 0)
+    first = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 0)
+    second = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 0)
 
     first.warnings.append("Skipped an invalid sample")
-    first.features.append(FeatureReference("switch.device", "state"))
+    first.features.append(FeatureReference("switch.device", FeatureSource.STATE))
 
     assert second.warnings == []
     assert second.features == []
@@ -314,7 +251,7 @@ def test_analyser_selects_scalar_attribute_when_state_is_constant(tmp_path: Path
     result = RecorderAnalyser().analyse(path, CONTEXT)
 
     assert result.model_ready
-    assert result.feature == FeatureReference("switch.device", "attribute", "mode")
+    assert result.feature == FeatureReference("switch.device", FeatureSource.ATTRIBUTE, "mode")
     assert result.metrics is not None
     assert result.metrics.coverage == pytest.approx(1)
     assert result.metrics.mae_w == pytest.approx(0)
@@ -363,7 +300,7 @@ def test_analyser_rejects_recordings_without_a_credible_fixed_model(
     assert not result.model_ready
     assert result.status == "insufficient_data"
     assert reason in str(result.reason)
-    assert result.summary() == {
+    assert result.build_summary() == {
         "Recording analysis": "More data needed",
         "Recording analysis reason": result.reason,
     }
@@ -385,7 +322,7 @@ def test_analyser_explains_which_credibility_threshold_was_not_met(tmp_path: Pat
 
 
 def test_credibility_reason_reports_coverage_and_improvement_values() -> None:
-    reason = _credibility_reason(
+    reason = _find_model_credibility_failure(
         "composite",
         AnalysisMetrics(20, 4, 0.5, 0.95, 1.0, 5),
         AnalysisMetrics(20, 4, 1.0, 1.0, 1.0, 5),
@@ -397,6 +334,45 @@ def test_credibility_reason_reports_coverage_and_improvement_values() -> None:
         "is required; it reduced the typical validation difference from 1.00 W to 0.95 W (5%); at least 0.10 W "
         "or 15% improvement is required."
     )
+
+
+@pytest.mark.parametrize(
+    "coverage, prediction_range, baseline_mae, model_mae, expected_issue",
+    [
+        (0.9, 0.1, 1.0, 0.5, None),
+        (0.899, 0.1, 1.0, 0.5, "coverage"),
+        (0.9, 0.099, 1.0, 0.5, "range"),
+        (1.0, 1.0, 10.0, 9.0, None),
+        (1.0, 1.0, 0.5, 0.42, None),
+        (1.0, 1.0, 0.1, 0.0, None),
+        (1.0, 1.0, 1.0, 0.95, "improvement"),
+        (1.0, 1.0, 0.0, 0.0, "improvement"),
+    ],
+)
+def test_model_credibility_thresholds(
+    coverage: float,
+    prediction_range: float,
+    baseline_mae: float,
+    model_mae: float,
+    expected_issue: str | None,
+) -> None:
+    reason = _find_model_credibility_failure(
+        "fixed_states_power",
+        AnalysisMetrics(20, 4, coverage, model_mae, model_mae, 5),
+        AnalysisMetrics(20, 4, 1.0, baseline_mae, baseline_mae, 5),
+        prediction_range,
+    )
+
+    if expected_issue is None:
+        assert reason is None
+    else:
+        messages = {
+            "coverage": "could estimate",
+            "range": "power estimates differed",
+            "improvement": "improvement is required",
+        }
+        assert reason is not None
+        assert messages[expected_issue] in reason
 
 
 def test_analyser_requires_enough_samples(tmp_path: Path) -> None:
@@ -435,35 +411,9 @@ def test_analyser_requires_five_recorded_samples_for_every_model_value(tmp_path:
     assert "at least 5 samples for every value" in str(result.reason)
 
 
-def test_analysis_context_maps_generic_and_vacuum_recipes() -> None:
-    generic = RecorderMeasurementRequest(
-        power_meter=DummyPowerMeterSpec(),
-        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
-        profile_recipe=RecorderProfileRecipe.GENERIC,
-        tracked_entity_ids=("switch.device", "sensor.mode"),
-    )
-    vacuum = RecorderMeasurementRequest(
-        power_meter=DummyPowerMeterSpec(),
-        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
-        profile_recipe=RecorderProfileRecipe.VACUUM_ROBOT,
-        vacuum_entity_id="vacuum.robot",
-        battery_entity_id="sensor.robot_battery",
-    )
-
-    assert analysis_context_for(generic).device_type == "generic_iot"
-    assert generic.generate_model_json is False
-    vacuum_context = analysis_context_for(vacuum)
-    assert vacuum_context.device_type == "vacuum_robot"
-    assert [entity.role for entity in vacuum_context.entities] == ["primary", "battery"]
-
-    playbook = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
-    with pytest.raises(ValueError, match="complex-profile"):
-        analysis_context_for(playbook)
-
-
 class _Candidate:
     strategy_id = "test"
-    feature = FeatureReference("switch.device", "state")
+    feature = FeatureReference("switch.device", FeatureSource.STATE)
     standby_power = None
 
     def __init__(self, complexity: int) -> None:

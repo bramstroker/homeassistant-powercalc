@@ -24,6 +24,9 @@ export interface FieldState {
   dummyController: boolean;
 }
 
+type EntitySelectionState = Pick<FieldState, "selectedEntities" | "request">
+  & Partial<Pick<FieldState, "deviceEntities" | "definition">>;
+
 export function visible(field: FormField, state: FieldState): boolean {
   return fieldVisible(field, (name) => {
     const source = state.definition.fields.find((candidate) => candidate.name === name);
@@ -42,7 +45,7 @@ export function entityChoices(
   let entities = field.all_entities
     ? [...(state.deviceEntities["*"] ?? [])]
     : domains.flatMap((domain) => (domain === "light" ? state.lights : state.deviceEntities[domain] ?? []));
-  entities = entities.filter((entity) => !entity.disabled_by && entity.has_live_state !== false);
+  entities = entities.filter(hasEnabledLiveState);
   if (field.all_entities && domains.length) {
     entities = entities.filter((entity) => entity.domain && domains.includes(entity.domain));
   }
@@ -77,39 +80,52 @@ export function activeParameters(state: FieldState): ReadonlySet<string> {
 }
 
 /** Keep empty rows: an unanswered select is still a row in the form. */
-export function entityRows(field: FormField, state: Pick<FieldState, "selectedEntities" | "request"> & Partial<FieldState>): string[] {
+export function entityRows(field: FormField, state: EntitySelectionState): string[] {
   const chosen = state.selectedEntities[field.name];
-  if (chosen) return chosen;
+  if (chosen !== undefined) return chosen;
   const stored = state.request && requestFieldValue(state.request, field);
   if (Array.isArray(stored)) return stored.map(String);
-  if (field.name === "additional_entity_ids" && state.deviceEntities && state.definition) {
-    const vacuumField = state.definition.fields.find((candidate) => candidate.name === "vacuum_entity_id");
-    if (vacuumField) {
-      const vacuumId = entityRows(vacuumField, state)[0] ?? "";
-      const batteryField = state.definition.fields.find((candidate) => candidate.name === "battery_entity_id");
-      const batteryId = batteryField ? entityRows(batteryField, state)[0] : undefined;
-      return vacuumRecordingEntityIds(state.deviceEntities["*"] ?? [], vacuumId)
-        .filter((entityId) => entityId !== batteryId);
-    }
-  }
-  return typeof stored === "string" && stored ? [stored] : [];
+  const defaults = field.name === "additional_entity_ids" ? vacuumRecordingDefaults(state) : undefined;
+  return defaults ?? (typeof stored === "string" && stored ? [stored] : []);
+}
+
+function vacuumRecordingDefaults(state: EntitySelectionState): string[] | undefined {
+  if (!state.deviceEntities || !state.definition) return undefined;
+  const vacuumField = state.definition.fields.find((field) => field.name === "vacuum_entity_id");
+  if (!vacuumField) return undefined;
+  const vacuumId = entityRows(vacuumField, state)[0] ?? "";
+  const batteryField = state.definition.fields.find((field) => field.name === "battery_entity_id");
+  const batteryId = batteryField ? entityRows(batteryField, state)[0] : undefined;
+  return vacuumRecordingEntityIds(state.deviceEntities["*"] ?? [], vacuumId)
+    .filter((entityId) => entityId !== batteryId);
 }
 
 /** Defaults only: explicit edits and persisted selections always take precedence. */
 export function vacuumRecordingEntityIds(entities: EntityDescriptor[], vacuumId: string): string[] {
   const vacuum = entities.find((entity) => entity.entity_id === vacuumId);
   if (!vacuum?.device_id) return [];
-  const batteries = entities.filter((entity) => entity.device_id === vacuum.device_id
-    && matchesDeviceClass(entity, ["battery"]) && !entity.disabled_by && entity.has_live_state !== false);
+  const available = entities.filter((entity) => entity.device_id === vacuum.device_id && hasEnabledLiveState(entity));
+  const batteries = available.filter((entity) => matchesDeviceClass(entity, ["battery"]));
   const batteryId = batteries.length === 1 ? batteries[0]?.entity_id : undefined;
-  return entities.filter((entity) =>
-    entity.device_id === vacuum.device_id
-    && entity.entity_id !== vacuumId
+  return available.filter((entity) =>
+    entity.entity_id !== vacuumId
     && entity.entity_id !== batteryId
-    && !entity.disabled_by
-    && entity.has_live_state !== false
     && !["camera", "image"].includes(entity.domain ?? entity.entity_id.split(".")[0] ?? ""),
   ).map((entity) => entity.entity_id).sort((left, right) => left.localeCompare(right));
+}
+
+function hasEnabledLiveState(entity: EntityDescriptor): boolean {
+  return !entity.disabled_by && entity.has_live_state !== false;
+}
+
+export function disabledVacuumEntityCount(state: FieldState): number {
+  const vacuumField = state.definition.fields.find((field) => field.name === "vacuum_entity_id");
+  if (!vacuumField) return 0;
+  const entities = state.deviceEntities["*"] ?? [];
+  const vacuumId = selectedEntityId(vacuumField, state);
+  const deviceId = entities.find((entity) => entity.entity_id === vacuumId)?.device_id;
+  if (!deviceId) return 0;
+  return entities.filter((entity) => entity.device_id === deviceId && entity.disabled_by).length;
 }
 
 export function selectedEntityId(field: FormField, state: FieldState): string {

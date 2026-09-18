@@ -19,7 +19,13 @@ class DeviceSpecField:
     options: tuple[str, ...] = ()
 
 
-def device_spec_fields(schema: dict[str, Any]) -> dict[str, tuple[DeviceSpecField, ...]]:
+@dataclass(frozen=True)
+class ConditionalFields:
+    device_types: list[str]
+    fields: dict[str, DeviceSpecField]
+
+
+def device_spec_fields(schema: dict[str, Any]) -> dict[str, list[DeviceSpecField]]:
     """Return the applicable device specification fields per device type."""
 
     device_types = _device_types(schema)
@@ -33,18 +39,18 @@ def device_spec_fields(schema: dict[str, Any]) -> dict[str, tuple[DeviceSpecFiel
     conditions = schema.get("allOf")
     if isinstance(conditions, list):
         _apply_conditional_fields(fields_by_type, conditions, schema)
-    return {device_type: tuple(fields.values()) for device_type, fields in fields_by_type.items()}
+    return {device_type: list(fields.values()) for device_type, fields in fields_by_type.items()}
 
 
-def _device_types(schema: dict[str, Any]) -> tuple[str, ...]:
+def _device_types(schema: dict[str, Any]) -> list[str]:
     properties = schema.get("properties")
     if not isinstance(properties, dict):
-        return ()
+        return []
     device_type_schema = properties.get("device_type")
     if not isinstance(device_type_schema, dict):
-        return ()
+        return []
     values = device_type_schema.get("enum")
-    return tuple(value for value in values if isinstance(value, str)) if isinstance(values, list) else ()
+    return [value for value in values if isinstance(value, str)] if isinstance(values, list) else []
 
 
 def _apply_conditional_fields(
@@ -56,16 +62,15 @@ def _apply_conditional_fields(
         resolved = _conditional_fields(condition, schema)
         if resolved is None:
             continue
-        matching_types, conditional_fields = resolved
-        for device_type in matching_types:
+        for device_type in resolved.device_types:
             if device_type in fields_by_type:
-                fields_by_type[device_type].update(conditional_fields)
+                fields_by_type[device_type].update(resolved.fields)
 
 
 def _conditional_fields(
     condition: object,
     schema: dict[str, Any],
-) -> tuple[tuple[str, ...], dict[str, DeviceSpecField]] | None:
+) -> ConditionalFields | None:
     if not isinstance(condition, dict):
         return None
     matching_types = _condition_device_types(condition.get("if"))
@@ -78,10 +83,10 @@ def _conditional_fields(
     specs_schema = then_properties.get("device_specs")
     if not isinstance(specs_schema, dict):
         return None
-    return matching_types, _fields_from_object(specs_schema, schema)
+    return ConditionalFields(device_types=matching_types, fields=_fields_from_object(specs_schema, schema))
 
 
-def _condition_device_types(value: object) -> tuple[str, ...] | None:
+def _condition_device_types(value: object) -> list[str] | None:
     if not isinstance(value, dict):
         return None
     properties = value.get("properties")
@@ -92,10 +97,10 @@ def _condition_device_types(value: object) -> tuple[str, ...] | None:
         return None
     constant = condition.get("const")
     if isinstance(constant, str):
-        return (constant,)
+        return [constant]
     choices = condition.get("enum")
     if isinstance(choices, list):
-        return tuple(choice for choice in choices if isinstance(choice, str))
+        return [choice for choice in choices if isinstance(choice, str)]
     return None
 
 

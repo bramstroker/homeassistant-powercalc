@@ -267,6 +267,18 @@ export class MeasureAppController {
     });
   }
 
+  async recordMore(): Promise<void> {
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
+    await this.run(async () => {
+      this.state.snapshot = await this.api().recordMore(sessionId);
+      this.state.samples = [];
+      this.state.plotCollection = emptyPlots();
+      this.state.lastAnalysedSessionId = undefined;
+      await this.enterRunning();
+    });
+  }
+
   newMeasurement(): void {
     this.resetDraft();
     this.state.view = "setup";

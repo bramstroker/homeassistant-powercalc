@@ -3,8 +3,9 @@
 from collections.abc import Sequence
 from itertools import pairwise
 
-from measure.analyser.models import ActivityReport, EnergyMetrics, RecordingSample
-from measure.analyser.vacuum import VacuumCompositeCandidate, vacuum_episodes
+from measure.analyser.models import ActivityReport, EnergyMetrics
+from measure.analyser.vacuum import VacuumCompositeCandidate, group_vacuum_episodes
+from measure.recording.models import RecordingSample
 
 MAX_RELATIVE_ACTIVITY_MAE = 0.2
 MIN_ACTIVITY_MAE_ALLOWANCE_W = 0.5
@@ -13,20 +14,20 @@ MIN_ACTIVITY_MAE_ALLOWANCE_W = 0.5
 MAX_UNEXPLAINED_SHARE = 0.1
 
 
-def activity_reports(
+def build_activity_reports(
     candidate: VacuumCompositeCandidate,
     samples: Sequence[RecordingSample],
     validation: Sequence[RecordingSample],
 ) -> list[ActivityReport]:
-    episodes = vacuum_episodes(samples, candidate.signals)
+    episodes = group_vacuum_episodes(samples, candidate.signals)
     activities = list(dict.fromkeys(episode.activity for episode in episodes))
     transition_ids = {id(sample) for episode in episodes for sample in (episode.samples[0], episode.samples[-1])}
     reports: list[ActivityReport] = []
     for activity in activities:
-        all_samples = [sample for sample in samples if candidate.support_key(sample) == activity]
-        held_out = [sample for sample in validation if candidate.support_key(sample) == activity]
-        errors = _prediction_errors(candidate, held_out)
-        transition_errors = _prediction_errors(
+        all_samples = [sample for sample in samples if candidate.get_support_key(sample) == activity]
+        held_out = [sample for sample in validation if candidate.get_support_key(sample) == activity]
+        errors = _calculate_prediction_errors(candidate, held_out)
+        transition_errors = _calculate_prediction_errors(
             candidate, [sample for sample in held_out if id(sample) in transition_ids]
         )
         reports.append(
@@ -41,17 +42,19 @@ def activity_reports(
                 if transition_errors
                 else None,
                 mean_power_w=sum(sample.power for sample in held_out) / len(held_out) if held_out else 0,
-                energy=_energy(candidate, samples, held_out),
+                energy=_calculate_energy_metrics(candidate, samples, held_out),
             )
         )
     return reports
 
 
-def _prediction_errors(candidate: VacuumCompositeCandidate, samples: Sequence[RecordingSample]) -> list[float]:
+def _calculate_prediction_errors(
+    candidate: VacuumCompositeCandidate, samples: Sequence[RecordingSample]
+) -> list[float]:
     return [abs(power - sample.power) for sample in samples if (power := candidate.estimate_power(sample)) is not None]
 
 
-def credibility_failure(reports: Sequence[ActivityReport]) -> str | None:
+def find_credibility_failure(reports: Sequence[ActivityReport]) -> str | None:
     total = sum(report.sample_count for report in reports)
     for report in reports:
         activity = report.activity
@@ -76,7 +79,7 @@ def credibility_failure(reports: Sequence[ActivityReport]) -> str | None:
     return None
 
 
-def _energy(
+def _calculate_energy_metrics(
     candidate: VacuumCompositeCandidate,
     samples: Sequence[RecordingSample],
     held_out: Sequence[RecordingSample],

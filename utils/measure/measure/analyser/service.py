@@ -4,30 +4,24 @@ import logging
 import math
 from pathlib import Path
 from statistics import median
-from typing import TYPE_CHECKING
 
 from measure.analyser.fixed import FixedStatesPowerStrategy
 from measure.analyser.models import (
     ActivityReport,
     AnalysisCandidate,
-    AnalysisContext,
     AnalysisMetrics,
+    AnalysisStatus,
     EvaluatedCandidate,
     ProfileAnalysisStrategy,
-    RecordedEntity,
     RecorderAnalysisResult,
-    RecordingSample,
     StrategyNotApplicable,
     TrainingValidationSplit,
     ValidationMethod,
 )
-from measure.analyser.recording import load_recordings, recording_context
+from measure.analyser.recording import load_recordings, restore_recording_context
 from measure.analyser.vacuum import VacuumCompositeCandidate, VacuumCompositeStrategy, split_vacuum_samples
-from measure.analyser.vacuum_validation import activity_reports, credibility_failure
-from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe
-
-if TYPE_CHECKING:
-    from measure.home_assistant_entities import EntityDescriptor
+from measure.analyser.vacuum_validation import build_activity_reports, find_credibility_failure
+from measure.recording.models import RecordingContext, RecordingSample
 
 MIN_VALIDATION_COVERAGE = 0.9
 MIN_RELATIVE_MAE_IMPROVEMENT = 0.15
@@ -47,21 +41,23 @@ class RecorderAnalyser:
             list(strategies) if strategies is not None else [FixedStatesPowerStrategy(), VacuumCompositeStrategy()]
         )
 
-    def analyse(self, recording_path: Path | Sequence[Path], context: AnalysisContext) -> RecorderAnalysisResult:
+    def analyse(self, recording_path: Path | Sequence[Path], context: RecordingContext) -> RecorderAnalysisResult:
         loaded = load_recordings([recording_path] if isinstance(recording_path, Path) else recording_path)
-        context = recording_context(context, loaded.dataset.metadata)
+        context = restore_recording_context(context, loaded.dataset.metadata)
         samples = loaded.dataset.samples
         if len(samples) < 10:
-            return _insufficient(samples, loaded.warnings, "Record at least 10 valid samples across device states")
+            return _build_insufficient_data_result(
+                samples, loaded.warnings, "Record at least 10 valid samples across device states"
+            )
 
-        split = _analysis_split(samples, context)
+        split = _split_analysis_samples(samples, context)
         if isinstance(split, StrategyNotApplicable):
-            return _insufficient(samples, loaded.warnings, split.reason)
-        baseline = _constant_metrics(split.training, split.validation)
+            return _build_insufficient_data_result(samples, loaded.warnings, split.reason)
+        baseline = _calculate_baseline_metrics(split.training, split.validation)
         evaluated: list[EvaluatedCandidate] = []
         reasons: list[str] = []
         reports: list[ActivityReport] = []
-        for strategy in self._strategies_for(context):
+        for strategy in self._select_strategies(context):
             candidate = strategy.build_candidate(split.training, context)
             if isinstance(candidate, StrategyNotApplicable):
                 reasons.append(candidate.reason)
@@ -70,24 +66,24 @@ class RecorderAnalyser:
             metrics = _evaluate(candidate, samples, split.validation)
             _LOGGER.debug("Analyser strategy %s produced %s", strategy.strategy_id, metrics.to_dict())
             reports = (
-                activity_reports(candidate, samples, split.validation)
+                build_activity_reports(candidate, samples, split.validation)
                 if isinstance(candidate, VacuumCompositeCandidate)
                 else []
             )
             evaluation = EvaluatedCandidate(candidate, metrics, reports)
-            if (failure := _candidate_failure(evaluation, samples, baseline)) is None:
+            if (failure := _find_candidate_failure(evaluation, samples, baseline)) is None:
                 evaluated.append(evaluation)
             else:
                 reasons.append(failure)
 
         if not evaluated:
             reason = reasons[0] if reasons else "No analysis strategy could explain the recorded power"
-            return _insufficient(samples, loaded.warnings, reason, split.method, reports)
+            return _build_insufficient_data_result(samples, loaded.warnings, reason, split.method, reports)
 
         evaluation = _select_candidate(evaluated)
         selected = evaluation.candidate
         return RecorderAnalysisResult(
-            status="model_ready",
+            status=AnalysisStatus.MODEL_READY,
             sample_count=len(samples),
             strategy=selected.strategy_id,
             feature=selected.feature,
@@ -100,7 +96,7 @@ class RecorderAnalyser:
             activity_reports=evaluation.activity_reports,
         )
 
-    def _strategies_for(self, context: AnalysisContext) -> list[ProfileAnalysisStrategy]:
+    def _select_strategies(self, context: RecordingContext) -> list[ProfileAnalysisStrategy]:
         if not self._default_strategies:
             return self.strategies
         # Vacuum recipes require independent cycles and runtime signals; they
@@ -109,8 +105,8 @@ class RecorderAnalyser:
         return [strategy for strategy in self.strategies if (strategy.strategy_id == "vacuum_composite") == is_vacuum]
 
 
-def _analysis_split(
-    samples: Sequence[RecordingSample], context: AnalysisContext
+def _split_analysis_samples(
+    samples: Sequence[RecordingSample], context: RecordingContext
 ) -> TrainingValidationSplit | StrategyNotApplicable:
     if context.recipe == "vacuum_robot":
         if any(sample.power < 0 for sample in samples):
@@ -119,65 +115,19 @@ def _analysis_split(
     return _split_samples(samples)
 
 
-def _candidate_failure(
+def _find_candidate_failure(
     evaluation: EvaluatedCandidate,
     samples: Sequence[RecordingSample],
     baseline: AnalysisMetrics,
 ) -> str | None:
     candidate = evaluation.candidate
     metrics = evaluation.metrics
-    if (failure := credibility_failure(evaluation.activity_reports)) is not None:
+    if (failure := find_credibility_failure(evaluation.activity_reports)) is not None:
         return failure
     if not _has_minimum_support(candidate, samples):
         return f"{candidate.strategy_id} needs at least {MIN_SAMPLES_PER_MODEL_VALUE} samples for every value"
-    prediction_range = _prediction_range(candidate, samples)
-    if not _credible(metrics, baseline, prediction_range):
-        return _credibility_reason(candidate.strategy_id, metrics, baseline, prediction_range)
-    return None
-
-
-def analysis_context_for(
-    request: RecorderMeasurementRequest,
-    descriptors: Sequence[EntityDescriptor] = (),
-) -> AnalysisContext:
-    entity_ids = request.recorded_entity_ids
-    if not entity_ids or request.profile_recipe is None:
-        raise ValueError("A complex-profile recorder request is required for analysis")
-    roles = ["primary", *("tracked" for _ in entity_ids[1:])]
-    if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT:
-        roles[1] = "battery"
-    by_id = {entity.entity_id: entity for entity in descriptors}
-
-    def recorded_entity(entity_id: str, role: str) -> RecordedEntity:
-        entity = by_id.get(entity_id)
-        if entity is None:
-            return RecordedEntity(entity_id, entity_id.partition(".")[0], role)
-        return RecordedEntity(
-            entity_id,
-            entity.domain,
-            role,
-            device_class=entity.device_class,
-            integration=entity.integration,
-            translation_key=entity.translation_key,
-            device_id=entity.device_id,
-            unit=entity.unit,
-            disabled_by=entity.disabled_by,
-            has_live_state=entity.has_live_state,
-        )
-
-    primary = by_id.get(entity_ids[0])
-    device_entities = [
-        recorded_entity(entity.entity_id, "available" if entity.disabled_by is None else "disabled")
-        for entity in descriptors
-        if primary is not None and primary.device_id is not None and entity.device_id == primary.device_id
-    ]
-    return AnalysisContext(
-        recipe=request.profile_recipe.value,
-        primary_entity_id=entity_ids[0],
-        device_type="vacuum_robot" if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT else "generic_iot",
-        entities=[recorded_entity(entity_id, role) for entity_id, role in zip(entity_ids, roles, strict=True)],
-        device_entities=device_entities,
-    )
+    prediction_range = _calculate_prediction_range(candidate, samples)
+    return _find_model_credibility_failure(candidate.strategy_id, metrics, baseline, prediction_range)
 
 
 def _split_samples(
@@ -188,13 +138,13 @@ def _split_samples(
     return TrainingValidationSplit(training=training, validation=validation)
 
 
-def _constant_metrics(
+def _calculate_baseline_metrics(
     training: Sequence[RecordingSample],
     validation: Sequence[RecordingSample],
 ) -> AnalysisMetrics:
     estimate = median(sample.power for sample in training)
     errors = [estimate - sample.power for sample in validation]
-    return _metrics(len(training) + len(validation), validation, errors, len(validation))
+    return _calculate_metrics(len(training) + len(validation), validation, errors, len(validation))
 
 
 def _evaluate(
@@ -205,10 +155,10 @@ def _evaluate(
     errors = [
         estimate - sample.power for sample in validation if (estimate := candidate.estimate_power(sample)) is not None
     ]
-    return _metrics(len(samples), validation, errors, len(errors))
+    return _calculate_metrics(len(samples), validation, errors, len(errors))
 
 
-def _metrics(
+def _calculate_metrics(
     sample_count: int,
     validation: Sequence[RecordingSample],
     errors: Sequence[float],
@@ -222,27 +172,17 @@ def _metrics(
     return AnalysisMetrics(sample_count, len(validation), coverage, mae, rmse, power_range)
 
 
-def _credible(metrics: AnalysisMetrics, baseline: AnalysisMetrics, prediction_range: float) -> bool:
-    improvement = baseline.mae_w - metrics.mae_w
-    relative = improvement / baseline.mae_w if baseline.mae_w else 0
-    return (
-        metrics.coverage >= MIN_VALIDATION_COVERAGE
-        and prediction_range >= MIN_PREDICTION_RANGE_W
-        and (improvement >= MIN_ABSOLUTE_MAE_IMPROVEMENT_W or relative >= MIN_RELATIVE_MAE_IMPROVEMENT)
-    )
-
-
-def _prediction_range(candidate: AnalysisCandidate, samples: Sequence[RecordingSample]) -> float:
+def _calculate_prediction_range(candidate: AnalysisCandidate, samples: Sequence[RecordingSample]) -> float:
     predictions = [estimate for sample in samples if (estimate := candidate.estimate_power(sample)) is not None]
     return max(predictions) - min(predictions) if predictions else 0
 
 
-def _credibility_reason(
+def _find_model_credibility_failure(
     strategy_id: str,
     metrics: AnalysisMetrics,
     baseline: AnalysisMetrics,
     prediction_range: float,
-) -> str:
+) -> str | None:
     label = "The state-based profile" if strategy_id == "fixed_states_power" else f"The {strategy_id} profile"
     issues: list[str] = []
     if metrics.coverage < MIN_VALIDATION_COVERAGE:
@@ -263,14 +203,14 @@ def _credibility_reason(
             f"({relative:.0%}); at least {MIN_ABSOLUTE_MAE_IMPROVEMENT_W:.2f} W or "
             f"{MIN_RELATIVE_MAE_IMPROVEMENT:.0%} improvement is required",
         )
-    return f"{label} was not reliable enough: {'; '.join(issues)}."
+    return f"{label} was not reliable enough: {'; '.join(issues)}." if issues else None
 
 
 def _has_minimum_support(candidate: AnalysisCandidate, samples: Sequence[RecordingSample]) -> bool:
     counts = Counter(
         key
         for sample in samples
-        if (key := candidate.support_key(sample)) is not None and candidate.estimate_power(sample) is not None
+        if (key := candidate.get_support_key(sample)) is not None and candidate.estimate_power(sample) is not None
     )
     return bool(counts) and min(counts.values()) >= MIN_SAMPLES_PER_MODEL_VALUE
 
@@ -295,7 +235,7 @@ def _select_candidate(
     return selected
 
 
-def _insufficient(
+def _build_insufficient_data_result(
     samples: Sequence[RecordingSample],
     warnings: Sequence[str],
     reason: str,
@@ -303,7 +243,7 @@ def _insufficient(
     reports: Sequence[ActivityReport] = (),
 ) -> RecorderAnalysisResult:
     return RecorderAnalysisResult(
-        status="insufficient_data",
+        status=AnalysisStatus.INSUFFICIENT_DATA,
         sample_count=len(samples),
         reason=reason,
         warnings=list(warnings),

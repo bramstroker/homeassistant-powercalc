@@ -5,15 +5,17 @@ import json
 import logging
 from pathlib import Path
 import time
+from typing import TextIO
 
-from measure.analyser.models import AnalysisContext
-from measure.analyser.service import analysis_context_for
-from measure.execution import ImmediateInteraction, MeasurementCancelledError, RunInteraction
-from measure.recorder_capture import vacuum_attribute_policy, vacuum_recording_attributes
+from measure.cancellation import MeasurementCancelledError
+from measure.recording.capture import build_vacuum_attribute_policy, filter_vacuum_recording_attributes
+from measure.recording.context import build_recording_context
+from measure.recording.files import DEFAULT_EXPORT_FILENAME
+from measure.recording.models import RecordingContext
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, validate_export_filename
-from measure.runner.const import DEFAULT_EXPORT_FILENAME
+from measure.runner.interaction import ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.utils.sampling import MeasurementResult, PowerSampler
 
 INTERVAL = 2
 
@@ -28,6 +30,14 @@ class RecorderEntityState:
     attributes: Mapping[str, object]
 
 
+@dataclass(frozen=True)
+class CapturedEntities:
+    """Entity data for the recording file and the live session display."""
+
+    recorded: Mapping[str, object]
+    live_states: Mapping[str, str]
+
+
 # Reads every requested entity in one go: the Home Assistant WebSocket API has no
 # single-entity state command, so a per-entity reader refetches the whole state
 # machine for each entity of each sample.
@@ -37,16 +47,16 @@ type EntityStateReader = Callable[[Sequence[str]], Mapping[str, RecorderEntitySt
 class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
     def __init__(
         self,
-        measure_util: MeasureUtil,
+        sampler: PowerSampler,
         interaction: RunInteraction | None = None,
         entity_state_reader: EntityStateReader | None = None,
-        analysis_context: AnalysisContext | None = None,
+        recording_context: RecordingContext | None = None,
     ) -> None:
-        self.measure_util = measure_util
+        self.sampler = sampler
         self.filename = DEFAULT_EXPORT_FILENAME
         self.interaction = interaction or ImmediateInteraction()
         self.entity_state_reader = entity_state_reader
-        self.analysis_context = analysis_context
+        self.recording_context = recording_context
         self._missing_optional_entities: set[str] = set()
 
     def writes_export_files(self) -> bool:
@@ -63,8 +73,6 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         self.interaction.phase("Starting recording")
 
         entity_ids = request.recorded_entity_ids
-        is_vacuum = request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT
-        required_ids = entity_ids[:2] if is_vacuum else entity_ids
         if entity_ids and self.entity_state_reader is None:
             raise ValueError("A Home Assistant state reader is required when recorder entities are selected")
 
@@ -79,51 +87,19 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         # terminal conditions for this intentionally open-ended runner.
         try:
             with output_filepath.open("w", encoding="utf-8", newline="") as output_file:
-                writer = csv.writer(output_file) if not entity_ids else None
                 if entity_ids:
-                    metadata = self._metadata(request)
-                    output_file.write(
-                        json.dumps(
-                            metadata,
-                            ensure_ascii=False,
-                            separators=(",", ":"),
-                            sort_keys=True,
-                        ),
-                    )
-                    output_file.write("\n")
+                    _write_jsonl(output_file, self._build_metadata(request))
                 while True:
                     timestamp = time.time()
                     self.interaction.notify("Measurement")
-                    measurement = self.measure_util.take_measurement(timestamp)
+                    measurement = self.sampler.take_measurement(timestamp)
                     _LOGGER.info("Measurement %.2f", measurement.power)
                     elapsed_seconds = timestamp - start_time
-                    if entity_ids and self.entity_state_reader is not None:
-                        entity_states = self._read_entity_states(entity_ids, required_ids)
-                        if entity_states is None:
-                            self.interaction.wait(INTERVAL)
-                            continue
-                        entities, live_states = self._sample_entities(entity_ids, entity_states, is_vacuum=is_vacuum)
-                        output_file.write(
-                            json.dumps(
-                                {
-                                    "record_type": "sample",
-                                    "elapsed_seconds": elapsed_seconds,
-                                    "power": measurement.power,
-                                    "entities": entities,
-                                },
-                                ensure_ascii=False,
-                                separators=(",", ":"),
-                                sort_keys=True,
-                            ),
-                        )
-                        output_file.write("\n")
-                        self.interaction.entity_states(live_states)
-                    elif writer is not None:
-                        writer.writerow([elapsed_seconds, measurement.power])
-                    voltages.extend(measurement.voltages)
-                    recorded += 1
-                    # Open-ended recording: report the running sample count (total 0 = indeterminate).
-                    self.interaction.progress(recorded, 0, phase="Recording")
+                    if self._write_sample(output_file, request, elapsed_seconds, measurement.power):
+                        voltages.extend(measurement.voltages)
+                        recorded += 1
+                        # Open-ended recording: total 0 means indeterminate progress.
+                        self.interaction.progress(recorded, 0, phase="Recording")
                     self.interaction.wait(INTERVAL)
         except KeyboardInterrupt, MeasurementCancelledError:
             _LOGGER.info("Stopped recording")
@@ -136,10 +112,37 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
             summary["Optional entities missing during recording"] = ", ".join(sorted(self._missing_optional_entities))
         return RunnerResult(model_json_data={}, voltages=voltages, summary=summary)
 
-    def _metadata(self, request: RecorderMeasurementRequest) -> dict[str, object]:
-        metadata = (self.analysis_context or analysis_context_for(request)).metadata_record()
+    def _write_sample(
+        self, output_file: TextIO, request: RecorderMeasurementRequest, elapsed_seconds: float, power: float
+    ) -> bool:
+        """Write one sample, returning False when entity capture requires skipping it."""
+        entity_ids = request.recorded_entity_ids
+        if not entity_ids:
+            csv.writer(output_file).writerow([elapsed_seconds, power])
+            return True
+
+        is_vacuum = request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT
+        required_ids = entity_ids[:2] if is_vacuum else entity_ids
+        entity_states = self._read_entity_states(entity_ids, required_ids)
+        if entity_states is None:
+            return False
+        captured = self._sample_entities(entity_ids, entity_states, is_vacuum=is_vacuum)
+        _write_jsonl(
+            output_file,
+            {
+                "record_type": "sample",
+                "elapsed_seconds": elapsed_seconds,
+                "power": power,
+                "entities": captured.recorded,
+            },
+        )
+        self.interaction.entity_states(captured.live_states)
+        return True
+
+    def _build_metadata(self, request: RecorderMeasurementRequest) -> dict[str, object]:
+        metadata = (self.recording_context or build_recording_context(request)).build_metadata_record()
         if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT:
-            metadata["attribute_policy"] = vacuum_attribute_policy()
+            metadata["attribute_policy"] = build_vacuum_attribute_policy()
         return metadata
 
     def _sample_entities(
@@ -148,7 +151,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         entity_states: Mapping[str, RecorderEntityState],
         *,
         is_vacuum: bool,
-    ) -> tuple[dict[str, object], dict[str, str]]:
+    ) -> CapturedEntities:
         entities: dict[str, object] = {}
         live_states: dict[str, str] = {}
         for entity_id in entity_ids:
@@ -161,11 +164,11 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
             live_states[entity_id] = entity_state.state
             entities[entity_id] = {
                 "state": entity_state.state,
-                "attributes": vacuum_recording_attributes(entity_state.attributes)
+                "attributes": filter_vacuum_recording_attributes(entity_state.attributes)
                 if is_vacuum
                 else dict(entity_state.attributes),
             }
-        return entities, live_states
+        return CapturedEntities(recorded=entities, live_states=live_states)
 
     def _read_entity_states(
         self,
@@ -193,3 +196,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
 
     def measure_standby_power(self) -> MeasurementResult:
         return MeasurementResult(power=0, voltages=[])
+
+
+def _write_jsonl(output_file: TextIO, record: Mapping[str, object]) -> None:
+    output_file.write(json.dumps(record, ensure_ascii=False, separators=(",", ":"), sort_keys=True) + "\n")

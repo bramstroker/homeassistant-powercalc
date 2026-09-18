@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from enum import IntEnum, StrEnum
 import json
 
-from measure.analyser.models import AnalysisContext, FeatureReference, RecordedEntity, RecordingSample, ScalarStateValue
+from measure.analyser.models import FeatureReference, FeatureSource, ScalarStateValue
+from measure.recording.models import EntityRole, RecordedEntity, RecordingContext, RecordingSample
 
 
 class Activity(StrEnum):
@@ -151,25 +152,25 @@ class ActivitySignal:
     inactive: list[ScalarStateValue]
 
     def matches(self, sample: RecordingSample) -> bool | None:
-        value = self.feature.value(sample)
+        value = self.feature.get_value(sample)
         if value is None:
             return None
         if _contains(self.active, value):
             return True
         return False if _contains(self.inactive, value) else None
 
-    def condition(self, context: AnalysisContext, *, active: bool = True) -> dict[str, object]:
-        entity = portable_entity(self.feature.entity_id, context)
+    def build_condition(self, context: RecordingContext, *, active: bool = True) -> dict[str, object]:
+        entity = resolve_portable_entity(self.feature.entity_id, context)
         assert entity is not None
         values = self.active if active else self.inactive
-        if self.feature.source == "state":
+        if self.feature.source == FeatureSource.STATE:
             return {"condition": "state", "entity_id": entity, "state": list(values)}
         return {
             "condition": "template",
-            "value_template": self._attribute_template(entity, values),
+            "value_template": self._build_attribute_template(entity, values),
         }
 
-    def _attribute_template(self, entity: str, values: Sequence[ScalarStateValue]) -> str:
+    def _build_attribute_template(self, entity: str, values: Sequence[ScalarStateValue]) -> str:
         expression = f"state_attr({entity!r}, {self.feature.attribute!r})"
         comparisons = [
             expression + (" is sameas " if isinstance(value, bool) else " == ") + json.dumps(value) for value in values
@@ -183,7 +184,7 @@ class _SignalCandidate:
     signal: ActivitySignal
 
 
-def portable_entity(entity_id: str, context: AnalysisContext) -> str | None:
+def resolve_portable_entity(entity_id: str, context: RecordingContext) -> str | None:
     """Map a recorded entity ID to a profile placeholder reusable in other HA installations.
 
     Use [[entity]] for the vacuum, otherwise a unique translation key or supported
@@ -207,14 +208,14 @@ def portable_entity(entity_id: str, context: AnalysisContext) -> str | None:
     return None
 
 
-def _entity_signals(
+def _discover_entity_signals(
     samples: Sequence[RecordingSample],
     entities: Sequence[RecordedEntity],
     primary: str,
 ) -> list[_SignalCandidate]:
     candidates: list[_SignalCandidate] = []
     for entity in entities:
-        feature = FeatureReference(entity.entity_id, "state")
+        feature = FeatureReference(entity.entity_id, FeatureSource.STATE)
         key = entity.translation_key
         if entity.domain in {"binary_sensor", "switch"} and key in _ACTION_ENTITY_KEYS:
             _add_flags(candidates, samples, feature, _ACTION_ENTITY_KEYS[str(key)], _SourcePriority.ACTION_ENTITY)
@@ -233,7 +234,7 @@ def _entity_signals(
     return candidates
 
 
-def discover_signals(samples: Sequence[RecordingSample], context: AnalysisContext) -> list[ActivitySignal]:
+def discover_signals(samples: Sequence[RecordingSample], context: RecordingContext) -> list[ActivitySignal]:
     """Find recorded states and attributes that identify vacuum and dock activities.
 
     Prefer dedicated activity signals and one authoritative status source, using
@@ -243,18 +244,18 @@ def discover_signals(samples: Sequence[RecordingSample], context: AnalysisContex
     entities = [
         entity
         for entity in context.entities
-        if entity.disabled_by is None and portable_entity(entity.entity_id, context) is not None
+        if entity.disabled_by is None and resolve_portable_entity(entity.entity_id, context) is not None
     ]
     primary = context.primary_entity_id
-    candidates = _entity_signals(samples, entities, primary)
+    candidates = _discover_entity_signals(samples, entities, primary)
     attributes = {key for sample in samples if (state := sample.entities.get(primary)) for key in state.attributes}
     for attribute in sorted(attributes):
-        feature = FeatureReference(primary, "attribute", attribute)
+        feature = FeatureReference(primary, FeatureSource.ATTRIBUTE, attribute)
         if attribute in _ATTRIBUTE_FLAGS:
             _add_flags(candidates, samples, feature, _ATTRIBUTE_FLAGS[attribute], _SourcePriority.ACTIVITY_FLAG)
         elif attribute in _STATUS_ATTRIBUTES:
             _add_states(candidates, samples, feature, _STATUS_ATTRIBUTES[attribute])
-    _add_states(candidates, samples, FeatureReference(primary, "state"), _SourcePriority.HA_STATE)
+    _add_states(candidates, samples, FeatureReference(primary, FeatureSource.STATE), _SourcePriority.HA_STATE)
     # Use one authoritative enum source, rather than combining a rich runtime
     # status sensor with stale vacuum attributes or the coarse HA docked state.
     status_feature = next(
@@ -287,14 +288,14 @@ def _add_supplements(
 ) -> None:
     if Activity.SLEEPING not in status_activities:
         # Dreame/Mova can report charging_completed alongside an explicit sleep status.
-        _add_sleep_flag(candidates, samples, FeatureReference(primary, "attribute", "status"))
+        _add_sleep_flag(candidates, samples, FeatureReference(primary, FeatureSource.ATTRIBUTE, "status"))
         for entity in entities:
             if entity.domain == "sensor" and entity.translation_key == "status":
-                _add_sleep_flag(candidates, samples, FeatureReference(entity.entity_id, "state"))
+                _add_sleep_flag(candidates, samples, FeatureReference(entity.entity_id, FeatureSource.STATE))
     # Limited charging enums supplement the main status only where it has no
     # explicit charging/completion signal. A coarse HA docked state is preserved.
     for entity in entities:
-        feature = FeatureReference(entity.entity_id, "state")
+        feature = FeatureReference(entity.entity_id, FeatureSource.STATE)
         if entity.domain == "sensor" and entity.translation_key == "charging_status":
             _add_aux_states(
                 candidates,
@@ -314,10 +315,10 @@ def _is_charging_sensor(entity: RecordedEntity) -> bool:
     )
 
 
-def _values(samples: Sequence[RecordingSample], feature: FeatureReference) -> list[ScalarStateValue]:
+def _collect_feature_values(samples: Sequence[RecordingSample], feature: FeatureReference) -> list[ScalarStateValue]:
     values: list[ScalarStateValue] = []
     for sample in samples:
-        value = feature.value(sample)
+        value = feature.get_value(sample)
         if (
             value is not None
             and _normalise(value) not in {"unknown", "unavailable", "none"}
@@ -334,7 +335,7 @@ def _add_flags(
     activity: Activity,
     priority: _SourcePriority,
 ) -> None:
-    values = _values(samples, feature)
+    values = _collect_feature_values(samples, feature)
     active: list[ScalarStateValue] = [
         value
         for value in values
@@ -353,7 +354,7 @@ def _add_flags(
 def _add_sleep_flag(
     candidates: list[_SignalCandidate], samples: Sequence[RecordingSample], feature: FeatureReference
 ) -> None:
-    values = _values(samples, feature)
+    values = _collect_feature_values(samples, feature)
     active: list[ScalarStateValue] = [
         value for value in values if isinstance(value, str) and _normalise(value) in ALIASES[Activity.SLEEPING]
     ]
@@ -375,7 +376,7 @@ def _add_aux_states(
     activities: Sequence[Activity],
     off_values: set[str],
 ) -> None:
-    values = _values(samples, feature)
+    values = _collect_feature_values(samples, feature)
     recognised = off_values | set().union(*(ALIASES[activity] for activity in activities))
     # Other explicit charging modes are inactive, even when the authoritative
     # source already supplies that activity and we only supplement completion.
@@ -407,7 +408,7 @@ def _add_states(
     feature: FeatureReference,
     priority: _SourcePriority,
 ) -> None:
-    values = _values(samples, feature)
+    values = _collect_feature_values(samples, feature)
     for activity, aliases in ALIASES.items():
         active: list[ScalarStateValue] = [
             value for value in values if isinstance(value, str) and _normalise(value) in aliases
@@ -440,20 +441,20 @@ def resolve_activity(sample: RecordingSample, signals: Sequence[ActivitySignal])
     return None
 
 
-def battery_feature(samples: Sequence[RecordingSample], context: AnalysisContext) -> FeatureReference | None:
-    battery: RecordedEntity | None = next((entity for entity in context.entities if entity.role == "battery"), None)
-    if battery is not None and portable_entity(battery.entity_id, context) is not None:
-        return FeatureReference(battery.entity_id, "state")
+def find_battery_feature(samples: Sequence[RecordingSample], context: RecordingContext) -> FeatureReference | None:
+    battery = next((entity for entity in context.entities if entity.role == EntityRole.BATTERY), None)
+    if battery is not None and resolve_portable_entity(battery.entity_id, context) is not None:
+        return FeatureReference(battery.entity_id, FeatureSource.STATE)
     # Legacy recordings lack registry metadata, but usually expose the same battery
     # level directly on the vacuum. Never guess a related entity from its name.
-    feature = FeatureReference(context.primary_entity_id, "attribute", "battery_level")
+    feature = FeatureReference(context.primary_entity_id, FeatureSource.ATTRIBUTE, "battery_level")
     if (
         battery is not None
         and samples
         and all(
-            feature.value(sample) is not None
+            feature.get_value(sample) is not None
             and (state := sample.entities.get(battery.entity_id)) is not None
-            and str(feature.value(sample)) == state.state
+            and str(feature.get_value(sample)) == state.state
             for sample in samples
         )
     ):

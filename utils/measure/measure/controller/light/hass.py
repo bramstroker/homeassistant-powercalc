@@ -15,7 +15,7 @@ from measure.controller.light.capabilities import (
 )
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController, LightInfo
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 
 
 class HassLightController(HassControllerBase, LightController):

@@ -1,7 +1,7 @@
 from collections.abc import Callable
 import time
 
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter, PowerMeterDiagnosticSample
 

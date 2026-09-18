@@ -2,61 +2,23 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
 import math
-from typing import Literal, Protocol
+from typing import Protocol
+
+from measure.recording.models import RecordingContext, RecordingSample
 
 type ScalarStateValue = str | bool | int | float
 
 RECORDING_ANALYSIS_LABEL = "Recording analysis"
 
 
-@dataclass(frozen=True)
-class RecordedEntity:
-    """Metadata describing an entity included in a recording."""
-
-    entity_id: str
-    domain: str
-    role: str
-    device_class: str | None = None
-    integration: str | None = None
-    translation_key: str | None = None
-    device_id: str | None = None
-    unit: str | None = None
-    disabled_by: str | None = None
-    has_live_state: bool | None = None
-
-    def to_dict(self) -> dict[str, object]:
-        value: dict[str, object] = {
-            "entity_id": self.entity_id,
-            "domain": self.domain,
-            "role": self.role,
-        }
-        for key in (
-            "device_class",
-            "integration",
-            "translation_key",
-            "device_id",
-            "unit",
-            "disabled_by",
-            "has_live_state",
-        ):
-            item = getattr(self, key)
-            if item is not None:
-                value[key] = item
-        return value
+class FeatureSource(StrEnum):
+    STATE = "state"
+    ATTRIBUTE = "attribute"
 
 
-@dataclass(frozen=True)
-class RecordedEntityState:
-    state: str
-    attributes: Mapping[str, object]
-
-
-@dataclass(frozen=True)
-class RecordingSample:
-    elapsed_seconds: float
-    power: float
-    entities: Mapping[str, RecordedEntityState]
-    recording_id: int = 0
+class AnalysisStatus(StrEnum):
+    MODEL_READY = "model_ready"
+    INSUFFICIENT_DATA = "insufficient_data"
 
 
 class ValidationMethod(StrEnum):
@@ -74,64 +36,33 @@ class TrainingValidationSplit:
 
 
 @dataclass(frozen=True)
-class AnalysisContext:
-    recipe: str
-    primary_entity_id: str
-    device_type: str
-    entities: list[RecordedEntity]
-    device_entities: list[RecordedEntity] = field(default_factory=list)
-
-    def metadata_record(self) -> dict[str, object]:
-        record: dict[str, object] = {
-            "record_type": "metadata",
-            "format_version": 1,
-            "recipe": self.recipe,
-            "primary_entity_id": self.primary_entity_id,
-            "entities": [entity.to_dict() for entity in self.entities],
-        }
-        if self.device_entities:
-            record["device_entities"] = [entity.to_dict() for entity in self.device_entities]
-        return record
-
-
-@dataclass(frozen=True)
-class RecordingDataset:
-    samples: list[RecordingSample]
-    metadata: Mapping[str, object] | None = None
-
-
-@dataclass(frozen=True)
-class LoadedRecording:
-    dataset: RecordingDataset
-    warnings: list[str] = field(default_factory=list)
-
-
-@dataclass(frozen=True)
 class FeatureReference:
     entity_id: str
-    source: Literal["state", "attribute"]
+    source: FeatureSource
     attribute: str | None = None
 
     @property
     def identifier(self) -> str:
-        if self.source == "state":
+        if self.source == FeatureSource.STATE:
             return f"{self.entity_id}.state"
         return f"{self.entity_id}.attributes.{self.attribute}"
 
-    def value(self, sample: RecordingSample) -> ScalarStateValue | None:
+    def get_value(self, sample: RecordingSample) -> ScalarStateValue | None:
         entity = sample.entities.get(self.entity_id)
         if entity is None:
             return None
-        value: object = entity.state if self.source == "state" else entity.attributes.get(str(self.attribute))
+        value: object = (
+            entity.state if self.source == FeatureSource.STATE else entity.attributes.get(str(self.attribute))
+        )
         if isinstance(value, bool | int | str):
             return value
         if isinstance(value, float) and math.isfinite(value):
             return value
         return None
 
-    def model_key(self, value: ScalarStateValue) -> str:
+    def format_model_key(self, value: ScalarStateValue) -> str:
         rendered = str(value)
-        return rendered if self.source == "state" else f"{self.attribute}|{rendered}"
+        return rendered if self.source == FeatureSource.STATE else f"{self.attribute}|{rendered}"
 
 
 @dataclass(frozen=True)
@@ -159,7 +90,7 @@ class AnalysisCandidate(Protocol):
     @property
     def features(self) -> list[FeatureReference]: ...
 
-    def support_key(self, sample: RecordingSample) -> str | None: ...
+    def get_support_key(self, sample: RecordingSample) -> str | None: ...
 
     @property
     def complexity(self) -> int: ...
@@ -184,7 +115,7 @@ class ProfileAnalysisStrategy(Protocol):
     def build_candidate(
         self,
         samples: Sequence[RecordingSample],
-        context: AnalysisContext,
+        context: RecordingContext,
     ) -> AnalysisCandidate | StrategyNotApplicable: ...
 
 
@@ -261,7 +192,7 @@ class EvaluatedCandidate:
 
 @dataclass(frozen=True)
 class RecorderAnalysisResult:
-    status: Literal["model_ready", "insufficient_data"]
+    status: AnalysisStatus
     sample_count: int
     reason: str | None = None
     strategy: str | None = None
@@ -276,12 +207,12 @@ class RecorderAnalysisResult:
 
     @property
     def model_ready(self) -> bool:
-        return self.status == "model_ready" and self.model_config_fragment is not None
+        return self.status == AnalysisStatus.MODEL_READY and self.model_config_fragment is not None
 
     def to_dict(self) -> dict[str, object]:
         value: dict[str, object] = {
             "schema_version": 1,
-            "status": self.status,
+            "status": self.status.value,
             "sample_count": self.sample_count,
         }
         if self.reason is not None:
@@ -298,10 +229,10 @@ class RecorderAnalysisResult:
             value["standby_power"] = self.standby_power
         if self.warnings:
             value["warnings"] = list(self.warnings)
-        value.update(self._validation_details())
+        value.update(self._build_validation_details())
         return value
 
-    def _validation_details(self) -> dict[str, object]:
+    def _build_validation_details(self) -> dict[str, object]:
         details: dict[str, object] = {}
         if self.features:
             details["features"] = [feature.identifier for feature in self.features]
@@ -311,7 +242,7 @@ class RecorderAnalysisResult:
             details["activities"] = [report.to_dict() for report in self.activity_reports]
         return details
 
-    def summary(self) -> dict[str, str]:
+    def build_summary(self) -> dict[str, str]:
         if not self.model_ready:
             summary = {RECORDING_ANALYSIS_LABEL: "More data needed"}
             if self.reason is not None:

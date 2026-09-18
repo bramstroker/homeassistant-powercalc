@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
+from measure.controller.light.const import LutMode
 from measure.request import MeasurementRequest, parse_measurement_request
 from measure.visualization import (
     PlotDataError,
@@ -26,6 +27,85 @@ def light_request(*modes: str) -> MeasurementRequest:
             "modes": list(modes),
         },
     )
+
+
+@pytest.mark.parametrize("mode", [LutMode.EFFECT, "effects", None])
+def test_explicit_light_mode_and_legacy_filename(tmp_path: Path, mode: str | LutMode | None) -> None:
+    path = tmp_path / "effects.csv"
+    path.write_text("effect,bri,watt\nPulse,255,8\n")
+    assert build_plot_from_file(path, color_mode=mode).id == "effect"
+
+
+def test_invalid_explicit_light_mode(tmp_path: Path) -> None:
+    with pytest.raises(PlotDataError, match="unsupported light mode"):
+        build_plot_from_file(tmp_path / "data.csv", color_mode="invalid")
+
+
+def test_session_without_plot_artifacts() -> None:
+    assert build_session_plots(light_request("brightness"), {}).plots == []
+    request = parse_measurement_request({"measure_type": "average", "power_meter": {"type": "dummy"}})
+    assert build_session_plots(request, {}).plots == []
+
+
+def test_fan_session_selects_model_calibration(tmp_path: Path) -> None:
+    request = parse_measurement_request(
+        {"measure_type": "fan", "model_id": "fan", "power_meter": {"type": "dummy"}, "controller": {"type": "dummy"}}
+    )
+    path = tmp_path / "model.json"
+    path.write_text(
+        json.dumps({"calculation_strategy": "linear", "linear_config": {"calibrate": ["0 -> 1", "100 -> 20"]}})
+    )
+    result = build_session_plots(request, {"fan/model.json": path})
+    assert result.plots[0].id == "calibration"
+    assert result.warnings == []
+
+
+@pytest.mark.parametrize(
+    "filename,contents",
+    [
+        ("effect.csv", "effect,bri,watt\n,1,2\n"),
+        ("brightness.csv", "bri,watt\nbad,2\n"),
+        ("color_temp.csv", "bri,mired,watt\n1,0,2\n"),
+        ("hs.csv", "bri,hue,sat,watt\n1,bad,100,2\n"),
+    ],
+)
+def test_light_plots_require_valid_measurements(tmp_path: Path, filename: str, contents: str) -> None:
+    path = tmp_path / filename
+    path.write_text(contents)
+    with pytest.raises(PlotDataError, match="no valid"):
+        build_plot_from_file(path)
+
+
+def test_very_warm_light_color(tmp_path: Path) -> None:
+    path = tmp_path / "color_temp.csv"
+    path.write_text("bri,mired,watt\n255,1000,10\n")
+    color = build_plot_from_file(path).series[0].points[0].color
+    assert color is not None
+    assert color.endswith("00")
+
+
+@pytest.mark.parametrize("limit", [None, 1, 2, 3])
+def test_recorder_small_point_limits(tmp_path: Path, limit: int | None) -> None:
+    path = tmp_path / "record.csv"
+    path.write_text("invalid\n" + "\n".join(f"{index},{index}" for index in range(8)))
+    points = build_plot_from_file(path, max_points=limit).series[0].points
+    assert len(points) == (8 if limit is None else limit)
+    assert points[0].x == 0
+    if limit != 1:
+        assert points[-1].x == 7
+
+
+def test_recorder_ignores_non_object_json_rows(tmp_path: Path) -> None:
+    path = tmp_path / "record.jsonl"
+    path.write_text('[]\n{"elapsed_seconds": 0, "power": 2}\n')
+    assert len(build_plot_from_file(path).series[0].points) == 1
+
+
+def test_recorder_requires_valid_measurements(tmp_path: Path) -> None:
+    path = tmp_path / "record.csv"
+    path.write_text("invalid\n")
+    with pytest.raises(PlotDataError, match="no valid recorder"):
+        build_plot_from_file(path)
 
 
 def test_plots_work_before_model_id_is_known(tmp_path: Path) -> None:
@@ -59,7 +139,7 @@ def test_builds_all_light_plot_modes_from_plain_and_gzip_csv(tmp_path: Path) -> 
         files,
     )
 
-    assert result.warnings == ()
+    assert result.warnings == []
     assert [plot.id for plot in result.plots] == ["brightness", "color_temp", "hs", "effect"]
     assert result.plots[0].kind is PlotKind.SCATTER
     assert result.plots[0].series[0].points[-1].y == pytest.approx(8.2)
@@ -300,7 +380,7 @@ def test_builds_recorder_time_series_and_ignores_invalid_rows(tmp_path: Path) ->
 
     result = build_session_plots(request, {"measurement/record.csv": recording})
 
-    assert result.warnings == ()
+    assert result.warnings == []
     assert result.plots[0].kind is PlotKind.LINE
     assert result.plots[0].x_label == "Elapsed time (s)"
     assert [(point.x, point.y) for point in result.plots[0].series[0].points] == [(0.0, 1.2), (2.0, 3.4)]
@@ -331,8 +411,37 @@ incomplete
 
     result = build_session_plots(request, {"measurement/record.jsonl": recording})
 
-    assert result.warnings == ()
+    assert result.warnings == []
     assert [(point.x, point.y) for point in result.plots[0].series[0].points] == [(0.0, 1.2), (2.0, 3.4)]
+
+
+def test_plots_every_recording_in_run_order(tmp_path: Path) -> None:
+    request = parse_measurement_request(
+        {
+            "measure_type": "recorder",
+            "power_meter": {"type": "dummy"},
+            "recorder_purpose": "complex_profile",
+            "profile_recipe": "generic",
+            "tracked_entity_ids": ["switch.plug"],
+        }
+    )
+    files = {}
+    for name in ["record.jsonl", "record-10.jsonl", "record-2.jsonl", "record-other.jsonl"]:
+        path = tmp_path / name
+        path.write_text('{"elapsed_seconds":0,"power":1}\n{"elapsed_seconds":2,"power":2}\n')
+        files[f"measurement/{name}"] = path
+    files["other-model/record-1.jsonl"] = tmp_path / "record.jsonl"
+
+    result = build_session_plots(request, files)
+
+    assert result.warnings == []
+    assert [plot.source for plot in result.plots] == [
+        "measurement/record-2.jsonl",
+        "measurement/record-10.jsonl",
+        "measurement/record.jsonl",
+    ]
+    assert len({plot.id for plot in result.plots}) == 3
+    assert all(plot.series[0].points[0].x == 0 for plot in result.plots)
 
 
 def test_downsamples_large_recorder_files_while_streaming(tmp_path: Path) -> None:
@@ -350,7 +459,7 @@ def test_downsamples_large_recorder_files_while_streaming(tmp_path: Path) -> Non
         },
     )
 
-    with patch("measure.visualization.core._limit_line", side_effect=AssertionError("full input was materialized")):
+    with patch("measure.visualization.sampling.limit_line", side_effect=AssertionError("full input was materialized")):
         result = build_session_plots(
             request,
             {"measurement/record.csv": recording},

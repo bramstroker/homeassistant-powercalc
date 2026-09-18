@@ -1,16 +1,8 @@
-from dataclasses import dataclass
 import json
 from pathlib import Path
 
-from measure.files import write_json_atomic
-
-
-@dataclass(frozen=True)
-class TapoCredentials:
-    """TP-Link account credentials used to authenticate a Tapo power meter."""
-
-    username: str
-    password: str
+from measure.powermeter.credentials import TapoCredentials
+from measure.utils.files import write_json_atomic
 
 
 class TapoCredentialStore:

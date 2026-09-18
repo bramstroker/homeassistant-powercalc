@@ -4,25 +4,25 @@ import logging
 from pathlib import Path
 from threading import Lock, Thread
 import time
-from typing import Protocol, cast
+from typing import Protocol
 from uuid import uuid4
 
 from measure.analyser.execution import RecorderAnalysisExecution
-from measure.clock import utc_now
-from measure.execution import MeasurementCancelledError, OperatingPoint
+from measure.cancellation import MeasurementCancelledError
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
     RESUMABLE_SESSION_STATES,
-    CalibrationSample,
     SessionControl,
     SessionEvent,
     SessionEventType,
     SessionSnapshot,
     SessionState,
 )
+from measure.ha_app.session_projection import apply_session_event
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
 from measure.request import MeasurementRequest, RecorderMeasurementRequest, ResumePolicy
 from measure.runner.runner import RunnerResult
+from measure.utils.clock import utc_now
 
 _LOGGER = logging.getLogger("measure")
 _SNAPSHOT_PERSIST_INTERVAL = 5.0
@@ -68,7 +68,7 @@ class MeasurementCoordinator:
         self.service_factory = service_factory
         self._lock = Lock()
         self._snapshot = storage.load_current()
-        self._events = list(storage.load_events(self._snapshot.id)) if self._snapshot is not None else []
+        self._events = storage.load_events(self._snapshot.id) if self._snapshot is not None else []
         self._last_snapshot_write = 0.0
         self._control: SessionControl | None = None
         self._worker: Thread | None = None
@@ -113,14 +113,14 @@ class MeasurementCoordinator:
             return self._snapshot
         return self.storage.load_snapshot(session_id)
 
-    def sessions(self) -> tuple[SessionSnapshot, ...]:
+    def sessions(self) -> list[SessionSnapshot]:
         """Return all retained sessions with the live projection substituted."""
         stored = self.storage.list_sessions()
         with self._lock:
             current = self._snapshot
             if current is None:
                 return stored
-            return tuple(current if snapshot.id == current.id else snapshot for snapshot in stored)
+            return [current if snapshot.id == current.id else snapshot for snapshot in stored]
 
     def start(self, request: MeasurementRequest) -> SessionSnapshot:
         """Persist and launch a new session, rejecting overlapping work."""
@@ -165,11 +165,46 @@ class MeasurementCoordinator:
             if not self.storage.can_resume(snapshot.id):
                 raise SessionConflictError("The requested session has no compatible complete row to resume")
             self._snapshot = snapshot
-            self._events = list(self.storage.load_events(snapshot.id))
+            self._events = self.storage.load_events(snapshot.id)
             self.storage.set_current(snapshot.id)
             request = self.storage.load_request(snapshot.id).model_copy(
                 update={"resume_policy": ResumePolicy.RESUME},
             )
+            self._launch_locked(request)
+            current = self._snapshot
+        self._notify_listeners()
+        return current
+
+    def record_more(self, session_id: str) -> SessionSnapshot:
+        """Capture another run with the session's original recorder settings."""
+        with self._lock:
+            if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
+                raise SessionConflictError("A measurement session is already active")
+            if self._analysing:
+                raise SessionConflictError("Recording analysis is already active")
+            try:
+                snapshot = self._snapshot_locked(session_id)
+            except SESSION_LOAD_ERRORS as error:
+                raise SessionConflictError("The requested session does not exist") from error
+            if snapshot.state in ACTIVE_SESSION_STATES or not self.storage.can_analyse(session_id):
+                raise SessionConflictError("The requested session has no profile recording to extend")
+            request = self.storage.load_request(session_id)
+            assert isinstance(request, RecorderMeasurementRequest)
+            self.storage.archive_recording(session_id, request)
+            self._snapshot = replace(
+                snapshot,
+                completed=0,
+                total=0,
+                skipped=0,
+                estimated_remaining=None,
+                operating_point=None,
+                entity_states={},
+                summary=None,
+                warnings=(),
+            )
+            self._events = self.storage.load_events(session_id)
+            self._last_snapshot_write = 0.0
+            self.storage.set_current(session_id)
             self._launch_locked(request)
             current = self._snapshot
         self._notify_listeners()
@@ -277,7 +312,7 @@ class MeasurementCoordinator:
                 updated = replace(
                     snapshot,
                     updated_at=utc_now(),
-                    files=self.storage.list_files(session_id),
+                    files=tuple(self.storage.list_files(session_id)),
                     summary=summary,
                     warnings=tuple(
                         warning for warning in snapshot.warnings if not warning.startswith(_ANALYSIS_WARNING_PREFIXES)
@@ -299,12 +334,12 @@ class MeasurementCoordinator:
             raise SessionConflictError("The requested session is not active")
         return self._snapshot
 
-    def events_since(self, sequence: int, session_id: str) -> tuple[SessionEvent, ...]:
+    def events_since(self, sequence: int, session_id: str) -> list[SessionEvent]:
         """Return events after ``sequence`` for a live or retained session."""
         with self._lock:
             if self._snapshot is not None and self._snapshot.id == session_id:
-                return tuple(event for event in self._events if event.sequence > sequence)
-        return tuple(event for event in self.storage.load_events(session_id) if event.sequence > sequence)
+                return [event for event in self._events if event.sequence > sequence]
+        return [event for event in self.storage.load_events(session_id) if event.sequence > sequence]
 
     def _launch_locked(self, request: MeasurementRequest) -> None:
         """Create session control and launch the worker while holding the coordinator lock."""
@@ -357,7 +392,7 @@ class MeasurementCoordinator:
             self._finish(SessionState.COMPLETED, summary=result.summary)
 
     def _handle_event(self, event: SessionEvent) -> None:
-        """Project runner events onto the snapshot and persistence policy."""
+        """Update the live session and persist events according to their frequency and importance."""
 
         with self._lock:
             if self._snapshot is None:
@@ -365,60 +400,13 @@ class MeasurementCoordinator:
             self._events.append(event)
             if len(self._events) > 1000:
                 self._events = self._events[-1000:]
-            if self._project_transient_sample(event):
+            self._snapshot = apply_session_event(self._snapshot, event)
+            if event.type in {
+                SessionEventType.SAMPLE,
+                SessionEventType.CALIBRATION_SAMPLE,
+                SessionEventType.ENTITY_STATES,
+            }:
                 return
-            if event.type == SessionEventType.PROGRESS:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                    completed=int(event.data["completed"]),
-                    total=int(event.data["total"]),
-                    skipped=int(event.data.get("skipped", 0)),
-                    phase=str(event.data["mode"]),
-                    mode=str(event.data["mode"]),
-                    estimated_remaining=str(event.data["estimated_remaining"]),
-                )
-            elif event.type == SessionEventType.PHASE:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                    phase=str(event.data["message"]),
-                )
-            elif event.type == SessionEventType.OPERATING_POINT:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                    operating_point=cast(OperatingPoint, event.data),
-                )
-            elif event.type == SessionEventType.WARNING:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                    warnings=self._append_warning(
-                        self._snapshot.warnings,
-                        str(event.data["message"]),
-                    ),
-                )
-            elif event.type == SessionEventType.CHECKPOINT:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                    state=SessionState.AWAITING_CONFIRMATION,
-                    phase="Waiting for confirmation",
-                    confirmation_message=str(event.data["message"]),
-                    confirmation_action=(str(event.data["action"]) if event.data.get("action") else None),
-                )
-            else:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                )
             durable = event.type in {
                 SessionEventType.STATE,
                 SessionEventType.PHASE,
@@ -429,42 +417,8 @@ class MeasurementCoordinator:
             if self._should_persist_snapshot(event):
                 self.storage.write_snapshot(self._snapshot)
                 self._last_snapshot_write = time.monotonic()
-        self._notify_checkpoint(event)
-
-    @staticmethod
-    def _append_warning(warnings: tuple[str, ...], warning: str) -> tuple[str, ...]:
-        """Append a new user-facing warning while preserving distinct prior warnings."""
-
-        return tuple(dict.fromkeys((*warnings, warning)))[-20:]
-
-    def _notify_checkpoint(self, event: SessionEvent) -> None:
-        """Publish the state transition caused by an operator checkpoint."""
         if event.type == SessionEventType.CHECKPOINT:
             self._notify_listeners()
-
-    def _project_transient_sample(self, event: SessionEvent) -> bool:
-        """Project live readings in memory without writing high-frequency snapshots."""
-
-        assert self._snapshot is not None
-        if event.type == SessionEventType.SAMPLE:
-            self._snapshot = replace(self._snapshot, event_sequence=event.sequence, updated_at=event.created_at)
-        elif event.type == SessionEventType.CALIBRATION_SAMPLE:
-            self._snapshot = replace(
-                self._snapshot,
-                event_sequence=event.sequence,
-                updated_at=event.created_at,
-                calibration_sample=cast(CalibrationSample, event.data),
-            )
-        elif event.type == SessionEventType.ENTITY_STATES:
-            self._snapshot = replace(
-                self._snapshot,
-                event_sequence=event.sequence,
-                updated_at=event.created_at,
-                entity_states={str(key): str(value) for key, value in event.data.get("states", {}).items()},
-            )
-        else:
-            return False
-        return True
 
     def _should_persist_snapshot(self, event: SessionEvent) -> bool:
         if event.type == SessionEventType.LOG:
@@ -479,7 +433,7 @@ class MeasurementCoordinator:
         with self._lock:
             if self._snapshot is None:
                 return
-            files = self.storage.list_files(self._snapshot.id)
+            files = tuple(self.storage.list_files(self._snapshot.id))
             updated_at = utc_now()
             sequence = (
                 max(

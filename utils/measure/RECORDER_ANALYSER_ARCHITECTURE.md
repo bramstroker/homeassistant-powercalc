@@ -63,8 +63,8 @@ available same-device entities and supports changing the selection or adding doc
 [preflight.py](measure/ha_app/preflight.py) checks entity availability and verifies that the
 vacuum battery is a numeric percentage sensor on the same device.
 
-[assembler.py](measure/assembler.py) constructs the concrete power meter, `MeasureUtil`,
-batched state reader, `AnalysisContext`, and runner. A registry snapshot supplies identity
+[assembler.py](measure/assembler.py) constructs the concrete power meter, `PowerSampler`,
+batched state reader, `RecordingContext`, and runner. A registry snapshot supplies identity
 metadata for portable profile references.
 
 ## 4. Recorder: collecting observations
@@ -72,7 +72,8 @@ metadata for portable profile references.
 [RecorderRunner](measure/runner/recorder.py) samples power and selected entity states at a
 nominal two-second interval. Reads are sequential, so latency contributes to elapsed time
 and alignment around transitions. `EntityStateReader` batches the selected IDs and returns
-`RecorderEntityState` objects.
+`RecorderEntityState` objects. `CapturedEntities` pairs filtered recording data with the
+state-only values shown in the live session.
 
 The runner streams either:
 
@@ -83,18 +84,20 @@ Missing optional vacuum entities become `unavailable`, with one warning per enti
 Failed reads or missing required entities skip the sample. Stopping completes the run;
 `RunnerResult` contains sample counts, duration, and voltages.
 
-[recorder_capture.py](measure/recorder_capture.py) retains bounded scalar vacuum attributes
+[recording/capture.py](measure/recording/capture.py) retains bounded scalar vacuum attributes
 and filters known identifiers/secrets, URLs, and nested payloads. Generic recordings retain
 full attributes. Review entity IDs and values before sharing.
 
 ## 5. Data models and artifacts
 
-The analysis types are defined in [models.py](measure/analyser/models.py).
+Observation types live in [recording/models.py](measure/recording/models.py); fitting and
+validation types live in [analyser/models.py](measure/analyser/models.py).
 
 | Type | Responsibility |
 | --- | --- |
 | `RecordedEntity` | Captured identity: ID, domain, role, device ID, translation key, device class, unit, disabled/live-state information. |
-| `AnalysisContext` | Recipe, primary ID, device type, selected metadata, and same-device inventory. |
+| `EntityRole` | Named primary, battery, tracked, available, and disabled roles; serialized as strings. |
+| `RecordingContext` | Recipe, primary ID, device type, selected metadata, and same-device inventory. |
 | `RecordedEntityState` | One recorded state plus attributes. |
 | `RecordingSample` | Elapsed seconds, measured watts, entity map, and source `recording_id`. |
 | `RecordingDataset` / `LoadedRecording` | Parsed sample collection, metadata, and invalid-line warnings. |
@@ -111,12 +114,21 @@ The analysis types are defined in [models.py](measure/analyser/models.py).
 without `record_type`. Malformed samples are skipped with warnings; valid elapsed times and
 power must be finite. Samples are immutable and retain all recorded entities.
 
-`recording_context()` enriches the request's selected entities with captured registry
+`restore_recording_context()` enriches the request's selected entities with captured registry
 metadata, preserving recipe, primary selection, and roles for offline reanalysis.
 
 `load_recordings()` combines compatible files and assigns source IDs. Currently, typed
-headers must agree on recipe, primary entity, and selected entity metadata. The Python API
-accepts multiple paths; the app's session flow passes one file.
+headers must agree on recipe, primary entity, and selected entity metadata, apart from
+live availability and disabled status, which can change between runs.
+
+The app's **Record more** action reuses a retained complex-profile session's settings.
+After preflight, the coordinator archives `record.jsonl` as `record-1.jsonl` (then
+`record-2.jsonl`, etc.) and starts another run in the same session. Each file retains its
+own elapsed-time origin. Automatic analysis and **Analyse recording again** combine the
+numbered runs and the latest `record.jsonl`. Archived runs remain analysable if the app
+stops before the next file is created. The result lists total recordings and samples
+analysed alongside the latest run's measurement summary. Each run has its own result plot.
+Raw recordings remain downloadable session evidence and are excluded from prepared profiles.
 
 Artifacts have different lifetimes:
 
@@ -258,7 +270,7 @@ provide supplementary diagnostics.
 
 [MeasurementExecution](measure/execution.py) calls analysis after a complex recording stops.
 [RecorderAnalysisExecution](measure/analyser/execution.py) writes `analyser.json` atomically,
-uses [write_model_json](measure/model.py) to add measurement provenance to accepted fragments,
+uses [write_model_json](measure/profile/model_json.py) to add measurement provenance to accepted fragments,
 and merges an analysis summary into the original sample-count/duration summary.
 
 Reanalysis replaces derived artifacts while retaining observations and existing voltage

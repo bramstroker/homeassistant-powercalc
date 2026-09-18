@@ -2,20 +2,21 @@
 
 from collections.abc import Sequence
 
-from measure.contribution.models import ContributionJob, ContributionPreview, DeviceInfo
+from measure.contribution.models import ContributionJob, DeviceInfo
+from measure.profile.models import ProfilePreview
 
 
-def deterministic_branch_name(preview: ContributionPreview) -> str:
+def deterministic_branch_name(preview: ProfilePreview) -> str:
     manufacturer = _branch_part(preview.manufacturer_directory)
     model = _branch_part(preview.model_directory)
     return f"powercalc-profile-{manufacturer}-{model}"
 
 
-def conventional_commit_message(preview: ContributionPreview) -> str:
+def conventional_commit_message(preview: ProfilePreview) -> str:
     return f"feat(profile): add {preview.manufacturer_directory} {preview.model_directory}"
 
 
-def pull_request_title(preview: ContributionPreview) -> str:
+def pull_request_title(preview: ProfilePreview) -> str:
     return f"Add {preview.manufacturer_directory} {preview.model_directory} power profile"
 
 

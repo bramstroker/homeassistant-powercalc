@@ -4,14 +4,19 @@ import time
 from kasa import AuthenticationError, Credentials, Device, DeviceConfig, Discover, KasaException, Module
 from kasa.iot import IotPlug
 
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 
 class KasaPowerMeter(PowerMeter):
-    def __init__(self, device_ip: str, *, credentials: tuple[str, str] | None = None) -> None:
+    def __init__(self, device_ip: str, *, credentials: TapoCredentials | None = None) -> None:
         self._device_ip = device_ip
-        self._credentials = Credentials(*credentials) if credentials is not None else None
+        self._credentials = (
+            Credentials(username=credentials.username, password=credentials.password)
+            if credentials is not None
+            else None
+        )
         self._device_config: DeviceConfig | None = None
         self._voltage_supported: bool | None = None
 

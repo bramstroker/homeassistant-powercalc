@@ -8,8 +8,7 @@ from measure.controller.light.spec import (
     HassLightControllerSpec,
     HassMultiLightControllerSpec,
 )
-from measure.execution import RunInteraction
-from measure.home_assistant import HomeAssistantEntityData, HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistantManager
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec, TuyaPowerMeterSpec
 from measure.request import (
     AverageMeasurementRequest,
@@ -20,7 +19,8 @@ from measure.request import (
 )
 from measure.runner.average import AverageRunner
 from measure.runner.fan import FanRunner
-from measure.runner.light import LightRunner
+from measure.runner.interaction import RunInteraction
+from measure.runner.light.runner import LightRunner
 from measure.runner.recorder import RecorderEntityState, RecorderRunner
 from pydantic import ValidationError
 import pytest
@@ -107,9 +107,9 @@ def test_assembler_builds_recorder_state_reader_from_home_assistant() -> None:
 
     assert isinstance(prepared.runner, RecorderRunner)
     assert prepared.runner.entity_state_reader is not None
-    assert prepared.runner.analysis_context is not None
-    assert prepared.runner.analysis_context.entities[0].translation_key == "vacuum"
-    assert prepared.runner.analysis_context.entities[0].integration == "dreame_vacuum"
+    assert prepared.runner.recording_context is not None
+    assert prepared.runner.recording_context.entities[0].translation_key == "vacuum"
+    assert prepared.runner.recording_context.entities[0].integration == "dreame_vacuum"
     assert prepared.runner.entity_state_reader(("vacuum.robot",)) == {
         "vacuum.robot": RecorderEntityState(state="cleaning", attributes={"battery_level": 42}),
     }

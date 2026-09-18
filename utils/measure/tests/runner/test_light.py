@@ -3,23 +3,26 @@ from dataclasses import dataclass, replace
 import itertools
 import os.path
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
+from measure.cancellation import MeasurementCancelledError
+from measure.cli.const import QUESTION_MODE
 from measure.cli.questions import light_questions
 from measure.controller.errors import ApiConnectionError as HassApiConnectionError
 from measure.controller.light.const import LutMode
+from measure.controller.light.controller import LightController
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.spec import DummyLightControllerSpec
-from measure.execution import RunInteraction
-from measure.powermeter.errors import ZeroReadingError
+from measure.powermeter.errors import PowerMeterError, ZeroReadingError
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import LightMeasurementRequest
-from measure.runner.const import QUESTION_MODE
 from measure.runner.errors import RunnerError
-from measure.runner.light import EffectVariation, LightRunner, MeasurementRunInput
-from measure.runner.light_plan import LightMeasurementPlan, LightModePlan, Variation, build_light_plan
+from measure.runner.interaction import RunInteraction
+from measure.runner.light.csv import inspect_light_csv
+from measure.runner.light.plan import EffectVariation, LightMeasurementPlan, LightModePlan, Variation, build_light_plan
+from measure.runner.light.runner import LightRunner, LightRunProgress, MeasurementRunInput
 from measure.tuning import MeasurementParameters
-from measure.util.measure_util import AverageMeasurementConvergence, MeasurementResult, MeasureUtil
+from measure.utils.sampling import AverageMeasurementConvergence, MeasurementResult, PowerSampler
 import pytest
 
 
@@ -50,33 +53,33 @@ def _zero_sleep_parameters() -> MeasurementParameters:
 class _BrightnessRun:
     runner: LightRunner
     measurement_info: MeasurementRunInput
-    all_variations: list[Variation]
-    remaining_variations: list[Variation]
-    measure_util: MagicMock
+    progress: LightRunProgress
+    sampler: MagicMock
 
     def execute(self) -> None:
-        self.runner.run_mode(self.measurement_info, self.all_variations, self.remaining_variations)
+        self.runner.run_mode(self.measurement_info, self.progress)
 
 
-def _brightness_run(tmp_path: Path, variations: list[Variation]) -> _BrightnessRun:
-    measure_util_mock = MagicMock(MeasureUtil)
+def _brightness_run(
+    tmp_path: Path, variations: list[Variation], controller: LightController | None = None
+) -> _BrightnessRun:
+    measure_util_mock = MagicMock(PowerSampler)
     interaction = MagicMock(spec=RunInteraction)
-    runner = LightRunner(measure_util_mock, _zero_sleep_parameters(), DummyLightController(), interaction)
+    runner = LightRunner(measure_util_mock, _zero_sleep_parameters(), controller or DummyLightController(), interaction)
     runner.gzip = False
     runner.light_info = runner.light_controller.get_light_info()
     runner.active_plan = LightMeasurementPlan(
         modes=[LightModePlan(mode=LutMode.BRIGHTNESS, variations=variations)],
         effects=[],
     )
-    all_variations = variations.copy()
-    remaining_variations = variations.copy()
+    progress = LightRunProgress(total=len(variations), remaining=variations.copy())
     measurement_info = MeasurementRunInput(
         mode=LutMode.BRIGHTNESS,
         csv_file=str(tmp_path / "brightness.csv"),
         variations=variations.copy(),
         is_resuming=False,
     )
-    return _BrightnessRun(runner, measurement_info, all_variations, remaining_variations, measure_util_mock)
+    return _BrightnessRun(runner, measurement_info, progress, measure_util_mock)
 
 
 @pytest.mark.parametrize(
@@ -134,7 +137,7 @@ def test_fast_test_mode_uses_only_dimension_endpoints(mode: LutMode, expected_co
 
 
 def test_run(export_path: str) -> None:
-    measure_util_mock = MagicMock(MeasureUtil)
+    measure_util_mock = MagicMock(PowerSampler)
     measure_util_mock.take_measurement.return_value = MeasurementResult(power=1, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
     runner = LightRunner(measure_util_mock, _parameters(), DummyLightController(), interaction)
@@ -168,11 +171,11 @@ def test_resume_reports_progress_against_the_full_plan(
     completed_brightnesses: list[int],
 ) -> None:
     parameters = replace(_zero_sleep_parameters(), bri_bri_steps=127)
-    measure_util = MagicMock(MeasureUtil)
-    measure_util.take_measurement.return_value = MeasurementResult(power=1, voltages=[])
+    sampler = MagicMock(PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=1, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
     runner = LightRunner(
-        measure_util,
+        sampler,
         parameters,
         DummyLightController(),
         interaction,
@@ -210,13 +213,12 @@ def test_resume_reports_progress_against_the_full_plan(
 def test_initial_wait_happens_after_selecting_first_measurement_point(tmp_path: Path) -> None:
     events: list[tuple[str, object]] = []
     variation = Variation(1)
-    run = _brightness_run(tmp_path, [variation])
-    run.runner.config = replace(run.runner.config, sleep_time=2, sleep_initial=10)
     light_controller = MagicMock(spec=DummyLightController)
     light_controller.change_light_state.side_effect = lambda *args, **kwargs: events.append(("change", (args, kwargs)))
-    run.runner.light_controller = light_controller
+    run = _brightness_run(tmp_path, [variation], light_controller)
+    run.runner.config = replace(run.runner.config, sleep_time=2, sleep_initial=10)
     run.runner.interaction.wait.side_effect = lambda seconds: events.append(("wait", seconds))
-    run.measure_util.take_measurement.return_value = MeasurementResult(power=1, voltages=[])
+    run.sampler.take_measurement.return_value = MeasurementResult(power=1, voltages=[])
 
     run.execute()
 
@@ -235,7 +237,7 @@ def test_initial_wait_happens_after_selecting_first_measurement_point(tmp_path: 
 def test_zero_reading_retries_current_variation_and_reports_skipped_progress(tmp_path: Path) -> None:
     variations = [Variation(1), Variation(2)]
     run = _brightness_run(tmp_path, variations)
-    run.measure_util.take_measurement.side_effect = [
+    run.sampler.take_measurement.side_effect = [
         ZeroReadingError("0 watt was read from the power meter"),
         MeasurementResult(power=1, voltages=[]),
         MeasurementResult(power=2, voltages=[]),
@@ -257,7 +259,7 @@ def test_zero_reading_retries_current_variation_and_reports_skipped_progress(tmp
 def test_zero_reading_counter_resets_after_valid_measurement(tmp_path: Path) -> None:
     variations = [Variation(1), Variation(2)]
     run = _brightness_run(tmp_path, variations)
-    run.measure_util.take_measurement.side_effect = [
+    run.sampler.take_measurement.side_effect = [
         ZeroReadingError("first low reading"),
         MeasurementResult(power=1, voltages=[]),
         ZeroReadingError("second low reading"),
@@ -271,13 +273,58 @@ def test_zero_reading_counter_resets_after_valid_measurement(tmp_path: Path) -> 
 
     with open(run.measurement_info.csv_file, newline="") as csv_file:
         rows = list(csv.reader(csv_file))
-    assert rows[-2:] == [["1", "1.0"], ["2", "2.0"]]
+        assert rows[-2:] == [["1", "1.0"], ["2", "2.0"]]
+
+
+def test_zero_reading_retry_does_not_repeat_initial_stabilization(tmp_path: Path) -> None:
+    run = _brightness_run(tmp_path, [Variation(1), Variation(2)])
+    run.runner.config = replace(run.runner.config, sleep_initial=10)
+    run.sampler.take_measurement.side_effect = [
+        ZeroReadingError("zero"),
+        MeasurementResult(power=1, voltages=[]),
+        MeasurementResult(power=2, voltages=[]),
+    ]
+
+    run.execute()
+
+    run.runner.interaction.phase.assert_called_once_with("Stabilizing light before the first reading (10 s)")
+    assert run.runner.interaction.wait.call_args_list.count(call(10)) == 1
+    assert run.progress.completed == 2
+
+
+def test_meter_failure_keeps_variation_unfinished(tmp_path: Path) -> None:
+    run = _brightness_run(tmp_path, [Variation(1)])
+    error = PowerMeterError("Meter disconnected")
+    run.sampler.take_measurement.side_effect = error
+
+    with pytest.raises(RunnerError, match="Aborting measurement session: Meter disconnected") as raised:
+        run.execute()
+
+    assert raised.value.__cause__ is error
+    assert run.progress.completed == 0
+    assert Path(run.measurement_info.csv_file).read_text() == "bri,watt\n"
+
+
+def test_cancellation_after_measurement_does_not_save_or_complete_variation(tmp_path: Path) -> None:
+    run = _brightness_run(tmp_path, [Variation(1)])
+
+    def finish_measurement(*_: object) -> MeasurementResult:
+        run.runner.interaction.checkpoint.side_effect = MeasurementCancelledError()
+        return MeasurementResult(power=1, voltages=[])
+
+    run.sampler.take_measurement.side_effect = finish_measurement
+
+    with pytest.raises(MeasurementCancelledError):
+        run.execute()
+
+    assert run.progress.completed == 0
+    assert Path(run.measurement_info.csv_file).read_text() == "bri,watt\n"
 
 
 def test_repeated_zero_readings_fail_fast_with_actionable_error(tmp_path: Path) -> None:
     variations = [Variation(1), Variation(2)]
     run = _brightness_run(tmp_path, variations)
-    run.measure_util.take_measurement.side_effect = ZeroReadingError("0 watt was read from the power meter")
+    run.sampler.take_measurement.side_effect = ZeroReadingError("0 watt was read from the power meter")
 
     with pytest.raises(RunnerError) as error:
         run.execute()
@@ -288,13 +335,37 @@ def test_repeated_zero_readings_fail_fast_with_actionable_error(tmp_path: Path) 
     assert "multiple identical lights" in message
     assert "resistive dummy load" in message
     assert "https://docs.powercalc.nl/contributing/measure/troubleshooting/" in message
-    assert run.measure_util.take_measurement.call_count == 5
+    assert run.sampler.take_measurement.call_count == 5
     assert run.runner.interaction.progress.call_args_list[-1].kwargs["skipped"] == 5
+
+
+@pytest.mark.parametrize(
+    "contents,message",
+    [
+        ("wrong,watt\n1,1.0\n255,", "header does not match"),
+        ("bri,watt\n999,1.0\n255,", "does not match the configured measurement grid"),
+    ],
+)
+def test_resume_rejects_incompatible_csv_without_repairing_it(tmp_path: Path, contents: str, message: str) -> None:
+    path = tmp_path / "brightness.csv"
+    path.write_text(contents)
+    runner = LightRunner(MagicMock(PowerSampler), _zero_sleep_parameters(), DummyLightController(), resume=True)
+    request = LightMeasurementRequest(
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyLightControllerSpec(),
+        parameters=runner.config,
+    )
+
+    with pytest.raises(RunnerError, match=message):
+        runner.run(request, str(tmp_path))
+
+    assert path.read_text() == contents
 
 
 def test_cleanup_turns_off_light() -> None:
     light_controller = MagicMock(spec=DummyLightController)
-    runner = LightRunner(MagicMock(MeasureUtil), _parameters(), light_controller)
+    runner = LightRunner(MagicMock(PowerSampler), _parameters(), light_controller)
 
     runner.cleanup()
 
@@ -305,7 +376,7 @@ def test_cleanup_turns_off_light() -> None:
 def test_cleanup_failure_does_not_mask_measurement_result(caplog: pytest.LogCaptureFixture) -> None:
     light_controller = MagicMock(spec=DummyLightController)
     light_controller.change_light_state.side_effect = RuntimeError("unavailable")
-    runner = LightRunner(MagicMock(MeasureUtil), _parameters(), light_controller)
+    runner = LightRunner(MagicMock(PowerSampler), _parameters(), light_controller)
 
     runner.cleanup()
 
@@ -316,7 +387,7 @@ def test_cleanup_failure_does_not_mask_measurement_result(caplog: pytest.LogCapt
 def test_controller_close_failure_does_not_mask_measurement_result(caplog: pytest.LogCaptureFixture) -> None:
     light_controller = MagicMock(spec=DummyLightController)
     light_controller.close.side_effect = RuntimeError("close unavailable")
-    runner = LightRunner(MagicMock(MeasureUtil), _parameters(), light_controller)
+    runner = LightRunner(MagicMock(PowerSampler), _parameters(), light_controller)
 
     runner.cleanup()
 
@@ -352,9 +423,8 @@ def test_change_light_state_is_retried_after_a_dropped_connection(tmp_path: Path
     """
 
     variations = [Variation(1), Variation(2)]
-    run = _brightness_run(tmp_path, variations)
-    run.runner.light_controller = _flaky_light_controller(failures_after_startup=1)
-    run.measure_util.take_measurement.side_effect = [
+    run = _brightness_run(tmp_path, variations, _flaky_light_controller(failures_after_startup=1))
+    run.sampler.take_measurement.side_effect = [
         MeasurementResult(power=1, voltages=[]),
         MeasurementResult(power=2, voltages=[]),
     ]
@@ -368,8 +438,7 @@ def test_change_light_state_is_retried_after_a_dropped_connection(tmp_path: Path
 
 def test_change_light_state_gives_up_after_five_failed_retries(tmp_path: Path) -> None:
     variations = [Variation(1)]
-    run = _brightness_run(tmp_path, variations)
-    run.runner.light_controller = _flaky_light_controller(failures_after_startup=5)
+    run = _brightness_run(tmp_path, variations, _flaky_light_controller(failures_after_startup=5))
 
     with pytest.raises(RunnerError, match="Failed to change light state after 5 retries"):
         run.execute()
@@ -384,9 +453,8 @@ def test_initial_maximum_brightness_is_retried_after_a_dropped_connection(tmp_pa
     """
 
     variations = [Variation(1), Variation(2)]
-    run = _brightness_run(tmp_path, variations)
-    run.runner.light_controller = _flaky_light_controller(failures_after_startup=1, start_failing_at=0)
-    run.measure_util.take_measurement.side_effect = [
+    run = _brightness_run(tmp_path, variations, _flaky_light_controller(failures_after_startup=1, start_failing_at=0))
+    run.sampler.take_measurement.side_effect = [
         MeasurementResult(power=1, voltages=[]),
         MeasurementResult(power=2, voltages=[]),
     ]
@@ -399,8 +467,8 @@ def test_initial_maximum_brightness_is_retried_after_a_dropped_connection(tmp_pa
 
 
 def test_initial_maximum_brightness_gives_up_after_five_failed_retries(tmp_path: Path) -> None:
-    run = _brightness_run(tmp_path, [Variation(1)])
-    run.runner.light_controller = _flaky_light_controller(failures_after_startup=5, start_failing_at=0)
+    controller = _flaky_light_controller(failures_after_startup=5, start_failing_at=0)
+    run = _brightness_run(tmp_path, [Variation(1)], controller)
 
     with pytest.raises(RunnerError, match="Failed to change light state after 5 retries"):
         run.execute()
@@ -415,10 +483,7 @@ def test_resume_effect(tmp_path: Path) -> None:
         writer.writerow(["colorloop", 100, 2.5])
         writer.writerow(["nightlight", 200, 3.0])
 
-    measure_util_mock = MagicMock(MeasureUtil)
-    runner = LightRunner(measure_util_mock, _parameters(), DummyLightController())
-
-    resume_variation = runner.get_resume_variation(str(csv_file), LutMode.EFFECT)
+    resume_variation = inspect_light_csv(csv_file, LutMode.EFFECT).last_complete_variation
     assert isinstance(resume_variation, EffectVariation)
     assert resume_variation.effect == "nightlight"
     assert resume_variation.bri == 200
@@ -430,7 +495,7 @@ def test_resume_confirmation_uses_interaction(tmp_path: Path) -> None:
     interaction = MagicMock(spec=RunInteraction)
     interaction.choose.return_value = False
     runner = LightRunner(
-        MagicMock(MeasureUtil),
+        MagicMock(PowerSampler),
         replace(_parameters(), prompt_resume=True),
         DummyLightController(),
         interaction=interaction,
@@ -453,7 +518,7 @@ def test_effect_measurement_uses_convergence_settings() -> None:
         measure_time_effect_convergence_abs=0.1,
         measure_time_effect_convergence_rel=0.01,
     )
-    measure_util_mock = MagicMock(MeasureUtil)
+    measure_util_mock = MagicMock(PowerSampler)
     measure_util_mock.take_average_measurement.return_value = MeasurementResult(power=10, voltages=[])
     runner = LightRunner(measure_util_mock, parameters, DummyLightController())
 
@@ -472,7 +537,7 @@ def test_effect_measurement_uses_convergence_settings() -> None:
 
 def test_get_questions() -> None:
     """Test get_questions contains the new triple mode choice when effects are supported."""
-    measure_util_mock = MagicMock(MeasureUtil)
+    measure_util_mock = MagicMock(PowerSampler)
     runner = LightRunner(measure_util_mock, _parameters(), DummyLightController())
 
     questions = light_questions(supports_effects=runner.light_controller.has_effect_support())

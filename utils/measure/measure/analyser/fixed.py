@@ -5,14 +5,14 @@ from statistics import median
 
 from measure.analyser.models import (
     AnalysisCandidate,
-    AnalysisContext,
     FeatureReference,
+    FeatureSource,
     ModelConfigFragment,
     ProfileAnalysisStrategy,
-    RecordingSample,
     ScalarStateValue,
     StrategyNotApplicable,
 )
+from measure.recording.models import RecordingContext, RecordingSample
 
 MIN_SAMPLES_PER_VALUE = 4
 MAX_DISTINCT_VALUES = 20
@@ -29,23 +29,23 @@ class FixedStatesPowerCandidate:
     def features(self) -> list[FeatureReference]:
         return [self.feature]
 
-    def support_key(self, sample: RecordingSample) -> str | None:
-        value = self.feature.value(sample)
-        return self.feature.model_key(value) if value is not None else None
+    def get_support_key(self, sample: RecordingSample) -> str | None:
+        value = self.feature.get_value(sample)
+        return self.feature.format_model_key(value) if value is not None else None
 
     @property
     def complexity(self) -> int:
         return len(self.powers)
 
     def estimate_power(self, sample: RecordingSample) -> float | None:
-        value = self.feature.value(sample)
+        value = self.feature.get_value(sample)
         if value is None:
             return None
-        return self.powers.get(self.feature.model_key(value))
+        return self.powers.get(self.feature.format_model_key(value))
 
     def build_model_config_fragment(self) -> ModelConfigFragment:
         configuration: dict[str, object]
-        if self.feature.source == "state" and set(self.powers) == {"off", "on"}:
+        if self.feature.source == FeatureSource.STATE and set(self.powers) == {"off", "on"}:
             configuration = {"power": self.powers["on"]}
         else:
             configuration = {"states_power": dict(self.powers)}
@@ -57,7 +57,7 @@ class FixedStatesPowerCandidate:
 
     @property
     def standby_power(self) -> float | None:
-        if self.feature.source != "state":
+        if self.feature.source != FeatureSource.STATE:
             return None
         power = self.powers.get("off")
         return power if power is not None and power >= 0.05 else None
@@ -69,11 +69,11 @@ class FixedStatesPowerStrategy(ProfileAnalysisStrategy):
     def build_candidate(
         self,
         samples: Sequence[RecordingSample],
-        context: AnalysisContext,
+        context: RecordingContext,
     ) -> AnalysisCandidate | StrategyNotApplicable:
         candidates = [
             candidate
-            for feature in _features(samples, context.primary_entity_id)
+            for feature in _collect_features(samples, context.primary_entity_id)
             if (candidate := _fit_feature(samples, feature)) is not None
         ]
         if not candidates:
@@ -81,18 +81,21 @@ class FixedStatesPowerStrategy(ProfileAnalysisStrategy):
                 f"No state or scalar attribute had 2-{MAX_DISTINCT_VALUES} usable values with at least "
                 f"{MIN_SAMPLES_PER_VALUE} training samples per value",
             )
-        return min(candidates, key=lambda candidate: (_training_mae(candidate, samples), candidate.feature.identifier))
+        return min(
+            candidates,
+            key=lambda candidate: (_calculate_training_mae(candidate, samples), candidate.feature.identifier),
+        )
 
 
-def _features(samples: Sequence[RecordingSample], primary_entity_id: str) -> list[FeatureReference]:
+def _collect_features(samples: Sequence[RecordingSample], primary_entity_id: str) -> list[FeatureReference]:
     attributes: set[str] = set()
     for sample in samples:
         entity = sample.entities.get(primary_entity_id)
         if entity is not None:
             attributes.update(entity.attributes)
     return [
-        FeatureReference(primary_entity_id, "state"),
-        *(FeatureReference(primary_entity_id, "attribute", attribute) for attribute in sorted(attributes)),
+        FeatureReference(primary_entity_id, FeatureSource.STATE),
+        *(FeatureReference(primary_entity_id, FeatureSource.ATTRIBUTE, attribute) for attribute in sorted(attributes)),
     ]
 
 
@@ -102,10 +105,10 @@ def _fit_feature(
 ) -> FixedStatesPowerCandidate | None:
     grouped: dict[str, list[float]] = defaultdict(list)
     for sample in samples:
-        value = feature.value(sample)
-        if value is None or not _usable(value):
+        value = feature.get_value(sample)
+        if value is None or not _is_usable(value):
             continue
-        grouped[feature.model_key(value)].append(sample.power)
+        grouped[feature.format_model_key(value)].append(sample.power)
     if not 2 <= len(grouped) <= MAX_DISTINCT_VALUES:
         return None
     if any(len(powers) < MIN_SAMPLES_PER_VALUE for powers in grouped.values()):
@@ -114,11 +117,11 @@ def _fit_feature(
     return FixedStatesPowerCandidate(feature, powers)
 
 
-def _usable(value: ScalarStateValue) -> bool:
+def _is_usable(value: ScalarStateValue) -> bool:
     return not isinstance(value, str) or value.casefold() not in _IGNORED_VALUES
 
 
-def _training_mae(candidate: FixedStatesPowerCandidate, samples: Sequence[RecordingSample]) -> float:
+def _calculate_training_mae(candidate: FixedStatesPowerCandidate, samples: Sequence[RecordingSample]) -> float:
     errors = [
         abs(estimate - sample.power) for sample in samples if (estimate := candidate.estimate_power(sample)) is not None
     ]

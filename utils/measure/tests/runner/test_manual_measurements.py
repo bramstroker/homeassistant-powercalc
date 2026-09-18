@@ -4,31 +4,32 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from measure.analyser.models import AnalysisContext, RecordedEntity
-from measure.execution import MeasurementCancelledError, RunInteraction
+from measure.cancellation import MeasurementCancelledError
 from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.recording.models import RecordedEntity, RecordingContext
 from measure.request import AverageMeasurementRequest, RecorderMeasurementRequest
 from measure.runner.average import AverageRunner
+from measure.runner.interaction import RunInteraction
 from measure.runner.recorder import RecorderEntityState, RecorderRunner
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.utils.sampling import MeasurementResult, PowerSampler
 import pytest
 
 
 def test_average_reports_start_phase_after_confirmation() -> None:
-    measure_util = MagicMock(spec=MeasureUtil)
-    measure_util.take_average_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_average_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
-    runner = AverageRunner(measure_util, interaction)
+    runner = AverageRunner(sampler, interaction)
 
     runner.run(AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), duration=10), "")
 
     interaction.confirm.assert_called_once_with("Ready to start the average measurement.")
     interaction.phase.assert_called_once_with("Starting averaging")
-    assert measure_util.take_average_measurement.call_args.kwargs["finish_on_interrupt"] is True
+    assert sampler.take_average_measurement.call_args.kwargs["finish_on_interrupt"] is True
 
 
 def test_average_summary_uses_elapsed_duration() -> None:
-    measure_util = MagicMock(spec=MeasureUtil)
+    sampler = MagicMock(spec=PowerSampler)
 
     def average(
         duration: int,
@@ -41,18 +42,18 @@ def test_average_summary_uses_elapsed_duration() -> None:
         on_progress(6.5, duration)
         return MeasurementResult(power=4.2, voltages=[230.0, 232.0])
 
-    measure_util.take_average_measurement.side_effect = average
-    runner = AverageRunner(measure_util, MagicMock(spec=RunInteraction))
+    sampler.take_average_measurement.side_effect = average
+    runner = AverageRunner(sampler, MagicMock(spec=RunInteraction))
     result = runner.run(AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), duration=60), "")
     assert result.summary == {"Average power": "4.2 W", "Duration": "6.5 s", "Average voltage": "231.0 V"}
 
 
 def test_recorder_treats_app_stop_as_successful_completion(tmp_path: Path) -> None:
-    measure_util = MagicMock(spec=MeasureUtil)
-    measure_util.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
     interaction.wait.side_effect = MeasurementCancelledError
-    runner = RecorderRunner(measure_util, interaction)
+    runner = RecorderRunner(sampler, interaction)
 
     request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
     export_directory = str(tmp_path)
@@ -66,11 +67,11 @@ def test_recorder_treats_app_stop_as_successful_completion(tmp_path: Path) -> No
 
 
 def test_recorder_treats_cli_interrupt_as_successful_stop(tmp_path: Path) -> None:
-    measure_util = MagicMock(spec=MeasureUtil)
-    measure_util.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
     interaction.wait.side_effect = KeyboardInterrupt
-    runner = RecorderRunner(measure_util, interaction)
+    runner = RecorderRunner(sampler, interaction)
 
     result = runner.run(RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec()), str(tmp_path))
 
@@ -80,8 +81,8 @@ def test_recorder_treats_cli_interrupt_as_successful_stop(tmp_path: Path) -> Non
 
 
 def test_recorder_writes_entity_states_as_json_lines(tmp_path: Path) -> None:
-    measure_util = MagicMock(spec=MeasureUtil)
-    measure_util.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
     interaction.wait.side_effect = KeyboardInterrupt
     state_reader = MagicMock(
@@ -90,7 +91,7 @@ def test_recorder_writes_entity_states_as_json_lines(tmp_path: Path) -> None:
             "sensor.robot_battery": RecorderEntityState("42", {"unit_of_measurement": "%"}),
         },
     )
-    runner = RecorderRunner(measure_util, interaction, state_reader)
+    runner = RecorderRunner(sampler, interaction, state_reader)
     request = RecorderMeasurementRequest(
         power_meter=DummyPowerMeterSpec(),
         recorder_purpose="complex_profile",
@@ -151,8 +152,8 @@ def test_recorder_writes_entity_states_as_json_lines(tmp_path: Path) -> None:
 def test_recorder_skips_unreadable_samples_and_keeps_recording(tmp_path: Path) -> None:
     """A reloading integration costs one sample, not the whole recording."""
 
-    measure_util = MagicMock(spec=MeasureUtil)
-    measure_util.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
     interaction.wait.side_effect = [None, None, KeyboardInterrupt]
     state_reader = MagicMock(
@@ -162,7 +163,7 @@ def test_recorder_skips_unreadable_samples_and_keeps_recording(tmp_path: Path) -
             {"switch.plug": RecorderEntityState("off", {})},
         ],
     )
-    runner = RecorderRunner(measure_util, interaction, state_reader)
+    runner = RecorderRunner(sampler, interaction, state_reader)
     request = RecorderMeasurementRequest(
         power_meter=DummyPowerMeterSpec(),
         recorder_purpose="complex_profile",
@@ -185,8 +186,11 @@ def test_recorder_skips_unreadable_samples_and_keeps_recording(tmp_path: Path) -
 def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
     tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
-    measure_util = MagicMock(spec=MeasureUtil)
-    measure_util.take_measurement.return_value = MeasurementResult(power=22, voltages=[])
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.side_effect = [
+        MeasurementResult(power=22, voltages=[199]),
+        *[MeasurementResult(power=22, voltages=[230]) for _ in range(3)],
+    ]
     interaction = MagicMock(spec=RunInteraction)
     interaction.wait.side_effect = [None, None, None, KeyboardInterrupt]
     base_states = {
@@ -210,7 +214,7 @@ def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
         additional_entity_ids=("sensor.state",),
     )
     primary = RecordedEntity("vacuum.robot", "vacuum", "primary", integration="dreame_vacuum", translation_key="vacuum")
-    context = AnalysisContext(
+    context = RecordingContext(
         "vacuum_robot",
         "vacuum.robot",
         "vacuum_robot",
@@ -221,7 +225,7 @@ def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
         ],
         [RecordedEntity("sensor.disabled", "sensor", "disabled", disabled_by="integration", has_live_state=False)],
     )
-    result = RecorderRunner(measure_util, interaction, state_reader, context).run(request, str(tmp_path))
+    result = RecorderRunner(sampler, interaction, state_reader, context).run(request, str(tmp_path))
     metadata = json.loads((tmp_path / "record.jsonl").read_text().splitlines()[0])
     assert metadata["entities"][0] == primary.to_dict()
     assert metadata["device_entities"][0]["has_live_state"] is False
@@ -231,6 +235,10 @@ def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
         if row["record_type"] == "sample"
     ]
     assert result.summary["Samples recorded"] == "3"
+    assert result.voltages == [230, 230, 230]
+    assert interaction.progress.call_count == 3
+    assert interaction.wait.call_count == 4
+    assert interaction.entity_states.call_args_list[0].args[0]["sensor.state"] == "unavailable"
     assert result.summary["Optional entities missing during recording"] == "sensor.state"
     assert [row["entities"]["sensor.state"]["state"] for row in samples] == ["unavailable", "unavailable", "washing"]
     assert samples[0]["entities"]["vacuum.robot"]["attributes"] == {"washing": True}
@@ -239,14 +247,62 @@ def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
     assert "Required recording entities not found" in caplog.text
 
 
+@pytest.mark.parametrize("is_vacuum", [False, True])
+def test_recorder_separates_recorded_attributes_from_live_states(tmp_path: Path, is_vacuum: bool) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=22, voltages=[])
+    interaction = MagicMock(spec=RunInteraction)
+    interaction.wait.side_effect = KeyboardInterrupt
+    attributes = {"washing": True, "ap": {"ssid": "private"}}
+    state_reader = MagicMock(
+        return_value={
+            "vacuum.robot": RecorderEntityState("docked", attributes),
+            "sensor.battery": RecorderEntityState("100", {}),
+        }
+    )
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot" if is_vacuum else "generic",
+        vacuum_entity_id="vacuum.robot" if is_vacuum else None,
+        battery_entity_id="sensor.battery" if is_vacuum else None,
+        tracked_entity_ids=() if is_vacuum else ("vacuum.robot", "sensor.battery"),
+    )
+
+    RecorderRunner(sampler, interaction, state_reader).run(request, str(tmp_path))
+
+    sample = json.loads((tmp_path / "record.jsonl").read_text().splitlines()[1])
+    assert sample["entities"]["vacuum.robot"] == {
+        "state": "docked",
+        "attributes": {"washing": True} if is_vacuum else attributes,
+    }
+    interaction.entity_states.assert_called_once_with({"vacuum.robot": "docked", "sensor.battery": "100"})
+    assert attributes == {"washing": True, "ap": {"ssid": "private"}}
+
+
+def test_recorder_rejects_export_symlink_outside_output_directory(tmp_path: Path) -> None:
+    request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    directory = tmp_path / "recordings"
+    directory.mkdir()
+    (directory / request.export_filename).symlink_to(tmp_path / "outside.csv")
+    runner = RecorderRunner(MagicMock(spec=PowerSampler), MagicMock(spec=RunInteraction))
+    with pytest.raises(ValueError, match="escapes its output directory"):
+        runner.run(request, str(directory))
+
+
+def test_recorder_has_no_standby_measurement() -> None:
+    runner = RecorderRunner(MagicMock(spec=PowerSampler))
+    assert runner.measure_standby_power() == MeasurementResult(power=0, voltages=[])
+
+
 def test_recorder_stops_when_cancelled_while_reading_states(tmp_path: Path) -> None:
     """Cancellation raised by the state read still ends the run, unlike a read failure."""
 
-    measure_util = MagicMock(spec=MeasureUtil)
-    measure_util.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
     state_reader = MagicMock(side_effect=MeasurementCancelledError("stopped"))
-    runner = RecorderRunner(measure_util, interaction, state_reader)
+    runner = RecorderRunner(sampler, interaction, state_reader)
     request = RecorderMeasurementRequest(
         power_meter=DummyPowerMeterSpec(),
         recorder_purpose="complex_profile",
@@ -261,7 +317,7 @@ def test_recorder_stops_when_cancelled_while_reading_states(tmp_path: Path) -> N
 
 
 def test_recorder_requires_state_reader_for_complex_recording(tmp_path: Path) -> None:
-    runner = RecorderRunner(MagicMock(spec=MeasureUtil), MagicMock(spec=RunInteraction))
+    runner = RecorderRunner(MagicMock(spec=PowerSampler), MagicMock(spec=RunInteraction))
     request = RecorderMeasurementRequest(
         power_meter=DummyPowerMeterSpec(),
         recorder_purpose="complex_profile",

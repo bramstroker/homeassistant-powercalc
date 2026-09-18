@@ -2,47 +2,49 @@ from dataclasses import replace
 import json
 from pathlib import Path
 
+from measure.analyser.execution import RecorderAnalysisExecution
 from measure.analyser.fixed import FixedStatesPowerCandidate
 from measure.analyser.models import (
     ActivityReport,
-    AnalysisContext,
+    AnalysisStatus,
     EnergyMetrics,
     FeatureReference,
+    FeatureSource,
     ModelConfigFragment,
-    RecordedEntity,
-    RecordedEntityState,
     RecorderAnalysisResult,
-    RecordingSample,
     StrategyNotApplicable,
     TrainingValidationSplit,
     ValidationMethod,
 )
-from measure.analyser.recording import load_recordings, recording_context
+from measure.analyser.recording import load_recordings, restore_recording_context
 from measure.analyser.service import RecorderAnalyser
 from measure.analyser.vacuum import (
     ChargingPoint,
     VacuumBranch,
     VacuumCompositeCandidate,
     VacuumCompositeStrategy,
-    battery_level,
+    get_battery_level,
+    group_vacuum_episodes,
     split_vacuum_samples,
-    vacuum_episodes,
 )
 from measure.analyser.vacuum_signals import (
     Activity,
     ActivitySignal,
     discover_signals,
-    portable_entity,
     resolve_activity,
+    resolve_portable_entity,
 )
-from measure.analyser.vacuum_validation import activity_reports, credibility_failure
+from measure.analyser.vacuum_validation import build_activity_reports, find_credibility_failure
+from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.recording.models import RecordedEntity, RecordedEntityState, RecordingContext, RecordingSample
+from measure.request import RecorderMeasurementRequest
 import pytest
 
 PRIMARY = "vacuum.robot"
 BATTERY = "sensor.battery"
 STATE = "sensor.activity"
 DRYING = "binary_sensor.drying"
-CONTEXT = AnalysisContext(
+CONTEXT = RecordingContext(
     "vacuum_robot",
     PRIMARY,
     "vacuum_robot",
@@ -54,6 +56,30 @@ CONTEXT = AnalysisContext(
         RecordedEntity("switch.auto_drying", "switch", "tracked", translation_key="auto_drying", device_id="robot"),
     ],
 )
+
+
+def test_session_analysis_uses_archived_vacuum_run_for_fitting(tmp_path: Path) -> None:
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id=PRIMARY,
+        battery_entity_id=BATTERY,
+        additional_entity_ids=(STATE, DRYING, "switch.auto_drying"),
+    )
+    write_recording(tmp_path / "record.jsonl", cycle())
+    execution = RecorderAnalysisExecution()
+    assert execution.run(request, tmp_path)["Recording analysis"] == "More data needed"
+    write_recording(tmp_path / "record-1.jsonl", cycle())
+
+    summary = execution.run(request, tmp_path)
+
+    assert summary["Recording analysis"] == "Composite vacuum profile created"
+    assert summary["Recordings analysed"] == "2"
+    assert summary["Samples analysed"] == str(2 * len(cycle()))
+    result = json.loads((tmp_path / "analyser.json").read_text())
+    assert result["validation_method"] == "held_out_recording"
+    assert json.loads((tmp_path / "model.json").read_text())["calculation_strategy"] == "composite"
 
 
 def sample(activity: str, power: float, index: int = 0, level: object = 50) -> RecordingSample:
@@ -94,8 +120,8 @@ def repeated() -> list[RecordingSample]:
     return first + [replace(item, elapsed_seconds=item.elapsed_seconds + len(first)) for item in cycle()]
 
 
-def write_recording(path: Path, samples: list[RecordingSample], context: AnalysisContext | None = CONTEXT) -> Path:
-    records = [context.metadata_record()] if context is not None else []
+def write_recording(path: Path, samples: list[RecordingSample], context: RecordingContext | None = CONTEXT) -> Path:
+    records = [context.build_metadata_record()] if context is not None else []
     records.extend(
         {
             "elapsed_seconds": item.elapsed_seconds,
@@ -112,7 +138,7 @@ def write_recording(path: Path, samples: list[RecordingSample], context: Analysi
 
 
 def candidate(
-    samples: list[RecordingSample] | None = None, context: AnalysisContext = CONTEXT
+    samples: list[RecordingSample] | None = None, context: RecordingContext = CONTEXT
 ) -> VacuumCompositeCandidate:
     result = VacuumCompositeStrategy().build_candidate(samples if samples is not None else cycle(), context)
     assert isinstance(result, VacuumCompositeCandidate)
@@ -122,11 +148,11 @@ def candidate(
 def test_composite_features_preserve_order_without_duplicates() -> None:
     model = candidate()
     expected = [
-        FeatureReference(PRIMARY, "attribute", "auto_empty_status"),
-        FeatureReference(PRIMARY, "attribute", "washing"),
-        FeatureReference(DRYING, "state"),
-        FeatureReference(STATE, "state"),
-        FeatureReference(BATTERY, "state"),
+        FeatureReference(PRIMARY, FeatureSource.ATTRIBUTE, "auto_empty_status"),
+        FeatureReference(PRIMARY, FeatureSource.ATTRIBUTE, "washing"),
+        FeatureReference(DRYING, FeatureSource.STATE),
+        FeatureReference(STATE, FeatureSource.STATE),
+        FeatureReference(BATTERY, FeatureSource.STATE),
     ]
 
     assert model.features == expected
@@ -140,7 +166,7 @@ def test_composite_profile_from_separate_entities(tmp_path: Path) -> None:
     assert result.strategy == "vacuum_composite"
     assert result.validation_method is ValidationMethod.HELD_OUT_EPISODES
     assert json.loads(json.dumps(result.to_dict()))["validation_method"] == "held_out_episodes"
-    assert result.summary()["Validation method"] == "held_out_episodes"
+    assert result.build_summary()["Validation method"] == "held_out_episodes"
     assert result.metrics is not None
     assert result.metrics.mae_w == 0
     assert result.metrics.coverage == 1
@@ -156,7 +182,7 @@ def test_composite_profile_from_separate_entities(tmp_path: Path) -> None:
     assert all(report.episode_count == 2 for report in result.activity_reports)
     assert all(report.energy.bias_percent == 0 for report in result.activity_reports)
     assert STATE + ".state" in result.to_dict()["features"]
-    assert result.summary()["Recording analysis"] == "Composite vacuum profile created"
+    assert result.build_summary()["Recording analysis"] == "Composite vacuum profile created"
     fragment = result.model_config_fragment
     assert fragment is not None
     config = fragment.to_dict()["composite_config"]
@@ -178,7 +204,7 @@ def test_whole_recording_validation_and_captured_metadata(tmp_path: Path) -> Non
     assert result.model_ready
     assert result.validation_method is ValidationMethod.HELD_OUT_RECORDING
     assert json.loads(json.dumps(result.to_dict()))["validation_method"] == "held_out_recording"
-    assert result.summary()["Validation method"] == "held_out_recording"
+    assert result.build_summary()["Validation method"] == "held_out_recording"
     assert result.metrics is not None
     assert result.metrics.validation_count == len(cycle())
     assert candidate().complexity == 12
@@ -230,7 +256,7 @@ def test_precedence_active_drying_not_enabled_setting() -> None:
     model = candidate(changed)
     assert model.estimate_power(changed[35]) == 7
     assert model.estimate_power(changed[0]) == 3.5
-    assert model.features.count(FeatureReference(DRYING, "state")) == 1
+    assert model.features.count(FeatureReference(DRYING, FeatureSource.STATE)) == 1
 
 
 def test_unmeasured_activity_guard_and_missing_flag() -> None:
@@ -256,9 +282,9 @@ def test_unmeasured_activity_guard_and_missing_flag() -> None:
         is None
     )
     assert (
-        ActivitySignal(Activity.WASHING, FeatureReference(PRIMARY, "attribute", "washing"), [True], [False]).matches(
-            replace(item, entities={**item.entities, PRIMARY: replace(primary, attributes={"washing": 1})})
-        )
+        ActivitySignal(
+            Activity.WASHING, FeatureReference(PRIMARY, FeatureSource.ATTRIBUTE, "washing"), [True], [False]
+        ).matches(replace(item, entities={**item.entities, PRIMARY: replace(primary, attributes={"washing": 1})}))
         is None
     )
 
@@ -266,8 +292,8 @@ def test_unmeasured_activity_guard_and_missing_flag() -> None:
 @pytest.mark.parametrize("level", ["unknown", "unavailable", "bad", True, -1, 101, "NaN", "inf"])
 def test_invalid_battery_levels(level: object) -> None:
     item = sample("charging", 10, level=level)
-    feature = FeatureReference(PRIMARY, "attribute", "battery_level")
-    assert battery_level(item, feature) is None
+    feature = FeatureReference(PRIMARY, FeatureSource.ATTRIBUTE, "battery_level")
+    assert get_battery_level(item, feature) is None
     assert candidate().estimate_power(item) is None
 
 
@@ -278,12 +304,12 @@ def test_charging_range_integer_conversion_and_attribute_fallback() -> None:
     assert model.estimate_power(sample("charging", 0, level=81)) is None
     bare = replace(CONTEXT, entities=[RecordedEntity(e.entity_id, e.domain, e.role) for e in CONTEXT.entities])
     model = candidate(context=bare)
-    assert model.battery == FeatureReference(PRIMARY, "attribute", "battery_level")
+    assert model.battery == FeatureReference(PRIMARY, FeatureSource.ATTRIBUTE, "battery_level")
     fragment = model.build_model_config_fragment().to_dict()
     charging = next(branch for branch in fragment["composite_config"]["strategies"] if "linear" in branch)
     assert charging["entity_id"] == "[[entity]]"
     assert charging["linear"]["attribute"] == "battery_level"
-    assert battery_level(sample("charging", 1), None) is None
+    assert get_battery_level(sample("charging", 1), None) is None
 
 
 @pytest.mark.parametrize(
@@ -320,17 +346,20 @@ def test_charging_requires_portable_battery_not_entity_name() -> None:
 
 
 def test_portable_references_require_unique_same_device_metadata() -> None:
-    assert portable_entity(PRIMARY, CONTEXT) == "[[entity]]"
-    assert portable_entity(STATE, CONTEXT) == "[[entity_by_translation_key:state]]"
-    assert portable_entity("sensor.missing", CONTEXT) is None
+    assert resolve_portable_entity(PRIMARY, CONTEXT) == "[[entity]]"
+    assert resolve_portable_entity(STATE, CONTEXT) == "[[entity_by_translation_key:state]]"
+    assert resolve_portable_entity("sensor.missing", CONTEXT) is None
     duplicate = RecordedEntity(
         "sensor.duplicate", "sensor", "disabled", translation_key="state", device_id="robot", disabled_by="user"
     )
-    assert portable_entity(STATE, replace(CONTEXT, device_entities=[*CONTEXT.entities, duplicate])) is None
+    assert resolve_portable_entity(STATE, replace(CONTEXT, device_entities=[*CONTEXT.entities, duplicate])) is None
     other = replace(CONTEXT.entities[2], device_id="other")
-    assert portable_entity(STATE, replace(CONTEXT, entities=[*CONTEXT.entities[:2], other])) is None
+    assert resolve_portable_entity(STATE, replace(CONTEXT, entities=[*CONTEXT.entities[:2], other])) is None
     duplicate_battery = replace(duplicate, translation_key=None, device_class="battery")
-    assert portable_entity(BATTERY, replace(CONTEXT, device_entities=[*CONTEXT.entities, duplicate_battery])) is None
+    assert (
+        resolve_portable_entity(BATTERY, replace(CONTEXT, device_entities=[*CONTEXT.entities, duplicate_battery]))
+        is None
+    )
 
 
 def test_telemetry_gaps_are_not_independent_cycles() -> None:
@@ -342,9 +371,9 @@ def test_telemetry_gaps_are_not_independent_cycles() -> None:
         replace(first, recording_id=1, elapsed_seconds=0),
         replace(first, recording_id=1, elapsed_seconds=0),
     ]
-    episodes = vacuum_episodes(data, discover_signals(data, CONTEXT))
+    episodes = group_vacuum_episodes(data, discover_signals(data, CONTEXT))
     assert [len(episode.samples) for episode in episodes] == [3, 2]
-    assert vacuum_episodes([], []) == []
+    assert group_vacuum_episodes([], []) == []
 
 
 def test_unexplained_episodes_are_held_out_and_reported(tmp_path: Path) -> None:
@@ -367,10 +396,10 @@ def test_brief_unexplained_blip_does_not_reject_recording(tmp_path: Path) -> Non
 def test_energy_only_integrates_adjacent_held_out_samples() -> None:
     data = repeated()
     model = candidate()
-    reports = activity_reports(model, data, [data[0], data[2], replace(data[3], recording_id=99)])
+    reports = build_activity_reports(model, data, [data[0], data[2], replace(data[3], recording_id=99)])
     assert all(report.energy.duration_seconds == 0 for report in reports)
     assert all(report.energy.bias_percent is None for report in reports)
-    assert credibility_failure(reports) is not None
+    assert find_credibility_failure(reports) is not None
 
 
 def test_strategy_rejections_and_empty_recordings(tmp_path: Path) -> None:
@@ -397,9 +426,9 @@ def test_metadata_validation_and_legacy_loading(tmp_path: Path) -> None:
         load_recordings([])
     legacy = write_recording(tmp_path / "legacy.jsonl", cycle(), None)
     assert load_recordings([legacy]).dataset.metadata is None
-    assert recording_context(CONTEXT, None) == CONTEXT
-    assert recording_context(CONTEXT, {"recipe": "generic"}) == CONTEXT
-    enriched = recording_context(
+    assert restore_recording_context(CONTEXT, None) == CONTEXT
+    assert restore_recording_context(CONTEXT, {"recipe": "generic"}) == CONTEXT
+    enriched = restore_recording_context(
         CONTEXT,
         {
             "recipe": "vacuum_robot",
@@ -426,16 +455,16 @@ def test_metadata_validation_and_legacy_loading(tmp_path: Path) -> None:
 
 
 def test_fragment_sequence_and_report_serialization() -> None:
-    fixed = FixedStatesPowerCandidate(FeatureReference(PRIMARY, "state"), {"docked": 3, "cleaning": 0.3})
+    fixed = FixedStatesPowerCandidate(FeatureReference(PRIMARY, FeatureSource.STATE), {"docked": 3, "cleaning": 0.3})
     assert fixed.features == [fixed.feature]
     assert ModelConfigFragment("composite", "composite_config", [{"fixed": {"power": 2}}]).to_dict()[
         "composite_config"
     ] == [{"fixed": {"power": 2}}]
     result = RecorderAnalysisResult(
-        "insufficient_data",
+        AnalysisStatus.INSUFFICIENT_DATA,
         10,
         validation_method=ValidationMethod.HELD_OUT_RECORDING,
-        activity_reports=activity_reports(candidate(), repeated(), cycle()),
+        activity_reports=build_activity_reports(candidate(), repeated(), cycle()),
     )
     assert result.to_dict()["validation_method"] == "held_out_recording"
     assert "activities" in result.to_dict()
@@ -455,7 +484,7 @@ def test_activity_report_preserves_flat_json_contract() -> None:
         mean_power_w=22,
         energy=EnergyMetrics(duration_seconds=9, measured_wh=0.055, predicted_wh=0.056, bias_percent=1.82),
     )
-    result = RecorderAnalysisResult("insufficient_data", 20, activity_reports=[report])
+    result = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 20, activity_reports=[report])
     assert result.to_dict()["activities"] == [
         {
             "activity": "washing",
@@ -500,7 +529,7 @@ def test_charging_points_interpolate_between_named_coordinates() -> None:
             ChargingPoint(battery_level=80, power=10),
         ],
     )
-    battery = FeatureReference(BATTERY, "state")
+    battery = FeatureReference(BATTERY, FeatureSource.STATE)
     assert branch.estimate(sample("charging", 0, level=20), battery) == 40
     assert branch.estimate(sample("charging", 0, level=50), battery) == 25
     assert branch.estimate(sample("charging", 0, level=80), battery) == 10

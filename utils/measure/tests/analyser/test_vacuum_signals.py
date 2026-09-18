@@ -2,15 +2,21 @@
 
 from dataclasses import replace
 
-from measure.analyser.models import AnalysisContext, RecordedEntity, RecordedEntityState, RecordingSample
-from measure.analyser.vacuum_signals import ALIASES, Activity, discover_signals, portable_entity, resolve_activity
+from measure.analyser.vacuum_signals import (
+    ALIASES,
+    Activity,
+    discover_signals,
+    resolve_activity,
+    resolve_portable_entity,
+)
+from measure.recording.models import RecordedEntity, RecordedEntityState, RecordingContext, RecordingSample
 import pytest
 
 PRIMARY = "vacuum.robot"
 
 
-def context(*entities: RecordedEntity) -> AnalysisContext:
-    return AnalysisContext(
+def context(*entities: RecordedEntity) -> RecordingContext:
+    return RecordingContext(
         "vacuum_robot",
         PRIMARY,
         "vacuum_robot",
@@ -175,7 +181,7 @@ def test_runtime_flags_not_settings(
 def test_separate_device_remains_outside_mvp() -> None:
     descriptor = replace(entity("mop_drying", "switch", "roborock"), device_id="dock")
     ctx = context(descriptor)
-    assert portable_entity(descriptor.entity_id, ctx) is None
+    assert resolve_portable_entity(descriptor.entity_id, ctx) is None
     item = sample(**{descriptor.entity_id: "on"})
     assert resolve_activity(item, discover_signals([item], ctx)) == "docked"
 

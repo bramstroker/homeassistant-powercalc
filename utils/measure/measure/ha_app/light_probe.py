@@ -8,13 +8,14 @@ import time
 from measure.assembler import MeasurementAssembler
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController
-from measure.execution import ImmediateInteraction
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.errors import ZeroReadingError
 from measure.request import LightMeasurementRequest
-from measure.runner.light_plan import Variation, build_light_plan, low_load_probe_variations
-from measure.runner.light_setup import set_light_to_maximum_brightness
-from measure.util.measure_util import MeasureUtil
+from measure.runner.interaction import ImmediateInteraction
+from measure.runner.light.plan import Variation, build_light_plan, low_load_probe_variations
+from measure.runner.light.runner import LightControl
+from measure.utils.sampling import PowerSampler
 
 LIGHT_LOAD_PROBE_CACHE_SECONDS = 600
 LOW_POWER_MEASUREMENT_GUIDE_URL = "https://docs.powercalc.nl/contributing/measure/low-power-measurements/"
@@ -33,6 +34,12 @@ class LightLoadProbeResult:
     checked_variations: int
     minimum_aggregate_power_w: float
     points: tuple[LightLoadProbePoint, ...]
+
+
+@dataclass(frozen=True)
+class CachedLightLoadProbe:
+    cached_at: float
+    result: LightLoadProbeResult
 
 
 class LightLoadProbeError(Exception):
@@ -63,19 +70,19 @@ class LightLoadProbe:
         self._wait = wait
         self._monotonic = monotonic
         self._now = now
-        self._cache: dict[str, tuple[float, LightLoadProbeResult]] = {}
+        self._cache: dict[str, CachedLightLoadProbe] = {}
         self._lock = RLock()
 
     def evaluate(self, request: LightMeasurementRequest) -> LightLoadProbeResult:
         key = self._cache_key(request)
         with self._lock:
             cached = self._cache.get(key)
-            if cached is not None and self._monotonic() - cached[0] < LIGHT_LOAD_PROBE_CACHE_SECONDS:
-                return cached[1]
+            if cached is not None and self._monotonic() - cached.cached_at < LIGHT_LOAD_PROBE_CACHE_SECONDS:
+                return cached.result
 
         result = self._probe(request)
         with self._lock:
-            self._cache[key] = (self._monotonic(), result)
+            self._cache[key] = CachedLightLoadProbe(cached_at=self._monotonic(), result=result)
         return result
 
     def _probe(self, request: LightMeasurementRequest) -> LightLoadProbeResult:
@@ -83,7 +90,7 @@ class LightLoadProbe:
         controller: LightController | None = None
         light_driven = False
         try:
-            controller = assembler.build_light_controller(request.controller)
+            controller = assembler.create_light_controller(request.controller)
             light_info = controller.get_light_info()
             effects = controller.get_effect_list() if LutMode.EFFECT in request.modes else []
             plan = build_light_plan(request.modes, request.parameters, light_info, effects)
@@ -91,24 +98,23 @@ class LightLoadProbe:
             if not variations:
                 return LightLoadProbeResult(checked_variations=0, minimum_aggregate_power_w=0, points=())
 
-            meter = assembler.build_power_meter(request.power_meter)
-            measure_util = MeasureUtil(meter, request.parameters, wait=self._wait)
+            meter = assembler.create_power_meter(request.power_meter)
+            sampler = PowerSampler(meter, request.parameters, wait=self._wait)
             light_driven = True
-            set_light_to_maximum_brightness(
-                controller,
+            light_control = LightControl(controller, wait=self._wait)
+            light_control.set_maximum_brightness(
                 light_info,
                 variations[0].mode,
                 sleep_time=request.parameters.sleep_time,
-                wait=self._wait,
             )
             points = [
                 LightLoadProbePoint(
-                    label=light_load_probe_label(variation),
+                    label=format_light_load_probe_label(variation),
                     mode=variation.mode,
                     power_w=round(
                         self._measure_variation(
                             controller,
-                            measure_util,
+                            sampler,
                             request,
                             variation,
                             initial=index == 0,
@@ -149,7 +155,7 @@ class LightLoadProbe:
     def _measure_variation(
         self,
         controller: LightController,
-        measure_util: MeasureUtil,
+        sampler: PowerSampler,
         request: LightMeasurementRequest,
         variation: Variation,
         *,
@@ -160,7 +166,7 @@ class LightLoadProbe:
         self._wait(request.parameters.sleep_time)
         if initial:
             self._wait(request.parameters.sleep_initial)
-        return measure_util.take_measurement(start_timestamp=start_timestamp).power
+        return sampler.take_measurement(start_timestamp=start_timestamp).power
 
     @staticmethod
     def _cache_key(request: LightMeasurementRequest) -> str:
@@ -169,11 +175,11 @@ class LightLoadProbe:
         return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
-def app_measurement_assembler(
+def create_app_measurement_assembler(
     *,
     home_assistant: HomeAssistantManager,
     shelly_password: str | None,
-    kasa_credentials: tuple[str, str] | None = None,
+    kasa_credentials: TapoCredentials | None = None,
 ) -> MeasurementAssembler:
     """Build the non-interactive adapter graph used by an app preflight probe."""
 
@@ -185,7 +191,7 @@ def app_measurement_assembler(
     )
 
 
-def light_load_probe_label(variation: Variation) -> str:
+def format_light_load_probe_label(variation: Variation) -> str:
     """Describe a probe variation in native values for the preflight review."""
 
     values = asdict(variation)

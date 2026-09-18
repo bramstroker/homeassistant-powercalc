@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostics
 from measure.powermeter.hass import HassPowerMeter
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter, PowerMeterDiagnosticSample

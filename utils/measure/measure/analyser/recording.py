@@ -4,11 +4,11 @@ import json
 import math
 from pathlib import Path
 
-from measure.analyser.models import (
-    AnalysisContext,
+from measure.recording.models import (
     LoadedRecording,
     RecordedEntity,
     RecordedEntityState,
+    RecordingContext,
     RecordingDataset,
     RecordingSample,
 )
@@ -52,7 +52,10 @@ def load_recordings(paths: Sequence[Path]) -> LoadedRecording:
         if (
             metadata is not None
             and other is not None
-            and any(metadata.get(key) != other.get(key) for key in ("recipe", "primary_entity_id", "entities"))
+            and (
+                any(metadata.get(key) != other.get(key) for key in ("recipe", "primary_entity_id"))
+                or _normalize_selected_entity_metadata(metadata) != _normalize_selected_entity_metadata(other)
+            )
         ):
             raise ValueError("Combined recordings must describe the same recipe and entities")
     return LoadedRecording(
@@ -68,7 +71,15 @@ def load_recordings(paths: Sequence[Path]) -> LoadedRecording:
     )
 
 
-def recording_context(fallback: AnalysisContext, metadata: Mapping[str, object] | None) -> AnalysisContext:
+def _normalize_selected_entity_metadata(metadata: Mapping[str, object]) -> list[RecordedEntity]:
+    """Compare entity identities and signal metadata independently of live availability."""
+    return [
+        replace(entity, has_live_state=None, disabled_by=None)
+        for entity in _parse_metadata_entities(metadata.get("entities"))
+    ]
+
+
+def restore_recording_context(fallback: RecordingContext, metadata: Mapping[str, object] | None) -> RecordingContext:
     """Reanalyse using captured registry metadata, without contacting Home Assistant.
 
     Requests still choose the recipe, primary entity, and roles. A metadata header
@@ -80,21 +91,21 @@ def recording_context(fallback: AnalysisContext, metadata: Mapping[str, object] 
         or metadata.get("primary_entity_id") != fallback.primary_entity_id
     ):
         return fallback
-    entities = {entity.entity_id: entity for entity in _metadata_entities(metadata.get("entities"))}
+    entities = {entity.entity_id: entity for entity in _parse_metadata_entities(metadata.get("entities"))}
     selected = [
         replace(entities[entity.entity_id], role=entity.role) if entity.entity_id in entities else entity
         for entity in fallback.entities
     ]
-    return AnalysisContext(
+    return RecordingContext(
         recipe=fallback.recipe,
         primary_entity_id=fallback.primary_entity_id,
         device_type=fallback.device_type,
         entities=selected,
-        device_entities=_metadata_entities(metadata.get("device_entities")),
+        device_entities=_parse_metadata_entities(metadata.get("device_entities")),
     )
 
 
-def _metadata_entities(value: object) -> list[RecordedEntity]:
+def _parse_metadata_entities(value: object) -> list[RecordedEntity]:
     if not isinstance(value, list):
         return []
     result: list[RecordedEntity] = []
@@ -127,8 +138,8 @@ def _metadata_entities(value: object) -> list[RecordedEntity]:
 
 
 def _parse_sample(record: dict[str, object]) -> RecordingSample:
-    elapsed_seconds = _number(record["elapsed_seconds"])
-    power = _number(record["power"])
+    elapsed_seconds = _parse_number(record["elapsed_seconds"])
+    power = _parse_number(record["power"])
     if not math.isfinite(elapsed_seconds) or not math.isfinite(power):
         raise ValueError("elapsed time and power must be finite")
     raw_entities = record["entities"]
@@ -146,7 +157,7 @@ def _parse_sample(record: dict[str, object]) -> RecordingSample:
     return RecordingSample(elapsed_seconds, power, entities)
 
 
-def _number(value: object) -> float:
+def _parse_number(value: object) -> float:
     if isinstance(value, bool) or not isinstance(value, str | int | float):
         raise ValueError("expected a number")
     return float(value)
