@@ -241,6 +241,17 @@ def test_recorded_entity_and_analysis_result_include_optional_evidence() -> None
     assert result.to_dict()["warnings"] == ["bad line"]
 
 
+@pytest.mark.parametrize("reason", [None, "Record another complete cycle"])
+def test_insufficient_analysis_summary_includes_only_a_supplied_reason(reason: str | None) -> None:
+    result = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 3, reason=reason)
+
+    expected = {"Recording analysis": "More data needed"}
+    if reason is not None:
+        expected["Recording analysis reason"] = reason
+
+    assert result.build_summary() == expected
+
+
 def test_analysis_results_do_not_share_default_collections() -> None:
     first = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 0)
     second = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 0)
