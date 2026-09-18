@@ -207,6 +207,25 @@ def test_hass_voltage_selector_handles_missing_related_sensor(
     assert question.choices == (["sensor.voltage"] if has_voltage_sensor else [])
 
 
+def test_average_voltage_prompt_is_skipped_without_voltage_dependent_options(
+    mock_config_factory: MockConfigFactory,
+) -> None:
+    environment = mock_config_factory({"selected_power_meter": PowerMeterType.HASS})
+    catalog = _catalog(
+        _entity("sensor.power", EntityDomain.SENSOR, device_class=DeviceClass.POWER, state="1.2", unit="W"),
+        _entity("sensor.voltage", EntityDomain.SENSOR, device_class=DeviceClass.VOLTAGE, state="230", unit="V"),
+    )
+    question = next(
+        question
+        for question in measurement_questions(MeasureType.AVERAGE, environment, catalog)
+        if question.name == QUESTION_VOLTAGEMETER_ENTITY_ID
+    )
+    question.answers = {QUESTION_POWERMETER_ENTITY_ID: "sensor.power", QUESTION_DUMMY_LOAD: False}
+
+    assert question.ignore is True
+    catalog.load_snapshot.assert_not_called()
+
+
 @pytest.mark.parametrize(
     "measure_type, controller_setting, controller_type, domain, entity_id",
     [
