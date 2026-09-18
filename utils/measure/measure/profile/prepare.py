@@ -109,7 +109,7 @@ class ProfilePreparer:
                 self._build_prepared_file(relative_path, artifact_directory, model, metadata)
                 for relative_path in relative_files
             ),
-            warnings=tuple(self._collect_duplicate_warnings(model, manufacturer_directory, metadata.model_id)),
+            warnings=tuple(self._collect_duplicate_warnings(model)),
         )
 
     def render_contents(
@@ -236,19 +236,10 @@ class ProfilePreparer:
             if in_library or relative_path.as_posix().casefold() in indexed_paths:
                 raise ProfilePreparationError(f"Refusing to overwrite existing profile path: {relative_path}")
 
-    def _collect_duplicate_warnings(
-        self,
-        model: dict[str, Any],
-        manufacturer_directory: str,
-        model_directory: str,
-    ) -> list[str]:
-        requested_name = self._normalize(str(model.get("name", "")))
-        if not requested_name:
-            return []
+    def _collect_duplicate_warnings(self, model: dict[str, Any]) -> list[str]:
+        requested_name = self._normalize(str(model["name"]))
         warnings: list[str] = []
         for model_path in self.library_root.glob("*/*/model.json"):
-            if model_path.parent.parent.name == manufacturer_directory and model_path.parent.name == model_directory:
-                continue
             try:
                 existing = self._read_object(model_path)
             except OSError, ValueError:
@@ -257,8 +248,6 @@ class ProfilePreparer:
                 relative = model_path.relative_to(self.library_root)
                 warnings.append(f"Possible duplicate profile: profile_library/{relative}")
         for directory, existing in self._models_in_index():
-            if directory == manufacturer_directory and existing.get("id") == model_directory:
-                continue
             if requested_name in self._known_names(existing, "name"):
                 path = f"{directory}/{existing.get('id')}/model.json"
                 warnings.append(f"Possible duplicate profile: profile_library/{path}")
