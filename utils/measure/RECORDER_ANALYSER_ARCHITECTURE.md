@@ -98,7 +98,8 @@ The analysis types are defined in [models.py](measure/analyser/models.py).
 | `RecordedEntityState` | One recorded state plus attributes. |
 | `RecordingSample` | Elapsed seconds, measured watts, entity map, and source `recording_id`. |
 | `RecordingDataset` / `LoadedRecording` | Parsed sample collection, metadata, and invalid-line warnings. |
-| `AnalysisSplit` | Training samples, held-out validation samples, and the split method. |
+| `TrainingValidationSplit` | Training samples, held-out validation samples, and the split method. |
+| `ValidationMethod` | Held-out recording or held-out activity episodes. |
 | `FeatureReference` | A selected entity's state or one scalar attribute; knows how to read a sample. |
 | `AnalysisMetrics` | Validation count, coverage, MAE, RMSE, and observed power range. |
 | `ActivityReport` / `EnergyMetrics` | Per-activity validation evidence and measured/predicted energy. |

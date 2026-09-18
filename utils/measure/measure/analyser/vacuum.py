@@ -10,12 +10,13 @@ from statistics import median
 
 from measure.analyser.models import (
     AnalysisContext,
-    AnalysisSplit,
     FeatureReference,
     ModelConfigFragment,
     ProfileAnalysisStrategy,
     RecordingSample,
     StrategyNotApplicable,
+    TrainingValidationSplit,
+    ValidationMethod,
 )
 from measure.analyser.vacuum_signals import (
     Activity,
@@ -283,7 +284,7 @@ def vacuum_episodes(samples: Sequence[RecordingSample], signals: Sequence[Activi
 def split_vacuum_samples(
     samples: Sequence[RecordingSample],
     context: AnalysisContext,
-) -> AnalysisSplit | StrategyNotApplicable:
+) -> TrainingValidationSplit | StrategyNotApplicable:
     signals = discover_signals(samples, context)
     episodes = vacuum_episodes(samples, signals)
     grouped: dict[Activity, list[VacuumEpisode]] = defaultdict(list)
@@ -317,7 +318,9 @@ def split_vacuum_samples(
             and any(episode.samples[0].recording_id != held_out for episode in items)
             for items in grouped.values()
         ):
-            return AnalysisSplit(training=training, validation=validation, method="held_out_recording")
+            return TrainingValidationSplit(
+                training=training, validation=validation, method=ValidationMethod.HELD_OUT_RECORDING
+            )
     validation_ids = {
         id(sample)
         for items in grouped.values()
@@ -333,8 +336,8 @@ def split_vacuum_samples(
         if episode.activity is None or len(episode.samples) < MIN_EPISODE_SAMPLES
         for sample in episode.samples
     )
-    return AnalysisSplit(
+    return TrainingValidationSplit(
         training=[sample for sample in samples if id(sample) not in validation_ids],
         validation=[sample for sample in samples if id(sample) in validation_ids],
-        method="held_out_episodes",
+        method=ValidationMethod.HELD_OUT_EPISODES,
     )

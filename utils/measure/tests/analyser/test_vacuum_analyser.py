@@ -6,7 +6,6 @@ from measure.analyser.fixed import FixedStatesPowerCandidate
 from measure.analyser.models import (
     ActivityReport,
     AnalysisContext,
-    AnalysisSplit,
     EnergyMetrics,
     FeatureReference,
     ModelConfigFragment,
@@ -15,6 +14,8 @@ from measure.analyser.models import (
     RecorderAnalysisResult,
     RecordingSample,
     StrategyNotApplicable,
+    TrainingValidationSplit,
+    ValidationMethod,
 )
 from measure.analyser.recording import load_recordings, recording_context
 from measure.analyser.service import RecorderAnalyser
@@ -137,7 +138,9 @@ def test_composite_profile_from_separate_entities(tmp_path: Path) -> None:
     result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", repeated()), CONTEXT)
     assert result.model_ready
     assert result.strategy == "vacuum_composite"
-    assert result.validation_method == "held_out_episodes"
+    assert result.validation_method is ValidationMethod.HELD_OUT_EPISODES
+    assert json.loads(json.dumps(result.to_dict()))["validation_method"] == "held_out_episodes"
+    assert result.summary()["Validation method"] == "held_out_episodes"
     assert result.metrics is not None
     assert result.metrics.mae_w == 0
     assert result.metrics.coverage == 1
@@ -173,7 +176,9 @@ def test_whole_recording_validation_and_captured_metadata(tmp_path: Path) -> Non
     bare = replace(CONTEXT, entities=[RecordedEntity(e.entity_id, e.domain, e.role) for e in CONTEXT.entities])
     result = RecorderAnalyser().analyse(paths, bare)
     assert result.model_ready
-    assert result.validation_method == "held_out_recording"
+    assert result.validation_method is ValidationMethod.HELD_OUT_RECORDING
+    assert json.loads(json.dumps(result.to_dict()))["validation_method"] == "held_out_recording"
+    assert result.summary()["Validation method"] == "held_out_recording"
     assert result.metrics is not None
     assert result.metrics.validation_count == len(cycle())
     assert candidate().complexity == 12
@@ -197,7 +202,7 @@ def test_short_mode_error_is_not_hidden_by_long_idle(tmp_path: Path) -> None:
     assert not result.model_ready
     assert "washing validation error" in str(result.reason)
     assert result.activity_reports
-    assert result.validation_method == "held_out_episodes"
+    assert result.validation_method is ValidationMethod.HELD_OUT_EPISODES
 
 
 @pytest.mark.parametrize("state", ["unknown", "unavailable", "new_mode"])
@@ -429,7 +434,7 @@ def test_fragment_sequence_and_report_serialization() -> None:
     result = RecorderAnalysisResult(
         "insufficient_data",
         10,
-        validation_method="held_out_recording",
+        validation_method=ValidationMethod.HELD_OUT_RECORDING,
         activity_reports=activity_reports(candidate(), repeated(), cycle()),
     )
     assert result.to_dict()["validation_method"] == "held_out_recording"
@@ -477,10 +482,12 @@ def test_analysis_split_keeps_training_and_validation_separate(separate_recordin
         for item in cycle()
     ]
     split = split_vacuum_samples(training + validation, CONTEXT)
-    assert isinstance(split, AnalysisSplit)
+    assert isinstance(split, TrainingValidationSplit)
     assert split.training == training
     assert split.validation == validation
-    assert split.method == ("held_out_recording" if separate_recordings else "held_out_episodes")
+    assert split.method is (
+        ValidationMethod.HELD_OUT_RECORDING if separate_recordings else ValidationMethod.HELD_OUT_EPISODES
+    )
     assert {id(item) for item in split.training}.isdisjoint(id(item) for item in split.validation)
 
 

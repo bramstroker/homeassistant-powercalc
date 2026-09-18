@@ -12,13 +12,14 @@ from measure.analyser.models import (
     AnalysisCandidate,
     AnalysisContext,
     AnalysisMetrics,
-    AnalysisSplit,
     EvaluatedCandidate,
     ProfileAnalysisStrategy,
     RecordedEntity,
     RecorderAnalysisResult,
     RecordingSample,
     StrategyNotApplicable,
+    TrainingValidationSplit,
+    ValidationMethod,
 )
 from measure.analyser.recording import load_recordings, recording_context
 from measure.analyser.vacuum import VacuumCompositeCandidate, VacuumCompositeStrategy, split_vacuum_samples
@@ -110,7 +111,7 @@ class RecorderAnalyser:
 
 def _analysis_split(
     samples: Sequence[RecordingSample], context: AnalysisContext
-) -> AnalysisSplit | StrategyNotApplicable:
+) -> TrainingValidationSplit | StrategyNotApplicable:
     if context.recipe == "vacuum_robot":
         if any(sample.power < 0 for sample in samples):
             return StrategyNotApplicable("Vacuum power must be non-negative; check the meter or dummy-load correction")
@@ -181,10 +182,10 @@ def analysis_context_for(
 
 def _split_samples(
     samples: Sequence[RecordingSample],
-) -> AnalysisSplit:
+) -> TrainingValidationSplit:
     training = [sample for index, sample in enumerate(samples) if index % 5 != 4]
     validation = [sample for index, sample in enumerate(samples) if index % 5 == 4]
-    return AnalysisSplit(training=training, validation=validation)
+    return TrainingValidationSplit(training=training, validation=validation)
 
 
 def _constant_metrics(
@@ -298,7 +299,7 @@ def _insufficient(
     samples: Sequence[RecordingSample],
     warnings: Sequence[str],
     reason: str,
-    validation_method: str | None = None,
+    validation_method: ValidationMethod | None = None,
     reports: Sequence[ActivityReport] = (),
 ) -> RecorderAnalysisResult:
     return RecorderAnalysisResult(

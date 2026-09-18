@@ -1,5 +1,6 @@
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from enum import StrEnum
 import math
 from typing import Literal, Protocol
 
@@ -58,13 +59,18 @@ class RecordingSample:
     recording_id: int = 0
 
 
+class ValidationMethod(StrEnum):
+    HELD_OUT_RECORDING = "held_out_recording"
+    HELD_OUT_EPISODES = "held_out_episodes"
+
+
 @dataclass(frozen=True)
-class AnalysisSplit:
+class TrainingValidationSplit:
     """Samples used to fit a model and independently validate it."""
 
     training: list[RecordingSample]
     validation: list[RecordingSample]
-    method: str | None = None
+    method: ValidationMethod | None = None
 
 
 @dataclass(frozen=True)
@@ -265,7 +271,7 @@ class RecorderAnalysisResult:
     standby_power: float | None = None
     warnings: list[str] = field(default_factory=list)
     features: list[FeatureReference] = field(default_factory=list)
-    validation_method: str | None = None
+    validation_method: ValidationMethod | None = None
     activity_reports: list[ActivityReport] = field(default_factory=list)
 
     @property
@@ -300,7 +306,7 @@ class RecorderAnalysisResult:
         if self.features:
             details["features"] = [feature.identifier for feature in self.features]
         if self.validation_method is not None:
-            details["validation_method"] = self.validation_method
+            details["validation_method"] = self.validation_method.value
         if self.activity_reports:
             details["activities"] = [report.to_dict() for report in self.activity_reports]
         return details
@@ -320,7 +326,7 @@ class RecorderAnalysisResult:
                 "Analysed inputs": ", ".join(feature.identifier for feature in self.features),
                 "Validation MAE": f"{self.metrics.mae_w:.2f} W",
                 "Validation coverage": f"{self.metrics.coverage:.0%}",
-                "Validation method": self.validation_method or "held-out episodes",
+                "Validation method": self.validation_method.value if self.validation_method else "held-out episodes",
                 "Recorded activities": ", ".join(report.activity for report in self.activity_reports),
             }
         fixed_config = self.model_config_fragment.configuration
