@@ -184,6 +184,11 @@ class _SignalCandidate:
 
 
 def portable_entity(entity_id: str, context: AnalysisContext) -> str | None:
+    """Map a recorded entity ID to a profile placeholder reusable in other HA installations.
+
+    Use [[entity]] for the vacuum, otherwise a unique translation key or supported
+    battery device class on the same device. Return None when no safe mapping exists.
+    """
     if entity_id == context.primary_entity_id:
         return "[[entity]]"
     entity = next((entity for entity in context.entities if entity.entity_id == entity_id), None)
@@ -229,7 +234,12 @@ def _entity_signals(
 
 
 def discover_signals(samples: Sequence[RecordingSample], context: AnalysisContext) -> list[ActivitySignal]:
-    """Choose one signal per activity using portable sources and explicit priorities."""
+    """Find recorded states and attributes that identify vacuum and dock activities.
+
+    Prefer dedicated activity signals and one authoritative status source, using
+    entities with reusable profile placeholders. Return one signal per activity,
+    ordered by activity priority for resolve_activity().
+    """
     entities = [
         entity
         for entity in context.entities
