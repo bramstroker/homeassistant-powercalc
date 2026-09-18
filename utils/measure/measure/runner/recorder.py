@@ -15,7 +15,7 @@ from measure.recording.models import RecordingContext
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, validate_export_filename
 from measure.runner.interaction import ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.utils.sampling import MeasurementResult, PowerSampler
+from measure.utils.sampling import PowerSampler
 
 INTERVAL = 2
 
@@ -192,9 +192,6 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         except Exception as error:  # noqa: BLE001
             _LOGGER.warning("Skipping sample, could not read entity states: %s", error)
             return None
-
-    def measure_standby_power(self) -> MeasurementResult:
-        return MeasurementResult(power=0, voltages=[])
 
 
 def _write_jsonl(output_file: TextIO, record: Mapping[str, object]) -> None:

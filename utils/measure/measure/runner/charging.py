@@ -9,7 +9,7 @@ from measure.runner.errors import RunnerError
 from measure.runner.interaction import ChargingOperatingPoint, ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.tuning import MeasurementParameters
-from measure.utils.sampling import MeasurementResult, PowerSampler
+from measure.utils.sampling import PowerSampler
 
 _LOGGER = logging.getLogger("measure")
 
@@ -166,6 +166,3 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
             "calculation_enabled_condition": calculation_enabled_condition,
             "linear_config": linear_config,
         }
-
-    def measure_standby_power(self) -> MeasurementResult:
-        return MeasurementResult(power=0, voltages=[])

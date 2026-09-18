@@ -3,7 +3,7 @@ from statistics import mean
 
 from measure.request import AverageMeasurementRequest
 from measure.runner.interaction import ImmediateInteraction, RunInteraction
-from measure.utils.sampling import MeasurementResult, PowerSampler
+from measure.utils.sampling import PowerSampler
 
 from .runner import MeasurementRunner, RunnerResult
 
@@ -56,6 +56,3 @@ class AverageRunner(MeasurementRunner[AverageMeasurementRequest]):
             phase="Averaging",
             remaining_seconds=max(0.0, duration - elapsed),
         )
-
-    def measure_standby_power(self) -> MeasurementResult:
-        return MeasurementResult(power=0, voltages=[])

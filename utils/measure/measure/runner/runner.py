@@ -25,7 +25,7 @@ class MeasurementRunner[TRequest: BaseMeasurementRequest](ABC):
         """Release runner-owned resources after execution."""
 
     def measure_standby_power(self) -> MeasurementResult:
-        """Measure idle power after cleanup when the strategy supports it."""
+        """Default to zero when the strategy has no separate standby measurement."""
 
         return MeasurementResult(power=0, voltages=[])
 
