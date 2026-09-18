@@ -110,24 +110,24 @@ def low_load_probe_variations(plan: LightMeasurementPlan) -> list[Variation]:
                 ),
             )
             continue
-        if mode_plan.mode == LutMode.HS:
-            minimum_brightness = min(variation.bri for variation in variations)
-            maximum_saturation = max(
-                variation.sat
-                for variation in variations
-                if isinstance(variation, HsVariation) and variation.bri == minimum_brightness
-            )
-            hs_candidates = [
-                variation
-                for variation in variations
-                if isinstance(variation, HsVariation)
-                and variation.bri == minimum_brightness
-                and variation.sat == maximum_saturation
-            ]
-            probes.extend(
-                min(hs_candidates, key=lambda variation: abs(variation.hue - primary_hue))
-                for primary_hue in (0, 65535 // 3, 2 * 65535 // 3)
-            )
+        # HS is the remaining mode in the generated measurement plan.
+        minimum_brightness = min(variation.bri for variation in variations)
+        maximum_saturation = max(
+            variation.sat
+            for variation in variations
+            if isinstance(variation, HsVariation) and variation.bri == minimum_brightness
+        )
+        hs_candidates = [
+            variation
+            for variation in variations
+            if isinstance(variation, HsVariation)
+            and variation.bri == minimum_brightness
+            and variation.sat == maximum_saturation
+        ]
+        probes.extend(
+            min(hs_candidates, key=lambda variation: abs(variation.hue - primary_hue))
+            for primary_hue in (0, 65535 // 3, 2 * 65535 // 3)
+        )
 
     return list(dict.fromkeys(probes))
 
