@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import json
 from pathlib import Path
 
-from measure.analyser.fixed import FixedStatesPowerStrategy
+from measure.analyser.fixed import FixedStatesPowerCandidate, FixedStatesPowerStrategy
 from measure.analyser.models import (
     AnalysisMetrics,
     AnalysisStatus,
@@ -446,3 +446,30 @@ def test_selector_only_prefers_complex_candidate_for_material_error_improvement(
         [EvaluatedCandidate(simple, base), EvaluatedCandidate(equal_complexity, AnalysisMetrics(20, 4, 1, 0.9, 1, 5))]
     )
     assert selected.candidate is equal_complexity
+
+
+@pytest.mark.parametrize("contender_mae", [1.0, 1.1], ids=["equal-error", "higher-error"])
+@pytest.mark.parametrize("reverse_order", [False, True])
+def test_equal_complexity_selection_is_stable_without_error_improvement(
+    contender_mae: float,
+    reverse_order: bool,
+) -> None:
+    preferred = FixedStatesPowerCandidate(
+        FeatureReference("switch.device", FeatureSource.ATTRIBUTE, "mode"),
+        {"idle": 1.0, "active": 5.0},
+    )
+    contender = FixedStatesPowerCandidate(
+        FeatureReference("switch.device", FeatureSource.ATTRIBUTE, "status"),
+        {"idle": 1.0, "active": 5.0},
+    )
+    evaluations = [
+        EvaluatedCandidate(preferred, AnalysisMetrics(20, 4, 1, 1.0, 1.0, 5)),
+        EvaluatedCandidate(contender, AnalysisMetrics(20, 4, 1, contender_mae, contender_mae, 5)),
+    ]
+    if reverse_order:
+        evaluations.reverse()
+
+    selected = _select_candidate(evaluations)
+
+    assert selected.candidate is preferred
+    assert selected.metrics.mae_w == 1.0
