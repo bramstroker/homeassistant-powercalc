@@ -106,6 +106,28 @@ def test_zero_standby_reading_is_kept_as_zero() -> None:
     interaction.operating_point.assert_called_once_with({"type": "light", "on": False})
 
 
+def test_outdated_standby_reading_is_remeasured_after_nudge() -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    measurement = MeasurementResult(power=0.4, voltages=[230.0])
+    sampler.take_measurement.side_effect = [OutdatedMeasurementError("Stale reading"), measurement]
+    controller = MagicMock(spec=LightController)
+    interaction = MagicMock(spec=RunInteraction)
+    runner = LightRunner(sampler, MeasurementParameters(max_nudges=1), controller, interaction)
+
+    assert runner.measure_standby_power() == measurement
+    assert sampler.take_measurement.call_count == 2
+    assert controller.change_light_state.call_args_list == [
+        call(LutMode.BRIGHTNESS, on=False),
+        call(LutMode.BRIGHTNESS, on=True, bri=255),
+        call(LutMode.BRIGHTNESS, on=True, bri=0),
+    ]
+
+
+@pytest.mark.parametrize("seconds,expected", [(-1, "0s"), (30, "30s"), (90, "1.5m"), (5400, "1.5h")])
+def test_time_left_is_formatted_for_display(seconds: float, expected: str) -> None:
+    assert LightRunner.format_time_left(seconds) == expected
+
+
 @pytest.mark.parametrize(
     "variation,expected_dimensions",
     [

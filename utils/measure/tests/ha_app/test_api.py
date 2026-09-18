@@ -48,7 +48,7 @@ from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistant
 from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.diagnostics import PowerMeterDiagnostics
 from measure.powermeter.powermeter import PowerMeter, PowerMeterDiagnosticSample
-from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, KasaPowerMeterSpec
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, KasaPowerMeterSpec, ShellyPowerMeterSpec
 from measure.request import MeasurementRequest, RecorderMeasurementRequest, RecorderProfileRecipe, RecorderPurpose
 from measure.runner.interaction import LightOperatingPoint
 from measure.runner.runner import RunnerResult
@@ -407,6 +407,28 @@ def test_measure_device_catalog_failure_returns_service_unavailable(tmp_path: Pa
     assert response.json()["message"] == "Could not load measurement devices from the Powercalc library"
 
 
+@pytest.mark.parametrize(
+    "catalog_attribute,endpoint,method",
+    [
+        pytest.param("manufacturer_catalog", "manufacturers", "manufacturers", id="manufacturers"),
+        pytest.param("device_specification_catalog", "device-specifications", "fields", id="device-specifications"),
+    ],
+)
+def test_library_catalog_outage_returns_service_unavailable(
+    tmp_path: Path, catalog_attribute: str, endpoint: str, method: str
+) -> None:
+    test_client = client(tmp_path)
+    catalog = MagicMock()
+    getattr(catalog, method).side_effect = LibraryCatalogError("Library unavailable")
+    setattr(test_client.app.state.context, catalog_attribute, catalog)
+
+    response = test_client.get(f"/api/library/{endpoint}")
+
+    assert response.status_code == 503
+    assert response.json()["message"] == "Library unavailable"
+    assert "cache-control" not in response.headers
+
+
 def test_manufacturer_catalog_uses_canonical_names_and_http_caching(tmp_path: Path) -> None:
     test_client = client(tmp_path)
     test_client.app.state.context.manufacturer_catalog = ManufacturerCatalog(
@@ -658,6 +680,55 @@ def test_entity_integration_is_resolved_and_stays_optional(tmp_path: Path) -> No
     context.home_assistant = MagicMock(spec=HomeAssistantManager)
     context.home_assistant.get_entity_data.side_effect = OSError("Home Assistant is unreachable")
     assert context.get_entity_integrations(["light.test"]) == {"light.test": None}
+
+
+@pytest.mark.parametrize("meter_type", ["hass", "shelly", "kasa"])
+def test_saved_calibration_is_hidden_until_meter_settings_are_complete(tmp_path: Path, meter_type: str) -> None:
+    test_client = client(tmp_path)
+    storage = test_client.app.state.context.storage
+    storage.save_dummy_load_calibration(
+        DummyLoadCalibration(
+            description="Resistive bulb",
+            resistance=1322.5,
+            calibrated_at="2026-09-18T10:00:00Z",
+            power_meter_fingerprint=power_meter_fingerprint(DummyPowerMeterSpec()),
+        )
+    )
+    assert test_client.put("/api/settings", json={"power_meter": meter_type}).status_code == 200
+
+    response = test_client.get("/api/dummy-load/calibration")
+
+    assert response.status_code == 200
+    assert response.json() is None
+    assert storage.load_dummy_load_calibration() is not None
+
+
+def test_saved_calibration_matches_network_meter_without_home_assistant_lookup(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    spec = ShellyPowerMeterSpec(device_ip="192.168.1.10")
+    calibration = DummyLoadCalibration(
+        description="Resistive bulb",
+        resistance=1322.5,
+        calibrated_at="2026-09-18T10:00:00Z",
+        power_meter_fingerprint=power_meter_fingerprint(spec),
+    )
+    context.storage.save_dummy_load_calibration(calibration)
+    assert (
+        test_client.put("/api/settings", json={"power_meter": "shelly", "shelly_ip": spec.device_ip}).status_code == 200
+    )
+    with patch.object(context.home_assistant, "get_entity_data", side_effect=AssertionError("HA lookup not needed")):
+        response = test_client.get("/api/dummy-load/calibration")
+
+    assert response.status_code == 200
+    assert response.json() == calibration.model_dump(mode="json")
+
+
+def test_calibration_endpoint_without_saved_calibration_returns_none(tmp_path: Path) -> None:
+    response = client(tmp_path).get("/api/dummy-load/calibration")
+
+    assert response.status_code == 200
+    assert response.json() is None
 
 
 def test_dummy_load_calibration_is_returned_only_for_the_configured_meter(tmp_path: Path) -> None:
