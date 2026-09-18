@@ -14,7 +14,7 @@ def write_bytes_atomic(path: Path, content: bytes) -> None:
             file.write(content)
         temporary.replace(path)
     finally:
-        if temporary is not None:
+        if temporary is not None:  # pragma: no branch - no temporary exists only when creation raises
             temporary.unlink(missing_ok=True)
 
 
