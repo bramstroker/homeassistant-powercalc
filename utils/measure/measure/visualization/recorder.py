@@ -100,7 +100,7 @@ def _recorder_extrema(path: Path, point_count: int, max_points: int) -> list[Plo
         if bucket_maximum is None or point.y > bucket_maximum.point.y:
             bucket_maximum = candidate
     _append_bucket_extrema(selected, bucket_minimum, bucket_maximum)
-    if last is not None:
+    if last is not None:  # pragma: no branch - absent only if the file shrinks between counting and plotting
         selected.append(last)
     return [item.point for item in selected[:max_points]]
 
