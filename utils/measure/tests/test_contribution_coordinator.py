@@ -190,6 +190,30 @@ def test_job_store_rejects_unsafe_ids_without_touching_files(tmp_path: Path, job
     assert list(store.root.iterdir()) == []
 
 
+def test_coordinator_creates_a_fork_for_first_time_contributors(tmp_path: Path) -> None:
+    github = FakeGitHubClient()
+    coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
+    job = coordinator.create_job(tmp_path / "artifacts", make_metadata())
+
+    with (
+        patch.object(github, "find_fork", return_value=None),
+        patch.object(
+            github, "create_fork", return_value={"name": "profiles", "owner": {"login": "octo"}}
+        ) as create_fork,
+        patch.object(github, "create_blob", wraps=github.create_blob) as create_blob,
+    ):
+        submitted = coordinator.submit(job.id, tmp_path / "artifacts")
+
+    create_fork.assert_called_once_with()
+    assert submitted.status == ContributionJobStatus.SUBMITTED
+    assert submitted.submission is not None
+    assert submitted.submission.pull_request_url == "https://github.test/pr/1"
+    assert create_blob.call_args.args[:2] == ("octo", "profiles")
+    assert "sync_fork_branch:octo:profiles:powercalc-profile-signify-lct999" in github.calls
+    assert "create_pr:Add signify LCT999 power profile:octo:powercalc-profile-signify-lct999:master" in github.calls
+    assert coordinator.job_store.load(job.id) == submitted
+
+
 def test_missing_upstream_branch_records_failure_before_github_writes(tmp_path: Path) -> None:
     github = FakeGitHubClient()
     coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)

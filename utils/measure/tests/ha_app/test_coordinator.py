@@ -626,6 +626,38 @@ def test_coordinator_deletes_only_terminal_sessions(tmp_path: Path) -> None:
     assert coordinator.current is None
 
 
+def test_deleting_an_unknown_session_preserves_the_current_session(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+    completed = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+    snapshot = coordinator.current
+
+    with pytest.raises(SessionConflictError, match="The requested session does not exist"):
+        coordinator.delete("missing-session")
+
+    assert coordinator.current == snapshot
+    assert coordinator.get(completed.id) == snapshot
+    assert len(coordinator.sessions()) == 1
+
+
+def test_deleting_an_active_session_does_not_stop_the_worker(tmp_path: Path) -> None:
+    started = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
+    session = coordinator.start(light_request())
+    assert started.wait(1)
+
+    try:
+        with pytest.raises(SessionConflictError, match="An active measurement session cannot be deleted"):
+            coordinator.delete(session.id)
+
+        assert coordinator.current is not None
+        assert coordinator.current.state == SessionState.RUNNING
+        assert coordinator.get(session.id).id == session.id
+    finally:
+        coordinator.cancel(session.id)
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+
 def test_transient_sample_does_not_reuse_terminal_event_sequence(tmp_path: Path) -> None:
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), SamplingService)
 
