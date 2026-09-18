@@ -398,6 +398,30 @@ def test_registration_save_failure_is_reported(monkeypatch: pytest.MonkeyPatch, 
     assert isinstance(raised.value.__cause__, OSError)
 
 
+def test_registration_does_not_overwrite_config_corrupted_during_link_prompt(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    config = tmp_path / ".python_hue"
+    config.write_text("{}", encoding="utf-8")
+    corrupted_contents = '{"192.0.2.20":'
+
+    def answer_link_prompt(_message: str) -> str:
+        config.write_text(corrupted_contents, encoding="utf-8")
+        return ""
+
+    monkeypatch.setattr("builtins.input", answer_link_prompt)
+    registration = AsyncMock(return_value="new-key")
+    monkeypatch.setattr(hue_module, "create_app_key", registration)
+
+    with pytest.raises(LightControllerError, match="Could not read Hue bridge configuration") as raised:
+        HueLightController("192.0.2.10", config_file_path=config)
+
+    registration.assert_awaited_once()
+    assert isinstance(raised.value.__cause__, json.JSONDecodeError)
+    assert config.read_text(encoding="utf-8") == corrupted_contents
+
+
 def test_bridge_state_error_is_not_retried(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     controller, bridge = _controller(monkeypatch, tmp_path)
     error = AiohueException("Invalid state")
