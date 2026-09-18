@@ -352,5 +352,5 @@ def main() -> None:
         print(f"Warning: {warning}", file=sys.stderr)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover - entry-point behaviour is tested through main
     main()
