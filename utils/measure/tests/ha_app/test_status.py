@@ -112,6 +112,7 @@ def test_status_publisher_lifecycle_and_error_recovery(
             await asyncio.sleep(0.005)
 
         await publisher.async_stop()
+        await publisher.async_stop()
         publisher._signal_changed()  # noqa: SLF001
         assert home_assistant.fire_event.call_count == 2
 
@@ -119,3 +120,18 @@ def test_status_publisher_lifecycle_and_error_recovery(
         asyncio.run(exercise())
 
     assert "Could not publish Measure status to Home Assistant" in caplog.text
+
+
+def test_status_publisher_can_stop_without_starting(tmp_path: Path) -> None:
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), MagicMock())
+    publisher = MeasureStatusPublisher(home_assistant, coordinator)
+
+    async def exercise() -> None:
+        await publisher.async_stop()
+        await publisher.async_stop()
+
+    asyncio.run(exercise())
+
+    home_assistant.fire_event.assert_not_called()
+    assert coordinator.current is None
