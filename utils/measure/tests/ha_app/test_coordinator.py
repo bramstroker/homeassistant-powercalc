@@ -707,6 +707,34 @@ def test_deleting_an_unknown_session_preserves_the_current_session(tmp_path: Pat
     assert len(coordinator.sessions()) == 1
 
 
+def test_deleting_history_preserves_a_running_session_and_its_events(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    previous_coordinator = MeasurementCoordinator(storage, CompletingService)
+    completed = previous_coordinator.start(light_request())
+    wait_for_state(previous_coordinator, SessionState.COMPLETED)
+    started = Event()
+    coordinator = MeasurementCoordinator(storage, lambda: BlockingService(started))
+    current = coordinator.start(light_request())
+
+    try:
+        assert started.wait(1)
+        running_snapshot = coordinator.current
+        running_events = coordinator.events_since(0, current.id)
+
+        coordinator.delete(completed.id)
+
+        assert coordinator.current == running_snapshot
+        assert coordinator.events_since(0, current.id) == running_events
+        assert storage.load_snapshot(current.id) == running_snapshot
+        assert [session.id for session in coordinator.sessions()] == [current.id]
+        assert not storage.session_directory(completed.id).exists()
+    finally:
+        coordinator.cancel(current.id)
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+    assert storage.load_current() == coordinator.current
+
+
 def test_deleting_an_active_session_does_not_stop_the_worker(tmp_path: Path) -> None:
     started = Event()
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
