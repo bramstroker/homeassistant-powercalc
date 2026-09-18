@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any
 from unittest.mock import Mock
 
-from measure.controller.charging.spec import HassChargingControllerSpec
+from measure.controller.charging.spec import DummyChargingControllerSpec, HassChargingControllerSpec
 from measure.controller.fan.spec import HassFanControllerSpec
 from measure.controller.light.const import LutMode
 from measure.controller.light.spec import (
@@ -10,7 +10,7 @@ from measure.controller.light.spec import (
     HassLightControllerSpec,
     HassMultiLightControllerSpec,
 )
-from measure.controller.media.spec import HassMediaControllerSpec
+from measure.controller.media.spec import DummyMediaControllerSpec, HassMediaControllerSpec
 from measure.ha_app.preflight import ActiveSessionError, EntityRecord, MeasurementPreflight, PreflightError
 from measure.home_assistant.entities import DeviceClass
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
@@ -87,6 +87,62 @@ def base_entities() -> dict[tuple[str | None, str | None], list[Entity]]:
         ("lawn_mower", None): [Entity("lawn_mower.test", attribute_names=["battery_level"])],
         ("sensor", None): [Entity("sensor.battery", state="75")],
     }
+
+
+def test_preflight_accepts_request_without_meter_diagnostics() -> None:
+    checker = MeasurementPreflight(
+        has_active_session=lambda: False,
+        verify_storage=lambda: None,
+        load_entities=lambda _domain, _device_class: [],
+    )
+
+    result = checker.validate(AverageMeasurementRequest(power_meter=ShellyPowerMeterSpec(device_ip="192.0.2.1")))
+
+    assert result.power_meter_diagnostic is None
+    assert result.warnings == []
+
+
+def test_preflight_rejects_dummy_controller_outside_developer_mode() -> None:
+    request = SpeakerMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"), controller=DummyMediaControllerSpec()
+    )
+
+    with pytest.raises(PreflightError, match="Dummy controllers require developer mode"):
+        preflight(base_entities(), developer_mode=False).validate(request)
+
+
+def test_preflight_accepts_dummy_charging_controller_in_developer_mode() -> None:
+    request = ChargingMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(), controller=DummyChargingControllerSpec(), charging_device_type="vacuum_robot"
+    )
+
+    result = preflight({}).validate(request)
+
+    assert result.battery_level_entity_id is None
+    assert result.battery_level_attribute is None
+
+
+def test_dummy_load_requires_known_voltage_capability_even_after_successful_reading() -> None:
+    diagnostic = PowerMeterDiagnostic(
+        success=True,
+        status=DiagnosticStatus.GOOD,
+        precision_status=DiagnosticStatus.UNSUPPORTED,
+        update_interval_status=DiagnosticStatus.UNSUPPORTED,
+        supports_voltage=None,
+    )
+    checker = MeasurementPreflight(
+        has_active_session=lambda: False,
+        verify_storage=lambda: None,
+        load_entities=lambda _domain, _device_class: [],
+        diagnose_power_meter=lambda _: diagnostic,
+    )
+    request = AverageMeasurementRequest(
+        power_meter=ShellyPowerMeterSpec(device_ip="192.0.2.1"),
+        dummy_load=DummyLoadCalibrationRequest(description="Resistive bulb"),
+    )
+
+    with pytest.raises(PreflightError, match="Could not determine whether the selected power meter supports voltage"):
+        checker.validate(request)
 
 
 def test_preflight_rejects_unadvertised_light_mode() -> None:
@@ -520,11 +576,12 @@ def test_preflight_rejects_missing_charging_battery_source() -> None:
         validator.validate(request)
 
 
-def test_preflight_accepts_charging_with_related_battery_sensor() -> None:
+@pytest.mark.parametrize("battery_level", ["0", "80", "100", "42.5"])
+def test_preflight_accepts_charging_with_related_battery_sensor(battery_level: str) -> None:
     """A battery sensor on the same device is used even without the battery_level attribute."""
     entities = base_entities() | {
         ("vacuum", None): [Entity("vacuum.test", attribute_names=[], device_id="vacuum-device")],
-        (None, "battery"): [Entity("sensor.vacuum_battery", state="80", device_id="vacuum-device")],
+        (None, "battery"): [Entity("sensor.vacuum_battery", state=battery_level, device_id="vacuum-device")],
     }
 
     result = preflight(entities).validate(_charging_request())
@@ -541,10 +598,26 @@ def test_preflight_reports_battery_level_attribute_fallback() -> None:
     assert result.battery_level_attribute == "battery_level"
 
 
-def test_preflight_rejects_non_numeric_related_battery_sensor() -> None:
+def test_charging_ignores_battery_sensors_on_other_devices() -> None:
+    entities = base_entities() | {
+        ("vacuum", None): [Entity("vacuum.test", attribute_names=["battery_level"], device_id="vacuum-device")],
+        (None, "battery"): [
+            Entity("sensor.other_battery", state="unknown", device_id="other-device"),
+            Entity("sensor.vacuum_battery", state="42", device_id="vacuum-device"),
+        ],
+    }
+
+    result = preflight(entities).validate(_charging_request())
+
+    assert result.battery_level_entity_id == "sensor.vacuum_battery"
+    assert result.battery_level_attribute is None
+
+
+@pytest.mark.parametrize("battery_level", ["unknown", "", "-1", "101", "nan", "inf"])
+def test_preflight_rejects_invalid_related_battery_sensor(battery_level: str) -> None:
     entities = base_entities() | {
         ("vacuum", None): [Entity("vacuum.test", attribute_names=[], device_id="vacuum-device")],
-        (None, "battery"): [Entity("sensor.vacuum_battery", state="unknown", device_id="vacuum-device")],
+        (None, "battery"): [Entity("sensor.vacuum_battery", state=battery_level, device_id="vacuum-device")],
     }
 
     validator = preflight(entities)
