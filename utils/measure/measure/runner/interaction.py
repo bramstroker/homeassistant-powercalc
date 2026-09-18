@@ -109,4 +109,4 @@ class ImmediateInteraction(RunInteraction):
         return
 
     def entity_states(self, states: Mapping[str, str]) -> None:
-        return
+        return  # pragma: no cover - unattended entity-state reporting is intentionally a no-op

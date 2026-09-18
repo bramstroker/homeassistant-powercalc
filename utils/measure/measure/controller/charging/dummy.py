@@ -16,7 +16,7 @@ class DummyChargingController(ChargingController):
         return self._battery_level - 1
 
     def is_valid_state(self) -> bool:
-        return True
+        return True  # pragma: no cover - simulated charging is always valid
 
     def is_charging(self) -> bool:
         return True
