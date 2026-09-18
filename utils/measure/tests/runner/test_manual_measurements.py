@@ -37,7 +37,8 @@ def test_average_reports_start_phase_after_confirmation() -> None:
     assert sampler.take_average_measurement.call_args.kwargs["finish_on_interrupt"] is True
 
 
-def test_average_summary_uses_elapsed_duration() -> None:
+@pytest.mark.parametrize("unattended", [False, True])
+def test_average_summary_uses_elapsed_duration(unattended: bool) -> None:
     sampler = MagicMock(spec=PowerSampler)
 
     def average(
@@ -52,7 +53,8 @@ def test_average_summary_uses_elapsed_duration() -> None:
         return MeasurementResult(power=4.2, voltages=[230.0, 232.0])
 
     sampler.take_average_measurement.side_effect = average
-    runner = AverageRunner(sampler, MagicMock(spec=RunInteraction))
+    interaction = None if unattended else MagicMock(spec=RunInteraction)
+    runner = AverageRunner(sampler, interaction)
     result = runner.run(AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), duration=60), "")
     assert result.summary == {"Average power": "4.2 W", "Duration": "6.5 s", "Average voltage": "231.0 V"}
 
