@@ -269,7 +269,10 @@ class MeasurementPreflight:
             return
         if isinstance(controller, HueLightControllerSpec):
             raise PreflightError("Hue light controllers are not supported by the Home Assistant app")
-        raise PreflightError(f"{type(controller).__name__} is not supported by the Home Assistant app")
+        # Validated controller unions are exhausted above; retain a guard for future adapter types.
+        raise PreflightError(  # pragma: no cover
+            f"{type(controller).__name__} is not supported by the Home Assistant app"
+        )
 
     def _validate_power_meter(self, request: MeasurementRequest) -> None:
         power_meter = request.power_meter
@@ -407,7 +410,9 @@ class MeasurementPreflight:
     def _validate_light(self, request: LightMeasurementRequest) -> PreflightResult:
         if isinstance(request.controller, DummyLightControllerSpec):
             return self._estimate_dummy_light(request)
-        if not isinstance(request.controller, HassLightControllerSpec | HassMultiLightControllerSpec):
+        if not isinstance(  # pragma: no cover - other light adapters are rejected by _validate_adapters
+            request.controller, HassLightControllerSpec | HassMultiLightControllerSpec
+        ):
             raise PreflightError("Selected light entity is unavailable")
 
         selection = self._resolve_lights(request.controller.entity_ids)
