@@ -236,6 +236,7 @@ def test_coordinator_notifies_session_state_listeners(tmp_path: Path) -> None:
     wait_for_state(coordinator, SessionState.CANCELLED)
     assert terminal_notification.wait(1)
     unsubscribe()
+    unsubscribe()
     coordinator.delete(session.id)
 
     assert notifications == [SessionState.RUNNING, SessionState.CANCELLING, SessionState.CANCELLED]
