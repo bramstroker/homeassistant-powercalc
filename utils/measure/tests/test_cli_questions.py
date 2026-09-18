@@ -366,6 +366,35 @@ def test_cli_reuses_and_closes_prefill_manager(mock_config_factory: MockConfigFa
     home_assistant.close.assert_called_once_with()
 
 
+@pytest.mark.parametrize("entity_id, lookup_fails", [("", False), ("light.missing", False), ("light.desk", True)])
+def test_model_id_default_handles_missing_metadata_and_caches_failures(
+    mock_config_factory: MockConfigFactory,
+    entity_id: str,
+    lookup_fails: bool,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    environment = mock_config_factory({"selected_light_controller": LightControllerType.HASS})
+    catalog = _catalog()
+    if lookup_fails:
+        catalog.load_snapshot.side_effect = OSError("HA unavailable")
+    measure = Measure(environment)
+
+    with (
+        patch("measure.cli.main.HomeAssistantManager"),
+        patch("measure.cli.main.HomeAssistantEntityCatalog", return_value=catalog),
+    ):
+        questions = measure.get_questions([])
+        question = next(question for question in questions if question.name == QUESTION_MODEL_ID)
+        question.answers = {QUESTION_ENTITY_ID: entity_id}
+
+        assert question.default is None
+        assert question.default is None
+
+    assert catalog.load_snapshot.call_count == (1 if entity_id else 0)
+    if lookup_fails:
+        assert "Could not prefill model ID for light.desk: HA unavailable" in caplog.text
+
+
 @pytest.mark.parametrize(
     "model_id, explicit_model, explicit_name, expected_model, expected_name",
     [
