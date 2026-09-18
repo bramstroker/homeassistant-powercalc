@@ -3,8 +3,9 @@ from dataclasses import dataclass, replace
 import itertools
 import os.path
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
+from measure.cancellation import MeasurementCancelledError
 from measure.cli.const import QUESTION_MODE
 from measure.cli.questions import light_questions
 from measure.controller.errors import ApiConnectionError as HassApiConnectionError
@@ -12,12 +13,12 @@ from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.spec import DummyLightControllerSpec
-from measure.powermeter.errors import ZeroReadingError
+from measure.powermeter.errors import PowerMeterError, ZeroReadingError
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import LightMeasurementRequest
 from measure.runner.errors import RunnerError
 from measure.runner.interaction import RunInteraction
-from measure.runner.light.csv import inspect_light_csv, repair_incomplete_csv_tail
+from measure.runner.light.csv import inspect_light_csv
 from measure.runner.light.plan import EffectVariation, LightMeasurementPlan, LightModePlan, Variation, build_light_plan
 from measure.runner.light.runner import LightRunner, LightRunProgress, MeasurementRunInput
 from measure.tuning import MeasurementParameters
