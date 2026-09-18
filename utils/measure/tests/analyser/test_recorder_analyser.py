@@ -5,8 +5,10 @@ from pathlib import Path
 from measure.analyser.fixed import FixedStatesPowerStrategy
 from measure.analyser.models import (
     AnalysisMetrics,
+    AnalysisStatus,
     EvaluatedCandidate,
     FeatureReference,
+    FeatureSource,
     ModelConfigFragment,
     RecorderAnalysisResult,
     StrategyNotApplicable,
@@ -47,7 +49,7 @@ RECORDER_REGRESSION_CASES = (
             entities=[RecordedEntity("media_player.kpn_diw7022", "media_player", "primary")],
         ),
         strategy="fixed_states_power",
-        feature=FeatureReference("media_player.kpn_diw7022", "state"),
+        feature=FeatureReference("media_player.kpn_diw7022", FeatureSource.STATE),
         model_config_fragment={
             "calculation_strategy": "fixed",
             "fixed_config": {"power": 3.1},
@@ -163,7 +165,7 @@ def test_fixed_strategy_builds_a_lookup_candidate_for_primary_state() -> None:
     candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT)
 
     assert not isinstance(candidate, StrategyNotApplicable)
-    assert candidate.feature == FeatureReference("switch.device", "state")
+    assert candidate.feature == FeatureReference("switch.device", FeatureSource.STATE)
     assert candidate.estimate_power(sample(20, 99, "on")) == pytest.approx(5.2)
     assert candidate.estimate_power(sample(21, 99, "unknown")) is None
     assert candidate.standby_power == pytest.approx(0.2)
@@ -199,7 +201,7 @@ def test_fixed_strategy_keeps_multiple_active_states_as_states_power() -> None:
 
 
 def test_feature_reference_accepts_finite_scalar_attributes_only() -> None:
-    feature = FeatureReference("switch.device", "attribute", "value")
+    feature = FeatureReference("switch.device", FeatureSource.ATTRIBUTE, "value")
 
     assert feature.get_value(sample(1, 1, "on", {"value": 2.5})) == pytest.approx(2.5)
     assert feature.get_value(sample(1, 1, "on", {"value": float("nan")})) is None
@@ -216,7 +218,7 @@ def test_recorded_entity_and_analysis_result_include_optional_evidence() -> None
         translation_key="plug",
     )
     result = RecorderAnalysisResult(
-        status="insufficient_data",
+        status=AnalysisStatus.INSUFFICIENT_DATA,
         sample_count=3,
         reason="more data",
         warnings=["bad line"],
@@ -227,11 +229,11 @@ def test_recorded_entity_and_analysis_result_include_optional_evidence() -> None
 
 
 def test_analysis_results_do_not_share_default_collections() -> None:
-    first = RecorderAnalysisResult("insufficient_data", 0)
-    second = RecorderAnalysisResult("insufficient_data", 0)
+    first = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 0)
+    second = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 0)
 
     first.warnings.append("Skipped an invalid sample")
-    first.features.append(FeatureReference("switch.device", "state"))
+    first.features.append(FeatureReference("switch.device", FeatureSource.STATE))
 
     assert second.warnings == []
     assert second.features == []
@@ -249,7 +251,7 @@ def test_analyser_selects_scalar_attribute_when_state_is_constant(tmp_path: Path
     result = RecorderAnalyser().analyse(path, CONTEXT)
 
     assert result.model_ready
-    assert result.feature == FeatureReference("switch.device", "attribute", "mode")
+    assert result.feature == FeatureReference("switch.device", FeatureSource.ATTRIBUTE, "mode")
     assert result.metrics is not None
     assert result.metrics.coverage == pytest.approx(1)
     assert result.metrics.mae_w == pytest.approx(0)
@@ -411,7 +413,7 @@ def test_analyser_requires_five_recorded_samples_for_every_model_value(tmp_path:
 
 class _Candidate:
     strategy_id = "test"
-    feature = FeatureReference("switch.device", "state")
+    feature = FeatureReference("switch.device", FeatureSource.STATE)
     standby_power = None
 
     def __init__(self, complexity: int) -> None:

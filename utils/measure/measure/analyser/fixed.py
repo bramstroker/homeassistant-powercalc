@@ -6,6 +6,7 @@ from statistics import median
 from measure.analyser.models import (
     AnalysisCandidate,
     FeatureReference,
+    FeatureSource,
     ModelConfigFragment,
     ProfileAnalysisStrategy,
     ScalarStateValue,
@@ -44,7 +45,7 @@ class FixedStatesPowerCandidate:
 
     def build_model_config_fragment(self) -> ModelConfigFragment:
         configuration: dict[str, object]
-        if self.feature.source == "state" and set(self.powers) == {"off", "on"}:
+        if self.feature.source == FeatureSource.STATE and set(self.powers) == {"off", "on"}:
             configuration = {"power": self.powers["on"]}
         else:
             configuration = {"states_power": dict(self.powers)}
@@ -56,7 +57,7 @@ class FixedStatesPowerCandidate:
 
     @property
     def standby_power(self) -> float | None:
-        if self.feature.source != "state":
+        if self.feature.source != FeatureSource.STATE:
             return None
         power = self.powers.get("off")
         return power if power is not None and power >= 0.05 else None
@@ -93,8 +94,8 @@ def _collect_features(samples: Sequence[RecordingSample], primary_entity_id: str
         if entity is not None:
             attributes.update(entity.attributes)
     return [
-        FeatureReference(primary_entity_id, "state"),
-        *(FeatureReference(primary_entity_id, "attribute", attribute) for attribute in sorted(attributes)),
+        FeatureReference(primary_entity_id, FeatureSource.STATE),
+        *(FeatureReference(primary_entity_id, FeatureSource.ATTRIBUTE, attribute) for attribute in sorted(attributes)),
     ]
 
 

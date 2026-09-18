@@ -13,6 +13,7 @@ from measure.ha_app.light_probe import (
     create_app_measurement_assembler,
     format_light_load_probe_label,
 )
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.powermeter import PowerMeasurementResult
 from measure.powermeter.spec import HassPowerMeterSpec, KasaPowerMeterSpec
 from measure.request import LightMeasurementRequest
@@ -294,10 +295,11 @@ def test_active_probe_wraps_controller_errors_and_cleanup_errors_do_not_mask_suc
 
 
 def test_app_measurement_assembler_builds_non_interactive_adapter_graph() -> None:
+    credentials = TapoCredentials(username="user@example.com", password="account-password")  # noqa: S106
     assembler = create_app_measurement_assembler(
         home_assistant=MagicMock(),
         shelly_password="secret",  # noqa: S106
-        kasa_credentials=("user@example.com", "account-password"),
+        kasa_credentials=credentials,
     )
 
     assert isinstance(assembler, MeasurementAssembler)
@@ -306,5 +308,5 @@ def test_app_measurement_assembler_builds_non_interactive_adapter_graph() -> Non
 
     meter.assert_called_once_with(
         "192.0.2.1",
-        credentials=("user@example.com", "account-password"),
+        credentials=credentials,
     )

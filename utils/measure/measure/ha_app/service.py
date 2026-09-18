@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from contextvars import ContextVar
 import logging
 import re
@@ -10,6 +11,7 @@ from measure.ha_app.interaction import SessionInteraction
 from measure.ha_app.session import SessionControl, SessionEventType
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant.client import HomeAssistantManager
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import MeasurementRequest
 from measure.runner.runner import RunnerResult
@@ -20,7 +22,7 @@ _SESSION_LOG_CONTROL: ContextVar[SessionControl | None] = ContextVar("measure_se
 
 
 class _SessionLogHandler(logging.Handler):
-    def __init__(self, control: SessionControl, secrets: tuple[str, ...]) -> None:
+    def __init__(self, control: SessionControl, secrets: Sequence[str]) -> None:
         super().__init__(level=logging.INFO)
         self.control = control
         self.secrets = secrets
@@ -65,7 +67,7 @@ class SessionDummyLoadCalibrationStore(DummyLoadCalibrationStore):
         return calibration
 
 
-def _redact_secrets(message: str, secrets: tuple[str, ...]) -> str:
+def _redact_secrets(message: str, secrets: Sequence[str]) -> str:
     redacted = re.sub(r"(?i)(authorization\s*[:=]\s*(?:bearer\s+)?)[^\s,;]+", r"\1[REDACTED]", message)
     for secret in secrets:
         if secret:
@@ -82,7 +84,7 @@ class MeasurementService(SessionMeasurementService):
         storage: SessionStorage | None = None,
         *,
         shelly_password: str | None = None,
-        kasa_credentials: tuple[str, str] | None = None,
+        kasa_credentials: TapoCredentials | None = None,
     ) -> None:
         self.home_assistant = home_assistant
         self.storage = storage
@@ -97,7 +99,9 @@ class MeasurementService(SessionMeasurementService):
     ) -> RunnerResult:
         """Run with session logging and redact secrets from surfaced failures."""
 
-        secrets = (self.home_assistant.token, self.shelly_password or "", *(self.kasa_credentials or ()))
+        secrets = [self.home_assistant.token, self.shelly_password or ""]
+        if self.kasa_credentials is not None:
+            secrets.extend([self.kasa_credentials.username, self.kasa_credentials.password])
         handler = _SessionLogHandler(control, secrets)
         _LOGGER.addHandler(handler)
         context_token = _SESSION_LOG_CONTROL.set(control)

@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from dataclasses import replace
 import math
 
-from measure.visualization.models import PlotKind, PlotPoint, PlotSpec
+from measure.visualization.models import IndexedPoint, PlotKind, PlotPoint, PlotSpec
 
 
 def limit_plot_points(plot: PlotSpec, max_points: int) -> PlotSpec:
@@ -32,15 +32,16 @@ def limit_line(points: Sequence[PlotPoint], max_points: int | None) -> list[Plot
     if max_points < 4:
         return limit_scatter(points, max_points)
 
-    indexed = list(enumerate(points))
+    indexed = [IndexedPoint(index, point) for index, point in enumerate(points)]
     interior = indexed[1:-1]
     bucket_count = max(1, (max_points - 2) // 2)
     bucket_size = math.ceil(len(interior) / bucket_count)
-    selected: list[tuple[int, PlotPoint]] = [indexed[0]]
+    selected = [indexed[0]]
     for start in range(0, len(interior), bucket_size):
         bucket = interior[start : start + bucket_size]
-        minimum = min(bucket, key=lambda item: item[1].y)
-        maximum = max(bucket, key=lambda item: item[1].y)
-        selected.extend(sorted({minimum[0]: minimum, maximum[0]: maximum}.values()))
+        minimum = min(bucket, key=lambda item: item.point.y)
+        maximum = max(bucket, key=lambda item: item.point.y)
+        extrema = {minimum.index: minimum, maximum.index: maximum}
+        selected.extend(sorted(extrema.values(), key=lambda item: item.index))
     selected.append(indexed[-1])
-    return [point for _, point in sorted(selected)[:max_points]]
+    return [item.point for item in sorted(selected, key=lambda item: item.index)[:max_points]]

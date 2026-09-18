@@ -3,6 +3,7 @@ import json
 import logging
 from pathlib import Path
 
+from measure.analyser.models import AnalysisStatus
 from measure.analyser.service import RecorderAnalyser
 from measure.profile.model_json import write_model_json
 from measure.recording.context import build_recording_context
@@ -92,7 +93,7 @@ class RecorderAnalysisExecution:
                 output_directory / ANALYSER_FILENAME,
                 {
                     "schema_version": 1,
-                    "status": "insufficient_data",
+                    "status": AnalysisStatus.INSUFFICIENT_DATA.value,
                     "sample_count": 0,
                     "reason": reason,
                 },

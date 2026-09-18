@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import IntEnum, StrEnum
 import json
 
-from measure.analyser.models import FeatureReference, ScalarStateValue
+from measure.analyser.models import FeatureReference, FeatureSource, ScalarStateValue
 from measure.recording.models import EntityRole, RecordedEntity, RecordingContext, RecordingSample
 
 
@@ -163,7 +163,7 @@ class ActivitySignal:
         entity = resolve_portable_entity(self.feature.entity_id, context)
         assert entity is not None
         values = self.active if active else self.inactive
-        if self.feature.source == "state":
+        if self.feature.source == FeatureSource.STATE:
             return {"condition": "state", "entity_id": entity, "state": list(values)}
         return {
             "condition": "template",
@@ -215,7 +215,7 @@ def _discover_entity_signals(
 ) -> list[_SignalCandidate]:
     candidates: list[_SignalCandidate] = []
     for entity in entities:
-        feature = FeatureReference(entity.entity_id, "state")
+        feature = FeatureReference(entity.entity_id, FeatureSource.STATE)
         key = entity.translation_key
         if entity.domain in {"binary_sensor", "switch"} and key in _ACTION_ENTITY_KEYS:
             _add_flags(candidates, samples, feature, _ACTION_ENTITY_KEYS[str(key)], _SourcePriority.ACTION_ENTITY)
@@ -250,12 +250,12 @@ def discover_signals(samples: Sequence[RecordingSample], context: RecordingConte
     candidates = _discover_entity_signals(samples, entities, primary)
     attributes = {key for sample in samples if (state := sample.entities.get(primary)) for key in state.attributes}
     for attribute in sorted(attributes):
-        feature = FeatureReference(primary, "attribute", attribute)
+        feature = FeatureReference(primary, FeatureSource.ATTRIBUTE, attribute)
         if attribute in _ATTRIBUTE_FLAGS:
             _add_flags(candidates, samples, feature, _ATTRIBUTE_FLAGS[attribute], _SourcePriority.ACTIVITY_FLAG)
         elif attribute in _STATUS_ATTRIBUTES:
             _add_states(candidates, samples, feature, _STATUS_ATTRIBUTES[attribute])
-    _add_states(candidates, samples, FeatureReference(primary, "state"), _SourcePriority.HA_STATE)
+    _add_states(candidates, samples, FeatureReference(primary, FeatureSource.STATE), _SourcePriority.HA_STATE)
     # Use one authoritative enum source, rather than combining a rich runtime
     # status sensor with stale vacuum attributes or the coarse HA docked state.
     status_feature = next(
@@ -288,14 +288,14 @@ def _add_supplements(
 ) -> None:
     if Activity.SLEEPING not in status_activities:
         # Dreame/Mova can report charging_completed alongside an explicit sleep status.
-        _add_sleep_flag(candidates, samples, FeatureReference(primary, "attribute", "status"))
+        _add_sleep_flag(candidates, samples, FeatureReference(primary, FeatureSource.ATTRIBUTE, "status"))
         for entity in entities:
             if entity.domain == "sensor" and entity.translation_key == "status":
-                _add_sleep_flag(candidates, samples, FeatureReference(entity.entity_id, "state"))
+                _add_sleep_flag(candidates, samples, FeatureReference(entity.entity_id, FeatureSource.STATE))
     # Limited charging enums supplement the main status only where it has no
     # explicit charging/completion signal. A coarse HA docked state is preserved.
     for entity in entities:
-        feature = FeatureReference(entity.entity_id, "state")
+        feature = FeatureReference(entity.entity_id, FeatureSource.STATE)
         if entity.domain == "sensor" and entity.translation_key == "charging_status":
             _add_aux_states(
                 candidates,
@@ -444,10 +444,10 @@ def resolve_activity(sample: RecordingSample, signals: Sequence[ActivitySignal])
 def find_battery_feature(samples: Sequence[RecordingSample], context: RecordingContext) -> FeatureReference | None:
     battery = next((entity for entity in context.entities if entity.role == EntityRole.BATTERY), None)
     if battery is not None and resolve_portable_entity(battery.entity_id, context) is not None:
-        return FeatureReference(battery.entity_id, "state")
+        return FeatureReference(battery.entity_id, FeatureSource.STATE)
     # Legacy recordings lack registry metadata, but usually expose the same battery
     # level directly on the vacuum. Never guess a related entity from its name.
-    feature = FeatureReference(context.primary_entity_id, "attribute", "battery_level")
+    feature = FeatureReference(context.primary_entity_id, FeatureSource.ATTRIBUTE, "battery_level")
     if (
         battery is not None
         and samples

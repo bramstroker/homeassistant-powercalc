@@ -17,6 +17,12 @@ class PlotPoint:
 
 
 @dataclass(frozen=True, slots=True)
+class IndexedPoint:
+    index: int
+    point: PlotPoint
+
+
+@dataclass(frozen=True, slots=True)
 class PlotSeries:
     label: str | None
     color: str | None

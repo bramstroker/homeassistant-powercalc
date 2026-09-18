@@ -23,7 +23,8 @@ from measure.ha_app.session import (
     SessionState,
 )
 from measure.ha_app.shelly_credentials import ShellyCredentials, ShellyCredentialStore
-from measure.ha_app.tapo_credentials import TapoCredentials, TapoCredentialStore
+from measure.ha_app.tapo_credentials import TapoCredentialStore
+from measure.powermeter.credentials import TapoCredentials
 from measure.recording.files import find_recording_paths
 from measure.request import (
     LightMeasurementRequest,

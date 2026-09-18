@@ -1,11 +1,14 @@
 from dataclasses import dataclass
+from enum import StrEnum
 import json
 from pathlib import Path
-from typing import Literal
 
 from measure.utils.files import write_json_atomic
 
-CredentialKind = Literal["oauth", "pat"]
+
+class CredentialKind(StrEnum):
+    OAUTH = "oauth"
+    PAT = "pat"
 
 
 @dataclass(frozen=True)
@@ -35,8 +38,12 @@ class CredentialStore:
         username = value.get("github_username")
         scopes = value.get("scopes", [])
         permissions_verified = value.get("permissions_verified", False)
-        if kind not in {"oauth", "pat"} or not isinstance(token, str) or not token:
+        if not isinstance(kind, str) or not isinstance(token, str) or not token:
             raise ValueError("Credential file is invalid")
+        try:
+            credential_kind = CredentialKind(kind)
+        except ValueError as error:
+            raise ValueError("Credential file is invalid") from error
         if username is not None and not isinstance(username, str):
             raise ValueError("Credential username is invalid")
         if not isinstance(scopes, list) or not all(isinstance(scope, str) for scope in scopes):
@@ -44,7 +51,7 @@ class CredentialStore:
         if not isinstance(permissions_verified, bool):
             raise ValueError("Credential permission status is invalid")
         return StoredCredential(
-            kind=kind,
+            kind=credential_kind,
             token=token,
             github_username=username,
             scopes=tuple(scopes),
@@ -55,7 +62,7 @@ class CredentialStore:
         write_json_atomic(
             self.path,
             {
-                "kind": credential.kind,
+                "kind": credential.kind.value,
                 "token": credential.token,
                 "github_username": credential.github_username,
                 "scopes": list(credential.scopes),

@@ -20,6 +20,7 @@ from measure.ha_app.session import SessionSnapshot
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
 from measure.home_assistant.client import HomeAssistantManager
 from measure.home_assistant.entities import EntityDescriptor, HomeAssistantEntityCatalog
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.diagnostics import PowerMeterDiagnostics
 from measure.powermeter.powermeter import PowerMeter
 from measure.powermeter.spec import PowerMeterSpec
@@ -111,9 +112,8 @@ class AppContext:
         credentials = self.storage.load_shelly_credentials()
         return credentials.password if credentials is not None else None
 
-    def get_tapo_credentials(self) -> tuple[str, str] | None:
-        credentials = self.storage.load_tapo_credentials()
-        return (credentials.username, credentials.password) if credentials is not None else None
+    def get_tapo_credentials(self) -> TapoCredentials | None:
+        return self.storage.load_tapo_credentials()
 
     def create_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:
         return MeasurementAssembler(

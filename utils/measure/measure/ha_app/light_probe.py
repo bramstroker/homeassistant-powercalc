@@ -9,6 +9,7 @@ from measure.assembler import MeasurementAssembler
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController
 from measure.home_assistant.client import HomeAssistantManager
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.errors import ZeroReadingError
 from measure.request import LightMeasurementRequest
 from measure.runner.interaction import ImmediateInteraction
@@ -178,7 +179,7 @@ def create_app_measurement_assembler(
     *,
     home_assistant: HomeAssistantManager,
     shelly_password: str | None,
-    kasa_credentials: tuple[str, str] | None = None,
+    kasa_credentials: TapoCredentials | None = None,
 ) -> MeasurementAssembler:
     """Build the non-interactive adapter graph used by an app preflight probe."""
 

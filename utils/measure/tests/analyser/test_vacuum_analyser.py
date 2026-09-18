@@ -6,8 +6,10 @@ from measure.analyser.execution import RecorderAnalysisExecution
 from measure.analyser.fixed import FixedStatesPowerCandidate
 from measure.analyser.models import (
     ActivityReport,
+    AnalysisStatus,
     EnergyMetrics,
     FeatureReference,
+    FeatureSource,
     ModelConfigFragment,
     RecorderAnalysisResult,
     StrategyNotApplicable,
@@ -146,11 +148,11 @@ def candidate(
 def test_composite_features_preserve_order_without_duplicates() -> None:
     model = candidate()
     expected = [
-        FeatureReference(PRIMARY, "attribute", "auto_empty_status"),
-        FeatureReference(PRIMARY, "attribute", "washing"),
-        FeatureReference(DRYING, "state"),
-        FeatureReference(STATE, "state"),
-        FeatureReference(BATTERY, "state"),
+        FeatureReference(PRIMARY, FeatureSource.ATTRIBUTE, "auto_empty_status"),
+        FeatureReference(PRIMARY, FeatureSource.ATTRIBUTE, "washing"),
+        FeatureReference(DRYING, FeatureSource.STATE),
+        FeatureReference(STATE, FeatureSource.STATE),
+        FeatureReference(BATTERY, FeatureSource.STATE),
     ]
 
     assert model.features == expected
@@ -254,7 +256,7 @@ def test_precedence_active_drying_not_enabled_setting() -> None:
     model = candidate(changed)
     assert model.estimate_power(changed[35]) == 7
     assert model.estimate_power(changed[0]) == 3.5
-    assert model.features.count(FeatureReference(DRYING, "state")) == 1
+    assert model.features.count(FeatureReference(DRYING, FeatureSource.STATE)) == 1
 
 
 def test_unmeasured_activity_guard_and_missing_flag() -> None:
@@ -280,9 +282,9 @@ def test_unmeasured_activity_guard_and_missing_flag() -> None:
         is None
     )
     assert (
-        ActivitySignal(Activity.WASHING, FeatureReference(PRIMARY, "attribute", "washing"), [True], [False]).matches(
-            replace(item, entities={**item.entities, PRIMARY: replace(primary, attributes={"washing": 1})})
-        )
+        ActivitySignal(
+            Activity.WASHING, FeatureReference(PRIMARY, FeatureSource.ATTRIBUTE, "washing"), [True], [False]
+        ).matches(replace(item, entities={**item.entities, PRIMARY: replace(primary, attributes={"washing": 1})}))
         is None
     )
 
@@ -290,7 +292,7 @@ def test_unmeasured_activity_guard_and_missing_flag() -> None:
 @pytest.mark.parametrize("level", ["unknown", "unavailable", "bad", True, -1, 101, "NaN", "inf"])
 def test_invalid_battery_levels(level: object) -> None:
     item = sample("charging", 10, level=level)
-    feature = FeatureReference(PRIMARY, "attribute", "battery_level")
+    feature = FeatureReference(PRIMARY, FeatureSource.ATTRIBUTE, "battery_level")
     assert get_battery_level(item, feature) is None
     assert candidate().estimate_power(item) is None
 
@@ -302,7 +304,7 @@ def test_charging_range_integer_conversion_and_attribute_fallback() -> None:
     assert model.estimate_power(sample("charging", 0, level=81)) is None
     bare = replace(CONTEXT, entities=[RecordedEntity(e.entity_id, e.domain, e.role) for e in CONTEXT.entities])
     model = candidate(context=bare)
-    assert model.battery == FeatureReference(PRIMARY, "attribute", "battery_level")
+    assert model.battery == FeatureReference(PRIMARY, FeatureSource.ATTRIBUTE, "battery_level")
     fragment = model.build_model_config_fragment().to_dict()
     charging = next(branch for branch in fragment["composite_config"]["strategies"] if "linear" in branch)
     assert charging["entity_id"] == "[[entity]]"
@@ -453,13 +455,13 @@ def test_metadata_validation_and_legacy_loading(tmp_path: Path) -> None:
 
 
 def test_fragment_sequence_and_report_serialization() -> None:
-    fixed = FixedStatesPowerCandidate(FeatureReference(PRIMARY, "state"), {"docked": 3, "cleaning": 0.3})
+    fixed = FixedStatesPowerCandidate(FeatureReference(PRIMARY, FeatureSource.STATE), {"docked": 3, "cleaning": 0.3})
     assert fixed.features == [fixed.feature]
     assert ModelConfigFragment("composite", "composite_config", [{"fixed": {"power": 2}}]).to_dict()[
         "composite_config"
     ] == [{"fixed": {"power": 2}}]
     result = RecorderAnalysisResult(
-        "insufficient_data",
+        AnalysisStatus.INSUFFICIENT_DATA,
         10,
         validation_method=ValidationMethod.HELD_OUT_RECORDING,
         activity_reports=build_activity_reports(candidate(), repeated(), cycle()),
@@ -482,7 +484,7 @@ def test_activity_report_preserves_flat_json_contract() -> None:
         mean_power_w=22,
         energy=EnergyMetrics(duration_seconds=9, measured_wh=0.055, predicted_wh=0.056, bias_percent=1.82),
     )
-    result = RecorderAnalysisResult("insufficient_data", 20, activity_reports=[report])
+    result = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 20, activity_reports=[report])
     assert result.to_dict()["activities"] == [
         {
             "activity": "washing",
@@ -527,7 +529,7 @@ def test_charging_points_interpolate_between_named_coordinates() -> None:
             ChargingPoint(battery_level=80, power=10),
         ],
     )
-    battery = FeatureReference(BATTERY, "state")
+    battery = FeatureReference(BATTERY, FeatureSource.STATE)
     assert branch.estimate(sample("charging", 0, level=20), battery) == 40
     assert branch.estimate(sample("charging", 0, level=50), battery) == 25
     assert branch.estimate(sample("charging", 0, level=80), battery) == 10

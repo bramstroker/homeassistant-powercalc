@@ -2,13 +2,23 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
 import math
-from typing import Literal, Protocol
+from typing import Protocol
 
 from measure.recording.models import RecordingContext, RecordingSample
 
 type ScalarStateValue = str | bool | int | float
 
 RECORDING_ANALYSIS_LABEL = "Recording analysis"
+
+
+class FeatureSource(StrEnum):
+    STATE = "state"
+    ATTRIBUTE = "attribute"
+
+
+class AnalysisStatus(StrEnum):
+    MODEL_READY = "model_ready"
+    INSUFFICIENT_DATA = "insufficient_data"
 
 
 class ValidationMethod(StrEnum):
@@ -28,12 +38,12 @@ class TrainingValidationSplit:
 @dataclass(frozen=True)
 class FeatureReference:
     entity_id: str
-    source: Literal["state", "attribute"]
+    source: FeatureSource
     attribute: str | None = None
 
     @property
     def identifier(self) -> str:
-        if self.source == "state":
+        if self.source == FeatureSource.STATE:
             return f"{self.entity_id}.state"
         return f"{self.entity_id}.attributes.{self.attribute}"
 
@@ -41,7 +51,9 @@ class FeatureReference:
         entity = sample.entities.get(self.entity_id)
         if entity is None:
             return None
-        value: object = entity.state if self.source == "state" else entity.attributes.get(str(self.attribute))
+        value: object = (
+            entity.state if self.source == FeatureSource.STATE else entity.attributes.get(str(self.attribute))
+        )
         if isinstance(value, bool | int | str):
             return value
         if isinstance(value, float) and math.isfinite(value):
@@ -50,7 +62,7 @@ class FeatureReference:
 
     def format_model_key(self, value: ScalarStateValue) -> str:
         rendered = str(value)
-        return rendered if self.source == "state" else f"{self.attribute}|{rendered}"
+        return rendered if self.source == FeatureSource.STATE else f"{self.attribute}|{rendered}"
 
 
 @dataclass(frozen=True)
@@ -180,7 +192,7 @@ class EvaluatedCandidate:
 
 @dataclass(frozen=True)
 class RecorderAnalysisResult:
-    status: Literal["model_ready", "insufficient_data"]
+    status: AnalysisStatus
     sample_count: int
     reason: str | None = None
     strategy: str | None = None
@@ -195,12 +207,12 @@ class RecorderAnalysisResult:
 
     @property
     def model_ready(self) -> bool:
-        return self.status == "model_ready" and self.model_config_fragment is not None
+        return self.status == AnalysisStatus.MODEL_READY and self.model_config_fragment is not None
 
     def to_dict(self) -> dict[str, object]:
         value: dict[str, object] = {
             "schema_version": 1,
-            "status": self.status,
+            "status": self.status.value,
             "sample_count": self.sample_count,
         }
         if self.reason is not None:

@@ -35,6 +35,7 @@ from measure.execution import (
 )
 from measure.home_assistant.client import HomeAssistantManager
 from measure.home_assistant.entities import HomeAssistantEntityCatalog
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.hass import HassPowerMeter
@@ -90,7 +91,7 @@ class MeasurementAssembler:
         home_assistant: HomeAssistantManager | None = None,
         tuya_device_key: str | None = None,
         shelly_password: str | None = None,
-        kasa_credentials: tuple[str, str] | None = None,
+        kasa_credentials: TapoCredentials | None = None,
         on_sample: Callable[[float], None] | None = None,
         on_calibration_sample: Callable[[float, float, float], None] | None = None,
         dummy_load_calibration_store: DummyLoadCalibrationStore | None = None,

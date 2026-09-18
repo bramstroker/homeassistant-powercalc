@@ -6,7 +6,7 @@ from measure.contribution.coordinator import (
     ContributionJobExpiredError,
     ContributionJobStore,
 )
-from measure.contribution.credentials import CredentialStore, StoredCredential
+from measure.contribution.credentials import CredentialKind, CredentialStore, StoredCredential
 from measure.contribution.github import GitHubClient, GitHubRepository, GitHubUser
 from measure.contribution.models import ContributionAuthor, ContributionJob, ContributionJobStatus, ContributionMetadata
 from measure.contribution.pull_request import deterministic_branch_name, pull_request_body
@@ -130,7 +130,7 @@ def make_metadata(github: str = "test-user") -> ContributionMetadata:
     )
 
 
-def make_credential_store(tmp_path: Path, kind: str = "pat") -> CredentialStore:
+def make_credential_store(tmp_path: Path, kind: CredentialKind = CredentialKind.PAT) -> CredentialStore:
     """A credential store already holding a token for GitHub user `octo`."""
     store = CredentialStore(tmp_path / "credentials.json")
     store.save(StoredCredential(kind=kind, token="secret", github_username="octo"))  # noqa: S106
@@ -231,7 +231,7 @@ def test_coordinator_reports_missing_workflow_scope_before_writing_fork(tmp_path
     github.user = GitHubUser(login="octo", scopes=("public_repo",), scopes_reported=True)
     coordinator = make_coordinator(
         tmp_path,
-        credential_store=make_credential_store(tmp_path, kind="oauth"),
+        credential_store=make_credential_store(tmp_path, kind=CredentialKind.OAUTH),
         github_client=github,
     )
     job = coordinator.create_job(tmp_path / "artifacts", make_metadata())

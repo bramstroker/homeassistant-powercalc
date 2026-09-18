@@ -7,7 +7,7 @@ import math
 from pathlib import Path
 
 from measure.visualization.data import DEFAULT_COLOR, POWER_AXIS_LABEL, finite_float, open_csv
-from measure.visualization.models import PlotDataError, PlotKind, PlotPoint, PlotSeries, PlotSpec
+from measure.visualization.models import IndexedPoint, PlotDataError, PlotKind, PlotPoint, PlotSeries, PlotSpec
 
 
 def build_recorder_plot(path: Path, *, source: str, max_points: int | None) -> PlotSpec:
@@ -76,17 +76,17 @@ def _downsample_recorder_points(path: Path, point_count: int, max_points: int) -
 def _recorder_extrema(path: Path, point_count: int, max_points: int) -> list[PlotPoint]:
     bucket_count = max(1, (max_points - 2) // 2)
     bucket_size = math.ceil((point_count - 2) / bucket_count)
-    selected: list[tuple[int, PlotPoint]] = []
-    bucket_minimum: tuple[int, PlotPoint] | None = None
-    bucket_maximum: tuple[int, PlotPoint] | None = None
+    selected: list[IndexedPoint] = []
+    bucket_minimum: IndexedPoint | None = None
+    bucket_maximum: IndexedPoint | None = None
     current_bucket = -1
-    last: tuple[int, PlotPoint] | None = None
+    last: IndexedPoint | None = None
     for index, point in enumerate(_iter_recorder_points(path)):
         if index == 0:
-            selected.append((index, point))
+            selected.append(IndexedPoint(index, point))
             continue
         if index == point_count - 1:
-            last = (index, point)
+            last = IndexedPoint(index, point)
             continue
         bucket_index = (index - 1) // bucket_size
         if bucket_index != current_bucket:
@@ -94,22 +94,23 @@ def _recorder_extrema(path: Path, point_count: int, max_points: int) -> list[Plo
             bucket_minimum = None
             bucket_maximum = None
             current_bucket = bucket_index
-        candidate = (index, point)
-        if bucket_minimum is None or point.y < bucket_minimum[1].y:
+        candidate = IndexedPoint(index, point)
+        if bucket_minimum is None or point.y < bucket_minimum.point.y:
             bucket_minimum = candidate
-        if bucket_maximum is None or point.y > bucket_maximum[1].y:
+        if bucket_maximum is None or point.y > bucket_maximum.point.y:
             bucket_maximum = candidate
     _append_bucket_extrema(selected, bucket_minimum, bucket_maximum)
     if last is not None:
         selected.append(last)
-    return [point for _, point in selected[:max_points]]
+    return [item.point for item in selected[:max_points]]
 
 
 def _append_bucket_extrema(
-    selected: list[tuple[int, PlotPoint]],
-    minimum: tuple[int, PlotPoint] | None,
-    maximum: tuple[int, PlotPoint] | None,
+    selected: list[IndexedPoint],
+    minimum: IndexedPoint | None,
+    maximum: IndexedPoint | None,
 ) -> None:
     if minimum is None or maximum is None:
         return
-    selected.extend(sorted({minimum[0]: minimum, maximum[0]: maximum}.values()))
+    extrema = {minimum.index: minimum, maximum.index: maximum}
+    selected.extend(sorted(extrema.values(), key=lambda item: item.index))

@@ -31,7 +31,6 @@ from measure.ha_app.preparation import apply_fast_test_mode, run_preflight
 from measure.ha_app.registry import measurement_definitions
 from measure.ha_app.shelly_credentials import ShellyCredentials
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
-from measure.ha_app.tapo_credentials import TapoCredentials
 from measure.home_assistant.entities import (
     DeviceClass,
     EntityDescriptor,
@@ -39,6 +38,7 @@ from measure.home_assistant.entities import (
     HomeAssistantEntityCatalog,
 )
 from measure.powermeter.const import PowerMeterType
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.spec import (
@@ -306,7 +306,7 @@ def _test_power_meter(context: AppContext, settings: AppSettingsUpdate) -> Power
     tapo_credentials = None
     if not settings.clear_tapo_credentials:
         if settings.tapo_username and settings.tapo_password:
-            tapo_credentials = (settings.tapo_username, settings.tapo_password)
+            tapo_credentials = TapoCredentials(username=settings.tapo_username, password=settings.tapo_password)
         else:
             tapo_credentials = context.get_tapo_credentials()
     return context.power_meter_diagnostics.evaluate(

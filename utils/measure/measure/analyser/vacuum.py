@@ -10,6 +10,7 @@ from statistics import median
 
 from measure.analyser.models import (
     FeatureReference,
+    FeatureSource,
     ModelConfigFragment,
     ProfileAnalysisStrategy,
     StrategyNotApplicable,
@@ -104,7 +105,7 @@ class VacuumCompositeCandidate:
         for branch in self.branches:
             # Composite checks an overridden source's availability before its
             # condition, including when it would otherwise skip charging.
-            if branch.calibration and self.battery is not None and self.battery.source == "state":
+            if branch.calibration and self.battery is not None and self.battery.source == FeatureSource.STATE:
                 state = sample.entities.get(self.battery.entity_id)
                 if state is None or state.state in {"unknown", "unavailable"}:
                     return None
@@ -141,7 +142,7 @@ class VacuumCompositeCandidate:
             linear: dict[str, object] = {
                 "calibrate": [f"{point.battery_level} -> {point.power}" for point in branch.calibration]
             }
-            if self.battery.source == "attribute":
+            if self.battery.source == FeatureSource.ATTRIBUTE:
                 linear["attribute"] = self.battery.attribute
             item["linear"] = linear
         else:
@@ -201,7 +202,7 @@ def get_battery_level(sample: RecordingSample, feature: FeatureReference | None)
             return None
         # Attribute-based LinearStrategy uses int(value), while numeric sensor
         # states use int(float(value)). Decimal strings are not valid attributes.
-        return int(value) if feature is not None and feature.source == "attribute" else int(level)
+        return int(value) if feature is not None and feature.source == FeatureSource.ATTRIBUTE else int(level)
     except ValueError:
         return None
 
@@ -210,7 +211,9 @@ def _build_charging_condition(branch: VacuumBranch, battery: FeatureReference, e
     # Guard the calibrated range: PowerCalc otherwise extrapolates. Reject
     # missing, boolean, non-finite and non-numeric values before integer coercion.
     expression = (
-        f"states({entity_id!r})" if battery.source == "state" else f"state_attr({entity_id!r}, {battery.attribute!r})"
+        f"states({entity_id!r})"
+        if battery.source == FeatureSource.STATE
+        else f"state_attr({entity_id!r}, {battery.attribute!r})"
     )
     minimum_level = branch.calibration[0].battery_level
     maximum_level = branch.calibration[-1].battery_level
@@ -219,7 +222,7 @@ def _build_charging_condition(branch: VacuumBranch, battery: FeatureReference, e
         f"0 <= ({expression} | float(-1)) <= 100",
         f"{minimum_level} <= ({expression} | float(-1) | int) <= {maximum_level}",
     ]
-    if battery.source == "attribute":
+    if battery.source == FeatureSource.ATTRIBUTE:
         checks.append(
             f"({expression} is number or ({expression} is string and {expression} | trim is match('^[+-]?[0-9]+$')))"
         )

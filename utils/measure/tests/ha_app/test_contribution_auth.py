@@ -3,7 +3,12 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from measure.contribution.github import REQUIRED_OAUTH_SCOPES, GitHubApiError, GitHubClient, GitHubUser
-from measure.ha_app.contribution.models import ContributionApiError, ContributionApiErrorCode, ContributionAuthMethod
+from measure.ha_app.contribution.models import (
+    ContributionApiError,
+    ContributionApiErrorCode,
+    ContributionAuthMethod,
+    DeviceFlowPollStatus,
+)
 from measure.ha_app.contribution.service import SharedContributionService
 from pydantic import SecretStr
 import pytest
@@ -76,14 +81,27 @@ def test_auth_errors_are_translated_without_saving_credentials(tmp_path: Path, o
     assert not service.auth_status().authenticated
 
 
-@pytest.mark.parametrize("oauth_error,status", [("expired_token", "expired"), ("access_denied", "denied")])
-def test_device_flow_terminal_states(tmp_path: Path, oauth_error: str, status: str) -> None:
+@pytest.mark.parametrize(
+    "oauth_error,status",
+    [
+        ("authorization_pending", DeviceFlowPollStatus.PENDING),
+        ("slow_down", DeviceFlowPollStatus.SLOW_DOWN),
+        ("expired_token", DeviceFlowPollStatus.EXPIRED),
+        ("access_denied", DeviceFlowPollStatus.DENIED),
+    ],
+)
+def test_device_flow_maps_oauth_errors_to_poll_status(
+    tmp_path: Path,
+    oauth_error: str,
+    status: DeviceFlowPollStatus,
+) -> None:
     github = MagicMock(spec=GitHubClient)
-    github.poll_device_flow.return_value = {"error": oauth_error}
+    github.poll_device_flow.return_value = {"error": oauth_error, "error_description": "Test message"}
     with patch("measure.ha_app.contribution.auth.GitHubClient", return_value=github):
         result = SharedContributionService(tmp_path).poll_device_flow("client", "device")
-    assert result.status == status
-    assert result.message == oauth_error
+    assert result.status is status
+    assert result.model_dump(mode="json")["status"] == status.value
+    assert result.message == "Test message"
     github.fetch_authenticated_user.assert_not_called()
 
 
@@ -105,6 +123,8 @@ def test_device_flow_uses_response_scopes_when_identity_does_not_report_them(tmp
     with patch("measure.ha_app.contribution.auth.GitHubClient", return_value=github):
         result = SharedContributionService(tmp_path).poll_device_flow("client", "device")
     assert result.auth is not None
+    assert result.status is DeviceFlowPollStatus.AUTHORIZED
+    assert result.model_dump(mode="json")["status"] == "authorized"
     assert result.auth.method is ContributionAuthMethod.OAUTH_DEVICE
     assert result.auth.permissions_verified
 

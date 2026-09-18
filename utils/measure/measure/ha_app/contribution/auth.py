@@ -2,7 +2,7 @@
 
 from pydantic import SecretStr
 
-from measure.contribution.credentials import CredentialStore, StoredCredential
+from measure.contribution.credentials import CredentialKind, CredentialStore, StoredCredential
 from measure.contribution.github import (
     REQUIRED_OAUTH_SCOPES,
     GitHubApiError,
@@ -16,6 +16,7 @@ from measure.ha_app.contribution.models import (
     ContributionAuthStatus,
     ContributionIdentity,
     DeviceFlowPollResponse,
+    DeviceFlowPollStatus,
     DeviceFlowStart,
 )
 
@@ -33,7 +34,9 @@ class ContributionAuth:
         return ContributionAuthStatus(
             authenticated=True,
             connected=True,
-            method=ContributionAuthMethod.OAUTH_DEVICE if credential.kind == "oauth" else ContributionAuthMethod.PAT,
+            method=ContributionAuthMethod.OAUTH_DEVICE
+            if credential.kind == CredentialKind.OAUTH
+            else ContributionAuthMethod.PAT,
             identity=ContributionIdentity(login=credential.github_username or ""),
             username=credential.github_username,
             scopes=list(credential.scopes),
@@ -54,7 +57,7 @@ class ContributionAuth:
             )
         self._credential_store.save(
             StoredCredential(
-                kind="pat",
+                kind=CredentialKind.PAT,
                 token=raw_token,
                 github_username=user.login,
                 scopes=user.scopes,
@@ -91,18 +94,18 @@ class ContributionAuth:
         oauth_error = data.get("error")
         if oauth_error == "authorization_pending":
             return DeviceFlowPollResponse(
-                status="pending",
+                status=DeviceFlowPollStatus.PENDING,
                 message=str(data.get("error_description") or "Authorization pending"),
             )
         if oauth_error == "slow_down":
             return DeviceFlowPollResponse(
-                status="slow_down",
+                status=DeviceFlowPollStatus.SLOW_DOWN,
                 message=str(data.get("error_description") or "Authorization pending"),
                 retry_after=_positive_integer(data.get("interval")),
             )
         if oauth_error in {"expired_token", "access_denied"}:
             return DeviceFlowPollResponse(
-                status="expired" if oauth_error == "expired_token" else "denied",
+                status=DeviceFlowPollStatus.EXPIRED if oauth_error == "expired_token" else DeviceFlowPollStatus.DENIED,
                 message=str(data.get("error_description") or oauth_error),
             )
         token = data.get("access_token")
@@ -121,14 +124,14 @@ class ContributionAuth:
         granted = user.scopes or response_scopes
         self._credential_store.save(
             StoredCredential(
-                kind="oauth",
+                kind=CredentialKind.OAUTH,
                 token=token,
                 github_username=user.login,
                 scopes=granted,
                 permissions_verified=not missing_required_scopes(granted),
             ),
         )
-        return DeviceFlowPollResponse(status="authorized", auth=self.auth_status())
+        return DeviceFlowPollResponse(status=DeviceFlowPollStatus.AUTHORIZED, auth=self.auth_status())
 
 
 def _positive_integer(value: object) -> int | None:

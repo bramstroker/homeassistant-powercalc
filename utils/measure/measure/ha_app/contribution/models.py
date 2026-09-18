@@ -128,7 +128,12 @@ class DeviceFlowStartResponse(DeviceFlowStart):
     flow_id: str
 
 
-DeviceFlowPollStatus = Literal["pending", "slow_down", "authorized", "expired", "denied"]
+class DeviceFlowPollStatus(StrEnum):
+    PENDING = "pending"
+    SLOW_DOWN = "slow_down"
+    AUTHORIZED = "authorized"
+    EXPIRED = "expired"
+    DENIED = "denied"
 
 
 class DeviceFlowPollResponse(BaseModel):

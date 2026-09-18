@@ -17,6 +17,7 @@ from measure.ha_app.session import (
 )
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant.client import HomeAssistantManager
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.spec import HassPowerMeterSpec
 from measure.request import DummyLoadCalibrationRequest, LightMeasurementRequest
@@ -138,6 +139,32 @@ def test_service_preserves_logger_configuration_and_redacts_failure(tmp_path: Pa
         assert logger.handlers == previous_handlers
     finally:
         logger.setLevel(previous_level)
+
+
+def test_service_redacts_tapo_credentials_from_logs_and_failures(tmp_path: Path) -> None:
+    credentials = TapoCredentials(username="user@example.com", password="account-password")  # noqa: S106
+    service = MeasurementService(
+        HomeAssistantManager("ws://supervisor/core/websocket", "ha-token"),
+        kasa_credentials=credentials,
+    )
+    events: list[SessionEvent] = []
+    control = SessionControl()
+    control.subscribe(events.append)
+    message = f"Authentication failed for {credentials.username}: {credentials.password}"
+
+    def fail(*_: object) -> RunnerResult:
+        logging.getLogger("measure").warning(message)
+        raise RuntimeError(message)
+
+    with (
+        patch.object(service, "_run", side_effect=fail),
+        pytest.raises(RuntimeError) as error,
+    ):
+        service.run(MagicMock(), control, SessionExecutionContext(session_id="test", artifact_directory=tmp_path))
+
+    expected = "Authentication failed for [REDACTED]: [REDACTED]"
+    assert str(error.value) == expected
+    assert [event.data["message"] for event in events if event.type == SessionEventType.WARNING] == [expected]
 
 
 def test_concurrent_services_capture_only_their_own_log_context(tmp_path: Path) -> None:

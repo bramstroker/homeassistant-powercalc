@@ -10,6 +10,7 @@ from measure.analyser.models import (
     ActivityReport,
     AnalysisCandidate,
     AnalysisMetrics,
+    AnalysisStatus,
     EvaluatedCandidate,
     ProfileAnalysisStrategy,
     RecorderAnalysisResult,
@@ -82,7 +83,7 @@ class RecorderAnalyser:
         evaluation = _select_candidate(evaluated)
         selected = evaluation.candidate
         return RecorderAnalysisResult(
-            status="model_ready",
+            status=AnalysisStatus.MODEL_READY,
             sample_count=len(samples),
             strategy=selected.strategy_id,
             feature=selected.feature,
@@ -242,7 +243,7 @@ def _build_insufficient_data_result(
     reports: Sequence[ActivityReport] = (),
 ) -> RecorderAnalysisResult:
     return RecorderAnalysisResult(
-        status="insufficient_data",
+        status=AnalysisStatus.INSUFFICIENT_DATA,
         sample_count=len(samples),
         reason=reason,
         warnings=list(warnings),

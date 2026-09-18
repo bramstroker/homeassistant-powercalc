@@ -25,6 +25,7 @@ from measure.ha_app.contribution.models import (
     ContributionService,
     ContributionSubmissionResult,
     DeviceFlowPollResponse,
+    DeviceFlowPollStatus,
     DeviceFlowStart,
 )
 from measure.ha_app.contribution.service import SharedContributionService
@@ -35,6 +36,7 @@ from measure.ha_app.routes.measurement import _power_meter_spec
 from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType, SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistantManager
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.diagnostics import PowerMeterDiagnostics
 from measure.powermeter.powermeter import PowerMeter, PowerMeterDiagnosticSample
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, KasaPowerMeterSpec
@@ -247,7 +249,7 @@ class FakeContributionService(ContributionService):
         del client_id, device_code
         self.username = "oauth-user"
         return DeviceFlowPollResponse(
-            status="authorized",
+            status=DeviceFlowPollStatus.AUTHORIZED,
             auth=ContributionAuthStatus(
                 authenticated=True,
                 connected=True,
@@ -272,12 +274,8 @@ class FakeContributionService(ContributionService):
             session_id=session_id,
             eligible=True,
             home_assistant={"integration": integration},
-            manufacturer_name=payload.manufacturer_name,
             manufacturer_directory="signify",
-            model_id=payload.model_id,
-            product_name=payload.product_name,
-            contributor=payload.contributor,
-            notes=payload.notes,
+            **payload.model_dump(exclude_none=True),
             files=[
                 ContributionFile(
                     name="model.json",
@@ -756,6 +754,10 @@ def test_tapo_credentials_are_kept_out_of_preferences_and_are_available_to_the_k
     assert (tmp_path / "tapo_credentials.json").stat().st_mode & 0o777 == 0o600
     settings = test_client.app.state.context.storage.load_settings()
     assert _power_meter_spec(settings) == KasaPowerMeterSpec(device_ip="192.0.2.31")
+    credentials = test_client.app.state.context.get_tapo_credentials()
+    assert isinstance(credentials, TapoCredentials)
+    assert credentials.username == payload["tapo_username"]
+    assert credentials.password == payload["tapo_password"]
 
     cleared = test_client.put(
         "/api/settings",
@@ -808,6 +810,46 @@ def test_power_meter_test_endpoint(tmp_path: Path) -> None:
     assert validated.json()["supports_voltage"] is False
     assert validated.json()["precision_decimals"] == 1
     assert validated.json()["update_interval_status"] == "poor"
+
+
+@pytest.mark.parametrize(
+    "credential_settings,expected_username",
+    [
+        ({"tapo_username": "entered@example.com", "tapo_password": "entered-password"}, "entered@example.com"),
+        ({}, "saved@example.com"),
+        ({"clear_tapo_credentials": True}, None),
+    ],
+)
+def test_power_meter_test_uses_selected_tapo_credentials_without_saving(
+    tmp_path: Path,
+    credential_settings: dict[str, object],
+    expected_username: str | None,
+) -> None:
+    test_client = client(tmp_path)
+    storage = test_client.app.state.context.storage
+    saved = TapoCredentials(username="saved@example.com", password="saved-password")  # noqa: S106
+    storage.save_tapo_credentials(saved)
+    meter = MagicMock(spec=PowerMeter)
+    meter.has_voltage_support.return_value = False
+    meter.diagnostic_sample.return_value = PowerMeterDiagnosticSample(power=5.1, raw_value="5.1", reported_at=1)
+
+    with patch("measure.powermeter.kasa.KasaPowerMeter", return_value=meter) as create_meter:
+        response = test_client.post(
+            "/api/settings/test-power-meter",
+            json={"power_meter": "kasa", "kasa_ip": "192.0.2.31"} | credential_settings,
+        )
+
+    assert response.status_code == 200
+    assert response.json()["success"] is True
+    create_meter.assert_called_once()
+    credentials = create_meter.call_args.kwargs["credentials"]
+    if expected_username is None:
+        assert credentials is None
+    else:
+        assert isinstance(credentials, TapoCredentials)
+        assert credentials.username == expected_username
+        assert credentials.password == credential_settings.get("tapo_password", saved.password)
+    assert storage.load_tapo_credentials() == saved
 
 
 def test_shelly_discovery_endpoint(tmp_path: Path) -> None:
@@ -1510,6 +1552,81 @@ def test_measurement_can_complete_without_product_identity(tmp_path: Path) -> No
     assert draft.status_code == 200
     assert draft.json()["model_id"] == "Hue White Ambiance"
     assert draft.json()["product_name"] == ""
+
+
+@pytest.mark.parametrize(
+    "preview_details,submitted_details,matches",
+    [
+        ({}, {"manufacturer_name": "Other"}, False),
+        ({}, {"model_id": "Other"}, False),
+        ({}, {"product_name": "Other"}, False),
+        ({}, {"contributor": "Other"}, False),
+        ({}, {"contributor_github": "octo"}, False),
+        ({}, {"contributor_email": "octo@example.com"}, False),
+        ({}, {"aliases": ["Other"]}, False),
+        ({}, {"gtins": ["8719514340105"]}, False),
+        ({}, {"product_url": "https://example.com"}, False),
+        ({}, {"mains_voltage": 230}, False),
+        ({}, {"device_specs": {"power": 10}}, False),
+        ({}, {"measure_device": "Meter"}, False),
+        ({}, {"measure_device_firmware": "1.0"}, False),
+        ({}, {"measure_description": "Test run"}, False),
+        ({}, {"notes": "Changed"}, False),
+        ({}, {}, True),
+        (
+            {},
+            {
+                "contributor_github": "",
+                "contributor_email": "",
+                "product_url": "",
+                "measure_device": "",
+                "measure_device_firmware": "",
+                "measure_description": "",
+            },
+            True,
+        ),
+        ({"aliases": ["A", "B"]}, {"aliases": ["B", "A"]}, False),
+        (
+            {"device_specs": {"power": 10, "nested": {"a": 1, "b": 2}}},
+            {"device_specs": {"nested": {"b": 2, "a": 1}, "power": 10}},
+            True,
+        ),
+        ({"device_specs": {"value": 1}}, {"device_specs": {"value": True}}, False),
+        ({"device_specs": {"value": 1}}, {"device_specs": {"value": 1.0}}, False),
+        ({"device_specs": {}}, {"device_specs": None}, False),
+    ],
+)
+def test_contribution_submission_must_match_preview(
+    tmp_path: Path,
+    preview_details: dict[str, object],
+    submitted_details: dict[str, object],
+    matches: bool,
+) -> None:
+    test_client = client(tmp_path)
+    service = FakeContributionService()
+    service.username = "measure-user"
+    context = test_client.app.state.context
+    context.contribution = ContributionApiCoordinator(context.storage, service_factory=lambda: service)
+    started = test_client.post("/api/sessions", json=payload())
+    session_id = started.json()["session_id"]
+    assert context.coordinator._worker is not None  # noqa: SLF001
+    context.coordinator._worker.join(timeout=5)  # noqa: SLF001
+    metadata = {
+        "manufacturer_name": "Signify",
+        "model_id": "LCT010",
+        "product_name": "Test light",
+        "contributor": "measure-user",
+    }
+    endpoint = f"/api/sessions/{session_id}/contribution"
+    preview = test_client.post(f"{endpoint}/preview", json=metadata | preview_details)
+    assert preview.status_code == 200
+
+    submitted = test_client.post(endpoint, json=metadata | submitted_details | {"confirmed": True})
+
+    assert submitted.status_code == (200 if matches else 409)
+    assert service.submit_calls == int(matches)
+    if not matches:
+        assert submitted.json()["code"] == "preview_required"
 
 
 def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

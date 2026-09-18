@@ -11,7 +11,7 @@ from measure.contribution.coordinator import (
     ContributionJobExpiredError,
     ContributionJobStore,
 )
-from measure.contribution.credentials import CredentialStore, StoredCredential
+from measure.contribution.credentials import CredentialKind, CredentialStore, StoredCredential
 from measure.contribution.github import GitHubApiError
 from measure.ha_app.contribution.models import (
     ContributionApiError,
@@ -50,7 +50,7 @@ def session(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> ContributionSess
     monkeypatch.setattr(github, "get_file", MagicMock(return_value=b"{}"))
     monkeypatch.setattr("measure.ha_app.contribution.service.GitHubClient", lambda _token: github)
     CredentialStore(tmp_path / "contribution/credentials.json").save(
-        StoredCredential(kind="pat", token="test-token", github_username="octo"),  # noqa: S106
+        StoredCredential(kind=CredentialKind.PAT, token="test-token", github_username="octo"),  # noqa: S106
     )
     artifacts = tmp_path / "artifacts"
     artifacts.mkdir()
