@@ -1,3 +1,4 @@
+from dataclasses import replace
 import json
 import logging
 from pathlib import Path
@@ -191,6 +192,40 @@ def test_storage_round_trips_bounded_event_replay(tmp_path: Path) -> None:
 
     assert [event.sequence for event in events] == [2, 3]
     assert [event.sequence for event in all_events] == [1, 2, 3]
+
+
+def test_clearing_current_session_retains_history_and_allows_reselection(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot(SessionState.COMPLETED)
+    measurement_request = light_request()
+    storage.create(current, measurement_request)
+
+    storage.clear_current()
+    storage.clear_current()
+
+    assert storage.load_current() is None
+    assert storage.load_snapshot(current.id) == current
+    assert storage.load_request(current.id) == measurement_request
+    assert [item.id for item in storage.list_sessions()] == [current.id]
+
+    storage.set_current(current.id)
+
+    assert storage.load_current() == current
+
+
+def test_repeated_session_deletion_preserves_another_current_session(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    previous = snapshot(SessionState.COMPLETED)
+    storage.create(previous, light_request())
+    current = replace(previous, id="current-session")
+    storage.create(current, light_request())
+
+    storage.delete_session(previous.id)
+    storage.delete_session(previous.id)
+
+    assert not storage.session_directory(previous.id).exists()
+    assert storage.load_current() == current
+    assert [item.id for item in storage.list_sessions()] == [current.id]
 
 
 def test_storage_recovers_from_truncated_final_event(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
