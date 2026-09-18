@@ -99,12 +99,14 @@ def test_device_spec_conditions_override_only_matching_device_types() -> None:
         {"type": "array"},
         {"$ref": "#/$defs/missing"},
         {"oneOf": [{"type": "string"}, {"type": "number"}]},
+        {"$ref": "#/$defs/scalar/nested"},
     ],
 )
 def test_device_spec_fields_skip_unsupported_fields_without_losing_supported_ones(
     unsupported_field: dict[str, object],
 ) -> None:
     schema = {
+        "$defs": {"scalar": "not an object"},
         "properties": {
             "device_type": {"enum": ["light"]},
             "device_specs": {"properties": {"unsupported": unsupported_field, "rated_power": {"type": "number"}}},
@@ -126,3 +128,44 @@ def test_device_spec_fields_ignore_conditions_that_also_depend_on_other_properti
     }
 
     assert device_spec_fields(schema) == {"light": []}
+
+
+@pytest.mark.parametrize(
+    "condition",
+    [
+        "unusable",
+        {"if": {"properties": {"device_type": {"const": "light"}}}, "then": {}},
+        {"if": {"properties": {"device_type": {"const": "light"}}}, "then": {"properties": {}}},
+        {"if": "unusable", "then": {}},
+        {"if": {"properties": {"device_type": "unusable"}}, "then": {}},
+        {"if": {"properties": {"device_type": {"type": "string"}}}, "then": {}},
+    ],
+)
+def test_unrelated_or_unusable_conditions_preserve_base_fields(condition: object) -> None:
+    schema = {
+        "properties": {
+            "device_type": {"enum": ["light"]},
+            "device_specs": {"properties": {"rated_power": {"type": "number"}}},
+        },
+        "allOf": [condition],
+    }
+
+    assert device_spec_fields(schema) == {"light": [DeviceSpecField("rated_power", "Rated power", "", "number")]}
+
+
+def test_composed_specs_keep_supported_fields_in_declaration_order() -> None:
+    schema = {
+        "properties": {
+            "device_type": {"enum": ["light"]},
+            "device_specs": {
+                "allOf": [
+                    {"properties": {"rated_power": {"type": "number"}}},
+                    False,
+                    {"properties": {"lumens": {"type": "integer"}}},
+                ],
+                "properties": {"description": {"type": "string"}, "unsupported": False},
+            },
+        },
+    }
+
+    assert [field.name for field in device_spec_fields(schema)["light"]] == ["rated_power", "lumens", "description"]
