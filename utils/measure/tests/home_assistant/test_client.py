@@ -364,9 +364,18 @@ def test_manager_reconnects_once_when_read_fails_on_closed_websocket() -> None:
     reconnected_client.get_entities.assert_called_once_with()
 
 
-def test_manager_does_not_retry_non_connection_errors() -> None:
+@pytest.mark.parametrize("wrap_error", [False, True], ids=["direct", "chained"])
+def test_manager_does_not_retry_non_connection_errors(wrap_error: bool) -> None:
+    def get_entities() -> None:
+        try:
+            raise ValueError("invalid entity response")
+        except ValueError as error:
+            if wrap_error:
+                raise RuntimeError("invalid entity response") from error
+            raise
+
     client = MagicMock(spec=HomeAssistantWebsocketClient)
-    client.get_entities.side_effect = ValueError("invalid entity response")
+    client.get_entities.side_effect = get_entities
     client_factory = MagicMock(return_value=client)
     manager = HomeAssistantManager(
         "ws://127.0.0.1:8123/api/websocket",
@@ -374,10 +383,12 @@ def test_manager_does_not_retry_non_connection_errors() -> None:
         client_factory=client_factory,
     )
 
-    with pytest.raises(ValueError, match="invalid entity response"):
+    expected_error = RuntimeError if wrap_error else ValueError
+    with pytest.raises(expected_error, match="invalid entity response"):
         manager.get_entities()
 
     client_factory.assert_called_once_with("ws://127.0.0.1:8123/api/websocket", "token")
+    client.get_entities.assert_called_once_with()
     client.close.assert_not_called()
 
 
