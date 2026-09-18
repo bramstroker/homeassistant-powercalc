@@ -3,7 +3,7 @@ from typing import Any
 from unittest.mock import Mock
 
 from measure.controller.charging.spec import DummyChargingControllerSpec, HassChargingControllerSpec
-from measure.controller.fan.spec import HassFanControllerSpec
+from measure.controller.fan.spec import DummyFanControllerSpec, HassFanControllerSpec
 from measure.controller.light.const import LutMode
 from measure.controller.light.spec import (
     DummyLightControllerSpec,
@@ -120,6 +120,31 @@ def test_preflight_accepts_dummy_charging_controller_in_developer_mode() -> None
 
     assert result.battery_level_entity_id is None
     assert result.battery_level_attribute is None
+
+
+@pytest.mark.parametrize(
+    "measurement_request",
+    [
+        SpeakerMeasurementRequest(power_meter=DummyPowerMeterSpec(), controller=DummyMediaControllerSpec()),
+        FanMeasurementRequest(power_meter=DummyPowerMeterSpec(), controller=DummyFanControllerSpec()),
+    ],
+)
+def test_developer_preflight_accepts_synthetic_controllers_without_home_assistant_entities(
+    measurement_request: SpeakerMeasurementRequest | FanMeasurementRequest,
+) -> None:
+    checker = preflight({}, developer_mode=True)
+
+    result = checker.validate(measurement_request)
+
+    assert result.warnings == []
+    assert result.power_meter_diagnostic is not None
+    assert result.power_meter_diagnostic.success is True
+
+    real_meter_request = measurement_request.model_copy(
+        update={"power_meter": ShellyPowerMeterSpec(device_ip="192.0.2.1")}
+    )
+    with pytest.raises(PreflightError, match="Dummy controllers require developer mode"):
+        preflight({}, developer_mode=False).validate(real_meter_request)
 
 
 def test_dummy_load_requires_known_voltage_capability_even_after_successful_reading() -> None:
