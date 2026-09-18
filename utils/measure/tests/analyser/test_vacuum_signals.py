@@ -190,3 +190,32 @@ def test_disabled_sleep_status_is_ignored() -> None:
     items = [sample(**{"sensor.state": "charging_completed", "sensor.status": "sleeping"})]
     signals = discover_signals(items, context(entity("state"), replace(entity("status"), disabled_by="user")))
     assert resolve_activity(items[0], signals) == "completed"
+
+
+def test_unavailable_action_sensor_does_not_override_standard_vacuum_activities() -> None:
+    descriptor = entity("mop_drying", "switch", "roborock")
+    items = [
+        sample("docked", **{descriptor.entity_id: "unavailable"}),
+        sample("cleaning", **{descriptor.entity_id: "unknown"}),
+    ]
+
+    signals = discover_signals(items, context(descriptor))
+
+    assert all(signal.feature.entity_id != descriptor.entity_id for signal in signals)
+    assert [resolve_activity(item, signals) for item in items] == [Activity.DOCKED, Activity.AWAY]
+
+
+def test_numeric_action_attributes_are_not_interpreted_as_boolean_flags() -> None:
+    items = [
+        RecordingSample(
+            index,
+            5,
+            {PRIMARY: RecordedEntityState(state, {"drying": value})},
+        )
+        for index, (state, value) in enumerate([("docked", 0), ("cleaning", 1)])
+    ]
+
+    signals = discover_signals(items, context())
+
+    assert all(signal.feature.attribute != "drying" for signal in signals)
+    assert [resolve_activity(item, signals) for item in items] == [Activity.DOCKED, Activity.AWAY]
