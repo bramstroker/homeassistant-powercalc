@@ -132,6 +132,27 @@ def test_manager_passes_entity_identifiers_to_shared_client() -> None:
         manager.close()
 
 
+@pytest.mark.parametrize("disconnect", [False, True])
+def test_manager_retrieves_states_and_recovers_from_a_disconnect(disconnect: bool) -> None:
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    states = (State(entity_id="vacuum.robot", state="docked", attributes={"battery_level": 80}),)
+    client.get_states.return_value = states
+    disconnected_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    disconnected_client.get_states.side_effect = EOFError("Connection closed")
+    factory = MagicMock(side_effect=[disconnected_client, client] if disconnect else [client])
+    manager = HomeAssistantManager("http://ha.lan:8123", "token", client_factory=factory, keepalive_interval=0)
+
+    try:
+        assert manager.get_states() == states
+        client.get_states.assert_called_once_with()
+        client.connect.assert_called_once_with()
+        assert factory.call_count == (2 if disconnect else 1)
+        if disconnect:
+            disconnected_client.close.assert_called_once_with()
+    finally:
+        manager.close()
+
+
 def test_manager_returns_registry_data_as_lists() -> None:
     client = MagicMock(spec=HomeAssistantWebsocketClient)
     entry = EntityRegistryEntry.from_json(_entity_registry_entry(entity_id="sensor.battery", unique_id="battery"))

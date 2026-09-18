@@ -274,6 +274,43 @@ def test_catalog_exposes_group_members_and_infers_their_shared_model() -> None:
     assert group.manufacturer == "Signify"
 
 
+@pytest.mark.parametrize("missing_member", [False, True])
+def test_nested_group_metadata_respects_registered_groups_and_missing_members(missing_member: bool) -> None:
+    data = _entity_data()
+    data.entities["light"].entities["registered_group"] = _entity(
+        "light.registered_group",
+        "on",
+        supported_color_modes=["brightness"],
+    )
+    data.entities["light"].entities["registered_group"].state.attributes["entity_id"] = ["light.desk"]
+    data.entity_registry.append(
+        SimpleNamespace(entity_id="light.registered_group", device_id="group-device", platform="hue")
+    )
+    data.device_registry.append(
+        {"id": "group-device", "manufacturer": "Group manufacturer", "model_id": "GROUP-1", "model": "Registered group"}
+    )
+    members = ["light.registered_group", "light.missing"] if missing_member else ["light.registered_group"]
+    data.entities["light"].entities["outer_group"] = _entity(
+        "light.outer_group", "on", supported_color_modes=["brightness"]
+    )
+    data.entities["light"].entities["outer_group"].state.attributes["entity_id"] = members
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+
+    snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
+    lights = {light.entity_id: light for light in snapshot.select(domain=EntityDomain.LIGHT)}
+
+    registered = lights["light.registered_group"]
+    assert registered.model_id == "GROUP-1"
+    assert registered.product_name == "Registered group"
+    assert registered.manufacturer == "Group manufacturer"
+    outer = lights["light.outer_group"]
+    assert outer.member_entity_ids == members
+    assert outer.model_id == (None if missing_member else "GROUP-1")
+    assert outer.product_name == (None if missing_member else "Registered group")
+    assert outer.manufacturer == (None if missing_member else "Group manufacturer")
+
+
 def test_snapshot_requires_exactly_one_entity_filter() -> None:
     home_assistant = MagicMock(spec=HomeAssistantManager)
     home_assistant.get_entity_data.return_value = _entity_data()
