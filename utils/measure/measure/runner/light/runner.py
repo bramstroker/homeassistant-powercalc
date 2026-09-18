@@ -553,7 +553,8 @@ class LightControl:
 
     def change_state_with_retry(self, mode: LutMode, **kwargs: int | str) -> None:
         """Retry connection failures, checking for cancellation before each attempt."""
-        for attempt in range(MAX_LIGHT_COMMAND_ATTEMPTS):
+        # Success returns; exhausting the fixed retry budget always raises.
+        for attempt in range(MAX_LIGHT_COMMAND_ATTEMPTS):  # pragma: no branch
             if self._checkpoint is not None:
                 self._checkpoint()
             try:
