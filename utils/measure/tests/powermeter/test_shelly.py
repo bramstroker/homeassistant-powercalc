@@ -235,6 +235,30 @@ def test_api_gen2_unavailable(mock_requests_get_factory: MockRequestsGetFactory)
         ShellyPowerMeter(DEFAULT_SHELLY_IP)
 
 
+@pytest.mark.parametrize("component_key", ["unknown:0", "meter:0", "switch:not-a-number", "switch"])
+@pytest.mark.parametrize("has_supported_component", [False, True])
+def test_rpc_ignores_unsupported_components(
+    mock_requests_get_factory: MockRequestsGetFactory, component_key: str, has_supported_component: bool
+) -> None:
+    status = {component_key: {"apower": 2.0}}
+    if has_supported_component:
+        status["switch:1"] = {"apower": 3.0}
+    mock_requests_get_factory(
+        {
+            SHELLY_ENDPOINT: ({"gen": 3}, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Shelly.GetStatus": (status, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Switch.GetStatus?id=1": ({"apower": 3.0}, 200),
+        }
+    )
+
+    if has_supported_component:
+        meter = ShellyPowerMeter(DEFAULT_SHELLY_IP)
+        assert meter.get_power().power == 3.0
+    else:
+        with pytest.raises(ApiConnectionError, match="No supported power measurement component"):
+            ShellyPowerMeter(DEFAULT_SHELLY_IP)
+
+
 def test_multiple_power_components_are_rejected(mock_requests_get_factory: MockRequestsGetFactory) -> None:
     mock_requests_get_factory(
         {

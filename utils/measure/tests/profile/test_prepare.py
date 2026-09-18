@@ -102,6 +102,30 @@ def write_library_index(tmp_path: Path, *, full_name: bool = False, model_aliase
     index.write_text(json.dumps({"manufacturers": [manufacturer]}), encoding="utf-8")
 
 
+@pytest.mark.parametrize("contents", ["not json", "[]", "null"])
+def test_duplicate_scan_skips_malformed_profiles_and_keeps_valid_warnings(tmp_path: Path, contents: str) -> None:
+    write_library(tmp_path)
+    broken_profile = library_root(tmp_path) / "other" / "BROKEN"
+    broken_profile.mkdir(parents=True)
+    (broken_profile / "model.json").write_text(contents, encoding="utf-8")
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts, name=EXISTING_MODEL_NAME)
+
+    preview = make_preparer(tmp_path).prepare(artifacts, metadata())
+
+    assert list(preview.warnings) == [
+        f"Possible duplicate profile: profile_library/{EXISTING_DIRECTORY}/{EXISTING_MODEL_ID}/model.json"
+    ]
+
+
+def test_manufacturer_without_usable_directory_characters_is_rejected(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+
+    with pytest.raises(ProfilePreparationError, match="Manufacturer directory cannot be empty"):
+        make_preparer(tmp_path).prepare(artifacts, metadata(manufacturer="灯具"))
+
+
 def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_unchanged(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
     write_library(tmp_path)
