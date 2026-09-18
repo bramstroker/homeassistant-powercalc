@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 from measure.ha_app import library_catalog
 from measure.ha_app.library_catalog import (
     FULL_LIBRARY_ENDPOINT,
@@ -5,6 +7,9 @@ from measure.ha_app.library_catalog import (
     LibraryCatalogError,
     ManufacturerCatalog,
     MeasureDeviceCatalog,
+    _CachedLoader,
+    _load_published_library,
+    _load_published_model_schema,
     extract_manufacturers,
     extract_measure_devices,
     resolve_manufacturer_name,
@@ -45,6 +50,8 @@ def test_extract_measure_devices_returns_canonical_unique_hardware_names() -> No
                     {"measure_device": "From manufacturer specifications"},
                     {"measure_device": "TP-Link Kasa KP115"},
                     {"measure_device": None},
+                    {"measure_device": " "},
+                    "invalid",
                 ],
             },
             {"models": [{"measure_device": "See linked profile"}]},
@@ -63,6 +70,8 @@ def test_extract_manufacturers_prefers_full_names_and_removes_case_duplicates() 
             {"name": "SIGNIFY", "models": []},
             {"name": " IKEA ", "models": []},
             {"name": "", "models": []},
+            {"name": " "},
+            {"name": 42},
             "invalid",
         ],
     }
@@ -148,3 +157,101 @@ def test_device_specification_catalog_extracts_schema_fields() -> None:
     assert [field.name for field in catalog.fields()["generic_iot"]] == ["rated_power"]
     catalog.fields()["generic_iot"].clear()
     assert [field.name for field in catalog.fields()["generic_iot"]] == ["rated_power"]
+
+
+def test_manufacturer_resolution_ignores_invalid_names_and_aliases() -> None:
+    catalog = ManufacturerCatalog(
+        loader=lambda: {
+            "manufacturers": [
+                {"name": " ", "aliases": ["Invalid"]},
+                {"name": 42, "aliases": ["Invalid"]},
+                {"name": "Shelly", "aliases": "Not an alias list"},
+                {"name": "Signify", "aliases": [None, 42, " ", " Philips ", "Shelly"]},
+            ],
+        },
+    )
+
+    assert catalog.canonical_name(" Philips ") == "Signify"
+    assert catalog.canonical_name("Shelly") == "Shelly"
+    assert catalog.canonical_name("Invalid") == "Invalid"
+    assert catalog.canonical_name("Not an alias list") == "Not an alias list"
+    assert catalog.canonical_name("  ") == ""
+
+
+def test_manufacturer_resolution_preserves_loader_failure_cause() -> None:
+    failure = OSError("Library unavailable")
+    catalog = ManufacturerCatalog(loader=MagicMock(side_effect=failure))
+
+    with pytest.raises(LibraryCatalogError, match="Could not load manufacturers") as error:
+        catalog.canonical_name("Shelly")
+
+    assert error.value.__cause__ is failure
+
+
+@pytest.mark.parametrize("schema", [None, [], "invalid"])
+def test_device_specification_catalog_rejects_non_object_schemas(schema: object) -> None:
+    catalog = DeviceSpecificationCatalog(loader=lambda: schema)
+
+    with pytest.raises(LibraryCatalogError, match="Could not load device specifications") as error:
+        catalog.fields()
+
+    assert isinstance(error.value.__cause__, TypeError)
+
+
+def test_device_specification_catalog_preserves_loader_failure_cause() -> None:
+    failure = OSError("Schema unavailable")
+    catalog = DeviceSpecificationCatalog(loader=MagicMock(side_effect=failure))
+
+    with pytest.raises(LibraryCatalogError, match="Could not load device specifications") as error:
+        catalog.fields()
+
+    assert error.value.__cause__ is failure
+
+
+def test_default_manufacturer_catalog_reuses_library_until_cache_expires(monkeypatch: pytest.MonkeyPatch) -> None:
+    response = MagicMock()
+    response.json.return_value = {"manufacturers": [{"name": "Shelly", "aliases": ["Shelly Europe"]}]}
+    get = MagicMock(return_value=response)
+    clock = MagicMock(return_value=100.0)
+    monkeypatch.setattr(library_catalog.requests, "get", get)
+    monkeypatch.setattr(library_catalog, "monotonic", clock)
+    monkeypatch.setattr(
+        library_catalog,
+        "_cached_library",
+        _CachedLoader(_load_published_library),
+    )
+
+    assert ManufacturerCatalog().manufacturers() == ["Shelly"]
+    clock.return_value = 699.0
+    assert ManufacturerCatalog().canonical_name("Shelly Europe") == "Shelly"
+    get.assert_called_once_with(library_catalog.LIBRARY_ENDPOINT, timeout=15)
+
+    response.json.return_value = {"manufacturers": [{"name": "IKEA"}]}
+    clock.return_value = 700.0
+    assert ManufacturerCatalog().manufacturers() == ["IKEA"]
+    assert get.call_count == 2
+    assert response.raise_for_status.call_count == 2
+
+
+def test_default_schema_catalog_retries_after_http_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    response = MagicMock()
+    failure = library_catalog.requests.HTTPError("Service unavailable")
+    response.raise_for_status.side_effect = [failure, None]
+    response.json.return_value = {"properties": {}}
+    get = MagicMock(return_value=response)
+    monkeypatch.setattr(library_catalog.requests, "get", get)
+    monkeypatch.setattr(
+        library_catalog,
+        "_cached_model_schema",
+        _CachedLoader(_load_published_model_schema),
+    )
+
+    with pytest.raises(LibraryCatalogError) as error:
+        DeviceSpecificationCatalog().fields()
+
+    assert error.value.__cause__ is failure
+    response.json.assert_not_called()
+    assert DeviceSpecificationCatalog().fields() == {}
+    assert DeviceSpecificationCatalog().fields() == {}
+    assert get.call_count == 2
+    get.assert_called_with(library_catalog.MODEL_SCHEMA_ENDPOINT, timeout=15)
