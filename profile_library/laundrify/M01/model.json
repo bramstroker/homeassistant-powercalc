@@ -3,7 +3,7 @@
     "WLAN-Adapter mini"
   ],
   "calculation_strategy": "fixed",
-  "created_at": "2026-09-08T19:59:21Z",
+  "created_at": "2026-09-18T22:59:43Z",
   "device_type": "smart_switch",
   "device_specs": {
     "form_factor": "plug",
@@ -13,15 +13,15 @@
     ]
   },
   "discovery_by": "device",
-  "measure_description": "measured via the PowerCalc HA app",
-  "measure_device": "IKEA GRILLPLATS",
+  "measure_description": "measured using the PowerCalc HA app with a resistive dummy load (25W Osram E14 incandescent oven bulb)",
+  "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
   "mains_voltage": 230,
   "name": "WLAN-Adapter mini",
   "product_url": "https://laundrify.de/blog/laundrify-wlan-adapter-mini",
   "only_self_usage": true,
-  "standby_power": 0.9,
-  "standby_power_on": 0.9,
+  "standby_power": 0.686,
+  "standby_power_on": 0.983,
   "authors": [
     {
       "name": "ps1noob",
