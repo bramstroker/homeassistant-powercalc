@@ -265,6 +265,23 @@ def test_invalid_current_pointer_is_removed_without_deleting_retained_session(tm
     assert storage.load_snapshot(current.id) == current
 
 
+def test_output_download_rejects_symlinks_outside_data_root(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path / "measure-data")
+    current = snapshot()
+    storage.create(current, light_request())
+    external_file = tmp_path / "external.txt"
+    external_file.write_text("private external contents", encoding="utf-8")
+    linked_output = storage.output_directory(current.id) / "external.txt"
+    linked_output.symlink_to(external_file)
+
+    assert "external.txt" not in storage.list_files(current.id)
+    with pytest.raises(ValueError, match="Path escapes data root"):
+        storage.file_path(current.id, "external.txt")
+
+    assert external_file.read_text(encoding="utf-8") == "private external contents"
+    assert linked_output.is_symlink()
+
+
 def test_event_replay_ignores_blank_lines(tmp_path: Path) -> None:
     storage = SessionStorage(tmp_path)
     storage.create(snapshot(), light_request())
