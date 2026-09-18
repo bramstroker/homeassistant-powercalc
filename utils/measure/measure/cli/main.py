@@ -59,7 +59,7 @@ logging.basicConfig(
 )
 
 # homeassistant_api logs every websocket exchange at INFO; only surface those when debugging.
-if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
+if logging.getLogger().getEffectiveLevel() > logging.DEBUG:  # pragma: no branch - import-time logging configuration
     logging.getLogger("homeassistant_api").setLevel(logging.WARNING)
 
 
