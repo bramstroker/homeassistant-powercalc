@@ -149,6 +149,73 @@ def test_main_rejects_colormode_for_composite_diagram(tmp_path: Path) -> None:
         cli.main([str(model), "--kind=composite", "--colormode=brightness"])
 
 
+@pytest.mark.parametrize("output", [None, "auto", "custom.svg"])
+def test_main_renders_light_plot_to_selected_output(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, output: str | None
+) -> None:
+    brightness = tmp_path / "brightness.csv"
+    brightness.write_text("bri,watt\n1,1.5\n", encoding="utf-8")
+    rendered: list[tuple[PlotSpec, Path | None]] = []
+    monkeypatch.setattr(cli, "render_plot", lambda plot, path: rendered.append((plot, path)))
+    arguments = [str(brightness)]
+    if output is not None:
+        arguments.append(f"--output={output}")
+
+    cli.main(arguments)
+
+    expected_output = None if output is None else Path("brightness.png" if output == "auto" else output)
+    assert len(rendered) == 1
+    plot, destination = rendered[0]
+    assert destination == expected_output
+    assert plot.id == "brightness"
+    assert plot.series[0].points[0].x == 1
+    assert plot.series[0].points[0].y == 1.5
+
+
+def test_auto_plot_output_removes_compression_suffix() -> None:
+    assert cli.plot_output_path(Path("acme/brightness.csv.gz"), "auto") == Path("brightness.png")
+
+
+@pytest.mark.parametrize("force", [False, True])
+def test_main_generates_directory_plots_and_reports_count(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], force: bool
+) -> None:
+    (tmp_path / "brightness.csv").write_text("bri,watt\n1,1.5\n", encoding="utf-8")
+    (tmp_path / "brightness.png").write_bytes(b"existing")
+    (tmp_path / "brightness.svg").write_bytes(b"existing")
+    rendered: list[Path] = []
+    monkeypatch.setattr(cli, "render_plot", lambda plot, path: rendered.append(path))
+    arguments = [str(tmp_path)]
+    if force:
+        arguments.append("--force")
+
+    cli.main(arguments)
+
+    assert capsys.readouterr().out == f"Generated {2 if force else 0} plot(s).\n"
+    assert rendered == ([tmp_path / "brightness.png", tmp_path / "brightness.svg"] if force else [])
+
+
+@pytest.mark.parametrize("option", ["--output=auto", "--colormode=brightness", "--kind=composite"])
+def test_main_rejects_file_options_for_directory(
+    tmp_path: Path, option: str, capsys: pytest.CaptureFixture[str]
+) -> None:
+    with pytest.raises(SystemExit) as raised:
+        cli.main([str(tmp_path), option])
+
+    assert raised.value.code == 2
+    assert "can only be used with a file" in capsys.readouterr().err
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_main_reports_missing_input(tmp_path: Path) -> None:
+    missing = tmp_path / "missing.csv"
+
+    with pytest.raises(FileNotFoundError, match="File not found"):
+        cli.main([str(missing)])
+
+    assert list(tmp_path.iterdir()) == []
+
+
 def test_generate_directory_plots_ignores_invalid_model_json(tmp_path: Path) -> None:
     (tmp_path / "model.json").write_text("invalid", encoding="utf-8")
 
