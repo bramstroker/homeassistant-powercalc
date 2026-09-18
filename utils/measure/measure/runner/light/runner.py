@@ -142,7 +142,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         for measurement_info in measurements_to_run:
             voltages.extend(self.run_mode(measurement_info, progress))
 
-        if progress.remaining:
+        if progress.remaining:  # pragma: no cover - successful mode runs consume every planned variation
             raise RunnerError(f"Measurement ended with {len(progress.remaining)} incomplete variations")
 
         return RunnerResult(

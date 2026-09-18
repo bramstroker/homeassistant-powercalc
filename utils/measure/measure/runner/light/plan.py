@@ -271,7 +271,7 @@ def _variations_for_mode(
                 parameters.effect_bri_steps,
             )
         ]
-    raise RunnerError(f"Mode {mode} not supported")
+    raise RunnerError(f"Mode {mode} not supported")  # pragma: no cover - callers iterate LIGHT_MODE_ORDER
 
 
 def _inclusive_range(start: int, end: int, step: int) -> list[int]:
