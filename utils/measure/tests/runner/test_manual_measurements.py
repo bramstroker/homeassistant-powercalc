@@ -15,6 +15,15 @@ from measure.utils.sampling import MeasurementResult, PowerSampler
 import pytest
 
 
+def test_average_has_no_separate_standby_measurement() -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    runner = AverageRunner(sampler)
+
+    assert runner.measure_standby_power() == MeasurementResult(power=0, voltages=[])
+    sampler.take_measurement.assert_not_called()
+    sampler.take_average_measurement.assert_not_called()
+
+
 def test_average_reports_start_phase_after_confirmation() -> None:
     sampler = MagicMock(spec=PowerSampler)
     sampler.take_average_measurement.return_value = MeasurementResult(power=4.2, voltages=[])

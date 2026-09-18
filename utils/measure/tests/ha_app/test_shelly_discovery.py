@@ -240,6 +240,35 @@ def test_discovery_failure_keeps_manual_configuration_available() -> None:
     assert "manually" in str(result.message)
 
 
+@pytest.mark.parametrize("supported_first", [False, True])
+def test_same_device_at_multiple_addresses_prefers_supported_connection(supported_first: bool) -> None:
+    supported_address = "192.168.1.30"
+    unsupported_address = "192.168.1.31"
+    addresses = (
+        [supported_address, unsupported_address] if supported_first else [unsupported_address, supported_address]
+    )
+    home_assistant = FakeHomeAssistant(
+        [service("shelly-plug", "_shelly._tcp.local.", [address]) for address in addresses]
+    )
+    info = {"id": "shelly-plug", "model": "SNPL-00112EU", "gen": 2}
+    http_get = response_map(
+        {
+            f"http://{supported_address}/shelly": FakeResponse(info),
+            f"http://{supported_address}/rpc/Shelly.GetStatus": FakeResponse({"switch:0": {"apower": 1.0}}),
+            f"http://{unsupported_address}/shelly": FakeResponse(info),
+            f"http://{unsupported_address}/rpc/Shelly.GetStatus": FakeResponse({"wifi": {}}),
+        }
+    )
+
+    result = asyncio.run(ShellyDiscoveryService(home_assistant, http_get=http_get).discover())  # type: ignore[arg-type]
+
+    assert len(result.devices) == 1
+    assert result.devices[0].id == "shelly-plug"
+    assert result.devices[0].supported is True
+    assert result.devices[0].ip_address == supported_address
+    assert result.devices[0].reason is None
+
+
 def test_duplicate_advertisements_are_probed_once() -> None:
     duplicate = service("shelly-duplicate", "_shelly._tcp.local.", ["192.168.1.30"])
     home_assistant = FakeHomeAssistant((duplicate, duplicate | {"type": "_http._tcp.local."}))
