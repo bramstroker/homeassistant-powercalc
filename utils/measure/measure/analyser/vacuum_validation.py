@@ -17,9 +17,9 @@ def activity_reports(
     candidate: VacuumCompositeCandidate,
     samples: Sequence[RecordingSample],
     validation: Sequence[RecordingSample],
-) -> tuple[ActivityReport, ...]:
+) -> list[ActivityReport]:
     episodes = vacuum_episodes(samples, candidate.signals)
-    activities = tuple(dict.fromkeys(episode.activity for episode in episodes))
+    activities = list(dict.fromkeys(episode.activity for episode in episodes))
     transition_ids = {id(sample) for episode in episodes for sample in (episode.samples[0], episode.samples[-1])}
     reports: list[ActivityReport] = []
     for activity in activities:
@@ -44,7 +44,7 @@ def activity_reports(
                 energy=_energy(candidate, samples, held_out),
             )
         )
-    return tuple(reports)
+    return reports
 
 
 def _prediction_errors(candidate: VacuumCompositeCandidate, samples: Sequence[RecordingSample]) -> list[float]:

@@ -214,12 +214,12 @@ def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
         "vacuum_robot",
         "vacuum.robot",
         "vacuum_robot",
-        (
+        [
             primary,
             RecordedEntity("sensor.battery", "sensor", "battery"),
             RecordedEntity("sensor.state", "sensor", "tracked"),
-        ),
-        (RecordedEntity("sensor.disabled", "sensor", "disabled", disabled_by="integration", has_live_state=False),),
+        ],
+        [RecordedEntity("sensor.disabled", "sensor", "disabled", disabled_by="integration", has_live_state=False)],
     )
     result = RecorderRunner(measure_util, interaction, state_reader, context).run(request, str(tmp_path))
     metadata = json.loads((tmp_path / "record.jsonl").read_text().splitlines()[0])

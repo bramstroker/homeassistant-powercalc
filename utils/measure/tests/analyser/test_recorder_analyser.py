@@ -26,7 +26,7 @@ CONTEXT = AnalysisContext(
     recipe="generic",
     primary_entity_id="switch.device",
     device_type="generic_iot",
-    entities=(RecordedEntity("switch.device", "switch", "primary"),),
+    entities=[RecordedEntity("switch.device", "switch", "primary")],
 )
 
 
@@ -50,7 +50,7 @@ RECORDER_REGRESSION_CASES = (
             recipe="generic",
             primary_entity_id="media_player.kpn_diw7022",
             device_type="generic_iot",
-            entities=(RecordedEntity("media_player.kpn_diw7022", "media_player", "primary"),),
+            entities=[RecordedEntity("media_player.kpn_diw7022", "media_player", "primary")],
         ),
         strategy="fixed_states_power",
         feature=FeatureReference("media_player.kpn_diw7022", "state"),
@@ -189,14 +189,14 @@ def test_load_recording_accepts_typed_and_legacy_samples_and_reports_bad_lines(t
     loaded = load_recording(path)
 
     assert loaded.dataset.metadata is not None
-    assert loaded.dataset.samples == (sample(0, 1.2, "idle"),)
+    assert loaded.dataset.samples == [sample(0, 1.2, "idle")]
     assert len(loaded.warnings) == 1
     assert "Skipped 2 invalid recorder line(s)" in loaded.warnings[0]
     assert "line 3" in loaded.warnings[0]
 
     legacy = tmp_path / "legacy.jsonl"
     write_recording(legacy, [sample(1, 2.3, "active")], typed=False)
-    assert load_recording(legacy).dataset.samples == (sample(1, 2.3, "active"),)
+    assert load_recording(legacy).dataset.samples == [sample(1, 2.3, "active")]
 
 
 @pytest.mark.parametrize(
@@ -218,7 +218,7 @@ def test_load_recording_skips_unsupported_and_invalid_records(tmp_path: Path, re
 
     loaded = load_recording(path)
 
-    assert loaded.dataset.samples == ()
+    assert loaded.dataset.samples == []
     assert len(loaded.warnings) == (0 if record == {"record_type": "future"} else 1)
 
 
@@ -284,11 +284,23 @@ def test_recorded_entity_and_analysis_result_include_optional_evidence() -> None
         status="insufficient_data",
         sample_count=3,
         reason="more data",
-        warnings=("bad line",),
+        warnings=["bad line"],
     )
 
     assert entity.to_dict()["translation_key"] == "plug"
     assert result.to_dict()["warnings"] == ["bad line"]
+
+
+def test_analysis_results_do_not_share_default_collections() -> None:
+    first = RecorderAnalysisResult("insufficient_data", 0)
+    second = RecorderAnalysisResult("insufficient_data", 0)
+
+    first.warnings.append("Skipped an invalid sample")
+    first.features.append(FeatureReference("switch.device", "state"))
+
+    assert second.warnings == []
+    assert second.features == []
+    assert second.to_dict() == {"schema_version": 1, "status": "insufficient_data", "sample_count": 0}
 
 
 def test_analyser_selects_scalar_attribute_when_state_is_constant(tmp_path: Path) -> None:

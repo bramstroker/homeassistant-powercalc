@@ -26,8 +26,8 @@ class FixedStatesPowerCandidate:
     strategy_id: str = "fixed_states_power"
 
     @property
-    def features(self) -> tuple[FeatureReference, ...]:
-        return (self.feature,)
+    def features(self) -> list[FeatureReference]:
+        return [self.feature]
 
     def support_key(self, sample: RecordingSample) -> str | None:
         value = self.feature.value(sample)
@@ -84,16 +84,16 @@ class FixedStatesPowerStrategy(ProfileAnalysisStrategy):
         return min(candidates, key=lambda candidate: (_training_mae(candidate, samples), candidate.feature.identifier))
 
 
-def _features(samples: Sequence[RecordingSample], primary_entity_id: str) -> tuple[FeatureReference, ...]:
+def _features(samples: Sequence[RecordingSample], primary_entity_id: str) -> list[FeatureReference]:
     attributes: set[str] = set()
     for sample in samples:
         entity = sample.entities.get(primary_entity_id)
         if entity is not None:
             attributes.update(entity.attributes)
-    return (
+    return [
         FeatureReference(primary_entity_id, "state"),
         *(FeatureReference(primary_entity_id, "attribute", attribute) for attribute in sorted(attributes)),
-    )
+    ]
 
 
 def _fit_feature(

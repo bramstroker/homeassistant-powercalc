@@ -1,5 +1,5 @@
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import math
 from typing import Literal, Protocol
 
@@ -62,8 +62,8 @@ class RecordingSample:
 class AnalysisSplit:
     """Samples used to fit a model and independently validate it."""
 
-    training: tuple[RecordingSample, ...]
-    validation: tuple[RecordingSample, ...]
+    training: list[RecordingSample]
+    validation: list[RecordingSample]
     method: str | None = None
 
 
@@ -72,8 +72,8 @@ class AnalysisContext:
     recipe: str
     primary_entity_id: str
     device_type: str
-    entities: tuple[RecordedEntity, ...]
-    device_entities: tuple[RecordedEntity, ...] = ()
+    entities: list[RecordedEntity]
+    device_entities: list[RecordedEntity] = field(default_factory=list)
 
     def metadata_record(self) -> dict[str, object]:
         record: dict[str, object] = {
@@ -90,14 +90,14 @@ class AnalysisContext:
 
 @dataclass(frozen=True)
 class RecordingDataset:
-    samples: tuple[RecordingSample, ...]
+    samples: list[RecordingSample]
     metadata: Mapping[str, object] | None = None
 
 
 @dataclass(frozen=True)
 class LoadedRecording:
     dataset: RecordingDataset
-    warnings: tuple[str, ...] = ()
+    warnings: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -151,7 +151,7 @@ class AnalysisCandidate(Protocol):
     def feature(self) -> FeatureReference: ...
 
     @property
-    def features(self) -> tuple[FeatureReference, ...]: ...
+    def features(self) -> list[FeatureReference]: ...
 
     def support_key(self, sample: RecordingSample) -> str | None: ...
 
@@ -250,7 +250,7 @@ class ActivityReport:
 class EvaluatedCandidate:
     candidate: AnalysisCandidate
     metrics: AnalysisMetrics
-    activity_reports: tuple[ActivityReport, ...] = ()
+    activity_reports: list[ActivityReport] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -263,10 +263,10 @@ class RecorderAnalysisResult:
     metrics: AnalysisMetrics | None = None
     model_config_fragment: ModelConfigFragment | None = None
     standby_power: float | None = None
-    warnings: tuple[str, ...] = ()
-    features: tuple[FeatureReference, ...] = ()
+    warnings: list[str] = field(default_factory=list)
+    features: list[FeatureReference] = field(default_factory=list)
     validation_method: str | None = None
-    activity_reports: tuple[ActivityReport, ...] = ()
+    activity_reports: list[ActivityReport] = field(default_factory=list)
 
     @property
     def model_ready(self) -> bool:

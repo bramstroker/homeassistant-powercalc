@@ -36,10 +36,10 @@ def load_recording(path: Path) -> LoadedRecording:
                 invalid_records.append(f"line {line_number}: {error}")
                 continue
             samples.append(sample)
-    warnings: tuple[str, ...] = ()
+    warnings: list[str] = []
     if invalid_records:
-        warnings = (f"Skipped {len(invalid_records)} invalid recorder line(s); first was {invalid_records[0]}",)
-    return LoadedRecording(RecordingDataset(tuple(samples), metadata), warnings)
+        warnings.append(f"Skipped {len(invalid_records)} invalid recorder line(s); first was {invalid_records[0]}")
+    return LoadedRecording(RecordingDataset(samples, metadata), warnings)
 
 
 def load_recordings(paths: Sequence[Path]) -> LoadedRecording:
@@ -57,14 +57,14 @@ def load_recordings(paths: Sequence[Path]) -> LoadedRecording:
             raise ValueError("Combined recordings must describe the same recipe and entities")
     return LoadedRecording(
         RecordingDataset(
-            tuple(
+            [
                 replace(sample, recording_id=index)
                 for index, recording in enumerate(loaded)
                 for sample in recording.dataset.samples
-            ),
+            ],
             metadata,
         ),
-        tuple(warning for recording in loaded for warning in recording.warnings),
+        [warning for recording in loaded for warning in recording.warnings],
     )
 
 
@@ -81,10 +81,10 @@ def recording_context(fallback: AnalysisContext, metadata: Mapping[str, object] 
     ):
         return fallback
     entities = {entity.entity_id: entity for entity in _metadata_entities(metadata.get("entities"))}
-    selected = tuple(
+    selected = [
         replace(entities[entity.entity_id], role=entity.role) if entity.entity_id in entities else entity
         for entity in fallback.entities
-    )
+    ]
     return AnalysisContext(
         recipe=fallback.recipe,
         primary_entity_id=fallback.primary_entity_id,
@@ -94,9 +94,9 @@ def recording_context(fallback: AnalysisContext, metadata: Mapping[str, object] 
     )
 
 
-def _metadata_entities(value: object) -> tuple[RecordedEntity, ...]:
+def _metadata_entities(value: object) -> list[RecordedEntity]:
     if not isinstance(value, list):
-        return ()
+        return []
     result: list[RecordedEntity] = []
     for item in value:
         if not isinstance(item, dict) or not all(
@@ -123,7 +123,7 @@ def _metadata_entities(value: object) -> tuple[RecordedEntity, ...]:
                 has_live_state=item.get("has_live_state") if isinstance(item.get("has_live_state"), bool) else None,
             )
         )
-    return tuple(result)
+    return result
 
 
 def _parse_sample(record: dict[str, object]) -> RecordingSample:

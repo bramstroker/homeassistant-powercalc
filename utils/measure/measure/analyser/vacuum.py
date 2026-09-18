@@ -3,7 +3,7 @@
 from bisect import bisect_right
 from collections import defaultdict
 from collections.abc import Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from itertools import pairwise
 import math
 from statistics import median
@@ -44,7 +44,7 @@ class ChargingPoint:
 class VacuumBranch:
     activity: Activity
     power: float | None = None
-    calibration: tuple[ChargingPoint, ...] = ()
+    calibration: list[ChargingPoint] = field(default_factory=list)
 
     @property
     def complexity(self) -> int:
@@ -65,8 +65,8 @@ class VacuumBranch:
 
 @dataclass(frozen=True)
 class VacuumCompositeCandidate:
-    signals: tuple[ActivitySignal, ...]
-    branches: tuple[VacuumBranch, ...]
+    signals: list[ActivitySignal]
+    branches: list[VacuumBranch]
     battery: FeatureReference | None
     context: AnalysisContext
     strategy_id: str = "vacuum_composite"
@@ -76,11 +76,11 @@ class VacuumCompositeCandidate:
         return self.features[0]
 
     @property
-    def features(self) -> tuple[FeatureReference, ...]:
+    def features(self) -> list[FeatureReference]:
         features = [signal.feature for signal in self.signals]
         if self.battery is not None:
             features.append(self.battery)
-        return tuple(dict.fromkeys(features))
+        return list(dict.fromkeys(features))
 
     @property
     def complexity(self) -> int:
@@ -176,7 +176,7 @@ class VacuumCompositeStrategy(ProfileAnalysisStrategy):
             if isinstance(branch, StrategyNotApplicable):
                 return branch
             branches.append(branch)
-        return VacuumCompositeCandidate(signals, tuple(branches), battery, context)
+        return VacuumCompositeCandidate(signals, branches, battery, context)
 
 
 def _fit_branch(
@@ -253,16 +253,16 @@ def _charging_branch(
         return StrategyNotApplicable(
             "Charging has a battery coverage gap over 20 percentage points; record a continuous charging cycle"
         )
-    return VacuumBranch(Activity.CHARGING, calibration=tuple(points))
+    return VacuumBranch(Activity.CHARGING, calibration=points)
 
 
 @dataclass(frozen=True)
 class VacuumEpisode:
     activity: Activity | None
-    samples: tuple[RecordingSample, ...]
+    samples: list[RecordingSample]
 
 
-def vacuum_episodes(samples: Sequence[RecordingSample], signals: Sequence[ActivitySignal]) -> tuple[VacuumEpisode, ...]:
+def vacuum_episodes(samples: Sequence[RecordingSample], signals: Sequence[ActivitySignal]) -> list[VacuumEpisode]:
     episodes: list[VacuumEpisode] = []
     current: list[RecordingSample] = []
     previous: RecordingSample | None = None
@@ -271,13 +271,13 @@ def vacuum_episodes(samples: Sequence[RecordingSample], signals: Sequence[Activi
         label = resolve_activity(sample, signals)
         boundary = previous is not None and (label != activity or sample.recording_id != previous.recording_id)
         if boundary:
-            episodes.append(VacuumEpisode(activity, tuple(current)))
+            episodes.append(VacuumEpisode(activity, current))
             current = []
         current.append(sample)
         activity, previous = label, sample
     if current:
-        episodes.append(VacuumEpisode(activity, tuple(current)))
-    return tuple(episodes)
+        episodes.append(VacuumEpisode(activity, current))
+    return episodes
 
 
 def split_vacuum_samples(
@@ -307,11 +307,11 @@ def split_vacuum_samples(
         activity: [episode for episode in items if len(episode.samples) >= MIN_EPISODE_SAMPLES]
         for activity, items in grouped.items()
     }
-    recordings = tuple(dict.fromkeys(sample.recording_id for sample in samples))
+    recordings = list(dict.fromkeys(sample.recording_id for sample in samples))
     if len(recordings) > 1:
         held_out = recordings[-1]
-        training = tuple(sample for sample in samples if sample.recording_id != held_out)
-        validation = tuple(sample for sample in samples if sample.recording_id == held_out)
+        training = [sample for sample in samples if sample.recording_id != held_out]
+        validation = [sample for sample in samples if sample.recording_id == held_out]
         if all(
             any(episode.samples[0].recording_id == held_out for episode in items)
             and any(episode.samples[0].recording_id != held_out for episode in items)
@@ -334,7 +334,7 @@ def split_vacuum_samples(
         for sample in episode.samples
     )
     return AnalysisSplit(
-        training=tuple(sample for sample in samples if id(sample) not in validation_ids),
-        validation=tuple(sample for sample in samples if id(sample) in validation_ids),
+        training=[sample for sample in samples if id(sample) not in validation_ids],
+        validation=[sample for sample in samples if id(sample) in validation_ids],
         method="held_out_episodes",
     )

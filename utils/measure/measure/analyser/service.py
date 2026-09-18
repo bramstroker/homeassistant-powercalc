@@ -42,12 +42,12 @@ class RecorderAnalyser:
 
     def __init__(self, strategies: Sequence[ProfileAnalysisStrategy] | None = None) -> None:
         self._default_strategies = strategies is None
-        self.strategies = (
-            tuple(strategies) if strategies is not None else (FixedStatesPowerStrategy(), VacuumCompositeStrategy())
+        self.strategies: list[ProfileAnalysisStrategy] = (
+            list(strategies) if strategies is not None else [FixedStatesPowerStrategy(), VacuumCompositeStrategy()]
         )
 
     def analyse(self, recording_path: Path | Sequence[Path], context: AnalysisContext) -> RecorderAnalysisResult:
-        loaded = load_recordings((recording_path,) if isinstance(recording_path, Path) else recording_path)
+        loaded = load_recordings([recording_path] if isinstance(recording_path, Path) else recording_path)
         context = recording_context(context, loaded.dataset.metadata)
         samples = loaded.dataset.samples
         if len(samples) < 10:
@@ -59,7 +59,7 @@ class RecorderAnalyser:
         baseline = _constant_metrics(split.training, split.validation)
         evaluated: list[EvaluatedCandidate] = []
         reasons: list[str] = []
-        reports: tuple[ActivityReport, ...] = ()
+        reports: list[ActivityReport] = []
         for strategy in self._strategies_for(context):
             candidate = strategy.build_candidate(split.training, context)
             if isinstance(candidate, StrategyNotApplicable):
@@ -71,7 +71,7 @@ class RecorderAnalyser:
             reports = (
                 activity_reports(candidate, samples, split.validation)
                 if isinstance(candidate, VacuumCompositeCandidate)
-                else ()
+                else []
             )
             evaluation = EvaluatedCandidate(candidate, metrics, reports)
             if (failure := _candidate_failure(evaluation, samples, baseline)) is None:
@@ -94,20 +94,18 @@ class RecorderAnalyser:
             model_config_fragment=selected.build_model_config_fragment(),
             standby_power=selected.standby_power,
             warnings=loaded.warnings,
-            features=selected.features if isinstance(selected, VacuumCompositeCandidate) else (),
+            features=selected.features if isinstance(selected, VacuumCompositeCandidate) else [],
             validation_method=split.method,
             activity_reports=evaluation.activity_reports,
         )
 
-    def _strategies_for(self, context: AnalysisContext) -> tuple[ProfileAnalysisStrategy, ...]:
+    def _strategies_for(self, context: AnalysisContext) -> list[ProfileAnalysisStrategy]:
         if not self._default_strategies:
             return self.strategies
         # Vacuum recipes require independent cycles and runtime signals; they
         # must not fall back to adjacent-sample fixed validation.
         is_vacuum = context.recipe == "vacuum_robot"
-        return tuple(
-            strategy for strategy in self.strategies if (strategy.strategy_id == "vacuum_composite") == is_vacuum
-        )
+        return [strategy for strategy in self.strategies if (strategy.strategy_id == "vacuum_composite") == is_vacuum]
 
 
 def _analysis_split(
@@ -167,16 +165,16 @@ def analysis_context_for(
         )
 
     primary = by_id.get(entity_ids[0])
-    device_entities = tuple(
+    device_entities = [
         recorded_entity(entity.entity_id, "available" if entity.disabled_by is None else "disabled")
         for entity in descriptors
         if primary is not None and primary.device_id is not None and entity.device_id == primary.device_id
-    )
+    ]
     return AnalysisContext(
         recipe=request.profile_recipe.value,
         primary_entity_id=entity_ids[0],
         device_type="vacuum_robot" if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT else "generic_iot",
-        entities=tuple(recorded_entity(entity_id, role) for entity_id, role in zip(entity_ids, roles, strict=True)),
+        entities=[recorded_entity(entity_id, role) for entity_id, role in zip(entity_ids, roles, strict=True)],
         device_entities=device_entities,
     )
 
@@ -184,8 +182,8 @@ def analysis_context_for(
 def _split_samples(
     samples: Sequence[RecordingSample],
 ) -> AnalysisSplit:
-    training = tuple(sample for index, sample in enumerate(samples) if index % 5 != 4)
-    validation = tuple(sample for index, sample in enumerate(samples) if index % 5 == 4)
+    training = [sample for index, sample in enumerate(samples) if index % 5 != 4]
+    validation = [sample for index, sample in enumerate(samples) if index % 5 == 4]
     return AnalysisSplit(training=training, validation=validation)
 
 
@@ -298,16 +296,16 @@ def _select_candidate(
 
 def _insufficient(
     samples: Sequence[RecordingSample],
-    warnings: tuple[str, ...],
+    warnings: Sequence[str],
     reason: str,
     validation_method: str | None = None,
-    reports: tuple[ActivityReport, ...] = (),
+    reports: Sequence[ActivityReport] = (),
 ) -> RecorderAnalysisResult:
     return RecorderAnalysisResult(
         status="insufficient_data",
         sample_count=len(samples),
         reason=reason,
-        warnings=warnings,
+        warnings=list(warnings),
         validation_method=validation_method,
-        activity_reports=reports,
+        activity_reports=list(reports),
     )

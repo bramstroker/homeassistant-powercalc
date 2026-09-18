@@ -147,8 +147,8 @@ def _contains(values: Sequence[ScalarStateValue], value: ScalarStateValue) -> bo
 class ActivitySignal:
     activity: Activity
     feature: FeatureReference
-    active: tuple[ScalarStateValue, ...]
-    inactive: tuple[ScalarStateValue, ...]
+    active: list[ScalarStateValue]
+    inactive: list[ScalarStateValue]
 
     def matches(self, sample: RecordingSample) -> bool | None:
         value = self.feature.value(sample)
@@ -228,13 +228,13 @@ def _entity_signals(
     return candidates
 
 
-def discover_signals(samples: Sequence[RecordingSample], context: AnalysisContext) -> tuple[ActivitySignal, ...]:
+def discover_signals(samples: Sequence[RecordingSample], context: AnalysisContext) -> list[ActivitySignal]:
     """Choose one signal per activity using portable sources and explicit priorities."""
-    entities = tuple(
+    entities = [
         entity
         for entity in context.entities
         if entity.disabled_by is None and portable_entity(entity.entity_id, context) is not None
-    )
+    ]
     primary = context.primary_entity_id
     candidates = _entity_signals(samples, entities, primary)
     attributes = {key for sample in samples if (state := sample.entities.get(primary)) for key in state.attributes}
@@ -265,7 +265,7 @@ def discover_signals(samples: Sequence[RecordingSample], context: AnalysisContex
         if candidate.priority >= _SourcePriority.RELATED_STATE and signal.feature != status_feature:
             continue
         chosen.setdefault(signal.activity, signal)
-    return tuple(chosen[activity] for activity in ACTIVITY_PRIORITY if activity in chosen)
+    return [chosen[activity] for activity in ACTIVITY_PRIORITY if activity in chosen]
 
 
 def _add_supplements(
@@ -290,7 +290,7 @@ def _add_supplements(
                 candidates,
                 samples,
                 feature,
-                tuple(activity for activity in _CHARGING_ACTIVITIES if activity not in status_activities),
+                [activity for activity in _CHARGING_ACTIVITIES if activity not in status_activities],
                 {"not_charging", "return_to_charge"},
             )
         elif Activity.CHARGING not in status_activities and _is_charging_sensor(entity):
@@ -304,7 +304,7 @@ def _is_charging_sensor(entity: RecordedEntity) -> bool:
     )
 
 
-def _values(samples: Sequence[RecordingSample], feature: FeatureReference) -> tuple[ScalarStateValue, ...]:
+def _values(samples: Sequence[RecordingSample], feature: FeatureReference) -> list[ScalarStateValue]:
     values: list[ScalarStateValue] = []
     for sample in samples:
         value = feature.value(sample)
@@ -314,7 +314,7 @@ def _values(samples: Sequence[RecordingSample], feature: FeatureReference) -> tu
             and not _contains(values, value)
         ):
             values.append(value)
-    return tuple(values)
+    return values
 
 
 def _add_flags(
@@ -325,17 +325,17 @@ def _add_flags(
     priority: _SourcePriority,
 ) -> None:
     values = _values(samples, feature)
-    active = tuple(
+    active: list[ScalarStateValue] = [
         value
         for value in values
         if value is True or (isinstance(value, str) and _normalise(value) in {"on", "active", "true"})
-    )
-    inactive = tuple(
+    ]
+    inactive: list[ScalarStateValue] = [
         value
         for value in values
         if value is False
         or (isinstance(value, str) and _normalise(value) in {"off", "inactive", "false", "idle", "not_performed"})
-    )
+    ]
     if active or inactive:
         candidates.append(_SignalCandidate(priority, ActivitySignal(activity, feature, active, inactive)))
 
@@ -344,15 +344,15 @@ def _add_sleep_flag(
     candidates: list[_SignalCandidate], samples: Sequence[RecordingSample], feature: FeatureReference
 ) -> None:
     values = _values(samples, feature)
-    active = tuple(
+    active: list[ScalarStateValue] = [
         value for value in values if isinstance(value, str) and _normalise(value) in ALIASES[Activity.SLEEPING]
-    )
+    ]
     if active:
         candidates.append(
             _SignalCandidate(
                 _SourcePriority.ACTIVITY_FLAG,
                 ActivitySignal(
-                    Activity.SLEEPING, feature, active, tuple(value for value in values if not _contains(active, value))
+                    Activity.SLEEPING, feature, active, [value for value in values if not _contains(active, value)]
                 ),
             )
         )
@@ -373,19 +373,21 @@ def _add_aux_states(
         recognised |= ALIASES[Activity.CHARGING] | ALIASES[Activity.COMPLETED]
     signals: list[ActivitySignal] = []
     for activity in activities:
-        active = tuple(value for value in values if isinstance(value, str) and _normalise(value) in ALIASES[activity])
-        inactive = tuple(
+        active: list[ScalarStateValue] = [
+            value for value in values if isinstance(value, str) and _normalise(value) in ALIASES[activity]
+        ]
+        inactive: list[ScalarStateValue] = [
             value
             for value in values
             if isinstance(value, str) and _normalise(value) in recognised and not _contains(active, value)
-        )
+        ]
         if active:
             signals.append(ActivitySignal(activity, feature, active, inactive))
     # One inactive guard is sufficient when this recording only saw station idle.
     if not signals and activities:
-        inactive = tuple(value for value in values if isinstance(value, str) and _normalise(value) in recognised)
+        inactive = [value for value in values if isinstance(value, str) and _normalise(value) in recognised]
         if inactive:
-            signals.append(ActivitySignal(activities[0], feature, (), inactive))
+            signals.append(ActivitySignal(activities[0], feature, [], inactive))
     candidates.extend(_SignalCandidate(_SourcePriority.ACTIVITY_FLAG, signal) for signal in signals)
 
 
@@ -397,13 +399,15 @@ def _add_states(
 ) -> None:
     values = _values(samples, feature)
     for activity, aliases in ALIASES.items():
-        active = tuple(value for value in values if isinstance(value, str) and _normalise(value) in aliases)
+        active: list[ScalarStateValue] = [
+            value for value in values if isinstance(value, str) and _normalise(value) in aliases
+        ]
         if active:
             candidates.append(
                 _SignalCandidate(
                     priority,
                     ActivitySignal(
-                        activity, feature, active, tuple(value for value in values if not _contains(active, value))
+                        activity, feature, active, [value for value in values if not _contains(active, value)]
                     ),
                 )
             )

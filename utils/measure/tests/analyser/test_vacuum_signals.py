@@ -14,10 +14,10 @@ def context(*entities: RecordedEntity) -> AnalysisContext:
         "vacuum_robot",
         PRIMARY,
         "vacuum_robot",
-        (
+        [
             RecordedEntity(PRIMARY, "vacuum", "primary", device_id="robot"),
             *entities,
-        ),
+        ],
     )
 
 
