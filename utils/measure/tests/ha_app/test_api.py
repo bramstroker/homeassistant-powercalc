@@ -576,6 +576,58 @@ def test_index_is_not_cached(tmp_path: Path) -> None:
     assert response.headers["cache-control"] == "no-store, max-age=0"
 
 
+@pytest.mark.parametrize("token", [None, ""])
+def test_app_requires_home_assistant_credentials(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, token: str | None
+) -> None:
+    monkeypatch.delenv("SUPERVISOR_TOKEN", raising=False)
+
+    with pytest.raises(RuntimeError, match="SUPERVISOR_TOKEN is required"):
+        create_app(data_root=tmp_path, hass_token=token)
+
+
+def test_app_accepts_supervisor_credentials_from_environment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SUPERVISOR_TOKEN", "supervisor-test-token")
+    app = create_app(data_root=tmp_path, trusted_ingress_only=False)
+    test_client = TestClient(app, client=("127.0.0.1", 50000))
+
+    assert test_client.get("/health").json() == {"status": "ok"}
+
+
+def test_frontend_assets_are_served_from_build_directory(tmp_path: Path) -> None:
+    static_root = tmp_path / "static"
+    assets = static_root / "assets"
+    assets.mkdir(parents=True)
+    (assets / "app.js").write_text("console.log('measure');", encoding="utf-8")
+    app = create_app(
+        data_root=tmp_path,
+        hass_token="test-token",  # noqa: S106
+        static_root=static_root,
+        trusted_ingress_only=False,
+    )
+    test_client = TestClient(app, client=("127.0.0.1", 50000))
+
+    response = test_client.get("/assets/app.js")
+
+    assert response.status_code == 200
+    assert response.text == "console.log('measure');"
+    assert test_client.get("/assets/missing.js").status_code == 404
+
+
+def test_backend_runs_without_frontend_build(tmp_path: Path) -> None:
+    app = create_app(
+        data_root=tmp_path,
+        hass_token="test-token",  # noqa: S106
+        static_root=tmp_path / "missing-build",
+        trusted_ingress_only=False,
+    )
+    test_client = TestClient(app, client=("127.0.0.1", 50000))
+
+    assert test_client.get("/health").status_code == 200
+    assert test_client.get("/").status_code == 404
+    assert test_client.get("/api/settings").status_code == 200
+
+
 def test_capabilities_and_entity_filters(tmp_path: Path) -> None:
     test_client = client(tmp_path)
 
@@ -1566,6 +1618,23 @@ def test_openapi_contract_contains_the_supported_app_endpoints(tmp_path: Path) -
         "anyOf": [{"$ref": "#/components/schemas/OperatingPoint"}, {"type": "null"}],
     }
     assert contract["components"]["schemas"]["AppPowerMeterType"]["enum"] == ["hass", "shelly", "kasa", "dummy"]
+
+
+def test_contribution_disconnect_clears_authentication(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    context = test_client.app.state.context
+    service = FakeContributionService()
+    context.contribution = ContributionApiCoordinator(context.storage, service_factory=lambda: service)
+    connected = test_client.put("/api/contribution/auth", json={"token": "github-test-token"})
+    assert connected.status_code == 200
+    assert connected.json()["authenticated"] is True
+
+    response = test_client.delete("/api/contribution/auth")
+
+    assert response.status_code == 200
+    assert response.json()["authenticated"] is False
+    assert response.json()["username"] is None
+    assert test_client.get("/api/contribution/auth").json()["authenticated"] is False
 
 
 def test_contribution_device_flow_reports_configuration_and_uses_injected_service(tmp_path: Path) -> None:
