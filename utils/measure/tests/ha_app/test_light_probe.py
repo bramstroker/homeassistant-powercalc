@@ -7,6 +7,7 @@ from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightInfo
 from measure.controller.light.spec import HassLightControllerSpec
 from measure.ha_app.light_probe import (
+    LIGHT_LOAD_PROBE_CACHE_SECONDS,
     LightLoadProbe,
     LightLoadProbeError,
     create_app_measurement_assembler,
@@ -143,6 +144,25 @@ def test_active_probe_checks_rgb_primaries_and_caches_an_exact_request() -> None
     assert hues == [1, 21849, 43697]
     assert controller.changes[-1] == (LutMode.BRIGHTNESS, False, {})
     assert controller.closed
+
+
+def test_active_probe_refreshes_when_its_cached_result_expires() -> None:
+    controller = FakeLightController()
+    meter = FakePowerMeter([1.2, 1.5])
+    assembler = FakeAssembler(controller, meter)
+    now = 0.0
+    probe = LightLoadProbe(lambda: assembler, wait=lambda _: None, monotonic=lambda: now, now=lambda: 10)
+    measurement = request(modes={LutMode.BRIGHTNESS})
+
+    first = probe.evaluate(measurement)
+    now = LIGHT_LOAD_PROBE_CACHE_SECONDS - 1
+    assert probe.evaluate(measurement) is first
+    assert meter.calls == 1
+
+    now = LIGHT_LOAD_PROBE_CACHE_SECONDS
+    refreshed = probe.evaluate(measurement)
+    assert refreshed.minimum_aggregate_power_w == 1.5
+    assert meter.calls == 2
 
 
 @pytest.mark.parametrize(

@@ -30,7 +30,7 @@ def test_measure_device_catalog_uses_full_library_metadata_endpoint(monkeypatch:
 
     monkeypatch.setattr(library_catalog.requests, "get", get)
 
-    assert MeasureDeviceCatalog().devices() == ("Shelly Plug S",)
+    assert MeasureDeviceCatalog().devices() == ["Shelly Plug S"]
     assert requested == [(FULL_LIBRARY_ENDPOINT, 15)]
 
 
@@ -53,7 +53,7 @@ def test_extract_measure_devices_returns_canonical_unique_hardware_names() -> No
         ],
     }
 
-    assert extract_measure_devices(library) == ("Shelly Plug S", "TP-Link Kasa KP115")
+    assert extract_measure_devices(library) == ["Shelly Plug S", "TP-Link Kasa KP115"]
 
 
 def test_extract_manufacturers_prefers_full_names_and_removes_case_duplicates() -> None:
@@ -67,7 +67,19 @@ def test_extract_manufacturers_prefers_full_names_and_removes_case_duplicates() 
         ],
     }
 
-    assert extract_manufacturers(library) == ("IKEA", "Signify")
+    assert extract_manufacturers(library) == ["IKEA", "Signify"]
+
+
+def test_catalog_collections_do_not_modify_the_loaded_library() -> None:
+    library = {"manufacturers": [{"name": "Shelly", "models": [{"measure_device": "Shelly Plug S"}]}]}
+    devices = MeasureDeviceCatalog(loader=lambda: library)
+    manufacturers = ManufacturerCatalog(loader=lambda: library)
+
+    devices.devices().clear()
+    manufacturers.manufacturers().append("Unknown")
+
+    assert devices.devices() == ["Shelly Plug S"]
+    assert manufacturers.manufacturers() == ["Shelly"]
 
 
 def test_resolve_manufacturer_name_uses_names_and_unambiguous_aliases() -> None:
@@ -107,7 +119,7 @@ def test_catalog_translates_loader_failures_without_application_caching() -> Non
 
     catalog = MeasureDeviceCatalog(loader=load)
 
-    assert catalog.devices() == ("Shelly Plug S",)
+    assert catalog.devices() == ["Shelly Plug S"]
     with pytest.raises(LibraryCatalogError, match="Could not load measurement devices"):
         catalog.devices()
     assert calls == 2
@@ -133,4 +145,6 @@ def test_device_specification_catalog_extracts_schema_fields() -> None:
         },
     )
 
+    assert [field.name for field in catalog.fields()["generic_iot"]] == ["rated_power"]
+    catalog.fields()["generic_iot"].clear()
     assert [field.name for field in catalog.fields()["generic_iot"]] == ["rated_power"]

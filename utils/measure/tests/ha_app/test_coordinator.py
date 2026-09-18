@@ -184,6 +184,24 @@ def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:
     ]
 
 
+def test_returned_session_collections_do_not_modify_coordinator_state(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    coordinator = MeasurementCoordinator(storage, CompletingService)
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+    expected_events = coordinator.events_since(0, session.id)
+
+    coordinator.sessions().clear()
+    coordinator.events_since(0, session.id).clear()
+    storage.list_files(session.id).clear()
+    storage.load_events(session.id).clear()
+
+    assert [snapshot.id for snapshot in coordinator.sessions()] == [session.id]
+    assert coordinator.events_since(0, session.id) == expected_events
+    assert storage.load_events(session.id) == expected_events
+    assert storage.list_files(session.id) == ["LCT010/brightness.csv"]
+
+
 def test_coordinator_projects_latest_recorder_entity_states(tmp_path: Path) -> None:
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), EntityStateService)
 
@@ -471,7 +489,7 @@ def test_coordinator_deletes_only_terminal_sessions(tmp_path: Path) -> None:
 
     coordinator.delete(completed.id)
 
-    assert coordinator.sessions() == ()
+    assert coordinator.sessions() == []
     assert coordinator.current is None
 
 
@@ -518,7 +536,7 @@ def test_transient_events_update_live_session_without_persisting(
         current = coordinator.get(session.id)
         assert current.event_sequence == 1
         assert coordinator.events_since(0, session.id)[0].data == data
-        assert storage.load_events(session.id) == ()
+        assert storage.load_events(session.id) == []
         assert storage.load_snapshot(session.id).event_sequence == 0
         if event_type == SessionEventType.CALIBRATION_SAMPLE:
             assert current.calibration_sample == data

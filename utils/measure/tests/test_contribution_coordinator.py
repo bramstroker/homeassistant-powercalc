@@ -70,7 +70,7 @@ class FakeGitHubClient(GitHubClient):
         owner: str,
         repo: str,
         base_tree: str,
-        tree: tuple[dict[str, Any], ...],
+        tree: list[dict[str, Any]],
     ) -> str:
         self.calls.append(f"create_tree:{base_tree}:{len(tree)}")
         return "tree-sha"

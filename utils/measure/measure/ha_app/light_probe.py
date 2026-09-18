@@ -35,6 +35,12 @@ class LightLoadProbeResult:
     points: tuple[LightLoadProbePoint, ...]
 
 
+@dataclass(frozen=True)
+class CachedLightLoadProbe:
+    cached_at: float
+    result: LightLoadProbeResult
+
+
 class LightLoadProbeError(Exception):
     """Raised when active preflight cannot verify the selected light's lowest loads.
 
@@ -63,19 +69,19 @@ class LightLoadProbe:
         self._wait = wait
         self._monotonic = monotonic
         self._now = now
-        self._cache: dict[str, tuple[float, LightLoadProbeResult]] = {}
+        self._cache: dict[str, CachedLightLoadProbe] = {}
         self._lock = RLock()
 
     def evaluate(self, request: LightMeasurementRequest) -> LightLoadProbeResult:
         key = self._cache_key(request)
         with self._lock:
             cached = self._cache.get(key)
-            if cached is not None and self._monotonic() - cached[0] < LIGHT_LOAD_PROBE_CACHE_SECONDS:
-                return cached[1]
+            if cached is not None and self._monotonic() - cached.cached_at < LIGHT_LOAD_PROBE_CACHE_SECONDS:
+                return cached.result
 
         result = self._probe(request)
         with self._lock:
-            self._cache[key] = (self._monotonic(), result)
+            self._cache[key] = CachedLightLoadProbe(cached_at=self._monotonic(), result=result)
         return result
 
     def _probe(self, request: LightMeasurementRequest) -> LightLoadProbeResult:

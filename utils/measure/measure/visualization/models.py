@@ -20,7 +20,7 @@ class PlotPoint:
 class PlotSeries:
     label: str | None
     color: str | None
-    points: tuple[PlotPoint, ...]
+    points: list[PlotPoint]
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,13 +31,13 @@ class PlotSpec:
     x_label: str
     y_label: str
     source: str
-    series: tuple[PlotSeries, ...]
+    series: list[PlotSeries]
 
 
 @dataclass(frozen=True, slots=True)
 class PlotBuildResult:
-    plots: tuple[PlotSpec, ...]
-    warnings: tuple[str, ...]
+    plots: list[PlotSpec]
+    warnings: list[str]
 
 
 class PlotDataError(ValueError):

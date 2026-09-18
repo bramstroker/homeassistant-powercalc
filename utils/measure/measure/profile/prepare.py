@@ -109,7 +109,7 @@ class ProfilePreparer:
                 self._build_prepared_file(relative_path, artifact_directory, model, metadata)
                 for relative_path in relative_files
             ),
-            warnings=self._collect_duplicate_warnings(model, manufacturer_directory, metadata.model_id),
+            warnings=tuple(self._collect_duplicate_warnings(model, manufacturer_directory, metadata.model_id)),
         )
 
     def render_contents(
@@ -128,7 +128,7 @@ class ProfilePreparer:
         ]
 
     @staticmethod
-    def _artifact_csv_names(artifact_directory: Path) -> tuple[str, ...]:
+    def _artifact_csv_names(artifact_directory: Path) -> list[str]:
         """Validate the artifact directory layout and return the gzipped CSV file names."""
         if not artifact_directory.is_dir():
             raise ProfilePreparationError("Artifact directory does not exist")
@@ -140,7 +140,7 @@ class ProfilePreparer:
         unexpected = sorted(names - csv_names - {MODEL_JSON, MANUFACTURER_JSON} - recorder_sources)
         if unexpected:
             raise ProfilePreparationError(f"Unexpected artifact file(s): {', '.join(unexpected)}")
-        return tuple(sorted({f"{name.removesuffix('.gz')}.gz" for name in csv_names}))
+        return sorted({f"{name.removesuffix('.gz')}.gz" for name in csv_names})
 
     @staticmethod
     def _apply_metadata(model: dict[str, Any], metadata: ProfileMetadata) -> dict[str, Any]:
@@ -241,10 +241,10 @@ class ProfilePreparer:
         model: dict[str, Any],
         manufacturer_directory: str,
         model_directory: str,
-    ) -> tuple[str, ...]:
+    ) -> list[str]:
         requested_name = self._normalize(str(model.get("name", "")))
         if not requested_name:
-            return ()
+            return []
         warnings: list[str] = []
         for model_path in self.library_root.glob("*/*/model.json"):
             if model_path.parent.parent.name == manufacturer_directory and model_path.parent.name == model_directory:
@@ -262,7 +262,7 @@ class ProfilePreparer:
             if requested_name in self._known_names(existing, "name"):
                 path = f"{directory}/{existing.get('id')}/model.json"
                 warnings.append(f"Possible duplicate profile: profile_library/{path}")
-        return tuple(dict.fromkeys(warnings))
+        return list(dict.fromkeys(warnings))
 
     def _manufacturer_manifests(self) -> Iterator[tuple[str, dict[str, Any]]]:
         """Yield (directory name, manifest) for each manufacturer in a full library checkout."""

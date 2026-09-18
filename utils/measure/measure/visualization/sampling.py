@@ -13,22 +13,22 @@ def limit_plot_points(plot: PlotSpec, max_points: int) -> PlotSpec:
     limit = limit_line if plot.kind is PlotKind.LINE else limit_scatter
     limited: PlotSpec = replace(
         plot,
-        series=tuple(replace(series, points=limit(series.points, max_points)) for series in plot.series),
+        series=[replace(series, points=limit(series.points, max_points)) for series in plot.series],
     )
     return limited
 
 
-def limit_scatter(points: Sequence[PlotPoint], max_points: int | None) -> tuple[PlotPoint, ...]:
+def limit_scatter(points: Sequence[PlotPoint], max_points: int | None) -> list[PlotPoint]:
     if max_points is None or len(points) <= max_points:
-        return tuple(points)
+        return list(points)
     if max_points <= 1:
-        return (points[0],)
-    return tuple(points[round(index * (len(points) - 1) / (max_points - 1))] for index in range(max_points))
+        return [points[0]]
+    return [points[round(index * (len(points) - 1) / (max_points - 1))] for index in range(max_points)]
 
 
-def limit_line(points: Sequence[PlotPoint], max_points: int | None) -> tuple[PlotPoint, ...]:
+def limit_line(points: Sequence[PlotPoint], max_points: int | None) -> list[PlotPoint]:
     if max_points is None or len(points) <= max_points:
-        return tuple(points)
+        return list(points)
     if max_points < 4:
         return limit_scatter(points, max_points)
 
@@ -43,4 +43,4 @@ def limit_line(points: Sequence[PlotPoint], max_points: int | None) -> tuple[Plo
         maximum = max(bucket, key=lambda item: item[1].y)
         selected.extend(sorted({minimum[0]: minimum, maximum[0]: maximum}.values()))
     selected.append(indexed[-1])
-    return tuple(point for _, point in sorted(selected)[:max_points])
+    return [point for _, point in sorted(selected)[:max_points]]

@@ -44,7 +44,7 @@ def test_recording_names_are_ordered_and_exclude_unrelated_files() -> None:
             "record-².jsonl",
             "analyser.json",
         ]
-    ) == ("record-1.jsonl", "record-2.jsonl", "record-10.jsonl", "record.jsonl")
+    ) == ["record-1.jsonl", "record-2.jsonl", "record-10.jsonl", "record.jsonl"]
 
 
 def write_recording(path: Path, request: RecorderMeasurementRequest, state: str) -> None:

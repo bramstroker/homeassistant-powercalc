@@ -21,7 +21,7 @@ def build_recorder_plot(path: Path, *, source: str, max_points: int | None) -> P
         x_label="Elapsed time (s)",
         y_label=POWER_AXIS_LABEL,
         source=source,
-        series=(PlotSeries(label=None, color=DEFAULT_COLOR, points=points),),
+        series=[PlotSeries(label=None, color=DEFAULT_COLOR, points=points)],
     )
 
 
@@ -54,26 +54,26 @@ def _iter_jsonl_recorder_points(path: Path) -> Iterable[PlotPoint]:
                 yield PlotPoint(x=elapsed, y=power)
 
 
-def _stream_recorder_points(path: Path, max_points: int | None) -> tuple[PlotPoint, ...]:
+def _stream_recorder_points(path: Path, max_points: int | None) -> list[PlotPoint]:
     if max_points is None:
-        return tuple(_iter_recorder_points(path))
+        return list(_iter_recorder_points(path))
 
     point_count = sum(1 for _ in _iter_recorder_points(path))
     if point_count <= max_points:
-        return tuple(_iter_recorder_points(path))
+        return list(_iter_recorder_points(path))
     return _downsample_recorder_points(path, point_count, max_points)
 
 
-def _downsample_recorder_points(path: Path, point_count: int, max_points: int) -> tuple[PlotPoint, ...]:
+def _downsample_recorder_points(path: Path, point_count: int, max_points: int) -> list[PlotPoint]:
     if max_points <= 1:
-        return tuple(point for index, point in enumerate(_iter_recorder_points(path)) if index == 0)
+        return [point for index, point in enumerate(_iter_recorder_points(path)) if index == 0]
     if max_points < 4:
         selected_indexes = {round(index * (point_count - 1) / (max_points - 1)) for index in range(max_points)}
-        return tuple(point for index, point in enumerate(_iter_recorder_points(path)) if index in selected_indexes)
+        return [point for index, point in enumerate(_iter_recorder_points(path)) if index in selected_indexes]
     return _recorder_extrema(path, point_count, max_points)
 
 
-def _recorder_extrema(path: Path, point_count: int, max_points: int) -> tuple[PlotPoint, ...]:
+def _recorder_extrema(path: Path, point_count: int, max_points: int) -> list[PlotPoint]:
     bucket_count = max(1, (max_points - 2) // 2)
     bucket_size = math.ceil((point_count - 2) / bucket_count)
     selected: list[tuple[int, PlotPoint]] = []
@@ -102,7 +102,7 @@ def _recorder_extrema(path: Path, point_count: int, max_points: int) -> tuple[Pl
     _append_bucket_extrema(selected, bucket_minimum, bucket_maximum)
     if last is not None:
         selected.append(last)
-    return tuple(point for _, point in selected[:max_points])
+    return [point for _, point in selected[:max_points]]
 
 
 def _append_bucket_extrema(

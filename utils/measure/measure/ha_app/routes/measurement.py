@@ -85,7 +85,7 @@ async def measure_devices(request: Request, response: Response) -> MeasureDevice
     except LibraryCatalogError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
     response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
-    return MeasureDeviceCatalogResponse(devices=list(devices))
+    return MeasureDeviceCatalogResponse(devices=devices)
 
 
 @router.get("/library/manufacturers", responses={503: ERROR_RESPONSE})
@@ -95,7 +95,7 @@ async def manufacturers(request: Request, response: Response) -> ManufacturerCat
     except LibraryCatalogError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
     response.headers["Cache-Control"] = CACHE_CONTROL_LIBRARY
-    return ManufacturerCatalogResponse(manufacturers=list(values))
+    return ManufacturerCatalogResponse(manufacturers=values)
 
 
 @router.get("/library/device-specifications", responses={503: ERROR_RESPONSE})
@@ -196,10 +196,10 @@ async def preflight(payload: MeasurementRequestPayload, request: Request) -> Pre
     result = assessment.checks
     return PreflightResponse(
         valid=True,
-        warnings=list(result.warnings),
+        warnings=result.warnings,
         estimated_variations=result.estimated_variations,
         estimated_duration_seconds=result.estimated_duration_seconds,
-        supported_modes=list(result.supported_modes) if result.supported_modes is not None else None,
+        supported_modes=result.supported_modes,
         power_meter_diagnostic=result.power_meter_diagnostic,
         battery_level_entity_id=result.battery_level_entity_id,
         battery_level_attribute=result.battery_level_attribute,

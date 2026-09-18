@@ -60,7 +60,7 @@ def build_session_plots(
             )
         except (OSError, PlotDataError, json.JSONDecodeError) as error:
             warnings.append(f"Could not plot {candidate.source}: {error}")
-    return PlotBuildResult(plots=tuple(plots), warnings=tuple(warnings))
+    return PlotBuildResult(plots=plots, warnings=warnings)
 
 
 def _session_plot_candidates(

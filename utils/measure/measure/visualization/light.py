@@ -47,7 +47,7 @@ def build_light_plot(path: Path, *, source: str, mode: LutMode, max_points: int 
     )
 
 
-def _effect_series(rows: list[dict[str, str | None]], max_points: int | None) -> tuple[PlotSeries, ...]:
+def _effect_series(rows: list[dict[str, str | None]], max_points: int | None) -> list[PlotSeries]:
     grouped: dict[str, list[PlotPoint]] = {}
     for row in rows:
         effect = str(row.get("effect", "")).strip()
@@ -56,31 +56,31 @@ def _effect_series(rows: list[dict[str, str | None]], max_points: int | None) ->
             grouped.setdefault(effect, []).append(point)
     if not grouped:
         raise PlotDataError("no valid effect measurements found")
-    return tuple(
+    return [
         PlotSeries(
             label=effect,
             color=SERIES_COLORS[index % len(SERIES_COLORS)],
             points=limit_scatter(points, max_points),
         )
         for index, (effect, points) in enumerate(grouped.items())
-    )
+    ]
 
 
 def _single_light_series(
     rows: list[dict[str, str | None]],
     mode: LutMode,
     max_points: int | None,
-) -> tuple[PlotSeries, ...]:
+) -> list[PlotSeries]:
     points = [point for row in rows if (point := _light_point(row, mode)) is not None]
     if not points:
         raise PlotDataError("no valid light measurements found")
-    return (
+    return [
         PlotSeries(
             label=None,
             color=DEFAULT_COLOR if mode is LutMode.BRIGHTNESS else None,
             points=limit_scatter(points, max_points),
         ),
-    )
+    ]
 
 
 def _light_point(row: Mapping[str, str | None], mode: LutMode) -> PlotPoint | None:

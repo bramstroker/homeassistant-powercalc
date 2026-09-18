@@ -34,7 +34,7 @@ def build_linear_plot(path: Path, *, source: str, max_points: int | None) -> Plo
         raise PlotDataError("model does not contain linear calibration data")
 
     series_count = len(linear_configs)
-    series = tuple(
+    series = [
         _linear_series(
             calibration.config,
             label=_condition_label(calibration.condition, index) if series_count > 1 else None,
@@ -42,7 +42,7 @@ def build_linear_plot(path: Path, *, source: str, max_points: int | None) -> Plo
             max_points=max_points,
         )
         for index, calibration in enumerate(linear_configs, start=1)
-    )
+    ]
 
     device_type = data.get("device_type") if isinstance(data, dict) else None
     title, x_label = _linear_labels(device_type if isinstance(device_type, str) else None)
@@ -57,16 +57,16 @@ def build_linear_plot(path: Path, *, source: str, max_points: int | None) -> Plo
     )
 
 
-def _linear_calibration_configs(data: object) -> tuple[LinearCalibration, ...]:
+def _linear_calibration_configs(data: object) -> list[LinearCalibration]:
     if not isinstance(data, dict):
-        return ()
+        return []
 
     strategy = data.get("calculation_strategy")
     if strategy == _LINEAR_STRATEGY:
         linear_config = data.get("linear_config")
-        return (LinearCalibration(condition=None, config=linear_config),) if _has_calibration(linear_config) else ()
+        return [LinearCalibration(condition=None, config=linear_config)] if _has_calibration(linear_config) else []
     if strategy != _COMPOSITE_STRATEGY:
-        return ()
+        return []
 
     composite_config = data.get("composite_config")
     strategies: object
@@ -75,9 +75,9 @@ def _linear_calibration_configs(data: object) -> tuple[LinearCalibration, ...]:
     elif isinstance(composite_config, dict):
         strategies = composite_config.get("strategies")
     else:
-        return ()
+        return []
     if not isinstance(strategies, list):
-        return ()
+        return []
 
     configs: list[LinearCalibration] = []
     for strategy_config in strategies:
@@ -86,7 +86,7 @@ def _linear_calibration_configs(data: object) -> tuple[LinearCalibration, ...]:
         linear_config = strategy_config.get(_LINEAR_STRATEGY)
         if _has_calibration(linear_config):
             configs.append(LinearCalibration(condition=strategy_config.get("condition"), config=linear_config))
-    return tuple(configs)
+    return configs
 
 
 def _has_calibration(config: object) -> TypeGuard[Mapping[str, object]]:

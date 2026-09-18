@@ -68,7 +68,7 @@ class MeasurementCoordinator:
         self.service_factory = service_factory
         self._lock = Lock()
         self._snapshot = storage.load_current()
-        self._events = list(storage.load_events(self._snapshot.id)) if self._snapshot is not None else []
+        self._events = storage.load_events(self._snapshot.id) if self._snapshot is not None else []
         self._last_snapshot_write = 0.0
         self._control: SessionControl | None = None
         self._worker: Thread | None = None
@@ -113,14 +113,14 @@ class MeasurementCoordinator:
             return self._snapshot
         return self.storage.load_snapshot(session_id)
 
-    def sessions(self) -> tuple[SessionSnapshot, ...]:
+    def sessions(self) -> list[SessionSnapshot]:
         """Return all retained sessions with the live projection substituted."""
         stored = self.storage.list_sessions()
         with self._lock:
             current = self._snapshot
             if current is None:
                 return stored
-            return tuple(current if snapshot.id == current.id else snapshot for snapshot in stored)
+            return [current if snapshot.id == current.id else snapshot for snapshot in stored]
 
     def start(self, request: MeasurementRequest) -> SessionSnapshot:
         """Persist and launch a new session, rejecting overlapping work."""
@@ -165,7 +165,7 @@ class MeasurementCoordinator:
             if not self.storage.can_resume(snapshot.id):
                 raise SessionConflictError("The requested session has no compatible complete row to resume")
             self._snapshot = snapshot
-            self._events = list(self.storage.load_events(snapshot.id))
+            self._events = self.storage.load_events(snapshot.id)
             self.storage.set_current(snapshot.id)
             request = self.storage.load_request(snapshot.id).model_copy(
                 update={"resume_policy": ResumePolicy.RESUME},
@@ -202,7 +202,7 @@ class MeasurementCoordinator:
                 summary=None,
                 warnings=(),
             )
-            self._events = list(self.storage.load_events(session_id))
+            self._events = self.storage.load_events(session_id)
             self._last_snapshot_write = 0.0
             self.storage.set_current(session_id)
             self._launch_locked(request)
@@ -312,7 +312,7 @@ class MeasurementCoordinator:
                 updated = replace(
                     snapshot,
                     updated_at=utc_now(),
-                    files=self.storage.list_files(session_id),
+                    files=tuple(self.storage.list_files(session_id)),
                     summary=summary,
                     warnings=tuple(
                         warning for warning in snapshot.warnings if not warning.startswith(_ANALYSIS_WARNING_PREFIXES)
@@ -334,12 +334,12 @@ class MeasurementCoordinator:
             raise SessionConflictError("The requested session is not active")
         return self._snapshot
 
-    def events_since(self, sequence: int, session_id: str) -> tuple[SessionEvent, ...]:
+    def events_since(self, sequence: int, session_id: str) -> list[SessionEvent]:
         """Return events after ``sequence`` for a live or retained session."""
         with self._lock:
             if self._snapshot is not None and self._snapshot.id == session_id:
-                return tuple(event for event in self._events if event.sequence > sequence)
-        return tuple(event for event in self.storage.load_events(session_id) if event.sequence > sequence)
+                return [event for event in self._events if event.sequence > sequence]
+        return [event for event in self.storage.load_events(session_id) if event.sequence > sequence]
 
     def _launch_locked(self, request: MeasurementRequest) -> None:
         """Create session control and launch the worker while holding the coordinator lock."""
@@ -433,7 +433,7 @@ class MeasurementCoordinator:
         with self._lock:
             if self._snapshot is None:
                 return
-            files = self.storage.list_files(self._snapshot.id)
+            files = tuple(self.storage.list_files(self._snapshot.id))
             updated_at = utc_now()
             sequence = (
                 max(

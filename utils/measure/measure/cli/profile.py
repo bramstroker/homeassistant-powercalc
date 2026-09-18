@@ -133,7 +133,7 @@ def _metadata_defaults(artifact_directory: Path, model: dict[str, Any]) -> dict[
 def _prompt_metadata(
     values: dict[str, Any],
     prompt: Prompt,
-    device_specification_fields: tuple[DeviceSpecField, ...] = (),
+    device_specification_fields: Sequence[DeviceSpecField] = (),
     *,
     has_voltage_range: bool = False,
 ) -> dict[str, Any]:
@@ -205,7 +205,7 @@ def _ask(prompt: Prompt, label: str, default: object = None, *, required: bool =
 
 def _prompt_device_specs(
     prompt: Prompt,
-    fields: tuple[DeviceSpecField, ...],
+    fields: Sequence[DeviceSpecField],
     defaults: object,
 ) -> dict[str, Any] | None:
     existing = defaults if isinstance(defaults, dict) else {}

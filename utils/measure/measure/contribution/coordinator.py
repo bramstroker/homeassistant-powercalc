@@ -165,7 +165,7 @@ class ContributionJobCoordinator:
         for file in self.preparer.render_contents(artifact_directory, job.metadata, job.preview):
             blob_sha = client.create_blob(fork_owner, fork_repo, base64.b64encode(file.content).decode("ascii"))
             tree_entries.append({"path": file.path, "mode": "100644", "type": "blob", "sha": blob_sha})
-        tree_sha = client.create_tree(fork_owner, fork_repo, base_tree_sha, tuple(tree_entries))
+        tree_sha = client.create_tree(fork_owner, fork_repo, base_tree_sha, tree_entries)
         commit_sha = client.create_commit(
             fork_owner,
             fork_repo,

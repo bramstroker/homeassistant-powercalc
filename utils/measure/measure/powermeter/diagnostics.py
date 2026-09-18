@@ -39,6 +39,19 @@ class PowerMeterDiagnostic(BaseModel):
     message: str | None = None
 
 
+@dataclass(frozen=True)
+class CachedPowerMeterDiagnostic:
+    cached_at: float
+    result: PowerMeterDiagnostic
+
+
+@dataclass(frozen=True)
+class ReportCadence:
+    status: DiagnosticStatus
+    max_interval_seconds: float | None
+    reports_observed: int
+
+
 class PowerMeterDiagnostics:
     """Passively assess a configured power meter and briefly cache the result."""
 
@@ -62,7 +75,7 @@ class PowerMeterDiagnostics:
         self._cache_ttl = cache_ttl
         self._monotonic = monotonic
         self._wait = wait
-        self._cache: dict[str, tuple[float, PowerMeterDiagnostic]] = {}
+        self._cache: dict[str, CachedPowerMeterDiagnostic] = {}
         self._lock = RLock()
 
     def evaluate(
@@ -88,11 +101,11 @@ class PowerMeterDiagnostics:
         with self._lock:
             now = self._monotonic()
             cached = self._cache.get(cache_key)
-            if not force and cached is not None and now - cached[0] <= self._cache_ttl:
-                return cached[1]
+            if not force and cached is not None and now - cached.cached_at <= self._cache_ttl:
+                return cached.result
             result = self._evaluate_uncached(spec, create_power_meter or self._create_power_meter)
             if result.success:
-                self._cache[cache_key] = (self._monotonic(), result)
+                self._cache[cache_key] = CachedPowerMeterDiagnostic(cached_at=self._monotonic(), result=result)
             return result
 
     def _evaluate_uncached(
@@ -171,12 +184,13 @@ def _summarize(
 ) -> PowerMeterDiagnostic:
     precision = min(_decimal_places(observation.sample.raw_value) for observation in samples)
     precision_status = DiagnosticStatus.GOOD if precision >= 1 else DiagnosticStatus.POOR
-    update_status, max_interval, reports_observed = _report_cadence(samples, duration)
-    messages = _diagnostic_messages(precision_status, update_status, max_interval)
+    cadence = _report_cadence(samples, duration)
+    max_interval = cadence.max_interval_seconds
+    messages = _diagnostic_messages(precision_status, cadence.status, max_interval)
     status = DiagnosticStatus.GOOD
-    if DiagnosticStatus.POOR in {precision_status, update_status}:
+    if DiagnosticStatus.POOR in {precision_status, cadence.status}:
         status = DiagnosticStatus.POOR
-    elif DiagnosticStatus.WARNING in {precision_status, update_status}:
+    elif DiagnosticStatus.WARNING in {precision_status, cadence.status}:
         status = DiagnosticStatus.WARNING
     return PowerMeterDiagnostic(
         success=True,
@@ -185,10 +199,10 @@ def _summarize(
         status=status,
         precision_decimals=precision,
         max_report_interval_seconds=round(max_interval, 2) if max_interval is not None else None,
-        reports_observed=reports_observed,
+        reports_observed=cadence.reports_observed,
         duration_seconds=duration,
         precision_status=precision_status,
-        update_interval_status=update_status,
+        update_interval_status=cadence.status,
         messages=messages,
     )
 
@@ -196,7 +210,7 @@ def _summarize(
 def _report_cadence(
     samples: list[_ObservedSample],
     duration: float,
-) -> tuple[DiagnosticStatus, float | None, int]:
+) -> ReportCadence:
     reports: list[_ObservedSample] = []
     for observation in samples:
         if not reports or observation.sample.reported_at != reports[-1].sample.reported_at:
@@ -214,7 +228,7 @@ def _report_cadence(
         update_status = DiagnosticStatus.WARNING
     else:
         update_status = DiagnosticStatus.POOR
-    return update_status, max_interval, len(report_times)
+    return ReportCadence(status=update_status, max_interval_seconds=max_interval, reports_observed=len(report_times))
 
 
 def _diagnostic_messages(

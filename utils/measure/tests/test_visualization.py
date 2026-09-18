@@ -42,9 +42,9 @@ def test_invalid_explicit_light_mode(tmp_path: Path) -> None:
 
 
 def test_session_without_plot_artifacts() -> None:
-    assert build_session_plots(light_request("brightness"), {}).plots == ()
+    assert build_session_plots(light_request("brightness"), {}).plots == []
     request = parse_measurement_request({"measure_type": "average", "power_meter": {"type": "dummy"}})
-    assert build_session_plots(request, {}).plots == ()
+    assert build_session_plots(request, {}).plots == []
 
 
 def test_fan_session_selects_model_calibration(tmp_path: Path) -> None:
@@ -57,7 +57,7 @@ def test_fan_session_selects_model_calibration(tmp_path: Path) -> None:
     )
     result = build_session_plots(request, {"fan/model.json": path})
     assert result.plots[0].id == "calibration"
-    assert result.warnings == ()
+    assert result.warnings == []
 
 
 @pytest.mark.parametrize(
@@ -139,7 +139,7 @@ def test_builds_all_light_plot_modes_from_plain_and_gzip_csv(tmp_path: Path) -> 
         files,
     )
 
-    assert result.warnings == ()
+    assert result.warnings == []
     assert [plot.id for plot in result.plots] == ["brightness", "color_temp", "hs", "effect"]
     assert result.plots[0].kind is PlotKind.SCATTER
     assert result.plots[0].series[0].points[-1].y == pytest.approx(8.2)
@@ -380,7 +380,7 @@ def test_builds_recorder_time_series_and_ignores_invalid_rows(tmp_path: Path) ->
 
     result = build_session_plots(request, {"measurement/record.csv": recording})
 
-    assert result.warnings == ()
+    assert result.warnings == []
     assert result.plots[0].kind is PlotKind.LINE
     assert result.plots[0].x_label == "Elapsed time (s)"
     assert [(point.x, point.y) for point in result.plots[0].series[0].points] == [(0.0, 1.2), (2.0, 3.4)]
@@ -411,7 +411,7 @@ incomplete
 
     result = build_session_plots(request, {"measurement/record.jsonl": recording})
 
-    assert result.warnings == ()
+    assert result.warnings == []
     assert [(point.x, point.y) for point in result.plots[0].series[0].points] == [(0.0, 1.2), (2.0, 3.4)]
 
 
@@ -434,7 +434,7 @@ def test_plots_every_recording_in_run_order(tmp_path: Path) -> None:
 
     result = build_session_plots(request, files)
 
-    assert result.warnings == ()
+    assert result.warnings == []
     assert [plot.source for plot in result.plots] == [
         "measurement/record-2.jsonl",
         "measurement/record-10.jsonl",

@@ -54,8 +54,8 @@ def test_request_exposes_the_controlled_entities_only_when_the_controller_drives
         {"power_meter": {"type": "hass", "entity_id": "sensor.test_power"}},
     )
 
-    assert controlled.controlled_entity_ids == ("light.test",)
-    assert uncontrolled.controlled_entity_ids == ()
+    assert controlled.controlled_entity_ids == ["light.test"]
+    assert uncontrolled.controlled_entity_ids == []
 
 
 def test_request_exposes_all_controlled_entities_for_multi_light_controller() -> None:
@@ -65,7 +65,10 @@ def test_request_exposes_all_controlled_entities_for_multi_light_controller() ->
     )
 
     assert isinstance(request.controller, HassMultiLightControllerSpec)
-    assert request.controlled_entity_ids == ("light.one", "light.two")
+    assert request.controlled_entity_ids == ["light.one", "light.two"]
+    entity_ids = request.controlled_entity_ids
+    entity_ids.clear()
+    assert request.controlled_entity_ids == ["light.one", "light.two"]
 
 
 @pytest.mark.parametrize(
@@ -226,7 +229,7 @@ def test_recorder_defaults_to_legacy_playbook_recording() -> None:
     request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
 
     assert request.recorder_purpose == RecorderPurpose.PLAYBOOK
-    assert request.recorded_entity_ids == ()
+    assert request.recorded_entity_ids == []
 
 
 def test_generic_recorder_preserves_tracked_entity_order() -> None:
@@ -237,8 +240,11 @@ def test_generic_recorder_preserves_tracked_entity_order() -> None:
         tracked_entity_ids=("switch.plug", "sensor.mode"),
     )
 
-    assert request.recorded_entity_ids == ("switch.plug", "sensor.mode")
+    assert request.recorded_entity_ids == ["switch.plug", "sensor.mode"]
     assert request.export_filename == "record.jsonl"
+    entity_ids = request.recorded_entity_ids
+    entity_ids.reverse()
+    assert request.recorded_entity_ids == ["switch.plug", "sensor.mode"]
 
 
 def test_complex_recorder_uses_a_fixed_export_filename() -> None:
@@ -263,7 +269,7 @@ def test_vacuum_recorder_orders_required_roles_before_additional_entities() -> N
         additional_entity_ids=("sensor.dock_state",),
     )
 
-    assert request.recorded_entity_ids == ("vacuum.robot", "sensor.robot_battery", "sensor.dock_state")
+    assert request.recorded_entity_ids == ["vacuum.robot", "sensor.robot_battery", "sensor.dock_state"]
 
 
 @pytest.mark.parametrize(

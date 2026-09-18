@@ -129,11 +129,11 @@ class SessionStorage:
             if durable:
                 os.fsync(file.fileno())
 
-    def load_events(self, session_id: str, *, limit: int | None = 1000) -> tuple[SessionEvent, ...]:
+    def load_events(self, session_id: str, *, limit: int | None = 1000) -> list[SessionEvent]:
         """Load persisted events, optionally retaining only the newest entries."""
         path = self.session_directory(session_id) / "events.jsonl"
         if not path.exists():
-            return ()
+            return []
         events: deque[SessionEvent] = deque(maxlen=limit)
         pending_line: str | None = None
         with path.open(encoding="utf-8") as file:
@@ -150,7 +150,7 @@ class SessionStorage:
                 # The session id is caller-supplied, so keep it out of the log and report the
                 # recovered count instead — it says as much about where the file was cut off.
                 _LOGGER.warning("Ignoring a truncated final session event after %d recovered events", len(events))
-        return tuple(events)
+        return list(events)
 
     @staticmethod
     def _decode_event(line: str) -> SessionEvent:
@@ -221,7 +221,7 @@ class SessionStorage:
             raise ValueError("Session state id does not match its directory")
         return snapshot
 
-    def list_sessions(self) -> tuple[SessionSnapshot, ...]:
+    def list_sessions(self) -> list[SessionSnapshot]:
         """Return valid persisted sessions, newest activity first."""
         sessions: list[SessionSnapshot] = []
         for path in self.sessions_root.iterdir():
@@ -231,7 +231,7 @@ class SessionStorage:
                 sessions.append(self.load_snapshot(path.name))
             except SESSION_LOAD_ERRORS as error:
                 _LOGGER.warning("Ignoring incompatible measurement session %s: %s", path.name, error)
-        return tuple(sorted(sessions, key=lambda item: item.updated_at, reverse=True))
+        return sorted(sessions, key=lambda item: item.updated_at, reverse=True)
 
     def session_size(self, session_id: str) -> int:
         """Return the total size of regular files stored for one session."""
@@ -388,14 +388,12 @@ class SessionStorage:
         finally:
             probe.unlink(missing_ok=True)
 
-    def list_files(self, session_id: str) -> tuple[str, ...]:
+    def list_files(self, session_id: str) -> list[str]:
         output = self.output_directory(session_id)
         if not output.exists():
-            return ()
-        return tuple(
-            sorted(
-                str(path.relative_to(output)) for path in output.rglob("*") if path.is_file() and not path.is_symlink()
-            ),
+            return []
+        return sorted(
+            str(path.relative_to(output)) for path in output.rglob("*") if path.is_file() and not path.is_symlink()
         )
 
     def file_path(self, session_id: str, relative_name: str) -> Path:

@@ -264,11 +264,11 @@ class GitHubClient:
         )
         return str(data["sha"])
 
-    def create_tree(self, owner: str, repo: str, base_tree: str, tree: tuple[dict[str, Any], ...]) -> str:
+    def create_tree(self, owner: str, repo: str, base_tree: str, tree: list[dict[str, Any]]) -> str:
         data = self._request(
             "POST",
             f"{self.api_base_url}/repos/{owner}/{repo}/git/trees",
-            json={"base_tree": base_tree, "tree": list(tree)},
+            json={"base_tree": base_tree, "tree": tree},
         )
         return str(data["sha"])
 

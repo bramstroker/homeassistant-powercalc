@@ -194,8 +194,8 @@ async def _session_plots(context: AppContext, snapshot: SessionSnapshot) -> Sess
     )
     return SessionPlots(
         partial=snapshot.state is not SessionState.COMPLETED,
-        plots=list(result.plots),
-        warnings=list(result.warnings),
+        plots=result.plots,
+        warnings=result.warnings,
     )
 
 

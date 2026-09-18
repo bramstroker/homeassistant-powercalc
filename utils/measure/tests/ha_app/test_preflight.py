@@ -129,7 +129,7 @@ def test_preflight_rejects_inactive_recorder_entity(entity: Entity, message: str
     ],
 )
 def test_preflight_validates_runtime_dependencies_for_every_non_light_kind(payload: Any) -> None:  # noqa: ANN401
-    assert preflight(base_entities()).validate(payload).warnings == ()
+    assert preflight(base_entities()).validate(payload).warnings == []
 
 
 def test_preflight_rejects_missing_hass_power_entity_for_non_light_kind() -> None:
@@ -160,7 +160,7 @@ def test_preflight_accepts_vacuum_recorder_with_same_device_battery() -> None:
         battery_entity_id=battery.entity_id,
     )
 
-    assert preflight(entities).validate(request).warnings == ()
+    assert preflight(entities).validate(request).warnings == []
 
 
 def test_preflight_accepts_playbook_recorder_without_entity_catalog() -> None:
@@ -179,7 +179,7 @@ def test_preflight_accepts_playbook_recorder_without_entity_catalog() -> None:
 
     result = checker.validate(RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec()))
 
-    assert result.warnings == ()
+    assert result.warnings == []
 
 
 def test_preflight_requires_entity_catalog_for_complex_recorder() -> None:
@@ -216,7 +216,7 @@ def test_preflight_accepts_generic_recorder_entity_from_complete_catalog() -> No
         tracked_entity_ids=("switch.plug",),
     )
 
-    assert preflight(entities).validate(request).warnings == ()
+    assert preflight(entities).validate(request).warnings == []
 
 
 def test_preflight_rejects_missing_complex_recorder_entity() -> None:
@@ -434,7 +434,7 @@ def test_preflight_accepts_charging_with_related_battery_sensor() -> None:
 
     result = preflight(entities).validate(_charging_request())
 
-    assert result.warnings == ()
+    assert result.warnings == []
     assert result.battery_level_entity_id == "sensor.vacuum_battery"
     assert result.battery_level_attribute is None
 
@@ -471,7 +471,7 @@ def test_light_preflight_accepts_dummy_controller_without_entity_checks() -> Non
 
     result = preflight(base_entities()).validate(request)
 
-    assert result.supported_modes == (LutMode.BRIGHTNESS,)
+    assert result.supported_modes == [LutMode.BRIGHTNESS]
     assert result.estimated_variations == 255
     assert result.estimated_duration_seconds is not None
 
@@ -492,7 +492,7 @@ def test_light_preflight_returns_supported_modes_and_estimate() -> None:
 
     result = preflight(base_entities()).validate(request)
 
-    assert result.supported_modes == (LutMode.BRIGHTNESS,)
+    assert result.supported_modes == [LutMode.BRIGHTNESS]
     assert result.estimated_variations == 255
     assert result.estimated_duration_seconds == 782
 
@@ -593,8 +593,8 @@ def test_multi_light_preflight_uses_common_capabilities_and_models() -> None:
 
     result = preflight(entities).validate(request)
 
-    assert result.warnings == ()
-    assert result.supported_modes == (LutMode.BRIGHTNESS, LutMode.COLOR_TEMP)
+    assert result.warnings == []
+    assert result.supported_modes == [LutMode.BRIGHTNESS, LutMode.COLOR_TEMP]
 
 
 def test_multi_light_preflight_rejects_mixed_models_and_group_member_overlap() -> None:
@@ -692,4 +692,4 @@ def test_non_hass_power_meter_does_not_require_power_entity() -> None:
 
     result = preflight({}).validate(request)
 
-    assert result.warnings == ()
+    assert result.warnings == []
