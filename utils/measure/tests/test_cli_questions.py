@@ -18,6 +18,7 @@ from measure.cli.const import (
 )
 from measure.cli.main import Measure
 from measure.cli.measurements import CLI_QUESTION_BUILDERS, measurement_questions
+from measure.cli.questions import average_questions, hue_light_controller_questions
 from measure.const import MeasureType
 from measure.controller.charging.const import ChargingControllerType, ChargingDeviceType
 from measure.controller.fan.const import FanControllerType
@@ -179,6 +180,31 @@ def test_hass_voltage_selector_prefills_the_sensor_from_the_same_device(
     assert voltage_question.ignore is True
 
 
+@pytest.mark.parametrize("has_voltage_sensor", [False, True])
+def test_hass_voltage_selector_handles_missing_related_sensor(
+    mock_config_factory: MockConfigFactory,
+    has_voltage_sensor: bool,
+) -> None:
+    environment = mock_config_factory({"selected_power_meter": PowerMeterType.HASS})
+    entities = [_entity("sensor.power", EntityDomain.SENSOR, device_class=DeviceClass.POWER, state="1.2", unit="W")]
+    if has_voltage_sensor:
+        entities.append(
+            _entity("sensor.voltage", EntityDomain.SENSOR, device_class=DeviceClass.VOLTAGE, state="230", unit="V")
+        )
+    catalog = _catalog(*entities)
+    question = next(
+        question
+        for question in measurement_questions(MeasureType.AVERAGE, environment, catalog)
+        if question.name == QUESTION_VOLTAGEMETER_ENTITY_ID
+    )
+
+    assert question.default is None
+    question.answers = {QUESTION_POWERMETER_ENTITY_ID: "sensor.power", QUESTION_DUMMY_LOAD: True}
+    assert question.default is None
+    assert question.ignore is not has_voltage_sensor
+    assert question.choices == (["sensor.voltage"] if has_voltage_sensor else [])
+
+
 @pytest.mark.parametrize(
     "measure_type, controller_setting, controller_type, domain, entity_id",
     [
@@ -237,6 +263,49 @@ def test_hue_target_is_entered_directly(mock_config_factory: MockConfigFactory) 
     questions = measurement_questions(MeasureType.LIGHT, environment)
 
     assert questions[-1].name == "light"
+
+
+@pytest.mark.parametrize(
+    "measure_type, setting, adapter",
+    [
+        (MeasureType.LIGHT, "selected_light_controller", LightControllerType.HASS),
+        (MeasureType.SPEAKER, "selected_media_controller", MediaControllerType.HASS),
+        (MeasureType.FAN, "selected_fan_controller", FanControllerType.HASS),
+        (MeasureType.CHARGING, "selected_charging_controller", ChargingControllerType.HASS),
+        (MeasureType.AVERAGE, "selected_power_meter", PowerMeterType.HASS),
+    ],
+)
+def test_home_assistant_question_builders_require_entity_catalog(
+    mock_config_factory: MockConfigFactory,
+    measure_type: MeasureType,
+    setting: str,
+    adapter: object,
+) -> None:
+    environment = mock_config_factory({setting: adapter})
+
+    with pytest.raises(ValueError, match="entity choices require an entity catalog"):
+        measurement_questions(measure_type, environment)
+
+
+@pytest.mark.parametrize("duration", ["0", "-1", "1.5", "invalid", ""])
+def test_average_duration_question_rejects_non_positive_integers(duration: str) -> None:
+    question = average_questions()[0]
+
+    with pytest.raises(inquirer.errors.ValidationError):
+        question.validate(duration)
+
+
+def test_average_duration_question_accepts_positive_integer() -> None:
+    assert average_questions()[0].validate("60") is None
+
+
+@pytest.mark.parametrize("multiple, target", [(False, "light"), (True, "group")])
+def test_hue_target_prompt_reflects_multiple_lights_selection(multiple: bool, target: str) -> None:
+    question = hue_light_controller_questions()[0]
+    question.answers = {QUESTION_MULTIPLE_LIGHTS: multiple}
+
+    assert question.message == f"Enter the Hue {target} as {target}:<id>"
+    assert question.validate(f"{target}:1") is None
 
 
 def test_hass_entity_precedes_model_id_and_prefills_from_device(mock_config_factory: MockConfigFactory) -> None:
