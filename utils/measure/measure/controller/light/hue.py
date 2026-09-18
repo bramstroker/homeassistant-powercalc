@@ -59,7 +59,7 @@ class HueLightController(LightController):
         **kwargs: Any,  # noqa: ANN401
     ) -> None:
         del lut_mode
-        for attempt in range(3):
+        for attempt in range(3):  # pragma: no branch - success returns and the final failure raises
             try:
                 selected_id = self._selected_id()
                 if self.is_group:
