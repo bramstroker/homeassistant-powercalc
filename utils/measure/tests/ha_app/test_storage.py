@@ -276,6 +276,27 @@ def test_event_replay_ignores_blank_lines(tmp_path: Path) -> None:
     assert storage.load_events("a1b2-c3d4") == [event]
 
 
+@pytest.mark.parametrize("contents", ["", "\n  \n"], ids=["empty", "blank-lines"])
+def test_event_replay_accepts_logs_without_events(
+    tmp_path: Path,
+    contents: str,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot()
+    storage.create(current, light_request())
+    path = storage.session_directory(current.id) / "events.jsonl"
+    path.write_text(contents, encoding="utf-8")
+
+    with caplog.at_level(logging.WARNING, logger="measure"):
+        events = storage.load_events(current.id)
+
+    assert events == []
+    assert caplog.records == []
+    assert path.read_text(encoding="utf-8") == contents
+    assert storage.load_snapshot(current.id) == current
+
+
 @pytest.mark.parametrize("invalid_event", ["[]", '{"data":[]}', '{"sequence":'])
 @pytest.mark.parametrize("is_final", [False, True])
 def test_event_recovery_only_tolerates_truncated_final_json(
