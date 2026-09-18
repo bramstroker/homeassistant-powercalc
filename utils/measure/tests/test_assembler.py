@@ -20,7 +20,7 @@ from measure.request import (
 from measure.runner.average import AverageRunner
 from measure.runner.fan import FanRunner
 from measure.runner.interaction import RunInteraction
-from measure.runner.light import LightRunner
+from measure.runner.light.runner import LightRunner
 from measure.runner.recorder import RecorderEntityState, RecorderRunner
 from pydantic import ValidationError
 import pytest

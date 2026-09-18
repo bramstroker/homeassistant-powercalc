@@ -72,7 +72,7 @@ from measure.runner.average import AverageRunner
 from measure.runner.charging import ChargingRunner
 from measure.runner.fan import FanRunner
 from measure.runner.interaction import RunInteraction
-from measure.runner.light import LightRunner
+from measure.runner.light.runner import LightRunner
 from measure.runner.recorder import EntityStateReader, RecorderEntityState, RecorderRunner
 from measure.runner.runner import MeasurementRunner
 from measure.runner.speaker import SpeakerRunner

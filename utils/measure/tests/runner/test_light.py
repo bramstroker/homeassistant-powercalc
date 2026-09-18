@@ -16,8 +16,9 @@ from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import LightMeasurementRequest
 from measure.runner.errors import RunnerError
 from measure.runner.interaction import RunInteraction
-from measure.runner.light import EffectVariation, LightRunner, MeasurementRunInput
-from measure.runner.light_plan import LightMeasurementPlan, LightModePlan, Variation, build_light_plan
+from measure.runner.light.csv import inspect_light_csv, repair_incomplete_csv_tail
+from measure.runner.light.plan import EffectVariation, LightMeasurementPlan, LightModePlan, Variation, build_light_plan
+from measure.runner.light.runner import LightRunner, LightRunProgress, MeasurementRunInput
 from measure.tuning import MeasurementParameters
 from measure.utils.sampling import AverageMeasurementConvergence, MeasurementResult, PowerSampler
 import pytest
@@ -50,12 +51,11 @@ def _zero_sleep_parameters() -> MeasurementParameters:
 class _BrightnessRun:
     runner: LightRunner
     measurement_info: MeasurementRunInput
-    all_variations: list[Variation]
-    remaining_variations: list[Variation]
+    progress: LightRunProgress
     sampler: MagicMock
 
     def execute(self) -> None:
-        self.runner.run_mode(self.measurement_info, self.all_variations, self.remaining_variations)
+        self.runner.run_mode(self.measurement_info, self.progress)
 
 
 def _brightness_run(tmp_path: Path, variations: list[Variation]) -> _BrightnessRun:
@@ -68,15 +68,14 @@ def _brightness_run(tmp_path: Path, variations: list[Variation]) -> _BrightnessR
         modes=[LightModePlan(mode=LutMode.BRIGHTNESS, variations=variations)],
         effects=[],
     )
-    all_variations = variations.copy()
-    remaining_variations = variations.copy()
+    progress = LightRunProgress(total=len(variations), remaining=variations.copy())
     measurement_info = MeasurementRunInput(
         mode=LutMode.BRIGHTNESS,
         csv_file=str(tmp_path / "brightness.csv"),
         variations=variations.copy(),
         is_resuming=False,
     )
-    return _BrightnessRun(runner, measurement_info, all_variations, remaining_variations, measure_util_mock)
+    return _BrightnessRun(runner, measurement_info, progress, measure_util_mock)
 
 
 @pytest.mark.parametrize(
@@ -271,7 +270,52 @@ def test_zero_reading_counter_resets_after_valid_measurement(tmp_path: Path) -> 
 
     with open(run.measurement_info.csv_file, newline="") as csv_file:
         rows = list(csv.reader(csv_file))
-    assert rows[-2:] == [["1", "1.0"], ["2", "2.0"]]
+        assert rows[-2:] == [["1", "1.0"], ["2", "2.0"]]
+
+
+def test_zero_reading_retry_does_not_repeat_initial_stabilization(tmp_path: Path) -> None:
+    run = _brightness_run(tmp_path, [Variation(1), Variation(2)])
+    run.runner.config = replace(run.runner.config, sleep_initial=10)
+    run.sampler.take_measurement.side_effect = [
+        ZeroReadingError("zero"),
+        MeasurementResult(power=1, voltages=[]),
+        MeasurementResult(power=2, voltages=[]),
+    ]
+
+    run.execute()
+
+    run.runner.interaction.phase.assert_called_once_with("Stabilizing light before the first reading (10 s)")
+    assert run.runner.interaction.wait.call_args_list.count(call(10)) == 1
+    assert run.progress.completed == 2
+
+
+def test_meter_failure_keeps_variation_unfinished(tmp_path: Path) -> None:
+    run = _brightness_run(tmp_path, [Variation(1)])
+    error = PowerMeterError("Meter disconnected")
+    run.sampler.take_measurement.side_effect = error
+
+    with pytest.raises(RunnerError, match="Aborting measurement session: Meter disconnected") as raised:
+        run.execute()
+
+    assert raised.value.__cause__ is error
+    assert run.progress.completed == 0
+    assert Path(run.measurement_info.csv_file).read_text() == "bri,watt\n"
+
+
+def test_cancellation_after_measurement_does_not_save_or_complete_variation(tmp_path: Path) -> None:
+    run = _brightness_run(tmp_path, [Variation(1)])
+
+    def finish_measurement(*_: object) -> MeasurementResult:
+        run.runner.interaction.checkpoint.side_effect = MeasurementCancelledError()
+        return MeasurementResult(power=1, voltages=[])
+
+    run.sampler.take_measurement.side_effect = finish_measurement
+
+    with pytest.raises(MeasurementCancelledError):
+        run.execute()
+
+    assert run.progress.completed == 0
+    assert Path(run.measurement_info.csv_file).read_text() == "bri,watt\n"
 
 
 def test_repeated_zero_readings_fail_fast_with_actionable_error(tmp_path: Path) -> None:
@@ -290,6 +334,30 @@ def test_repeated_zero_readings_fail_fast_with_actionable_error(tmp_path: Path) 
     assert "https://docs.powercalc.nl/contributing/measure/troubleshooting/" in message
     assert run.sampler.take_measurement.call_count == 5
     assert run.runner.interaction.progress.call_args_list[-1].kwargs["skipped"] == 5
+
+
+@pytest.mark.parametrize(
+    "contents,message",
+    [
+        ("wrong,watt\n1,1.0\n255,", "header does not match"),
+        ("bri,watt\n999,1.0\n255,", "does not match the configured measurement grid"),
+    ],
+)
+def test_resume_rejects_incompatible_csv_without_repairing_it(tmp_path: Path, contents: str, message: str) -> None:
+    path = tmp_path / "brightness.csv"
+    path.write_text(contents)
+    runner = LightRunner(MagicMock(PowerSampler), _zero_sleep_parameters(), DummyLightController(), resume=True)
+    request = LightMeasurementRequest(
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyLightControllerSpec(),
+        parameters=runner.config,
+    )
+
+    with pytest.raises(RunnerError, match=message):
+        runner.run(request, str(tmp_path))
+
+    assert path.read_text() == contents
 
 
 def test_cleanup_turns_off_light() -> None:
@@ -415,10 +483,7 @@ def test_resume_effect(tmp_path: Path) -> None:
         writer.writerow(["colorloop", 100, 2.5])
         writer.writerow(["nightlight", 200, 3.0])
 
-    measure_util_mock = MagicMock(PowerSampler)
-    runner = LightRunner(measure_util_mock, _parameters(), DummyLightController())
-
-    resume_variation = runner.get_resume_variation(str(csv_file), LutMode.EFFECT)
+    resume_variation = inspect_light_csv(csv_file, LutMode.EFFECT).last_complete_variation
     assert isinstance(resume_variation, EffectVariation)
     assert resume_variation.effect == "nightlight"
     assert resume_variation.bri == 200

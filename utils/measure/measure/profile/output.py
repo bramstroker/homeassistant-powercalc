@@ -4,20 +4,20 @@ from pathlib import Path
 import tempfile
 import zipfile
 
-from measure.profile.models import ProfileMetadata, ProfilePreview
+from measure.profile.models import ProfileMetadata, ProfilePreview, RenderedProfileFile
 from measure.profile.prepare import ProfilePreparationError, ProfilePreparer
 
 
-def prepared_profile_archive(contents: tuple[tuple[str, bytes], ...]) -> bytes:
+def prepared_profile_archive(contents: list[RenderedProfileFile]) -> bytes:
     """Return prepared profile files as a reproducible ZIP archive."""
 
     output = io.BytesIO()
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        for relative_path, content in contents:
-            info = zipfile.ZipInfo(relative_path, date_time=(1980, 1, 1, 0, 0, 0))
+        for file in contents:
+            info = zipfile.ZipInfo(file.path, date_time=(1980, 1, 1, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o100644 << 16
-            archive.writestr(info, content)
+            archive.writestr(info, file.content)
     return output.getvalue()
 
 
@@ -40,11 +40,11 @@ def write_prepared_profile(
     preview = preparer.prepare(artifact_directory, metadata)
     contents = preparer.render_contents(artifact_directory, metadata, preview)
 
-    destinations = tuple((_safe_destination(output_directory, relative), content) for relative, content in contents)
-    for destination, _content in destinations:
+    destinations = [_safe_destination(output_directory, file.path) for file in contents]
+    for destination in destinations:
         destination.parent.mkdir(parents=True, exist_ok=True)
-    for destination, content in destinations:
-        _atomic_write(destination, content)
+    for destination, file in zip(destinations, contents, strict=True):
+        _atomic_write(destination, file.content)
     return preview
 
 

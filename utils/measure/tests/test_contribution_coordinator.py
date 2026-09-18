@@ -20,7 +20,7 @@ from measure.ha_app.contribution.models import (
 from measure.ha_app.contribution.preview import metadata_from_request
 from measure.ha_app.contribution.service import _validate_latest_preview
 from measure.powermeter.spec import DummyPowerMeterSpec
-from measure.profile.models import PreparedProfileFile, ProfilePreview
+from measure.profile.models import PreparedProfileFile, ProfilePreview, RenderedProfileFile
 from measure.profile.prepare import ProfilePreparer
 from measure.request import LightMeasurementRequest
 from pydantic import ValidationError
@@ -109,8 +109,8 @@ class FakePreparer(ProfilePreparer):
         artifact_directory: Path,
         metadata: ContributionMetadata,
         preview: ProfilePreview,
-    ) -> tuple[tuple[str, bytes], ...]:
-        return tuple((file.path, b"content") for file in preview.files)
+    ) -> list[RenderedProfileFile]:
+        return [RenderedProfileFile(path=file.path, content=b"content") for file in preview.files]
 
 
 def make_preview() -> ProfilePreview:

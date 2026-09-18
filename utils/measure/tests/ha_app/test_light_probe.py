@@ -15,7 +15,7 @@ from measure.ha_app.light_probe import (
 from measure.powermeter.powermeter import PowerMeasurementResult
 from measure.powermeter.spec import HassPowerMeterSpec, KasaPowerMeterSpec
 from measure.request import LightMeasurementRequest
-from measure.runner.light_plan import (
+from measure.runner.light.plan import (
     ColorTempVariation,
     HsVariation,
     LightMeasurementPlan,

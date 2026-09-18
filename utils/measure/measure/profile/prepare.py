@@ -8,7 +8,7 @@ import re
 from typing import Any
 
 from measure.profile.model_json import mains_voltage_from_range
-from measure.profile.models import PreparedProfileFile, ProfileMetadata, ProfilePreview
+from measure.profile.models import PreparedProfileFile, ProfileMetadata, ProfilePreview, RenderedProfileFile
 from measure.recording.files import select_recording_filenames
 
 JsonValidator = Callable[[dict[str, Any], dict[str, Any]], None]
@@ -117,12 +117,15 @@ class ProfilePreparer:
         artifact_directory: Path,
         metadata: ProfileMetadata,
         preview: ProfilePreview,
-    ) -> tuple[tuple[str, bytes], ...]:
+    ) -> list[RenderedProfileFile]:
         model = self._apply_metadata(self._read_object(artifact_directory / MODEL_JSON), metadata)
-        return tuple(
-            (file.path, self._render_file_content(Path(file.path), artifact_directory, model, metadata))
+        return [
+            RenderedProfileFile(
+                path=file.path,
+                content=self._render_file_content(Path(file.path), artifact_directory, model, metadata),
+            )
             for file in preview.files
-        )
+        ]
 
     @staticmethod
     def _artifact_csv_names(artifact_directory: Path) -> tuple[str, ...]:

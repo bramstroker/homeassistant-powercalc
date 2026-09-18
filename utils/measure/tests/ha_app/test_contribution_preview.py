@@ -8,6 +8,7 @@ from measure.ha_app.contribution.preview import (
     draft_from_request,
     metadata_from_request,
 )
+from measure.profile.models import RenderedProfileFile
 from measure.request import MeasurementRequest, parse_measurement_request
 import pytest
 
@@ -75,8 +76,10 @@ def test_draft_reads_artifact_author_and_voltage(
         assert preview.mains_voltage == 230
 
 
-@pytest.mark.parametrize("contents", [(), (("model.json", b"invalid"),), (("model.json", b"[]"),)])
-def test_missing_or_invalid_prepared_model_is_empty(contents: tuple[tuple[str, bytes], ...]) -> None:
+@pytest.mark.parametrize(
+    "contents", [[], [RenderedProfileFile("model.json", b"invalid")], [RenderedProfileFile("model.json", b"[]")]]
+)
+def test_missing_or_invalid_prepared_model_is_empty(contents: list[RenderedProfileFile]) -> None:
     assert _prepared_model(contents) == {}
 
 

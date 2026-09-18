@@ -30,6 +30,7 @@ from measure.ha_app.contribution.models import (
     supports_automatic_contribution,
 )
 from measure.profile.model_json import mains_voltage_from_range
+from measure.profile.models import RenderedProfileFile
 from measure.request import MeasurementRequest
 
 MODEL_FILENAME = "model.json"
@@ -259,12 +260,12 @@ def preview_from_job(
     request: MeasurementRequest,
     job: ContributionJob,
     notes: str,
-    contents: tuple[tuple[str, bytes], ...],
+    contents: list[RenderedProfileFile],
     base_sha: str,
     fork_owner: str | None,
     repository: GitHubRepository,
 ) -> ContributionPreviewResponse:
-    content_by_path = dict(contents)
+    content_by_path = {file.path: file.content for file in contents}
     prepared_model = _prepared_model(contents)
     content = _PreviewContent(
         manufacturer_name=job.metadata.manufacturer,
@@ -420,8 +421,8 @@ def _model_mains_voltage(model: dict[str, Any]) -> Literal[120, 230] | None:
     return 120 if value == 120 else 230
 
 
-def _prepared_model(contents: tuple[tuple[str, bytes], ...]) -> dict[str, Any]:
-    content = next((content for path, content in contents if Path(path).name == MODEL_FILENAME), None)
+def _prepared_model(contents: list[RenderedProfileFile]) -> dict[str, Any]:
+    content = next((file.content for file in contents if Path(file.path).name == MODEL_FILENAME), None)
     if content is None:
         return {}
     try:

@@ -37,7 +37,7 @@ from measure.request import (
     RecorderProfileRecipe,
     SpeakerMeasurementRequest,
 )
-from measure.runner.light_plan import build_light_plan, estimate_light_time_left
+from measure.runner.light.plan import build_light_plan, estimate_light_time_left
 
 
 class PreflightError(Exception):

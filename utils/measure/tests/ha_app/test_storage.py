@@ -149,6 +149,25 @@ def test_running_session_becomes_resumable_after_restart(tmp_path: Path) -> None
     assert loaded.state == SessionState.RESUMABLE
 
 
+@pytest.mark.parametrize("tail", ["128,", "128,4.2", "128,\nbroken\n", "128,nan\n"])
+def test_incomplete_csv_tail_does_not_block_resume_or_get_repaired_by_storage(tmp_path: Path, tail: str) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot(SessionState.RUNNING)
+    storage.create(current, light_request())
+    output = storage.artifact_directory(current.id, "LCT010")
+    output.mkdir()
+    path = output / "brightness.csv"
+    path.write_text("bri,watt\n1,0.45\n" + tail)
+    original = path.read_bytes()
+
+    assert storage.can_resume(current.id)
+    recovered = storage.load_current()
+
+    assert recovered is not None
+    assert recovered.state == SessionState.RESUMABLE
+    assert path.read_bytes() == original
+
+
 @pytest.mark.parametrize(
     "state",
     [
@@ -177,7 +196,9 @@ def test_every_orphaned_nonterminal_session_is_recovered(tmp_path: Path, state: 
         "bri,watt\n",
         "wrong,watt\n1,1.0\n",
         "bri,watt\n1,",
+        "bri,watt\n1,1.0",
         "bri,watt\n999,1.0\n",
+        "bri,watt\n999,1.0\n128,",
     ],
 )
 def test_interrupted_session_without_compatible_complete_row_fails(tmp_path: Path, contents: str) -> None:

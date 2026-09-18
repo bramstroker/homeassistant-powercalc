@@ -1,5 +1,4 @@
 from collections import deque
-import csv
 from dataclasses import replace
 import json
 import logging
@@ -33,13 +32,12 @@ from measure.request import (
     RecorderPurpose,
     parse_measurement_request,
 )
-from measure.runner.light_plan import (
-    CSV_HEADERS,
+from measure.runner.light.csv import inspect_light_csv
+from measure.runner.light.plan import (
     ColorTempVariation,
     EffectVariation,
     Variation,
     build_light_plan,
-    variation_from_csv_row,
 )
 from measure.utils.clock import utc_now
 from measure.utils.files import write_json_atomic
@@ -428,13 +426,8 @@ class SessionStorage:
         if not path.is_file() or path.is_symlink():
             return False
         try:
-            raw = path.read_bytes()
-            if not raw.endswith((b"\n", b"\r")):
-                return False
-            rows = list(csv.reader(raw.decode("utf-8").splitlines()))
-            if len(rows) < 2 or rows[0] != CSV_HEADERS[mode]:
-                return False
-            variation = variation_from_csv_row(rows[-1], mode)
+            inspection = inspect_light_csv(path, mode, include_datetime=request.parameters.csv_add_datetime_column)
+            variation = inspection.last_complete_variation
             if variation is None:
                 return False
             return SessionStorage._variation_matches_request(variation, mode, request)

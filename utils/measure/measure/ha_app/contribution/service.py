@@ -29,7 +29,7 @@ from measure.ha_app.contribution.models import (
     DeviceFlowStart,
 )
 from measure.ha_app.contribution.preview import metadata_from_request, preview_from_job
-from measure.profile.models import ProfilePreview
+from measure.profile.models import ProfilePreview, RenderedProfileFile
 from measure.profile.output import prepared_profile_archive
 from measure.profile.prepare import ProfilePreparationError, ProfilePreparer
 from measure.request import MeasurementRequest
@@ -122,7 +122,7 @@ class SharedContributionService:
             )
         return path.read_bytes()
 
-    def _save_prepared_archive(self, job_id: str, contents: tuple[tuple[str, bytes], ...]) -> None:
+    def _save_prepared_archive(self, job_id: str, contents: list[RenderedProfileFile]) -> None:
         directory = self._contribution_root / "prepared"
         directory.mkdir(parents=True, exist_ok=True)
         path = self._prepared_archive_path(job_id)

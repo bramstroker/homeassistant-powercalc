@@ -1,6 +1,7 @@
 from pathlib import Path
 from threading import Event, Thread
 import time
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 from measure.controller.light.spec import DummyLightControllerSpec
@@ -483,6 +484,50 @@ def test_transient_sample_does_not_reuse_terminal_event_sequence(tmp_path: Path)
     events = coordinator.events_since(0, session.id)
     assert [event.sequence for event in events] == [1, 2]
     assert len({event.sequence for event in events}) == len(events)
+
+
+@pytest.mark.parametrize(
+    "event_type,data",
+    [
+        (SessionEventType.SAMPLE, {"power": 4.2}),
+        (SessionEventType.CALIBRATION_SAMPLE, {"power": 4.2, "resistance": 100.0, "voltage": 230.0}),
+        (SessionEventType.ENTITY_STATES, {"states": {"vacuum.robot": "cleaning"}}),
+    ],
+)
+def test_transient_events_update_live_session_without_persisting(
+    tmp_path: Path, event_type: SessionEventType, data: dict[str, Any]
+) -> None:
+    emitted = Event()
+
+    def emit_live_reading(
+        request: MeasurementRequest, control: SessionControl, context: SessionExecutionContext
+    ) -> RunnerResult:
+        control.emit(event_type, data)
+        emitted.set()
+        control.wait(60)
+        raise AssertionError("Cancelled wait returned")
+
+    service = MagicMock(spec=SessionMeasurementService)
+    service.run.side_effect = emit_live_reading
+    storage = SessionStorage(tmp_path)
+    coordinator = MeasurementCoordinator(storage, lambda: service)
+    session = coordinator.start(light_request())
+
+    try:
+        assert emitted.wait(1)
+        current = coordinator.get(session.id)
+        assert current.event_sequence == 1
+        assert coordinator.events_since(0, session.id)[0].data == data
+        assert storage.load_events(session.id) == ()
+        assert storage.load_snapshot(session.id).event_sequence == 0
+        if event_type == SessionEventType.CALIBRATION_SAMPLE:
+            assert current.calibration_sample == data
+            assert storage.load_snapshot(session.id).calibration_sample is None
+        elif event_type == SessionEventType.ENTITY_STATES:
+            assert current.entity_states == data["states"]
+    finally:
+        coordinator.cancel(session.id)
+        wait_for_state(coordinator, SessionState.CANCELLED)
 
 
 def test_coordinator_reloads_persisted_events_for_reconnect(tmp_path: Path) -> None:

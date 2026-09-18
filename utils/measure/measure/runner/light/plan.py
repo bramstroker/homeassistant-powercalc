@@ -1,6 +1,5 @@
 from collections.abc import Collection, Sequence
 from dataclasses import dataclass
-import math
 
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightInfo
@@ -9,13 +8,6 @@ from measure.tuning import MeasurementParameters
 
 ESTIMATED_IO_DELAY = 0.15
 LIGHT_MODE_ORDER = (LutMode.BRIGHTNESS, LutMode.COLOR_TEMP, LutMode.HS, LutMode.EFFECT)
-
-CSV_HEADERS = {
-    LutMode.HS: ["bri", "hue", "sat", "watt"],
-    LutMode.COLOR_TEMP: ["bri", "mired", "watt"],
-    LutMode.BRIGHTNESS: ["bri", "watt"],
-    LutMode.EFFECT: ["effect", "bri", "watt"],
-}
 
 
 @dataclass(frozen=True)
@@ -161,29 +153,6 @@ def build_light_plan(
         ],
         effects=effect_list,
     )
-
-
-def variation_from_csv_row(row: Sequence[str], mode: LutMode) -> Variation | None:
-    """Parse a measurement CSV data row into its variation, or None when incomplete.
-
-    A row only counts when every variation column parses and the power column holds
-    a finite number, so torn rows from an interrupted write are never resumed from.
-    """
-    watt_index = len(CSV_HEADERS[mode]) - 1
-    try:
-        if len(row) <= watt_index or not math.isfinite(float(row[watt_index])):
-            return None
-        if mode == LutMode.BRIGHTNESS:
-            return Variation(bri=int(row[0]))
-        if mode == LutMode.COLOR_TEMP:
-            return ColorTempVariation(bri=int(row[0]), ct=int(row[1]))
-        if mode == LutMode.HS:
-            return HsVariation(bri=int(row[0]), hue=int(row[1]), sat=int(row[2]))
-        if mode == LutMode.EFFECT:
-            return EffectVariation(effect=row[0], bri=int(row[1])) if row[0].strip() else None
-    except ValueError:
-        return None
-    raise RunnerError(f"Mode {mode} not supported")
 
 
 def variations_after(variations: Sequence[Variation], resume_at: Variation | None) -> list[Variation]:

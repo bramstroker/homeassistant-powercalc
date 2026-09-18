@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from threading import Lock, Thread
 import time
-from typing import Protocol, cast
+from typing import Protocol
 from uuid import uuid4
 
 from measure.analyser.execution import RecorderAnalysisExecution
@@ -12,16 +12,15 @@ from measure.cancellation import MeasurementCancelledError
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
     RESUMABLE_SESSION_STATES,
-    CalibrationSample,
     SessionControl,
     SessionEvent,
     SessionEventType,
     SessionSnapshot,
     SessionState,
 )
+from measure.ha_app.session_projection import apply_session_event
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
 from measure.request import MeasurementRequest, RecorderMeasurementRequest, ResumePolicy
-from measure.runner.interaction import OperatingPoint
 from measure.runner.runner import RunnerResult
 from measure.utils.clock import utc_now
 
@@ -393,7 +392,7 @@ class MeasurementCoordinator:
             self._finish(SessionState.COMPLETED, summary=result.summary)
 
     def _handle_event(self, event: SessionEvent) -> None:
-        """Project runner events onto the snapshot and persistence policy."""
+        """Update the live session and persist events according to their frequency and importance."""
 
         with self._lock:
             if self._snapshot is None:
@@ -401,60 +400,13 @@ class MeasurementCoordinator:
             self._events.append(event)
             if len(self._events) > 1000:
                 self._events = self._events[-1000:]
-            if self._project_transient_sample(event):
+            self._snapshot = apply_session_event(self._snapshot, event)
+            if event.type in {
+                SessionEventType.SAMPLE,
+                SessionEventType.CALIBRATION_SAMPLE,
+                SessionEventType.ENTITY_STATES,
+            }:
                 return
-            if event.type == SessionEventType.PROGRESS:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                    completed=int(event.data["completed"]),
-                    total=int(event.data["total"]),
-                    skipped=int(event.data.get("skipped", 0)),
-                    phase=str(event.data["mode"]),
-                    mode=str(event.data["mode"]),
-                    estimated_remaining=str(event.data["estimated_remaining"]),
-                )
-            elif event.type == SessionEventType.PHASE:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                    phase=str(event.data["message"]),
-                )
-            elif event.type == SessionEventType.OPERATING_POINT:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                    operating_point=cast(OperatingPoint, event.data),
-                )
-            elif event.type == SessionEventType.WARNING:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                    warnings=self._append_warning(
-                        self._snapshot.warnings,
-                        str(event.data["message"]),
-                    ),
-                )
-            elif event.type == SessionEventType.CHECKPOINT:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                    state=SessionState.AWAITING_CONFIRMATION,
-                    phase="Waiting for confirmation",
-                    confirmation_message=str(event.data["message"]),
-                    confirmation_action=(str(event.data["action"]) if event.data.get("action") else None),
-                )
-            else:
-                self._snapshot = replace(
-                    self._snapshot,
-                    event_sequence=event.sequence,
-                    updated_at=event.created_at,
-                )
             durable = event.type in {
                 SessionEventType.STATE,
                 SessionEventType.PHASE,
@@ -465,42 +417,8 @@ class MeasurementCoordinator:
             if self._should_persist_snapshot(event):
                 self.storage.write_snapshot(self._snapshot)
                 self._last_snapshot_write = time.monotonic()
-        self._notify_checkpoint(event)
-
-    @staticmethod
-    def _append_warning(warnings: tuple[str, ...], warning: str) -> tuple[str, ...]:
-        """Append a new user-facing warning while preserving distinct prior warnings."""
-
-        return tuple(dict.fromkeys((*warnings, warning)))[-20:]
-
-    def _notify_checkpoint(self, event: SessionEvent) -> None:
-        """Publish the state transition caused by an operator checkpoint."""
         if event.type == SessionEventType.CHECKPOINT:
             self._notify_listeners()
-
-    def _project_transient_sample(self, event: SessionEvent) -> bool:
-        """Project live readings in memory without writing high-frequency snapshots."""
-
-        assert self._snapshot is not None
-        if event.type == SessionEventType.SAMPLE:
-            self._snapshot = replace(self._snapshot, event_sequence=event.sequence, updated_at=event.created_at)
-        elif event.type == SessionEventType.CALIBRATION_SAMPLE:
-            self._snapshot = replace(
-                self._snapshot,
-                event_sequence=event.sequence,
-                updated_at=event.created_at,
-                calibration_sample=cast(CalibrationSample, event.data),
-            )
-        elif event.type == SessionEventType.ENTITY_STATES:
-            self._snapshot = replace(
-                self._snapshot,
-                event_sequence=event.sequence,
-                updated_at=event.created_at,
-                entity_states={str(key): str(value) for key, value in event.data.get("states", {}).items()},
-            )
-        else:
-            return False
-        return True
 
     def _should_persist_snapshot(self, event: SessionEvent) -> bool:
         if event.type == SessionEventType.LOG:

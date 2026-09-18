@@ -20,6 +20,7 @@ from measure.ha_app.contribution.models import (
     ContributionPreviewResponse,
 )
 from measure.ha_app.contribution.service import SharedContributionService
+from measure.profile.models import RenderedProfileFile
 from measure.request import MeasurementRequest, parse_measurement_request
 import pytest
 
@@ -210,5 +211,5 @@ def test_failed_archive_replacement_cleans_up_temporary_file(session: Contributi
         patch.object(Path, "replace", side_effect=OSError("No space")),
         pytest.raises(OSError, match="No space"),
     ):
-        session.service._save_prepared_archive("job", (("model.json", b"{}"),))  # noqa: SLF001
+        session.service._save_prepared_archive("job", [RenderedProfileFile("model.json", b"{}")])  # noqa: SLF001
     assert list((tmp_path / "contribution/prepared").iterdir()) == []

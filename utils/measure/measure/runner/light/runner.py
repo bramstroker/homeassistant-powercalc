@@ -1,12 +1,7 @@
-import csv
 from dataclasses import asdict, dataclass
-from datetime import datetime as dt
-import gzip
 import logging
-import os
-import shutil
+from pathlib import Path
 import time
-from typing import Literal, TextIO
 
 from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import LutMode
@@ -19,8 +14,14 @@ from measure.powermeter.errors import (
 from measure.request import LightMeasurementRequest
 from measure.runner.errors import RunnerError
 from measure.runner.interaction import ImmediateInteraction, LightOperatingPoint, RunInteraction
-from measure.runner.light_plan import (
-    CSV_HEADERS,
+from measure.runner.light.csv import (
+    compress_light_csv,
+    has_measurement_rows,
+    inspect_light_csv,
+    open_csv_writer,
+    repair_incomplete_csv_tail,
+)
+from measure.runner.light.plan import (
     ColorTempVariation,
     EffectVariation,
     HsVariation,
@@ -29,15 +30,13 @@ from measure.runner.light_plan import (
     Variation,
     build_light_plan,
     estimate_light_time_left,
-    variation_from_csv_row,
     variations_after,
 )
-from measure.runner.light_setup import set_light_to_maximum_brightness
+from measure.runner.light.setup import set_light_to_maximum_brightness
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.tuning import MeasurementParameters
 from measure.utils.sampling import AverageMeasurementConvergence, MeasurementResult, PowerSampler
 
-CSV_WRITE_BUFFER = 50
 MAX_CONSECUTIVE_ZERO_READINGS = 5
 ZERO_READING_ABORT_MESSAGE = (
     "Aborting measurement session after repeated 0 W readings. The power meter may not resolve this low load. "
@@ -47,6 +46,18 @@ ZERO_READING_ABORT_MESSAGE = (
 )
 
 _LOGGER = logging.getLogger("measure")
+
+
+@dataclass
+class LightRunProgress:
+    """Track unfinished variations against the full plan, including resumed work."""
+
+    total: int
+    remaining: list[Variation]
+
+    @property
+    def completed(self) -> int:
+        return self.total - len(self.remaining)
 
 
 class LightRunner(MeasurementRunner[LightMeasurementRequest]):
@@ -121,16 +132,15 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             effects=list(self.plan.effects),
         )
 
-        all_variations = self.plan.variations
-        _LOGGER.info("Total number of variations: %d", len(all_variations))
-        remaining_variations = self.active_plan.variations.copy()
+        progress = LightRunProgress(total=self.plan.variation_count, remaining=self.active_plan.variations.copy())
+        _LOGGER.info("Total number of variations: %d", progress.total)
         voltages: list[float] = []
 
         for measurement_info in measurements_to_run:
-            voltages.extend(self.run_mode(measurement_info, all_variations, remaining_variations))
+            voltages.extend(self.run_mode(measurement_info, progress))
 
-        if remaining_variations:
-            raise RunnerError(f"Measurement ended with {len(remaining_variations)} incomplete variations")
+        if progress.remaining:
+            raise RunnerError(f"Measurement ended with {len(progress.remaining)} incomplete variations")
 
         return RunnerResult(
             model_json_data={
@@ -148,12 +158,20 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
 
         csv_file_path = f"{export_directory}/{mode.value}.csv"
 
-        resume_at = None
+        inspection = None
         if self.should_resume(csv_file_path):
-            resume_at = self.get_resume_variation(csv_file_path, mode)
+            try:
+                inspection = inspect_light_csv(
+                    Path(csv_file_path), mode, include_datetime=self.config.csv_add_datetime_column
+                )
+            except ValueError as error:
+                raise RunnerError(str(error)) from error
 
         assert self.plan is not None
+        resume_at = inspection.last_complete_variation if inspection is not None else None
         variations = list(variations_after(self.plan.for_mode(mode).variations, resume_at))
+        if inspection is not None:
+            repair_incomplete_csv_tail(Path(csv_file_path), inspection)
         return MeasurementRunInput(
             mode=mode,
             csv_file=csv_file_path,
@@ -171,29 +189,26 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
     def run_mode(
         self,
         measurement_info: MeasurementRunInput,
-        all_variations: list[Variation],
-        remaining_variations: list[Variation],
+        progress: LightRunProgress,
     ) -> list[float]:
-        """Run the measurement session for lights"""
+        """Measure and save each unfinished variation for one light mode."""
 
         mode = self._resolve_white_mode(measurement_info.mode)
         voltages: list[float] = []
 
-        file_write_mode, write_header_row = self._get_csv_write_options(measurement_info)
+        if measurement_info.is_resuming:
+            _LOGGER.info("Resuming measurements")
 
         _LOGGER.info(
             "Starting measurements. Estimated duration: %s",
-            self.calculate_time_left(mode, remaining_variations),
+            self.calculate_time_left(mode, progress.remaining),
         )
 
-        with open(measurement_info.csv_file, file_write_mode, newline="") as csv_file:
-            csv_writer = CsvWriter(csv_file, mode, write_header_row, self.config)
-
-            # To avoid bugs in some lights, when set to low brightness initially
-            # where they turn off again. And also bugs where lights will turn off
-            # again, after they received two turn-off commands, followed by a single
-            # turn on command, we set them to maximum brightness, twice here.
-            # See issue #2598
+        with open_csv_writer(
+            Path(measurement_info.csv_file), mode, append=measurement_info.is_resuming, parameters=self.config
+        ) as csv_writer:
+            # Set maximum brightness twice to prevent some lights turning off
+            # when starting at low brightness or after repeated off commands (#2598).
             assert self.light_info is not None
             set_light_to_maximum_brightness(
                 self.light_controller,
@@ -209,40 +224,17 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
                 mode.value,
             )
 
-            self._report_progress(mode, all_variations, remaining_variations)
+            self._report_progress(mode, progress)
             previous_variation = None
             for count, variation in enumerate(measurement_info.variations):
-                while True:
-                    self._log_progress(mode, count, variation, all_variations, remaining_variations)
-                    _LOGGER.info("Changing light to: %s", variation)
-                    self._checkpoint()
-                    variation_start_time = time.time()
-                    self._change_light_with_retry(mode, variation)
-                    self.wait(variation, previous_variation)
-
-                    previous_variation = variation
-
-                    try:
-                        self._checkpoint()
-                        measurement_result = self.take_power_measurement(mode, variation_start_time)
-                    except OutdatedMeasurementError:
-                        measurement_result = self.nudge_and_remeasure(mode, variation)
-                    except ZeroReadingError as error:
-                        self._record_zero_reading()
-                        self._report_progress(mode, all_variations, remaining_variations, variation)
-                        _LOGGER.warning("Discarding measurement: %s", error)
-                        self._raise_for_repeated_zero_readings(error)
-                        continue
-                    except PowerMeterError as error:
-                        raise RunnerError(f"Aborting measurement session: {error}") from error
-                    self.num_0_readings = 0
-                    _LOGGER.info("Measured power: %.2f", measurement_result.power)
-                    self._checkpoint()
-                    csv_writer.write_measurement(variation, measurement_result.power)
-                    voltages.extend(measurement_result.voltages)
-                    remaining_variations.remove(variation)
-                    self._report_progress(mode, all_variations, remaining_variations, variation)
-                    break
+                self._log_progress(mode, count, variation, progress)
+                result = self.measure_variation(mode, variation, previous_variation, progress)
+                previous_variation = variation
+                self._checkpoint()
+                csv_writer.write_measurement(variation, result.power)
+                voltages.extend(result.voltages)
+                progress.remaining.remove(variation)
+                self._report_progress(mode, progress, variation)
 
             _LOGGER.info(
                 "Hooray! measurements finished. Exported CSV file %s",
@@ -250,46 +242,70 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             )
 
         if self.gzip:
-            self.gzip_csv(measurement_info.csv_file)
+            compress_light_csv(Path(measurement_info.csv_file))
         return voltages
 
-    def _get_csv_write_options(self, measurement_info: MeasurementRunInput) -> tuple[Literal["w", "a"], bool]:
-        if not measurement_info.is_resuming:
-            return "w", True
+    def measure_variation(
+        self,
+        mode: LutMode,
+        variation: Variation,
+        previous_variation: Variation | None,
+        progress: LightRunProgress,
+    ) -> MeasurementResult:
+        """Settle and measure one light setting, retrying zero or stale readings."""
+        while True:
+            _LOGGER.info("Changing light to: %s", variation)
+            self._checkpoint()
+            variation_start_time = time.time()
+            self._change_light_with_retry(mode, variation)
+            self.wait(variation, previous_variation)
+            previous_variation = variation
 
-        _LOGGER.info("Resuming measurements")
-        return "a", False
+            try:
+                self._checkpoint()
+                result = self.take_power_measurement(mode, variation_start_time)
+            except OutdatedMeasurementError:
+                result = self.nudge_and_remeasure(mode, variation)
+            except ZeroReadingError as error:
+                self._record_zero_reading()
+                self._report_progress(mode, progress, variation)
+                _LOGGER.warning("Discarding measurement: %s", error)
+                self._raise_for_repeated_zero_readings(error)
+                continue
+            except PowerMeterError as error:
+                raise RunnerError(f"Aborting measurement session: {error}") from error
+
+            self.num_0_readings = 0
+            _LOGGER.info("Measured power: %.2f", result.power)
+            return result
 
     def _log_progress(
         self,
         mode: LutMode,
         count: int,
         variation: Variation,
-        all_variations: list[Variation],
-        remaining_variations: list[Variation],
+        progress: LightRunProgress,
     ) -> None:
         if count % 10 != 0:
             return
 
-        time_left = self.calculate_time_left(mode, remaining_variations, variation)
-        progress_percentage = ((len(all_variations) - len(remaining_variations)) / len(all_variations)) * 100
+        time_left = self.calculate_time_left(mode, progress.remaining, variation)
+        progress_percentage = progress.completed / progress.total * 100
         _LOGGER.info("Progress: %d%%, Estimated time left: %s", progress_percentage, time_left)
 
     def _report_progress(
         self,
         mode: LutMode,
-        all_variations: list[Variation],
-        remaining_variations: list[Variation],
+        progress: LightRunProgress,
         current_variation: Variation | None = None,
     ) -> None:
-        completed_variations = len(all_variations) - len(remaining_variations)
         self.interaction.progress(
-            completed=completed_variations,
-            total=len(all_variations),
+            completed=progress.completed,
+            total=progress.total,
             phase=mode.value,
             remaining_seconds=self.calculate_time_left_seconds(
                 mode,
-                remaining_variations,
+                progress.remaining,
                 current_variation,
             ),
             skipped=self.skipped_zero_readings,
@@ -449,54 +465,14 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
 
     def should_resume(self, csv_file_path: str) -> bool:
         """Apply the configured resume policy to a non-empty measurement CSV."""
-        if not os.path.exists(csv_file_path):
+        if not self._resume or not has_measurement_rows(Path(csv_file_path)):
             return False
-
-        size = os.path.getsize(csv_file_path)
-        if size == 0:
-            return False
-
-        with open(csv_file_path) as csv_file:
-            rows = csv.reader(csv_file)
-            if len(list(rows)) == 1:
-                return False
-
-        should_resume = self._resume
-        if should_resume:
-            if not self.config.prompt_resume:
-                return True
-            return self.interaction.choose(
-                f"CSV File {csv_file_path} already exists. Do you want to resume measurements?",
-                default=True,
-            )
-        return should_resume
-
-    def get_resume_variation(self, csv_file_path: str, mode: LutMode) -> Variation | None:
-        """Parse the last complete CSV row into the variation from which the mode resumes.
-
-        Trailing rows that cannot be parsed (typically a torn final line after a crash)
-        are dropped from the file so appended measurements produce a valid CSV.
-        """
-
-        with open(csv_file_path, newline="") as csv_file:
-            rows = list(csv.reader(csv_file))
-
-        valid_row_count = len(rows)
-        while valid_row_count > 1 and variation_from_csv_row(rows[valid_row_count - 1], mode) is None:
-            valid_row_count -= 1
-
-        if valid_row_count < len(rows):
-            _LOGGER.warning(
-                "Dropping %d incomplete trailing row(s) from %s before resuming",
-                len(rows) - valid_row_count,
-                csv_file_path,
-            )
-            with open(csv_file_path, "w", newline="") as csv_file:
-                csv.writer(csv_file).writerows(rows[:valid_row_count])
-
-        if valid_row_count == 1:
-            return None
-        return variation_from_csv_row(rows[valid_row_count - 1], mode)
+        if not self.config.prompt_resume:
+            return True
+        return self.interaction.choose(
+            f"CSV File {csv_file_path} already exists. Do you want to resume measurements?",
+            default=True,
+        )
 
     def take_power_measurement(
         self,
@@ -522,18 +498,6 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         power = result.power / self.num_lights
 
         return MeasurementResult(power=round(power, 2), voltages=result.voltages)
-
-    @staticmethod
-    def gzip_csv(csv_file_path: str) -> None:
-        """Gzip the CSV file"""
-        with (
-            open(csv_file_path, "rb") as csv_file,
-            gzip.open(
-                f"{csv_file_path}.gz",
-                "wb",
-            ) as gzip_file,
-        ):
-            shutil.copyfileobj(csv_file, gzip_file)
 
     def measure_standby_power(self) -> MeasurementResult:
         """Measures the standby power (when the light is OFF)"""
@@ -578,34 +542,3 @@ class MeasurementRunInput:
     csv_file: str
     variations: list[Variation]
     is_resuming: bool
-
-
-class CsvWriter:
-    def __init__(
-        self,
-        csv_file: TextIO,
-        mode: LutMode,
-        add_header: bool,
-        parameters: MeasurementParameters,
-    ) -> None:
-        self.csv_file = csv_file
-        self.config = parameters
-        self.writer = csv.writer(csv_file)
-        self.rows_written = 0
-        if add_header:
-            header_row = [*CSV_HEADERS[mode]]
-            if self.config.csv_add_datetime_column:
-                header_row.append("time")
-            self.writer.writerow(header_row)
-
-    def write_measurement(self, variation: Variation, power: float) -> None:
-        """Write row with measurement to the CSV"""
-        row = variation.to_csv_row()
-        row.append(power)
-        if self.config.csv_add_datetime_column:
-            row.append(dt.now().strftime("%Y%m%d%H%M%S"))
-        self.writer.writerow(row)
-        self.rows_written += 1
-        if self.rows_written % CSV_WRITE_BUFFER == 1:
-            self.csv_file.flush()
-            _LOGGER.debug("Flushing CSV buffer")

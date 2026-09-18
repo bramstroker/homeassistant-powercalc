@@ -123,7 +123,9 @@ def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_u
     assert seen_model["authors"] == [{"name": "Test User", "github": "test-user", "email": "test@example.com"}]
     assert seen_model["name"] == "Hue test lamp"
     assert "aliases" not in seen_model
-    prepared_contents = dict(preparer.render_contents(artifacts, contribution_metadata, preview))
+    prepared_contents = {
+        file.path: file.content for file in preparer.render_contents(artifacts, contribution_metadata, preview)
+    }
     prepared_model = json.loads(prepared_contents[preview.files[0].path])
     assert prepared_model["name"] == "Hue test lamp"
     assert "aliases" not in prepared_model
@@ -151,7 +153,7 @@ def test_preparer_applies_delivery_independent_profile_metadata(tmp_path: Path) 
     )
 
     preview = preparer.prepare(artifacts, contribution_metadata)
-    model = json.loads(dict(preparer.render_contents(artifacts, contribution_metadata, preview))[preview.files[0].path])
+    model = json.loads(preparer.render_contents(artifacts, contribution_metadata, preview)[0].content)
 
     assert model["aliases"] == ["Hue test"]
     assert model["gtin"] == ["12345678", "1234567890123"]
@@ -172,7 +174,7 @@ def test_preparer_derives_mains_voltage_from_measured_voltage_range(tmp_path: Pa
     voltage_metadata = metadata().model_copy(update={"mains_voltage": None})
     preparer = make_preparer(tmp_path)
     preview = preparer.prepare(artifacts, voltage_metadata)
-    model = json.loads(dict(preparer.render_contents(artifacts, voltage_metadata, preview))[preview.files[0].path])
+    model = json.loads(preparer.render_contents(artifacts, voltage_metadata, preview)[0].content)
 
     assert model["mains_voltage"] == 120
 
@@ -210,7 +212,7 @@ def test_preparer_omits_empty_optional_profile_metadata(tmp_path: Path) -> None:
 
     preview = make_preparer(tmp_path).prepare(artifacts, contribution_metadata)
     model = json.loads(
-        dict(make_preparer(tmp_path).render_contents(artifacts, contribution_metadata, preview))[preview.files[0].path],
+        make_preparer(tmp_path).render_contents(artifacts, contribution_metadata, preview)[0].content,
     )
 
     assert not {
@@ -291,7 +293,7 @@ def test_preparer_generates_new_manufacturer_manifest_without_adding_aliases(tmp
     preview = preparer.prepare(artifacts, metadata("Acme"))
 
     assert "profile_library/acme/manufacturer.json" in {file.path for file in preview.files}
-    contents = dict(preparer.render_contents(artifacts, metadata("Acme"), preview))
+    contents = {file.path: file.content for file in preparer.render_contents(artifacts, metadata("Acme"), preview)}
     assert json.loads(contents["profile_library/acme/manufacturer.json"]) == {"name": "Acme", "aliases": []}
 
 
@@ -331,11 +333,11 @@ def test_preparer_packages_recorder_model_without_source_artifacts(tmp_path: Pat
     preparer = make_preparer(tmp_path)
 
     preview = preparer.prepare(artifacts, contribution_metadata)
-    contents = dict(preparer.render_contents(artifacts, contribution_metadata, preview))
+    contents = preparer.render_contents(artifacts, contribution_metadata, preview)
 
     assert [file.path for file in preview.files] == ["profile_library/signify/Heater 1/model.json"]
-    assert list(contents) == ["profile_library/signify/Heater 1/model.json"]
-    assert json.loads(contents[preview.files[0].path])["name"] == "Smart heater"
+    assert [file.path for file in contents] == ["profile_library/signify/Heater 1/model.json"]
+    assert json.loads(contents[0].content)["name"] == "Smart heater"
 
 
 def test_preparer_blocks_collisions_and_warns_on_duplicates(tmp_path: Path) -> None:
@@ -460,7 +462,7 @@ def test_preparer_compresses_raw_csv_for_profile_library(tmp_path: Path) -> None
     preparer = make_preparer(tmp_path)
 
     preview = preparer.prepare(artifacts, metadata())
-    contents = dict(preparer.render_contents(artifacts, metadata(), preview))
+    contents = {file.path: file.content for file in preparer.render_contents(artifacts, metadata(), preview)}
 
     assert gzip.decompress(contents["profile_library/signify/LCT999/brightness.csv.gz"]) == raw_content
 
