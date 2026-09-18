@@ -6,7 +6,7 @@ from homeassistant_api.errors import HomeassistantAPIError
 from measure.controller.charging.const import ATTR_BATTERY_LEVEL
 from measure.controller.charging.errors import BatteryLevelRetrievalError
 from measure.controller.charging.hass import HassChargingController
-from measure.controller.errors import ApiConnectionError
+from measure.controller.errors import ApiConnectionError, ControllerError
 from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistantManager
 import pytest
 
@@ -129,6 +129,25 @@ def test_get_battery_level_sensor_invalid_state() -> None:
     controller = _get_instance(client=client)
     with pytest.raises(BatteryLevelRetrievalError):
         controller.get_battery_level()
+
+
+def test_get_battery_level_reports_disappeared_sensor() -> None:
+    client = _mock_client()
+    client.get_entity_data.return_value = _battery_sensor_data()
+    client.get_entity.return_value = None
+
+    with pytest.raises(BatteryLevelRetrievalError, match=r"Battery level entity sensor\.test_battery_level not found"):
+        _get_instance(client=client).get_battery_level()
+
+    client.get_entity.assert_called_once_with(entity_id="sensor.test_battery_level")
+
+
+def test_charging_state_reports_disappeared_vacuum() -> None:
+    client = _mock_client()
+    client.get_entity.return_value = None
+
+    with pytest.raises(ControllerError, match=r"Entity vacuum\.test not found"):
+        _get_instance(client=client).is_charging()
 
 
 def test_is_charging() -> None:

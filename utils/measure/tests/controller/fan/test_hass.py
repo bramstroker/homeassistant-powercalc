@@ -27,6 +27,18 @@ def test_turn_off() -> None:
     client.trigger_service.assert_called_once_with("fan", "turn_off", entity_id="fan.test")
 
 
+def test_turn_off_reports_service_failure() -> None:
+    client = _mock_client()
+    error = HomeassistantAPIError("Service unavailable")
+    client.trigger_service.side_effect = error
+
+    with pytest.raises(ControllerError, match="Failed to turn off fan") as raised:
+        _get_instance(client).turn_off()
+
+    assert raised.value.__cause__ is error
+    client.trigger_service.assert_called_once_with("fan", "turn_off", entity_id="fan.test")
+
+
 def test_connection_validation() -> None:
     client = _mock_client()
     client.get_config.side_effect = HomeassistantAPIError("Error")

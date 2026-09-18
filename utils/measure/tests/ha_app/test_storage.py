@@ -2,7 +2,7 @@ import json
 import logging
 from pathlib import Path
 
-from measure.controller.light.const import LutMode
+from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
 from measure.ha_app.contribution.coordinator import ContributionApiCoordinator
@@ -134,6 +134,91 @@ def test_storage_recovers_from_truncated_final_event(tmp_path: Path, caplog: pyt
 
     assert [event.sequence for event in events] == [1]
     assert "truncated final session event" in caplog.text
+
+
+@pytest.mark.parametrize("contents", ["not json", "[]", "{}", '{"id":"missing-session"}'])
+def test_invalid_current_pointer_is_removed_without_deleting_retained_session(tmp_path: Path, contents: str) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot(SessionState.COMPLETED)
+    storage.create(current, light_request())
+    pointer = tmp_path / "current.json"
+    pointer.write_text(contents, encoding="utf-8")
+
+    assert storage.load_current() is None
+    assert not pointer.exists()
+    assert storage.load_snapshot(current.id) == current
+
+
+def test_event_replay_ignores_blank_lines(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    storage.create(snapshot(), light_request())
+    event = SessionEvent(sequence=1, type=SessionEventType.LOG, created_at=utc_now(), data={"message": "saved"})
+    storage.append_event("a1b2-c3d4", event)
+    path = storage.session_directory("a1b2-c3d4") / "events.jsonl"
+    path.write_text("\n  \n" + path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+
+    assert storage.load_events("a1b2-c3d4") == [event]
+
+
+@pytest.mark.parametrize("invalid_event", ["[]", '{"data":[]}', '{"sequence":'])
+@pytest.mark.parametrize("is_final", [False, True])
+def test_event_recovery_only_tolerates_truncated_final_json(
+    tmp_path: Path,
+    invalid_event: str,
+    is_final: bool,
+) -> None:
+    storage = SessionStorage(tmp_path)
+    storage.create(snapshot(), light_request())
+    event = SessionEvent(sequence=1, type=SessionEventType.LOG, created_at=utc_now(), data={"message": "saved"})
+    storage.append_event("a1b2-c3d4", event)
+    path = storage.session_directory("a1b2-c3d4") / "events.jsonl"
+    valid_event = path.read_text(encoding="utf-8")
+    contents = valid_event + invalid_event if is_final else invalid_event + "\n" + valid_event
+    path.write_text(contents, encoding="utf-8")
+
+    if is_final and invalid_event == '{"sequence":':
+        assert storage.load_events("a1b2-c3d4") == [event]
+    else:
+        message = "Expecting value" if invalid_event == '{"sequence":' else "Persisted session event must be an object"
+        with pytest.raises(ValueError, match=message):
+            storage.load_events("a1b2-c3d4")
+    assert path.read_text(encoding="utf-8") == contents
+
+
+@pytest.mark.parametrize("provider", ["shelly", "tapo"])
+@pytest.mark.parametrize("contents", ["not json", "[]", "{}"])
+def test_invalid_credentials_are_treated_as_unconfigured(tmp_path: Path, provider: str, contents: str) -> None:
+    storage = SessionStorage(tmp_path)
+    path = tmp_path / f"{provider}_credentials.json"
+    path.write_text(contents, encoding="utf-8")
+
+    credentials = storage.load_shelly_credentials() if provider == "shelly" else storage.load_tapo_credentials()
+
+    assert credentials is None
+    assert path.read_text(encoding="utf-8") == contents
+
+
+@pytest.mark.parametrize(
+    "brightness,mired,resumable",
+    [(1, MIN_MIRED, True), (1, MAX_MIRED, True), (1, MIN_MIRED - 1, False), (1, MAX_MIRED + 1, False), (2, 250, False)],
+)
+def test_color_temperature_resume_requires_compatible_brightness_and_mired_range(
+    tmp_path: Path,
+    brightness: int,
+    mired: int,
+    resumable: bool,
+) -> None:
+    storage = SessionStorage(tmp_path)
+    request = light_request().model_copy(update={"modes": {LutMode.COLOR_TEMP}})
+    storage.create(snapshot(SessionState.RUNNING), request)
+    output = storage.artifact_directory("a1b2-c3d4", "LCT010")
+    output.mkdir()
+    (output / "color_temp.csv").write_text(f"bri,mired,watt\n{brightness},{mired},1.0\n", encoding="utf-8")
+
+    assert storage.can_resume("a1b2-c3d4") is resumable
+    recovered = storage.load_current()
+    assert recovered is not None
+    assert recovered.state == (SessionState.RESUMABLE if resumable else SessionState.FAILED)
 
 
 def test_running_session_becomes_resumable_after_restart(tmp_path: Path) -> None:

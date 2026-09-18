@@ -2,12 +2,13 @@ from contextlib import closing
 import json
 from pathlib import Path
 from typing import Any
+from unittest.mock import AsyncMock, MagicMock
 
 import aiohttp
-from aiohue.errors import Unauthorized
+from aiohue.errors import AiohueException, Unauthorized
 from measure.controller.errors import ApiConnectionError
-from measure.controller.light.const import LutMode
-from measure.controller.light.errors import LightControllerError
+from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
+from measure.controller.light.errors import LightControllerError, ModelNotDiscoveredError
 import measure.controller.light.hue as hue_module
 from measure.controller.light.hue import HueLightController
 import pytest
@@ -244,3 +245,163 @@ def test_rejects_invalid_or_missing_targets(monkeypatch: pytest.MonkeyPatch, tmp
 
     with pytest.raises(LightControllerError, match="does not exist"):
         HueLightController("192.0.2.10", light="light:99", config_file_path=config_path)
+
+
+@pytest.mark.parametrize("has_registration", [True, False])
+@pytest.mark.parametrize(
+    "error", [aiohttp.ClientConnectionError("Offline"), TimeoutError("Timed out"), AiohueException("Bridge error")]
+)
+def test_initialization_failure_closes_bridge(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    has_registration: bool,
+    error: Exception,
+) -> None:
+    lights, groups = _resources()
+    bridge = _Bridge(lights, groups, initialize_error=error)
+    monkeypatch.setattr(hue_module, "HueBridgeV1", lambda host, app_key: bridge)
+    monkeypatch.setattr(hue_module, "create_app_key", AsyncMock(return_value="new-key"))
+    monkeypatch.setattr("builtins.input", lambda _: "")
+    config = tmp_path / ".python_hue"
+    if has_registration:
+        config.write_text(json.dumps({"192.0.2.10": {"username": "existing-key"}}), encoding="utf-8")
+
+    with pytest.raises(LightControllerError, match="Failed to connect to Hue bridge") as raised:
+        HueLightController("192.0.2.10", light="light:1", config_file_path=config)
+
+    assert raised.value.__cause__ is error
+    assert bridge.closed
+
+
+def test_registration_failure_is_reported(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    error = aiohttp.ClientConnectionError("Offline")
+    registration = AsyncMock(side_effect=error)
+    constructor = MagicMock()
+    monkeypatch.setattr(hue_module, "create_app_key", registration)
+    monkeypatch.setattr(hue_module, "HueBridgeV1", constructor)
+    monkeypatch.setattr("builtins.input", lambda _: "")
+    config = tmp_path / ".python_hue"
+
+    with pytest.raises(LightControllerError, match="Failed to register with Hue bridge") as raised:
+        HueLightController("192.0.2.10", config_file_path=config)
+
+    assert raised.value.__cause__ is error
+    constructor.assert_not_called()
+    assert not config.exists()
+
+
+@pytest.mark.parametrize("contents", ["{invalid json", ""])
+def test_corrupt_registration_file_is_reported(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, contents: str) -> None:
+    config = tmp_path / ".python_hue"
+    config.write_text(contents, encoding="utf-8")
+    constructor = MagicMock()
+    monkeypatch.setattr(hue_module, "HueBridgeV1", constructor)
+
+    with pytest.raises(LightControllerError, match="Could not read Hue bridge configuration"):
+        HueLightController("192.0.2.10", config_file_path=config)
+
+    constructor.assert_not_called()
+    assert config.read_text(encoding="utf-8") == contents
+
+
+def test_new_registration_preserves_other_valid_bridge_entries(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    lights, groups = _resources()
+    bridge = _Bridge(lights, groups)
+    monkeypatch.setattr(hue_module, "HueBridgeV1", lambda host, app_key: bridge)
+    monkeypatch.setattr(hue_module, "create_app_key", AsyncMock(return_value="new-key"))
+    monkeypatch.setattr("builtins.input", lambda _: "")
+    config = tmp_path / ".python_hue"
+    config.write_text(
+        json.dumps(
+            {
+                "192.0.2.10": "invalid entry",
+                "192.0.2.20": {"username": "other-key"},
+                "192.0.2.30": {"username": 42},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with closing(HueLightController("192.0.2.10", light="light:1", config_file_path=config)):
+        pass
+
+    assert json.loads(config.read_text(encoding="utf-8")) == {
+        "192.0.2.10": {"username": "new-key"},
+        "192.0.2.20": {"username": "other-key"},
+    }
+
+
+def test_registration_save_failure_is_reported(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(hue_module, "create_app_key", AsyncMock(return_value="new-key"))
+    monkeypatch.setattr("builtins.input", lambda _: "")
+    blocker = tmp_path / "not-a-directory"
+    blocker.write_text("file", encoding="utf-8")
+
+    with pytest.raises(LightControllerError, match="Could not save Hue bridge configuration") as raised:
+        HueLightController("192.0.2.10", config_file_path=blocker / ".python_hue")
+
+    assert isinstance(raised.value.__cause__, OSError)
+
+
+def test_bridge_state_error_is_not_retried(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    controller, bridge = _controller(monkeypatch, tmp_path)
+    error = AiohueException("Invalid state")
+    bridge.lights["1"].failures = [error]
+
+    with closing(controller), pytest.raises(LightControllerError, match="Failed to set light state") as raised:
+        controller.change_light_state(LutMode.BRIGHTNESS, bri=100)
+
+    assert raised.value.__cause__ is error
+    assert bridge.lights["1"].calls == [{"on": True, "bri": 100}]
+
+
+def test_group_model_and_effect_capabilities(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    controller, _ = _controller(monkeypatch, tmp_path, target="group:12")
+
+    with closing(controller):
+        assert controller.get_light_info().model_id == "LCT010"
+        assert controller.has_effect_support() is False
+        assert controller.get_effect_list() == []
+
+
+def test_empty_group_has_no_discoverable_model(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    lights, _ = _resources()
+    bridge = _Bridge(lights, [_Group("12", "Empty", [])])
+    controller, _ = _controller(monkeypatch, tmp_path, target="group:12", bridge=bridge)
+
+    with closing(controller), pytest.raises(ModelNotDiscoveredError, match="Could not find a model id"):
+        controller.get_light_info()
+
+
+def test_light_without_color_temperature_bounds(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    controller, _ = _controller(monkeypatch, tmp_path, target="light:2")
+
+    with closing(controller):
+        info = controller.get_light_info()
+
+    assert info.model_id == "LCT010"
+    assert info.min_mired == MIN_MIRED
+    assert info.max_mired == MAX_MIRED
+
+
+def test_target_without_separator_is_rejected_and_bridge_closed(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    lights, groups = _resources()
+    bridge = _Bridge(lights, groups)
+
+    with pytest.raises(LightControllerError, match="format"):
+        _controller(monkeypatch, tmp_path, target="light", bridge=bridge)
+
+    assert bridge.closed
+
+
+def test_close_is_idempotent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    controller, bridge = _controller(monkeypatch, tmp_path)
+    close = AsyncMock(wraps=bridge.close)
+    monkeypatch.setattr(bridge, "close", close)
+
+    controller.close()
+    controller.close()
+
+    close.assert_awaited_once_with()

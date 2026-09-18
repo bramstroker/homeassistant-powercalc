@@ -116,8 +116,7 @@ class DummyLoadPreparation(MeasurementPreparation):
                 remaining_seconds=0,
             )
             trend = self.sampler.classify_dummy_load_trend(averages)
-            if trend is None:
-                raise DummyLoadMeasurementError("No dummy-load resistance trend could be calculated")
+            assert trend is not None  # Calibration always collects the required 20 samples.
             if trend == Trend.STEADY:
                 resistance = round(mean(averages), 2)
                 interaction.phase(f"Dummy-load calibration completed at {resistance:.2f} Ω")

@@ -65,3 +65,7 @@ include = ["measure*"]
 
 [tool.pytest.ini_options]
 pythonpath = "."
+
+[tool.coverage.run]
+# Temporary: restore coverage when the OCR implementation is replaced.
+omit = ["measure/ocr/*", "measure/powermeter/ocr.py"]

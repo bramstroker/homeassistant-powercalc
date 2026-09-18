@@ -181,8 +181,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         open-ended recording that may run for hours skips that sample instead of ending.
         """
 
-        if self.entity_state_reader is None:  # pragma: no cover - guarded by the caller
-            return None
+        assert self.entity_state_reader is not None
         try:
             states = self.entity_state_reader(entity_ids)
             if missing := sorted(set(required_ids) - states.keys()):

@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Any
+from unittest.mock import patch
 
 from measure.contribution.coordinator import (
     ContributionJobCoordinator,
@@ -224,6 +225,72 @@ def test_coordinator_records_missing_credentials_failure(tmp_path: Path) -> None
     assert failed.status == "failed"
     assert failed.error is not None
     assert failed.error.code == "missing_credentials"
+
+
+@pytest.mark.parametrize(
+    "upstream_sha,expected_error",
+    [(None, "Upstream branch was not found"), ("new-sha", "changed after preview")],
+)
+def test_coordinator_rejects_missing_or_changed_upstream_before_writing(
+    tmp_path: Path, upstream_sha: str | None, expected_error: str
+) -> None:
+    github = FakeGitHubClient()
+    coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
+    job = coordinator.create_job(tmp_path / "artifacts", make_metadata(), base_sha="base-sha")
+    response = {"object": {"sha": upstream_sha}} if upstream_sha is not None else None
+
+    with patch.object(github, "get_ref", return_value=response) as get_ref:
+        failed = coordinator.submit(job.id, tmp_path / "artifacts")
+
+    assert failed.status is ContributionJobStatus.FAILED
+    assert failed.submission is None
+    assert failed.error is not None
+    assert expected_error in failed.error.message
+    assert coordinator.job_store.load(job.id) == failed
+    get_ref.assert_called_once_with(github.repository.owner, github.repository.name, github.repository.branch)
+    assert github.calls == ["fetch_authenticated_user", "find_fork:octo:homeassistant-powercalc"]
+
+
+def test_coordinator_rejects_missing_fork_base_before_writing(tmp_path: Path) -> None:
+    github = FakeGitHubClient()
+    coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
+    job = coordinator.create_job(tmp_path / "artifacts", make_metadata(), base_sha="base-sha")
+
+    with patch.object(github, "get_ref", side_effect=[{"object": {"sha": "base-sha"}}, None, None]) as get_ref:
+        failed = coordinator.submit(job.id, tmp_path / "artifacts")
+
+    assert failed.status is ContributionJobStatus.FAILED
+    assert failed.error is not None
+    assert failed.error.message == "The fork base branch was not found"
+    assert coordinator.job_store.load(job.id) == failed
+    assert get_ref.call_args.args == ("octo", github.repository.name, github.repository.branch)
+    assert github.calls == ["fetch_authenticated_user", "find_fork:octo:homeassistant-powercalc"]
+
+
+@pytest.mark.parametrize("owns_repository", [False, True])
+def test_coordinator_creates_missing_contribution_branch(tmp_path: Path, owns_repository: bool) -> None:
+    repository = GitHubRepository(owner="octo" if owns_repository else "upstream", name="profiles", branch="main")
+    github = FakeGitHubClient(repository)
+    coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
+    job = coordinator.create_job(tmp_path / "artifacts", make_metadata(), base_sha="base-sha")
+    references = [{"object": {"sha": "base-sha"}}, None]
+    if not owns_repository:
+        references.append({"object": {"sha": "old-fork-sha"}})
+
+    with patch.object(github, "get_ref", side_effect=references):
+        submitted = coordinator.submit(job.id, tmp_path / "artifacts")
+
+    assert submitted.status is ContributionJobStatus.SUBMITTED
+    branch = deterministic_branch_name(job.preview)
+    initial_sha = "base-sha" if owns_repository else "old-fork-sha"
+    create_call = f"create_ref:{branch}:{initial_sha}"
+    assert create_call in github.calls
+    if not owns_repository:
+        sync_call = f"sync_fork_branch:octo:profiles:{branch}"
+        assert (
+            github.calls.index(create_call) < github.calls.index(sync_call) < github.calls.index("get_commit:base-sha")
+        )
+    assert f"update_ref:{branch}:commit-sha:True" in github.calls
 
 
 def test_coordinator_reports_missing_workflow_scope_before_writing_fork(tmp_path: Path) -> None:

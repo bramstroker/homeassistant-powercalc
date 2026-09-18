@@ -23,6 +23,7 @@ from measure.request import (
     RecorderMeasurementRequest,
     RecorderProfileRecipe,
     RecorderPurpose,
+    ResumePolicy,
 )
 from measure.runner.average import AverageRunner
 from measure.runner.interaction import LightOperatingPoint
@@ -411,6 +412,138 @@ def test_coordinator_rejects_resume_without_compatible_output(tmp_path: Path) ->
 
     with pytest.raises(SessionConflictError, match="no compatible complete row"):
         coordinator.resume(current.id)
+
+
+def test_resume_policy_cannot_start_a_new_session(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    service = MagicMock(spec=SessionMeasurementService)
+    coordinator = MeasurementCoordinator(storage, lambda: service)
+    request = light_request().model_copy(update={"resume_policy": ResumePolicy.RESUME})
+
+    with pytest.raises(SessionConflictError, match="Use the resume action"):
+        coordinator.start(request)
+
+    assert coordinator.sessions() == []
+    service.run.assert_not_called()
+
+
+def test_missing_session_cannot_be_resumed(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+
+    with pytest.raises(SessionConflictError, match="does not exist"):
+        coordinator.resume("missing")
+
+    assert coordinator.current is None
+
+
+def test_completed_session_cannot_be_resumed(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    with pytest.raises(SessionConflictError, match="cannot be resumed"):
+        coordinator.resume(session.id)
+
+    assert coordinator.get(session.id).state == SessionState.COMPLETED
+
+
+def test_running_session_cannot_be_resumed_or_confirmed(tmp_path: Path) -> None:
+    started = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
+    session = coordinator.start(light_request())
+    try:
+        assert started.wait(1)
+        with pytest.raises(SessionConflictError, match="already active"):
+            coordinator.resume(session.id)
+        with pytest.raises(SessionConflictError, match="not waiting for confirmation"):
+            coordinator.confirm(session.id)
+        assert coordinator.get(session.id).state == SessionState.RUNNING
+    finally:
+        coordinator.cancel(session.id)
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_analysis_failure_releases_slot_and_preserves_recording_for_retry(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    request = RecorderMeasurementRequest(
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
+        tracked_entity_ids=["switch.device"],
+        power_meter=DummyPowerMeterSpec(),
+    )
+    completed = SessionSnapshot(
+        id="recording",
+        state=SessionState.COMPLETED,
+        created_at="2026-09-04T08:00:00Z",
+        updated_at="2026-09-04T08:00:00Z",
+        summary={"Recording": "Complete"},
+    )
+    storage.create(completed, request)
+    output = storage.artifact_directory(completed.id, request.model_id)
+    output.mkdir()
+    recording = output / "record.jsonl"
+    recording.write_text("original recording", encoding="utf-8")
+    coordinator = MeasurementCoordinator(storage, CompletingService)
+
+    with patch("measure.ha_app.coordinator.RecorderAnalysisExecution") as execution:
+        execution.return_value.run.side_effect = [
+            ValueError("Analysis failed"),
+            {"Recording analysis": "Profile created"},
+        ]
+        with pytest.raises(ValueError, match="Analysis failed"):
+            coordinator.analyse(completed.id)
+        assert storage.load_snapshot(completed.id) == completed
+        assert recording.read_text(encoding="utf-8") == "original recording"
+
+        retried = coordinator.analyse(completed.id)
+
+    assert retried.summary == {"Recording analysis": "Profile created"}
+    assert execution.return_value.run.call_count == 2
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+    assert session.id != completed.id
+
+
+def test_long_session_bounds_live_events_and_replays_retained_session(tmp_path: Path) -> None:
+    emitted = Event()
+    finish = Event()
+
+    def emit_events(
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        for index in range(1005):
+            control.log(f"Reading {index}")
+        emitted.set()
+        assert finish.wait(5)
+        return RunnerResult(model_json_data={})
+
+    service = MagicMock(spec=SessionMeasurementService)
+    service.run.side_effect = emit_events
+    storage = SessionStorage(tmp_path)
+    coordinator = MeasurementCoordinator(storage, lambda: service)
+    session = coordinator.start(light_request())
+    try:
+        assert emitted.wait(5)
+        events = coordinator.events_since(0, session.id)
+        assert len(events) == 1000
+        assert events[0].sequence == 6
+        assert events[-1].sequence == 1005
+        assert len(storage.load_events(session.id, limit=None)) == 1005
+    finally:
+        finish.set()
+        wait_for_state(coordinator, SessionState.COMPLETED)
+
+    service.run.side_effect = None
+    service.run.return_value = RunnerResult(model_json_data={})
+    coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    retained = coordinator.events_since(1003, session.id)
+    assert [event.sequence for event in retained] == [1004, 1005, 1006]
+    assert retained[-1].type == SessionEventType.STATE
+    assert retained[-1].data["state"] == SessionState.COMPLETED
 
 
 def test_starting_a_session_retains_the_previous_one(tmp_path: Path) -> None:

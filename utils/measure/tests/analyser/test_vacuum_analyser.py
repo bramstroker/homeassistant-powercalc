@@ -211,6 +211,46 @@ def test_whole_recording_validation_and_captured_metadata(tmp_path: Path) -> Non
     assert candidate().feature == candidate().features[0]
 
 
+@pytest.mark.parametrize("missing_activity", ["washing", "charging", "drying"])
+def test_incomplete_last_recording_falls_back_to_independent_episode_validation(
+    tmp_path: Path, missing_activity: str
+) -> None:
+    first = write_recording(tmp_path / "record-1.jsonl", repeated())
+    last = write_recording(
+        tmp_path / "record.jsonl", [item for item in cycle() if item.entities[STATE].state != missing_activity]
+    )
+    samples = load_recordings([first, last]).dataset.samples
+
+    split = split_vacuum_samples(samples, CONTEXT)
+
+    assert isinstance(split, TrainingValidationSplit)
+    assert split.method is ValidationMethod.HELD_OUT_EPISODES
+    training_ids = {id(item) for item in split.training}
+    validation_ids = {id(item) for item in split.validation}
+    assert training_ids.isdisjoint(validation_ids)
+    assert training_ids | validation_ids == {id(item) for item in samples}
+    # Whole episodes stay together; adjacent samples from the same cycle never
+    # become each other's validation evidence.
+    signals = discover_signals(samples, CONTEXT)
+    for episode in group_vacuum_episodes(samples, signals):
+        episode_ids = {id(item) for item in episode.samples}
+        assert episode_ids <= training_ids or episode_ids <= validation_ids
+    expected_activities = {item.entities[STATE].state for item in cycle()}
+    assert {item.entities[STATE].state for item in split.training} == expected_activities
+    assert {item.entities[STATE].state for item in split.validation} == expected_activities
+    assert any(item.recording_id == 1 for item in split.training)
+    assert any(item.recording_id == 0 for item in split.validation)
+
+    result = RecorderAnalyser().analyse([first, last], CONTEXT)
+
+    assert result.model_ready
+    assert result.validation_method is ValidationMethod.HELD_OUT_EPISODES
+    assert result.metrics is not None
+    assert result.metrics.coverage == 1
+    assert result.metrics.mae_w == 0
+    assert result.metrics.validation_count == len(split.validation)
+
+
 def test_single_cycle_is_not_independent_evidence(tmp_path: Path) -> None:
     result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", cycle()), CONTEXT)
     assert not result.model_ready

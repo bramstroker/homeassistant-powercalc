@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
 
-from measure.profile.specifications import device_spec_fields
+from measure.profile.specifications import DeviceSpecField, device_spec_fields
+import pytest
 
 
 def test_device_spec_fields_follow_model_schema_device_type_conditions() -> None:
@@ -28,3 +29,100 @@ def test_device_spec_fields_follow_model_schema_device_type_conditions() -> None
 
 def test_device_spec_fields_returns_empty_catalog_for_unusable_schema() -> None:
     assert device_spec_fields({}) == {}
+
+
+def test_device_spec_fields_resolve_references_and_preserve_local_descriptions() -> None:
+    schema = {
+        "$defs": {
+            "power/rating~watts": {"type": "number", "description": "Default description"},
+            "connection": {"type": "string", "enum": ["wifi", "zigbee"]},
+        },
+        "properties": {
+            "device_type": {"enum": ["light"]},
+            "device_specs": {
+                "properties": {
+                    "rated_power": {"$ref": "#/$defs/power~1rating~0watts", "description": "Power in watts"},
+                    "connectivity": {"type": "array", "items": {"$ref": "#/$defs/connection"}},
+                },
+            },
+        },
+    }
+
+    assert device_spec_fields(schema) == {
+        "light": [
+            DeviceSpecField("rated_power", "Rated power", "Power in watts", "number"),
+            DeviceSpecField("connectivity", "Connectivity", "", "string", "array", ("wifi", "zigbee")),
+        ],
+    }
+
+
+def test_device_spec_conditions_override_only_matching_device_types() -> None:
+    schema = {
+        "properties": {
+            "device_type": {"enum": ["light", "fan", "smart_switch"]},
+            "device_specs": {"properties": {"rated_power": {"type": "number"}}},
+        },
+        "allOf": [
+            {
+                "if": {"properties": {"device_type": {"enum": ["light", "fan", "future_device"]}}},
+                "then": {
+                    "properties": {
+                        "device_specs": {
+                            "properties": {
+                                "rated_power": {"type": "integer"},
+                                "speed_control": {"type": "boolean"},
+                            },
+                        },
+                    },
+                },
+            },
+            {
+                "if": {"properties": {"device_type": {"const": "light"}}},
+                "then": {"properties": {"device_specs": {"properties": {"lumens": {"type": "number"}}}}},
+            },
+        ],
+    }
+
+    fields = device_spec_fields(schema)
+
+    assert [field.name for field in fields["light"]] == ["rated_power", "speed_control", "lumens"]
+    assert [field.name for field in fields["fan"]] == ["rated_power", "speed_control"]
+    assert fields["fan"][0].value_type == "integer"
+    assert fields["smart_switch"] == [DeviceSpecField("rated_power", "Rated power", "", "number")]
+    assert "future_device" not in fields
+
+
+@pytest.mark.parametrize(
+    "unsupported_field",
+    [
+        {"type": "object", "properties": {"nested": {"type": "string"}}},
+        {"type": "array"},
+        {"$ref": "#/$defs/missing"},
+        {"oneOf": [{"type": "string"}, {"type": "number"}]},
+    ],
+)
+def test_device_spec_fields_skip_unsupported_fields_without_losing_supported_ones(
+    unsupported_field: dict[str, object],
+) -> None:
+    schema = {
+        "properties": {
+            "device_type": {"enum": ["light"]},
+            "device_specs": {"properties": {"unsupported": unsupported_field, "rated_power": {"type": "number"}}},
+        },
+    }
+
+    assert device_spec_fields(schema) == {"light": [DeviceSpecField("rated_power", "Rated power", "", "number")]}
+
+
+def test_device_spec_fields_ignore_conditions_that_also_depend_on_other_properties() -> None:
+    schema = {
+        "properties": {"device_type": {"enum": ["light"]}},
+        "allOf": [
+            {
+                "if": {"properties": {"device_type": {"const": "light"}, "calculation_strategy": {"const": "lut"}}},
+                "then": {"properties": {"device_specs": {"properties": {"lumens": {"type": "number"}}}}},
+            },
+        ],
+    }
+
+    assert device_spec_fields(schema) == {"light": []}

@@ -69,16 +69,81 @@ def test_home_assistant_discovery_client_collects_add_events_until_timeout() -> 
     client.send.assert_awaited_once_with("zeroconf/subscribe_discovery")
 
 
-def test_home_assistant_discovery_client_reports_rejected_subscription() -> None:
+@pytest.mark.parametrize(
+    "response,message",
+    [
+        ({"id": 3, "type": "result", "success": False, "error": {"message": "Unknown command"}}, "Unknown command"),
+        ({"id": 3, "type": "result", "success": False}, "discovery is unavailable"),
+        ({"id": 3, "type": "result", "success": False, "error": "unsupported"}, "discovery is unavailable"),
+        ({"id": 4, "type": "result", "success": True}, "Unexpected Home Assistant discovery response"),
+        ({"id": 3, "type": "event"}, "Unexpected Home Assistant discovery response"),
+    ],
+)
+def test_home_assistant_discovery_client_reports_rejected_subscription(
+    response: dict[str, object], message: str
+) -> None:
     client = MagicMock(spec=HomeAssistantDiscoveryClient)
     client.send = AsyncMock(return_value=3)
     client._async_recv = AsyncMock(  # noqa: SLF001
-        return_value={"id": 3, "type": "result", "success": False, "error": {"message": "Unknown command"}},
+        return_value=response,
     )
 
     coroutine = HomeAssistantDiscoveryClient.discover_zeroconf(client, 0.1)
-    with pytest.raises(HomeAssistantDiscoveryError, match="Unknown command"):
+    with pytest.raises(HomeAssistantDiscoveryError, match=message):
         asyncio.run(coroutine)
+
+
+@pytest.mark.parametrize(
+    "event",
+    [
+        {"id": 8, "type": "event", "event": {"add": [{"name": "unrelated"}]}},
+        {"id": 7, "type": "result", "event": {"add": [{"name": "unrelated"}]}},
+        {"id": 7, "type": "event", "event": None},
+        {"id": 7, "type": "event", "event": {"remove": ["old-service"]}},
+        {"id": 7, "type": "event", "event": {"add": "invalid"}},
+    ],
+)
+def test_discovery_ignores_unrelated_or_malformed_events(event: dict[str, object]) -> None:
+    client = MagicMock(spec=HomeAssistantDiscoveryClient)
+    client.send = AsyncMock(return_value=7)
+    client._async_recv = AsyncMock(  # noqa: SLF001
+        side_effect=[
+            {"id": 7, "type": "result", "success": True},
+            event,
+            {"id": 7, "type": "event", "event": {"add": [None, "invalid", {"name": "shelly-one"}]}},
+            TimeoutError,
+        ],
+    )
+
+    result = asyncio.run(HomeAssistantDiscoveryClient.discover_zeroconf(client, 10))
+
+    assert result == [{"name": "shelly-one"}]
+
+
+def test_discovery_stops_when_collection_window_has_elapsed() -> None:
+    client = MagicMock(spec=HomeAssistantDiscoveryClient)
+    client.send = AsyncMock(return_value=7)
+    client._async_recv = AsyncMock(return_value={"id": 7, "type": "result", "success": True})  # noqa: SLF001
+
+    assert asyncio.run(HomeAssistantDiscoveryClient.discover_zeroconf(client, 0)) == []
+    client._async_recv.assert_awaited_once()  # noqa: SLF001
+
+
+def test_manager_closes_discovery_connection_after_failure() -> None:
+    client = MagicMock(spec=HomeAssistantDiscoveryClient)
+    client.__aenter__ = AsyncMock(return_value=client)
+    client.__aexit__ = AsyncMock(return_value=None)
+    error = HomeAssistantDiscoveryError("Subscription rejected")
+    client.discover_zeroconf = AsyncMock(side_effect=error)
+    manager = HomeAssistantManager(
+        "http://ha.lan:8123", "token", discovery_client_factory=MagicMock(return_value=client)
+    )
+
+    with pytest.raises(HomeAssistantDiscoveryError, match="Subscription rejected"):
+        asyncio.run(manager.discover_zeroconf())
+
+    client.__aexit__.assert_awaited_once()
+    assert client.__aexit__.call_args.args[1] is error
 
 
 def test_manager_uses_an_ephemeral_discovery_client() -> None:

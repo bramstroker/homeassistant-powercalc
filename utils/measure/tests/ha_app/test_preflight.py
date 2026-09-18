@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Any
+from unittest.mock import Mock
 
 from measure.controller.charging.spec import HassChargingControllerSpec
 from measure.controller.fan.spec import HassFanControllerSpec
@@ -86,6 +87,100 @@ def base_entities() -> dict[tuple[str | None, str | None], list[Entity]]:
         ("lawn_mower", None): [Entity("lawn_mower.test", attribute_names=["battery_level"])],
         ("sensor", None): [Entity("sensor.battery", state="75")],
     }
+
+
+def test_preflight_rejects_unadvertised_light_mode() -> None:
+    request = LightMeasurementRequest(
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        controller=HassLightControllerSpec(entity_id="light.test"),
+        modes={LutMode.COLOR_TEMP},
+    )
+
+    with pytest.raises(PreflightError, match="does not advertise every requested mode"):
+        preflight(base_entities()).validate(request)
+
+
+def test_preflight_rejects_non_overlapping_color_temperature_ranges() -> None:
+    entities = base_entities()
+    entities[("light", None)] = [
+        Entity("light.warm", [LutMode.COLOR_TEMP], min_mired=300, max_mired=400, model_id="same-model"),
+        Entity("light.cool", [LutMode.COLOR_TEMP], min_mired=150, max_mired=250, model_id="same-model"),
+    ]
+    request = LightMeasurementRequest(
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        controller=HassMultiLightControllerSpec(entity_ids=["light.warm", "light.cool"]),
+        multiple_light_count=2,
+        modes={LutMode.COLOR_TEMP},
+    )
+
+    with pytest.raises(PreflightError, match="do not share a color temperature range"):
+        preflight(entities).validate(request)
+
+
+def test_preflight_rejects_unavailable_voltage_sensor() -> None:
+    request = AverageMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power", voltage_entity_id="sensor.missing"),
+    )
+
+    with pytest.raises(PreflightError, match="voltage entity is unavailable"):
+        preflight(base_entities()).validate(request)
+
+
+@pytest.mark.parametrize("message", [None, "Meter did not respond"])
+def test_preflight_reports_meter_diagnostic_failure(message: str | None) -> None:
+    diagnostic = PowerMeterDiagnostic(
+        success=False,
+        status=DiagnosticStatus.POOR,
+        precision_status=DiagnosticStatus.UNSUPPORTED,
+        update_interval_status=DiagnosticStatus.UNSUPPORTED,
+        message=message,
+    )
+    diagnose = Mock(return_value=diagnostic)
+    checker = MeasurementPreflight(
+        has_active_session=lambda: False,
+        verify_storage=lambda: None,
+        load_entities=lambda _domain, _device_class: [],
+        diagnose_power_meter=diagnose,
+    )
+    request = AverageMeasurementRequest(power_meter=ShellyPowerMeterSpec(device_ip="192.0.2.1"))
+
+    with pytest.raises(PreflightError, match=message or "Could not read from the power meter"):
+        checker.validate(request)
+    diagnose.assert_called_once_with(request.power_meter)
+
+
+@pytest.mark.parametrize("status", [DiagnosticStatus.WARNING, DiagnosticStatus.POOR])
+@pytest.mark.parametrize("with_dummy_load", [False, True])
+def test_preflight_preserves_meter_warnings_without_repeating_diagnostics(
+    status: DiagnosticStatus, with_dummy_load: bool
+) -> None:
+    diagnostic = PowerMeterDiagnostic(
+        success=True,
+        status=status,
+        precision_status=status,
+        update_interval_status=DiagnosticStatus.GOOD,
+        supports_voltage=True,
+        messages=["Meter precision is low"],
+    )
+    diagnose = Mock(return_value=diagnostic)
+    checker = MeasurementPreflight(
+        has_active_session=lambda: False,
+        verify_storage=lambda: None,
+        load_entities=lambda _domain, _device_class: [],
+        diagnose_power_meter=diagnose,
+    )
+    request = AverageMeasurementRequest(
+        power_meter=ShellyPowerMeterSpec(device_ip="192.0.2.1"),
+        dummy_load=DummyLoadCalibrationRequest(description="Resistive bulb") if with_dummy_load else None,
+    )
+
+    result = checker.validate(request)
+
+    assert result.power_meter_diagnostic == diagnostic
+    assert result.warnings.count("Meter precision is low") == 1
+    diagnose.assert_called_once_with(request.power_meter)
 
 
 @pytest.mark.parametrize(

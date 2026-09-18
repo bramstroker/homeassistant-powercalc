@@ -1,8 +1,10 @@
 from collections.abc import Callable, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from datetime import UTC, datetime
 import json
 from pathlib import Path
+from threading import Event
 import time
 from types import SimpleNamespace
 from typing import Any
@@ -17,12 +19,14 @@ from measure.ha_app.api import create_app
 from measure.ha_app.contribution.coordinator import ContributionApiCoordinator
 from measure.ha_app.contribution.models import (
     ContributionApiError,
+    ContributionApiErrorCode,
     ContributionAuthMethod,
     ContributionAuthStatus,
     ContributionFile,
     ContributionPreviewRequest,
     ContributionPreviewResponse,
     ContributionService,
+    ContributionState,
     ContributionSubmissionResult,
     DeviceFlowPollResponse,
     DeviceFlowPollStatus,
@@ -1627,6 +1631,149 @@ def test_contribution_submission_must_match_preview(
     assert service.submit_calls == int(matches)
     if not matches:
         assert submitted.json()["code"] == "preview_required"
+
+
+@pytest.mark.parametrize(
+    "failure,expected_code,expected_status",
+    [
+        (RuntimeError("GitHub unavailable"), ContributionApiErrorCode.SUBMISSION_FAILED, 502),
+        (
+            ContributionApiError(ContributionApiErrorCode.INVALID_METADATA, "Invalid profile"),
+            ContributionApiErrorCode.INVALID_METADATA,
+            422,
+        ),
+    ],
+)
+def test_failed_contribution_is_persisted_and_can_be_retried(
+    tmp_path: Path,
+    failure: Exception,
+    expected_code: ContributionApiErrorCode,
+    expected_status: int,
+) -> None:
+    test_client = client(tmp_path)
+    service = FakeContributionService()
+    service.username = "measure-user"
+    context = test_client.app.state.context
+    context.contribution = ContributionApiCoordinator(context.storage, service_factory=lambda: service)
+    started = test_client.post("/api/sessions", json=payload())
+    session_id = started.json()["session_id"]
+    assert context.coordinator._worker is not None  # noqa: SLF001
+    context.coordinator._worker.join(timeout=5)  # noqa: SLF001
+    metadata = {
+        "manufacturer_name": "Signify",
+        "model_id": "LCT010",
+        "product_name": "Test light",
+        "contributor": "measure-user",
+    }
+    endpoint = f"/api/sessions/{session_id}/contribution"
+    assert test_client.post(f"{endpoint}/preview", json=metadata).status_code == 200
+
+    with patch.object(service, "submit", side_effect=failure):
+        submitted = test_client.post(endpoint, json=metadata | {"confirmed": True})
+
+    assert submitted.status_code == expected_status
+    assert submitted.json()["code"] == expected_code
+    status = test_client.get("/api/contribution/status").json()
+    assert status["state"] == ContributionState.FAILED
+    assert status["error"] == str(failure)
+    assert status["preview"] is not None
+    context.contribution = ContributionApiCoordinator(SessionStorage(tmp_path), service_factory=lambda: service)
+    assert context.contribution.status().state == ContributionState.FAILED
+
+    retried = test_client.post(endpoint, json=metadata | {"confirmed": True})
+
+    assert retried.status_code == 200
+    assert service.submit_calls == 1
+    status = test_client.get("/api/contribution/status").json()
+    assert status["state"] == ContributionState.SUBMITTED
+    assert status["error"] is None
+
+
+@pytest.mark.parametrize(
+    "authenticated,has_preview,expected_status,expected_code",
+    [
+        (False, True, 401, "auth_unavailable"),
+        (True, False, 409, "preview_required"),
+    ],
+)
+def test_contribution_submission_requires_authentication_and_preview(
+    tmp_path: Path, authenticated: bool, has_preview: bool, expected_status: int, expected_code: str
+) -> None:
+    test_client = client(tmp_path)
+    service = FakeContributionService()
+    service.username = "measure-user"
+    context = test_client.app.state.context
+    context.contribution = ContributionApiCoordinator(context.storage, service_factory=lambda: service)
+    started = test_client.post("/api/sessions", json=payload())
+    session_id = started.json()["session_id"]
+    assert context.coordinator._worker is not None  # noqa: SLF001
+    context.coordinator._worker.join(timeout=5)  # noqa: SLF001
+    metadata = {
+        "manufacturer_name": "Signify",
+        "model_id": "LCT010",
+        "product_name": "Test light",
+        "contributor": "measure-user",
+    }
+    endpoint = f"/api/sessions/{session_id}/contribution"
+    if has_preview:
+        assert test_client.post(f"{endpoint}/preview", json=metadata).status_code == 200
+    if not authenticated:
+        service.disconnect()
+    previous_status = context.contribution.status()
+
+    response = test_client.post(endpoint, json=metadata | {"confirmed": True})
+
+    assert response.status_code == expected_status
+    assert response.json()["code"] == expected_code
+    assert service.submit_calls == 0
+    assert context.contribution.status() == previous_status
+
+
+def test_concurrent_contribution_submission_is_rejected(tmp_path: Path) -> None:
+    test_client = client(tmp_path)
+    service = FakeContributionService()
+    service.username = "measure-user"
+    context = test_client.app.state.context
+    context.contribution = ContributionApiCoordinator(context.storage, service_factory=lambda: service)
+    started = test_client.post("/api/sessions", json=payload())
+    session_id = started.json()["session_id"]
+    assert context.coordinator._worker is not None  # noqa: SLF001
+    context.coordinator._worker.join(timeout=5)  # noqa: SLF001
+    metadata = {
+        "manufacturer_name": "Signify",
+        "model_id": "LCT010",
+        "product_name": "Test light",
+        "contributor": "measure-user",
+    }
+    endpoint = f"/api/sessions/{session_id}/contribution"
+    assert test_client.post(f"{endpoint}/preview", json=metadata).status_code == 200
+    entered = Event()
+    release = Event()
+
+    def submit(*, preview: ContributionPreviewResponse, artifact_root: Path) -> ContributionSubmissionResult:
+        assert preview.session_id == session_id
+        assert artifact_root.is_dir()
+        entered.set()
+        assert release.wait(timeout=5)
+        return ContributionSubmissionResult(pull_request_url="https://github.test/pr/1", message="Submitted")
+
+    with patch.object(service, "submit", side_effect=submit) as submission, ThreadPoolExecutor(max_workers=1) as pool:
+        pending = pool.submit(test_client.post, endpoint, json=metadata | {"confirmed": True})
+        try:
+            assert entered.wait(timeout=5)
+            assert context.storage.load_contribution_status().state is ContributionState.SUBMITTING
+
+            rejected = test_client.post(endpoint, json=metadata | {"confirmed": True})
+
+            assert rejected.status_code == 409
+            assert rejected.json()["code"] == "contribution_active"
+            assert submission.call_count == 1
+            assert context.contribution.status().state is ContributionState.SUBMITTING
+        finally:
+            release.set()
+        assert pending.result(timeout=5).status_code == 200
+
+    assert context.storage.load_contribution_status().state is ContributionState.SUBMITTED
 
 
 def test_contribution_preview_submit_and_artifact_lock(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

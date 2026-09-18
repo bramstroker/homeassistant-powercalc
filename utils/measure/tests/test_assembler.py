@@ -2,26 +2,52 @@ from types import SimpleNamespace
 from unittest.mock import ANY, MagicMock, patch
 
 from measure.assembler import MeasurementAssembler
-from measure.controller.fan.spec import DummyFanControllerSpec
+from measure.controller.charging.const import ChargingDeviceType
+from measure.controller.charging.hass import HassChargingController
+from measure.controller.charging.spec import HassChargingControllerSpec
+from measure.controller.fan.hass import HassFanController
+from measure.controller.fan.spec import DummyFanControllerSpec, HassFanControllerSpec
 from measure.controller.light.spec import (
     DummyLightControllerSpec,
     HassLightControllerSpec,
     HassMultiLightControllerSpec,
+    HueLightControllerSpec,
 )
+from measure.controller.media.hass import HassMediaController
+from measure.controller.media.spec import HassMediaControllerSpec
 from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistantManager
-from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec, ShellyPowerMeterSpec, TuyaPowerMeterSpec
+from measure.powermeter.const import OwonOwh98xxChannelType
+from measure.powermeter.credentials import TapoCredentials
+from measure.powermeter.errors import PowerMeterError
+from measure.powermeter.spec import (
+    DummyPowerMeterSpec,
+    HassPowerMeterSpec,
+    KasaPowerMeterSpec,
+    ManualPowerMeterSpec,
+    MyStromPowerMeterSpec,
+    OcrPowerMeterSpec,
+    OwonOwh98xxPowerMeterSpec,
+    PowerMeterSpec,
+    ShellyPowerMeterSpec,
+    TasmotaPowerMeterSpec,
+    TuyaPowerMeterSpec,
+)
 from measure.request import (
     AverageMeasurementRequest,
+    ChargingMeasurementRequest,
     DummyLoadReuseRequest,
     FanMeasurementRequest,
     LightMeasurementRequest,
     RecorderMeasurementRequest,
+    SpeakerMeasurementRequest,
 )
 from measure.runner.average import AverageRunner
+from measure.runner.charging import ChargingRunner
 from measure.runner.fan import FanRunner
 from measure.runner.interaction import RunInteraction
 from measure.runner.light.runner import LightRunner
 from measure.runner.recorder import RecorderEntityState, RecorderRunner
+from measure.runner.speaker import SpeakerRunner
 from pydantic import ValidationError
 import pytest
 
@@ -38,6 +64,64 @@ def _assembler(
         tuya_device_key=tuya_device_key,
         shelly_password=shelly_password,
     )
+
+
+@pytest.mark.parametrize(
+    "spec,constructor,arguments",
+    [
+        (MyStromPowerMeterSpec(device_ip="192.0.2.10"), "measure.assembler.MyStromPowerMeter", ["192.0.2.10"]),
+        (TasmotaPowerMeterSpec(device_ip="192.0.2.20"), "measure.assembler.TasmotaPowerMeter", ["192.0.2.20"]),
+        (ManualPowerMeterSpec(), "measure.assembler.ManualPowerMeter", []),
+        (OcrPowerMeterSpec(), "measure.assembler.OcrPowerMeter", []),
+    ],
+)
+def test_assembler_constructs_selected_meter(spec: PowerMeterSpec, constructor: str, arguments: list[object]) -> None:
+    with patch(constructor) as meter:
+        result = _assembler().create_power_meter(spec)
+
+    assert result is meter.return_value
+    meter.assert_called_once_with(*arguments)
+
+
+def test_assembler_passes_serial_meter_settings() -> None:
+    spec = OwonOwh98xxPowerMeterSpec(
+        port="/dev/ttyUSB0",
+        baudrate=9600,
+        timeout=2.5,
+        channel=OwonOwh98xxChannelType.CHANNEL1,
+    )
+    with patch("measure.powermeter.serial_scpi.OwonOwh98xxPowerMeter") as meter:
+        result = _assembler().create_power_meter(spec)
+
+    assert result is meter.return_value
+    meter.assert_called_once_with("/dev/ttyUSB0", 9600, 2.5, OwonOwh98xxChannelType.CHANNEL1)
+
+
+def test_assembler_passes_tapo_credentials() -> None:
+    credentials = TapoCredentials(username="user@example.com", password="device-password")  # noqa: S106
+    assembler = MeasurementAssembler(MagicMock(spec=RunInteraction), kasa_credentials=credentials)
+
+    with patch("measure.powermeter.kasa.KasaPowerMeter") as meter:
+        result = assembler.create_power_meter(KasaPowerMeterSpec(device_ip="192.0.2.30"))
+
+    assert result is meter.return_value
+    meter.assert_called_once_with("192.0.2.30", credentials=credentials)
+
+
+def test_assembler_requires_tuya_key_before_creating_device() -> None:
+    spec = TuyaPowerMeterSpec(device_id="device-id", device_ip="192.0.2.10")
+    with (
+        patch("measure.powermeter.tuya.TuyaPowerMeter") as meter,
+        pytest.raises(PowerMeterError, match="key is required"),
+    ):
+        _assembler().create_power_meter(spec)
+
+    meter.assert_not_called()
+
+
+def test_assembler_requires_home_assistant_for_entity_meter() -> None:
+    with pytest.raises(ValueError, match="Home Assistant runtime connection is required"):
+        _assembler().create_power_meter(HassPowerMeterSpec(entity_id="sensor.power"))
 
 
 @pytest.mark.parametrize(
@@ -170,6 +254,77 @@ def test_assembler_builds_multi_light_controller() -> None:
         _assembler(home_assistant=home_assistant).assemble(request)
 
     controller.assert_called_once_with(home_assistant, 2, entity_ids=["light.one", "light.two"], wait=ANY)
+
+
+@pytest.mark.parametrize("target", ["light:7", "group:3"])
+def test_assembler_passes_hue_bridge_and_target(target: str) -> None:
+    spec = HueLightControllerSpec(bridge_ip="192.0.2.40", light=target)
+
+    with patch("measure.controller.light.hue.HueLightController") as controller:
+        result = _assembler().create_light_controller(spec)
+
+    assert result is controller.return_value
+    controller.assert_called_once_with("192.0.2.40", light=target)
+
+
+def test_assembler_wires_home_assistant_speaker_controller() -> None:
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    request = SpeakerMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        controller=HassMediaControllerSpec(entity_id="media_player.speaker"),
+    )
+
+    prepared = _assembler(home_assistant=home_assistant).assemble(request)
+
+    assert isinstance(prepared.runner, SpeakerRunner)
+    controller = prepared.runner.media_controller
+    assert isinstance(controller, HassMediaController)
+    controller.set_volume(35)
+    home_assistant.trigger_service.assert_called_once_with(
+        "media_player",
+        "volume_set",
+        entity_id="media_player.speaker",
+        volume_level=0.35,
+    )
+
+
+def test_assembler_wires_home_assistant_charging_controller() -> None:
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity.return_value.state.state = "docked"
+    request = ChargingMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        controller=HassChargingControllerSpec(entity_id="vacuum.robot"),
+        charging_device_type=ChargingDeviceType.VACUUM_ROBOT,
+    )
+
+    prepared = _assembler(home_assistant=home_assistant).assemble(request)
+
+    assert isinstance(prepared.runner, ChargingRunner)
+    controller = prepared.runner.controller
+    assert isinstance(controller, HassChargingController)
+    assert controller.is_charging() is True
+    home_assistant.get_entity.assert_called_once_with(entity_id="vacuum.robot")
+
+
+def test_assembler_wires_home_assistant_fan_controller() -> None:
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    request = FanMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        controller=HassFanControllerSpec(entity_id="fan.desk"),
+    )
+
+    prepared = _assembler(home_assistant=home_assistant).assemble(request)
+
+    assert isinstance(prepared.runner, FanRunner)
+    controller = prepared.runner.fan_controller
+    assert isinstance(controller, HassFanController)
+    controller.set_percentage(50)
+    home_assistant.trigger_service.assert_called_once_with(
+        "fan",
+        "set_percentage",
+        percentage=50,
+        entity_id="fan.desk",
+    )
 
 
 def test_assembler_reads_tuya_key_from_cli_config_dependency() -> None:

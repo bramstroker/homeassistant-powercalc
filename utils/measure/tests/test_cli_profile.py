@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
+import sys
 
-from measure.cli.profile import _ask_mains_voltage, _metadata_defaults, _prompt_device_specs, prepare_profile
+from measure.cli.profile import _ask_mains_voltage, _metadata_defaults, _prompt_device_specs, main, prepare_profile
 from measure.profile.prepare import ProfilePreparationError
 from measure.profile.specifications import DeviceSpecField
 import pytest
@@ -22,6 +23,244 @@ def write_artifacts(path: Path) -> dict[str, object]:
 def write_library(path: Path) -> None:
     path.mkdir()
     (path / "model_schema.json").write_text("{}", encoding="utf-8")
+
+
+@pytest.mark.parametrize("use_voltage_range", [False, True])
+def test_interactive_preparation_preserves_defaults_and_unknown_specifications(
+    tmp_path: Path,
+    use_voltage_range: bool,
+) -> None:
+    artifacts = tmp_path / "MODEL-1"
+    model = write_artifacts(artifacts)
+    model.update(
+        {
+            "device_type": "light",
+            "mains_voltage": 230,
+            "aliases": ["Lamp v2"],
+            "gtin": ["12345678"],
+            "product_url": "https://example.com/lamp",
+            "device_specs": {"rated_power": 9.5, "legacy_field": "keep"},
+            "authors": [{"name": "Test User", "github": "tester", "email": "test@example.com"}],
+        }
+    )
+    if use_voltage_range:
+        model["voltage_range"] = {"min": 225, "max": 235}
+    (artifacts / "model.json").write_text(json.dumps(model), encoding="utf-8")
+    library = tmp_path / "profile_library"
+    write_library(library)
+    schema = {
+        "properties": {
+            "device_type": {"enum": ["light"]},
+            "device_specs": {"properties": {"rated_power": {"type": "number"}}},
+        },
+    }
+    (library / "model_schema.json").write_text(json.dumps(schema), encoding="utf-8")
+    metadata = tmp_path / "metadata.json"
+    metadata.write_text('{"manufacturer":"Acme"}', encoding="utf-8")
+    questions: list[str] = []
+
+    def accept_default(question: str) -> str:
+        questions.append(question)
+        return ""
+
+    result = prepare_profile(
+        ["prepare", str(artifacts), "--metadata", str(metadata), "--library-root", str(library)],
+        prompt=accept_default,
+    )
+
+    prepared = result.output_directory / "profile_library" / "acme" / "MODEL-1" / "model.json"
+    assert json.loads(prepared.read_text(encoding="utf-8")) == model
+    assert json.loads((artifacts / "model.json").read_text(encoding="utf-8")) == model
+    assert any("Rated power [9.5]" in question for question in questions)
+    assert any("Nominal mains voltage" in question for question in questions) is not use_voltage_range
+
+
+def test_interactive_preparation_reprompts_required_fields_and_accepts_edits(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    artifacts = tmp_path / "MODEL-1"
+    write_artifacts(artifacts)
+    library = tmp_path / "profile_library"
+    write_library(library)
+    answers = iter(
+        [
+            "",
+            " Acme ",
+            "MODEL-2",
+            "Desk lamp",
+            "Alias one, Alias two",
+            "12345678",
+            "",
+            "not a number",
+            "230",
+            "New meter",
+            "1.2",
+            "Measured indoors",
+            "Test User",
+            "tester",
+            "",
+        ]
+    )
+
+    result = prepare_profile(
+        ["prepare", str(artifacts), "--library-root", str(library)],
+        prompt=lambda _: next(answers),
+    )
+
+    prepared = result.output_directory / "profile_library" / "acme" / "MODEL-2" / "model.json"
+    model = json.loads(prepared.read_text(encoding="utf-8"))
+    assert model["name"] == "Desk lamp"
+    assert model["aliases"] == ["Alias one", "Alias two"]
+    assert model["gtin"] == ["12345678"]
+    assert model["mains_voltage"] == 230
+    assert model["measure_device"] == "New meter"
+    assert model["measure_device_firmware"] == "1.2"
+    assert model["measure_description"] == "Measured indoors"
+    assert model["authors"] == [{"name": "Test User", "github": "tester"}]
+    assert "product_url" not in model
+    output = capsys.readouterr().out
+    assert "Manufacturer is required" in output
+    assert "Nominal mains voltage must be one of" in output
+    assert next(answers, None) is None
+
+
+@pytest.mark.parametrize(
+    "field,answers,default,expected,feedback",
+    [
+        (DeviceSpecField("value", "Value", "", "boolean"), ["maybe", "YES"], None, True, "must be yes or no"),
+        (DeviceSpecField("value", "Value", "", "boolean"), ["no"], None, False, ""),
+        (DeviceSpecField("value", "Value", "", "boolean"), [""], True, True, ""),
+        (DeviceSpecField("value", "Value", "", "boolean"), [""], False, False, ""),
+        (DeviceSpecField("value", "Value", "", "boolean"), [""], None, None, ""),
+        (DeviceSpecField("value", "Value", "", "number"), ["bad", "9.5"], None, 9.5, "must be a number"),
+        (DeviceSpecField("value", "Value", "", "integer"), ["1.5", "2"], None, 2, "must be a whole number"),
+        (DeviceSpecField("value", "Value", "", "integer"), [""], None, None, ""),
+        (
+            DeviceSpecField("value", "Value", "", "integer", collection="array"),
+            ["1,x", "1,2"],
+            None,
+            [1, 2],
+            "list of numbers",
+        ),
+        (DeviceSpecField("value", "Value", "", "number", collection="array"), ["1.5,2.5"], None, [1.5, 2.5], ""),
+        (DeviceSpecField("value", "Value", "", "number", collection="array"), [""], None, None, ""),
+        (DeviceSpecField("value", "Value", "", "number", collection="scalar_or_array"), [""], 9.5, 9.5, ""),
+        (
+            DeviceSpecField("value", "Value", "", "string", options=("E27", "GU10")),
+            ["invalid", "GU10"],
+            None,
+            "GU10",
+            "not an allowed value",
+        ),
+        (
+            DeviceSpecField("value", "Value", "", "string", collection="array", options=("wifi", "zigbee")),
+            ["wifi,bluetooth", "wifi,zigbee"],
+            None,
+            ["wifi", "zigbee"],
+            "not an allowed value",
+        ),
+    ],
+)
+def test_device_specification_prompts_validate_values_and_preserve_types(
+    field: DeviceSpecField,
+    answers: list[str],
+    default: object,
+    expected: object,
+    feedback: str,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    responses = iter(answers)
+
+    result = _prompt_device_specs(lambda _: next(responses), [field], {"value": default, "legacy": "keep"})
+
+    assert result == ({"value": expected, "legacy": "keep"} if expected is not None else {"legacy": "keep"})
+    if expected is not None:
+        assert type(result["value"]) is type(expected)
+    assert feedback in capsys.readouterr().out
+    assert next(responses, None) is None
+
+
+@pytest.mark.parametrize(
+    "contents,message", [(None, "File does not exist"), ("{", "Invalid JSON"), ("[]", "must contain a JSON object")]
+)
+def test_cli_reports_unreadable_model_without_creating_output(
+    tmp_path: Path,
+    contents: str | None,
+    message: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    artifacts = tmp_path / "MODEL-1"
+    artifacts.mkdir()
+    if contents is not None:
+        (artifacts / "model.json").write_text(contents, encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["powercalc-profile", "prepare", str(artifacts), "--non-interactive"])
+
+    with pytest.raises(SystemExit) as raised:
+        main()
+
+    assert raised.value.code == 2
+    assert message in capsys.readouterr().err
+    assert not (artifacts / "prepared").exists()
+
+
+@pytest.mark.parametrize("library_exists", [False, True])
+def test_cli_reports_missing_library_or_schema(tmp_path: Path, library_exists: bool) -> None:
+    artifacts = tmp_path / "MODEL-1"
+    write_artifacts(artifacts)
+    library = tmp_path / "profile_library"
+    if library_exists:
+        library.mkdir()
+    message = "Model schema does not exist" if library_exists else "Profile library checkout was not found"
+
+    with pytest.raises(ProfilePreparationError, match=message):
+        prepare_profile(["prepare", str(artifacts), "--non-interactive", "--library-root", str(library)])
+
+
+def test_cli_main_reports_prepared_files_and_duplicate_warning(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    artifacts = tmp_path / "MODEL-1"
+    model = write_artifacts(artifacts)
+    model.update({"mains_voltage": 230, "authors": [{"name": "Test User", "github": "tester"}]})
+    (artifacts / "model.json").write_text(json.dumps(model), encoding="utf-8")
+    library = tmp_path / "profile_library"
+    write_library(library)
+    existing = library / "other" / "lamp"
+    existing.mkdir(parents=True)
+    (existing / "model.json").write_text(json.dumps(model), encoding="utf-8")
+    metadata = tmp_path / "metadata.json"
+    metadata.write_text('{"manufacturer":"Acme"}', encoding="utf-8")
+    output = tmp_path / "prepared"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "powercalc-profile",
+            "prepare",
+            str(artifacts),
+            "--non-interactive",
+            "--metadata",
+            str(metadata),
+            "--library-root",
+            str(tmp_path),
+            "--output",
+            str(output),
+            "--schema",
+            str(library / "model_schema.json"),
+        ],
+    )
+
+    main()
+
+    captured = capsys.readouterr()
+    assert f"Prepared profile written to {output}" in captured.out
+    assert "profile_library/acme/MODEL-1/model.json" in captured.out
+    assert "Warning: Possible duplicate profile: profile_library/other/lamp/model.json" in captured.err
+    assert (output / "profile_library" / "acme" / "MODEL-1" / "model.json").is_file()
 
 
 @pytest.mark.parametrize("directory", ["measurement", f"session-{'a' * 32}"])

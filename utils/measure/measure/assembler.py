@@ -1,5 +1,5 @@
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any
+from typing import Any, assert_never
 
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.dummy import DummyChargingController
@@ -182,7 +182,7 @@ class MeasurementAssembler:
             from measure.powermeter.serial_scpi import OwonOwh98xxPowerMeter
 
             return OwonOwh98xxPowerMeter(spec.port, spec.baudrate, spec.timeout, spec.channel)
-        raise PowerMeterError(f"Unsupported power meter specification: {type(spec).__name__}")
+        assert_never(spec)  # pragma: no cover - all PowerMeterSpec variants handled
 
     def _create_runner(
         self,
@@ -226,7 +226,7 @@ class MeasurementAssembler:
         if isinstance(request, FanMeasurementRequest):
             fan_controller = self._create_fan_controller(request.controller)
             return FanRunner(sampler, parameters, fan_controller, interaction)
-        raise ValueError(f"Unsupported measurement request: {type(request).__name__}")
+        assert_never(request)  # pragma: no cover - all MeasurementRequest variants handled
 
     def _create_recorder_state_reader(self) -> EntityStateReader:
         home_assistant = self._require_home_assistant()
@@ -260,7 +260,7 @@ class MeasurementAssembler:
             from measure.controller.light.hue import HueLightController
 
             return HueLightController(spec.bridge_ip, light=spec.light)
-        raise ValueError(f"Expected a light controller specification, got {type(spec).__name__}")
+        assert_never(spec)  # pragma: no cover - all LightControllerSpec variants handled
 
     def _create_media_controller(self, spec: MediaControllerSpec) -> MediaController:
         if isinstance(spec, DummyMediaControllerSpec):
@@ -268,7 +268,7 @@ class MeasurementAssembler:
         if isinstance(spec, HassMediaControllerSpec):
             hass = self._require_home_assistant()
             return HassMediaController(hass, entity_id=spec.entity_id)
-        raise ValueError(f"Expected a media controller specification, got {type(spec).__name__}")
+        assert_never(spec)  # pragma: no cover - all MediaControllerSpec variants handled
 
     def _create_charging_controller(self, spec: ChargingControllerSpec) -> ChargingController:
         if isinstance(spec, DummyChargingControllerSpec):
@@ -279,7 +279,7 @@ class MeasurementAssembler:
                 hass,
                 entity_id=spec.entity_id,
             )
-        raise ValueError(f"Expected a charging controller specification, got {type(spec).__name__}")
+        assert_never(spec)  # pragma: no cover - all ChargingControllerSpec variants handled
 
     def _create_fan_controller(self, spec: FanControllerSpec) -> FanController:
         if isinstance(spec, DummyFanControllerSpec):
@@ -287,7 +287,7 @@ class MeasurementAssembler:
         if isinstance(spec, HassFanControllerSpec):
             hass = self._require_home_assistant()
             return HassFanController(hass, entity_id=spec.entity_id)
-        raise ValueError(f"Expected a fan controller specification, got {type(spec).__name__}")
+        assert_never(spec)  # pragma: no cover - all FanControllerSpec variants handled
 
     def _require_home_assistant(self) -> HomeAssistantManager:
         if self._home_assistant_manager is None:

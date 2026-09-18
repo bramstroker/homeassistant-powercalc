@@ -28,7 +28,6 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         self.config = parameters
         self.sampler = sampler
         self.controller = controller
-        self.charging_device_type: ChargingDeviceType | None = None
         self.interaction = interaction or ImmediateInteraction()
 
     def run(
@@ -36,8 +35,6 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         request: ChargingMeasurementRequest,
         export_directory: str,
     ) -> RunnerResult:
-        self.charging_device_type = request.charging_device_type
-
         self.interaction.notify(
             "Make sure the device is as close to 0% charged as possible before starting the test.",
         )
@@ -86,7 +83,9 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         measurements[100] = [trickle_result.power]
         voltages.extend(trickle_result.voltages)
 
-        return RunnerResult(model_json_data=self._build_model_json_data(measurements), voltages=voltages)
+        return RunnerResult(
+            model_json_data=self._build_model_json_data(measurements, request.charging_device_type), voltages=voltages
+        )
 
     def _measure_charging_step(
         self,
@@ -146,10 +145,10 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         if wait_message_printed:
             self.interaction.notify("Charging device started charging, starting measurements")
 
-    def _build_model_json_data(self, measurements: dict[int, list[float]]) -> dict[str, object]:
+    def _build_model_json_data(
+        self, measurements: dict[int, list[float]], device_type: ChargingDeviceType
+    ) -> dict[str, object]:
         """Build the model JSON data from the measurements"""
-        if self.charging_device_type is None:
-            raise RuntimeError("Charging runner is not configured")
         calibrate_list = []
         for battery_level, powers in measurements.items():
             average_power = round(sum(powers) / len(powers), 2)
@@ -162,7 +161,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
             linear_config["attribute"] = self.controller.battery_level_attribute
 
         return {
-            "device_type": self.charging_device_type.value,
+            "device_type": device_type.value,
             "calculation_strategy": "linear",
             "calculation_enabled_condition": calculation_enabled_condition,
             "linear_config": linear_config,
