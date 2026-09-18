@@ -153,6 +153,29 @@ def test_interrupted_light_prints_recovery(
     assert "powercalc-profile prepare" not in caplog.text
 
 
+def test_failed_average_does_not_print_light_recovery_instructions(
+    mock_config_factory: MockConfigFactory,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    measure = _create_measure_instance(
+        config=mock_config_factory(
+            question_defaults={QUESTION_SELECTED_MEASURE_TYPE: MeasureType.AVERAGE, QUESTION_DURATION: 30},
+        ),
+    )
+
+    with (
+        patch("measure.cli.main.MeasurementExecution.run", side_effect=RuntimeError("Meter disconnected")),
+        pytest.raises(RuntimeError, match="Meter disconnected"),
+    ):
+        measure.start()
+
+    assert "Measurement stopped." in caplog.text
+    assert "To resume" not in caplog.text
+    assert "RESUME=true" not in caplog.text
+    assert "Files exported to" not in caplog.text
+    assert "powercalc-profile prepare" not in caplog.text
+
+
 def test_take_measurement_tracks_voltage_range(mock_config_factory: MockConfigFactory) -> None:
     mock_config = mock_config_factory(config_values={"sample_count": 3})
     power_meter = SequencePowerMeter(
