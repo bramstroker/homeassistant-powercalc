@@ -80,7 +80,7 @@ class ImmediateInteraction(RunInteraction):
         del action
 
     def notify(self, _: str) -> None:
-        return
+        return  # pragma: no cover - unattended notification is intentionally a no-op
 
     def choose(self, _: str, *, default: bool) -> bool:
         return default
@@ -97,13 +97,13 @@ class ImmediateInteraction(RunInteraction):
         remaining_seconds: float | None = None,
         skipped: int = 0,
     ) -> None:
-        return
+        return  # pragma: no cover - unattended progress is intentionally a no-op
 
     def wait(self, seconds: float) -> None:
         time.sleep(seconds)
 
     def checkpoint(self) -> None:
-        return
+        return  # pragma: no cover - unattended runs have no cancellation source
 
     def operating_point(self, point: OperatingPoint) -> None:
         return
