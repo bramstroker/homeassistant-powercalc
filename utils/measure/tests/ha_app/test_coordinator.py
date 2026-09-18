@@ -447,6 +447,73 @@ def test_completed_session_cannot_be_resumed(tmp_path: Path) -> None:
     assert coordinator.get(session.id).state == SessionState.COMPLETED
 
 
+def test_cancelling_a_completed_session_preserves_its_result(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+    completed = coordinator.get(session.id)
+    events = coordinator.events_since(0, session.id)
+
+    with pytest.raises(SessionConflictError, match="No running measurement session"):
+        coordinator.cancel(session.id)
+
+    assert coordinator.current == completed
+    assert coordinator.storage.load_snapshot(session.id) == completed
+    assert coordinator.events_since(0, session.id) == events
+
+
+@pytest.mark.parametrize("action", ["cancel", "confirm"])
+def test_stale_session_actions_do_not_affect_the_running_session(tmp_path: Path, action: str) -> None:
+    storage = SessionStorage(tmp_path)
+    completed_coordinator = MeasurementCoordinator(storage, CompletingService)
+    previous = completed_coordinator.start(light_request())
+    wait_for_state(completed_coordinator, SessionState.COMPLETED)
+    started = Event()
+    coordinator = MeasurementCoordinator(storage, lambda: BlockingService(started))
+    current = coordinator.start(light_request())
+
+    try:
+        assert started.wait(1)
+        with pytest.raises(SessionConflictError, match="The requested session is not active"):
+            getattr(coordinator, action)(previous.id)
+
+        assert coordinator.get(current.id).state == SessionState.RUNNING
+        assert coordinator.get(previous.id).state == SessionState.COMPLETED
+    finally:
+        coordinator.cancel(current.id)
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_repeated_cancellation_preserves_cancellation_intent_while_the_worker_stops(tmp_path: Path) -> None:
+    started = Event()
+    release = Event()
+
+    class SlowStoppingService(SessionMeasurementService):
+        def run(
+            self, request: MeasurementRequest, control: SessionControl, context: SessionExecutionContext
+        ) -> RunnerResult:
+            started.set()
+            assert release.wait(2)
+            control.checkpoint()
+            return RunnerResult(model_json_data={})
+
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), SlowStoppingService)
+    session = coordinator.start(light_request())
+    try:
+        assert started.wait(1)
+        cancelling = coordinator.cancel(session.id)
+        repeated = coordinator.cancel(session.id)
+
+        assert cancelling.state == SessionState.CANCELLING
+        assert repeated == cancelling
+        assert coordinator.storage.load_snapshot(session.id) == cancelling
+    finally:
+        release.set()
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+    assert coordinator.cancel(session.id).state == SessionState.CANCELLED
+
+
 def test_running_session_cannot_be_resumed_or_confirmed(tmp_path: Path) -> None:
     started = Event()
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
