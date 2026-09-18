@@ -9,8 +9,8 @@ from measure.cancellation import MeasurementCancelledError
 from measure.cli.const import QUESTION_MODE
 from measure.cli.questions import light_questions
 from measure.controller.errors import ApiConnectionError as HassApiConnectionError
-from measure.controller.light.const import LutMode
-from measure.controller.light.controller import LightController
+from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
+from measure.controller.light.controller import LightController, LightInfo
 from measure.controller.light.dummy import DummyLightController
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.powermeter.errors import OutdatedMeasurementError, PowerMeterError, ZeroReadingError
@@ -27,6 +27,7 @@ from measure.runner.light.plan import (
     LightModePlan,
     Variation,
     build_light_plan,
+    estimate_light_time_left,
 )
 from measure.runner.light.runner import LightRunner, LightRunProgress, MeasurementRunInput
 from measure.tuning import MeasurementParameters
@@ -223,6 +224,38 @@ def test_get_variations(mode: LutMode, expected_count: int) -> None:
     )
 
     assert plan.variation_count == expected_count
+
+
+@pytest.mark.parametrize(
+    "property_name,value,expected",
+    [
+        ("min_mired", MIN_MIRED - 1, MIN_MIRED),
+        ("min_mired", MIN_MIRED, MIN_MIRED),
+        ("min_mired", 200, 200),
+        ("max_mired", MAX_MIRED + 1, MAX_MIRED),
+        ("max_mired", MAX_MIRED, MAX_MIRED),
+        ("max_mired", 400, 400),
+    ],
+)
+def test_light_info_limits_color_temperature_to_supported_bounds(property_name: str, value: int, expected: int) -> None:
+    info = LightInfo("test-light")
+
+    setattr(info, property_name, value)
+
+    assert getattr(info, property_name) == expected
+
+
+@pytest.mark.parametrize("effects", [None, []])
+def test_effect_plan_requires_available_effects(effects: list[str] | None) -> None:
+    with pytest.raises(RunnerError, match="No effects found for the light"):
+        build_light_plan({LutMode.EFFECT}, _parameters(), LightInfo("test-light"), effects)
+
+
+def test_empty_light_plan_has_no_remaining_measurement_time() -> None:
+    plan = build_light_plan(set(), _parameters(), LightInfo("test-light"))
+
+    assert plan.variation_count == 0
+    assert estimate_light_time_left(plan, _parameters()) == 0
 
 
 @pytest.mark.parametrize(
