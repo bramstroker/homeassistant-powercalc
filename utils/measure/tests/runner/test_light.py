@@ -743,6 +743,21 @@ def test_resume_effect(tmp_path: Path) -> None:
     assert resume_variation.bri == 200
 
 
+def test_unattended_resume_accepts_existing_measurements(tmp_path: Path) -> None:
+    csv_file = tmp_path / "brightness.csv"
+    contents = "bri,watt\n1,1.0\n"
+    csv_file.write_text(contents)
+    runner = LightRunner(
+        MagicMock(spec=PowerSampler),
+        replace(_parameters(), prompt_resume=True),
+        DummyLightController(),
+        resume=True,
+    )
+
+    assert runner.should_resume(str(csv_file)) is True
+    assert csv_file.read_text() == contents
+
+
 def test_resume_confirmation_uses_interaction(tmp_path: Path) -> None:
     csv_file = tmp_path / "brightness.csv"
     csv_file.write_text("bri,watt\n1,1.0\n")
