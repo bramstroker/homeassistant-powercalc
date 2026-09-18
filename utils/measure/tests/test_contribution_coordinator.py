@@ -9,7 +9,13 @@ from measure.contribution.coordinator import (
 )
 from measure.contribution.credentials import CredentialKind, CredentialStore, StoredCredential
 from measure.contribution.github import GitHubClient, GitHubRepository, GitHubUser
-from measure.contribution.models import ContributionAuthor, ContributionJob, ContributionJobStatus, ContributionMetadata
+from measure.contribution.models import (
+    ContributionAuthor,
+    ContributionErrorCode,
+    ContributionJob,
+    ContributionJobStatus,
+    ContributionMetadata,
+)
 from measure.contribution.pull_request import deterministic_branch_name, pull_request_body
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.ha_app.contribution.models import (
@@ -172,6 +178,32 @@ def test_coordinator_persists_preview_and_submits_idempotently(tmp_path: Path) -
         for call in github.calls
     )
     assert any(call.startswith("create_commit:feat(profile): add signify LCT999") for call in github.calls)
+
+
+@pytest.mark.parametrize("job_id", ["", "../outside", "job/id", "job.id"])
+def test_job_store_rejects_unsafe_ids_without_touching_files(tmp_path: Path, job_id: str) -> None:
+    store = ContributionJobStore(tmp_path / "jobs")
+
+    with pytest.raises(ValueError, match="Invalid contribution job id"):
+        store.load(job_id)
+
+    assert list(store.root.iterdir()) == []
+
+
+def test_missing_upstream_branch_records_failure_before_github_writes(tmp_path: Path) -> None:
+    github = FakeGitHubClient()
+    coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
+    job = coordinator.create_job(tmp_path / "artifacts", make_metadata())
+
+    with patch.object(github, "get_ref", return_value=None):
+        submitted = coordinator.submit(job.id, tmp_path / "artifacts")
+
+    assert submitted.status == ContributionJobStatus.FAILED
+    assert submitted.error is not None
+    assert submitted.error.code == ContributionErrorCode.GITHUB_ERROR
+    assert submitted.error.message == "Upstream branch was not found"
+    assert coordinator.job_store.load(job.id) == submitted
+    assert not any(call.startswith(("create_", "update_", "sync_")) for call in github.calls)
 
 
 def test_coordinator_targets_configured_repository_and_branch(tmp_path: Path) -> None:

@@ -34,7 +34,12 @@ from measure.ha_app.contribution.models import (
 )
 from measure.ha_app.contribution.service import SharedContributionService
 from measure.ha_app.coordinator import MeasurementCoordinator, SessionExecutionContext, SessionMeasurementService
-from measure.ha_app.library_catalog import DeviceSpecificationCatalog, ManufacturerCatalog, MeasureDeviceCatalog
+from measure.ha_app.library_catalog import (
+    DeviceSpecificationCatalog,
+    LibraryCatalogError,
+    ManufacturerCatalog,
+    MeasureDeviceCatalog,
+)
 from measure.ha_app.light_probe import LightLoadProbeError, LightLoadProbePoint, LightLoadProbeResult
 from measure.ha_app.routes.measurement import _power_meter_spec
 from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType, SessionSnapshot, SessionState
@@ -488,6 +493,45 @@ def test_entity_manufacturer_normalizes_a_library_alias(tmp_path: Path) -> None:
         ],
     ):
         assert context.get_entity_manufacturers(["light.test"]) == {"light.test": "Signify"}
+
+
+@pytest.mark.parametrize("manufacturer", [None, ""])
+def test_entity_without_manufacturer_skips_library_lookup(tmp_path: Path, manufacturer: str | None) -> None:
+    context = client(tmp_path).app.state.context
+    context.home_assistant = FakeClient()
+    catalog = MagicMock(spec=ManufacturerCatalog)
+    context.manufacturer_catalog = catalog
+
+    with patch.object(
+        FakeClient,
+        "get_device_registry",
+        return_value=[{"id": "light-device", "manufacturer": manufacturer}],
+    ):
+        assert context.get_entity_manufacturers(["light.test", "light.missing"]) == {
+            "light.test": None,
+            "light.missing": None,
+        }
+
+    catalog.canonical_name.assert_not_called()
+
+
+def test_manufacturer_lookup_failure_preserves_home_assistant_name(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    context = client(tmp_path).app.state.context
+    context.home_assistant = FakeClient()
+    catalog = MagicMock(spec=ManufacturerCatalog)
+    catalog.canonical_name.side_effect = LibraryCatalogError("Library unavailable")
+    context.manufacturer_catalog = catalog
+
+    with patch.object(
+        FakeClient,
+        "get_device_registry",
+        return_value=[{"id": "light-device", "manufacturer": "Acme Lighting"}],
+    ):
+        assert context.get_entity_manufacturers(["light.test"]) == {"light.test": "Acme Lighting"}
+
+    assert "Could not normalize manufacturer Acme Lighting" in caplog.text
 
 
 def test_index_is_not_cached(tmp_path: Path) -> None:
