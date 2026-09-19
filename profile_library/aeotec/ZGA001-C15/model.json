@@ -12,7 +12,7 @@
   "discovery_by": "device",
   "device_specs": {
     "form_factor": "repeater",
-    "rated_power": "1.0",
+    "rated_power": 1.0,
     "connectivity": [
       "zigbee"
     ]
