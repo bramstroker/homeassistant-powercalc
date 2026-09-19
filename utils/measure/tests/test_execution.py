@@ -126,6 +126,22 @@ def test_execution_writes_model_from_prepared_measurement(
     assert "NUM_LIGHTS" not in model["measure_settings"]
 
 
+def test_execution_saves_completed_light_profile_without_unavailable_standby(tmp_path: Path) -> None:
+    request = LightMeasurementRequest(
+        controller=DummyLightControllerSpec(), power_meter=DummyPowerMeterSpec(), measure_device="Test meter"
+    )
+    runner = MagicMock(spec=MeasurementRunner)
+    runner.run.return_value = RunnerResult(model_json_data={"device_type": "light"}, voltages=[229.9, 231.2])
+    runner.measure_standby_power.return_value = None
+    MeasurementExecution(
+        measurement=PreparedMeasurement(request=request, runner=runner), output_directory=tmp_path
+    ).run()
+    model = json.loads((tmp_path / "model.json").read_text())
+    assert "standby_power" not in model
+    assert model["voltage_range"] == {"min": 229.9, "max": 231.2}
+    runner.cleanup.assert_called_once_with()
+
+
 def test_execution_records_enabled_dummy_load_in_measure_settings(tmp_path: Path) -> None:
     request = AverageMeasurementRequest(
         product_name="Test device",

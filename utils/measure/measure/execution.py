@@ -183,10 +183,10 @@ class MeasurementExecution:
                 )
             if request.generate_model_json and output_directory is not None:
                 standby = runner.measure_standby_power()
-                voltages = list(result.voltages or []) + standby.voltages
+                voltages = list(result.voltages or []) + (standby.voltages if standby is not None else [])
                 write_model_json(
                     output_directory,
-                    standby_power=standby.power,
+                    standby_power=standby.power if standby is not None else None,
                     name=request.model_name,
                     measure_device=request.measure_device,
                     parameters=request.parameters,

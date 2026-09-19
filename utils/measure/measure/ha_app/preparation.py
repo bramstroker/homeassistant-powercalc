@@ -16,7 +16,7 @@ class PreflightAssessment:
     light_load_probe: LightLoadProbeResult | None = None
 
 
-def run_preflight(context: AppContext, payload: MeasurementRequest) -> PreflightAssessment:
+def run_preflight(context: AppContext, payload: MeasurementRequest, *, refresh: bool = False) -> PreflightAssessment:
     """Validate app dependencies and probe low light loads before starting a run."""
     catalog = HomeAssistantEntityCatalog(context.home_assistant)
     snapshot = None
@@ -36,7 +36,11 @@ def run_preflight(context: AppContext, payload: MeasurementRequest) -> Preflight
         developer_mode=context.developer_mode,
     ).validate(payload)
     light_load_probe = (
-        context.light_load_probe.evaluate(payload)
+        (
+            context.light_load_probe.evaluate(payload, refresh=True)
+            if refresh
+            else context.light_load_probe.evaluate(payload)
+        )
         if isinstance(payload, LightMeasurementRequest)
         and payload.dummy_load is None
         and not payload.controller.is_dummy

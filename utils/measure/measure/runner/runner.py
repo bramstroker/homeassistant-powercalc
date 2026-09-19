@@ -24,7 +24,7 @@ class MeasurementRunner[TRequest: BaseMeasurementRequest](ABC):
     def cleanup(self) -> None:  # noqa: B027 - optional lifecycle hook
         """Release runner-owned resources after execution."""
 
-    def measure_standby_power(self) -> MeasurementResult:
+    def measure_standby_power(self) -> MeasurementResult | None:
         """Default to zero when the strategy has no separate standby measurement."""
 
         return MeasurementResult(power=0, voltages=[])

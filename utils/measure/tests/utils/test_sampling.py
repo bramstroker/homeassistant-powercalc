@@ -32,7 +32,10 @@ class SamplingClock:
 
 
 @pytest.mark.parametrize("measure_resistance", [False, True])
-def test_average_skips_zero_readings_and_stops_before_deadline(measure_resistance: bool) -> None:
+def test_average_skips_zero_readings_and_stops_before_deadline(
+    measure_resistance: bool, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level("INFO", logger="measure")
     clock = SamplingClock()
     meter = MagicMock(spec=PowerMeter)
     meter.get_power.side_effect = [
@@ -45,6 +48,10 @@ def test_average_skips_zero_readings_and_stops_before_deadline(measure_resistanc
 
     with patch("measure.utils.sampling.time.time", side_effect=lambda: clock.elapsed):
         result = sampler.take_average_measurement(6, measure_resistance=measure_resistance, on_progress=progress)
+
+    if not measure_resistance:
+        assert "Skipped a 0.00 W sample" in caplog.text
+        assert not any(record.levelname == "WARNING" for record in caplog.records)
 
     assert result == MeasurementResult(power=18.75 if measure_resistance else 6, voltages=[10, 10])
     assert meter.get_power.call_count == 3
