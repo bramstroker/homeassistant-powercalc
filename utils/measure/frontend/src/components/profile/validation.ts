@@ -17,7 +17,7 @@ export function validateMetadata(values: ContributionPreviewRequest): Record<str
   validateRequiredMetadata(values, errors);
   validateMainsVoltage(values, errors);
   if (values.standby_power !== undefined && (values.standby_power === null || !Number.isFinite(values.standby_power) || values.standby_power < 0.05)) {
-    errors.standby_power = "Enter standby power of at least 0.05 W per light, or use an estimate.";
+    errors.standby_power = "Enter standby power of at least 0.05 W, or use an estimate.";
   }
   const limits: Partial<Record<keyof ContributionPreviewRequest, number>> = {
     manufacturer_name: 200, model_id: 120, product_name: 200, contributor: 200,

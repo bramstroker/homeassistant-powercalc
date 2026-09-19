@@ -1,7 +1,7 @@
 import { ProfilePrepareView } from "./prepare-view";
 import type { Combobox } from "../shared/combobox";
 import type { StringListInput } from "../shared/string-list-input";
-import type { ContributionPreview, StandbyEstimate } from "../../types";
+import type { ContributionPreview, StandbyEstimate, StandbyMeasurementResult } from "../../types";
 
 const preview: ContributionPreview = {
   eligible: true, manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010",
@@ -31,6 +31,50 @@ function submit(element: ProfilePrepareView): void {
 }
 
 describe("profile validation", () => {
+  it("applies a retry result, clears estimated, and requires validation again", async () => {
+    const element = await mount();
+    let resolve!: (result: StandbyMeasurementResult) => void;
+    element.measureStandby = vi.fn(() => new Promise<StandbyMeasurementResult>(done => { resolve = done; }));
+    element.contributionFormValues = { standby_power: "0.4", standby_power_estimated: "true" };
+    await element.updateComplete;
+    const fields = element.shadowRoot!.querySelector("measure-profile-measurement-fields")!;
+    fields.dispatchEvent(new CustomEvent("standby-measure", { bubbles: true }));
+    await element.updateComplete;
+    expect(element.measureStandby).toHaveBeenCalledWith("session-1");
+    expect(element.shadowRoot!.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
+    resolve({ status: "measured", power_w: 0.65 });
+    await vi.waitFor(() => expect(input(element, "standby_power").value).toBe("0.65"));
+    expect(input(element, "standby_power_estimated").checked).toBe(false);
+    expect(element.previewDirty).toBe(true);
+  });
+
+  it.each(["unavailable", "error", "stale"])("preserves entered standby after a %s retry", async outcome => {
+    const element = await mount();
+    let resolve!: (result: StandbyMeasurementResult) => void;
+    let reject!: (error: Error) => void;
+    element.measureStandby = vi.fn(() => new Promise<StandbyMeasurementResult>((done, fail) => { resolve = done; reject = fail; }));
+    element.shadowRoot!.querySelector("measure-profile-measurement-fields")!.dispatchEvent(new CustomEvent("standby-measure", { bubbles: true }));
+    if (outcome === "stale") element.snapshot = { state: "completed", session_id: "session-2" };
+    if (outcome === "error") reject(new Error("Meter offline"));
+    else resolve({ status: outcome === "stale" ? "measured" : "unavailable", power_w: outcome === "stale" ? 0.9 : null });
+    await Promise.resolve();
+    await element.updateComplete;
+    expect(input(element, "standby_power").value).toBe("0.3");
+  });
+
+  it("allows standby overrides for non-light profiles and preserves omitted values", async () => {
+    const element = await mount();
+    element.contributionDraft = { ...preview, device_type: "fan", standby_power: null };
+    const onPreview = vi.fn();
+    element.addEventListener("contribution-preview", onPreview);
+    await element.updateComplete;
+    submit(element);
+    expect(onPreview.mock.lastCall![0].detail).not.toHaveProperty("standby_power");
+    input(element, "standby_power").value = "1.2";
+    input(element, "standby_power_estimated").checked = true;
+    submit(element);
+    expect(onPreview.mock.lastCall![0].detail).toMatchObject({ standby_power: 1.2, standby_power_estimated: true });
+  });
   it("requires a correction for legacy zero standby and applies estimates only on request", async () => {
     const element = await mount();
     element.contributionDraft = { ...preview, standby_power: null };
@@ -84,14 +128,15 @@ describe("profile validation", () => {
     expect(input(element, "standby_power_estimated").checked).toBe(false);
   });
 
-  it("offers a fallback after a library outage and does not show light-only fields for other profiles", async () => {
+  it("offers a fallback after a library outage but only suggests estimates for lights", async () => {
     const element = await mount();
     element.loadStandbyEstimate = vi.fn().mockRejectedValue(new Error("offline"));
     element.contributionDraft = { ...preview, device_specs: { connectivity: ["wifi"] } };
     await vi.waitFor(() => expect(element.shadowRoot!.textContent).toContain("Use estimated standby: 0.4 W"));
     element.contributionDraft = { ...preview, device_type: "generic" };
     await element.updateComplete;
-    expect(input(element, "standby_power")).toBeNull();
+    expect(input(element, "standby_power")).not.toBeNull();
+    expect(element.shadowRoot!.textContent).not.toContain("Use estimated standby");
   });
 
   it("marks required fields, lists missing values together and focuses the first error", async () => {

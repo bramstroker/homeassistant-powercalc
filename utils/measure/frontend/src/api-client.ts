@@ -25,6 +25,7 @@ import {
   decodeSettings,
   decodeShellyDiscovery,
   decodeStandbyEstimate,
+  decodeStandbyMeasurement,
 } from "./api-decoders";
 import type { Decoder } from "./api-decoders";
 import type {
@@ -184,6 +185,12 @@ export class MeasureApiClient {
     const query = new URLSearchParams({ manufacturer });
     for (const value of connectivity) query.append("connectivity", value);
     return this.requestJson(`api/library/standby-estimate?${query}`, decodeStandbyEstimate);
+  }
+
+  measureStandby(sessionId: string) {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby`, decodeStandbyMeasurement, {
+      method: "POST", body: JSON.stringify({ confirmed: true }),
+    });
   }
 
   start(request: MeasurementRequest): Promise<SessionSnapshot> {

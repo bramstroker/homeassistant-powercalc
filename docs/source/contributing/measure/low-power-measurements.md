@@ -103,6 +103,18 @@ when several lights were measured together. Keep **Estimated** checked for estim
 estimate with a measured value. This also works for older completed sessions whose standby is missing or zero; no
 new LUT run is required.
 
+**Measure standby** retries only the standby reading using the completed session's original setup. Confirm the
+device and meter are still connected correctly. Lights, speakers, and fans use their existing turn-off routines;
+for charging and recorded devices, put the device into standby yourself before confirming. Lights may briefly
+pulse on and off to refresh stale readings. Any resistive dummy load must remain connected and warmed up, as its
+session calibration is reused. A successful reading fills the field and clears **Estimated**; an unavailable
+reading or error leaves your entry unchanged. Dummy meters and controllers are allowed for testing, with a
+simulation notice; their results must not be submitted as real measurements.
+
+The standby field, **Estimated** checkbox, and retry action are also available for non-light profiles. Their value
+is watts for the device, not watts per light. Leave the optional field blank to preserve an existing value or
+template. Library suggestions and the `0.4` W fallback apply only to lights.
+
 The suggestion uses the median standby of at least three distinct, non-estimated light profiles with exactly the
 same connectivity set and manufacturer (including manufacturer aliases). If too few match that manufacturer, it
 uses at least three matching profiles across manufacturers. With too few comparable profiles, unknown connectivity,

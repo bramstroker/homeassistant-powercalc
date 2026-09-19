@@ -10,6 +10,7 @@ import type {
   DeviceSpecificationField,
   SessionSnapshot,
   StandbyEstimate,
+  StandbyMeasurementResult,
 } from "../../types";
 import { emit } from "../../utils/events";
 import { formText, submittedForm } from "../../utils/form";
@@ -41,6 +42,9 @@ export class ProfilePrepareView extends LitElement {
   @property({ type: String }) measureDevicesError = "";
   @property({ attribute: false }) deviceSpecificationFields: Record<string, DeviceSpecificationField[]> = {};
   @property({ attribute: false }) loadStandbyEstimate?: (manufacturer: string, connectivity: string[]) => Promise<StandbyEstimate>;
+  @property({ attribute: false }) measureStandby?: (sessionId: string) => Promise<StandbyMeasurementResult>;
+  @state() private standbyBusy = false;
+  @state() private standbyMessage = "";
   @state() private standbyEstimate?: StandbyEstimate;
   private standbyEstimateKey = "";
   private standbyEstimateVersion = 0;
@@ -63,6 +67,8 @@ export class ProfilePrepareView extends LitElement {
       this.fieldErrors = {};
       this.previewDirty = false;
       this.dismissedServerField = undefined;
+      this.standbyBusy = false;
+      this.standbyMessage = "";
     }
     if (changed.has("contributionPreview") && this.contributionPreview) {
       if (this.hasUpdated) this.contributionFormValues = {};
@@ -106,8 +112,35 @@ export class ProfilePrepareView extends LitElement {
   }
 
   private applyStandbyEstimate(event: CustomEvent<number>): void {
+    this.standbyMessage = "";
+    this.applyStandbyValue(event.detail, true);
+  }
+
+  private async retryStandby(): Promise<void> {
+    const sessionId = this.snapshot.session_id;
+    if (!sessionId || !this.measureStandby || this.standbyBusy) return;
+    this.standbyBusy = true;
+    this.standbyMessage = "";
+    try {
+      const result = await this.measureStandby(sessionId);
+      if (!this.isConnected || this.snapshot.session_id !== sessionId) return;
+      if (result.status === "measured" && result.power_w !== null && result.power_w >= 0.05) {
+        this.applyStandbyValue(result.power_w, false);
+        this.standbyMessage = `Measured ${result.power_w} W${this.snapshot.request?.measure_type === "light" ? " per light" : ""}. Validate the updated profile before continuing.`;
+      } else {
+        this.standbyMessage = "Standby could not be measured reliably. Your entered value is unchanged; try an estimate or a separate measurement.";
+      }
+    } catch (error) {
+      if (!this.isConnected || this.snapshot.session_id !== sessionId) return;
+      this.standbyMessage = `${error instanceof Error ? error.message : "Standby measurement failed."} Your entered value is unchanged.`;
+    } finally {
+      if (this.snapshot.session_id === sessionId) this.standbyBusy = false;
+    }
+  }
+
+  private applyStandbyValue(power: number, estimated: boolean): void {
     this.contributionFormValues = {
-      ...this.contributionFormValues, standby_power: String(event.detail), standby_power_estimated: "true",
+      ...this.contributionFormValues, standby_power: String(power), standby_power_estimated: String(estimated),
     };
     this.previewDirty = true;
     const errors = { ...this.fieldErrors };
@@ -149,7 +182,11 @@ export class ProfilePrepareView extends LitElement {
     .contribution-grid > *, .contribution-grid label, .notes-field { align-self: start; }
     .contribution-grid label, .notes-field { display: grid; gap: 0.4rem; }
     .contribution-grid label > span, .notes-field > span { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
-    .standby-checkbox { display: flex; align-items: center; gap: 0.5rem; }
+    .standby-field > label { display: block; color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+    .standby-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; }
+    .standby-controls > input { width: 9rem; max-width: 100%; }
+    .standby-controls > button { max-width: 100%; }
+    .standby-checkbox { display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
     .standby-checkbox input { width: auto; min-height: 0; }
     .field-stack { display: grid; gap: 0.4rem; min-width: 0; }
     textarea { min-height: 84px; resize: vertical; }
@@ -166,6 +203,7 @@ export class ProfilePrepareView extends LitElement {
     .info-list dd { margin: 0.15rem 0 0; overflow-wrap: anywhere; }
     pre { max-height: 240px; overflow: auto; margin: 0; padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--well); color: var(--ink); font-size: 0.75rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
     a { color: var(--signal-strong); font-weight: 700; }
+    .inline-link { display: inline; min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--signal-strong); font: inherit; font-weight: 700; text-decoration: underline; }
     @media (max-width: 520px) {
       .contribution-grid, .contribution-grid.contributor-grid { grid-template-columns: 1fr; }
       .validation-footer { gap: 0.75rem; padding: 0.75rem; }
@@ -224,6 +262,8 @@ export class ProfilePrepareView extends LitElement {
             .busy=${this.contributionBusy} .measureDevices=${this.measureDevices}
             .measureDevicesLoading=${this.measureDevicesLoading} .measureDevicesError=${this.measureDevicesError}
             .standbyEstimate=${this.standbyEstimate} @standby-estimate-apply=${this.applyStandbyEstimate}
+            .measurementRequest=${this.snapshot.request} .standbyBusy=${this.standbyBusy}
+            .standbyMessage=${this.standbyMessage} @standby-measure=${this.retryStandby}
           ></measure-profile-measurement-fields>
           <measure-profile-device-specification-fields
             .draft=${draft} .values=${this.contributionFormValues} .errors=${errors}
@@ -253,6 +293,7 @@ export class ProfilePrepareView extends LitElement {
   }
 
   private validationStatus(valid: boolean) {
+    if (this.standbyBusy) return "Measuring standby…";
     if (valid) return html`<span aria-hidden="true">✓</span> Profile validated`;
     if (this.contributionBusy) return "Checking your metadata and generated profile…";
     if (this.contributionError || Object.keys(this.fieldErrors).length) {
@@ -269,7 +310,7 @@ export class ProfilePrepareView extends LitElement {
     let label = "Validate profile";
     if (this.contributionBusy) label = "Validating profile…";
     else if (this.previewDirty) label = "Validate changes";
-    return html`<button class="primary" type="submit" ?disabled=${this.contributionBusy}>${label}</button>`;
+    return html`<button class="primary" type="submit" ?disabled=${this.contributionBusy || this.standbyBusy}>${label}</button>`;
   }
 
 
@@ -294,7 +335,7 @@ export class ProfilePrepareView extends LitElement {
       product_url: formText(data, "product_url"),
       mains_voltage: mainsVoltageValue ? Number(mainsVoltageValue) : null,
       device_specs: deviceSpecs,
-      ...(draft && profileDeviceType(draft) === "light" ? {
+      ...(formText(data, "standby_power") || (draft && profileDeviceType(draft) === "light") ? {
         standby_power: formText(data, "standby_power") ? Number(formText(data, "standby_power")) : null,
         standby_power_estimated: data.has("standby_power_estimated"),
       } : {}),
@@ -307,7 +348,7 @@ export class ProfilePrepareView extends LitElement {
 
   private previewContribution(event: SubmitEvent): void {
     event.preventDefault();
-    if (this.contributionBusy) return;
+    if (this.contributionBusy || this.standbyBusy) return;
     const detail = this.collectContribution();
     if (!detail) return;
     this.contributionEdit = detail;
@@ -420,7 +461,7 @@ export class ProfilePrepareView extends LitElement {
   }
 
   private canContinue(): boolean {
-    return Boolean(this.contributionPreview && !this.previewDirty && !this.contributionBusy && !this.contributionError && !Object.keys(this.fieldErrors).length);
+    return Boolean(this.contributionPreview && !this.previewDirty && !this.contributionBusy && !this.standbyBusy && !this.contributionError && !Object.keys(this.fieldErrors).length);
   }
 
   private editableDraft(): ContributionDraft | undefined {

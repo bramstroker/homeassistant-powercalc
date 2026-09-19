@@ -1,4 +1,5 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, replace
 import logging
 from pathlib import Path
@@ -73,12 +74,26 @@ class MeasurementCoordinator:
         self._control: SessionControl | None = None
         self._worker: Thread | None = None
         self._analysing: set[str] = set()
+        self._probing = False
         self._listeners: list[Callable[[], None]] = []
 
     @property
     def current(self) -> SessionSnapshot | None:
         with self._lock:
             return self._snapshot
+
+    @contextmanager
+    def reserve_devices(self) -> Iterator[None]:
+        """Keep short hardware checks exclusive with measurement sessions and other checks."""
+        with self._lock:
+            if self._probing or (self._snapshot and self._snapshot.state in ACTIVE_SESSION_STATES):
+                raise SessionConflictError("A measurement or device check is already active")
+            self._probing = True
+        try:
+            yield
+        finally:
+            with self._lock:
+                self._probing = False
 
     def subscribe(self, listener: Callable[[], None]) -> Callable[[], None]:
         """Notify a listener whenever the externally visible session state changes."""
@@ -126,6 +141,8 @@ class MeasurementCoordinator:
         """Persist and launch a new session, rejecting overlapping work."""
 
         with self._lock:
+            if self._probing:
+                raise SessionConflictError("A device check is already active")
             if self._snapshot and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if self._analysing:
@@ -152,6 +169,8 @@ class MeasurementCoordinator:
         """Relaunch a retained session from compatible persisted output."""
 
         with self._lock:
+            if self._probing:
+                raise SessionConflictError("A device check is already active")
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if self._analysing:
@@ -178,6 +197,8 @@ class MeasurementCoordinator:
     def record_more(self, session_id: str) -> SessionSnapshot:
         """Capture another run with the session's original recorder settings."""
         with self._lock:
+            if self._probing:
+                raise SessionConflictError("A device check is already active")
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if self._analysing:
@@ -267,6 +288,8 @@ class MeasurementCoordinator:
     def delete(self, session_id: str) -> None:
         """Delete a terminal retained session."""
         with self._lock:
+            if self._probing:
+                raise SessionConflictError("A session cannot be deleted during a device check")
             try:
                 snapshot = self._snapshot_locked(session_id)
             except SESSION_LOAD_ERRORS as error:

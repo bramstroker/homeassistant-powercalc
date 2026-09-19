@@ -28,6 +28,7 @@ import type {
   SessionSummary,
   ShellyDiscoveryResponse,
   StandbyEstimate,
+  StandbyMeasurementResult,
 } from "./types";
 
 export type Decoder<T> = (value: unknown) => T;
@@ -439,6 +440,9 @@ export const decodePlots = decoder("plots", isPlotCollection);
 export const decodeContributionPreview = decoder("contribution preview", isContributionPreview);
 export const decodeStandbyEstimate: Decoder<StandbyEstimate> = decoder("standby estimate", objectOf({
   power_w: isNumber, basis: oneOf("manufacturer", "connectivity", "fallback"), profile_count: isNumber,
+}));
+export const decodeStandbyMeasurement: Decoder<StandbyMeasurementResult> = decoder("standby measurement", objectOf({
+  status: oneOf("measured", "unavailable", "skipped"), power_w: nullable(isNumber),
 }));
 export const decodeContributionResult = decoder("contribution result", isContributionResult);
 

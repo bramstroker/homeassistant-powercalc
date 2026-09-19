@@ -17,7 +17,7 @@ export class ProfilePreparedPreview extends LitElement {
       ?? this.preview.files.find((file) => file.path.endsWith("model.json"))?.rendered_json
       ?? {};
     return html`
-      ${this.preview.device_type === "light" && this.preview.standby_power != null ? html`<p class="notice">Standby power: <strong>${this.preview.standby_power} W per light (${this.preview.standby_power_estimated ? "estimated" : "measured"})</strong></p>` : nothing}
+      ${this.preview.standby_power != null ? html`<p class="notice">Standby power: <strong>${this.preview.standby_power} W${this.preview.device_type === "light" ? " per light" : ""} (${this.preview.standby_power_estimated ? "estimated" : "measured"})</strong></p>` : nothing}
       ${this.preview.warnings.map((warning) => html`<p class="notice warning preparation-warning">${warning}</p>`)}
       <details class="profile-details prepared-preview">
         <summary>Prepared files (${this.preview.files.length})</summary>

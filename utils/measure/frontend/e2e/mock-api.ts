@@ -206,7 +206,7 @@ const lightRequest = {
   power_meter: { type: "hass", entity_id: "sensor.plug_power", voltage_entity_id: "sensor.plug_voltage" },
 } as const satisfies SessionSnapshot["request"];
 
-const completedSnapshot = {
+export const completedSnapshot = {
   session_id: "session-completed",
   state: "completed",
   can_analyse: false,

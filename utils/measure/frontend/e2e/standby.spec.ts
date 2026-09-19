@@ -1,5 +1,92 @@
 import { expect, test } from "@playwright/test";
-import { contributionPreview, mockApi } from "./mock-api";
+import { completedSnapshot, contributionPreview, mockApi } from "./mock-api";
+
+for (const kind of ["light", "fan", "recorder"] as const) {
+  test(`confirms standby retry for a simulated ${kind} session`, async ({ page }) => {
+    await mockApi(page);
+    await page.route("**/api/sessions/session-completed", async route => {
+      const snapshot = { ...completedSnapshot, request: { ...completedSnapshot.request, measure_type: kind, power_meter: { type: "dummy" },
+        controller: kind === "recorder" ? null : { type: "dummy" },
+        ...(kind === "recorder" ? { recorder_purpose: "complex_profile", profile_recipe: "generic" } : {}),
+      } };
+      await route.fulfill({ json: snapshot });
+    });
+    if (kind !== "light") {
+      await page.route("**/api/sessions/session-completed/contribution", route => route.fulfill({
+        json: { ...contributionPreview, device_type: kind === "fan" ? "fan" : "generic", standby_power: 0.4 },
+      }));
+    }
+    let attempts = 0;
+    await page.route("**/api/sessions/session-completed/standby", async route => {
+      expect(route.request().postDataJSON()).toEqual({ confirmed: true });
+      attempts++;
+      await route.fulfill({ json: { status: attempts === 1 ? "measured" : "unavailable", power_w: attempts === 1 ? 0.65 : null } });
+    });
+    await page.goto("/");
+    await page.getByRole("button", { name: "Open", exact: true }).click();
+    await page.getByRole("button", { name: "Prepare profile" }).click();
+    const retry = page.getByRole("button", { name: "Measure standby", exact: true });
+    await expect(retry).toBeEnabled();
+    await retry.click();
+    await expect(page.getByText(/Results are simulated for testing/)).toBeVisible();
+    if (kind === "recorder") await expect(page.getByText(/Put the device into its intended standby state first/)).toBeVisible();
+    await page.getByRole("button", { name: "Cancel", exact: true }).click();
+    expect(attempts).toBe(0);
+    await page.getByRole("checkbox", { name: "Estimated", exact: true }).check();
+    await retry.click();
+    await page.getByRole("button", { name: "Confirm and measure standby" }).click();
+    await expect(page.getByRole("spinbutton", { name: /Standby power/ })).toHaveValue("0.65");
+    await expect(page.getByRole("checkbox", { name: "Estimated", exact: true })).not.toBeChecked();
+    await retry.click();
+    await page.getByRole("button", { name: "Confirm and measure standby" }).click();
+    await expect(page.getByText(/Your entered value is unchanged/)).toBeVisible();
+    await expect(page.getByRole("spinbutton", { name: /Standby power/ })).toHaveValue("0.65");
+  });
+}
+
+test("opens profile settings from contributor guidance and preserves standby edits", async ({ page }) => {
+  await mockApi(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+  const standby = page.getByRole("spinbutton", { name: /Standby power/ });
+  await standby.fill("0.25");
+  await page.getByRole("checkbox", { name: "Estimated", exact: true }).check();
+  await page.getByRole("button", { name: "profile settings", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Profile metadata", exact: true })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Contributor name", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await expect(standby).toHaveValue("0.25");
+  await expect(page.getByRole("checkbox", { name: "Estimated", exact: true })).toBeChecked();
+});
+
+for (const width of [1280, 390]) {
+  test(`keeps standby controls compact at ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await mockApi(page);
+    await page.goto("/");
+    await page.getByRole("button", { name: "Open", exact: true }).click();
+    await page.getByRole("button", { name: "Prepare profile" }).click();
+    const standby = page.getByRole("spinbutton", { name: /Standby power/ });
+    const estimate = page.getByRole("button", { name: "Use estimated standby: 0.4 W" });
+    await expect(estimate).toBeVisible();
+    await standby.scrollIntoViewIfNeeded();
+    const inputBox = await standby.boundingBox();
+    const checkboxBox = await page.locator(".standby-checkbox").boundingBox();
+    const buttonBox = await estimate.boundingBox();
+    if (!inputBox || !checkboxBox || !buttonBox) throw new Error("Standby controls must be visible");
+    expect(inputBox.width).toBeLessThan(180);
+    if (width === 1280) {
+      const inputCenter = inputBox.y + inputBox.height / 2;
+      expect(Math.abs(checkboxBox.y + checkboxBox.height / 2 - inputCenter)).toBeLessThan(2);
+      expect(Math.abs(buttonBox.y + buttonBox.height / 2 - inputCenter)).toBeLessThan(2);
+    } else {
+      expect(buttonBox.y).toBeGreaterThanOrEqual(inputBox.y + inputBox.height);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    await page.locator(".standby-field").screenshot({ path: testInfo.outputPath("standby-inline.png") });
+  });
+}
 
 test("recovers a completed session with zero standby without starting another measurement", async ({ page }, testInfo) => {
   await mockApi(page);

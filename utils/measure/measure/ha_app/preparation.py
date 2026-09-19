@@ -2,8 +2,9 @@ from dataclasses import dataclass, replace
 
 from measure.controller.light.const import LutMode
 from measure.ha_app.context import AppContext
+from measure.ha_app.coordinator import SessionConflictError
 from measure.ha_app.light_probe import LightLoadProbeResult
-from measure.ha_app.preflight import MeasurementPreflight, PreflightResult
+from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightResult
 from measure.ha_app.session import is_active_session
 from measure.home_assistant.entities import DeviceClass, EntityDescriptor, EntityDomain, HomeAssistantEntityCatalog
 from measure.powermeter.spec import DummyPowerMeterSpec
@@ -18,6 +19,14 @@ class PreflightAssessment:
 
 def run_preflight(context: AppContext, payload: MeasurementRequest, *, refresh: bool = False) -> PreflightAssessment:
     """Validate app dependencies and probe low light loads before starting a run."""
+    try:
+        with context.coordinator.reserve_devices():
+            return _run_preflight(context, payload, refresh=refresh)
+    except SessionConflictError as error:
+        raise ActiveSessionError(str(error)) from error
+
+
+def _run_preflight(context: AppContext, payload: MeasurementRequest, *, refresh: bool) -> PreflightAssessment:
     catalog = HomeAssistantEntityCatalog(context.home_assistant)
     snapshot = None
 

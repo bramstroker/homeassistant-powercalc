@@ -13,6 +13,11 @@ export type SessionState =
   | "failed"
   | "resumable";
 
+export interface StandbyMeasurementResult {
+  status: "measured" | "unavailable" | "skipped";
+  power_w: number | null;
+}
+
 export interface PreflightResponse {
   valid: boolean;
   warnings: string[];
@@ -25,7 +30,7 @@ export interface PreflightResponse {
   light_load_probe?: {
     checked_variations: number;
     minimum_aggregate_power_w: number;
-    standby?: { status: "measured" | "unavailable" | "skipped"; power_w: number | null };
+    standby?: StandbyMeasurementResult;
     points: {
       label: string;
       mode: LutMode;
