@@ -157,6 +157,43 @@ def test_summary_activities_exclude_the_unexplained_bucket(tmp_path: Path) -> No
     assert any(item["activity"] == "unexplained" for item in activities)
 
 
+def test_insufficient_result_reports_belong_to_the_reason_it_states(tmp_path: Path) -> None:
+    """The stated reason and the activity reports must describe the same candidate.
+
+    Only reachable with injected strategies today, but the reports of a later strategy
+    must not be attached to an earlier strategy's rejection.
+    """
+
+    class NeverApplicable:
+        strategy_id = "never_applicable"
+
+        def build_candidate(
+            self,
+            samples: list[RecordingSample],
+            context: RecordingContext,
+            signals: list[ActivitySignal],
+        ) -> StrategyNotApplicable:
+            return StrategyNotApplicable("never_applicable did not fit")
+
+    # Enough unrecognised samples that the vacuum candidate fails its credibility check.
+    unknown = [
+        replace(
+            sample("cleaning", 12.0, index),
+            entities={**sample("cleaning", 12.0).entities, STATE: RecordedEntityState("error_dustbin_full", {})},
+        )
+        for index in range(30)
+    ]
+    data = [replace(item, elapsed_seconds=float(index)) for index, item in enumerate(repeated() + unknown)]
+    path = write_recording(tmp_path / "record.jsonl", data)
+
+    analyser = RecorderAnalyser([NeverApplicable(), VacuumCompositeStrategy()])
+    result = analyser.analyse(path, CONTEXT)
+
+    assert not result.model_ready
+    assert result.reason == "never_applicable did not fit"
+    assert result.activity_reports == []
+
+
 def sample(activity: str, power: float, index: int = 0, level: object = 50) -> RecordingSample:
     return RecordingSample(
         float(index),
