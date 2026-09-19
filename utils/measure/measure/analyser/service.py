@@ -58,7 +58,7 @@ class RecorderAnalyser:
         reasons: list[str] = []
         reports: list[ActivityReport] = []
         for strategy in self._select_strategies(context):
-            candidate = strategy.build_candidate(split.training, context)
+            candidate = strategy.build_candidate(split.training, context, split.signals)
             if isinstance(candidate, StrategyNotApplicable):
                 reasons.append(candidate.reason)
                 _LOGGER.debug("Analyser strategy %s was not applicable: %s", strategy.strategy_id, candidate.reason)

@@ -2,9 +2,12 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
 import math
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from measure.recording.models import RecordingContext, RecordingSample
+
+if TYPE_CHECKING:
+    from measure.analyser.vacuum_signals import ActivitySignal
 
 type ScalarStateValue = str | bool | int | float
 
@@ -28,11 +31,18 @@ class ValidationMethod(StrEnum):
 
 @dataclass(frozen=True)
 class TrainingValidationSplit:
-    """Samples used to fit a model and independently validate it."""
+    """Samples used to fit a model and independently validate it.
+
+    The signals travel with the split because they were discovered over every sample to
+    establish its episode coverage. A strategy that rediscovered them from the training
+    half alone would judge validation samples against a narrower vocabulary than the one
+    the split was accepted under, and report the difference as unexplained.
+    """
 
     training: list[RecordingSample]
     validation: list[RecordingSample]
     method: ValidationMethod | None = None
+    signals: Sequence[ActivitySignal] = ()
 
 
 @dataclass(frozen=True)
@@ -116,6 +126,7 @@ class ProfileAnalysisStrategy(Protocol):
         self,
         samples: Sequence[RecordingSample],
         context: RecordingContext,
+        signals: Sequence[ActivitySignal],
     ) -> AnalysisCandidate | StrategyNotApplicable: ...
 
 

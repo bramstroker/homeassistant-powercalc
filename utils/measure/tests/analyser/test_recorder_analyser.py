@@ -162,7 +162,7 @@ def test_load_recording_skips_unsupported_and_invalid_records(tmp_path: Path, re
 def test_fixed_strategy_builds_a_lookup_candidate_for_primary_state() -> None:
     samples = [sample(index, 0.2 if index % 2 == 0 else 5.2, "off" if index % 2 == 0 else "on") for index in range(8)]
 
-    candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT)
+    candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT, [])
 
     assert not isinstance(candidate, StrategyNotApplicable)
     assert candidate.feature == FeatureReference("switch.device", FeatureSource.STATE)
@@ -181,7 +181,7 @@ def test_fixed_strategy_builds_a_lookup_candidate_for_primary_state() -> None:
 def test_fixed_strategy_ignores_unavailable_values_and_non_scalar_attributes() -> None:
     samples = [sample(index, 2.0 if index % 2 else 8.0, "unavailable", {"mode": ["invalid"]}) for index in range(8)]
 
-    result = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT)
+    result = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT, [])
 
     assert isinstance(result, StrategyNotApplicable)
 
@@ -190,7 +190,7 @@ def test_fixed_strategy_ignores_samples_without_the_primary_entity() -> None:
     samples = [sample(index, 0.2 if index % 2 == 0 else 5.2, "off" if index % 2 == 0 else "on") for index in range(8)]
     missing_entity = RecordingSample(8, 50, {})
 
-    candidate = FixedStatesPowerStrategy().build_candidate([*samples, missing_entity], CONTEXT)
+    candidate = FixedStatesPowerStrategy().build_candidate([*samples, missing_entity], CONTEXT, [])
 
     assert not isinstance(candidate, StrategyNotApplicable)
     assert candidate.feature == FeatureReference("switch.device", FeatureSource.STATE)
@@ -204,7 +204,7 @@ def test_fixed_strategy_keeps_multiple_active_states_as_states_power() -> None:
         sample(index, (2.0, 5.0, 8.0)[index % 3], ("idle", "playing", "recording")[index % 3]) for index in range(12)
     ]
 
-    candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT)
+    candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT, [])
 
     assert not isinstance(candidate, StrategyNotApplicable)
     assert candidate.build_model_config_fragment().to_dict() == {

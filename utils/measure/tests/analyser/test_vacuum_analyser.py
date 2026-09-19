@@ -82,6 +82,38 @@ def test_session_analysis_uses_archived_vacuum_run_for_fitting(tmp_path: Path) -
     assert json.loads((tmp_path / "model.json").read_text())["calculation_strategy"] == "composite"
 
 
+def test_value_seen_only_in_the_held_out_run_is_not_unexplained(tmp_path: Path) -> None:
+    """Signals are discovered over every sample, so an alias the held-out run alone uses resolves.
+
+    The split already accepted this recording because it saw both runs. Rediscovering signals
+    from the training half would leave that run's away samples matching no known activity, and
+    reject the profile asking for a cycle the user had in fact recorded.
+    """
+
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id=PRIMARY,
+        battery_entity_id=BATTERY,
+        additional_entity_ids=(STATE, DRYING, "switch.auto_drying"),
+    )
+    write_recording(tmp_path / "record.jsonl", cycle())
+    # The same activity, reported under a second alias the first run never used.
+    aliased = [
+        replace(item, entities={**item.entities, STATE: RecordedEntityState("sweeping", {})})
+        if item.entities[STATE].state == "cleaning"
+        else item
+        for item in cycle()
+    ]
+    write_recording(tmp_path / "record-1.jsonl", aliased)
+
+    summary = RecorderAnalysisExecution().run(request, tmp_path)
+
+    assert summary["Recording analysis"] == "Composite vacuum profile created"
+    assert "away" in summary["Recorded activities"]
+
+
 def sample(activity: str, power: float, index: int = 0, level: object = 50) -> RecordingSample:
     return RecordingSample(
         float(index),
@@ -140,7 +172,8 @@ def write_recording(path: Path, samples: list[RecordingSample], context: Recordi
 def candidate(
     samples: list[RecordingSample] | None = None, context: RecordingContext = CONTEXT
 ) -> VacuumCompositeCandidate:
-    result = VacuumCompositeStrategy().build_candidate(samples if samples is not None else cycle(), context)
+    data = samples if samples is not None else cycle()
+    result = VacuumCompositeStrategy().build_candidate(data, context, discover_signals(data, context))
     assert isinstance(result, VacuumCompositeCandidate)
     return result
 
@@ -358,7 +391,7 @@ def test_charging_range_integer_conversion_and_attribute_fallback() -> None:
 def test_unsupported_charging_curves(levels: list[int], reason: str) -> None:
     data = [sample("sleeping", 3.5, index) for index in range(5)]
     data += [sample("charging", 20, len(data) + index, level) for level in levels for index in range(3)]
-    result = VacuumCompositeStrategy().build_candidate(data, CONTEXT)
+    result = VacuumCompositeStrategy().build_candidate(data, CONTEXT, discover_signals(data, CONTEXT))
     assert isinstance(result, StrategyNotApplicable)
     assert reason in result.reason
 
@@ -380,7 +413,7 @@ def test_charging_requires_portable_battery_not_entity_name() -> None:
         for item in cycle()
     ]
     bare = replace(CONTEXT, entities=[RecordedEntity(e.entity_id, e.domain, e.role) for e in CONTEXT.entities])
-    result = VacuumCompositeStrategy().build_candidate(data, bare)
+    result = VacuumCompositeStrategy().build_candidate(data, bare, discover_signals(data, bare))
     assert isinstance(result, StrategyNotApplicable)
     assert "portable battery metadata" in result.reason
 
@@ -444,14 +477,16 @@ def test_energy_only_integrates_adjacent_held_out_samples() -> None:
 
 def test_strategy_rejections_and_empty_recordings(tmp_path: Path) -> None:
     strategy = VacuumCompositeStrategy()
-    assert isinstance(strategy.build_candidate(cycle(), replace(CONTEXT, recipe="generic")), StrategyNotApplicable)
-    assert isinstance(strategy.build_candidate([sample("sleeping", 3.5)] * 10, CONTEXT), StrategyNotApplicable)
-    result = strategy.build_candidate([replace(item, power=-1) for item in cycle()], CONTEXT)
+
+    def build(data: list[RecordingSample], context: RecordingContext = CONTEXT) -> object:
+        return strategy.build_candidate(data, context, discover_signals(data, context))
+
+    assert isinstance(build(cycle(), replace(CONTEXT, recipe="generic")), StrategyNotApplicable)
+    assert isinstance(build([sample("sleeping", 3.5)] * 10), StrategyNotApplicable)
+    result = build([replace(item, power=-1) for item in cycle()])
     assert isinstance(result, StrategyNotApplicable)
     assert "non-negative" in result.reason
-    assert isinstance(
-        strategy.build_candidate([sample("sleeping", 3)] * 5 + [sample("washing", 22)], CONTEXT), StrategyNotApplicable
-    )
+    assert isinstance(build([sample("sleeping", 3)] * 5 + [sample("washing", 22)]), StrategyNotApplicable)
     assert isinstance(split_vacuum_samples([sample("mystery", 1)] * 20, CONTEXT), StrategyNotApplicable)
     result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", []), CONTEXT)
     assert not result.model_ready
