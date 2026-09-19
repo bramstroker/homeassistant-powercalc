@@ -5,7 +5,6 @@ from homeassistant_api.errors import HomeassistantAPIError
 from measure.controller.errors import ApiConnectionError
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.hass import HassLightController
-from measure.home_assistant.client import HomeAssistantManager
 import pytest
 
 
@@ -24,44 +23,41 @@ import pytest
         ),
     ],
 )
-def test_get_light_info(attributes: dict[str, int], min_mired: int, max_mired: int) -> None:
+def test_get_light_info(hass_client: MagicMock, attributes: dict[str, int], min_mired: int, max_mired: int) -> None:
     mocked_state = State(
         entity_id="light.test",
         state="on",
         attributes=attributes,
     )
-    client = _mock_client()
-    client.get_state.return_value = mocked_state
-    light_info = _get_instance(client).get_light_info()
+    hass_client.get_state.return_value = mocked_state
+    light_info = _get_instance(hass_client).get_light_info()
     assert light_info.get_min_mired() == min_mired
     assert light_info.get_max_mired() == max_mired
 
 
-def test_effect_list() -> None:
+def test_effect_list(hass_client: MagicMock) -> None:
     mocked_state = State(
         entity_id="light.test",
         state="on",
         attributes={"effect_list": ["A", "B", "C"]},
     )
-    client = _mock_client()
-    client.get_state.return_value = mocked_state
-    assert _get_instance(client).get_effect_list() == ["A", "B", "C"]
+    hass_client.get_state.return_value = mocked_state
+    assert _get_instance(hass_client).get_effect_list() == ["A", "B", "C"]
 
 
-def test_effect_list_handles_null_value() -> None:
+def test_effect_list_handles_null_value(hass_client: MagicMock) -> None:
     mocked_state = State(
         entity_id="light.test",
         state="on",
         attributes={"effect_list": None},
     )
-    client = _mock_client()
-    client.get_state.return_value = mocked_state
+    hass_client.get_state.return_value = mocked_state
 
-    assert _get_instance(client).get_effect_list() == []
+    assert _get_instance(hass_client).get_effect_list() == []
 
 
-def test_has_effect_support() -> None:
-    hass_controller = _get_instance()
+def test_has_effect_support(hass_client: MagicMock) -> None:
+    hass_controller = _get_instance(hass_client)
     assert hass_controller.has_effect_support()
 
 
@@ -95,44 +91,43 @@ def test_has_effect_support() -> None:
         ),
     ],
 )
-def test_change_light_state(mode: LutMode, call_kwargs: dict, trigger_service_body: dict) -> None:
-    client = _mock_client()
-    _get_instance(client).change_light_state(mode, on=True, **call_kwargs)
-    client.trigger_service.assert_called_once_with("light", "turn_on", entity_id="light.test", **trigger_service_body)
+def test_change_light_state(
+    hass_client: MagicMock, mode: LutMode, call_kwargs: dict, trigger_service_body: dict
+) -> None:
+    _get_instance(hass_client).change_light_state(mode, on=True, **call_kwargs)
+    hass_client.trigger_service.assert_called_once_with(
+        "light", "turn_on", entity_id="light.test", **trigger_service_body
+    )
 
 
-def test_turn_off() -> None:
-    client = _mock_client()
-    _get_instance(client).change_light_state(LutMode.BRIGHTNESS, on=False)
-    client.trigger_service.assert_called_once_with("light", "turn_off", entity_id="light.test")
+def test_turn_off(hass_client: MagicMock) -> None:
+    _get_instance(hass_client).change_light_state(LutMode.BRIGHTNESS, on=False)
+    hass_client.trigger_service.assert_called_once_with("light", "turn_off", entity_id="light.test")
 
 
 @pytest.mark.parametrize("connection_error", [HomeassistantAPIError("Error"), BrokenPipeError(32, "Broken pipe")])
-def test_change_light_state_error(connection_error: Exception) -> None:
-    client = _mock_client()
-    client.trigger_service.side_effect = connection_error
-    controller = _get_instance(client)
+def test_change_light_state_error(hass_client: MagicMock, connection_error: Exception) -> None:
+    hass_client.trigger_service.side_effect = connection_error
+    controller = _get_instance(hass_client)
     with pytest.raises(ApiConnectionError) as error:
         controller.change_light_state(LutMode.BRIGHTNESS, on=True, bri=100)
 
     assert error.value.__cause__ is connection_error
 
 
-def test_connection_validation() -> None:
-    client = _mock_client()
-    client.get_config.side_effect = HomeassistantAPIError("Error")
+def test_connection_validation(hass_client: MagicMock) -> None:
+    hass_client.get_config.side_effect = HomeassistantAPIError("Error")
     with pytest.raises(ApiConnectionError):
-        HassLightController(client, 0, entity_ids=["light.test"])
+        HassLightController(hass_client, 0, entity_ids=["light.test"])
 
 
-def test_controller_requires_an_entity() -> None:
+def test_controller_requires_an_entity(hass_client: MagicMock) -> None:
     with pytest.raises(ValueError, match="at least one entity"):
-        HassLightController(_mock_client(), 0, entity_ids=[])
+        HassLightController(hass_client, 0, entity_ids=[])
 
 
-def test_multiple_entities_are_targeted_together_with_their_common_capabilities() -> None:
-    client = _mock_client()
-    client.get_state.side_effect = [
+def test_multiple_entities_are_targeted_together_with_their_common_capabilities(hass_client: MagicMock) -> None:
+    hass_client.get_state.side_effect = [
         State(
             entity_id="light.one",
             state="on",
@@ -146,10 +141,10 @@ def test_multiple_entities_are_targeted_together_with_their_common_capabilities(
         State(entity_id="light.one", state="on", attributes={"effect_list": ["one", "shared"]}),
         State(entity_id="light.two", state="on", attributes={"effect_list": ["shared", "two"]}),
     ]
-    controller = HassLightController(client, 0, entity_ids=["light.one", "light.two"])
+    controller = HassLightController(hass_client, 0, entity_ids=["light.one", "light.two"])
 
     controller.change_light_state(LutMode.BRIGHTNESS, bri=100)
-    client.trigger_service.assert_called_once_with(
+    hass_client.trigger_service.assert_called_once_with(
         "light",
         "turn_on",
         entity_id=["light.one", "light.two"],
@@ -161,10 +156,9 @@ def test_multiple_entities_are_targeted_together_with_their_common_capabilities(
     assert controller.get_effect_list() == ["shared"]
 
 
-def test_controller_waits_for_transition_only_after_turning_on() -> None:
-    client = _mock_client()
+def test_controller_waits_for_transition_only_after_turning_on(hass_client: MagicMock) -> None:
     wait = MagicMock()
-    controller = HassLightController(client, 3, entity_ids=["light.test"], wait=wait)
+    controller = HassLightController(hass_client, 3, entity_ids=["light.test"], wait=wait)
 
     controller.change_light_state(LutMode.BRIGHTNESS, bri=100)
     wait.assert_called_once_with(3)
@@ -173,12 +167,11 @@ def test_controller_waits_for_transition_only_after_turning_on() -> None:
     controller.close()
 
 
-def test_controller_does_not_wait_when_service_call_fails() -> None:
-    client = _mock_client()
+def test_controller_does_not_wait_when_service_call_fails(hass_client: MagicMock) -> None:
     failure = OSError("Disconnected")
-    client.trigger_service.side_effect = failure
+    hass_client.trigger_service.side_effect = failure
     wait = MagicMock()
-    controller = HassLightController(client, 3, entity_ids=["light.test"], wait=wait)
+    controller = HassLightController(hass_client, 3, entity_ids=["light.test"], wait=wait)
 
     with pytest.raises(ApiConnectionError, match="Failed to change light state") as error:
         controller.change_light_state(LutMode.BRIGHTNESS, bri=100)
@@ -187,15 +180,9 @@ def test_controller_does_not_wait_when_service_call_fails() -> None:
     wait.assert_not_called()
 
 
-def _get_instance(client: MagicMock | None = None) -> HassLightController:
+def _get_instance(client: MagicMock) -> HassLightController:
     return HassLightController(
-        client or _mock_client(),
+        client,
         0,
         entity_ids=["light.test"],
     )
-
-
-def _mock_client() -> MagicMock:
-    client = MagicMock(spec=HomeAssistantManager)
-    client.get_config.return_value = {}
-    return client

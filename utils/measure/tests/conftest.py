@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 import os
+from pathlib import Path
 import shutil
 from typing import Any, Protocol, cast
 from unittest.mock import MagicMock, patch
@@ -184,7 +185,7 @@ def mock_requests_get_factory() -> Iterator[MockRequestsGetFactory]:
 
 
 @pytest.fixture
-def export_path(tmp_path: str) -> str:
+def export_path(tmp_path: Path) -> str:
     export_dir = tmp_path / "export"
     export_dir.mkdir(parents=True, exist_ok=True)
     return str(export_dir)
