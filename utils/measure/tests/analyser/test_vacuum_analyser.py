@@ -114,6 +114,49 @@ def test_value_seen_only_in_the_held_out_run_is_not_unexplained(tmp_path: Path) 
     assert "away" in summary["Recorded activities"]
 
 
+def test_summary_activities_exclude_the_unexplained_bucket(tmp_path: Path) -> None:
+    """Tolerated unexplained samples are not a mode the profile covers.
+
+    The analyser accepts a recording with a small share of them, so the summary must not
+    list "unexplained" beside the activities it does cover.
+    """
+
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id=PRIMARY,
+        battery_entity_id=BATTERY,
+        additional_entity_ids=(STATE, DRYING, "switch.auto_drying"),
+    )
+
+    def with_unknown_status(items: list[RecordingSample]) -> list[RecordingSample]:
+        # A status no alias table recognises, under the tolerated 10% share.
+        extra = [
+            replace(
+                sample("cleaning", 12.0, len(items) + index),
+                entities={
+                    **sample("cleaning", 12.0).entities,
+                    STATE: RecordedEntityState("error_dustbin_full", {}),
+                },
+            )
+            for index in range(6)
+        ]
+        return [replace(item, elapsed_seconds=float(index)) for index, item in enumerate(items + extra)]
+
+    write_recording(tmp_path / "record.jsonl", with_unknown_status(cycle()))
+    write_recording(tmp_path / "record-1.jsonl", with_unknown_status(cycle()))
+
+    summary = RecorderAnalysisExecution().run(request, tmp_path)
+
+    assert summary["Recording analysis"] == "Composite vacuum profile created"
+    assert "unexplained" not in summary["Recorded activities"]
+    assert "washing" in summary["Recorded activities"]
+    # The bucket stays in the artifact, where it is labelled for diagnostics.
+    activities = json.loads((tmp_path / "analyser.json").read_text())["activities"]
+    assert any(item["activity"] == "unexplained" for item in activities)
+
+
 def sample(activity: str, power: float, index: int = 0, level: object = 50) -> RecordingSample:
     return RecordingSample(
         float(index),

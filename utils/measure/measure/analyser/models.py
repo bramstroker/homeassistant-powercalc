@@ -12,6 +12,8 @@ if TYPE_CHECKING:
 type ScalarStateValue = str | bool | int | float
 
 RECORDING_ANALYSIS_LABEL = "Recording analysis"
+# The bucket for samples matching no activity. Not a mode the profile covers.
+UNEXPLAINED_ACTIVITY = "unexplained"
 
 
 class FeatureSource(StrEnum):
@@ -269,7 +271,9 @@ class RecorderAnalysisResult:
                 "Validation MAE": f"{self.metrics.mae_w:.2f} W",
                 "Validation coverage": f"{self.metrics.coverage:.0%}",
                 "Validation method": self.validation_method.value if self.validation_method else "held-out episodes",
-                "Recorded activities": ", ".join(report.activity for report in self.activity_reports),
+                "Recorded activities": ", ".join(
+                    report.activity for report in self.activity_reports if report.activity != UNEXPLAINED_ACTIVITY
+                ),
             }
         fixed_config = self.model_config_fragment.configuration
         profile_type = "Fixed power" if "power" in fixed_config else "Fixed states_power"
