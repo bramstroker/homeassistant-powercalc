@@ -94,14 +94,14 @@ def test_light_settling_waits_follow_dimension_changes(
     assert interaction.wait.call_args_list == [call(seconds) for seconds in expected_waits]
 
 
-def test_zero_standby_reading_is_kept_as_zero() -> None:
+def test_zero_standby_reading_is_unavailable() -> None:
     sampler = MagicMock(spec=PowerSampler)
     sampler.take_measurement.side_effect = ZeroReadingError("No consumption")
     controller = MagicMock(spec=LightController)
     interaction = MagicMock(spec=RunInteraction)
     runner = LightRunner(sampler, MeasurementParameters(sleep_standby=20), controller, interaction)
 
-    assert runner.measure_standby_power() == MeasurementResult(power=0, voltages=[])
+    assert runner.measure_standby_power() is None
     controller.change_light_state.assert_called_once_with(LutMode.BRIGHTNESS, on=False)
     interaction.wait.assert_called_once_with(20)
     interaction.operating_point.assert_called_once_with({"type": "light", "on": False})
@@ -120,8 +120,45 @@ def test_outdated_standby_reading_is_remeasured_after_nudge() -> None:
     assert controller.change_light_state.call_args_list == [
         call(LutMode.BRIGHTNESS, on=False),
         call(LutMode.BRIGHTNESS, on=True, bri=255),
-        call(LutMode.BRIGHTNESS, on=True, bri=0),
+        call(LutMode.BRIGHTNESS, on=False),
     ]
+
+
+@pytest.mark.parametrize("last_error", [ZeroReadingError("zero"), OutdatedMeasurementError("stale")])
+def test_unavailable_standby_after_nudge_warns_once(last_error: Exception, caplog: pytest.LogCaptureFixture) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.side_effect = [OutdatedMeasurementError("stale"), last_error]
+    runner = LightRunner(
+        sampler, MeasurementParameters(max_nudges=1), MagicMock(spec=LightController), MagicMock(spec=RunInteraction)
+    )
+
+    assert runner.measure_standby_power() is None
+    assert sampler.take_measurement.call_count == 2
+    assert len([record for record in caplog.records if record.levelname == "WARNING"]) == 1
+    assert "Your light measurements are saved" in caplog.text
+
+
+@pytest.mark.parametrize(
+    "error", [PowerMeterError("disconnected"), MeasurementCancelledError(), HassApiConnectionError("offline")]
+)
+def test_standby_does_not_hide_operational_errors(error: Exception) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.side_effect = error
+    runner = LightRunner(
+        sampler, MeasurementParameters(), MagicMock(spec=LightController), MagicMock(spec=RunInteraction)
+    )
+    with pytest.raises(type(error)):
+        runner.measure_standby_power()
+
+
+def test_standby_normalizes_multiple_lights() -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=0.9, voltages=[230.0])
+    runner = LightRunner(
+        sampler, MeasurementParameters(), MagicMock(spec=LightController), MagicMock(spec=RunInteraction)
+    )
+    runner.num_lights = 3
+    assert runner.measure_standby_power() == MeasurementResult(power=0.3, voltages=[230.0])
 
 
 @pytest.mark.parametrize("seconds,expected", [(-1, "0s"), (30, "30s"), (90, "1.5m"), (5400, "1.5h")])

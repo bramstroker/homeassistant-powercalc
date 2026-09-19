@@ -88,6 +88,15 @@ export class PreflightView extends LitElement {
         ${this.warnings.length ? html`
           <div class="notice"><strong>Check before starting</strong><ul class="warning-list">${this.warnings.map((warning) => html`<li>${warning}</li>`)}</ul></div>
         ` : nothing}
+        ${this.lightLoadProbe?.standby?.status === "measured" ? html`
+          <p class="notice">Standby check: ${this.lightLoadProbe.standby.power_w?.toFixed(2)} W per light. Standby will be measured again after the run.</p>
+        ` : nothing}
+        ${this.lightLoadProbe?.standby?.status === "unavailable" ? html`
+          <div class="notice warning" role="status"><strong>Standby power could not be measured reliably</strong>
+            <p>You can continue measuring the light. Before submitting, enter a separately measured standby value or use an estimate.</p>
+            <a href="https://docs.powercalc.nl/contributing/measure/low-power-measurements/" target="_blank" rel="noopener noreferrer">Low-power measurement guide</a>
+          </div>
+        ` : nothing}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${this.busy ? html`
           <div class="notice starting" role="status" aria-live="polite">
@@ -97,6 +106,7 @@ export class PreflightView extends LitElement {
         ` : nothing}
         <div class="actions">
           <button type="button" @click=${() => this.emit("back")} ?disabled=${this.busy}>Back</button>
+          <button type="button" @click=${() => this.emit("recheck")} ?disabled=${this.busy}>Recheck setup</button>
           <button class="primary" type="button" @click=${() => this.emit("start")} ?disabled=${this.busy}>${this.startButtonLabel()}</button>
         </div>
       </section>
@@ -108,7 +118,7 @@ export class PreflightView extends LitElement {
     return this.confirmationAction ? "Prepare measurement" : "Start measurement";
   }
 
-  private emit(name: "back" | "start"): void {
+  private emit(name: "back" | "start" | "recheck"): void {
     emit(this, name);
   }
 }

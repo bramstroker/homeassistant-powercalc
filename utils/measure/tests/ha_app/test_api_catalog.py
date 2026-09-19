@@ -9,6 +9,7 @@ from measure.ha_app.library_catalog import (
     LibraryCatalogError,
     ManufacturerCatalog,
     MeasureDeviceCatalog,
+    StandbyCatalog,
 )
 from measure.ha_app.routes.measurement import _power_meter_spec
 from measure.home_assistant.client import HomeAssistantManager
@@ -31,6 +32,37 @@ def test_app_metadata_uses_the_runtime_measure_version(app_client: TestClient) -
     assert app_client.app.version == measure_version()
     assert app_client.get("/openapi.json").json()["info"]["version"] == measure_version()
     assert app_client.get("/api/capabilities").json()["runtime_version"] == measure_version()
+
+
+def test_standby_estimate_endpoint_uses_requested_connectivity_and_manufacturer(app_client: TestClient) -> None:
+    app_client.app.state.context.standby_catalog = StandbyCatalog(
+        loader=lambda: {
+            "manufacturers": [
+                {
+                    "full_name": "Acme",
+                    "models": [
+                        {
+                            "id": str(index),
+                            "device_type": "light",
+                            "standby_power": power,
+                            "device_specs": {"connectivity": ["zigbee", "bluetooth"]},
+                        }
+                        for index, power in enumerate([0.2, 0.3, 0.6])
+                    ],
+                }
+            ]
+        }
+    )
+    response = app_client.get(
+        "/api/library/standby-estimate", params={"manufacturer": "Acme", "connectivity": ["bluetooth", "zigbee"]}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"power_w": 0.3, "basis": "manufacturer", "profile_count": 3}
+    assert app_client.get("/api/library/standby-estimate").json() == {
+        "power_w": 0.4,
+        "basis": "fallback",
+        "profile_count": 0,
+    }
 
 
 def test_measure_device_catalog_uses_published_values_and_http_caching(app_client: TestClient) -> None:
@@ -476,6 +508,8 @@ def test_dummy_load_preflight_requires_voltage_and_includes_calibration_time(
 
     assert response.status_code == 200
     assert response.json()["estimated_duration_seconds"] >= 600
+    assert response.json()["light_load_probe"] is None
+    app_client.app.state.context.light_load_probe.evaluate.assert_not_called()
     assert any("at least 10 minutes" in warning for warning in response.json()["warnings"])
 
     request["power_meter"] = {

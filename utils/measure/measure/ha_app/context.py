@@ -13,6 +13,7 @@ from measure.ha_app.library_catalog import (
     LibraryCatalogError,
     ManufacturerCatalog,
     MeasureDeviceCatalog,
+    StandbyCatalog,
 )
 from measure.ha_app.light_probe import LightLoadProbe, create_app_measurement_assembler
 from measure.ha_app.service import MeasurementService
@@ -44,6 +45,7 @@ class AppContext:
         self.developer_mode = developer_mode
         self.storage = SessionStorage(data_root)
         self.measure_device_catalog = MeasureDeviceCatalog()
+        self.standby_catalog = StandbyCatalog()
         self.manufacturer_catalog = ManufacturerCatalog()
         self.device_specification_catalog = DeviceSpecificationCatalog()
         self.power_meter_diagnostics = PowerMeterDiagnostics(self.create_power_meter)

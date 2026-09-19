@@ -216,6 +216,14 @@ export class MeasureAppController {
     });
   }
 
+  async recheckSetup(): Promise<void> {
+    const request = this.state.request;
+    if (!request) return;
+    await this.run(async () => {
+      this.state.preflight = await this.api().preflight(request, true);
+    });
+  }
+
   backToSetup(): void {
     this.clearError();
     this.state.view = "setup";

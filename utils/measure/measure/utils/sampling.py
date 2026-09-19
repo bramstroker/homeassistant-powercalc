@@ -336,7 +336,7 @@ class PowerSampler:
                 )
         elif round(power, 2) <= 0:
             if ignore_zero:
-                _LOGGER.warning("Invalid measurement. Consumption: %.2f W; ignoring", power)
+                _LOGGER.info("Skipped a %.2f W sample", power)
                 return None
             raise ZeroReadingError("0 watt was read from the power meter")
 

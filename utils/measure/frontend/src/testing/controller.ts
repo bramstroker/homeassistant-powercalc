@@ -60,6 +60,7 @@ export function api(overrides: Partial<MeasureAppApi> = {}): MeasureAppApi {
     getCapabilities: async () => capabilities,
     getMeasureDefinitions: async () => [],
     getMeasureDevices: async () => ({ devices: [] }),
+    getStandbyEstimate: async () => ({ power_w: 0.4, basis: "fallback", profile_count: 0 }),
     getManufacturers: async () => ({ manufacturers: [] }),
     getDeviceSpecifications: async () => ({ device_types: {} }),
     getSettings: async () => settings,

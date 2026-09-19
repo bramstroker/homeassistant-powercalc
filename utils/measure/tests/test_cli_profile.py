@@ -35,6 +35,7 @@ def test_interactive_preparation_preserves_defaults_and_unknown_specifications(
     model.update(
         {
             "device_type": "light",
+            "standby_power": 0.3,
             "mains_voltage": 230,
             "aliases": ["Lamp v2"],
             "gtin": ["12345678"],

@@ -9,6 +9,7 @@ import type {
   ContributionPreviewRequest,
   DeviceSpecificationField,
   SessionSnapshot,
+  StandbyEstimate,
 } from "../../types";
 import { emit } from "../../utils/events";
 import { formText, submittedForm } from "../../utils/form";
@@ -39,6 +40,10 @@ export class ProfilePrepareView extends LitElement {
   @property({ type: Boolean }) measureDevicesLoading = false;
   @property({ type: String }) measureDevicesError = "";
   @property({ attribute: false }) deviceSpecificationFields: Record<string, DeviceSpecificationField[]> = {};
+  @property({ attribute: false }) loadStandbyEstimate?: (manufacturer: string, connectivity: string[]) => Promise<StandbyEstimate>;
+  @state() private standbyEstimate?: StandbyEstimate;
+  private standbyEstimateKey = "";
+  private standbyEstimateVersion = 0;
 
   @state()
   private contributionEdit?: ContributionPreviewRequest;
@@ -67,10 +72,49 @@ export class ProfilePrepareView extends LitElement {
     }
     this.previewDirty = Object.keys(this.contributionFormValues).length > 0 || this.previewDirty;
     if (changed.has("contributionBusy") && this.contributionBusy) this.dismissedServerField = undefined;
+    this.updateStandbyEstimate();
   }
 
   protected updated(changed: PropertyValues<this>): void {
     if (changed.has("contributionError") && this.contributionError) void this.focusValidationAfterRender();
+  }
+
+  private updateStandbyEstimate(): void {
+    const draft = this.editableDraft();
+    if (!draft || profileDeviceType(draft) !== "light") {
+      this.standbyEstimateVersion++;
+      this.standbyEstimateKey = "";
+      this.standbyEstimate = undefined;
+      return;
+    }
+    const manufacturer = formValue(this.contributionFormValues.manufacturer_name ?? draft.manufacturer_name);
+    const selected = this.contributionFormValues["device_specs.connectivity"] ?? draft.device_specs?.connectivity;
+    const connectivity = Array.isArray(selected) ? selected.filter((value): value is string => typeof value === "string") : [];
+    const key = JSON.stringify([this.snapshot.session_id, manufacturer, [...connectivity].sort()]);
+    if (key === this.standbyEstimateKey) return;
+    this.standbyEstimateKey = key;
+    const version = ++this.standbyEstimateVersion;
+    this.standbyEstimate = undefined;
+    const fallback: StandbyEstimate = { power_w: 0.4, basis: "fallback", profile_count: 0 };
+    if (!connectivity.length || !this.loadStandbyEstimate) {
+      this.standbyEstimate = fallback;
+      return;
+    }
+    void this.loadStandbyEstimate(manufacturer, connectivity).catch(() => fallback).then((estimate) => {
+      if (version === this.standbyEstimateVersion) this.standbyEstimate = estimate;
+    });
+  }
+
+  private applyStandbyEstimate(event: CustomEvent<number>): void {
+    this.contributionFormValues = {
+      ...this.contributionFormValues, standby_power: String(event.detail), standby_power_estimated: "true",
+    };
+    this.previewDirty = true;
+    const errors = { ...this.fieldErrors };
+    delete errors.standby_power;
+    this.fieldErrors = errors;
+    if (this.contributionErrorField === "standby_power") this.dismissedServerField = "standby_power";
+    emit(this, "contribution-edit", this.contributionFormValues);
   }
 
   static readonly styles = [sharedStyles, css`
@@ -105,6 +149,8 @@ export class ProfilePrepareView extends LitElement {
     .contribution-grid > *, .contribution-grid label, .notes-field { align-self: start; }
     .contribution-grid label, .notes-field { display: grid; gap: 0.4rem; }
     .contribution-grid label > span, .notes-field > span { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+    .standby-checkbox { display: flex; align-items: center; gap: 0.5rem; }
+    .standby-checkbox input { width: auto; min-height: 0; }
     .field-stack { display: grid; gap: 0.4rem; min-width: 0; }
     textarea { min-height: 84px; resize: vertical; }
     .profile-details { min-width: 0; }
@@ -177,6 +223,7 @@ export class ProfilePrepareView extends LitElement {
             .draft=${draft} .values=${this.contributionFormValues} .errors=${errors}
             .busy=${this.contributionBusy} .measureDevices=${this.measureDevices}
             .measureDevicesLoading=${this.measureDevicesLoading} .measureDevicesError=${this.measureDevicesError}
+            .standbyEstimate=${this.standbyEstimate} @standby-estimate-apply=${this.applyStandbyEstimate}
           ></measure-profile-measurement-fields>
           <measure-profile-device-specification-fields
             .draft=${draft} .values=${this.contributionFormValues} .errors=${errors}
@@ -247,6 +294,10 @@ export class ProfilePrepareView extends LitElement {
       product_url: formText(data, "product_url"),
       mains_voltage: mainsVoltageValue ? Number(mainsVoltageValue) : null,
       device_specs: deviceSpecs,
+      ...(draft && profileDeviceType(draft) === "light" ? {
+        standby_power: formText(data, "standby_power") ? Number(formText(data, "standby_power")) : null,
+        standby_power_estimated: data.has("standby_power_estimated"),
+      } : {}),
       measure_device: formText(data, "measure_device"),
       measure_device_firmware: formText(data, "measure_device_firmware"),
       measure_description: formText(data, "measure_description"),
@@ -263,7 +314,7 @@ export class ProfilePrepareView extends LitElement {
     this.fieldErrors = validateMetadata(detail);
     const form = this.shadowRoot?.querySelector(".contribution-form");
     for (const input of form?.querySelectorAll<HTMLInputElement>('input[type="number"]') ?? []) {
-      if (!input.validity.valid) this.fieldErrors[input.name] = input.validity.badInput ? "Enter a number." : "Enter a whole number.";
+      if (!input.validity.valid && !this.fieldErrors[input.name]) this.fieldErrors[input.name] = input.validity.badInput ? "Enter a number." : "Enter a whole number.";
     }
     if (Object.keys(this.fieldErrors).length) {
       this.previewDirty = true;
@@ -342,7 +393,8 @@ export class ProfilePrepareView extends LitElement {
     const name = control.name;
     if (!name || name === "confirm_contribution") return;
     if (control.value !== undefined) {
-      this.contributionFormValues = { ...this.contributionFormValues, [name]: control.value };
+      const value = control instanceof HTMLInputElement && control.type === "checkbox" ? String(control.checked) : control.value;
+      this.contributionFormValues = { ...this.contributionFormValues, [name]: value };
       emit(this, "contribution-edit", this.contributionFormValues);
     }
     this.previewDirty = true;
