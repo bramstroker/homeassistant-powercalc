@@ -14705,6 +14705,61 @@
       ]
     },
     {
+      "aliases": [],
+      "name": "laundrify",
+      "full_name": "laundrify",
+      "dir_name": "laundrify",
+      "website": "https://laundrify.de",
+      "country": "DE",
+      "description": "German provider of smart plugs that measure washing machines and dryers power consumption.",
+      "models": [
+        {
+          "aliases": [
+            "WLAN-Adapter mini"
+          ],
+          "calculation_strategy": "fixed",
+          "created_at": "2026-09-18T22:59:43Z",
+          "device_type": "smart_switch",
+          "device_specs": {
+            "form_factor": "plug",
+            "power_monitoring": true,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "discovery_by": "device",
+          "measure_description": "measured using the PowerCalc HA app with a resistive dummy load (25W Osram E14 incandescent oven bulb)",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "script",
+          "mains_voltage": 230,
+          "name": "WLAN-Adapter mini",
+          "product_url": "https://laundrify.de/blog/laundrify-wlan-adapter-mini",
+          "only_self_usage": true,
+          "standby_power": 0.686,
+          "standby_power_on": 0.983,
+          "authors": [
+            {
+              "name": "ps1noob",
+              "github": "ps1noob"
+            }
+          ],
+          "id": "M01",
+          "manufacturer": "laundrify",
+          "updated_at": "2026-09-19T07:53:11",
+          "max_power": 0.983,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.686,
+            "max": 0.983
+          },
+          "hash": "6befd7efca1a23fa01a32ccbea5e9580"
+        }
+      ],
+      "device_types": [
+        "smart_switch"
+      ]
+    },
+    {
       "aliases": [
         "Led Online"
       ],
@@ -33459,7 +33514,7 @@
           },
           "id": "LTW018",
           "manufacturer": "signify",
-          "updated_at": "2026-09-15T09:53:12",
+          "updated_at": "2026-09-16T17:28:56",
           "max_power": 31.47,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-15T08:17:23",
@@ -33474,7 +33529,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "fce550784a9d1c35212da0685b081627"
+          "hash": "e2ae45c2264e37f47d9bbdbde481092d"
         },
         {
           "aliases": [
