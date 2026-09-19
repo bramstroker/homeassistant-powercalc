@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Any
+from typing import Any, assert_never
 
 from measure.cli.const import (
     QUESTION_CHARGING_DEVICE_TYPE,
@@ -97,10 +97,12 @@ def request_from_answers(
             controller=_charging_controller_spec(environment, answers),
             charging_device_type=ChargingDeviceType(answers[QUESTION_CHARGING_DEVICE_TYPE]),
         )
-    return FanMeasurementRequest(
-        **common,
-        controller=_fan_controller_spec(environment, answers),
-    )
+    if measure_type == MeasureType.FAN:
+        return FanMeasurementRequest(
+            **common,
+            controller=_fan_controller_spec(environment, answers),
+        )
+    assert_never(measure_type)  # pragma: no cover - all MeasureType members handled
 
 
 def _parameters_from_environment(environment: CliEnvironment) -> MeasurementParameters:
@@ -147,7 +149,7 @@ def _power_meter_spec(environment: CliEnvironment, answers: dict[str, Any]) -> P
         return OwonOwh98xxPowerMeterSpec(
             port=environment.serial_port, baudrate=environment.serial_baudrate, channel=environment.owon_owh98xx_channel
         )
-    raise ValueError(f"Unsupported CLI power meter: {selected}")
+    assert_never(selected)  # pragma: no cover - all PowerMeterType members handled
 
 
 def _light_controller_spec(
@@ -167,7 +169,7 @@ def _light_controller_spec(
             bridge_ip=environment.hue_bridge_ip,
             light=_required_answer(answers, "light"),
         )
-    raise ValueError(f"Unsupported CLI light controller: {selected}")
+    assert_never(selected)  # pragma: no cover - all LightControllerType members handled
 
 
 def _media_controller_spec(
@@ -179,7 +181,7 @@ def _media_controller_spec(
         return DummyMediaControllerSpec()
     if selected == MediaControllerType.HASS:
         return HassMediaControllerSpec(entity_id=_required_answer(answers, QUESTION_ENTITY_ID))
-    raise ValueError(f"Unsupported CLI media controller: {selected}")
+    assert_never(selected)  # pragma: no cover - all MediaControllerType members handled
 
 
 def _charging_controller_spec(
@@ -193,7 +195,7 @@ def _charging_controller_spec(
         return HassChargingControllerSpec(
             entity_id=_required_answer(answers, QUESTION_ENTITY_ID),
         )
-    raise ValueError(f"Unsupported CLI charging controller: {selected}")
+    assert_never(selected)  # pragma: no cover - all ChargingControllerType members handled
 
 
 def _fan_controller_spec(
@@ -205,7 +207,7 @@ def _fan_controller_spec(
         return DummyFanControllerSpec()
     if selected == FanControllerType.HASS:
         return HassFanControllerSpec(entity_id=_required_answer(answers, QUESTION_ENTITY_ID))
-    raise ValueError(f"Unsupported CLI fan controller: {selected}")
+    assert_never(selected)  # pragma: no cover - all FanControllerType members handled
 
 
 def _required_answer(answers: dict[str, Any], key: str) -> str:

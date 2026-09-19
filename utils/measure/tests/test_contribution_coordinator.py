@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Any
+from unittest.mock import patch
 
 from measure.contribution.coordinator import (
     ContributionJobCoordinator,
@@ -8,7 +9,13 @@ from measure.contribution.coordinator import (
 )
 from measure.contribution.credentials import CredentialKind, CredentialStore, StoredCredential
 from measure.contribution.github import GitHubClient, GitHubRepository, GitHubUser
-from measure.contribution.models import ContributionAuthor, ContributionJob, ContributionJobStatus, ContributionMetadata
+from measure.contribution.models import (
+    ContributionAuthor,
+    ContributionErrorCode,
+    ContributionJob,
+    ContributionJobStatus,
+    ContributionMetadata,
+)
 from measure.contribution.pull_request import deterministic_branch_name, pull_request_body
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.ha_app.contribution.models import (
@@ -173,6 +180,56 @@ def test_coordinator_persists_preview_and_submits_idempotently(tmp_path: Path) -
     assert any(call.startswith("create_commit:feat(profile): add signify LCT999") for call in github.calls)
 
 
+@pytest.mark.parametrize("job_id", ["", "../outside", "job/id", "job.id"])
+def test_job_store_rejects_unsafe_ids_without_touching_files(tmp_path: Path, job_id: str) -> None:
+    store = ContributionJobStore(tmp_path / "jobs")
+
+    with pytest.raises(ValueError, match="Invalid contribution job id"):
+        store.load(job_id)
+
+    assert list(store.root.iterdir()) == []
+
+
+def test_coordinator_creates_a_fork_for_first_time_contributors(tmp_path: Path) -> None:
+    github = FakeGitHubClient()
+    coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
+    job = coordinator.create_job(tmp_path / "artifacts", make_metadata())
+
+    with (
+        patch.object(github, "find_fork", return_value=None),
+        patch.object(
+            github, "create_fork", return_value={"name": "profiles", "owner": {"login": "octo"}}
+        ) as create_fork,
+        patch.object(github, "create_blob", wraps=github.create_blob) as create_blob,
+    ):
+        submitted = coordinator.submit(job.id, tmp_path / "artifacts")
+
+    create_fork.assert_called_once_with()
+    assert submitted.status == ContributionJobStatus.SUBMITTED
+    assert submitted.submission is not None
+    assert submitted.submission.pull_request_url == "https://github.test/pr/1"
+    assert create_blob.call_args.args[:2] == ("octo", "profiles")
+    assert "sync_fork_branch:octo:profiles:powercalc-profile-signify-lct999" in github.calls
+    assert "create_pr:Add signify LCT999 power profile:octo:powercalc-profile-signify-lct999:master" in github.calls
+    assert coordinator.job_store.load(job.id) == submitted
+
+
+def test_missing_upstream_branch_records_failure_before_github_writes(tmp_path: Path) -> None:
+    github = FakeGitHubClient()
+    coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
+    job = coordinator.create_job(tmp_path / "artifacts", make_metadata())
+
+    with patch.object(github, "get_ref", return_value=None):
+        submitted = coordinator.submit(job.id, tmp_path / "artifacts")
+
+    assert submitted.status == ContributionJobStatus.FAILED
+    assert submitted.error is not None
+    assert submitted.error.code == ContributionErrorCode.GITHUB_ERROR
+    assert submitted.error.message == "Upstream branch was not found"
+    assert coordinator.job_store.load(job.id) == submitted
+    assert not any(call.startswith(("create_", "update_", "sync_")) for call in github.calls)
+
+
 def test_coordinator_targets_configured_repository_and_branch(tmp_path: Path) -> None:
     github = FakeGitHubClient(GitHubRepository(owner="test-owner", name="powercalc-sandbox", branch="main"))
     coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
@@ -224,6 +281,72 @@ def test_coordinator_records_missing_credentials_failure(tmp_path: Path) -> None
     assert failed.status == "failed"
     assert failed.error is not None
     assert failed.error.code == "missing_credentials"
+
+
+@pytest.mark.parametrize(
+    "upstream_sha,expected_error",
+    [(None, "Upstream branch was not found"), ("new-sha", "changed after preview")],
+)
+def test_coordinator_rejects_missing_or_changed_upstream_before_writing(
+    tmp_path: Path, upstream_sha: str | None, expected_error: str
+) -> None:
+    github = FakeGitHubClient()
+    coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
+    job = coordinator.create_job(tmp_path / "artifacts", make_metadata(), base_sha="base-sha")
+    response = {"object": {"sha": upstream_sha}} if upstream_sha is not None else None
+
+    with patch.object(github, "get_ref", return_value=response) as get_ref:
+        failed = coordinator.submit(job.id, tmp_path / "artifacts")
+
+    assert failed.status is ContributionJobStatus.FAILED
+    assert failed.submission is None
+    assert failed.error is not None
+    assert expected_error in failed.error.message
+    assert coordinator.job_store.load(job.id) == failed
+    get_ref.assert_called_once_with(github.repository.owner, github.repository.name, github.repository.branch)
+    assert github.calls == ["fetch_authenticated_user", "find_fork:octo:homeassistant-powercalc"]
+
+
+def test_coordinator_rejects_missing_fork_base_before_writing(tmp_path: Path) -> None:
+    github = FakeGitHubClient()
+    coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
+    job = coordinator.create_job(tmp_path / "artifacts", make_metadata(), base_sha="base-sha")
+
+    with patch.object(github, "get_ref", side_effect=[{"object": {"sha": "base-sha"}}, None, None]) as get_ref:
+        failed = coordinator.submit(job.id, tmp_path / "artifacts")
+
+    assert failed.status is ContributionJobStatus.FAILED
+    assert failed.error is not None
+    assert failed.error.message == "The fork base branch was not found"
+    assert coordinator.job_store.load(job.id) == failed
+    assert get_ref.call_args.args == ("octo", github.repository.name, github.repository.branch)
+    assert github.calls == ["fetch_authenticated_user", "find_fork:octo:homeassistant-powercalc"]
+
+
+@pytest.mark.parametrize("owns_repository", [False, True])
+def test_coordinator_creates_missing_contribution_branch(tmp_path: Path, owns_repository: bool) -> None:
+    repository = GitHubRepository(owner="octo" if owns_repository else "upstream", name="profiles", branch="main")
+    github = FakeGitHubClient(repository)
+    coordinator = make_coordinator(tmp_path, credential_store=make_credential_store(tmp_path), github_client=github)
+    job = coordinator.create_job(tmp_path / "artifacts", make_metadata(), base_sha="base-sha")
+    references = [{"object": {"sha": "base-sha"}}, None]
+    if not owns_repository:
+        references.append({"object": {"sha": "old-fork-sha"}})
+
+    with patch.object(github, "get_ref", side_effect=references):
+        submitted = coordinator.submit(job.id, tmp_path / "artifacts")
+
+    assert submitted.status is ContributionJobStatus.SUBMITTED
+    branch = deterministic_branch_name(job.preview)
+    initial_sha = "base-sha" if owns_repository else "old-fork-sha"
+    create_call = f"create_ref:{branch}:{initial_sha}"
+    assert create_call in github.calls
+    if not owns_repository:
+        sync_call = f"sync_fork_branch:octo:profiles:{branch}"
+        assert (
+            github.calls.index(create_call) < github.calls.index(sync_call) < github.calls.index("get_commit:base-sha")
+        )
+    assert f"update_ref:{branch}:commit-sha:True" in github.calls
 
 
 def test_coordinator_reports_missing_workflow_scope_before_writing_fork(tmp_path: Path) -> None:

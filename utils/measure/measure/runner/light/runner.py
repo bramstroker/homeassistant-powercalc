@@ -142,7 +142,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
         for measurement_info in measurements_to_run:
             voltages.extend(self.run_mode(measurement_info, progress))
 
-        if progress.remaining:
+        if progress.remaining:  # pragma: no cover - successful mode runs consume every planned variation
             raise RunnerError(f"Measurement ended with {len(progress.remaining)} incomplete variations")
 
         return RunnerResult(
@@ -155,9 +155,6 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
 
     def prepare_measurements_for_mode(self, export_directory: str, mode: LutMode) -> MeasurementRunInput:
         """Fetch all variations for the given color mode and prepare the measurement session."""
-
-        if mode == LutMode.WHITE:
-            mode = LutMode.BRIGHTNESS
 
         csv_file_path = f"{export_directory}/{mode.value}.csv"
 
@@ -182,13 +179,6 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
             is_resuming=bool(resume_at),
         )
 
-    def _resolve_white_mode(self, mode: LutMode) -> LutMode:
-        """WHITE is measured as BRIGHTNESS after turning the light fully on."""
-        if mode == LutMode.WHITE:
-            self.light_controller.change_light_state(mode, on=True, bri=255)
-            return LutMode.BRIGHTNESS
-        return mode
-
     def run_mode(
         self,
         measurement_info: MeasurementRunInput,
@@ -196,7 +186,7 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
     ) -> list[float]:
         """Measure and save each unfinished variation for one light mode."""
 
-        mode = self._resolve_white_mode(measurement_info.mode)
+        mode = measurement_info.mode
         voltages: list[float] = []
 
         if measurement_info.is_resuming:
@@ -563,7 +553,8 @@ class LightControl:
 
     def change_state_with_retry(self, mode: LutMode, **kwargs: int | str) -> None:
         """Retry connection failures, checking for cancellation before each attempt."""
-        for attempt in range(MAX_LIGHT_COMMAND_ATTEMPTS):
+        # Success returns; exhausting the fixed retry budget always raises.
+        for attempt in range(MAX_LIGHT_COMMAND_ATTEMPTS):  # pragma: no branch
             if self._checkpoint is not None:
                 self._checkpoint()
             try:

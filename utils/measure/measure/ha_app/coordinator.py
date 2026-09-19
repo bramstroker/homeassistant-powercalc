@@ -199,7 +199,6 @@ class MeasurementCoordinator:
                 estimated_remaining=None,
                 operating_point=None,
                 entity_states={},
-                summary=None,
                 warnings=(),
             )
             self._events = self.storage.load_events(session_id)
@@ -238,8 +237,8 @@ class MeasurementCoordinator:
                 )
                 self._snapshot = snapshot
                 self.storage.write_snapshot(snapshot)
-            if self._control is not None:
-                self._control.cancel()
+            assert self._control is not None
+            self._control.cancel()
         self._notify_listeners()
         return snapshot
 
@@ -250,8 +249,7 @@ class MeasurementCoordinator:
             snapshot = self._require_active(session_id)
             if snapshot.state != SessionState.AWAITING_CONFIRMATION:
                 raise SessionConflictError("The requested session is not waiting for confirmation")
-            if self._control is None:
-                raise SessionConflictError("The requested session cannot be continued")
+            assert self._control is not None
             running: SessionSnapshot = replace(
                 snapshot,
                 state=SessionState.RUNNING,
@@ -298,8 +296,7 @@ class MeasurementCoordinator:
             if snapshot.state in ACTIVE_SESSION_STATES or not self.storage.can_analyse(session_id):
                 raise SessionConflictError("The requested session has no recording that can be analysed")
             request = self.storage.load_request(session_id)
-            if not isinstance(request, RecorderMeasurementRequest):  # pragma: no cover - guarded by can_analyse
-                raise SessionConflictError("The requested session is not a recorder session")
+            assert isinstance(request, RecorderMeasurementRequest)
             self._analysing.add(session_id)
 
         try:
@@ -395,8 +392,7 @@ class MeasurementCoordinator:
         """Update the live session and persist events according to their frequency and importance."""
 
         with self._lock:
-            if self._snapshot is None:
-                return
+            assert self._snapshot is not None
             self._events.append(event)
             if len(self._events) > 1000:
                 self._events = self._events[-1000:]
@@ -431,17 +427,11 @@ class MeasurementCoordinator:
         """Persist the terminal snapshot and its final state event."""
 
         with self._lock:
-            if self._snapshot is None:
-                return
+            assert self._snapshot is not None
+            assert self._control is not None
             files = tuple(self.storage.list_files(self._snapshot.id))
             updated_at = utc_now()
-            sequence = (
-                max(
-                    self._snapshot.event_sequence,
-                    self._control.sequence if self._control is not None else 0,
-                )
-                + 1
-            )
+            sequence = max(self._snapshot.event_sequence, self._control.sequence) + 1
             self._snapshot = replace(
                 self._snapshot,
                 state=state,
@@ -449,7 +439,7 @@ class MeasurementCoordinator:
                     SessionState.CANCELLED: "Measurement cancelled",
                     SessionState.COMPLETED: "Measurement completed",
                     SessionState.FAILED: "Measurement failed",
-                }.get(state, self._snapshot.phase),
+                }[state],
                 confirmation_message=None,
                 confirmation_action=None,
                 updated_at=updated_at,

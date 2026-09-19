@@ -55,12 +55,13 @@ class RecorderAnalyser:
             return _build_insufficient_data_result(samples, loaded.warnings, split.reason)
         baseline = _calculate_baseline_metrics(split.training, split.validation)
         evaluated: list[EvaluatedCandidate] = []
-        reasons: list[str] = []
-        reports: list[ActivityReport] = []
+        # Each reason carries the reports of the candidate that produced it, so the result
+        # never explains one strategy's rejection with another strategy's activities.
+        failures: list[tuple[str, list[ActivityReport]]] = []
         for strategy in self._select_strategies(context):
-            candidate = strategy.build_candidate(split.training, context)
+            candidate = strategy.build_candidate(split.training, context, split.signals)
             if isinstance(candidate, StrategyNotApplicable):
-                reasons.append(candidate.reason)
+                failures.append((candidate.reason, []))
                 _LOGGER.debug("Analyser strategy %s was not applicable: %s", strategy.strategy_id, candidate.reason)
                 continue
             metrics = _evaluate(candidate, samples, split.validation)
@@ -74,10 +75,10 @@ class RecorderAnalyser:
             if (failure := _find_candidate_failure(evaluation, samples, baseline)) is None:
                 evaluated.append(evaluation)
             else:
-                reasons.append(failure)
+                failures.append((failure, reports))
 
         if not evaluated:
-            reason = reasons[0] if reasons else "No analysis strategy could explain the recorded power"
+            reason, reports = failures[0] if failures else ("No analysis strategy could explain the recorded power", [])
             return _build_insufficient_data_result(samples, loaded.warnings, reason, split.method, reports)
 
         evaluation = _select_candidate(evaluated)

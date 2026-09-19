@@ -75,5 +75,5 @@ def _configure_logging(debug: bool) -> None:
     logging.getLogger("homeassistant_api").setLevel(logging.DEBUG if debug else logging.WARNING)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover - entry-point behaviour is tested through main
     main()

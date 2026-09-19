@@ -203,7 +203,7 @@ class ContributionApiCoordinator:
         return self._service_factory().prepared_archive(job_id)
 
     def submit(self, snapshot: SessionSnapshot, payload: ContributionSubmitRequest) -> ContributionSubmissionResult:
-        if not payload.confirmed:
+        if not payload.confirmed:  # pragma: no cover - validated requests require Literal[True]
             raise ContributionApiError(
                 ContributionApiErrorCode.PREVIEW_REQUIRED,
                 "Review and explicitly confirm the contribution preview before submitting",

@@ -45,7 +45,7 @@ class HassChargingController(HassControllerBase, ChargingController):
     def _discover_battery_sensor(self) -> str | None:
         """Find a battery sensor belonging to the same device as the charging entity."""
 
-        if not self.entity_id:
+        if not self.entity_id:  # pragma: no cover - validated charging requests always supply an entity ID
             return None
         snapshot = HomeAssistantEntityCatalog(self.client).load_snapshot()
         return snapshot.find_related_entity_id(self.entity_id, DeviceClass.BATTERY)

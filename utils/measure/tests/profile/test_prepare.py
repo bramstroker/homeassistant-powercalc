@@ -102,6 +102,30 @@ def write_library_index(tmp_path: Path, *, full_name: bool = False, model_aliase
     index.write_text(json.dumps({"manufacturers": [manufacturer]}), encoding="utf-8")
 
 
+@pytest.mark.parametrize("contents", ["not json", "[]", "null"])
+def test_duplicate_scan_skips_malformed_profiles_and_keeps_valid_warnings(tmp_path: Path, contents: str) -> None:
+    write_library(tmp_path)
+    broken_profile = library_root(tmp_path) / "other" / "BROKEN"
+    broken_profile.mkdir(parents=True)
+    (broken_profile / "model.json").write_text(contents, encoding="utf-8")
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts, name=EXISTING_MODEL_NAME)
+
+    preview = make_preparer(tmp_path).prepare(artifacts, metadata())
+
+    assert list(preview.warnings) == [
+        f"Possible duplicate profile: profile_library/{EXISTING_DIRECTORY}/{EXISTING_MODEL_ID}/model.json"
+    ]
+
+
+def test_manufacturer_without_usable_directory_characters_is_rejected(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+
+    with pytest.raises(ProfilePreparationError, match="Manufacturer directory cannot be empty"):
+        make_preparer(tmp_path).prepare(artifacts, metadata(manufacturer="灯具"))
+
+
 def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_unchanged(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
     write_library(tmp_path)
@@ -249,6 +273,73 @@ def test_preparer_reports_model_schema_validation_errors(tmp_path: Path) -> None
         preparer.prepare(artifacts, profile_metadata)
 
 
+def test_preparer_rejects_lut_without_measurements(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    (artifacts / "brightness.csv.gz").unlink()
+
+    with pytest.raises(ProfilePreparationError, match="artifact is required for LUT profiles"):
+        make_preparer(tmp_path).prepare(artifacts, metadata())
+
+
+def test_preparer_reports_artifact_removed_after_preview(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    preparer = make_preparer(tmp_path)
+    profile_metadata = metadata()
+    preview = preparer.prepare(artifacts, profile_metadata)
+    (artifacts / "brightness.csv.gz").unlink()
+
+    with pytest.raises(ProfilePreparationError, match=r"Artifact file is missing: brightness.csv.gz"):
+        preparer.render_contents(artifacts, profile_metadata, preview)
+
+
+def test_preparer_reports_missing_artifact_directory(tmp_path: Path) -> None:
+    with pytest.raises(ProfilePreparationError, match="Artifact directory does not exist"):
+        make_preparer(tmp_path).prepare(tmp_path / "missing", metadata())
+
+
+@pytest.mark.parametrize(
+    "schema,expected_message,expected_field",
+    [
+        ({"type": "invalid-type"}, "model_schema.json is invalid", None),
+        ({"type": "array"}, "model.json does not match model_schema.json", None),
+        (
+            {"properties": {"authors": {"items": {"properties": {"name": {"maxLength": 2}}}}}},
+            "at authors.0.name",
+            "contributor",
+        ),
+        (
+            {"properties": {"authors": {"items": {"properties": {"github": {"maxLength": 2}}}}}},
+            "at authors.0.github",
+            "contributor_github",
+        ),
+        (
+            {"properties": {"device_specs": {"properties": {"rated_power": {"minimum": 1}}}}},
+            "at device_specs.rated_power",
+            "device_specs.rated_power",
+        ),
+    ],
+)
+def test_preparer_exposes_actionable_schema_errors(
+    tmp_path: Path, schema: dict[str, object], expected_message: str, expected_field: str | None
+) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    model_path = artifacts / "model.json"
+    original_model = model_path.read_bytes()
+    schema_path = tmp_path / "schema.json"
+    schema_path.write_text(json.dumps(schema), encoding="utf-8")
+    preparer = ProfilePreparer(library_root=library_root(tmp_path), model_schema_path=schema_path)
+    profile_metadata = metadata().model_copy(update={"device_specs": {"rated_power": 0}})
+
+    with pytest.raises(ProfilePreparationError, match=expected_message) as error:
+        preparer.prepare(artifacts, profile_metadata)
+
+    assert error.value.field == expected_field
+    assert model_path.read_bytes() == original_model
+
+
 @pytest.mark.parametrize("field", ["product_url", "measure_device_firmware", "measure_description"])
 def test_preparer_clears_explicitly_blank_optional_text_but_preserves_omitted_fields(field: str) -> None:
     from measure.profile.models import ProfileMetadata
@@ -295,6 +386,31 @@ def test_preparer_generates_new_manufacturer_manifest_without_adding_aliases(tmp
     assert "profile_library/acme/manufacturer.json" in {file.path for file in preview.files}
     contents = {file.path: file.content for file in preparer.render_contents(artifacts, metadata("Acme"), preview)}
     assert json.loads(contents["profile_library/acme/manufacturer.json"]) == {"name": "Acme", "aliases": []}
+
+
+def test_preparer_can_prepare_contribution_without_a_local_library(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    schema = tmp_path / "model_schema.json"
+    schema.write_text("{}", encoding="utf-8")
+    missing_library = tmp_path / "missing-library"
+    preparer = ProfilePreparer(library_root=missing_library, model_schema_path=schema)
+    contribution_metadata = metadata("Acme")
+
+    preview = preparer.prepare(artifacts, contribution_metadata)
+    contents = {file.path: file.content for file in preparer.render_contents(artifacts, contribution_metadata, preview)}
+
+    assert preview.manufacturer_library_url is None
+    assert preview.warnings == ()
+    assert set(contents) == {
+        "profile_library/acme/manufacturer.json",
+        "profile_library/acme/LCT999/model.json",
+        "profile_library/acme/LCT999/brightness.csv.gz",
+    }
+    assert json.loads(contents["profile_library/acme/manufacturer.json"]) == {"name": "Acme", "aliases": []}
+    assert json.loads(contents["profile_library/acme/LCT999/model.json"])["name"] == "New lamp"
+    assert not missing_library.exists()
+    assert (artifacts / "model.json").exists()
 
 
 def test_preparer_allows_generated_linear_profile_without_csv(tmp_path: Path) -> None:
@@ -476,3 +592,107 @@ def test_preparer_blocks_case_insensitive_index_collisions(tmp_path: Path) -> No
     collision_metadata = metadata(model_id="lct010")
     with pytest.raises(ProfilePreparationError, match="Refusing to overwrite"):
         preparer.prepare(artifacts, collision_metadata)
+
+
+@pytest.mark.parametrize("contents", ["[]", "{invalid json"])
+def test_preparer_skips_unreadable_existing_profiles_when_checking_duplicates(tmp_path: Path, contents: str) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts, name="Old lamp")
+    write_library(tmp_path)
+    broken_profile = library_root(tmp_path) / "other" / "broken"
+    broken_profile.mkdir(parents=True)
+    (broken_profile / "model.json").write_text(contents, encoding="utf-8")
+
+    preview = make_preparer(tmp_path).prepare(artifacts, metadata())
+
+    assert preview.warnings == ("Possible duplicate profile: profile_library/signify/LCT010/model.json",)
+
+
+def test_preparer_deduplicates_warnings_from_checkout_and_index(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts, name="Old lamp")
+    write_library(tmp_path)
+    write_library_index(tmp_path, model_aliases=True)
+
+    preview = make_preparer(tmp_path).prepare(artifacts, metadata())
+
+    assert preview.warnings == ("Possible duplicate profile: profile_library/signify/LCT010/model.json",)
+
+
+@pytest.mark.parametrize("aliases,expected", [(["Acme Lighting"], ["Acme Lighting"]), ("invalid", [])])
+def test_preparer_preserves_valid_artifact_manufacturer_aliases(
+    tmp_path: Path, aliases: object, expected: list[str]
+) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    (artifacts / "manufacturer.json").write_text(json.dumps({"name": "Acme", "aliases": aliases}), encoding="utf-8")
+    preparer = make_preparer(tmp_path)
+    profile_metadata = metadata("Acme")
+
+    preview = preparer.prepare(artifacts, profile_metadata)
+    files = {file.path: file.content for file in preparer.render_contents(artifacts, profile_metadata, preview)}
+
+    assert json.loads(files["profile_library/acme/manufacturer.json"]) == {"name": "Acme", "aliases": expected}
+
+
+@pytest.mark.parametrize("contents", ["[]", "null", '"not an object"'])
+def test_preparer_rejects_non_object_model_artifact(tmp_path: Path, contents: str) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    (artifacts / "model.json").write_text(contents, encoding="utf-8")
+
+    with pytest.raises(ProfilePreparationError, match=r"model\.json must contain a JSON object"):
+        make_preparer(tmp_path).prepare(artifacts, metadata())
+
+
+@pytest.mark.parametrize("symlink", [False, True])
+def test_preparer_requires_regular_model_artifact(tmp_path: Path, symlink: bool) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    model = artifacts / "model.json"
+    target = tmp_path / "external-model.json"
+    model.rename(target)
+    if symlink:
+        model.symlink_to(target)
+
+    with pytest.raises(ProfilePreparationError, match=r"model\.json is required"):
+        make_preparer(tmp_path).prepare(artifacts, metadata())
+
+
+@pytest.mark.parametrize(
+    "index",
+    [
+        {},
+        {"manufacturers": "invalid"},
+        {"manufacturers": [None, "invalid", {"name": "Other", "dir_name": 42, "models": []}]},
+        {"manufacturers": [{"name": "Other", "dir_name": "other", "models": "invalid"}]},
+        {"manufacturers": [{"name": "Other", "dir_name": "other", "models": [None, "invalid"]}]},
+    ],
+)
+def test_preparer_ignores_malformed_optional_index_entries(tmp_path: Path, index: dict[str, object]) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    (library_root(tmp_path) / "library.json").write_text(json.dumps(index), encoding="utf-8")
+
+    preview = make_preparer(tmp_path).prepare(artifacts, metadata("Acme"))
+
+    assert preview.manufacturer_directory == "acme"
+    assert preview.manufacturer_library_url is None
+    assert preview.warnings == ()
+    assert "profile_library/acme/manufacturer.json" in {file.path for file in preview.files}
+
+
+def test_preparer_keeps_existing_manifest_when_name_resolves_to_its_directory(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_profile_artifacts(artifacts)
+    manufacturer = library_root(tmp_path) / "acme"
+    manufacturer.mkdir()
+    manifest = manufacturer / "manufacturer.json"
+    manifest.write_text(json.dumps({"name": "Different display name"}), encoding="utf-8")
+    original = manifest.read_bytes()
+
+    preview = make_preparer(tmp_path).prepare(artifacts, metadata("Acme"))
+
+    assert preview.manufacturer_directory == "acme"
+    assert all(not file.path.endswith("manufacturer.json") for file in preview.files)
+    assert manifest.read_bytes() == original

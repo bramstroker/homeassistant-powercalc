@@ -18,7 +18,7 @@ from measure.request import (
 )
 from measure.runner.interaction import ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.utils.sampling import DummyLoadMeasurementError, PowerSampler
+from measure.utils.sampling import PowerSampler
 
 
 class MeasurementPreparation(Protocol):
@@ -85,8 +85,6 @@ class DummyLoadPreparation(MeasurementPreparation):
         calibration = self.calibration_store.load(self.request)
         if calibration is None:
             return None
-        if calibration.resistance <= 0:
-            raise DummyLoadMeasurementError("Restored dummy-load resistance must be positive")
         return calibration.resistance
 
     def _calibrate(self, interaction: RunInteraction) -> float:
@@ -116,8 +114,7 @@ class DummyLoadPreparation(MeasurementPreparation):
                 remaining_seconds=0,
             )
             trend = self.sampler.classify_dummy_load_trend(averages)
-            if trend is None:
-                raise DummyLoadMeasurementError("No dummy-load resistance trend could be calculated")
+            assert trend is not None  # Calibration always collects the required 20 samples.
             if trend == Trend.STEADY:
                 resistance = round(mean(averages), 2)
                 interaction.phase(f"Dummy-load calibration completed at {resistance:.2f} Ω")
@@ -207,6 +204,6 @@ class MeasurementExecution:
         if isinstance(self.measurement.request.dummy_load, DummyLoadReuseRequest):
             return self.measurement.request.dummy_load.resistance
         for preparation in self.measurement.preparations:
-            if isinstance(preparation, DummyLoadPreparation):
+            if isinstance(preparation, DummyLoadPreparation):  # pragma: no branch - only concrete preparation type
                 return preparation.sampler.dummy_load_value
         return None

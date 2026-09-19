@@ -158,10 +158,10 @@ class VacuumCompositeStrategy(ProfileAnalysisStrategy):
         self,
         samples: Sequence[RecordingSample],
         context: RecordingContext,
+        signals: Sequence[ActivitySignal],
     ) -> VacuumCompositeCandidate | StrategyNotApplicable:
         if context.recipe != "vacuum_robot":
             return StrategyNotApplicable("The vacuum analyser requires the vacuum recipe")
-        signals = discover_signals(samples, context)
         grouped: dict[Activity, list[RecordingSample]] = defaultdict(list)
         for sample in samples:
             if (activity := resolve_activity(sample, signals)) is not None:
@@ -179,7 +179,7 @@ class VacuumCompositeStrategy(ProfileAnalysisStrategy):
             if isinstance(branch, StrategyNotApplicable):
                 return branch
             branches.append(branch)
-        return VacuumCompositeCandidate(signals, branches, battery, context)
+        return VacuumCompositeCandidate(list(signals), branches, battery, context)
 
 
 def _fit_branch(
@@ -323,7 +323,10 @@ def split_vacuum_samples(
             for items in grouped.values()
         ):
             return TrainingValidationSplit(
-                training=training, validation=validation, method=ValidationMethod.HELD_OUT_RECORDING
+                training=training,
+                validation=validation,
+                method=ValidationMethod.HELD_OUT_RECORDING,
+                signals=signals,
             )
     validation_ids = {
         id(sample)
@@ -344,4 +347,5 @@ def split_vacuum_samples(
         training=[sample for sample in samples if id(sample) not in validation_ids],
         validation=[sample for sample in samples if id(sample) in validation_ids],
         method=ValidationMethod.HELD_OUT_EPISODES,
+        signals=signals,
     )

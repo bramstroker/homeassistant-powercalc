@@ -1,4 +1,5 @@
 from threading import Event, Thread
+from time import monotonic
 
 from measure.cancellation import MeasurementCancelledError
 from measure.ha_app.session import SessionControl, SessionEvent, SessionEventType
@@ -14,6 +15,23 @@ def test_cancel_is_idempotent_and_checkpoint_raises() -> None:
 
     with pytest.raises(MeasurementCancelledError):
         control.checkpoint()
+
+
+def test_wait_completes_after_settling_delay_and_remains_cancellable() -> None:
+    control = SessionControl()
+    settling_delay = 0.01
+    started_at = monotonic()
+
+    control.wait(settling_delay)
+
+    assert monotonic() - started_at >= settling_delay
+    assert not control.is_cancelled
+    control.checkpoint()
+
+    control.cancel()
+
+    with pytest.raises(MeasurementCancelledError):
+        control.wait(settling_delay)
 
 
 def test_events_are_sequenced_and_delivered() -> None:

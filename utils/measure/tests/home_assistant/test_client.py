@@ -1,11 +1,12 @@
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from time import sleep
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
+from homeassistant_api import Entity, EntityRegistryEntry, State, WebsocketClient
 from homeassistant_api.errors import WebsocketError
 from measure.home_assistant.client import HomeAssistantManager, HomeAssistantWebsocketClient, normalize_hass_url
-from measure.home_assistant.const import HASS_ENTITY_REGISTRY_LIST
+from measure.home_assistant.const import HASS_DEVICE_REGISTRY_LIST, HASS_ENTITY_REGISTRY_LIST
 import pytest
 from urllib3.exceptions import ProtocolError
 
@@ -53,18 +54,175 @@ def _entity_registry_entry(*, entity_id: str, unique_id: object) -> dict[str, ob
     }
 
 
-def test_entity_registry_normalizes_numeric_unique_id() -> None:
+@pytest.mark.parametrize("unique_id,expected", [(609369805, "609369805"), ("battery-id", "battery-id")])
+def test_entity_registry_normalizes_unique_id(unique_id: object, expected: str) -> None:
     client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
     client.send = MagicMock(return_value=42)  # type: ignore[method-assign]
     client.recv_result_list = MagicMock(  # type: ignore[method-assign]
-        return_value=[_entity_registry_entry(entity_id="sensor.battery", unique_id=609369805)],
+        return_value=[_entity_registry_entry(entity_id="sensor.battery", unique_id=unique_id)],
     )
 
     entries = client.list_entity_registry()
 
-    assert entries[0].unique_id == "609369805"
+    assert entries[0].unique_id == expected
     client.send.assert_called_once_with(HASS_ENTITY_REGISTRY_LIST)
     client.recv_result_list.assert_called_once_with(42)
+
+
+def test_client_reuses_connection_and_can_reconnect_after_close() -> None:
+    client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
+    with patch.object(WebsocketClient, "__enter__") as connect, patch.object(WebsocketClient, "__exit__") as close:
+        with client as connected:
+            assert connected is client
+            assert client.connect() is client
+            connect.assert_called_once_with()
+
+        client.close()
+        close.assert_called_once_with(None, None, None)
+
+        with client:
+            assert connect.call_count == 2
+        assert close.call_count == 2
+
+
+def test_client_closes_connection_when_context_raises() -> None:
+    client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
+    error = ValueError("Invalid response")
+    with patch.object(WebsocketClient, "__enter__"), patch.object(WebsocketClient, "__exit__") as close:
+        with pytest.raises(ValueError, match="Invalid response"), client:
+            raise error
+
+        close.assert_called_once()
+        assert close.call_args.args[0] is ValueError
+        assert close.call_args.args[1] is error
+        client.close()
+        assert close.call_count == 1
+
+
+def test_client_requests_device_registry() -> None:
+    client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
+    devices = [{"id": "robot-device", "manufacturer": "Dreame"}]
+    with (
+        patch.object(client, "send", return_value=42) as send,
+        patch.object(client, "recv_result_list", return_value=devices) as receive,
+    ):
+        assert client.get_device_registry() == devices
+
+    send.assert_called_once_with(HASS_DEVICE_REGISTRY_LIST)
+    receive.assert_called_once_with(42)
+
+
+def test_manager_passes_entity_identifiers_to_shared_client() -> None:
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    state = State(entity_id="vacuum.robot", state="docked", attributes={"battery_level": 80})
+    entity = MagicMock(spec=Entity)
+    client.get_state.return_value = state
+    client.get_entity.return_value = entity
+    manager = HomeAssistantManager(
+        "http://ha.lan:8123", "token", client_factory=MagicMock(return_value=client), keepalive_interval=0
+    )
+
+    try:
+        assert manager.get_state(entity_id="vacuum.robot") is state
+        assert manager.get_entity(group_id="vacuum", slug="robot") is entity
+        client.get_state.assert_called_once_with(entity_id="vacuum.robot", group_id=None, slug=None)
+        client.get_entity.assert_called_once_with(entity_id=None, group_id="vacuum", slug="robot")
+        client.connect.assert_called_once_with()
+    finally:
+        manager.close()
+
+
+@pytest.mark.parametrize("disconnect", [False, True])
+def test_manager_retrieves_states_and_recovers_from_a_disconnect(disconnect: bool) -> None:
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    states = (State(entity_id="vacuum.robot", state="docked", attributes={"battery_level": 80}),)
+    client.get_states.return_value = states
+    disconnected_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    disconnected_client.get_states.side_effect = EOFError("Connection closed")
+    factory = MagicMock(side_effect=[disconnected_client, client] if disconnect else [client])
+    manager = HomeAssistantManager("http://ha.lan:8123", "token", client_factory=factory, keepalive_interval=0)
+
+    try:
+        assert manager.get_states() == states
+        client.get_states.assert_called_once_with()
+        client.connect.assert_called_once_with()
+        assert factory.call_count == (2 if disconnect else 1)
+        if disconnect:
+            disconnected_client.close.assert_called_once_with()
+    finally:
+        manager.close()
+
+
+def test_manager_returns_registry_data_as_lists() -> None:
+    client = MagicMock(spec=HomeAssistantWebsocketClient)
+    entry = EntityRegistryEntry.from_json(_entity_registry_entry(entity_id="sensor.battery", unique_id="battery"))
+    client.list_entity_registry.return_value = (entry,)
+    devices = [{"id": "robot-device"}]
+    client.get_device_registry.return_value = devices
+    manager = HomeAssistantManager(
+        "http://ha.lan:8123", "token", client_factory=MagicMock(return_value=client), keepalive_interval=0
+    )
+
+    try:
+        assert manager.list_entity_registry() == [entry]
+        assert manager.get_device_registry() == devices
+        client.list_entity_registry.assert_called_once_with()
+        client.get_device_registry.assert_called_once_with()
+    finally:
+        manager.close()
+
+
+def test_manager_reloads_entire_entity_snapshot_after_disconnect() -> None:
+    first_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    first_client.get_entities.return_value = {"vacuum": MagicMock()}
+    first_client.list_entity_registry.side_effect = EOFError("Connection closed")
+    second_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    second_client.get_entities.return_value = {"sensor": MagicMock()}
+    entry = EntityRegistryEntry.from_json(_entity_registry_entry(entity_id="sensor.battery", unique_id="battery"))
+    second_client.list_entity_registry.return_value = (entry,)
+    second_client.get_device_registry.return_value = [{"id": "robot-device"}]
+    manager = HomeAssistantManager(
+        "http://ha.lan:8123",
+        "token",
+        client_factory=MagicMock(side_effect=[first_client, second_client]),
+        keepalive_interval=0,
+    )
+
+    try:
+        snapshot = manager.get_entity_data()
+
+        assert snapshot.entities == second_client.get_entities.return_value
+        assert snapshot.entity_registry == [entry]
+        assert snapshot.device_registry == [{"id": "robot-device"}]
+        first_client.close.assert_called_once_with()
+        first_client.get_device_registry.assert_not_called()
+        second_client.get_entities.assert_called_once_with()
+        second_client.list_entity_registry.assert_called_once_with()
+        second_client.get_device_registry.assert_called_once_with()
+    finally:
+        manager.close()
+
+
+def test_manager_preserves_non_connection_error_during_retry() -> None:
+    first_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    first_client.get_config.side_effect = EOFError("Connection closed")
+    second_client = MagicMock(spec=HomeAssistantWebsocketClient)
+    error = ValueError("Invalid configuration")
+    second_client.get_config.side_effect = [error, {"location_name": "Home"}]
+    factory = MagicMock(side_effect=[first_client, second_client])
+    manager = HomeAssistantManager("http://ha.lan:8123", "token", client_factory=factory, keepalive_interval=0)
+
+    try:
+        with pytest.raises(ValueError, match="Invalid configuration") as raised:
+            manager.get_config()
+
+        assert raised.value is error
+        first_client.close.assert_called_once_with()
+        second_client.close.assert_not_called()
+        assert manager.get_config() == {"location_name": "Home"}
+        assert factory.call_count == 2
+    finally:
+        manager.close()
 
 
 @pytest.mark.parametrize(
@@ -206,9 +364,18 @@ def test_manager_reconnects_once_when_read_fails_on_closed_websocket() -> None:
     reconnected_client.get_entities.assert_called_once_with()
 
 
-def test_manager_does_not_retry_non_connection_errors() -> None:
+@pytest.mark.parametrize("wrap_error", [False, True], ids=["direct", "chained"])
+def test_manager_does_not_retry_non_connection_errors(wrap_error: bool) -> None:
+    def get_entities() -> None:
+        try:
+            raise ValueError("invalid entity response")
+        except ValueError as error:
+            if wrap_error:
+                raise RuntimeError("invalid entity response") from error
+            raise
+
     client = MagicMock(spec=HomeAssistantWebsocketClient)
-    client.get_entities.side_effect = ValueError("invalid entity response")
+    client.get_entities.side_effect = get_entities
     client_factory = MagicMock(return_value=client)
     manager = HomeAssistantManager(
         "ws://127.0.0.1:8123/api/websocket",
@@ -216,10 +383,12 @@ def test_manager_does_not_retry_non_connection_errors() -> None:
         client_factory=client_factory,
     )
 
-    with pytest.raises(ValueError, match="invalid entity response"):
+    expected_error = RuntimeError if wrap_error else ValueError
+    with pytest.raises(expected_error, match="invalid entity response"):
         manager.get_entities()
 
     client_factory.assert_called_once_with("ws://127.0.0.1:8123/api/websocket", "token")
+    client.get_entities.assert_called_once_with()
     client.close.assert_not_called()
 
 

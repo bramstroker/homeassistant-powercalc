@@ -109,8 +109,8 @@ def metadata_from_request(
             ),
         )
     except ValidationError as error:
-        first_location = error.errors()[0].get("loc", ())
-        field = str(first_location[0]) if first_location else None
+        first_error = error.errors()[0]
+        field = str(first_error["loc"][0])
         # ProfileAuthor is validated before ContributionMetadata, so its error
         # locations are name/github/email, without an "author" prefix.
         field_names: dict[str, str] = {
@@ -119,12 +119,10 @@ def metadata_from_request(
             "email": "contributor_email",
             "manufacturer": "manufacturer_name",
         }
-        if field is not None:
-            field = field_names.get(field, field)
         raise ContributionApiError(
             ContributionApiErrorCode.INVALID_METADATA,
-            str(error.errors()[0]["msg"]).removeprefix("Value error, "),
-            field=field,
+            str(first_error["msg"]).removeprefix("Value error, "),
+            field=field_names.get(field, field),
         ) from error
 
 

@@ -29,10 +29,6 @@ from measure.home_assistant.entities import (
 )
 
 
-def _not_empty(_: Any, current: str) -> bool:  # noqa: ANN401
-    return bool(current.strip())
-
-
 def _positive_number(_: Any, current: str) -> bool:  # noqa: ANN401
     return re.fullmatch(r"\d+", current) is not None and int(current) > 0
 

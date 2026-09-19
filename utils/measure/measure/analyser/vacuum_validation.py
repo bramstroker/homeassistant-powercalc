@@ -3,7 +3,7 @@
 from collections.abc import Sequence
 from itertools import pairwise
 
-from measure.analyser.models import ActivityReport, EnergyMetrics
+from measure.analyser.models import UNEXPLAINED_ACTIVITY, ActivityReport, EnergyMetrics
 from measure.analyser.vacuum import VacuumCompositeCandidate, group_vacuum_episodes
 from measure.recording.models import RecordingSample
 
@@ -32,7 +32,7 @@ def build_activity_reports(
         )
         reports.append(
             ActivityReport(
-                activity=activity.value if activity is not None else "unexplained",
+                activity=activity.value if activity is not None else UNEXPLAINED_ACTIVITY,
                 sample_count=len(all_samples),
                 episode_count=sum(episode.activity == activity for episode in episodes),
                 validation_count=len(held_out),
@@ -58,7 +58,7 @@ def find_credibility_failure(reports: Sequence[ActivityReport]) -> str | None:
     total = sum(report.sample_count for report in reports)
     for report in reports:
         activity = report.activity
-        if activity == "unexplained":
+        if activity == UNEXPLAINED_ACTIVITY:
             if report.sample_count <= MAX_UNEXPLAINED_SHARE * total:
                 continue
             return (

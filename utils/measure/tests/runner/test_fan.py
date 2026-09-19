@@ -9,6 +9,32 @@ from measure.runner.fan import FanRunner
 from measure.runner.interaction import RunInteraction
 from measure.tuning import MeasurementParameters
 from measure.utils.sampling import MeasurementResult, PowerSampler
+import pytest
+
+
+@pytest.mark.parametrize("fast_test_mode", [False, True])
+def test_standby_turns_off_fan_and_preserves_measurement(fast_test_mode: bool) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    measurement = MeasurementResult(power=0.4, voltages=[231.2])
+    sampler.take_measurement.return_value = measurement
+    sampler.take_average_measurement.return_value = measurement
+    controller = MagicMock(spec=FanController)
+    interaction = MagicMock(spec=RunInteraction)
+    runner = FanRunner(sampler, MeasurementParameters(fast_test_mode=fast_test_mode), controller, interaction)
+
+    result = runner.measure_standby_power()
+
+    assert result == measurement
+    controller.turn_off.assert_called_once_with()
+    interaction.operating_point.assert_called_once_with({"type": "fan", "percentage": 0, "on": False})
+    if fast_test_mode:
+        sampler.take_measurement.assert_called_once()
+        sampler.take_average_measurement.assert_not_called()
+        interaction.wait.assert_not_called()
+    else:
+        interaction.wait.assert_called_once_with(15)
+        sampler.take_average_measurement.assert_called_once_with(20)
+        sampler.take_measurement.assert_not_called()
 
 
 def test_run(export_path: str) -> None:

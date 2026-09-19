@@ -198,3 +198,57 @@ def test_explains_when_a_discovered_device_requires_credentials() -> None:
         asyncio.run(meter.async_read_power_meter())
 
     plug.disconnect.assert_awaited_once_with()
+
+
+def test_power_only_read_and_voltage_probe_reuse_capability() -> None:
+    plug = MagicMock()
+    plug.update = AsyncMock()
+    plug.disconnect = AsyncMock()
+    plug.modules = {Module.Energy: MagicMock(current_consumption=12.5, voltage=230.4)}
+    plug.config = DeviceConfig(host="192.0.2.1")
+    meter = KasaPowerMeter("192.0.2.1")
+
+    with (
+        patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)) as discover,
+        patch("measure.powermeter.kasa.time.time", return_value=123.0),
+    ):
+        assert meter.get_power() == PowerMeasurementResult(power=12.5, updated=123.0)
+        assert meter.has_voltage_support() is True
+        assert meter.has_voltage_support() is True
+
+    discover.assert_awaited_once()
+    plug.update.assert_awaited_once()
+    plug.disconnect.assert_awaited_once()
+
+
+def test_rejects_devices_without_energy_monitoring_and_disconnects() -> None:
+    plug = MagicMock()
+    plug.update = AsyncMock()
+    plug.disconnect = AsyncMock()
+    plug.modules = {}
+    plug.config = DeviceConfig(host="192.0.2.1")
+    meter = KasaPowerMeter("192.0.2.1")
+
+    with (
+        patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)),
+        pytest.raises(PowerMeterError, match="does not provide energy monitoring"),
+    ):
+        meter.get_power()
+
+    plug.disconnect.assert_awaited_once()
+
+
+def test_explains_rejected_account_credentials_without_exposing_them() -> None:
+    credentials = TapoCredentials(username="user@example.com", password="account-password")  # noqa: S106
+    meter = KasaPowerMeter("192.0.2.1", credentials=credentials)
+    failure = AuthenticationError("Authentication rejected")
+
+    with (
+        patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(side_effect=failure)),
+        pytest.raises(PowerMeterError, match="authentication failed; verify the configured credentials") as error,
+    ):
+        meter.get_power()
+
+    assert error.value.__cause__ is failure
+    assert credentials.username not in str(error.value)
+    assert credentials.password not in str(error.value)

@@ -1,8 +1,9 @@
+from dataclasses import replace
 import json
 import logging
 from pathlib import Path
 
-from measure.controller.light.const import LutMode
+from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
 from measure.ha_app.contribution.coordinator import ContributionApiCoordinator
@@ -33,6 +34,87 @@ def light_request() -> LightMeasurementRequest:
 def snapshot(state: SessionState = SessionState.READY) -> SessionSnapshot:
     now = utc_now()
     return SessionSnapshot(id="a1b2-c3d4", state=state, created_at=now, updated_at=now)
+
+
+@pytest.mark.parametrize("session_id", ["", "../outside", "nested/session", "session.json"])
+def test_storage_rejects_unsafe_session_ids(tmp_path: Path, session_id: str) -> None:
+    storage = SessionStorage(tmp_path)
+
+    with pytest.raises(ValueError, match="Invalid session id"):
+        storage.session_directory(session_id)
+
+    assert list(storage.sessions_root.iterdir()) == []
+
+
+@pytest.mark.parametrize("contents", ["not json", "[]", "{}"])
+def test_clear_current_removes_corrupt_pointer(tmp_path: Path, contents: str) -> None:
+    storage = SessionStorage(tmp_path)
+    pointer = tmp_path / "current.json"
+    pointer.write_text(contents, encoding="utf-8")
+
+    storage.clear_current("a1b2-c3d4")
+
+    assert not pointer.exists()
+
+
+def test_clear_current_preserves_pointer_to_another_session(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot(SessionState.COMPLETED)
+    storage.create(current, light_request())
+
+    storage.clear_current("other-session")
+
+    assert storage.load_current() == current
+
+
+def test_snapshot_id_must_match_session_directory(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    directory = storage.create(snapshot(), light_request())
+    state_path = directory / "state.json"
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    state["id"] = "other-session"
+    state_path.write_text(json.dumps(state), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Session state id does not match its directory"):
+        storage.load_snapshot("a1b2-c3d4")
+
+
+def test_session_listing_ignores_files_and_symbolic_links(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot()
+    directory = storage.create(current, light_request())
+    (storage.sessions_root / "notes.txt").write_text("notes", encoding="utf-8")
+    (storage.sessions_root / "linked-session").symlink_to(directory, target_is_directory=True)
+
+    assert storage.list_sessions() == [current]
+
+
+def test_missing_session_has_no_outputs_or_resume_data(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+
+    assert storage.list_files("missing-session") == []
+    assert not storage.can_resume("missing-session")
+    with pytest.raises(FileNotFoundError):
+        storage.session_size("missing-session")
+
+
+def test_light_session_cannot_be_analysed_as_a_recording(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    storage.create(snapshot(), light_request())
+
+    assert not storage.can_analyse("a1b2-c3d4")
+
+
+def test_measurement_only_recording_cannot_resume_or_be_analysed(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    storage.create(snapshot(), request)
+    output = storage.artifact_directory("a1b2-c3d4", request.model_id)
+    output.mkdir()
+    (output / request.export_filename).write_text("recording", encoding="utf-8")
+
+    assert not storage.can_resume("a1b2-c3d4")
+    assert not storage.can_analyse("a1b2-c3d4")
 
 
 def test_storage_round_trips_current_session(tmp_path: Path) -> None:
@@ -112,6 +194,40 @@ def test_storage_round_trips_bounded_event_replay(tmp_path: Path) -> None:
     assert [event.sequence for event in all_events] == [1, 2, 3]
 
 
+def test_clearing_current_session_retains_history_and_allows_reselection(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot(SessionState.COMPLETED)
+    measurement_request = light_request()
+    storage.create(current, measurement_request)
+
+    storage.clear_current()
+    storage.clear_current()
+
+    assert storage.load_current() is None
+    assert storage.load_snapshot(current.id) == current
+    assert storage.load_request(current.id) == measurement_request
+    assert [item.id for item in storage.list_sessions()] == [current.id]
+
+    storage.set_current(current.id)
+
+    assert storage.load_current() == current
+
+
+def test_repeated_session_deletion_preserves_another_current_session(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    previous = snapshot(SessionState.COMPLETED)
+    storage.create(previous, light_request())
+    current = replace(previous, id="current-session")
+    storage.create(current, light_request())
+
+    storage.delete_session(previous.id)
+    storage.delete_session(previous.id)
+
+    assert not storage.session_directory(previous.id).exists()
+    assert storage.load_current() == current
+    assert [item.id for item in storage.list_sessions()] == [current.id]
+
+
 def test_storage_recovers_from_truncated_final_event(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
     storage = SessionStorage(tmp_path)
     current = snapshot()
@@ -134,6 +250,129 @@ def test_storage_recovers_from_truncated_final_event(tmp_path: Path, caplog: pyt
 
     assert [event.sequence for event in events] == [1]
     assert "truncated final session event" in caplog.text
+
+
+@pytest.mark.parametrize("contents", ["not json", "[]", "{}", '{"id":"missing-session"}'])
+def test_invalid_current_pointer_is_removed_without_deleting_retained_session(tmp_path: Path, contents: str) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot(SessionState.COMPLETED)
+    storage.create(current, light_request())
+    pointer = tmp_path / "current.json"
+    pointer.write_text(contents, encoding="utf-8")
+
+    assert storage.load_current() is None
+    assert not pointer.exists()
+    assert storage.load_snapshot(current.id) == current
+
+
+def test_output_download_rejects_symlinks_outside_data_root(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path / "measure-data")
+    current = snapshot()
+    storage.create(current, light_request())
+    external_file = tmp_path / "external.txt"
+    external_file.write_text("private external contents", encoding="utf-8")
+    linked_output = storage.output_directory(current.id) / "external.txt"
+    linked_output.symlink_to(external_file)
+
+    assert "external.txt" not in storage.list_files(current.id)
+    with pytest.raises(ValueError, match="Path escapes data root"):
+        storage.file_path(current.id, "external.txt")
+
+    assert external_file.read_text(encoding="utf-8") == "private external contents"
+    assert linked_output.is_symlink()
+
+
+def test_event_replay_ignores_blank_lines(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    storage.create(snapshot(), light_request())
+    event = SessionEvent(sequence=1, type=SessionEventType.LOG, created_at=utc_now(), data={"message": "saved"})
+    storage.append_event("a1b2-c3d4", event)
+    path = storage.session_directory("a1b2-c3d4") / "events.jsonl"
+    path.write_text("\n  \n" + path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+
+    assert storage.load_events("a1b2-c3d4") == [event]
+
+
+@pytest.mark.parametrize("contents", ["", "\n  \n"], ids=["empty", "blank-lines"])
+def test_event_replay_accepts_logs_without_events(
+    tmp_path: Path,
+    contents: str,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot()
+    storage.create(current, light_request())
+    path = storage.session_directory(current.id) / "events.jsonl"
+    path.write_text(contents, encoding="utf-8")
+
+    with caplog.at_level(logging.WARNING, logger="measure"):
+        events = storage.load_events(current.id)
+
+    assert events == []
+    assert caplog.records == []
+    assert path.read_text(encoding="utf-8") == contents
+    assert storage.load_snapshot(current.id) == current
+
+
+@pytest.mark.parametrize("invalid_event", ["[]", '{"data":[]}', '{"sequence":'])
+@pytest.mark.parametrize("is_final", [False, True])
+def test_event_recovery_only_tolerates_truncated_final_json(
+    tmp_path: Path,
+    invalid_event: str,
+    is_final: bool,
+) -> None:
+    storage = SessionStorage(tmp_path)
+    storage.create(snapshot(), light_request())
+    event = SessionEvent(sequence=1, type=SessionEventType.LOG, created_at=utc_now(), data={"message": "saved"})
+    storage.append_event("a1b2-c3d4", event)
+    path = storage.session_directory("a1b2-c3d4") / "events.jsonl"
+    valid_event = path.read_text(encoding="utf-8")
+    contents = valid_event + invalid_event if is_final else invalid_event + "\n" + valid_event
+    path.write_text(contents, encoding="utf-8")
+
+    if is_final and invalid_event == '{"sequence":':
+        assert storage.load_events("a1b2-c3d4") == [event]
+    else:
+        message = "Expecting value" if invalid_event == '{"sequence":' else "Persisted session event must be an object"
+        with pytest.raises(ValueError, match=message):
+            storage.load_events("a1b2-c3d4")
+    assert path.read_text(encoding="utf-8") == contents
+
+
+@pytest.mark.parametrize("provider", ["shelly", "tapo"])
+@pytest.mark.parametrize("contents", ["not json", "[]", "{}"])
+def test_invalid_credentials_are_treated_as_unconfigured(tmp_path: Path, provider: str, contents: str) -> None:
+    storage = SessionStorage(tmp_path)
+    path = tmp_path / f"{provider}_credentials.json"
+    path.write_text(contents, encoding="utf-8")
+
+    credentials = storage.load_shelly_credentials() if provider == "shelly" else storage.load_tapo_credentials()
+
+    assert credentials is None
+    assert path.read_text(encoding="utf-8") == contents
+
+
+@pytest.mark.parametrize(
+    "brightness,mired,resumable",
+    [(1, MIN_MIRED, True), (1, MAX_MIRED, True), (1, MIN_MIRED - 1, False), (1, MAX_MIRED + 1, False), (2, 250, False)],
+)
+def test_color_temperature_resume_requires_compatible_brightness_and_mired_range(
+    tmp_path: Path,
+    brightness: int,
+    mired: int,
+    resumable: bool,
+) -> None:
+    storage = SessionStorage(tmp_path)
+    request = light_request().model_copy(update={"modes": {LutMode.COLOR_TEMP}})
+    storage.create(snapshot(SessionState.RUNNING), request)
+    output = storage.artifact_directory("a1b2-c3d4", "LCT010")
+    output.mkdir()
+    (output / "color_temp.csv").write_text(f"bri,mired,watt\n{brightness},{mired},1.0\n", encoding="utf-8")
+
+    assert storage.can_resume("a1b2-c3d4") is resumable
+    recovered = storage.load_current()
+    assert recovered is not None
+    assert recovered.state == (SessionState.RESUMABLE if resumable else SessionState.FAILED)
 
 
 def test_running_session_becomes_resumable_after_restart(tmp_path: Path) -> None:
