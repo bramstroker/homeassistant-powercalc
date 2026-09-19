@@ -1,0 +1,36 @@
+{
+  "name": "ZGA001-C15",
+  "description": "Zigbee repeater for Type F sockets",
+  "device_type": "network",
+  "aliases": [
+    "Range extender Zi (WG001)"
+  ],
+  "product_url": "https://aeotec.com/products/aeotec-range-extender-zi/",
+  "compatible_integrations": [
+    "mqtt"
+  ],
+  "discovery_by": "device",
+  "device_specs": {
+    "form_factor": "repeater",
+    "rated_power": "1.0",
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "measure_method": "script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_description": "measured using the PowerCalc HA app with a resistive dummy load (25W Osram E14 incandescent oven bulb)",
+  "mains_voltage": 230,
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": 0.48
+  },
+  "standby_power": 0.48,
+  "created_at": "2026-09-19T18:55:44Z",
+  "authors": [
+    {
+      "name": "ps1noob",
+      "github": "ps1noob"
+    }
+  ]
+}
