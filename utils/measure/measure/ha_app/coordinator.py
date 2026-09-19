@@ -199,7 +199,6 @@ class MeasurementCoordinator:
                 estimated_remaining=None,
                 operating_point=None,
                 entity_states={},
-                summary=None,
                 warnings=(),
             )
             self._events = self.storage.load_events(session_id)

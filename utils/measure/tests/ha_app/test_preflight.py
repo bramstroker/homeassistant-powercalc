@@ -316,6 +316,79 @@ def test_preflight_rejects_missing_hass_power_entity_for_non_light_kind() -> Non
         checker.validate(request)
 
 
+@pytest.mark.parametrize(
+    "extra, message",
+    [
+        (Entity("sensor.extra", disabled_by="integration", domain="sensor"), "is disabled"),
+        (Entity("sensor.extra", has_live_state=False, domain="sensor"), "has no live state"),
+        (None, "does not exist"),
+    ],
+)
+def test_preflight_warns_instead_of_failing_for_unusable_optional_recorder_entity(
+    extra: Entity | None, message: str
+) -> None:
+    """A stored request must stay runnable when an auto-selected device entity goes away.
+
+    The runner records such an entity as "unavailable", so record-more and resume would be
+    permanently blocked if preflight rejected the whole request over it.
+    """
+
+    entities = base_entities()
+    vacuum = Entity("vacuum.test", device_id="robot-device", domain="vacuum")
+    battery = Entity(
+        "sensor.robot_battery",
+        state="42",
+        device_id="robot-device",
+        domain="sensor",
+        device_class=DeviceClass.BATTERY,
+    )
+    entities[("vacuum", None)] = [vacuum]
+    entities[(None, "battery")] = [battery]
+    if extra is not None:
+        entities[("sensor", None)] = [*entities[("sensor", None)], extra]
+    request = RecorderMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id=vacuum.entity_id,
+        battery_entity_id=battery.entity_id,
+        additional_entity_ids=("sensor.extra",),
+    )
+
+    warnings = preflight(entities).validate(request).warnings
+
+    assert len(warnings) == 1
+    assert message in warnings[0]
+    assert "recorded as unavailable" in warnings[0]
+
+
+@pytest.mark.parametrize("field_name", ["vacuum_entity_id", "battery_entity_id"])
+def test_preflight_still_rejects_an_unusable_required_vacuum_entity(field_name: str) -> None:
+    entities = base_entities()
+    vacuum = Entity("vacuum.test", device_id="robot-device", domain="vacuum")
+    battery = Entity(
+        "sensor.robot_battery",
+        state="42",
+        device_id="robot-device",
+        domain="sensor",
+        device_class=DeviceClass.BATTERY,
+    )
+    broken = vacuum if field_name == "vacuum_entity_id" else battery
+    broken.disabled_by = "integration"
+    entities[("vacuum", None)] = [vacuum]
+    entities[(None, "battery")] = [battery]
+    request = RecorderMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id=vacuum.entity_id,
+        battery_entity_id=battery.entity_id,
+    )
+
+    with pytest.raises(PreflightError, match="Selected recorder entity is disabled"):
+        preflight(entities).validate(request)
+
+
 def test_preflight_accepts_vacuum_recorder_with_same_device_battery() -> None:
     entities = base_entities()
     vacuum = Entity("vacuum.test", device_id="robot-device", domain="vacuum")

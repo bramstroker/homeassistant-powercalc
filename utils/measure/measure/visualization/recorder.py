@@ -15,7 +15,7 @@ def build_recorder_plot(path: Path, *, source: str, max_points: int | None) -> P
     if not points:
         raise PlotDataError("no valid recorder measurements found")
     return PlotSpec(
-        id=f"recording:{source}",
+        id=f"recording-{Path(source).stem}",
         title="Power recording",
         kind=PlotKind.LINE,
         x_label="Elapsed time (s)",

@@ -1,4 +1,4 @@
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 import math
 from typing import Any, Protocol
@@ -154,6 +154,19 @@ def _build_light_info(light: EntityRecord) -> LightInfo:
         min_mired=light.min_mired if light.min_mired is not None else MIN_MIRED,
         max_mired=light.max_mired if light.max_mired is not None else MAX_MIRED,
     )
+
+
+def _recorder_entity_problem(entity_id: str, all_entities: Mapping[str, EntityRecord]) -> str | None:
+    """Describe why an entity cannot be recorded, or None when it is usable."""
+
+    entity = all_entities.get(entity_id)
+    if entity is None:
+        return f"Selected recorder entity does not exist: {entity_id}"
+    if entity.disabled_by:
+        return f"Selected recorder entity is disabled: {entity_id}"
+    if not entity.has_live_state:
+        return f"Selected recorder entity has no live state: {entity_id}"
+    return None
 
 
 class MeasurementPreflight:
@@ -321,17 +334,20 @@ class MeasurementPreflight:
             raise PreflightError("Home Assistant entity metadata is unavailable")
 
         all_entities = {entity.entity_id: entity for entity in self._load_all_entities()}
-        if missing := [entity_id for entity_id in request.recorded_entity_ids if entity_id not in all_entities]:
-            raise PreflightError(f"Selected recorder entity does not exist: {missing[0]}")
-        if disabled := [entity_id for entity_id in request.recorded_entity_ids if all_entities[entity_id].disabled_by]:
-            raise PreflightError(f"Selected recorder entity is disabled: {disabled[0]}")
-        if no_state := [
-            entity_id for entity_id in request.recorded_entity_ids if not all_entities[entity_id].has_live_state
-        ]:
-            raise PreflightError(f"Selected recorder entity has no live state: {no_state[0]}")
+        required_ids = set(request.required_entity_ids)
+        warnings: list[str] = []
+        for entity_id in request.recorded_entity_ids:
+            problem = _recorder_entity_problem(entity_id, all_entities)
+            if problem is None:
+                continue
+            if entity_id in required_ids:
+                raise PreflightError(problem)
+            # The runner records a vanished optional entity as "unavailable" rather than ending
+            # the run, so this must not block record-more or resume on a stored request.
+            warnings.append(f"{problem}. It will be recorded as unavailable.")
 
         if request.profile_recipe != RecorderProfileRecipe.VACUUM_ROBOT:
-            return PreflightResult()
+            return PreflightResult(warnings=warnings)
 
         vacuums = {entity.entity_id: entity for entity in self._load_entities(EntityDomain.VACUUM, None)}
         vacuum = vacuums.get(request.vacuum_entity_id or "")
@@ -344,7 +360,7 @@ class MeasurementPreflight:
             raise PreflightError("Selected battery sensor is unavailable or not a numeric percentage")
         if vacuum.device_id is None or battery.device_id != vacuum.device_id:
             raise PreflightError("Battery sensor must belong to the same Home Assistant device as the vacuum")
-        return PreflightResult()
+        return PreflightResult(warnings=warnings)
 
     def _validate_speaker(self, request: SpeakerMeasurementRequest) -> PreflightResult:
         if isinstance(request.controller, HassMediaControllerSpec):

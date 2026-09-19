@@ -440,7 +440,12 @@ def test_plots_every_recording_in_run_order(tmp_path: Path) -> None:
         "measurement/record-10.jsonl",
         "measurement/record.jsonl",
     ]
-    assert len({plot.id for plot in result.plots}) == 3
+    # The frontend downloads a plot as `${plot.id}.png`, so ids stay unique and filename-safe.
+    assert [plot.id for plot in result.plots] == [
+        "recording-record-2",
+        "recording-record-10",
+        "recording-record",
+    ]
     assert all(plot.series[0].points[0].x == 0 for plot in result.plots)
 
 

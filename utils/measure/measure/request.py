@@ -316,6 +316,19 @@ class RecorderMeasurementRequest(BaseMeasurementRequest):
             if entity_id is not None
         ]
 
+    @property
+    def required_entity_ids(self) -> list[str]:
+        """Recorded entities a sample cannot be written without.
+
+        A vacuum recipe only needs the vacuum and its battery; the additional entities the
+        frontend preselects from the device are best effort and may disappear mid-session.
+        """
+
+        entity_ids = self.recorded_entity_ids
+        if self.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT:
+            return entity_ids[:2]
+        return entity_ids
+
 
 class SpeakerMeasurementRequest(BaseMeasurementRequest):
     measure_type: Literal[MeasureType.SPEAKER] = MeasureType.SPEAKER

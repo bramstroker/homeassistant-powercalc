@@ -110,7 +110,7 @@ def test_record_more_keeps_session_and_fits_both_runs(
     assert started.created_at == previous.created_at
     assert started.completed == 0
     assert started.entity_states == {}
-    assert started.summary is None
+    assert started.summary == previous.summary
     assert (output / "record-1.jsonl").read_bytes() == original
     assert not (output / "record.jsonl").exists()
     release.set()
@@ -133,6 +133,28 @@ def test_record_more_keeps_session_and_fits_both_runs(
     assert reopened.analyse(previous.id).summary["Samples analysed"] == "20"
     assert (output / "record-1.jsonl").read_bytes() == original
     assert (output / recorder_request.export_filename).is_file()
+
+
+def test_failed_record_more_keeps_the_previous_analysis_summary(
+    tmp_path: Path, recorder_request: RecorderMeasurementRequest
+) -> None:
+    """A meter failure during an extra run must not erase the analysis already produced."""
+
+    storage = SessionStorage(tmp_path)
+    previous = retained_session(storage, recorder_request)
+    service = MagicMock()
+    service.run.side_effect = RuntimeError("power meter disappeared")
+    coordinator = MeasurementCoordinator(storage, lambda: service)
+    finished = Event()
+    coordinator.subscribe(lambda: finished.set() if coordinator.current.state == SessionState.FAILED else None)
+
+    coordinator.record_more(previous.id)
+
+    assert finished.wait(2)
+    failed = coordinator.get(previous.id)
+    assert failed.state == SessionState.FAILED
+    assert failed.summary == previous.summary
+    assert storage.can_analyse(previous.id)
 
 
 def test_archiving_is_collision_safe_and_recoverable(

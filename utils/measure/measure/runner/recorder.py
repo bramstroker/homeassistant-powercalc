@@ -122,8 +122,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
             return True
 
         is_vacuum = request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT
-        required_ids = entity_ids[:2] if is_vacuum else entity_ids
-        entity_states = self._read_entity_states(entity_ids, required_ids)
+        entity_states = self._read_entity_states(entity_ids, request.required_entity_ids)
         if entity_states is None:
             return False
         captured = self._sample_entities(entity_ids, entity_states, is_vacuum=is_vacuum)
