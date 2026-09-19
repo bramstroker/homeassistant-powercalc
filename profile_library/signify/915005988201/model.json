@@ -29,6 +29,7 @@
   },
   "name": "Hue Play Gradient Light Tube Large",
   "standby_power": 0.25,
+  "standby_power_estimated": true,
   "authors": [
     {
       "name": "chpego",
