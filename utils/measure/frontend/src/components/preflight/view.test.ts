@@ -1,8 +1,22 @@
 import type { PowerMeterDiagnostic, PreflightResponse } from "../../types";
 import "./view";
+import { PreflightView } from "./view";
 import { goodPowerMeterDiagnostic } from "../testing/fixtures";
 
 describe("preflight power meter diagnostics", () => {
+  it.each(["measured", "unavailable"] as const)("shows %s standby without blocking start and offers a recheck", async (status) => {
+    const element = new PreflightView();
+    element.lightLoadProbe = { checked_variations: 1, minimum_aggregate_power_w: 1.2, points: [], standby: { status, power_w: status === "measured" ? 0.3 : null } };
+    const recheck = vi.fn();
+    element.addEventListener("recheck", recheck);
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot!.textContent).toContain(status === "measured" ? "0.30 W per light" : "Standby power could not be measured reliably");
+    expect(element.shadowRoot!.querySelector<HTMLButtonElement>("button.primary")!.disabled).toBe(false);
+    [...element.shadowRoot!.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent === "Recheck setup")!.click();
+    expect(recheck).toHaveBeenCalledOnce();
+  });
+
   it("explains preparation and provides immediate feedback while the session initializes", async () => {
     const element = document.createElement("measure-preflight-view") as HTMLElement & {
       confirmationAction: string; busy: boolean; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
@@ -23,6 +37,32 @@ describe("preflight power meter diagnostics", () => {
     expect(status?.textContent).toContain("This can take a few seconds");
     expect((element.shadowRoot.querySelector("button.primary") as HTMLButtonElement).disabled).toBe(true);
     expect((element.shadowRoot.querySelector(".actions button") as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("separates a setup recheck from starting the session", async () => {
+    const element = new PreflightView();
+    element.busy = true;
+    element.rechecking = true;
+    document.body.append(element);
+    await element.updateComplete;
+
+    const status = element.shadowRoot!.querySelector(".starting");
+    expect(status?.textContent).toContain("Rechecking setup");
+    expect(status?.textContent).not.toContain("Initializing measurement session");
+    expect(element.shadowRoot!.querySelector("button.primary")?.textContent).toBe("Rechecking\u2026");
+  });
+
+  it("blocks starting on results left behind by a failed recheck", async () => {
+    const element = new PreflightView();
+    element.stale = true;
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot!.textContent).toContain("The setup check did not complete");
+    expect(element.shadowRoot!.querySelector<HTMLButtonElement>("button.primary")!.disabled).toBe(true);
+    const recheck = [...element.shadowRoot!.querySelectorAll<HTMLButtonElement>("button")]
+      .find(button => button.textContent === "Recheck setup")!;
+    expect(recheck.disabled).toBe(false);
   });
 
   it("keeps direct measurements as a single Start measurement action", async () => {

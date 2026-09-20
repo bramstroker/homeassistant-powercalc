@@ -1,13 +1,17 @@
+from dataclasses import dataclass
 import logging
 import time
 from typing import Any
 from unittest.mock import MagicMock, patch
 
 from measure.cancellation import MeasurementCancelledError
-from measure.const import Trend
-from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError
+from measure.const import RETRY_COUNT_LIMIT, Trend
+from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError, ZeroReadingError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
+from measure.tuning import MeasurementParameters
 from measure.utils.sampling import (
+    AverageMeasurementConvergence,
+    AverageMeasurementSnapshot,
     AverageMeasurementState,
     DummyLoadMeasurementError,
     MeasurementResult,
@@ -17,6 +21,194 @@ from measure.utils.sampling import (
 import pytest
 
 from tests.conftest import MockConfigFactory
+
+
+@dataclass
+class SamplingClock:
+    elapsed: float = 0.0
+
+    def wait(self, seconds: float) -> None:
+        self.elapsed += seconds
+
+
+@pytest.mark.parametrize("measure_resistance", [False, True])
+def test_average_skips_zero_readings_and_stops_before_deadline(
+    measure_resistance: bool, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level("INFO", logger="measure")
+    clock = SamplingClock()
+    meter = MagicMock(spec=PowerMeter)
+    meter.get_power.side_effect = [
+        PowerMeasurementResult(power=0.004, voltage=10, updated=0),
+        PowerMeasurementResult(power=4, voltage=10, updated=0),
+        PowerMeasurementResult(power=8, voltage=10, updated=0),
+    ]
+    sampler = PowerSampler(meter, MeasurementParameters(sleep_time=2), wait=clock.wait)
+    progress = MagicMock()
+
+    with patch("measure.utils.sampling.time.time", side_effect=lambda: clock.elapsed):
+        result = sampler.take_average_measurement(6, measure_resistance=measure_resistance, on_progress=progress)
+
+    if not measure_resistance:
+        assert "Skipped a 0.00 W sample" in caplog.text
+        assert not any(record.levelname == "WARNING" for record in caplog.records)
+
+    assert result == MeasurementResult(power=18.75 if measure_resistance else 6, voltages=[10, 10])
+    assert meter.get_power.call_count == 3
+    assert clock.elapsed == 4
+    progress.assert_called_with(6, 6)
+
+
+def test_average_stops_when_measurements_converge() -> None:
+    clock = SamplingClock()
+    meter = MagicMock(spec=PowerMeter)
+    meter.get_power.return_value = PowerMeasurementResult(power=8, updated=0)
+    sampler = PowerSampler(meter, MeasurementParameters(sleep_time=2), wait=clock.wait)
+    convergence = AverageMeasurementConvergence(
+        min_duration=4, window_duration=2, absolute_threshold=0.1, relative_threshold=0.01
+    )
+
+    with patch("measure.utils.sampling.time.time", side_effect=lambda: clock.elapsed):
+        result = sampler.take_average_measurement(60, convergence=convergence)
+
+    assert result == MeasurementResult(power=8, voltages=[])
+    assert clock.elapsed == 4
+    assert meter.get_power.call_count == 3
+
+
+@pytest.mark.parametrize(
+    "snapshots, expected",
+    [
+        ([AverageMeasurementSnapshot(0, 10), AverageMeasurementSnapshot(3, 10)], False),
+        ([AverageMeasurementSnapshot(4, 10)], False),
+        ([AverageMeasurementSnapshot(3, 10), AverageMeasurementSnapshot(4, 10)], False),
+        ([AverageMeasurementSnapshot(0, 0), AverageMeasurementSnapshot(4, 1)], False),
+        ([AverageMeasurementSnapshot(0, 0), AverageMeasurementSnapshot(4, 0)], True),
+        ([AverageMeasurementSnapshot(0, 10), AverageMeasurementSnapshot(4, 10.125)], True),
+        ([AverageMeasurementSnapshot(0, 100), AverageMeasurementSnapshot(4, 101)], True),
+        ([AverageMeasurementSnapshot(0, 100), AverageMeasurementSnapshot(4, 102)], False),
+        # Compare with the newest snapshot old enough to span the lookback window.
+        (
+            [AverageMeasurementSnapshot(0, 2), AverageMeasurementSnapshot(2, 10), AverageMeasurementSnapshot(4, 10)],
+            True,
+        ),
+    ],
+)
+def test_average_convergence_requires_enough_history_and_stable_power(
+    snapshots: list[AverageMeasurementSnapshot],
+    expected: bool,
+) -> None:
+    convergence = AverageMeasurementConvergence(
+        min_duration=4, window_duration=2, absolute_threshold=0.125, relative_threshold=0.01
+    )
+
+    assert PowerSampler.has_average_converged(snapshots, convergence) is expected
+
+
+@pytest.mark.parametrize("measure_resistance", [False, True])
+def test_average_with_only_zero_readings_fails(measure_resistance: bool) -> None:
+    clock = SamplingClock()
+    meter = MagicMock(spec=PowerMeter)
+    meter.get_power.return_value = PowerMeasurementResult(power=0, voltage=230, updated=0)
+    sampler = PowerSampler(meter, MeasurementParameters(sleep_time=2), wait=clock.wait)
+
+    with (
+        patch("measure.utils.sampling.time.time", side_effect=lambda: clock.elapsed),
+        pytest.raises(NoValidReadingsError),
+    ):
+        sampler.take_average_measurement(4, measure_resistance=measure_resistance)
+
+    assert meter.get_power.call_count == 2
+
+
+@pytest.mark.parametrize("voltage", [None, 0, 0.5])
+@pytest.mark.parametrize("measure_resistance", [False, True])
+def test_dummy_load_measurements_require_valid_voltage(voltage: float | None, measure_resistance: bool) -> None:
+    meter = MagicMock(spec=PowerMeter)
+    meter.has_voltage_support.return_value = True
+    meter.get_power.return_value = PowerMeasurementResult(power=5, voltage=voltage, updated=0)
+    sampler = PowerSampler(meter, MeasurementParameters(max_retries=0))
+
+    if measure_resistance:
+        with pytest.raises(ZeroReadingError):
+            sampler.take_average_measurement(1, measure_resistance=True)
+    else:
+        sampler.set_dummy_load_resistance(10)
+        with pytest.raises(ZeroReadingError):
+            sampler.take_measurement()
+
+    meter.get_power.assert_called_once_with(include_voltage=True)
+
+
+@pytest.mark.parametrize("resistance", [0, -10])
+def test_invalid_dummy_load_resistance_preserves_previous_calibration(resistance: float) -> None:
+    meter = MagicMock(spec=PowerMeter)
+    meter.has_voltage_support.return_value = True
+    sampler = PowerSampler(meter, MeasurementParameters())
+    sampler.set_dummy_load_resistance(10)
+
+    with pytest.raises(DummyLoadMeasurementError, match="must be positive"):
+        sampler.set_dummy_load_resistance(resistance)
+
+    assert sampler.dummy_load_value == 10
+
+
+def test_empty_sample_batch_fails_without_reading_meter() -> None:
+    meter = MagicMock(spec=PowerMeter)
+    sampler = PowerSampler(meter, MeasurementParameters(sample_count=0))
+
+    with pytest.raises(NoValidReadingsError):
+        sampler.take_measurement()
+
+    meter.get_power.assert_not_called()
+
+
+def test_retry_safety_limit_caps_excessive_configuration() -> None:
+    meter = MagicMock(spec=PowerMeter)
+    error = ApiConnectionError("Disconnected")
+    meter.get_power.side_effect = error
+    wait = MagicMock()
+    sampler = PowerSampler(meter, MeasurementParameters(max_retries=RETRY_COUNT_LIMIT + 10), wait=wait)
+
+    with pytest.raises(ApiConnectionError) as raised:
+        sampler.take_measurement()
+
+    assert raised.value is error
+    assert meter.get_power.call_count == RETRY_COUNT_LIMIT + 1
+    assert wait.call_count == RETRY_COUNT_LIMIT
+
+
+@pytest.mark.parametrize("power", [0, -1, 0.004])
+def test_point_measurement_rejects_non_positive_power(power: float) -> None:
+    meter = MagicMock(spec=PowerMeter)
+    meter.get_power.return_value = PowerMeasurementResult(power=power, updated=0)
+    sampler = PowerSampler(meter, MeasurementParameters(max_retries=0))
+
+    with pytest.raises(ZeroReadingError):
+        sampler.take_measurement()
+
+    meter.get_power.assert_called_once_with(include_voltage=False)
+
+
+@pytest.mark.parametrize("measure_resistance", [False, True])
+def test_failed_live_feedback_does_not_discard_measurements(measure_resistance: bool) -> None:
+    clock = SamplingClock()
+    meter = MagicMock(spec=PowerMeter)
+    meter.get_power.return_value = PowerMeasurementResult(power=5, voltage=10, updated=0)
+    callback = MagicMock(side_effect=RuntimeError("Disconnected listener"))
+    sampler = PowerSampler(
+        meter,
+        MeasurementParameters(sleep_time=2),
+        wait=clock.wait,
+        on_sample=callback,
+        on_calibration_sample=callback,
+    )
+
+    with patch("measure.utils.sampling.time.time", side_effect=lambda: clock.elapsed):
+        result = sampler.take_average_measurement(1, measure_resistance=measure_resistance)
+
+    assert result == MeasurementResult(power=20 if measure_resistance else 5, voltages=[10])
+    callback.assert_called_once()
 
 
 @pytest.mark.parametrize(

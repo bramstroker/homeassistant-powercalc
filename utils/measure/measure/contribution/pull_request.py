@@ -21,6 +21,9 @@ def pull_request_title(preview: ProfilePreview) -> str:
 
 
 def pull_request_body(job: ContributionJob) -> str:
+    notes = [job.metadata.notes] if job.metadata.notes else []
+    if job.preview.standby_power_estimated and job.preview.standby_power is not None:
+        notes.append(f"Standby power is estimated: {job.preview.standby_power:g} W.")
     return profile_pull_request_body(
         DeviceInfo(
             manufacturer=job.metadata.manufacturer,
@@ -30,7 +33,7 @@ def pull_request_body(job: ContributionJob) -> str:
         ),
         measure_device=job.metadata.measure_device,
         measure_type=job.metadata.measure_type,
-        notes=job.metadata.notes,
+        notes="\n\n".join(notes),
         file_paths=[file.path for file in job.preview.files],
         warnings=job.preview.warnings,
     )

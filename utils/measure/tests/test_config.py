@@ -1,5 +1,8 @@
 import logging
+from pathlib import Path
 
+from decouple import Config, RepositoryEnv
+import measure.cli.environment as environment
 from measure.cli.environment import CliEnvironment
 from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.powermeter.const import PowerMeterType
@@ -9,6 +12,45 @@ import pytest
 # derived from the HS_*_PRECISION vars and cannot leave their table range.
 _DERIVED_LIMIT_FIELDS = {"bri_bri_steps", "hs_bri_steps", "hs_hue_steps", "hs_sat_steps"}
 _ENV_BACKED_LIMIT_FIELDS = sorted(set(PARAMETER_LIMITS) - _DERIVED_LIMIT_FIELDS)
+
+
+def test_missing_measurement_selection_leaves_the_cli_interactive(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("SELECTED_MEASURE_TYPE", raising=False)
+    monkeypatch.setattr(environment, "config", Config({}))
+
+    assert CliEnvironment().selected_measure_type is None
+
+
+def test_environment_overrides_dotenv_answers_without_normalizing_text(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    dotenv = tmp_path / ".env"
+    dotenv.write_text("MODEL_ID=From file\nSELECTED_MEASURE_TYPE=Average\n", encoding="utf-8")
+    monkeypatch.setattr(environment, "config", Config(RepositoryEnv(str(dotenv))))
+    monkeypatch.delenv("MODEL_ID", raising=False)
+    monkeypatch.delenv("SELECTED_MEASURE_TYPE", raising=False)
+    config = CliEnvironment()
+
+    assert config.get_conf_value("MODEL_ID") == "From file"
+    assert config.selected_measure_type == MeasureType.AVERAGE
+
+    monkeypatch.setenv("MODEL_ID", " Model with spaces ")
+    monkeypatch.setenv("SELECTED_MEASURE_TYPE", "recorder")
+
+    assert config.get_conf_value("MODEL_ID") == " Model with spaces "
+    assert config.selected_measure_type == MeasureType.RECORDER
+
+
+def test_optional_environment_answer_distinguishes_missing_and_empty(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(environment, "config", Config({}))
+    monkeypatch.delenv("MODEL_ID", raising=False)
+    config = CliEnvironment()
+
+    assert config.get_conf_value("MODEL_ID") is None
+
+    monkeypatch.setenv("MODEL_ID", "")
+
+    assert config.get_conf_value("MODEL_ID") == ""
 
 
 def test_cli_environment_preserves_manual_power_meter_overrides(monkeypatch: pytest.MonkeyPatch) -> None:

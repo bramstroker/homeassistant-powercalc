@@ -17,6 +17,7 @@ from measure.profile.models import ProfileMetadata, ProfilePreview
 from measure.profile.output import write_prepared_profile
 from measure.profile.prepare import ProfilePreparationError, ProfilePreparer
 from measure.profile.specifications import DeviceSpecField, device_spec_fields
+from measure.profile.standby import MINIMUM_STANDBY_POWER, is_valid_standby_power
 
 Prompt = Callable[[str], str]
 MODEL_SCHEMA_FILENAME = "model_schema.json"
@@ -90,6 +91,7 @@ def prepare_profile(argv: Sequence[str], *, prompt: Prompt = input) -> ProfilePr
             prompt,
             fields,
             has_voltage_range=mains_voltage_from_range(raw_model.get("voltage_range")) is not None,
+            is_light=device_type == "light",
         )
 
     try:
@@ -123,6 +125,8 @@ def _metadata_defaults(artifact_directory: Path, model: dict[str, Any]) -> dict[
         "product_url": model.get("product_url"),
         "mains_voltage": mains_voltage if mains_voltage in (120, 230) else None,
         "device_specs": model.get("device_specs"),
+        "standby_power": model.get("standby_power"),
+        "standby_power_estimated": model.get("standby_power_estimated"),
     }
     authors = model.get("authors")
     if isinstance(authors, list) and authors and isinstance(authors[0], dict):
@@ -136,6 +140,7 @@ def _prompt_metadata(
     device_specification_fields: Sequence[DeviceSpecField] = (),
     *,
     has_voltage_range: bool = False,
+    is_light: bool = False,
 ) -> dict[str, Any]:
     print("\nPrepare profile metadata (press Enter to keep the value in brackets).")
     result = dict(values)
@@ -157,6 +162,8 @@ def _prompt_metadata(
         device_specification_fields,
         values.get("device_specs"),
     )
+    if is_light:
+        result.update(_prompt_standby_power(prompt, values))
     result["measure_device"] = _ask(prompt, "Measurement device", values.get("measure_device"))
     result["measure_device_firmware"] = _ask(
         prompt,
@@ -177,6 +184,31 @@ def _prompt_metadata(
         "email": _ask(prompt, "Contributor email", author.get("email")),
     }
     return result
+
+
+def _prompt_standby_power(prompt: Prompt, values: dict[str, Any]) -> dict[str, Any]:
+    """Ask for the light standby value, which the measurement may have failed to produce."""
+    measured = values.get("standby_power") if is_valid_standby_power(values.get("standby_power")) else None
+    if measured is None:
+        print("\nStandby power could not be measured. Enter a separately measured value, or an estimate.")
+    while True:
+        answer = _ask(
+            prompt,
+            f"Standby power in W per light (at least {MINIMUM_STANDBY_POWER})",
+            measured,
+            required=True,
+        )
+        try:
+            power = float(answer or "")
+        except ValueError:
+            power = 0.0
+        if is_valid_standby_power(power):
+            break
+        print(f"Standby power must be at least {MINIMUM_STANDBY_POWER} W per light.")
+    if power == measured:
+        return {"standby_power": power, "standby_power_estimated": values.get("standby_power_estimated") is True}
+    estimated = _ask_boolean(prompt, "Is this standby value an estimate?", measured is None)
+    return {"standby_power": power, "standby_power_estimated": estimated is True}
 
 
 def _ask_mains_voltage(prompt: Prompt, default: object) -> int:
@@ -352,5 +384,5 @@ def main() -> None:
         print(f"Warning: {warning}", file=sys.stderr)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover - entry-point behaviour is tested through main
     main()

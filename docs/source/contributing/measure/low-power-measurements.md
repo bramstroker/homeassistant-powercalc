@@ -15,9 +15,14 @@ briefly tests representative low-load points, uses the configured settle, sample
 lights off. The review screen lists every checked point and its aggregate power. Dynamic effects are excluded because
 a short sample cannot characterize their changing load.
 
-The check covers the lowest points at which the light is *on*. It does not measure standby power, which the meter can
-still round to `0` W even when every checked point reads a usable value. Verify the standby row of the generated CSV
-afterwards, and apply the same approaches below when it is zero.
+After the on-state checks, the app turns the lights off, waits for the configured standby settling time, and checks
+standby using the same sampling and stale-reading recovery settings as the final measurement. The review screen
+shows standby watts **per light**, or a nonblocking warning when it cannot be measured reliably. You can still start
+the measurement after that warning. Standby is measured again at the end of the run.
+
+Use **Recheck setup** after changing the physical setup; it bypasses the short-lived result cache. Starting an
+unchanged measurement shortly after checking it reuses the cached check. The active light check, including standby,
+is skipped when a dummy load is configured, when using dummy adapters, or when measuring only dynamic effects.
 
 If any representative point repeatedly reads `0` W, use one of the approaches below before starting the measurement.
 
@@ -56,16 +61,22 @@ Use a stable resistive load, such as a suitable incandescent lamp. Do not use an
 controlled load: its consumption is not stable enough for reliable subtraction. The meter must also provide voltage
 readings so Powercalc can account for voltage-dependent changes in the dummy load.
 
+The app supports dummy-load correction for light, speaker, fan, charging, average, and recorder measurements
+with a real power meter. A Home Assistant power sensor needs an associated voltage sensor reporting `V`; directly
+polled Shelly, Kasa, and Tapo meters must expose voltage through their API. The synthetic test meter cannot be used.
+
 In the Home Assistant app:
 
 1. Connect only the dummy load and allow it to warm up.
 2. Enable **Use resistive dummy load** during measurement setup.
-3. Calibrate it until Powercalc reports a stable resistance.
+3. Confirm calibration and wait until Powercalc reports a stable resistance. Calibration measures at least 20 periods of 30 seconds (at least 10 minutes); let it continue if resistance is still rising or falling.
 4. Connect the target device in parallel without disconnecting the dummy load.
 5. Keep the same meter, load, and wiring in place for the complete measurement.
 
 Reuse a stored calibration only after confirming that the same warmed-up load is connected. Recalibrate after changing
-the load, meter, wiring, or whenever its stability is uncertain.
+the load, meter, wiring, or whenever its stability is uncertain. Choose **Recalibrate** to replace a stored calibration.
+A calibration interrupted before resistance stabilizes is not saved. During the measurement, live and saved power
+readings show the target device consumption after subtracting the calculated dummy-load contribution.
 
 ## Use a meter with better low-load resolution
 
@@ -86,8 +97,39 @@ For lights, raising **Minimum brightness** can avoid a range where the light tur
 load. This deliberately excludes those brightness levels from the measured grid, so use it only when that tradeoff is
 acceptable for the profile. Powercalc does not automatically change this setting during preflight.
 
-Do not invent a precise standby value from an unstable or zero reading. If the load remains below the available
-meter's range, document any manual fallback estimate clearly in the pull request. A real measurement is preferred.
+## Recover a completed light profile with unavailable standby
+
+Exhausted zero or stale standby readings no longer discard a completed light measurement. The session retains its
+lookup tables and reports that standby is unavailable; its raw `model.json` omits standby rather than recording zero
+as a measured value. Connection, calibration, and other operational errors still need to be resolved.
+
+In **Prepare profile**, enter **Standby power (W per light)** from a separate reliable measurement, or explicitly
+choose **Use estimated standby**. The value must be finite and at least `0.05` W. Do not divide an entered value again
+when several lights were measured together. Keep **Estimated** checked for estimates, or clear it when replacing an
+estimate with a measured value. This also works for older completed sessions whose standby is missing or zero; no
+new LUT run is required.
+
+**Measure standby** retries only the standby reading using the completed session's original setup. Confirm the
+device and meter are still connected correctly. Lights, speakers, and fans use their existing turn-off routines;
+for charging and recorded devices, put the device into standby yourself before confirming. Lights may briefly
+pulse on and off to refresh stale readings. Any resistive dummy load must remain connected and warmed up, as its
+session calibration is reused. A successful reading fills the field and clears **Estimated**; an unavailable
+reading or error leaves your entry unchanged. Dummy meters and controllers are allowed for testing, with a
+simulation notice; their results must not be submitted as real measurements.
+
+The standby field, **Estimated** checkbox, and retry action are also available for non-light profiles. Their value
+is watts for the device, not watts per light. Leave the optional field blank to preserve an existing value or
+template. Library suggestions and the `0.4` W fallback apply only to lights.
+
+The suggestion uses the median standby of at least three distinct, non-estimated light profiles with exactly the
+same connectivity set and manufacturer (including manufacturer aliases). If too few match that manufacturer, it
+uses at least three matching profiles across manufacturers. With too few comparable profiles, unknown connectivity,
+or an unavailable library, it falls back to `0.4` W. The UI shows the basis and sample count. Changing manufacturer or
+connectivity refreshes the suggestion but never replaces your entry automatically.
+
+Validate the correction before submitting. The prepared preview, downloaded ZIP, and GitHub submission use the same
+corrected value and estimated flag; estimates are also identified in the pull request. Original measurement artifacts
+remain unchanged. A real measurement is preferred over any estimate.
 
 ## Verify the setup before a long run
 

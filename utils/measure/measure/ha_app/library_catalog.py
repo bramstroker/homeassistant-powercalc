@@ -6,6 +6,7 @@ from typing import cast
 import requests
 
 from measure.profile.specifications import DeviceSpecField, device_spec_fields
+from measure.profile.standby import StandbyEstimate, estimate_standby_power
 
 LIBRARY_ENDPOINT = "https://api.powercalc.nl/library"
 FULL_LIBRARY_ENDPOINT = "https://api.powercalc.nl/library/full"
@@ -71,6 +72,21 @@ class MeasureDeviceCatalog:
             return extract_measure_devices(self._loader())
         except Exception as error:
             raise LibraryCatalogError("Could not load measurement devices from the Powercalc library") from error
+
+
+class StandbyCatalog:
+    def __init__(self, *, loader: LibraryLoader | None = None) -> None:
+        self._loader = loader or _cached_full_library
+
+    def estimate(self, manufacturer: str, connectivity: list[str]) -> StandbyEstimate:
+        if not connectivity:
+            return StandbyEstimate()
+        try:
+            library = self._loader()
+            canonical = resolve_manufacturer_name(library, manufacturer)
+        except requests.RequestException, LibraryCatalogError, ValueError:
+            return StandbyEstimate()
+        return estimate_standby_power(library, canonical, connectivity)
 
 
 class ManufacturerCatalog:

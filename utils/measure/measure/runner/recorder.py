@@ -15,7 +15,7 @@ from measure.recording.models import RecordingContext
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, validate_export_filename
 from measure.runner.interaction import ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.utils.sampling import MeasurementResult, PowerSampler
+from measure.utils.sampling import PowerSampler
 
 INTERVAL = 2
 
@@ -122,8 +122,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
             return True
 
         is_vacuum = request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT
-        required_ids = entity_ids[:2] if is_vacuum else entity_ids
-        entity_states = self._read_entity_states(entity_ids, required_ids)
+        entity_states = self._read_entity_states(entity_ids, request.required_entity_ids)
         if entity_states is None:
             return False
         captured = self._sample_entities(entity_ids, entity_states, is_vacuum=is_vacuum)
@@ -181,8 +180,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         open-ended recording that may run for hours skips that sample instead of ending.
         """
 
-        if self.entity_state_reader is None:  # pragma: no cover - guarded by the caller
-            return None
+        assert self.entity_state_reader is not None
         try:
             states = self.entity_state_reader(entity_ids)
             if missing := sorted(set(required_ids) - states.keys()):
@@ -193,9 +191,6 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         except Exception as error:  # noqa: BLE001
             _LOGGER.warning("Skipping sample, could not read entity states: %s", error)
             return None
-
-    def measure_standby_power(self) -> MeasurementResult:
-        return MeasurementResult(power=0, voltages=[])
 
 
 def _write_jsonl(output_file: TextIO, record: Mapping[str, object]) -> None:

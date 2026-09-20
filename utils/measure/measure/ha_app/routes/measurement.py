@@ -48,6 +48,7 @@ from measure.powermeter.spec import (
     PowerMeterSpec,
     ShellyPowerMeterSpec,
 )
+from measure.profile.standby import StandbyEstimate
 from measure.runner.interaction import ImmediateInteraction
 from measure.tuning import MeasurementParameters
 from measure.utils.version import measure_version
@@ -56,6 +57,15 @@ CACHE_CONTROL_LIBRARY = "public, max-age=600"
 
 
 router = APIRouter()
+
+
+@router.get("/library/standby-estimate")
+async def standby_estimate(
+    request: Request,
+    manufacturer: str = "",
+    connectivity: Annotated[list[str] | None, Query()] = None,
+) -> StandbyEstimate:
+    return await run_in_threadpool(get_app_context(request).standby_catalog.estimate, manufacturer, connectivity or [])
 
 
 @router.get("/capabilities")
@@ -189,10 +199,10 @@ async def entities(
 
 
 @router.post("/preflight", responses={409: ERROR_RESPONSE, 422: ERROR_RESPONSE})
-async def preflight(payload: MeasurementRequestPayload, request: Request) -> PreflightResponse:
+async def preflight(payload: MeasurementRequestPayload, request: Request, refresh: bool = False) -> PreflightResponse:
     context = get_app_context(request)
     prepared = await run_in_threadpool(apply_fast_test_mode, context, payload)
-    assessment = await run_in_threadpool(run_preflight, context, prepared)
+    assessment = await run_in_threadpool(run_preflight, context, prepared, refresh=refresh)
     result = assessment.checks
     return PreflightResponse(
         valid=True,

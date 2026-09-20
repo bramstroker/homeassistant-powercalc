@@ -9,6 +9,7 @@ const draft: ContributionPreview = {
   eligible: true, manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010",
   product_name: "Hue lamp", contributor: "", contributor_github: "tester", measure_device: "Test meter",
   mains_voltage: 230, notes: "", device_info: {}, home_assistant: {}, device_type: "light", files: [], warnings: [],
+  standby_power: 0.3, standby_power_estimated: false,
   repository: "bramstroker/homeassistant-powercalc", base_branch: "master", commit_message: "Add profile",
   pr_title: "Add profile", pr_body: "Measured profile", branch_name: "measure/test",
 };
@@ -49,6 +50,7 @@ async function mount(preview?: ContributionPreview) {
   const api = {
     diagnosticsUrl: () => "/diagnostics",
     getMeasureDevices: vi.fn(async () => ({ devices: [] })),
+    getStandbyEstimate: vi.fn(async () => ({ power_w: 0.4, basis: "fallback", profile_count: 0 })),
     saveSettings: vi.fn(async (settings: AppSettings) => settings),
     getCapabilities: vi.fn(async () => capabilities),
     getDummyLoadCalibration: vi.fn(async () => null),
@@ -81,6 +83,10 @@ describe("profile draft navigation", () => {
   it("keeps unfinished text, list rows and multiselect tags when returning from Result", async () => {
     const { app } = await mount();
     await edit(app, "product_name", "Edited product ");
+    await edit(app, "standby_power", "0.45");
+    const estimated = field(app, "standby_power_estimated");
+    estimated.checked = true;
+    estimated.dispatchEvent(new Event("change", { bubbles: true }));
     const aliases = listField(app, "aliases");
     aliases.value = ["First alias ", ""];
     aliases.dispatchEvent(new CustomEvent("list-input-change", { bubbles: true, composed: true }));
@@ -93,6 +99,8 @@ describe("profile draft navigation", () => {
     await backAndForward(app);
 
     expect(field(app, "product_name").value).toBe("Edited product ");
+    expect(field(app, "standby_power").value).toBe("0.45");
+    expect(field(app, "standby_power_estimated").checked).toBe(true);
     expect(listField(app, "aliases").value).toEqual(["First alias ", ""]);
     expect(field(app, "contributor_github").value).toBe("");
     expect(field(app, "device_specs.connectivity").value).toEqual(["zigbee", "wifi"]);

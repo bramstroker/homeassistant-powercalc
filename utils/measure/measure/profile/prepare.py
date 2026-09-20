@@ -9,6 +9,7 @@ from typing import Any
 
 from measure.profile.model_json import mains_voltage_from_range
 from measure.profile.models import PreparedProfileFile, ProfileMetadata, ProfilePreview, RenderedProfileFile
+from measure.profile.standby import is_valid_standby_power
 from measure.recording.files import select_recording_filenames
 
 JsonValidator = Callable[[dict[str, Any], dict[str, Any]], None]
@@ -76,6 +77,10 @@ class ProfilePreparer:
         artifact_directory = artifact_directory.resolve()
         csv_names = self._artifact_csv_names(artifact_directory)
         model = self._apply_metadata(self._read_object(artifact_directory / MODEL_JSON), metadata)
+        if model.get("device_type") == "light" and not is_valid_standby_power(model.get("standby_power")):
+            raise ProfilePreparationError(
+                "Enter standby power of at least 0.05 W per light, or use an estimate.", field="standby_power"
+            )
         if not str(model.get("name") or "").strip():
             raise ProfilePreparationError("Enter the product name", field="product_name")
         if "mains_voltage" not in model:
@@ -109,7 +114,9 @@ class ProfilePreparer:
                 self._build_prepared_file(relative_path, artifact_directory, model, metadata)
                 for relative_path in relative_files
             ),
-            warnings=tuple(self._collect_duplicate_warnings(model, manufacturer_directory, metadata.model_id)),
+            warnings=tuple(self._collect_duplicate_warnings(model)),
+            standby_power=model.get("standby_power") if is_valid_standby_power(model.get("standby_power")) else None,
+            standby_power_estimated=model.get("standby_power_estimated") is True,
         )
 
     def render_contents(
@@ -152,11 +159,17 @@ class ProfilePreparer:
             ("product_url", metadata.product_url),
             ("mains_voltage", metadata.mains_voltage),
             ("device_specs", metadata.device_specs),
+            ("standby_power", metadata.standby_power),
+            ("standby_power_estimated", metadata.standby_power_estimated),
             ("measure_device", metadata.measure_device),
             ("measure_device_firmware", metadata.measure_device_firmware),
             ("measure_description", metadata.measure_description),
         )
         model.update({key: value for key, value in optional_values if value is not None})
+        # The flag marks a standby estimate. An explicit false carries no meaning
+        # and would end up in every newly contributed profile.
+        if model.get("standby_power_estimated") is not True:
+            model.pop("standby_power_estimated", None)
         derived_mains_voltage = mains_voltage_from_range(model.get("voltage_range"))
         if derived_mains_voltage is not None:
             model["mains_voltage"] = derived_mains_voltage
@@ -236,19 +249,10 @@ class ProfilePreparer:
             if in_library or relative_path.as_posix().casefold() in indexed_paths:
                 raise ProfilePreparationError(f"Refusing to overwrite existing profile path: {relative_path}")
 
-    def _collect_duplicate_warnings(
-        self,
-        model: dict[str, Any],
-        manufacturer_directory: str,
-        model_directory: str,
-    ) -> list[str]:
-        requested_name = self._normalize(str(model.get("name", "")))
-        if not requested_name:
-            return []
+    def _collect_duplicate_warnings(self, model: dict[str, Any]) -> list[str]:
+        requested_name = self._normalize(str(model["name"]))
         warnings: list[str] = []
         for model_path in self.library_root.glob("*/*/model.json"):
-            if model_path.parent.parent.name == manufacturer_directory and model_path.parent.name == model_directory:
-                continue
             try:
                 existing = self._read_object(model_path)
             except OSError, ValueError:
@@ -257,8 +261,6 @@ class ProfilePreparer:
                 relative = model_path.relative_to(self.library_root)
                 warnings.append(f"Possible duplicate profile: profile_library/{relative}")
         for directory, existing in self._models_in_index():
-            if directory == manufacturer_directory and existing.get("id") == model_directory:
-                continue
             if requested_name in self._known_names(existing, "name"):
                 path = f"{directory}/{existing.get('id')}/model.json"
                 warnings.append(f"Possible duplicate profile: profile_library/{path}")

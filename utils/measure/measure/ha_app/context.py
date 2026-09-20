@@ -13,10 +13,12 @@ from measure.ha_app.library_catalog import (
     LibraryCatalogError,
     ManufacturerCatalog,
     MeasureDeviceCatalog,
+    StandbyCatalog,
 )
 from measure.ha_app.light_probe import LightLoadProbe, create_app_measurement_assembler
 from measure.ha_app.service import MeasurementService
 from measure.ha_app.session import SessionSnapshot
+from measure.ha_app.standby import StandbyMeasurement
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
 from measure.home_assistant.client import HomeAssistantManager
 from measure.home_assistant.entities import EntityDescriptor, HomeAssistantEntityCatalog
@@ -44,10 +46,18 @@ class AppContext:
         self.developer_mode = developer_mode
         self.storage = SessionStorage(data_root)
         self.measure_device_catalog = MeasureDeviceCatalog()
+        self.standby_catalog = StandbyCatalog()
         self.manufacturer_catalog = ManufacturerCatalog()
         self.device_specification_catalog = DeviceSpecificationCatalog()
         self.power_meter_diagnostics = PowerMeterDiagnostics(self.create_power_meter)
         self.light_load_probe = LightLoadProbe(
+            lambda: create_app_measurement_assembler(
+                home_assistant=self.home_assistant,
+                shelly_password=self.get_shelly_password(),
+                kasa_credentials=self.get_tapo_credentials(),
+            ),
+        )
+        self.standby_measurement = StandbyMeasurement(
             lambda: create_app_measurement_assembler(
                 home_assistant=self.home_assistant,
                 shelly_password=self.get_shelly_password(),

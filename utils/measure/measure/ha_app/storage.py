@@ -406,7 +406,7 @@ class SessionStorage:
             raise ValueError("Path escapes session output directory")
         if relative_name not in self.list_files(session_id):
             raise FileNotFoundError(relative_name)
-        if not path.is_file() or path.is_symlink():
+        if not path.is_file() or path.is_symlink():  # pragma: no cover - file changes after list_files validated it
             raise FileNotFoundError(relative_name)
         return path
 

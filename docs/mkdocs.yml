@@ -165,7 +165,12 @@ nav:
       - 'Commit messages': 'contributing/commits.md'
       - 'Measure':
           - 'contributing/measure/index.md'
-          - 'Home Assistant app': 'contributing/measure/home-assistant-app.md'
+          - 'Home Assistant app':
+              - 'contributing/measure/home-assistant-app.md'
+              - 'App settings': 'contributing/measure/home-assistant-app/settings.md'
+              - 'Results and sessions': 'contributing/measure/home-assistant-app/sessions.md'
+              - 'Measurement automations': 'contributing/measure/home-assistant-app/automations.md'
+              - 'Troubleshooting': 'contributing/measure/home-assistant-app/troubleshooting.md'
           - 'CLI (Docker / Python)': 'contributing/measure/setup.md'
           - 'contributing/measure/lights.md'
           - 'Measuring low-power devices': 'contributing/measure/low-power-measurements.md'

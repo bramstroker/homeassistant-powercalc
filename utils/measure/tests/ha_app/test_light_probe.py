@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from measure.assembler import MeasurementAssembler
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightInfo
+from measure.controller.light.errors import LightControllerError
 from measure.controller.light.spec import HassLightControllerSpec
 from measure.ha_app.light_probe import (
     LIGHT_LOAD_PROBE_CACHE_SECONDS,
@@ -26,6 +27,7 @@ from measure.runner.light.plan import (
     low_load_probe_variations,
 )
 from measure.tuning import MeasurementParameters
+from measure.utils.sampling import DummyLoadMeasurementError
 import pytest
 
 
@@ -37,7 +39,7 @@ class FakeLightController:
         self.events = events
 
     def change_light_state(self, lut_mode: LutMode, on: bool = True, **kwargs: object) -> None:
-        if not on and self.fail_cleanup:
+        if not on and self.fail_cleanup and any(not change[1] for change in self.changes):
             raise RuntimeError("turn-off failed")
         change = (lut_mode, on, kwargs)
         self.changes.append(change)
@@ -125,7 +127,7 @@ def test_low_load_probe_variations_cover_static_mode_extremes_and_dedupe_hues() 
 
 def test_active_probe_checks_rgb_primaries_and_caches_an_exact_request() -> None:
     controller = FakeLightController()
-    meter = FakePowerMeter([1.2, 0.9, 1.1])
+    meter = FakePowerMeter([1.2, 0.9, 1.1, 0.3])
     assembler = FakeAssembler(controller, meter)
     probe = LightLoadProbe(lambda: assembler, wait=lambda _: None, now=lambda: 10)
 
@@ -140,7 +142,8 @@ def test_active_probe_checks_rgb_primaries_and_caches_an_exact_request() -> None
         "Color 120° / 100% saturation · brightness 1",
         "Color 240° / 100% saturation · brightness 1",
     ]
-    assert meter.calls == 3
+    assert meter.calls == 4
+    assert result.standby.power_w == 0.3
     hues = [change[2]["hue"] for change in controller.changes if change[0] == LutMode.HS and change[2]["bri"] == 1]
     assert hues == [1, 21849, 43697]
     assert controller.changes[-1] == (LutMode.BRIGHTNESS, False, {})
@@ -149,7 +152,7 @@ def test_active_probe_checks_rgb_primaries_and_caches_an_exact_request() -> None
 
 def test_active_probe_refreshes_when_its_cached_result_expires() -> None:
     controller = FakeLightController()
-    meter = FakePowerMeter([1.2, 1.5])
+    meter = FakePowerMeter([1.2, 0.3, 1.5, 0.4])
     assembler = FakeAssembler(controller, meter)
     now = 0.0
     probe = LightLoadProbe(lambda: assembler, wait=lambda _: None, monotonic=lambda: now, now=lambda: 10)
@@ -158,12 +161,63 @@ def test_active_probe_refreshes_when_its_cached_result_expires() -> None:
     first = probe.evaluate(measurement)
     now = LIGHT_LOAD_PROBE_CACHE_SECONDS - 1
     assert probe.evaluate(measurement) is first
-    assert meter.calls == 1
+    assert meter.calls == 2
 
     now = LIGHT_LOAD_PROBE_CACHE_SECONDS
     refreshed = probe.evaluate(measurement)
     assert refreshed.minimum_aggregate_power_w == 1.5
-    assert meter.calls == 2
+    assert meter.calls == 4
+
+
+def test_recheck_bypasses_cache_and_failed_recheck_invalidates_previous_result() -> None:
+    controller = FakeLightController()
+    meter = FakePowerMeter([1.2, 0.3, 1.5, 0.4])
+    probe = LightLoadProbe(lambda: FakeAssembler(controller, meter), wait=lambda _: None, now=lambda: 10)
+    measurement = request(modes={LutMode.BRIGHTNESS})
+    first = probe.evaluate(measurement)
+    refreshed = probe.evaluate(measurement, refresh=True)
+    assert first.standby.power_w == 0.3
+    assert refreshed.standby.power_w == 0.4
+    assert probe.evaluate(measurement) is refreshed
+    with pytest.raises(LightLoadProbeError):
+        probe.evaluate(measurement, refresh=True)
+    with pytest.raises(LightLoadProbeError):
+        probe.evaluate(measurement)
+    assert meter.calls == 6
+
+
+@pytest.mark.parametrize("standby", [0, 0.04, 0.6])
+def test_standby_probe_is_nonblocking_and_reports_per_light(standby: float) -> None:
+    controller = FakeLightController()
+    meter = FakePowerMeter([1.2, standby, standby])
+    probe = LightLoadProbe(lambda: FakeAssembler(controller, meter), wait=lambda _: None, now=lambda: 10)
+    measurement = request(modes={LutMode.BRIGHTNESS}, parameters=MeasurementParameters(max_retries=1)).model_copy(
+        update={"multiple_light_count": 2}
+    )
+    result = probe.evaluate(measurement)
+    assert result.checked_variations == 1
+    assert result.standby.status == ("measured" if standby == 0.6 else "unavailable")
+    assert result.standby.power_w == (0.3 if standby == 0.6 else None)
+    assert controller.closed
+
+
+@pytest.mark.parametrize(
+    "error",
+    [DummyLoadMeasurementError("non-positive target power"), LightControllerError("turn-off failed")],
+)
+def test_standby_failure_never_blocks_the_session(error: Exception) -> None:
+    controller = FakeLightController()
+    meter = FakePowerMeter([1.2])
+    probe = LightLoadProbe(lambda: FakeAssembler(controller, meter), wait=lambda _: None, now=lambda: 10)
+    measurement = request(modes={LutMode.BRIGHTNESS}, parameters=MeasurementParameters(max_retries=1))
+
+    with patch("measure.ha_app.light_probe.measure_light_standby", side_effect=error):
+        result = probe.evaluate(measurement)
+
+    assert result.checked_variations == 1
+    assert result.standby.status == "unavailable"
+    assert result.standby.power_w is None
+    assert controller.closed
 
 
 @pytest.mark.parametrize(
@@ -197,7 +251,7 @@ def test_active_probe_stabilizes_full_load_before_checking_low_load(
 ) -> None:
     events: list[tuple[str, object]] = []
     controller = FakeLightController(events=events)
-    meter = FakePowerMeter(powers)
+    meter = FakePowerMeter([*powers, 0.3])
     waits: list[float] = []
     parameters = MeasurementParameters(sleep_time=2, sleep_initial=10)
 
@@ -244,7 +298,7 @@ def test_active_probe_rejects_repeated_zero_on_saturated_green_and_cleans_up() -
 
 def test_active_probe_uses_configured_sample_count_and_request_key() -> None:
     controller = FakeLightController()
-    meter = FakePowerMeter([1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7])
+    meter = FakePowerMeter([1, 2, 2, 3, 3, 4, 0.2, 0.4, 4, 5, 5, 6, 6, 7, 0.3, 0.5])
     assembler = FakeAssembler(controller, meter)
     probe = LightLoadProbe(lambda: assembler, wait=lambda _: None, now=lambda: 10)
     parameters = replace(MeasurementParameters(), sleep_time=0, sample_count=2, sleep_time_sample=0)
@@ -254,7 +308,7 @@ def test_active_probe_uses_configured_sample_count_and_request_key() -> None:
 
     assert first.minimum_aggregate_power_w == 1.5
     assert second.minimum_aggregate_power_w == 4.5
-    assert meter.calls == 12
+    assert meter.calls == 16
 
 
 def test_active_probe_handles_effect_only_plan_and_formats_static_variations() -> None:
@@ -283,7 +337,7 @@ def test_active_probe_wraps_controller_errors_and_cleanup_errors_do_not_mask_suc
     assert error.value.help_url is None
 
     controller = FakeLightController(fail_cleanup=True)
-    meter = FakePowerMeter([1.2, 0.9, 1.1])
+    meter = FakePowerMeter([1.2, 0.9, 1.1, 0.3])
     result = LightLoadProbe(
         lambda: FakeAssembler(controller, meter),
         wait=lambda _: None,

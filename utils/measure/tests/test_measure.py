@@ -5,10 +5,12 @@ import json
 import logging
 import os
 import sys
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import inquirer
 from inquirer import events
+from inquirer.questions import Question
 from inquirer.render import ConsoleRender
 from measure.cli.const import (
     QUESTION_CHARGING_DEVICE_TYPE,
@@ -147,6 +149,29 @@ def test_interrupted_light_prints_recovery(
     assert f"Any saved output is kept in {PROJECT_DIR / 'export/LCT010'}" in caplog.text
     assert "RESUME=true MODEL_ID=LCT010 uv run --extra cli python -m measure.measure" in caplog.text
     assert "same device and settings" in caplog.text
+    assert "Files exported to" not in caplog.text
+    assert "powercalc-profile prepare" not in caplog.text
+
+
+def test_failed_average_does_not_print_light_recovery_instructions(
+    mock_config_factory: MockConfigFactory,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    measure = _create_measure_instance(
+        config=mock_config_factory(
+            question_defaults={QUESTION_SELECTED_MEASURE_TYPE: MeasureType.AVERAGE, QUESTION_DURATION: 30},
+        ),
+    )
+
+    with (
+        patch("measure.cli.main.MeasurementExecution.run", side_effect=RuntimeError("Meter disconnected")),
+        pytest.raises(RuntimeError, match="Meter disconnected"),
+    ):
+        measure.start()
+
+    assert "Measurement stopped." in caplog.text
+    assert "To resume" not in caplog.text
+    assert "RESUME=true" not in caplog.text
     assert "Files exported to" not in caplog.text
     assert "powercalc-profile prepare" not in caplog.text
 
@@ -431,3 +456,26 @@ def test_ask_questions_with_mode_converts_to_lut_mode_set(mock_config_factory: M
         answers = measure.ask_questions(questions)
 
     assert answers[QUESTION_MODE] == {LutMode.HS}
+
+
+@pytest.mark.parametrize("mode", [LutMode.HS, LutMode.BRIGHTNESS, LutMode.COLOR_TEMP])
+def test_environment_mode_is_normalized_before_prompt_callbacks(
+    mock_config_factory: MockConfigFactory, mode: LutMode
+) -> None:
+    environment = mock_config_factory(config_values={QUESTION_MODE: mode.value}, set_question_defaults=False)
+    measure = _create_measure_instance(config=environment)
+    mode_question = inquirer.List(QUESTION_MODE, choices=[mode])
+    model_question = inquirer.Text(QUESTION_MODEL_ID, default=lambda answers: next(iter(answers[QUESTION_MODE])).value)
+    questions = [mode_question, model_question]
+
+    def prompt(remaining: list[Question], *, answers: dict[str, Any], render: ConsoleRender) -> dict[str, Any]:
+        assert remaining == [model_question]
+        assert answers[QUESTION_MODE] == {mode}
+        model_question.answers = answers
+        return answers | {QUESTION_MODEL_ID: model_question.default}
+
+    with patch("inquirer.prompt", side_effect=prompt):
+        answers = measure.ask_questions(questions)
+
+    assert answers == {QUESTION_MODE: {mode}, QUESTION_MODEL_ID: mode.value}
+    assert questions == [mode_question, model_question]

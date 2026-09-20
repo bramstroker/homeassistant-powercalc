@@ -27,6 +27,8 @@ import type {
   SessionSnapshot,
   SessionSummary,
   ShellyDiscoveryResponse,
+  StandbyEstimate,
+  StandbyMeasurementResult,
 } from "./types";
 
 export type Decoder<T> = (value: unknown) => T;
@@ -281,6 +283,7 @@ const isContributionFile = objectOf({
 });
 const isPrimitiveRecord = recordOf(isPrimitive);
 const isContributionPreview: Guard<ContributionPreview> = objectOf({
+  standby_power: optionalNullable(isNumber), standby_power_estimated: optional(isBoolean),
   eligible: isBoolean,
   reason: optionalNullable(isString),
   repository: isString,
@@ -343,6 +346,7 @@ const isPreflight: Guard<PreflightResponse> = objectOf({
   battery_level_attribute: optionalNullable(isString),
   light_load_probe: optionalNullable(objectOf({
     checked_variations: isNumber, minimum_aggregate_power_w: isNumber,
+    standby: optional(objectOf({ status: oneOf("measured", "unavailable", "skipped"), power_w: nullable(isNumber) })),
     points: arrayOf(objectOf({ label: isString, mode: oneOf("brightness", "color_temp", "hs", "effect"), power_w: isNumber })),
   })),
 });
@@ -434,6 +438,12 @@ export const decodeSessionSummaries = decoder("session list", arrayOf(isSessionS
 export const decodeSessionFiles: Decoder<SessionFile[]> = decoder("session files", arrayOf(objectOf({ name: isString, size: isNumber, media_type: isString })));
 export const decodePlots = decoder("plots", isPlotCollection);
 export const decodeContributionPreview = decoder("contribution preview", isContributionPreview);
+export const decodeStandbyEstimate: Decoder<StandbyEstimate> = decoder("standby estimate", objectOf({
+  power_w: isNumber, basis: oneOf("manufacturer", "connectivity", "fallback"), profile_count: isNumber,
+}));
+export const decodeStandbyMeasurement: Decoder<StandbyMeasurementResult> = decoder("standby measurement", objectOf({
+  status: oneOf("measured", "unavailable", "skipped"), power_w: nullable(isNumber),
+}));
 export const decodeContributionResult = decoder("contribution result", isContributionResult);
 
 export function decodeApiError(value: unknown): Partial<ApiErrorBody> & { detail?: unknown } {

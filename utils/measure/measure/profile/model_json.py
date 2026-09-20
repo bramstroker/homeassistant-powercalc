@@ -44,7 +44,7 @@ def write_model_json(
         "created_at": created_at,
         "measure_device": measure_device,
         "measure_method": "script",
-        "measure_description": "Measured with utils/measure script",
+        "measure_description": "Measured with Powercalc Measure",
         "measure_settings": {
             "VERSION": measure_version(),
             "SAMPLE_COUNT": parameters.sample_count,

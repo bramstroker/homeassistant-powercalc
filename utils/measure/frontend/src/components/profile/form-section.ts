@@ -69,10 +69,12 @@ export abstract class ProfileFormSection extends LitElement {
       </label>`;
   }
 
-  protected renderTextarea(name: "measure_description" | "notes", label: string, fallback: unknown) {
+  protected renderTextarea(name: "measure_description" | "notes", label: string, fallback: unknown, hint = "") {
     const error = this.fieldError(name);
     const labelId = `${name}-label`;
+    const hintId = `${name}-hint`;
     const errorId = `${name}-error`;
+    const describedBy = [hint ? hintId : "", error ? errorId : ""].filter(Boolean).join(" ");
     return html`<label class="notes-field">
       <span id=${labelId}>${label}</span>
       <textarea
@@ -80,8 +82,9 @@ export abstract class ProfileFormSection extends LitElement {
         .value=${this.fieldValue(name, fallback)}
         aria-labelledby=${labelId}
         aria-invalid=${error ? "true" : "false"}
-        aria-describedby=${error ? errorId : nothing}
+        aria-describedby=${describedBy || nothing}
       ></textarea>
+      ${hint ? html`<small id=${hintId} class="field-hint">${hint}</small>` : nothing}
       ${this.renderFieldError(name)}
     </label>`;
   }

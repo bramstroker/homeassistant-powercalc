@@ -295,7 +295,7 @@ def _is_number(value: object) -> TypeGuard[int | float]:
         return False
     try:
         return math.isfinite(value)
-    except OverflowError:
+    except OverflowError:  # pragma: no cover - integers beyond float range are not realistic meter readings
         return False
 
 

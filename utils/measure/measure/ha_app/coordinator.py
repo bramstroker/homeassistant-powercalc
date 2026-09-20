@@ -1,4 +1,5 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, replace
 import logging
 from pathlib import Path
@@ -26,6 +27,7 @@ from measure.utils.clock import utc_now
 
 _LOGGER = logging.getLogger("measure")
 _SNAPSHOT_PERSIST_INTERVAL = 5.0
+_DEVICE_CHECK_ACTIVE = "A device check is already active"
 _ANALYSIS_WARNING_PREFIXES = (
     "Profile was not created:",
     "Profile model was not created:",
@@ -73,12 +75,26 @@ class MeasurementCoordinator:
         self._control: SessionControl | None = None
         self._worker: Thread | None = None
         self._analysing: set[str] = set()
+        self._probing = False
         self._listeners: list[Callable[[], None]] = []
 
     @property
     def current(self) -> SessionSnapshot | None:
         with self._lock:
             return self._snapshot
+
+    @contextmanager
+    def reserve_devices(self) -> Iterator[None]:
+        """Keep short hardware checks exclusive with measurement sessions and other checks."""
+        with self._lock:
+            if self._probing or (self._snapshot and self._snapshot.state in ACTIVE_SESSION_STATES):
+                raise SessionConflictError("A measurement or device check is already active")
+            self._probing = True
+        try:
+            yield
+        finally:
+            with self._lock:
+                self._probing = False
 
     def subscribe(self, listener: Callable[[], None]) -> Callable[[], None]:
         """Notify a listener whenever the externally visible session state changes."""
@@ -126,6 +142,8 @@ class MeasurementCoordinator:
         """Persist and launch a new session, rejecting overlapping work."""
 
         with self._lock:
+            if self._probing:
+                raise SessionConflictError(_DEVICE_CHECK_ACTIVE)
             if self._snapshot and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if self._analysing:
@@ -152,6 +170,8 @@ class MeasurementCoordinator:
         """Relaunch a retained session from compatible persisted output."""
 
         with self._lock:
+            if self._probing:
+                raise SessionConflictError(_DEVICE_CHECK_ACTIVE)
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if self._analysing:
@@ -178,6 +198,8 @@ class MeasurementCoordinator:
     def record_more(self, session_id: str) -> SessionSnapshot:
         """Capture another run with the session's original recorder settings."""
         with self._lock:
+            if self._probing:
+                raise SessionConflictError(_DEVICE_CHECK_ACTIVE)
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if self._analysing:
@@ -199,7 +221,6 @@ class MeasurementCoordinator:
                 estimated_remaining=None,
                 operating_point=None,
                 entity_states={},
-                summary=None,
                 warnings=(),
             )
             self._events = self.storage.load_events(session_id)
@@ -238,8 +259,8 @@ class MeasurementCoordinator:
                 )
                 self._snapshot = snapshot
                 self.storage.write_snapshot(snapshot)
-            if self._control is not None:
-                self._control.cancel()
+            assert self._control is not None
+            self._control.cancel()
         self._notify_listeners()
         return snapshot
 
@@ -250,8 +271,7 @@ class MeasurementCoordinator:
             snapshot = self._require_active(session_id)
             if snapshot.state != SessionState.AWAITING_CONFIRMATION:
                 raise SessionConflictError("The requested session is not waiting for confirmation")
-            if self._control is None:
-                raise SessionConflictError("The requested session cannot be continued")
+            assert self._control is not None
             running: SessionSnapshot = replace(
                 snapshot,
                 state=SessionState.RUNNING,
@@ -269,6 +289,8 @@ class MeasurementCoordinator:
     def delete(self, session_id: str) -> None:
         """Delete a terminal retained session."""
         with self._lock:
+            if self._probing:
+                raise SessionConflictError("A session cannot be deleted during a device check")
             try:
                 snapshot = self._snapshot_locked(session_id)
             except SESSION_LOAD_ERRORS as error:
@@ -298,8 +320,7 @@ class MeasurementCoordinator:
             if snapshot.state in ACTIVE_SESSION_STATES or not self.storage.can_analyse(session_id):
                 raise SessionConflictError("The requested session has no recording that can be analysed")
             request = self.storage.load_request(session_id)
-            if not isinstance(request, RecorderMeasurementRequest):  # pragma: no cover - guarded by can_analyse
-                raise SessionConflictError("The requested session is not a recorder session")
+            assert isinstance(request, RecorderMeasurementRequest)
             self._analysing.add(session_id)
 
         try:
@@ -395,8 +416,7 @@ class MeasurementCoordinator:
         """Update the live session and persist events according to their frequency and importance."""
 
         with self._lock:
-            if self._snapshot is None:
-                return
+            assert self._snapshot is not None
             self._events.append(event)
             if len(self._events) > 1000:
                 self._events = self._events[-1000:]
@@ -431,17 +451,11 @@ class MeasurementCoordinator:
         """Persist the terminal snapshot and its final state event."""
 
         with self._lock:
-            if self._snapshot is None:
-                return
+            assert self._snapshot is not None
+            assert self._control is not None
             files = tuple(self.storage.list_files(self._snapshot.id))
             updated_at = utc_now()
-            sequence = (
-                max(
-                    self._snapshot.event_sequence,
-                    self._control.sequence if self._control is not None else 0,
-                )
-                + 1
-            )
+            sequence = max(self._snapshot.event_sequence, self._control.sequence) + 1
             self._snapshot = replace(
                 self._snapshot,
                 state=state,
@@ -449,7 +463,7 @@ class MeasurementCoordinator:
                     SessionState.CANCELLED: "Measurement cancelled",
                     SessionState.COMPLETED: "Measurement completed",
                     SessionState.FAILED: "Measurement failed",
-                }.get(state, self._snapshot.phase),
+                }[state],
                 confirmation_message=None,
                 confirmation_action=None,
                 updated_at=updated_at,

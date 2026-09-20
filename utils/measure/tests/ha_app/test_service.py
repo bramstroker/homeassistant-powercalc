@@ -19,8 +19,8 @@ from measure.ha_app.storage import SessionStorage
 from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.dummy import DummyPowerMeter
-from measure.powermeter.spec import HassPowerMeterSpec
-from measure.request import DummyLoadCalibrationRequest, LightMeasurementRequest
+from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec
+from measure.request import AverageMeasurementRequest, DummyLoadCalibrationRequest, LightMeasurementRequest
 from measure.runner.runner import RunnerResult
 from measure.tuning import MeasurementParameters
 import pytest
@@ -246,3 +246,86 @@ def test_session_dummy_load_store_persists_for_resume_and_future_sessions(tmp_pa
 
     assert store.load(request) == calibration
     assert storage.load_dummy_load_calibration() == calibration
+
+
+def test_session_calibration_is_only_reused_for_the_same_meter(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    request = AverageMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        dummy_load=DummyLoadCalibrationRequest(description="Calibration bulb"),
+    )
+    now = utc_now()
+    storage.create(
+        SessionSnapshot(id="calibration", state=SessionState.RUNNING, created_at=now, updated_at=now),
+        request,
+    )
+    store = SessionDummyLoadCalibrationStore(storage, "calibration")
+
+    assert store.load(request) is None
+    calibration = store.save(request, 1322.5)
+    other_request = request.model_copy(update={"power_meter": HassPowerMeterSpec(entity_id="sensor.other_power")})
+
+    assert store.load(other_request) is None
+    assert store.load(request) == calibration
+    assert storage.load_dummy_load_calibration() == calibration
+
+
+def test_session_calibration_requires_dummy_load_configuration(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    store = SessionDummyLoadCalibrationStore(storage, "calibration")
+    request = AverageMeasurementRequest(power_meter=DummyPowerMeterSpec())
+
+    with pytest.raises(ValueError, match="without dummy-load configuration"):
+        store.save(request, 1322.5)
+
+    assert storage.load_dummy_load_calibration() is None
+
+
+def test_service_preserves_non_secret_failure_and_removes_session_logging(tmp_path: Path) -> None:
+    service = MeasurementService(HomeAssistantManager("ws://supervisor/core/websocket", "secret-token"))
+    control = SessionControl()
+    events: list[SessionEvent] = []
+    control.subscribe(events.append)
+    logger = logging.getLogger("measure")
+    previous_handlers = list(logger.handlers)
+    failure = OSError("Meter disconnected")
+
+    with (
+        patch.object(service, "_run", side_effect=failure),
+        pytest.raises(OSError, match="Meter disconnected") as error,
+    ):
+        service.run(
+            AverageMeasurementRequest(power_meter=DummyPowerMeterSpec()),
+            control,
+            SessionExecutionContext(session_id="failed", artifact_directory=tmp_path),
+        )
+
+    assert error.value is failure
+    assert logger.handlers == previous_handlers
+    logger.warning("Unrelated log after measurement")
+    assert events == []
+
+
+def test_service_warns_when_using_synthetic_measurements(tmp_path: Path) -> None:
+    service = MeasurementService(HomeAssistantManager("ws://supervisor/core/websocket", "token"))
+    control = SessionControl()
+    events: list[SessionEvent] = []
+    control.subscribe(events.append)
+    result = RunnerResult(model_json_data={})
+
+    with (
+        patch("measure.ha_app.service.MeasurementAssembler"),
+        patch("measure.ha_app.service.MeasurementExecution") as execution,
+    ):
+        execution.return_value.run.return_value = result
+        actual = service.run(
+            AverageMeasurementRequest(power_meter=DummyPowerMeterSpec()),
+            control,
+            SessionExecutionContext(session_id="synthetic", artifact_directory=tmp_path),
+        )
+
+    assert actual is result
+    assert [event.data["message"] for event in events if event.type == SessionEventType.WARNING] == [
+        "Using synthetic test meter — reported power values are not real measurements",
+    ]
+    assert [event.data for event in events if event.type == SessionEventType.STATE] == [{"state": "running"}]

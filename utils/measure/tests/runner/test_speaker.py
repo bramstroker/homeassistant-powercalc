@@ -2,12 +2,57 @@ from unittest.mock import MagicMock, call
 
 from measure.controller.media.controller import MediaController
 from measure.controller.media.spec import DummyMediaControllerSpec
+from measure.powermeter.errors import ZeroReadingError
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import SpeakerMeasurementRequest
 from measure.runner.interaction import RunInteraction
 from measure.runner.speaker import SpeakerRunner
 from measure.tuning import MeasurementParameters
 from measure.utils.sampling import MeasurementResult, PowerSampler
+import pytest
+
+
+@pytest.mark.parametrize("fast_test_mode", [False, True])
+def test_zero_standby_reading_is_preserved(fast_test_mode: bool) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.side_effect = ZeroReadingError
+    controller = MagicMock(spec=MediaController)
+    interaction = MagicMock(spec=RunInteraction)
+    runner = SpeakerRunner(
+        sampler, MeasurementParameters(fast_test_mode=fast_test_mode, sleep_standby=30), controller, interaction
+    )
+
+    assert runner.measure_standby_power() == MeasurementResult(power=0, voltages=[])
+    controller.turn_off.assert_called_once_with()
+    interaction.operating_point.assert_called_once_with({"type": "speaker", "volume": 0, "muted": True})
+    sampler.take_measurement.assert_called_once()
+    if fast_test_mode:
+        interaction.wait.assert_not_called()
+    else:
+        interaction.wait.assert_called_once_with(30)
+
+
+def test_disabled_streaming_leaves_existing_audio_untouched() -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=10.5, voltages=[230.0])
+    controller = MagicMock(spec=MediaController)
+    runner = SpeakerRunner(sampler, MeasurementParameters(fast_test_mode=True), controller)
+    request = SpeakerMeasurementRequest(
+        model_id="measurement",
+        product_name="Measurement",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyMediaControllerSpec(),
+        disable_streaming=True,
+        fast_test_mode=True,
+    )
+
+    result = runner.run(request, "")
+
+    controller.play_audio.assert_not_called()
+    controller.mute_volume.assert_called_once_with()
+    assert controller.set_volume.call_args_list == [call(10), call(100), call(10)]
+    assert result.voltages == [230.0, 230.0, 230.0]
+    assert result.model_json_data["linear_config"]["calibrate"] == ["10 -> 10.5", "100 -> 10.5", "0 -> 10.5"]
 
 
 def _run(media_controller: MagicMock) -> dict:

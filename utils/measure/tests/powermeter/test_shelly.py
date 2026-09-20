@@ -12,6 +12,75 @@ DEFAULT_SHELLY_IP = "192.168.1.200"
 SHELLY_ENDPOINT = f"http://{DEFAULT_SHELLY_IP}/shelly"
 
 
+@pytest.mark.parametrize("info", [[], {"gen": True}, {"gen": None}, {"gen": "invalid"}, {"gen": 0}])
+def test_invalid_device_information_is_rejected(
+    mock_requests_get_factory: MockRequestsGetFactory,
+    info: object,
+) -> None:
+    mock_requests_get_factory({SHELLY_ENDPOINT: (info, 200)})
+
+    with pytest.raises(ApiConnectionError, match="invalid"):
+        ShellyPowerMeter(DEFAULT_SHELLY_IP)
+
+
+def test_invalid_json_is_reported_as_connection_error() -> None:
+    response = MagicMock(status_code=200)
+    response.json.side_effect = ValueError("Invalid JSON")
+
+    with patch("requests.get", return_value=response), pytest.raises(ApiConnectionError, match="response was invalid"):
+        ShellyPowerMeter(DEFAULT_SHELLY_IP)
+
+
+@pytest.mark.parametrize(
+    "reading,message",
+    [
+        ([], "response was invalid"),
+        ({"meters": []}, "valid power value"),
+        ({"meters": [{"power": True}]}, "valid power value"),
+        ({"meters": [{"power": 1}]}, "valid timestamp"),
+        ({"meters": [{"power": 1, "timestamp": "invalid"}]}, "valid timestamp"),
+    ],
+)
+def test_gen1_rejects_malformed_reading_after_successful_probe(reading: object, message: str) -> None:
+    responses = [
+        MagicMock(status_code=200, json=lambda: {"gen": 1}),
+        MagicMock(status_code=200, json=lambda: {"meters": [{"power": 1, "timestamp": 1234}]}),
+        MagicMock(status_code=200, json=lambda: reading),
+    ]
+    with patch("requests.get", side_effect=responses):
+        meter = ShellyPowerMeter(DEFAULT_SHELLY_IP)
+        with pytest.raises(ApiConnectionError, match=message):
+            meter.get_power()
+
+
+@pytest.mark.parametrize(
+    "reading,include_voltage,message",
+    [
+        ([], False, "valid power value"),
+        ({"apower": None}, False, "valid power value"),
+        ({"apower": float("nan")}, False, "valid power value"),
+        ({"apower": True}, False, "valid power value"),
+        ({"apower": 1}, True, "valid voltage value"),
+        ({"apower": 1, "voltage": "230"}, True, "valid voltage value"),
+        ({"apower": 1, "voltage": float("inf")}, True, "valid voltage value"),
+    ],
+)
+def test_rpc_rejects_malformed_reading_after_successful_probe(
+    reading: object,
+    include_voltage: bool,
+    message: str,
+) -> None:
+    responses = [
+        MagicMock(status_code=200, json=lambda: {"gen": 3}),
+        MagicMock(status_code=200, json=lambda: {"switch:0": {"apower": 1, "voltage": 230}}),
+        MagicMock(status_code=200, json=lambda: reading),
+    ]
+    with patch("requests.get", side_effect=responses):
+        meter = ShellyPowerMeter(DEFAULT_SHELLY_IP)
+        with pytest.raises(ApiConnectionError, match=message):
+            meter.get_power(include_voltage=include_voltage)
+
+
 def test_api_gen1(mock_requests_get_factory: MockRequestsGetFactory) -> None:
     status_response = {
         "meters": [
@@ -164,6 +233,30 @@ def test_api_gen2_unavailable(mock_requests_get_factory: MockRequestsGetFactory)
 
     with pytest.raises(ApiConnectionError, match="No supported power measurement component"):
         ShellyPowerMeter(DEFAULT_SHELLY_IP)
+
+
+@pytest.mark.parametrize("component_key", ["unknown:0", "meter:0", "switch:not-a-number", "switch"])
+@pytest.mark.parametrize("has_supported_component", [False, True])
+def test_rpc_ignores_unsupported_components(
+    mock_requests_get_factory: MockRequestsGetFactory, component_key: str, has_supported_component: bool
+) -> None:
+    status = {component_key: {"apower": 2.0}}
+    if has_supported_component:
+        status["switch:1"] = {"apower": 3.0}
+    mock_requests_get_factory(
+        {
+            SHELLY_ENDPOINT: ({"gen": 3}, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Shelly.GetStatus": (status, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Switch.GetStatus?id=1": ({"apower": 3.0}, 200),
+        }
+    )
+
+    if has_supported_component:
+        meter = ShellyPowerMeter(DEFAULT_SHELLY_IP)
+        assert meter.get_power().power == 3.0
+    else:
+        with pytest.raises(ApiConnectionError, match="No supported power measurement component"):
+            ShellyPowerMeter(DEFAULT_SHELLY_IP)
 
 
 def test_multiple_power_components_are_rejected(mock_requests_get_factory: MockRequestsGetFactory) -> None:

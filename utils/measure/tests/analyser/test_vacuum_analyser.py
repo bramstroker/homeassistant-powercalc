@@ -82,6 +82,118 @@ def test_session_analysis_uses_archived_vacuum_run_for_fitting(tmp_path: Path) -
     assert json.loads((tmp_path / "model.json").read_text())["calculation_strategy"] == "composite"
 
 
+def test_value_seen_only_in_the_held_out_run_is_not_unexplained(tmp_path: Path) -> None:
+    """Signals are discovered over every sample, so an alias the held-out run alone uses resolves.
+
+    The split already accepted this recording because it saw both runs. Rediscovering signals
+    from the training half would leave that run's away samples matching no known activity, and
+    reject the profile asking for a cycle the user had in fact recorded.
+    """
+
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id=PRIMARY,
+        battery_entity_id=BATTERY,
+        additional_entity_ids=(STATE, DRYING, "switch.auto_drying"),
+    )
+    write_recording(tmp_path / "record.jsonl", cycle())
+    # The same activity, reported under a second alias the first run never used.
+    aliased = [
+        replace(item, entities={**item.entities, STATE: RecordedEntityState("sweeping", {})})
+        if item.entities[STATE].state == "cleaning"
+        else item
+        for item in cycle()
+    ]
+    write_recording(tmp_path / "record-1.jsonl", aliased)
+
+    summary = RecorderAnalysisExecution().run(request, tmp_path)
+
+    assert summary["Recording analysis"] == "Composite vacuum profile created"
+    assert "away" in summary["Recorded activities"]
+
+
+def test_summary_activities_exclude_the_unexplained_bucket(tmp_path: Path) -> None:
+    """Tolerated unexplained samples are not a mode the profile covers.
+
+    The analyser accepts a recording with a small share of them, so the summary must not
+    list "unexplained" beside the activities it does cover.
+    """
+
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id=PRIMARY,
+        battery_entity_id=BATTERY,
+        additional_entity_ids=(STATE, DRYING, "switch.auto_drying"),
+    )
+
+    def with_unknown_status(items: list[RecordingSample]) -> list[RecordingSample]:
+        # A status no alias table recognises, under the tolerated 10% share.
+        extra = [
+            replace(
+                sample("cleaning", 12.0, len(items) + index),
+                entities={
+                    **sample("cleaning", 12.0).entities,
+                    STATE: RecordedEntityState("error_dustbin_full", {}),
+                },
+            )
+            for index in range(6)
+        ]
+        return [replace(item, elapsed_seconds=float(index)) for index, item in enumerate(items + extra)]
+
+    write_recording(tmp_path / "record.jsonl", with_unknown_status(cycle()))
+    write_recording(tmp_path / "record-1.jsonl", with_unknown_status(cycle()))
+
+    summary = RecorderAnalysisExecution().run(request, tmp_path)
+
+    assert summary["Recording analysis"] == "Composite vacuum profile created"
+    assert "unexplained" not in summary["Recorded activities"]
+    assert "washing" in summary["Recorded activities"]
+    # The bucket stays in the artifact, where it is labelled for diagnostics.
+    activities = json.loads((tmp_path / "analyser.json").read_text())["activities"]
+    assert any(item["activity"] == "unexplained" for item in activities)
+
+
+def test_insufficient_result_reports_belong_to_the_reason_it_states(tmp_path: Path) -> None:
+    """The stated reason and the activity reports must describe the same candidate.
+
+    Only reachable with injected strategies today, but the reports of a later strategy
+    must not be attached to an earlier strategy's rejection.
+    """
+
+    class NeverApplicable:
+        strategy_id = "never_applicable"
+
+        def build_candidate(
+            self,
+            samples: list[RecordingSample],
+            context: RecordingContext,
+            signals: list[ActivitySignal],
+        ) -> StrategyNotApplicable:
+            return StrategyNotApplicable("never_applicable did not fit")
+
+    # Enough unrecognised samples that the vacuum candidate fails its credibility check.
+    unknown = [
+        replace(
+            sample("cleaning", 12.0, index),
+            entities={**sample("cleaning", 12.0).entities, STATE: RecordedEntityState("error_dustbin_full", {})},
+        )
+        for index in range(30)
+    ]
+    data = [replace(item, elapsed_seconds=float(index)) for index, item in enumerate(repeated() + unknown)]
+    path = write_recording(tmp_path / "record.jsonl", data)
+
+    analyser = RecorderAnalyser([NeverApplicable(), VacuumCompositeStrategy()])
+    result = analyser.analyse(path, CONTEXT)
+
+    assert not result.model_ready
+    assert result.reason == "never_applicable did not fit"
+    assert result.activity_reports == []
+
+
 def sample(activity: str, power: float, index: int = 0, level: object = 50) -> RecordingSample:
     return RecordingSample(
         float(index),
@@ -140,7 +252,8 @@ def write_recording(path: Path, samples: list[RecordingSample], context: Recordi
 def candidate(
     samples: list[RecordingSample] | None = None, context: RecordingContext = CONTEXT
 ) -> VacuumCompositeCandidate:
-    result = VacuumCompositeStrategy().build_candidate(samples if samples is not None else cycle(), context)
+    data = samples if samples is not None else cycle()
+    result = VacuumCompositeStrategy().build_candidate(data, context, discover_signals(data, context))
     assert isinstance(result, VacuumCompositeCandidate)
     return result
 
@@ -209,6 +322,46 @@ def test_whole_recording_validation_and_captured_metadata(tmp_path: Path) -> Non
     assert result.metrics.validation_count == len(cycle())
     assert candidate().complexity == 12
     assert candidate().feature == candidate().features[0]
+
+
+@pytest.mark.parametrize("missing_activity", ["washing", "charging", "drying"])
+def test_incomplete_last_recording_falls_back_to_independent_episode_validation(
+    tmp_path: Path, missing_activity: str
+) -> None:
+    first = write_recording(tmp_path / "record-1.jsonl", repeated())
+    last = write_recording(
+        tmp_path / "record.jsonl", [item for item in cycle() if item.entities[STATE].state != missing_activity]
+    )
+    samples = load_recordings([first, last]).dataset.samples
+
+    split = split_vacuum_samples(samples, CONTEXT)
+
+    assert isinstance(split, TrainingValidationSplit)
+    assert split.method is ValidationMethod.HELD_OUT_EPISODES
+    training_ids = {id(item) for item in split.training}
+    validation_ids = {id(item) for item in split.validation}
+    assert training_ids.isdisjoint(validation_ids)
+    assert training_ids | validation_ids == {id(item) for item in samples}
+    # Whole episodes stay together; adjacent samples from the same cycle never
+    # become each other's validation evidence.
+    signals = discover_signals(samples, CONTEXT)
+    for episode in group_vacuum_episodes(samples, signals):
+        episode_ids = {id(item) for item in episode.samples}
+        assert episode_ids <= training_ids or episode_ids <= validation_ids
+    expected_activities = {item.entities[STATE].state for item in cycle()}
+    assert {item.entities[STATE].state for item in split.training} == expected_activities
+    assert {item.entities[STATE].state for item in split.validation} == expected_activities
+    assert any(item.recording_id == 1 for item in split.training)
+    assert any(item.recording_id == 0 for item in split.validation)
+
+    result = RecorderAnalyser().analyse([first, last], CONTEXT)
+
+    assert result.model_ready
+    assert result.validation_method is ValidationMethod.HELD_OUT_EPISODES
+    assert result.metrics is not None
+    assert result.metrics.coverage == 1
+    assert result.metrics.mae_w == 0
+    assert result.metrics.validation_count == len(split.validation)
 
 
 def test_single_cycle_is_not_independent_evidence(tmp_path: Path) -> None:
@@ -318,7 +471,7 @@ def test_charging_range_integer_conversion_and_attribute_fallback() -> None:
 def test_unsupported_charging_curves(levels: list[int], reason: str) -> None:
     data = [sample("sleeping", 3.5, index) for index in range(5)]
     data += [sample("charging", 20, len(data) + index, level) for level in levels for index in range(3)]
-    result = VacuumCompositeStrategy().build_candidate(data, CONTEXT)
+    result = VacuumCompositeStrategy().build_candidate(data, CONTEXT, discover_signals(data, CONTEXT))
     assert isinstance(result, StrategyNotApplicable)
     assert reason in result.reason
 
@@ -340,7 +493,7 @@ def test_charging_requires_portable_battery_not_entity_name() -> None:
         for item in cycle()
     ]
     bare = replace(CONTEXT, entities=[RecordedEntity(e.entity_id, e.domain, e.role) for e in CONTEXT.entities])
-    result = VacuumCompositeStrategy().build_candidate(data, bare)
+    result = VacuumCompositeStrategy().build_candidate(data, bare, discover_signals(data, bare))
     assert isinstance(result, StrategyNotApplicable)
     assert "portable battery metadata" in result.reason
 
@@ -404,14 +557,16 @@ def test_energy_only_integrates_adjacent_held_out_samples() -> None:
 
 def test_strategy_rejections_and_empty_recordings(tmp_path: Path) -> None:
     strategy = VacuumCompositeStrategy()
-    assert isinstance(strategy.build_candidate(cycle(), replace(CONTEXT, recipe="generic")), StrategyNotApplicable)
-    assert isinstance(strategy.build_candidate([sample("sleeping", 3.5)] * 10, CONTEXT), StrategyNotApplicable)
-    result = strategy.build_candidate([replace(item, power=-1) for item in cycle()], CONTEXT)
+
+    def build(data: list[RecordingSample], context: RecordingContext = CONTEXT) -> object:
+        return strategy.build_candidate(data, context, discover_signals(data, context))
+
+    assert isinstance(build(cycle(), replace(CONTEXT, recipe="generic")), StrategyNotApplicable)
+    assert isinstance(build([sample("sleeping", 3.5)] * 10), StrategyNotApplicable)
+    result = build([replace(item, power=-1) for item in cycle()])
     assert isinstance(result, StrategyNotApplicable)
     assert "non-negative" in result.reason
-    assert isinstance(
-        strategy.build_candidate([sample("sleeping", 3)] * 5 + [sample("washing", 22)], CONTEXT), StrategyNotApplicable
-    )
+    assert isinstance(build([sample("sleeping", 3)] * 5 + [sample("washing", 22)]), StrategyNotApplicable)
     assert isinstance(split_vacuum_samples([sample("mystery", 1)] * 20, CONTEXT), StrategyNotApplicable)
     result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", []), CONTEXT)
     assert not result.model_ready
@@ -555,6 +710,47 @@ def test_unmeasured_flag_blocks_fallback() -> None:
     item = sample("auto_emptying", 600)
     assert model.estimate_power(item) is None
     assert model.estimate_power(sample("sleeping", 3.5)) == 3.5
+
+
+def test_export_preserves_unmeasured_auto_empty_guard_without_fitting_its_power() -> None:
+    data = [item for item in cycle() if item.entities[STATE].state != "auto_emptying"]
+    fragment = candidate(data).build_model_config_fragment().to_dict()
+    strategies = fragment["composite_config"]["strategies"]
+
+    assert len(strategies) == 5
+    assert not any(branch.get("fixed", {}).get("power") == 600 for branch in strategies)
+    assert all("auto_empty_status" in json.dumps(branch["condition"]) for branch in strategies)
+
+
+def test_profile_without_charging_uses_only_activity_features() -> None:
+    data = [sample("cleaning", 0.3)] * 10 + [sample("washing", 22)] * 10
+    model = candidate(data)
+
+    assert model.battery is None
+    assert FeatureReference(BATTERY, FeatureSource.STATE) not in model.features
+    assert all(branch.power is not None for branch in model.branches)
+    assert model.estimate_power(sample("cleaning", 0)) == 0.3
+    assert model.estimate_power(sample("washing", 0)) == 22
+    fragment = model.build_model_config_fragment().to_dict()
+    assert len(fragment["composite_config"]["strategies"]) == 2
+    assert "linear" not in json.dumps(fragment)
+
+
+def test_unidentified_training_activity_does_not_distort_fitted_branches() -> None:
+    unidentified = sample("new_mode", 999)
+    model = candidate([*cycle(), unidentified])
+
+    assert model.estimate_power(unidentified) is None
+    assert model.build_model_config_fragment() == candidate().build_model_config_fragment()
+
+
+@pytest.mark.parametrize("level", ["bad", "unknown", "unavailable"])
+def test_invalid_training_battery_samples_do_not_distort_charging_curve(level: str) -> None:
+    invalid = sample("charging", 999, level=level)
+    model = candidate([*cycle(), invalid])
+
+    assert model.estimate_power(invalid) is None
+    assert model.build_model_config_fragment() == candidate().build_model_config_fragment()
 
 
 def test_missing_battery_before_a_later_branch_matches_export() -> None:

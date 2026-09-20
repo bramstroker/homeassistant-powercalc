@@ -51,6 +51,8 @@ class ProfileMetadata(BaseModel):
     product_url: str | None = Field(default=None, max_length=2_000)
     mains_voltage: Literal[120, 230] | None = None
     device_specs: dict[str, Any] | None = None
+    standby_power: float | None = Field(default=None, ge=0.05, allow_inf_nan=False, strict=True)
+    standby_power_estimated: bool | None = None
     measure_device: str | None = Field(default=None, max_length=200)
     measure_device_firmware: str | None = Field(default=None, max_length=200)
     measure_description: str | None = Field(default=None, max_length=2_000)
@@ -146,3 +148,5 @@ class ProfilePreview(BaseModel):
     model_directory: str
     files: tuple[PreparedProfileFile, ...]
     warnings: tuple[str, ...] = ()
+    standby_power: float | None = None
+    standby_power_estimated: bool = False

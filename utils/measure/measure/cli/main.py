@@ -59,7 +59,7 @@ logging.basicConfig(
 )
 
 # homeassistant_api logs every websocket exchange at INFO; only surface those when debugging.
-if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
+if logging.getLogger().getEffectiveLevel() > logging.DEBUG:  # pragma: no branch - import-time logging configuration
     logging.getLogger("homeassistant_api").setLevel(logging.WARNING)
 
 
@@ -124,20 +124,18 @@ class Measure:
                 measurement=prepared,
                 output_directory=Path(PROJECT_DIR) / "export" / model_id,
             )
-            if execution.output_directory is not None:
-                _LOGGER.info("Measurement output directory: %s", execution.output_directory)
+            _LOGGER.info("Measurement output directory: %s", execution.output_directory)
             try:
                 execution.run()
             except KeyboardInterrupt, Exception:
-                if execution.output_directory is not None:
-                    _LOGGER.warning("Measurement stopped. Any saved output is kept in %s", execution.output_directory)
-                    if self.measure_type == MeasureType.LIGHT:
-                        _LOGGER.warning(
-                            "To resume, run from the measure directory with the same device and settings, "
-                            "then accept the resume prompt if saved rows are found:\n"
-                            "RESUME=true MODEL_ID=%s uv run --extra cli python -m measure.measure",
-                            shlex.quote(model_id),
-                        )
+                _LOGGER.warning("Measurement stopped. Any saved output is kept in %s", execution.output_directory)
+                if self.measure_type == MeasureType.LIGHT:
+                    _LOGGER.warning(
+                        "To resume, run from the measure directory with the same device and settings, "
+                        "then accept the resume prompt if saved rows are found:\n"
+                        "RESUME=true MODEL_ID=%s uv run --extra cli python -m measure.measure",
+                        shlex.quote(model_id),
+                    )
                 raise
         finally:
             if self._home_assistant is not None:
@@ -355,5 +353,5 @@ def main() -> None:
         sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover - entry-point behaviour is tested through main
     main()

@@ -6,8 +6,8 @@ from homeassistant_api.errors import HomeassistantAPIError
 from measure.controller.charging.const import ATTR_BATTERY_LEVEL
 from measure.controller.charging.errors import BatteryLevelRetrievalError
 from measure.controller.charging.hass import HassChargingController
-from measure.controller.errors import ApiConnectionError
-from measure.home_assistant.client import HomeAssistantEntityData, HomeAssistantManager
+from measure.controller.errors import ApiConnectionError, ControllerError
+from measure.home_assistant.client import HomeAssistantEntityData
 import pytest
 
 
@@ -50,88 +50,103 @@ def _battery_sensor_data(battery_state: str = "80") -> HomeAssistantEntityData:
     )
 
 
-def test_get_battery_level_from_sensor() -> None:
+@pytest.fixture
+def charging_hass_client(hass_client: MagicMock) -> MagicMock:
+    hass_client.get_entity_data.return_value = _no_registry_data()
+    return hass_client
+
+
+def test_get_battery_level_from_sensor(charging_hass_client: MagicMock) -> None:
     """Battery level is read from a separate battery sensor on the same device."""
-    client = _mock_client()
-    client.get_entity_data.return_value = _battery_sensor_data(battery_state="80")
-    client.get_entity.return_value = MagicMock(
+    charging_hass_client.get_entity_data.return_value = _battery_sensor_data(battery_state="80")
+    charging_hass_client.get_entity.return_value = MagicMock(
         state=State(entity_id="sensor.test_battery_level", state="80", attributes={}),
     )
-    assert _get_instance(client=client).get_battery_level() == 80
-    client.get_entity.assert_called_once_with(entity_id="sensor.test_battery_level")
+    assert _get_instance(charging_hass_client).get_battery_level() == 80
+    charging_hass_client.get_entity.assert_called_once_with(entity_id="sensor.test_battery_level")
 
 
-def test_get_battery_level_discovers_sensor_only_once() -> None:
-    client = _mock_client()
-    client.get_entity_data.return_value = _battery_sensor_data()
-    client.get_entity.return_value = MagicMock(
+def test_get_battery_level_discovers_sensor_only_once(charging_hass_client: MagicMock) -> None:
+    charging_hass_client.get_entity_data.return_value = _battery_sensor_data()
+    charging_hass_client.get_entity.return_value = MagicMock(
         state=State(entity_id="sensor.test_battery_level", state="80", attributes={}),
     )
-    controller = _get_instance(client=client)
+    controller = _get_instance(charging_hass_client)
 
     assert controller.get_battery_level() == 80
     assert controller.get_battery_level() == 80
-    client.get_entity_data.assert_called_once_with()
+    charging_hass_client.get_entity_data.assert_called_once_with()
     assert controller.battery_level_attribute is None
 
 
-def test_cached_battery_sensor_failure_does_not_switch_to_attribute() -> None:
-    client = _mock_client()
-    client.get_entity_data.return_value = _battery_sensor_data()
-    client.get_entity.side_effect = [
+def test_cached_battery_sensor_failure_does_not_switch_to_attribute(charging_hass_client: MagicMock) -> None:
+    charging_hass_client.get_entity_data.return_value = _battery_sensor_data()
+    charging_hass_client.get_entity.side_effect = [
         MagicMock(state=State(entity_id="sensor.test_battery_level", state="80", attributes={})),
         MagicMock(state=State(entity_id="sensor.test_battery_level", state="unknown", attributes={})),
     ]
-    controller = _get_instance(client=client)
+    controller = _get_instance(charging_hass_client)
 
     assert controller.get_battery_level() == 80
     with pytest.raises(BatteryLevelRetrievalError):
         controller.get_battery_level()
 
-    client.get_entity_data.assert_called_once_with()
-    assert [call.kwargs["entity_id"] for call in client.get_entity.call_args_list] == [
+    charging_hass_client.get_entity_data.assert_called_once_with()
+    assert [call.kwargs["entity_id"] for call in charging_hass_client.get_entity.call_args_list] == [
         "sensor.test_battery_level",
         "sensor.test_battery_level",
     ]
 
 
-def test_get_battery_level_falls_back_to_attribute() -> None:
+def test_get_battery_level_falls_back_to_attribute(charging_hass_client: MagicMock) -> None:
     """Without a battery sensor, the battery_level attribute of the main entity is used."""
-    client = _mock_client()
-    client.get_entity_data.return_value = _no_registry_data()
-    client.get_entity.return_value = MagicMock(
+    charging_hass_client.get_entity.return_value = MagicMock(
         state=State(entity_id="vacuum.test", state="docked", attributes={ATTR_BATTERY_LEVEL: 75}),
     )
-    controller = _get_instance(client=client)
+    controller = _get_instance(charging_hass_client)
     assert controller.get_battery_level() == 75
     assert controller.battery_level_attribute == ATTR_BATTERY_LEVEL
 
 
-def test_get_battery_level_no_sensor_no_attribute_error() -> None:
+def test_get_battery_level_no_sensor_no_attribute_error(charging_hass_client: MagicMock) -> None:
     """Error when neither a battery sensor nor the attribute is available."""
-    client = _mock_client()
-    client.get_entity_data.return_value = _no_registry_data()
-    client.get_entity.return_value = MagicMock(
+    charging_hass_client.get_entity.return_value = MagicMock(
         state=State(entity_id="vacuum.test", state="docked", attributes={}),
     )
-    controller = _get_instance(client=client)
+    controller = _get_instance(charging_hass_client)
     with pytest.raises(BatteryLevelRetrievalError):
         controller.get_battery_level()
 
 
-def test_get_battery_level_sensor_invalid_state() -> None:
+def test_get_battery_level_sensor_invalid_state(charging_hass_client: MagicMock) -> None:
     """Error when the discovered battery sensor state cannot be converted to int."""
-    client = _mock_client()
-    client.get_entity_data.return_value = _battery_sensor_data(battery_state="80")
-    client.get_entity.return_value = MagicMock(
+    charging_hass_client.get_entity_data.return_value = _battery_sensor_data(battery_state="80")
+    charging_hass_client.get_entity.return_value = MagicMock(
         state=State(entity_id="sensor.test_battery_level", state="unknown", attributes={}),
     )
-    controller = _get_instance(client=client)
+    controller = _get_instance(charging_hass_client)
     with pytest.raises(BatteryLevelRetrievalError):
         controller.get_battery_level()
 
 
-def test_is_charging() -> None:
+def test_get_battery_level_reports_disappeared_sensor(charging_hass_client: MagicMock) -> None:
+    charging_hass_client.get_entity_data.return_value = _battery_sensor_data()
+    charging_hass_client.get_entity.return_value = None
+
+    with pytest.raises(BatteryLevelRetrievalError, match=r"Battery level entity sensor\.test_battery_level not found"):
+        _get_instance(charging_hass_client).get_battery_level()
+
+    charging_hass_client.get_entity.assert_called_once_with(entity_id="sensor.test_battery_level")
+
+
+def test_charging_state_reports_disappeared_vacuum(charging_hass_client: MagicMock) -> None:
+    charging_hass_client.get_entity.return_value = None
+
+    with pytest.raises(ControllerError, match=r"Entity vacuum\.test not found"):
+        _get_instance(charging_hass_client).is_charging()
+
+
+def test_is_charging(charging_hass_client: MagicMock) -> None:
     """Test checking if device is charging."""
     mocked_state = State(
         entity_id="vacuum.test",
@@ -139,12 +154,11 @@ def test_is_charging() -> None:
         attributes={},
     )
 
-    client = _mock_client()
-    client.get_entity.return_value = MagicMock(state=mocked_state)
-    assert _get_instance(client=client).is_charging() is True
+    charging_hass_client.get_entity.return_value = MagicMock(state=mocked_state)
+    assert _get_instance(charging_hass_client).is_charging() is True
 
 
-def test_is_not_charging() -> None:
+def test_is_not_charging(charging_hass_client: MagicMock) -> None:
     """Test checking if device is not charging."""
     mocked_state = State(
         entity_id="vacuum.test",
@@ -152,12 +166,11 @@ def test_is_not_charging() -> None:
         attributes={},
     )
 
-    client = _mock_client()
-    client.get_entity.return_value = MagicMock(state=mocked_state)
-    assert _get_instance(client=client).is_charging() is False
+    charging_hass_client.get_entity.return_value = MagicMock(state=mocked_state)
+    assert _get_instance(charging_hass_client).is_charging() is False
 
 
-def test_is_valid_state() -> None:
+def test_is_valid_state(charging_hass_client: MagicMock) -> None:
     """Test checking if device is in a valid state."""
     for state in ["docked", "cleaning", "returning", "idle", "paused"]:
         mocked_state = State(
@@ -166,12 +179,11 @@ def test_is_valid_state() -> None:
             attributes={},
         )
 
-        client = _mock_client()
-        client.get_entity.return_value = MagicMock(state=mocked_state)
-        assert _get_instance(client=client).is_valid_state() is True
+        charging_hass_client.get_entity.return_value = MagicMock(state=mocked_state)
+        assert _get_instance(charging_hass_client).is_valid_state() is True
 
 
-def test_is_invalid_state() -> None:
+def test_is_invalid_state(charging_hass_client: MagicMock) -> None:
     """Test checking if device is in an invalid state."""
     mocked_state = State(
         entity_id="vacuum.test",
@@ -179,29 +191,16 @@ def test_is_invalid_state() -> None:
         attributes={},
     )
 
-    client = _mock_client()
-    client.get_entity.return_value = MagicMock(state=mocked_state)
-    assert _get_instance(client=client).is_valid_state() is False
+    charging_hass_client.get_entity.return_value = MagicMock(state=mocked_state)
+    assert _get_instance(charging_hass_client).is_valid_state() is False
 
 
-def test_connection_validation() -> None:
+def test_connection_validation(charging_hass_client: MagicMock) -> None:
     """Test API connection validation."""
-    client = _mock_client()
-    client.get_config.side_effect = HomeassistantAPIError("Error")
+    charging_hass_client.get_config.side_effect = HomeassistantAPIError("Error")
     with pytest.raises(ApiConnectionError):
-        HassChargingController(client)
+        HassChargingController(charging_hass_client)
 
 
-def _get_instance(*, client: MagicMock | None = None) -> HassChargingController:
-    """Get a mocked instance of HassChargingController."""
-    return HassChargingController(
-        client or _mock_client(),
-        entity_id="vacuum.test",
-    )
-
-
-def _mock_client() -> MagicMock:
-    client = MagicMock(spec=HomeAssistantManager)
-    client.get_config.return_value = {}
-    client.get_entity_data.return_value = _no_registry_data()
-    return client
+def _get_instance(client: MagicMock) -> HassChargingController:
+    return HassChargingController(client, entity_id="vacuum.test")

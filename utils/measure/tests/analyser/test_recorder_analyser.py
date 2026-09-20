@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import json
 from pathlib import Path
 
-from measure.analyser.fixed import FixedStatesPowerStrategy
+from measure.analyser.fixed import FixedStatesPowerCandidate, FixedStatesPowerStrategy
 from measure.analyser.models import (
     AnalysisMetrics,
     AnalysisStatus,
@@ -162,7 +162,7 @@ def test_load_recording_skips_unsupported_and_invalid_records(tmp_path: Path, re
 def test_fixed_strategy_builds_a_lookup_candidate_for_primary_state() -> None:
     samples = [sample(index, 0.2 if index % 2 == 0 else 5.2, "off" if index % 2 == 0 else "on") for index in range(8)]
 
-    candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT)
+    candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT, [])
 
     assert not isinstance(candidate, StrategyNotApplicable)
     assert candidate.feature == FeatureReference("switch.device", FeatureSource.STATE)
@@ -181,9 +181,22 @@ def test_fixed_strategy_builds_a_lookup_candidate_for_primary_state() -> None:
 def test_fixed_strategy_ignores_unavailable_values_and_non_scalar_attributes() -> None:
     samples = [sample(index, 2.0 if index % 2 else 8.0, "unavailable", {"mode": ["invalid"]}) for index in range(8)]
 
-    result = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT)
+    result = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT, [])
 
     assert isinstance(result, StrategyNotApplicable)
+
+
+def test_fixed_strategy_ignores_samples_without_the_primary_entity() -> None:
+    samples = [sample(index, 0.2 if index % 2 == 0 else 5.2, "off" if index % 2 == 0 else "on") for index in range(8)]
+    missing_entity = RecordingSample(8, 50, {})
+
+    candidate = FixedStatesPowerStrategy().build_candidate([*samples, missing_entity], CONTEXT, [])
+
+    assert not isinstance(candidate, StrategyNotApplicable)
+    assert candidate.feature == FeatureReference("switch.device", FeatureSource.STATE)
+    assert candidate.estimate_power(sample(9, 0, "off")) == pytest.approx(0.2)
+    assert candidate.estimate_power(sample(10, 0, "on")) == pytest.approx(5.2)
+    assert candidate.estimate_power(missing_entity) is None
 
 
 def test_fixed_strategy_keeps_multiple_active_states_as_states_power() -> None:
@@ -191,7 +204,7 @@ def test_fixed_strategy_keeps_multiple_active_states_as_states_power() -> None:
         sample(index, (2.0, 5.0, 8.0)[index % 3], ("idle", "playing", "recording")[index % 3]) for index in range(12)
     ]
 
-    candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT)
+    candidate = FixedStatesPowerStrategy().build_candidate(samples, CONTEXT, [])
 
     assert not isinstance(candidate, StrategyNotApplicable)
     assert candidate.build_model_config_fragment().to_dict() == {
@@ -226,6 +239,17 @@ def test_recorded_entity_and_analysis_result_include_optional_evidence() -> None
 
     assert entity.to_dict()["translation_key"] == "plug"
     assert result.to_dict()["warnings"] == ["bad line"]
+
+
+@pytest.mark.parametrize("reason", [None, "Record another complete cycle"])
+def test_insufficient_analysis_summary_includes_only_a_supplied_reason(reason: str | None) -> None:
+    result = RecorderAnalysisResult(AnalysisStatus.INSUFFICIENT_DATA, 3, reason=reason)
+
+    expected = {"Recording analysis": "More data needed"}
+    if reason is not None:
+        expected["Recording analysis reason"] = reason
+
+    assert result.build_summary() == expected
 
 
 def test_analysis_results_do_not_share_default_collections() -> None:
@@ -446,3 +470,30 @@ def test_selector_only_prefers_complex_candidate_for_material_error_improvement(
         [EvaluatedCandidate(simple, base), EvaluatedCandidate(equal_complexity, AnalysisMetrics(20, 4, 1, 0.9, 1, 5))]
     )
     assert selected.candidate is equal_complexity
+
+
+@pytest.mark.parametrize("contender_mae", [1.0, 1.1], ids=["equal-error", "higher-error"])
+@pytest.mark.parametrize("reverse_order", [False, True])
+def test_equal_complexity_selection_is_stable_without_error_improvement(
+    contender_mae: float,
+    reverse_order: bool,
+) -> None:
+    preferred = FixedStatesPowerCandidate(
+        FeatureReference("switch.device", FeatureSource.ATTRIBUTE, "mode"),
+        {"idle": 1.0, "active": 5.0},
+    )
+    contender = FixedStatesPowerCandidate(
+        FeatureReference("switch.device", FeatureSource.ATTRIBUTE, "status"),
+        {"idle": 1.0, "active": 5.0},
+    )
+    evaluations = [
+        EvaluatedCandidate(preferred, AnalysisMetrics(20, 4, 1, 1.0, 1.0, 5)),
+        EvaluatedCandidate(contender, AnalysisMetrics(20, 4, 1, contender_mae, contender_mae, 5)),
+    ]
+    if reverse_order:
+        evaluations.reverse()
+
+    selected = _select_candidate(evaluations)
+
+    assert selected.candidate is preferred
+    assert selected.metrics.mae_w == 1.0

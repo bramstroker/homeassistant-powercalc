@@ -206,7 +206,7 @@ const lightRequest = {
   power_meter: { type: "hass", entity_id: "sensor.plug_power", voltage_entity_id: "sensor.plug_voltage" },
 } as const satisfies SessionSnapshot["request"];
 
-const completedSnapshot = {
+export const completedSnapshot = {
   session_id: "session-completed",
   state: "completed",
   can_analyse: false,
@@ -265,6 +265,8 @@ const contributionDraft: ContributionPreview = {
   voltage_range: { min: 229.9, max: 231.2 },
   device_specs: null,
   device_type: "light",
+  standby_power: 0.3,
+  standby_power_estimated: false,
   measure_device: "Shelly Plug S",
   measure_device_firmware: "1.2.3",
   measure_description: "Measured with utils/measure script",
@@ -378,6 +380,7 @@ const fixedRoutes = new Map<string, unknown>([
   ["library/measure-devices", measureDevices],
   ["library/manufacturers", manufacturers],
   ["library/device-specifications", deviceSpecifications],
+  ["library/standby-estimate", { power_w: 0.4, basis: "fallback", profile_count: 0 }],
   ["dummy-load/calibration", null],
   ["preflight", preflight],
   ["sessions/session-running", startedSnapshot],

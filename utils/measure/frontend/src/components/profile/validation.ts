@@ -5,6 +5,7 @@ export const metadataLabels: Record<string, string> = {
   contributor: "Contributor name", contributor_github: "GitHub username", contributor_email: "Email",
   product_url: "Manufacturer product URL", aliases: "Model aliases", gtins: "GTIN / barcodes",
   mains_voltage: "Nominal mains voltage",
+  standby_power: "Standby power", standby_power_estimated: "Estimated standby",
   measure_device: "Measurement device", measure_device_firmware: "Device firmware",
   measure_description: "Measurement description", notes: "Notes", device_specs: "Device specifications",
 };
@@ -15,6 +16,9 @@ export function validateMetadata(values: ContributionPreviewRequest): Record<str
   const errors: Record<string, string> = {};
   validateRequiredMetadata(values, errors);
   validateMainsVoltage(values, errors);
+  if (values.standby_power !== undefined && (values.standby_power === null || !Number.isFinite(values.standby_power) || values.standby_power < 0.05)) {
+    errors.standby_power = "Enter standby power of at least 0.05 W, or use an estimate.";
+  }
   const limits: Partial<Record<keyof ContributionPreviewRequest, number>> = {
     manufacturer_name: 200, model_id: 120, product_name: 200, contributor: 200,
     contributor_github: 100, contributor_email: 200, product_url: 2000,
