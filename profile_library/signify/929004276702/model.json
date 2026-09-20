@@ -24,7 +24,7 @@
   "device_type": "light",
   "gtin": [
     "8721103088413"
-  ]
+  ],
   "mains_voltage": 230,
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly Plug S Gen3",
