@@ -61,16 +61,22 @@ Use a stable resistive load, such as a suitable incandescent lamp. Do not use an
 controlled load: its consumption is not stable enough for reliable subtraction. The meter must also provide voltage
 readings so Powercalc can account for voltage-dependent changes in the dummy load.
 
+The app supports dummy-load correction for light, speaker, fan, charging, average, and recorder measurements
+with a real power meter. A Home Assistant power sensor needs an associated voltage sensor reporting `V`; directly
+polled Shelly, Kasa, and Tapo meters must expose voltage through their API. The synthetic test meter cannot be used.
+
 In the Home Assistant app:
 
 1. Connect only the dummy load and allow it to warm up.
 2. Enable **Use resistive dummy load** during measurement setup.
-3. Calibrate it until Powercalc reports a stable resistance.
+3. Confirm calibration and wait until Powercalc reports a stable resistance. Calibration measures at least 20 periods of 30 seconds (at least 10 minutes); let it continue if resistance is still rising or falling.
 4. Connect the target device in parallel without disconnecting the dummy load.
 5. Keep the same meter, load, and wiring in place for the complete measurement.
 
 Reuse a stored calibration only after confirming that the same warmed-up load is connected. Recalibrate after changing
-the load, meter, wiring, or whenever its stability is uncertain.
+the load, meter, wiring, or whenever its stability is uncertain. Choose **Recalibrate** to replace a stored calibration.
+A calibration interrupted before resistance stabilizes is not saved. During the measurement, live and saved power
+readings show the target device consumption after subtracting the calculated dummy-load contribution.
 
 ## Use a meter with better low-load resolution
 
