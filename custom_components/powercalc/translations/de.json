@@ -112,7 +112,7 @@
               "follow_device_name": "Gerätenamen übernehmen"
             },
             "data_description": {
-              "follow_device_name": "Den Namen des zugewiesenen Geräts für erzeugte Entitäten unterstützter virtueller Leistungssensoren verwenden, die über die Benutzeroberfläche konfiguriert wurden. Entitäts-IDs und benutzerdefinierte Entitätsnamen bleiben unverändert. Beim Ausschalten werden die konfigurierten Namen wiederhergestellt."
+              "follow_device_name": "Den Namen des zugewiesenen Geräts für erzeugte Entitäten unterstützter virtueller Leistungssensoren verwenden, die über die Benutzeroberfläche konfiguriert wurden. Entitäts-IDs und benutzerdefinierte Entitätsnamen bleiben unverändert. Beim Ausschalten werden die konfigurierten Namen wiederhergestellt. Benutzerdefinierte Muster für Anzeigenamen, einschließlich globaler Muster, haben Vorrang: Betroffene Einträge behalten ihre konfigurierten Namen."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Gerätenamen übernehmen"
             },
             "data_description": {
-              "follow_device_name": "Den Namen des zugewiesenen Geräts für erzeugte Entitäten unterstützter virtueller Leistungssensoren verwenden, die über die Benutzeroberfläche konfiguriert wurden. Entitäts-IDs und benutzerdefinierte Entitätsnamen bleiben unverändert. Beim Ausschalten werden die konfigurierten Namen wiederhergestellt."
+              "follow_device_name": "Den Namen des zugewiesenen Geräts für erzeugte Entitäten unterstützter virtueller Leistungssensoren verwenden, die über die Benutzeroberfläche konfiguriert wurden. Entitäts-IDs und benutzerdefinierte Entitätsnamen bleiben unverändert. Beim Ausschalten werden die konfigurierten Namen wiederhergestellt. Benutzerdefinierte Muster für Anzeigenamen, einschließlich globaler Muster, haben Vorrang: Betroffene Einträge behalten ihre konfigurierten Namen."
             }
           },
           "features": {

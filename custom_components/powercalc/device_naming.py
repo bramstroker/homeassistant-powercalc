@@ -99,7 +99,12 @@ def resolve_naming_device(
     if entry is None or not global_config.get(CONF_FOLLOW_DEVICE_NAME):
         return None
     if error := get_device_naming_error(hass, config, entry):
-        log = _LOGGER.warning if error == "device_naming_no_device" else _LOGGER.debug
+        configured_device_missing = (
+            error == "device_naming_no_device"
+            and config.get(CONF_DEVICE) is not None
+            and get_device_entry(hass, config, config_entry=entry) is None
+        )
+        log = _LOGGER.warning if configured_device_missing else _LOGGER.debug
         log("Cannot follow device name for %s: %s; using configured names", entry.title, error)
         return None
     source = create_source_entity(config.get(CONF_ENTITY_ID, DUMMY_ENTITY_ID), hass)

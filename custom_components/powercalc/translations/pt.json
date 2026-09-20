@@ -112,7 +112,7 @@
               "follow_device_name": "Usar o nome do dispositivo"
             },
             "data_description": {
-              "follow_device_name": "Usar o nome do dispositivo atribuído para as entidades geradas dos sensores virtuais de potência suportados configurados na interface. Os IDs das entidades e os nomes personalizados permanecem inalterados. Desativar esta opção repõe os nomes configurados."
+              "follow_device_name": "Usar o nome do dispositivo atribuído para as entidades geradas dos sensores virtuais de potência suportados configurados na interface. Os IDs das entidades e os nomes personalizados permanecem inalterados. Desativar esta opção repõe os nomes configurados. Os padrões personalizados de nomes de apresentação, incluindo os globais, têm prioridade: as entradas afetadas mantêm os nomes configurados."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Usar o nome do dispositivo"
             },
             "data_description": {
-              "follow_device_name": "Usar o nome do dispositivo atribuído para as entidades geradas dos sensores virtuais de potência suportados configurados na interface. Os IDs das entidades e os nomes personalizados permanecem inalterados. Desativar esta opção repõe os nomes configurados."
+              "follow_device_name": "Usar o nome do dispositivo atribuído para as entidades geradas dos sensores virtuais de potência suportados configurados na interface. Os IDs das entidades e os nomes personalizados permanecem inalterados. Desativar esta opção repõe os nomes configurados. Os padrões personalizados de nomes de apresentação, incluindo os globais, têm prioridade: as entradas afetadas mantêm os nomes configurados."
             }
           },
           "features": {

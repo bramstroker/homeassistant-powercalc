@@ -112,7 +112,7 @@
               "follow_device_name": "Följ enhetens namn"
             },
             "data_description": {
-              "follow_device_name": "Använd namnet på den tilldelade enheten för genererade entiteter till virtuella effektsensorer som stöds och har konfigurerats i användargränssnittet. Entitets-ID:n och anpassade entitetsnamn förblir oförändrade. När inställningen stängs av återställs de konfigurerade namnen."
+              "follow_device_name": "Använd namnet på den tilldelade enheten för genererade entiteter till virtuella effektsensorer som stöds och har konfigurerats i användargränssnittet. Entitets-ID:n och anpassade entitetsnamn förblir oförändrade. När inställningen stängs av återställs de konfigurerade namnen. Anpassade mönster för visningsnamn, inklusive globala mönster, har företräde: berörda poster behåller sina konfigurerade namn."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Följ enhetens namn"
             },
             "data_description": {
-              "follow_device_name": "Använd namnet på den tilldelade enheten för genererade entiteter till virtuella effektsensorer som stöds och har konfigurerats i användargränssnittet. Entitets-ID:n och anpassade entitetsnamn förblir oförändrade. När inställningen stängs av återställs de konfigurerade namnen."
+              "follow_device_name": "Använd namnet på den tilldelade enheten för genererade entiteter till virtuella effektsensorer som stöds och har konfigurerats i användargränssnittet. Entitets-ID:n och anpassade entitetsnamn förblir oförändrade. När inställningen stängs av återställs de konfigurerade namnen. Anpassade mönster för visningsnamn, inklusive globala mönster, har företräde: berörda poster behåller sina konfigurerade namn."
             }
           },
           "features": {

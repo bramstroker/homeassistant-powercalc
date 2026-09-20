@@ -112,7 +112,7 @@
               "follow_device_name": "Follow device name"
             },
             "data_description": {
-              "follow_device_name": "Use the assigned device name for generated entities of supported virtual power sensors configured in the UI. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
+              "follow_device_name": "Use the assigned device name for generated entities of supported virtual power sensors configured in the UI. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names. Custom display-name patterns, including global patterns, take precedence: affected entries keep their configured names."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Follow device name"
             },
             "data_description": {
-              "follow_device_name": "Use the assigned device name for generated entities of supported virtual power sensors configured in the UI. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
+              "follow_device_name": "Use the assigned device name for generated entities of supported virtual power sensors configured in the UI. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names. Custom display-name patterns, including global patterns, take precedence: affected entries keep their configured names."
             }
           },
           "features": {

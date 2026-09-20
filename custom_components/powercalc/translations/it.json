@@ -112,7 +112,7 @@
               "follow_device_name": "Usa il nome del dispositivo"
             },
             "data_description": {
-              "follow_device_name": "Usa il nome del dispositivo assegnato per le entità generate dei sensori di potenza virtuali supportati configurati tramite l’interfaccia. Gli ID delle entità e i nomi personalizzati rimangono invariati. Disattivando questa opzione vengono ripristinati i nomi configurati."
+              "follow_device_name": "Usa il nome del dispositivo assegnato per le entità generate dei sensori di potenza virtuali supportati configurati tramite l’interfaccia. Gli ID delle entità e i nomi personalizzati rimangono invariati. Disattivando questa opzione vengono ripristinati i nomi configurati. I modelli personalizzati dei nomi visualizzati, inclusi quelli globali, hanno la precedenza: le voci interessate mantengono i nomi configurati."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Usa il nome del dispositivo"
             },
             "data_description": {
-              "follow_device_name": "Usa il nome del dispositivo assegnato per le entità generate dei sensori di potenza virtuali supportati configurati tramite l’interfaccia. Gli ID delle entità e i nomi personalizzati rimangono invariati. Disattivando questa opzione vengono ripristinati i nomi configurati."
+              "follow_device_name": "Usa il nome del dispositivo assegnato per le entità generate dei sensori di potenza virtuali supportati configurati tramite l’interfaccia. Gli ID delle entità e i nomi personalizzati rimangono invariati. Disattivando questa opzione vengono ripristinati i nomi configurati. I modelli personalizzati dei nomi visualizzati, inclusi quelli globali, hanno la precedenza: le voci interessate mantengono i nomi configurati."
             }
           },
           "features": {

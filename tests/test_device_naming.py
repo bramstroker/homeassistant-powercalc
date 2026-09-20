@@ -5,7 +5,7 @@ from unittest.mock import PropertyMock, patch
 from _pytest.fixtures import SubRequest
 from freezegun import freeze_time
 from homeassistant.components.recorder import Recorder, migration
-from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME
+from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import recorder as recorder_helper
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
@@ -31,6 +31,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_ID,
     CONF_FIXED,
     CONF_FOLLOW_DEVICE_NAME,
+    CONF_GROUP_MEMBER_SENSORS,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -50,7 +51,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.device_naming import get_device_naming_error
 from custom_components.powercalc.flow_helper.common import Step
-from tests.common import create_mock_config_entry
+from tests.common import create_mock_config_entry, create_mock_group_entry, run_powercalc_setup
 from tests.config_flow.common import handle_options_flow_update, initialize_options_flow
 from tests.config_flow.test_global_configuration import create_mock_global_config_entry
 
@@ -199,11 +200,93 @@ async def test_user_overrides_are_preserved(
         assert "My consumption" in hass.states.get("sensor.patio_power").name
 
 
-async def test_missing_device_falls_back_to_configured_names(hass: HomeAssistant) -> None:
+@pytest.mark.parametrize("configured_device", [None, "missing"])
+async def test_missing_device_falls_back_to_configured_names(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+    configured_device: str | None,
+) -> None:
     await create_mock_global_config_entry(hass, {CONF_FOLLOW_DEVICE_NAME: True})
-    await create_mock_config_entry(hass, entry_config())
+    config = entry_config()
+    if configured_device:
+        config[CONF_DEVICE] = configured_device
+    with caplog.at_level(logging.WARNING, logger="custom_components.powercalc.device_naming"):
+        await create_mock_config_entry(hass, config)
+        await set_follow_device_name(hass, True)
+
     assert hass.states.get("sensor.patio_power").name == "Patio power"
+    assert ("Cannot follow device name" in caplog.text) is (configured_device is not None)
     await set_follow_device_name(hass, False)
+
+
+@pytest.mark.parametrize("explicit_device", [False, True])
+async def test_unnamed_device_does_not_log_warning(
+    hass: HomeAssistant,
+    source_device: DeviceEntry,
+    device_registry: DeviceRegistry,
+    caplog: pytest.LogCaptureFixture,
+    explicit_device: bool,
+) -> None:
+    device_registry.async_update_device(source_device.id, name=None, name_by_user=None)
+    await create_mock_global_config_entry(hass, {CONF_FOLLOW_DEVICE_NAME: True})
+    config = entry_config()
+    if explicit_device:
+        config[CONF_DEVICE] = source_device.id
+    with caplog.at_level(logging.WARNING, logger="custom_components.powercalc.device_naming"):
+        await create_mock_config_entry(hass, config)
+
+    assert hass.states.get("sensor.patio_power").name == "Patio power"
+    assert "Cannot follow device name" not in caplog.text
+
+
+@pytest.mark.parametrize("use_group", [False, True], ids=["yaml", "ui_group"])
+async def test_platform_tariff_select_with_device(
+    hass: HomeAssistant,
+    source_device: DeviceEntry,
+    entity_registry: er.EntityRegistry,
+    caplog: pytest.LogCaptureFixture,
+    use_group: bool,
+) -> None:
+    meter_config = {
+        CONF_CREATE_UTILITY_METERS: True,
+        CONF_UTILITY_METER_TYPES: ["daily"],
+        CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+    }
+    if use_group:
+        member = await create_mock_config_entry(hass, {**entry_config(), CONF_CREATE_UTILITY_METERS: False})
+        await create_mock_group_entry(
+            hass,
+            "Patio group",
+            {
+                CONF_DEVICE: source_device.id,
+                CONF_GROUP_MEMBER_SENSORS: [member.entry_id],
+                **meter_config,
+            },
+        )
+        base_id = "patio_group_energy_daily"
+    else:
+        await run_powercalc_setup(
+            hass,
+            {
+                CONF_ENTITY_ID: "light.patio",
+                CONF_UNIQUE_ID: "patio",
+                CONF_FIXED: {CONF_POWER: 50},
+                **meter_config,
+            },
+        )
+        base_id = "patio_energy_daily"
+
+    select_id = f"select.{base_id}"
+    assert hass.states.get(select_id).state == "peak"
+    assert entity_registry.async_get(select_id).config_entry_id is None
+    assert entity_registry.async_get(f"sensor.{base_id}_peak").device_id == source_device.id
+    assert "attempts to attach a device to an entity without a config entry" not in caplog.text
+    await hass.services.async_call(
+        "select", "select_option", {CONF_ENTITY_ID: select_id, "option": "offpeak"}, blocking=True
+    )
+    await hass.async_block_till_done()
+    assert hass.states.get(f"sensor.{base_id}_offpeak").attributes["status"] == "collecting"
+    assert hass.states.get(f"sensor.{base_id}_peak").attributes["status"] == "paused"
 
 
 async def test_expected_ineligible_entry_does_not_log_warning(
@@ -323,6 +406,32 @@ async def test_global_naming_preserves_custom_patterns(
     await create_mock_config_entry(hass, {**entry_config(), CONF_POWER_SENSOR_NAMING: "{} custom"})
     assert entity_registry.async_get("sensor.patio_custom").original_name == "Patio custom"
     assert not entity_registry.async_get("sensor.patio_custom").has_entity_name
+
+
+@pytest.mark.parametrize("friendly_pattern", [None, "{} power"])
+async def test_global_custom_pattern_with_device_naming(
+    hass: HomeAssistant,
+    source_device: DeviceEntry,
+    entity_registry: er.EntityRegistry,
+    friendly_pattern: str | None,
+) -> None:
+    global_entry = await create_mock_global_config_entry(hass, {CONF_POWER_SENSOR_NAMING: "{} Power"})
+    config = entry_config()
+    if friendly_pattern:
+        config[CONF_POWER_SENSOR_FRIENDLY_NAMING] = friendly_pattern
+    await create_mock_config_entry(hass, config)
+
+    await handle_options_flow_update(
+        hass,
+        global_entry,
+        Step.GLOBAL_CONFIGURATION,
+        {CONF_FOLLOW_DEVICE_NAME: True, CONF_POWER_SENSOR_NAMING: "{} Power"},
+    )
+    await hass.async_block_till_done()
+
+    power_entry = entity_registry.async_get("sensor.patio_power")
+    assert power_entry.has_entity_name is (friendly_pattern is not None)
+    assert power_entry.original_name == ("Power" if friendly_pattern else "Patio Power")
 
 
 async def test_reused_energy_entity_is_untouched(

@@ -112,7 +112,7 @@
               "follow_device_name": "Eszköznév követése"
             },
             "data_description": {
-              "follow_device_name": "A hozzárendelt eszköz nevének használata a felületen beállított, támogatott virtuális teljesítményérzékelők létrehozott entitásaihoz. Az entitásazonosítók és az egyéni entitásnevek változatlanok maradnak. Kikapcsoláskor visszaállnak a beállított nevek."
+              "follow_device_name": "A hozzárendelt eszköz nevének használata a felületen beállított, támogatott virtuális teljesítményérzékelők létrehozott entitásaihoz. Az entitásazonosítók és az egyéni entitásnevek változatlanok maradnak. Kikapcsoláskor visszaállnak a beállított nevek. Az egyéni megjelenítési névminták, beleértve a globális mintákat is, elsőbbséget élveznek: az érintett bejegyzések megtartják a beállított neveiket."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Eszköznév követése"
             },
             "data_description": {
-              "follow_device_name": "A hozzárendelt eszköz nevének használata a felületen beállított, támogatott virtuális teljesítményérzékelők létrehozott entitásaihoz. Az entitásazonosítók és az egyéni entitásnevek változatlanok maradnak. Kikapcsoláskor visszaállnak a beállított nevek."
+              "follow_device_name": "A hozzárendelt eszköz nevének használata a felületen beállított, támogatott virtuális teljesítményérzékelők létrehozott entitásaihoz. Az entitásazonosítók és az egyéni entitásnevek változatlanok maradnak. Kikapcsoláskor visszaállnak a beállított nevek. Az egyéni megjelenítési névminták, beleértve a globális mintákat is, elsőbbséget élveznek: az érintett bejegyzések megtartják a beállított neveiket."
             }
           },
           "features": {

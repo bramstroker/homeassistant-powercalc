@@ -112,7 +112,7 @@
               "follow_device_name": "Apparaatnaam volgen"
             },
             "data_description": {
-              "follow_device_name": "Gebruik de naam van het gekoppelde apparaat voor gegenereerde entiteiten van ondersteunde virtuele vermogenssensoren die via de gebruikersinterface zijn ingesteld. Entiteits-ID’s en aangepaste entiteitsnamen blijven ongewijzigd. Uitschakelen herstelt de ingestelde namen."
+              "follow_device_name": "Gebruik de naam van het gekoppelde apparaat voor gegenereerde entiteiten van ondersteunde virtuele vermogenssensoren die via de gebruikersinterface zijn ingesteld. Entiteits-ID’s en aangepaste entiteitsnamen blijven ongewijzigd. Uitschakelen herstelt de ingestelde namen. Aangepaste patronen voor weergavenamen, inclusief globale patronen, hebben voorrang: de betreffende configuraties behouden hun ingestelde namen."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Apparaatnaam volgen"
             },
             "data_description": {
-              "follow_device_name": "Gebruik de naam van het gekoppelde apparaat voor gegenereerde entiteiten van ondersteunde virtuele vermogenssensoren die via de gebruikersinterface zijn ingesteld. Entiteits-ID’s en aangepaste entiteitsnamen blijven ongewijzigd. Uitschakelen herstelt de ingestelde namen."
+              "follow_device_name": "Gebruik de naam van het gekoppelde apparaat voor gegenereerde entiteiten van ondersteunde virtuele vermogenssensoren die via de gebruikersinterface zijn ingesteld. Entiteits-ID’s en aangepaste entiteitsnamen blijven ongewijzigd. Uitschakelen herstelt de ingestelde namen. Aangepaste patronen voor weergavenamen, inclusief globale patronen, hebben voorrang: de betreffende configuraties behouden hun ingestelde namen."
             }
           },
           "features": {

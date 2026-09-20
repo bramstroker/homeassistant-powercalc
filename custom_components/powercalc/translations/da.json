@@ -112,7 +112,7 @@
               "follow_device_name": "Følg enhedens navn"
             },
             "data_description": {
-              "follow_device_name": "Brug navnet på den tilknyttede enhed til genererede entiteter for understøttede virtuelle effektsensorer konfigureret i brugergrænsefladen. Entitets-id’er og brugerdefinerede entitetsnavne ændres ikke. De konfigurerede navne gendannes, når indstillingen slås fra."
+              "follow_device_name": "Brug navnet på den tilknyttede enhed til genererede entiteter for understøttede virtuelle effektsensorer konfigureret i brugergrænsefladen. Entitets-id’er og brugerdefinerede entitetsnavne ændres ikke. De konfigurerede navne gendannes, når indstillingen slås fra. Brugerdefinerede mønstre for visningsnavne, herunder globale mønstre, har forrang: berørte poster beholder deres konfigurerede navne."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Følg enhedens navn"
             },
             "data_description": {
-              "follow_device_name": "Brug navnet på den tilknyttede enhed til genererede entiteter for understøttede virtuelle effektsensorer konfigureret i brugergrænsefladen. Entitets-id’er og brugerdefinerede entitetsnavne ændres ikke. De konfigurerede navne gendannes, når indstillingen slås fra."
+              "follow_device_name": "Brug navnet på den tilknyttede enhed til genererede entiteter for understøttede virtuelle effektsensorer konfigureret i brugergrænsefladen. Entitets-id’er og brugerdefinerede entitetsnavne ændres ikke. De konfigurerede navne gendannes, når indstillingen slås fra. Brugerdefinerede mønstre for visningsnavne, herunder globale mønstre, har forrang: berørte poster beholder deres konfigurerede navne."
             }
           },
           "features": {

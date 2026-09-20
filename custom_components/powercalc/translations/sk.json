@@ -112,7 +112,7 @@
               "follow_device_name": "Používať názov zariadenia"
             },
             "data_description": {
-              "follow_device_name": "Použiť názov priradeného zariadenia pre generované entity podporovaných virtuálnych snímačov výkonu nakonfigurovaných v používateľskom rozhraní. ID entít a vlastné názvy entít sa nezmenia. Vypnutím sa obnovia nakonfigurované názvy."
+              "follow_device_name": "Použiť názov priradeného zariadenia pre generované entity podporovaných virtuálnych snímačov výkonu nakonfigurovaných v používateľskom rozhraní. ID entít a vlastné názvy entít sa nezmenia. Vypnutím sa obnovia nakonfigurované názvy. Vlastné vzory zobrazovaných názvov vrátane globálnych vzorov majú prednosť: dotknuté položky si ponechajú nakonfigurované názvy."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Používať názov zariadenia"
             },
             "data_description": {
-              "follow_device_name": "Použiť názov priradeného zariadenia pre generované entity podporovaných virtuálnych snímačov výkonu nakonfigurovaných v používateľskom rozhraní. ID entít a vlastné názvy entít sa nezmenia. Vypnutím sa obnovia nakonfigurované názvy."
+              "follow_device_name": "Použiť názov priradeného zariadenia pre generované entity podporovaných virtuálnych snímačov výkonu nakonfigurovaných v používateľskom rozhraní. ID entít a vlastné názvy entít sa nezmenia. Vypnutím sa obnovia nakonfigurované názvy. Vlastné vzory zobrazovaných názvov vrátane globálnych vzorov majú prednosť: dotknuté položky si ponechajú nakonfigurované názvy."
             }
           },
           "features": {

@@ -112,7 +112,7 @@
               "follow_device_name": "Utiliser le nom de l’appareil"
             },
             "data_description": {
-              "follow_device_name": "Utiliser le nom de l’appareil associé pour les entités générées des capteurs de puissance virtuels pris en charge configurés dans l’interface. Les identifiants et les noms personnalisés des entités restent inchangés. Désactiver cette option rétablit les noms configurés."
+              "follow_device_name": "Utiliser le nom de l’appareil associé pour les entités générées des capteurs de puissance virtuels pris en charge configurés dans l’interface. Les identifiants et les noms personnalisés des entités restent inchangés. Désactiver cette option rétablit les noms configurés. Les modèles de noms d’affichage personnalisés, y compris les modèles globaux, sont prioritaires : les entrées concernées conservent leurs noms configurés."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Utiliser le nom de l’appareil"
             },
             "data_description": {
-              "follow_device_name": "Utiliser le nom de l’appareil associé pour les entités générées des capteurs de puissance virtuels pris en charge configurés dans l’interface. Les identifiants et les noms personnalisés des entités restent inchangés. Désactiver cette option rétablit les noms configurés."
+              "follow_device_name": "Utiliser le nom de l’appareil associé pour les entités générées des capteurs de puissance virtuels pris en charge configurés dans l’interface. Les identifiants et les noms personnalisés des entités restent inchangés. Désactiver cette option rétablit les noms configurés. Les modèles de noms d’affichage personnalisés, y compris les modèles globaux, sont prioritaires : les entrées concernées conservent leurs noms configurés."
             }
           },
           "features": {

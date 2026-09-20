@@ -112,7 +112,7 @@
               "follow_device_name": "Folosește numele dispozitivului"
             },
             "data_description": {
-              "follow_device_name": "Folosește numele dispozitivului asociat pentru entitățile generate ale senzorilor virtuali de putere acceptați, configurați în interfață. ID-urile entităților și numele personalizate rămân neschimbate. Dezactivarea restabilește numele configurate."
+              "follow_device_name": "Folosește numele dispozitivului asociat pentru entitățile generate ale senzorilor virtuali de putere acceptați, configurați în interfață. ID-urile entităților și numele personalizate rămân neschimbate. Dezactivarea restabilește numele configurate. Modelele personalizate pentru numele afișate, inclusiv cele globale, au prioritate: intrările afectate își păstrează numele configurate."
             }
           },
           "features": {
@@ -811,7 +811,7 @@
               "follow_device_name": "Folosește numele dispozitivului"
             },
             "data_description": {
-              "follow_device_name": "Folosește numele dispozitivului asociat pentru entitățile generate ale senzorilor virtuali de putere acceptați, configurați în interfață. ID-urile entităților și numele personalizate rămân neschimbate. Dezactivarea restabilește numele configurate."
+              "follow_device_name": "Folosește numele dispozitivului asociat pentru entitățile generate ale senzorilor virtuali de putere acceptați, configurați în interfață. ID-urile entităților și numele personalizate rămân neschimbate. Dezactivarea restabilește numele configurate. Modelele personalizate pentru numele afișate, inclusiv cele globale, au prioritate: intrările afectate își păstrează numele configurate."
             }
           },
           "features": {
