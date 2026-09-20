@@ -1,10 +1,12 @@
 from dataclasses import dataclass, replace
 
+from fastapi import HTTPException
+
 from measure.controller.light.const import LutMode
 from measure.ha_app.context import AppContext
 from measure.ha_app.coordinator import SessionConflictError
 from measure.ha_app.light_probe import LightLoadProbeResult
-from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightResult
+from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, PreflightError, PreflightResult
 from measure.ha_app.session import is_active_session
 from measure.home_assistant.entities import DeviceClass, EntityDescriptor, EntityDomain, HomeAssistantEntityCatalog
 from measure.powermeter.spec import DummyPowerMeterSpec
@@ -95,3 +97,17 @@ def apply_fast_test_mode(context: AppContext, request: MeasurementRequest) -> Me
             measure_time_effect_min=1,
         )
     return request.model_copy(update={"fast_test_mode": enabled, "parameters": parameters})
+
+
+def validate_standby_setup(context: AppContext, payload: LightMeasurementRequest) -> None:
+    catalog = HomeAssistantEntityCatalog(context.home_assistant)
+    try:
+        MeasurementPreflight(
+            has_active_session=lambda: False,
+            verify_storage=lambda: None,
+            load_entities=lambda domain, device_class: catalog.load_snapshot().select(
+                domain=domain, device_class=device_class
+            ),
+        ).validate_standby(payload)
+    except PreflightError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error

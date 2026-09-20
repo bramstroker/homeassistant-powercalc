@@ -59,7 +59,7 @@ class DummyLoadPreparation(MeasurementPreparation):
                 f"({self.spec.description}) before starting calibration.",
                 action="Start dummy-load calibration",
             )
-            resistance = self._calibrate(interaction)
+            resistance = self.calibrate(interaction)
             calibrated = True
         else:
             interaction.phase("Preparing resistive dummy load")
@@ -87,7 +87,7 @@ class DummyLoadPreparation(MeasurementPreparation):
             return None
         return calibration.resistance
 
-    def _calibrate(self, interaction: RunInteraction) -> float:
+    def calibrate(self, interaction: RunInteraction) -> float:
         while True:
             averages: list[float] = []
             for index in range(DUMMY_LOAD_MEASUREMENT_COUNT):

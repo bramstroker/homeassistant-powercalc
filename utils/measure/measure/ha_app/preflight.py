@@ -189,6 +189,12 @@ class MeasurementPreflight:
         self._diagnose_power_meter = diagnose_power_meter
         self._developer_mode = developer_mode
 
+    def validate_standby(self, request: LightMeasurementRequest) -> None:
+        """Check retry entities without LUT validation or switching any devices."""
+        self._validate_power_meter(request)
+        if isinstance(request.controller, HassLightControllerSpec | HassMultiLightControllerSpec):
+            self._resolve_lights(request.controller.entity_ids)
+
     def validate(self, request: MeasurementRequest) -> PreflightResult:
         """Return warnings and estimates, or raise a typed preflight error."""
 

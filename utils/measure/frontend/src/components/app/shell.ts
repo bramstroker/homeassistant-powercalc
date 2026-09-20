@@ -1,3 +1,4 @@
+import type { LightMeasurementRequest } from "../../types";
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { cache } from "lit/directives/cache.js";
@@ -342,6 +343,8 @@ export class AppShell extends LitElement implements MeasureAppState {
         .deviceSpecificationFields=${this.deviceSpecificationFields}
         .loadStandbyEstimate=${this.loadStandbyEstimate}
         .measureStandby=${this.measureStandby}
+        .dummyLoadCalibration=${this.dummyLoadCalibration}
+        .calibrateStandby=${(sessionId: string, setup: LightMeasurementRequest, signal?: AbortSignal) => this.controller.calibrateStandby(sessionId, setup, signal)}
         @back=${() => this.controller.backToResult()}
         @open-settings=${this.openSettings}
         @profile-submit=${() => this.controller.openSubmit()}
@@ -446,7 +449,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   private readonly loadStandbyEstimate = (manufacturer: string, connectivity: string[]) =>
     this.api.getStandbyEstimate(manufacturer, connectivity);
 
-  private readonly measureStandby = (sessionId: string) => this.api.measureStandby(sessionId);
+  private readonly measureStandby = (sessionId: string, setup?: LightMeasurementRequest) => this.api.measureStandby(sessionId, setup);
 
   private readonly inspectResultJsonFile = (name: string): Promise<unknown> =>
     this.api.getJsonFile(this.snapshot?.session_id ?? "", name);
