@@ -103,6 +103,8 @@ def test_operational_failure_propagates_and_cleans_up() -> None:
     assembler = MagicMock(spec=MeasurementAssembler)
     runner = assembler.create_runner.return_value
     runner.measure_standby_power.side_effect = PowerMeterError("offline")
+    measurement = StandbyMeasurement(lambda: assembler)
+    request = standby_request("fan")
     with pytest.raises(PowerMeterError, match="offline"):
-        StandbyMeasurement(lambda: assembler).measure(standby_request("fan"))
+        measurement.measure(request)
     runner.cleanup.assert_called_once()

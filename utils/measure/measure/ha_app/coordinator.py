@@ -27,6 +27,7 @@ from measure.utils.clock import utc_now
 
 _LOGGER = logging.getLogger("measure")
 _SNAPSHOT_PERSIST_INTERVAL = 5.0
+_DEVICE_CHECK_ACTIVE = "A device check is already active"
 _ANALYSIS_WARNING_PREFIXES = (
     "Profile was not created:",
     "Profile model was not created:",
@@ -142,7 +143,7 @@ class MeasurementCoordinator:
 
         with self._lock:
             if self._probing:
-                raise SessionConflictError("A device check is already active")
+                raise SessionConflictError(_DEVICE_CHECK_ACTIVE)
             if self._snapshot and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if self._analysing:
@@ -170,7 +171,7 @@ class MeasurementCoordinator:
 
         with self._lock:
             if self._probing:
-                raise SessionConflictError("A device check is already active")
+                raise SessionConflictError(_DEVICE_CHECK_ACTIVE)
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if self._analysing:
@@ -198,7 +199,7 @@ class MeasurementCoordinator:
         """Capture another run with the session's original recorder settings."""
         with self._lock:
             if self._probing:
-                raise SessionConflictError("A device check is already active")
+                raise SessionConflictError(_DEVICE_CHECK_ACTIVE)
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("A measurement session is already active")
             if self._analysing:
