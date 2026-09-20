@@ -48,6 +48,7 @@ export class ProfilePrepareView extends LitElement {
   @state() private standbyEstimate?: StandbyEstimate;
   private standbyEstimateKey = "";
   private standbyEstimateVersion = 0;
+  private appliedStandbyEstimateKey = "";
 
   @state()
   private contributionEdit?: ContributionPreviewRequest;
@@ -69,6 +70,7 @@ export class ProfilePrepareView extends LitElement {
       this.dismissedServerField = undefined;
       this.standbyBusy = false;
       this.standbyMessage = "";
+      this.appliedStandbyEstimateKey = "";
     }
     if (changed.has("contributionPreview") && this.contributionPreview) {
       if (this.hasUpdated) this.contributionFormValues = {};
@@ -140,6 +142,7 @@ export class ProfilePrepareView extends LitElement {
   }
 
   private applyStandbyValue(power: number, estimated: boolean): void {
+    this.appliedStandbyEstimateKey = estimated ? this.standbyEstimateKey : "";
     this.contributionFormValues = {
       ...this.contributionFormValues, standby_power: String(power), standby_power_estimated: String(estimated),
     };
@@ -263,6 +266,7 @@ export class ProfilePrepareView extends LitElement {
             .busy=${this.contributionBusy} .measureDevices=${this.measureDevices}
             .measureDevicesLoading=${this.measureDevicesLoading} .measureDevicesError=${this.measureDevicesError}
             .standbyEstimate=${this.standbyEstimate} @standby-estimate-apply=${this.applyStandbyEstimate}
+            .standbyEstimateStale=${Boolean(this.appliedStandbyEstimateKey && this.appliedStandbyEstimateKey !== this.standbyEstimateKey)}
             .measurementRequest=${this.snapshot.request} .standbyBusy=${this.standbyBusy}
             .standbyMessage=${this.standbyMessage} @standby-measure=${this.retryStandby}
           ></measure-profile-measurement-fields>
@@ -434,6 +438,7 @@ export class ProfilePrepareView extends LitElement {
     const control = event.target as HTMLElement & { name?: string; value?: string | string[] };
     const name = control.name;
     if (!name || name === "confirm_contribution") return;
+    if (name === "standby_power" || name === "standby_power_estimated") this.appliedStandbyEstimateKey = "";
     if (control.value !== undefined) {
       const value = control instanceof HTMLInputElement && control.type === "checkbox" ? String(control.checked) : control.value;
       this.contributionFormValues = { ...this.contributionFormValues, [name]: value };

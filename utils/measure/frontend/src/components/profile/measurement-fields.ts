@@ -12,6 +12,7 @@ export class ProfileMeasurementFields extends ProfileFormSection {
   @property({ type: Boolean }) measureDevicesLoading = false;
   @property({ type: String }) measureDevicesError = "";
   @property({ attribute: false }) standbyEstimate?: StandbyEstimate;
+  @property({ type: Boolean }) standbyEstimateStale = false;
   @property({ attribute: false }) measurementRequest?: MeasurementRequest;
   @property({ type: Boolean }) standbyBusy = false;
   @property({ type: String }) standbyMessage = "";
@@ -88,6 +89,9 @@ export class ProfileMeasurementFields extends ProfileFormSection {
           ${this.renderStandbyEstimateButton(estimate)}
         </div>
         ${this.renderFieldError("standby_power")}
+        ${isLight && estimated && this.standbyEstimateStale
+          ? html`<p class="notice warning" role="alert">Connectivity or manufacturer changed after applying the standby estimate. Your standby value has not been updated. Click “Use estimated standby” again to apply the current suggestion, or enter a value manually. Submitting does not recalculate it.</p>`
+          : nothing}
         ${this.renderStandbyConfirmation(request, canMeasure)}
         ${this.renderStandbyStatus()}
         ${this.renderStandbyHint(isLight)}
