@@ -9,7 +9,7 @@
     }
   ],
   "calculation_strategy": "lut",
-  "created_at": "2026-09-20T01:34:19Z",
+  "created_at": "2026-09-20T19:15:39Z",
   "device_specs": {
     "connectivity": [
       "zigbee",
@@ -28,15 +28,15 @@
   "measure_method": "script",
   "measure_settings": {
     "DUMMY_LOAD": false,
-    "NUM_LIGHTS": 1,
-    "SAMPLE_COUNT": 1,
-    "SLEEP_TIME": 2.0,
-    "VERSION": "v0.7.0:app"
+    "NUM_LIGHTS": 2,
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.7.1:app"
   },
   "name": "Hue white lamp",
-  "standby_power": 0.06,
+  "standby_power": 0.25,
   "voltage_range": {
-    "max": 123.14,
-    "min": 121.93
+    "max": 124.89,
+    "min": 121.07
   }
 }
