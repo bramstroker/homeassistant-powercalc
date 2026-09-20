@@ -1,6 +1,31 @@
 import { expect, test } from "@playwright/test";
 import { completedSnapshot, contributionPreview, mockApi } from "./mock-api";
 
+test("uses detected connectivity for the first standby suggestion and preserves clearing", async ({ page }) => {
+  await mockApi(page);
+  await page.route("**/api/sessions/session-completed/contribution", route => route.fulfill({
+    json: { ...contributionPreview, job_id: null, device_specs: { connectivity: ["zigbee"] } },
+  }));
+  const estimates: string[][] = [];
+  await page.route("**/api/library/standby-estimate?*", route => {
+    estimates.push(new URL(route.request().url()).searchParams.getAll("connectivity"));
+    return route.fulfill({ json: { power_w: 0.25, basis: "connectivity", profile_count: 8 } });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+  await expect(page.getByRole("button", { name: "Use estimated standby: 0.25 W" })).toBeVisible();
+  expect(estimates).toEqual([["zigbee"]]);
+  await page.getByText("Device specifications (optional)", { exact: true }).click();
+  await page.getByRole("button", { name: "Remove Zigbee", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Use estimated standby: 0.4 W" })).toBeVisible();
+  await page.getByRole("button", { name: "Back to result", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+  await page.getByText("Device specifications (optional)", { exact: true }).click();
+  await expect(page.getByRole("button", { name: "Remove Zigbee", exact: true })).toHaveCount(0);
+  expect(estimates).toEqual([["zigbee"]]);
+});
+
 for (const kind of ["light", "fan", "recorder"] as const) {
   test(`confirms standby retry for a simulated ${kind} session`, async ({ page }) => {
     await mockApi(page);

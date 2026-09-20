@@ -179,6 +179,7 @@ def draft_from_request(
     auth: ContributionAuthStatus,
     integration: str | None = None,
     manufacturer: str | None = None,
+    default_connectivity: str | None = None,
     default_model_id: str | None = None,
     default_measure_device_firmware: str | None = None,
     default_contributor_name: str | None = None,
@@ -191,6 +192,9 @@ def draft_from_request(
     artifact_model = _artifact_model(artifact_root)
     voltage_range = _voltage_range(artifact_model)
     author = _first_author(artifact_model)
+    device_specs = _artifact_device_specs(artifact_model)
+    if default_connectivity is not None and "connectivity" not in (device_specs or {}):
+        device_specs = {**(device_specs or {}), "connectivity": [default_connectivity]}
     content = _PreviewContent(
         manufacturer_name=manufacturer or "",
         manufacturer_directory="",
@@ -205,7 +209,7 @@ def draft_from_request(
         product_url=str(artifact_model.get("product_url") or ""),
         mains_voltage=_model_mains_voltage(artifact_model),
         voltage_range=voltage_range,
-        device_specs=_artifact_device_specs(artifact_model),
+        device_specs=device_specs,
         device_type=str(artifact_model.get("device_type") or ""),
         standby_power=artifact_model.get("standby_power")
         if is_valid_standby_power(artifact_model.get("standby_power"))

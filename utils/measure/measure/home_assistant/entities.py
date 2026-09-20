@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from measure.controller.light.capabilities import light_info_from_attributes, supported_light_modes
 from measure.controller.light.const import LutMode
 from measure.home_assistant.client import HomeAssistantManager
+from measure.home_assistant.connectivity import Connectivity, detect_connectivity
 from measure.home_assistant.const import (
     HASS_DEVICE_REGISTRY_ID,
     HASS_DEVICE_REGISTRY_MANUFACTURER,
@@ -60,6 +61,7 @@ class EntityDescriptor(BaseModel):
     device_id: str | None = None
     #: Home Assistant integration providing the entity, as shown on the device page.
     integration: str | None = None
+    connectivity: Connectivity | None = None
     translation_key: str | None = None
     disabled_by: str | None = None
     has_live_state: bool = True
@@ -203,13 +205,15 @@ class HomeAssistantEntityCatalog:
             )
         live_ids = {descriptor.entity_id for descriptor in descriptors}
         descriptors.extend(
-            _describe_registry_entity(entry) for entity_id, entry in registry.items() if entity_id not in live_ids
+            _describe_registry_entity(entry, devices)
+            for entity_id, entry in registry.items()
+            if entity_id not in live_ids
         )
         by_id = {descriptor.entity_id: descriptor for descriptor in descriptors}
         return EntityCatalogSnapshot([_enrich_group_device_metadata(descriptor, by_id) for descriptor in descriptors])
 
 
-def _describe_registry_entity(entry: EntityRegistryEntry) -> EntityDescriptor:
+def _describe_registry_entity(entry: EntityRegistryEntry, devices: dict[str, dict[str, object]]) -> EntityDescriptor:
     """Describe an inventory-only entity with no live Home Assistant state."""
     return EntityDescriptor(
         entity_id=entry.entity_id,
@@ -217,6 +221,7 @@ def _describe_registry_entity(entry: EntityRegistryEntry) -> EntityDescriptor:
         domain=entry.entity_id.partition(".")[0],
         device_id=entry.device_id,
         integration=entry.platform,
+        connectivity=detect_connectivity(entry.platform, devices.get(entry.device_id or "", {})),
         translation_key=getattr(entry, "translation_key", None),
         disabled_by=getattr(entry, "disabled_by", None),
         has_live_state=False,
@@ -234,6 +239,8 @@ def _enrich_group_device_metadata(
     if not descriptor.member_entity_ids:
         return descriptor
     update: dict[str, str] = {}
+    if connectivity := _resolve_group_value(descriptor, by_id, frozenset(), "connectivity"):
+        update["connectivity"] = Connectivity(connectivity)
     if not descriptor.model_id and (model_id := _resolve_group_value(descriptor, by_id, frozenset(), "model_id")):
         update["model_id"] = model_id
     if not descriptor.product_name and (
@@ -300,6 +307,7 @@ def _describe_entity(
         device_class=device_class,
         device_id=device_id,
         integration=str(registry_entry.platform) if registry_entry is not None and registry_entry.platform else None,
+        connectivity=(detect_connectivity(getattr(registry_entry, "platform", None), device) if not members else None),
         translation_key=getattr(registry_entry, "translation_key", None),
         disabled_by=getattr(registry_entry, "disabled_by", None),
         manufacturer=str(manufacturer) if manufacturer else None,

@@ -415,6 +415,25 @@ def test_entity_integration_is_resolved_and_stays_optional(app_client: TestClien
     assert context.get_entity_integrations(["light.test"]) == {"light.test": None}
 
 
+def test_entity_connectivity_uses_device_metadata_and_stays_optional(app_client: TestClient) -> None:
+    context = app_client.app.state.context
+    devices = [
+        {"id": "light-device", "connections": [["mac", "00:17:88:01:02:03:04:05"]], "via_device_id": "bridge"},
+        {"id": "bridge", "connections": [["mac", "00:11:22:33:44:55"]]},
+    ]
+    with patch.object(context.home_assistant, "get_device_registry", return_value=devices):
+        assert context.get_entity_connectivity(["light.test", "light.missing"]) == {
+            "light.test": "zigbee",
+            "light.missing": None,
+        }
+    assert context.home_assistant.entity_data_calls == 1
+
+    with patch.object(context.home_assistant, "get_device_registry", return_value=devices[1:]):
+        assert context.get_entity_connectivity(["light.test"]) == {"light.test": None}
+    with patch.object(context.home_assistant, "get_entity_data", side_effect=OSError("HA offline")):
+        assert context.get_entity_connectivity(["light.test"]) == {"light.test": None}
+
+
 @pytest.mark.parametrize("meter_type", ["hass", "shelly", "kasa"])
 def test_saved_calibration_is_hidden_until_meter_settings_are_complete(app_client: TestClient, meter_type: str) -> None:
     storage = app_client.app.state.context.storage

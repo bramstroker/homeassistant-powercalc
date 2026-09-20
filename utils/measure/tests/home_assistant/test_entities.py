@@ -7,6 +7,48 @@ from measure.home_assistant.entities import DeviceClass, EntityDomain, HomeAssis
 import pytest
 
 
+def test_catalog_detects_connectivity_without_exposing_registry_addresses() -> None:
+    data = _entity_data()
+    data.device_registry[0].update(connections=[["mac", "00:17:88:01:02:03:04:05"]], via_device_id="hue-bridge")
+    data.entity_registry.append(SimpleNamespace(entity_id="light.offline", device_id="light-device", platform="hue"))
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+    snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
+
+    for entity_id in ["light.desk", "light.offline"]:
+        descriptor = snapshot.get(entity_id)
+        assert descriptor is not None
+        assert descriptor.connectivity == "zigbee"
+        assert "00:17:88:01:02:03:04:05" not in descriptor.model_dump_json()
+    assert snapshot.get("light.offline").has_live_state is False
+
+
+@pytest.mark.parametrize(
+    "second_platform,missing_member,expected",
+    [("zha", False, "zigbee"), ("zwave_js", False, None), ("mqtt", False, None), ("zha", True, None)],
+)
+def test_nested_groups_require_all_members_to_share_connectivity(
+    second_platform: str, missing_member: bool, expected: str | None
+) -> None:
+    data = _entity_data()
+    data.entity_registry[0].platform = "zha"
+    data.entities["light"].entities["second"] = _entity("light.second", "on")
+    data.entity_registry.append(SimpleNamespace(entity_id="light.second", device_id=None, platform=second_platform))
+    data.entities["light"].entities["inner"] = _entity("light.inner", "on")
+    data.entities["light"].entities["inner"].state.attributes["entity_id"] = ["light.desk"]
+    # A registered group's own platform must not override disagreement among members.
+    data.entity_registry.append(SimpleNamespace(entity_id="light.outer", device_id=None, platform="zha"))
+    members = ["light.inner", "light.missing" if missing_member else "light.second"]
+    data.entities["light"].entities["outer"] = _entity("light.outer", "on")
+    data.entities["light"].entities["outer"].state.attributes["entity_id"] = members
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+    snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
+
+    assert snapshot.get("light.inner").connectivity == "zigbee"
+    assert snapshot.get("light.outer").connectivity == expected
+
+
 def _entity(entity_id: str, state: str, **attributes: object) -> SimpleNamespace:
     return SimpleNamespace(
         entity_id=entity_id,
@@ -330,6 +372,7 @@ def test_cyclic_light_groups_remain_selectable_without_inferred_device_metadata(
     assert group.model_id is None
     assert group.product_name is None
     assert group.manufacturer is None
+    assert group.connectivity is None
     assert any(light.entity_id == "light.desk" and light.model_id == "LWA017" for light in lights)
 
 

@@ -96,6 +96,18 @@ uv run --group visualize powercalc-visualize ../../profile_library --force
 
 ## Developing the Home Assistant app locally
 
+The app prefills profile connectivity from reliable Home Assistant device metadata:
+ZHA, Zigbee2MQTT, supported Hue devices, and deCONZ use Zigbee; Z-Wave JS uses Z-Wave.
+Groups and multiple measured entities must all resolve to the same connectivity.
+Unknown or conflicting metadata leaves the field unset. Existing profile values are
+preserved, and you can change or clear the default before validating the profile.
+The initial standby suggestion uses this default.
+
+Detection lives in `measure/home_assistant/connectivity.py`. To support another
+integration, add an integration mapping or a metadata predicate to the rule registry,
+with tests using its actual Home Assistant registry metadata. Do not infer device
+connectivity from a bridge's transport or from generic MQTT/network MAC addresses.
+
 The Home Assistant app has a FastAPI backend (`measure/`) and a Lit frontend (`frontend/`). You can run both locally with hot-reloading of the UI.
 See the [measurement tool architecture](../../docs/source/contributing/measure/architecture.md) for the shared CLI/API request, assembly, execution, and result pipeline.
 
