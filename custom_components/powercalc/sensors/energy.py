@@ -39,6 +39,7 @@ from custom_components.powercalc.const import (
     UNAVAILABLE_STATES,
     UnitPrefix,
 )
+from custom_components.powercalc.device_naming import DeviceName
 from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.filter.outlier import OutlierFilter
 
@@ -285,6 +286,8 @@ class EnergySensor(BaseEntity):
 class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     """Virtual energy sensor, totalling kWh."""
 
+    device_name = DeviceName("energy")
+
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _unrecorded_attributes = frozenset({ATTR_SOURCE_DOMAIN, ATTR_SOURCE_ENTITY})
 
@@ -446,16 +449,20 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     def async_reset(self) -> None:
         _LOGGER.debug("%s: Reset energy sensor", self.entity_id)
         self._state = Decimal(0)
+        self._last_valid_state = self._state
         self.async_write_ha_state()
 
     async def async_calibrate(self, value: str) -> None:
         _LOGGER.debug("%s: Calibrate energy sensor to: %s", self.entity_id, value)
         self._state = Decimal(value)
+        self._last_valid_state = self._state
         self.async_write_ha_state()
 
 
 class VirtualStandbyEnergySensor(VirtualEnergySensor):
     """Energy sensor integrating only the standby portion of a virtual power sensor."""
+
+    device_name = DeviceName("standby_energy")
 
     def __init__(
         self,

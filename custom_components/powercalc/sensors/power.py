@@ -88,6 +88,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     PowerProfileSource,
 )
+from custom_components.powercalc.device_naming import DeviceName
 from custom_components.powercalc.discovery import get_discovery_manager
 from custom_components.powercalc.errors import (
     ModelNotSupportedError,
@@ -371,6 +372,8 @@ class PowerSensor(BaseEntity):
 
 class VirtualPowerSensor(PowerSensor, SensorEntity):
     """Virtual power sensor."""
+
+    device_name = DeviceName("power")
 
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT

@@ -623,6 +623,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Power"
+      },
+      "energy": {
+        "name": "Energy"
+      },
+      "standby_energy": {
+        "name": "Standby energy"
+      },
+      "cost": {
+        "name": "Cost"
+      },
+      "energy_period": {
+        "name": "Energy {period}"
+      },
+      "energy_period_tariff": {
+        "name": "Energy {period} {tariff}"
+      },
+      "energy_period_cost": {
+        "name": "Energy {period} cost"
+      },
+      "energy_period_tariff_cost": {
+        "name": "Energy {period} {tariff} cost"
+      }
+    },
+    "select": {
+      "energy_period": {
+        "name": "Energy {period}"
       }
     }
   },
@@ -684,7 +713,11 @@
       "linear_mandatory": "Anna vähintään max_power tai calibrate",
       "linear_min_higher_as_max": "Enimmäisteho ei voi olla pienempi kuin vähimmäisteho",
       "linear_unsupported_domain": "Entiteetin toimialuetta ei tueta lineaarisessa tilassa. Sen on oltava fan, light tai media_player. Voit kuitenkin käyttää calibrate-asetusta",
-      "unknown": "Tapahtui tuntematon virhe, katso lisätietoja lokeista"
+      "unknown": "Tapahtui tuntematon virhe, katso lisätietoja lokeista",
+      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
+      "device_naming_no_device": "Assign a device with a name before enabling this option.",
+      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
+      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
     },
     "step": {
       "advanced_options": {
@@ -714,7 +747,8 @@
           "create_utility_meters": "Luo kulutusmittarit",
           "entity_id": "Lähde-entiteetti",
           "name": "Nimi",
-          "standby_power": "Valmiustilan teho"
+          "standby_power": "Valmiustilan teho",
+          "follow_device_name": "Follow device name"
         },
         "data_description": {
           "create_energy_sensor": "Määrittää, luoko Powercalc kWh-anturin",
@@ -722,7 +756,8 @@
           "create_utility_meters": "Anna Powercalcin luoda kulutusmittarit, joiden jaksot ovat esimerkiksi päivä ja tunti",
           "entity_id": "Entiteetti, johon virtuaalinen teho perustuu, tehoanturi kuuntelee tämän entiteetin tilamuutoksia päivitettäväksi",
           "name": "Jos kenttä jätetään tyhjäksi, nimi otetaan lähde-entiteetistä",
-          "standby_power": "Määritä laitteen tehonkulutus, kun se on pois päältä"
+          "standby_power": "Määritä laitteen tehonkulutus, kun se on pois päältä",
+          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
         }
       },
       "daily_energy": {

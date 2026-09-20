@@ -623,6 +623,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Power"
+      },
+      "energy": {
+        "name": "Energy"
+      },
+      "standby_energy": {
+        "name": "Standby energy"
+      },
+      "cost": {
+        "name": "Cost"
+      },
+      "energy_period": {
+        "name": "Energy {period}"
+      },
+      "energy_period_tariff": {
+        "name": "Energy {period} {tariff}"
+      },
+      "energy_period_cost": {
+        "name": "Energy {period} cost"
+      },
+      "energy_period_tariff_cost": {
+        "name": "Energy {period} {tariff} cost"
+      }
+    },
+    "select": {
+      "energy_period": {
+        "name": "Energy {period}"
       }
     }
   },
@@ -684,7 +713,11 @@
       "linear_mandatory": "Du må oppgi minst én av max_power eller calibrate",
       "linear_min_higher_as_max": "Maks effekt kan ikke være lavere enn min effekt",
       "linear_unsupported_domain": "Entitetsdomenet støttes ikke i lineær modus. Det må være ett av følgende: fan, light eller media_player. Du kan likevel bruke calibrate",
-      "unknown": "Ukjent feil oppstod. Se loggene for mer informasjon"
+      "unknown": "Ukjent feil oppstod. Se loggene for mer informasjon",
+      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
+      "device_naming_no_device": "Assign a device with a name before enabling this option.",
+      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
+      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
     },
     "step": {
       "advanced_options": {
@@ -714,7 +747,8 @@
           "create_utility_meters": "Opprett forbruksmålere",
           "entity_id": "Kildeentitet",
           "name": "Navn",
-          "standby_power": "Standbyeffekt"
+          "standby_power": "Standbyeffekt",
+          "follow_device_name": "Follow device name"
         },
         "data_description": {
           "create_energy_sensor": "Om Powercalc trenger å lage en kWh-sensor",
@@ -722,7 +756,8 @@
           "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser",
           "entity_id": "Entiteten den virtuelle effekten er basert på. Effektsensoren oppdateres når tilstanden til denne entiteten endres",
           "name": "Hvis du lar det stå tomt, hentes navnet fra kildeentiteten",
-          "standby_power": "Definer mengden effekt enheten bruker når den er i AV-tilstand"
+          "standby_power": "Definer mengden effekt enheten bruker når den er i AV-tilstand",
+          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
         }
       },
       "daily_energy": {

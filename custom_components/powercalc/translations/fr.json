@@ -623,6 +623,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Power"
+      },
+      "energy": {
+        "name": "Energy"
+      },
+      "standby_energy": {
+        "name": "Standby energy"
+      },
+      "cost": {
+        "name": "Cost"
+      },
+      "energy_period": {
+        "name": "Energy {period}"
+      },
+      "energy_period_tariff": {
+        "name": "Energy {period} {tariff}"
+      },
+      "energy_period_cost": {
+        "name": "Energy {period} cost"
+      },
+      "energy_period_tariff_cost": {
+        "name": "Energy {period} {tariff} cost"
+      }
+    },
+    "select": {
+      "energy_period": {
+        "name": "Energy {period}"
       }
     }
   },
@@ -684,7 +713,11 @@
       "linear_mandatory": "Vous devez spécifier au moins la puissance minimale ou la valeur d'étalonnage",
       "linear_min_higher_as_max": "La puissance maximale ne peut pas être inférieure à la puissance minimale",
       "linear_unsupported_domain": "Domaine d'entité non pris en charge pour le mode linéaire. Doit être l'un des suivants : ventilateur, lumière ou lecteur multimédia. Vous pouvez cependant utiliser l'option de calibrage",
-      "unknown": "Une erreur inconnue s'est produite, veuillez consulter les journaux pour plus d'informations"
+      "unknown": "Une erreur inconnue s'est produite, veuillez consulter les journaux pour plus d'informations",
+      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
+      "device_naming_no_device": "Assign a device with a name before enabling this option.",
+      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
+      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
     },
     "step": {
       "advanced_options": {
@@ -714,7 +747,8 @@
           "create_utility_meters": "Créer un compteur d'électricité",
           "entity_id": "Entité source",
           "name": "Nom",
-          "standby_power": "Consommation en veille"
+          "standby_power": "Consommation en veille",
+          "follow_device_name": "Follow device name"
         },
         "data_description": {
           "create_energy_sensor": "Indique si Powercalc doit créer un capteur kWh",
@@ -722,7 +756,8 @@
           "create_utility_meters": "Laisser Powercalc créer des compteurs de services publics, avec des cycles quotidiens, horaires, etc.",
           "entity_id": "Entité sur laquelle la puissance virtuelle est basée ; le capteur de puissance écoutera les changements d'état de cette entité pour se mettre à jour",
           "name": "Si vous laissez vide, le nom de l'entité source sera utilisé",
-          "standby_power": "Définir la quantité de puissance consommée par l'appareil lorsqu'il est à l'état OFF"
+          "standby_power": "Définir la quantité de puissance consommée par l'appareil lorsqu'il est à l'état OFF",
+          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
         }
       },
       "daily_energy": {

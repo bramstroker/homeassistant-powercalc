@@ -623,6 +623,35 @@
           "failed": "Mislukt",
           "resumable": "Hervatbaar"
         }
+      },
+      "power": {
+        "name": "Power"
+      },
+      "energy": {
+        "name": "Energy"
+      },
+      "standby_energy": {
+        "name": "Standby energy"
+      },
+      "cost": {
+        "name": "Cost"
+      },
+      "energy_period": {
+        "name": "Energy {period}"
+      },
+      "energy_period_tariff": {
+        "name": "Energy {period} {tariff}"
+      },
+      "energy_period_cost": {
+        "name": "Energy {period} cost"
+      },
+      "energy_period_tariff_cost": {
+        "name": "Energy {period} {tariff} cost"
+      }
+    },
+    "select": {
+      "energy_period": {
+        "name": "Energy {period}"
       }
     }
   },
@@ -684,7 +713,11 @@
       "linear_mandatory": "Je moet mimimaal max vermogen of kalibratie waardes instellen",
       "linear_min_higher_as_max": "Maximale vermogen kan niet lager zijn dan mimimale vermogen",
       "linear_unsupported_domain": "Entity domein is niet ondersteund. Moet een van de volgende zijn: fan, light of mediaplayer. Je kan de calibratie optie gebruiken",
-      "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
+      "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie",
+      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
+      "device_naming_no_device": "Assign a device with a name before enabling this option.",
+      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
+      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
     },
     "step": {
       "advanced_options": {
@@ -714,7 +747,8 @@
           "create_utility_meters": "Utiliteit meters aanmaken",
           "entity_id": "Bron entiteit",
           "name": "Naam",
-          "standby_power": "Standby vermogen"
+          "standby_power": "Standby vermogen",
+          "follow_device_name": "Follow device name"
         },
         "data_description": {
           "create_energy_sensor": "Laat Powercalc een kWh-sensor aanmaken",
@@ -722,7 +756,8 @@
           "create_utility_meters": "Laat Powercalc utiliteit aanmeters maken. Deze resetten dagelijks, uurlijks etc.",
           "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
           "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
-          "standby_power": "Definieer het vermogen wanneer het apparaat uit staat"
+          "standby_power": "Definieer het vermogen wanneer het apparaat uit staat",
+          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
         }
       },
       "daily_energy": {

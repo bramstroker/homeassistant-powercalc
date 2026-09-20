@@ -623,6 +623,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Power"
+      },
+      "energy": {
+        "name": "Energy"
+      },
+      "standby_energy": {
+        "name": "Standby energy"
+      },
+      "cost": {
+        "name": "Cost"
+      },
+      "energy_period": {
+        "name": "Energy {period}"
+      },
+      "energy_period_tariff": {
+        "name": "Energy {period} {tariff}"
+      },
+      "energy_period_cost": {
+        "name": "Energy {period} cost"
+      },
+      "energy_period_tariff_cost": {
+        "name": "Energy {period} {tariff} cost"
+      }
+    },
+    "select": {
+      "energy_period": {
+        "name": "Energy {period}"
       }
     }
   },
@@ -684,7 +713,11 @@
       "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
       "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă",
       "linear_unsupported_domain": "Domeniul entității nu este acceptat pentru modul liniar. Trebuie să fie unul dintre: fan, light sau mediaplayer. Cu toate acestea, puteți utiliza opțiunea de calibrare",
-      "unknown": "A apărut o eroare necunoscută, vă rugăm să consultați jurnalele pentru informații suplimentare"
+      "unknown": "A apărut o eroare necunoscută, vă rugăm să consultați jurnalele pentru informații suplimentare",
+      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
+      "device_naming_no_device": "Assign a device with a name before enabling this option.",
+      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
+      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
     },
     "step": {
       "advanced_options": {
@@ -714,7 +747,8 @@
           "create_utility_meters": "Creați contoare",
           "entity_id": "Entitatea sursă",
           "name": "Nume",
-          "standby_power": "Putere in Standby"
+          "standby_power": "Putere in Standby",
+          "follow_device_name": "Follow device name"
         },
         "data_description": {
           "create_energy_sensor": "Dacă Powercalc trebuie să creeze un senzor kWh",
@@ -722,7 +756,8 @@
           "create_utility_meters": "Permiteți Powercalc să creeze contoare de utilitate care se resetează zilnic, orar etc.",
           "entity_id": "entitatea pe care se bazează puterea virtuală; senzorul de putere va asculta modificările de stare ale acestei entități pentru a se actualiza",
           "name": "Dacă lăsați necompletat, numele va fi preluat de la entitatea sursă",
-          "standby_power": "Definiți cantitatea de energie pe care o consumă dispozitivul în starea OPRIT"
+          "standby_power": "Definiți cantitatea de energie pe care o consumă dispozitivul în starea OPRIT",
+          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
         }
       },
       "daily_energy": {

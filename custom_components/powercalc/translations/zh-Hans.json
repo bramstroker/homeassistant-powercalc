@@ -623,6 +623,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Power"
+      },
+      "energy": {
+        "name": "Energy"
+      },
+      "standby_energy": {
+        "name": "Standby energy"
+      },
+      "cost": {
+        "name": "Cost"
+      },
+      "energy_period": {
+        "name": "Energy {period}"
+      },
+      "energy_period_tariff": {
+        "name": "Energy {period} {tariff}"
+      },
+      "energy_period_cost": {
+        "name": "Energy {period} cost"
+      },
+      "energy_period_tariff_cost": {
+        "name": "Energy {period} {tariff} cost"
+      }
+    },
+    "select": {
+      "energy_period": {
+        "name": "Energy {period}"
       }
     }
   },
@@ -684,7 +713,11 @@
       "linear_mandatory": "必须至少提供 max_power 或 calibrate 中的一项",
       "linear_min_higher_as_max": "最大功率不能低于最小功率",
       "linear_unsupported_domain": "线性模式不支持此实体域。必须是 fan、light 或 mediaplayer 之一，但仍可使用 calibrate 选项",
-      "unknown": "发生未知错误，详情请查看日志"
+      "unknown": "发生未知错误，详情请查看日志",
+      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
+      "device_naming_no_device": "Assign a device with a name before enabling this option.",
+      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
+      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
     },
     "step": {
       "advanced_options": {
@@ -714,7 +747,8 @@
           "create_utility_meters": "创建公用事业计量表",
           "entity_id": "源实体",
           "name": "名称",
-          "standby_power": "待机功率"
+          "standby_power": "待机功率",
+          "follow_device_name": "Follow device name"
         },
         "data_description": {
           "create_energy_sensor": "是否让 Powercalc 创建 kWh 传感器",
@@ -722,7 +756,8 @@
           "create_utility_meters": "让 Powercalc 创建按日、按小时等周期计量的公用事业计量表",
           "entity_id": "虚拟功率所基于的实体。功率传感器会监听此实体的状态变化并随之更新",
           "name": "留空则使用源实体的名称",
-          "standby_power": "定义设备处于关闭状态时消耗的功率"
+          "standby_power": "定义设备处于关闭状态时消耗的功率",
+          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
         }
       },
       "daily_energy": {

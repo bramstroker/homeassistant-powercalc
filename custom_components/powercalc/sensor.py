@@ -90,6 +90,7 @@ from .device_binding import (
     assign_device_to_entities,
     resolve_source_device,
 )
+from .device_naming import resolve_naming_device
 from .errors import (
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
@@ -98,6 +99,7 @@ from .errors import (
 from .group_include.filter import FilterOperator, create_composite_filter
 from .group_include.include import find_entities
 from .measure import MeasureAppCoordinator
+from .sensors.abstract import BaseEntity
 from .sensors.cost import CostSensor, create_cost_sensor_for_energy_entity
 from .sensors.daily_energy import (
     create_daily_fixed_energy_power_sensor,
@@ -701,12 +703,23 @@ async def create_individual_sensors(
         if sensor_config.get(CONF_CREATE_STANDBY_ENERGY_SENSOR) and isinstance(power_sensor, VirtualPowerSensor):
             entities_to_add.append(create_standby_energy_sensor(hass, sensor_config, power_sensor, source_entity))
 
+    naming_device = resolve_naming_device(hass, sensor_config, config_entry)
+
     if energy_sensor:
         entities_to_add.extend(
-            create_energy_related_sensors(hass, sensor_config, energy_sensor, source_entity, config_entry),
+            create_energy_related_sensors(
+                hass,
+                sensor_config,
+                energy_sensor,
+                source_entity,
+                config_entry,
+                naming_device=naming_device,
+            ),
         )
 
     assign_device_to_entities(hass, config_entry, entities_to_add, source_entity, sensor_config)
+    if naming_device:
+        _enable_device_naming(entities_to_add)
     hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update(
         {source_entity.entity_id: [(entity, context.is_yaml) for entity in entities_to_add]},
     )
@@ -719,6 +732,12 @@ async def create_individual_sensors(
     collect_analytics(hass, config_entry).inc(DATA_SOURCE_DOMAINS, source_entity.domain)
 
     return EntitiesBucket(new=entities_to_add, existing=[])
+
+
+def _enable_device_naming(entities: list[Entity]) -> None:
+    for entity in entities:
+        if isinstance(entity, BaseEntity):
+            entity.enable_device_naming()
 
 
 async def _create_daily_fixed_energy_sensors(

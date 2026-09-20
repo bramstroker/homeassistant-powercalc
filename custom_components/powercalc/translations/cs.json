@@ -623,6 +623,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Power"
+      },
+      "energy": {
+        "name": "Energy"
+      },
+      "standby_energy": {
+        "name": "Standby energy"
+      },
+      "cost": {
+        "name": "Cost"
+      },
+      "energy_period": {
+        "name": "Energy {period}"
+      },
+      "energy_period_tariff": {
+        "name": "Energy {period} {tariff}"
+      },
+      "energy_period_cost": {
+        "name": "Energy {period} cost"
+      },
+      "energy_period_tariff_cost": {
+        "name": "Energy {period} {tariff} cost"
+      }
+    },
+    "select": {
+      "energy_period": {
+        "name": "Energy {period}"
       }
     }
   },
@@ -684,7 +713,11 @@
       "linear_mandatory": "Musíte zadat alespoň jednu z možností max_power nebo calibrate",
       "linear_min_higher_as_max": "Maximální spotřeba nebůže být nižší, nežli minimální spotřeba",
       "linear_unsupported_domain": "Doména entity není pro lineární režim podporována. Musí být jedna z: fan, light nebo mediaplayer. Můžete však použít možnost calibrate",
-      "unknown": "Došlo k neznámé chybě. Více informací najdete v logu"
+      "unknown": "Došlo k neznámé chybě. Více informací najdete v logu",
+      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
+      "device_naming_no_device": "Assign a device with a name before enabling this option.",
+      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
+      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
     },
     "step": {
       "advanced_options": {
@@ -714,7 +747,8 @@
           "create_utility_meters": "Vytvořit měřiče spotřeby",
           "entity_id": "Zdrojová entita",
           "name": "Název",
-          "standby_power": "Výkon v pohotovostním režimu"
+          "standby_power": "Výkon v pohotovostním režimu",
+          "follow_device_name": "Follow device name"
         },
         "data_description": {
           "create_energy_sensor": "Zda má Powercalc vytvořit senzor kWh",
@@ -722,7 +756,8 @@
           "create_utility_meters": "Nechat Powercalc vytvořit měřiče spotřeby s denními, hodinovými apod. cykly",
           "entity_id": "Entita, na které je virtuální výkon založen. Senzor výkonu bude poslouchat změny stavu této entity, aby se aktualizoval",
           "name": "Při ponechání prázdné hodnoty se použije název ze zdrojové entity",
-          "standby_power": "Definujte množství výkonu, které zařízení spotřebovává ve vypnutém stavu"
+          "standby_power": "Definujte množství výkonu, které zařízení spotřebovává ve vypnutém stavu",
+          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
         }
       },
       "daily_energy": {

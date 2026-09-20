@@ -32,6 +32,7 @@ from .const import (
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_PRICE_SENSOR,
+    CONF_FOLLOW_DEVICE_NAME,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -48,6 +49,7 @@ from .const import (
     SensorType,
 )
 from .device_binding import resolve_source_device
+from .device_naming import get_device_naming_error
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults, flatten_sections
 from .flow_helper.flows.cost import CostConfigFlow, CostOptionsFlow
@@ -609,7 +611,21 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
     async def async_step_basic_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the basic options flow."""
-        return await self.async_handle_options_step(user_input, self.build_basic_options_schema(), Step.BASIC_OPTIONS)
+        return await self.async_handle_options_step(
+            user_input,
+            self.build_basic_options_schema(),
+            Step.BASIC_OPTIONS,
+            validate=self.validate_device_naming,
+        )
+
+    def validate_device_naming(self, user_input: dict[str, Any]) -> dict[str, str] | None:
+        config = {**get_global_powercalc_config(self), **self.sensor_config, **user_input}
+        if not config.get(CONF_FOLLOW_DEVICE_NAME):
+            return None
+        if self.selected_profile:
+            config.update(self.selected_profile.sensor_config)
+        error = get_device_naming_error(self.hass, config, self.config_entry)
+        return {CONF_FOLLOW_DEVICE_NAME: error} if error else None
 
     async def async_step_advanced_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the basic options flow."""
@@ -744,7 +760,11 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 },
             )
 
-        schema = vol.Schema({})
+        schema = vol.Schema(
+            {
+                vol.Optional(CONF_FOLLOW_DEVICE_NAME): selector.BooleanSelector(),
+            }
+        )
 
         if self.source_entity_id != DUMMY_ENTITY_ID:
             schema = schema.extend(

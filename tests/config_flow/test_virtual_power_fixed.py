@@ -17,6 +17,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_FIXED,
     CONF_FIXED_VALUE,
+    CONF_FOLLOW_DEVICE_NAME,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -157,6 +158,7 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
 
     schema_keys = list(result["data_schema"].schema.keys())
     assert schema_keys == [
+        CONF_FOLLOW_DEVICE_NAME,
         CONF_ENTITY_ID,
         CONF_STANDBY_POWER,
         CONF_CREATE_ENERGY_SENSOR,
