@@ -46,7 +46,7 @@ def create_utility_meters(
     energy_sensor: EnergySensor,
     sensor_config: ConfigType,
     config_entry: ConfigEntry | None = None,
-    naming_device: AnyDeviceEntry | None = None,
+    follow_device_name: bool = False,
     device_entry: AnyDeviceEntry | None = None,
 ) -> list[VirtualUtilityMeter]:
     """Create the utility meters."""
@@ -73,7 +73,7 @@ def create_utility_meters(
                     meter_type,
                     tariffs,
                     device_entry=device_entry,
-                    naming_device=naming_device,
+                    follow_device_name=follow_device_name,
                 ),
             )
 
@@ -110,7 +110,7 @@ def create_meters_for_type(
     unique_id: str | None,
     meter_type: str,
     tariffs: list[str],
-    naming_device: AnyDeviceEntry | None = None,
+    follow_device_name: bool = False,
     device_entry: AnyDeviceEntry | None = None,
 ) -> list[VirtualUtilityMeter]:
     """Create meters for a specific meter type."""
@@ -147,7 +147,7 @@ def create_meters_for_type(
             unique_id,
             tariffs,
             device_entry=device_entry,
-            naming_device=naming_device,
+            follow_device_name=follow_device_name,
         )
         tariff_sensors.extend(new_tariff_sensors)
         utility_meters.extend(new_tariff_sensors)
@@ -166,7 +166,7 @@ def create_tariff_meters(
     meter_type: str,
     unique_id: str | None,
     tariffs: list[str],
-    naming_device: AnyDeviceEntry | None = None,
+    follow_device_name: bool = False,
     device_entry: AnyDeviceEntry | None = None,
 ) -> list[VirtualUtilityMeter]:
     """Create utility meters for specific tariffs."""
@@ -178,7 +178,7 @@ def create_tariff_meters(
         name,
         unique_id,
         device_entry=device_entry,
-        naming_device=naming_device,
+        follow_device_name=follow_device_name,
         meter_type=meter_type,
     )
 
@@ -206,7 +206,7 @@ def create_tariff_select(
     hass: HomeAssistant,
     name: str,
     unique_id: str | None,
-    naming_device: AnyDeviceEntry | None = None,
+    follow_device_name: bool = False,
     meter_type: str = "",
     device_entry: AnyDeviceEntry | None = None,
 ) -> TariffSelect:
@@ -229,7 +229,7 @@ def create_tariff_select(
     # Platform entities (YAML and group selects) cannot attach a device directly.
     if config_entry:
         tariff_select.device_entry = device_entry
-    if naming_device:
+    if follow_device_name:
         tariff_select.device_name = DeviceName("utility_meter_cycle", {"period": meter_type})
         tariff_select.enable_device_naming()
 

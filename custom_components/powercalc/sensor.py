@@ -90,7 +90,7 @@ from .device_binding import (
     assign_device_to_entities,
     resolve_source_device,
 )
-from .device_naming import resolve_naming_device
+from .device_naming import should_follow_device_name
 from .errors import (
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
@@ -703,7 +703,7 @@ async def create_individual_sensors(
         if sensor_config.get(CONF_CREATE_STANDBY_ENERGY_SENSOR) and isinstance(power_sensor, VirtualPowerSensor):
             entities_to_add.append(create_standby_energy_sensor(hass, sensor_config, power_sensor, source_entity))
 
-    naming_device = resolve_naming_device(hass, sensor_config, config_entry)
+    follow_device_name = should_follow_device_name(hass, sensor_config, config_entry, source_entity)
 
     if energy_sensor:
         entities_to_add.extend(
@@ -713,12 +713,12 @@ async def create_individual_sensors(
                 energy_sensor,
                 source_entity,
                 config_entry,
-                naming_device=naming_device,
+                follow_device_name=follow_device_name,
             ),
         )
 
     assign_device_to_entities(hass, config_entry, entities_to_add, source_entity, sensor_config)
-    if naming_device:
+    if follow_device_name:
         _enable_device_naming(entities_to_add)
     hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update(
         {source_entity.entity_id: [(entity, context.is_yaml) for entity in entities_to_add]},
@@ -735,9 +735,9 @@ async def create_individual_sensors(
 
 
 def _enable_device_naming(entities: list[Entity]) -> None:
-    powercalc_entities = [entity for entity in entities if isinstance(entity, BaseEntity)]
-    for entity in powercalc_entities:
-        entity.enable_device_naming()
+    for entity in entities:
+        if isinstance(entity, BaseEntity):
+            entity.enable_device_naming()
 
 
 async def _create_daily_fixed_energy_sensors(

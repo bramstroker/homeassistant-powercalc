@@ -85,6 +85,10 @@ standard display-name patterns. It does not support YAML entries, groups, standa
 named source channels, multi-switch configurations, or multiple virtual power entries assigned to
 the same device. These configurations retain their existing naming behavior.
 
+The shared-device check considers UI entries only, not YAML sensors. Eligibility is checked
+on entry setup: after adding or removing another entry on the same device, reload existing
+entries or restart Home Assistant to update their naming behavior.
+
 Custom display-name patterns, including inherited global patterns, take precedence over this option.
 Custom entity-ID patterns can be used if their corresponding friendly-name patterns explicitly
 retain the standard display names, such as `power_sensor_friendly_naming: "{} power"`.

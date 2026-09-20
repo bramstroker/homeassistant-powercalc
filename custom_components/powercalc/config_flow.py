@@ -609,11 +609,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
     async def async_step_basic_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the basic options flow."""
-        return await self.async_handle_options_step(
-            user_input,
-            self.build_basic_options_schema(),
-            Step.BASIC_OPTIONS,
-        )
+        return await self.async_handle_options_step(user_input, self.build_basic_options_schema(), Step.BASIC_OPTIONS)
 
     async def async_step_advanced_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the basic options flow."""

@@ -4,7 +4,7 @@ import inspect
 import logging
 from typing import Any
 
-from homeassistant.components.integration.sensor import IntegrationSensor
+from homeassistant.components.integration.sensor import IntegrationSensor, IntegrationSensorExtraStoredData
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
@@ -283,6 +283,15 @@ class EnergySensor(BaseEntity):
     """Class which all energy sensors should extend from."""
 
 
+class VirtualEnergyExtraStoredData(IntegrationSensorExtraStoredData):
+    """Preserve zero totals which HA's integration serializer treats as missing."""
+
+    def as_dict(self) -> dict[str, Any]:
+        data = super().as_dict()
+        data["last_valid_state"] = str(self.last_valid_state) if self.last_valid_state is not None else None
+        return data
+
+
 class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     """Virtual energy sensor, totalling kWh."""
 
@@ -440,6 +449,15 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         if super_attrs:
             attrs.update(super_attrs)
         return attrs
+
+    @property
+    def extra_restore_state_data(self) -> VirtualEnergyExtraStoredData:
+        return VirtualEnergyExtraStoredData(
+            self.native_value,
+            self.native_unit_of_measurement,
+            self._source_entity,
+            self._last_valid_state,
+        )
 
     @property
     def icon(self) -> str:

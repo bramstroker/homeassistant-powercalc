@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 
-from .common import AnyDeviceEntry, create_source_entity
+from .common import AnyDeviceEntry, SourceEntity
 from .const import (
     CONF_COST_SENSOR_FRIENDLY_NAMING,
     CONF_COST_SENSOR_NAMING,
@@ -28,7 +28,6 @@ from .const import (
     DEFAULT_STANDBY_ENERGY_NAME_PATTERN,
     DOMAIN,
     DOMAIN_CONFIG,
-    DUMMY_ENTITY_ID,
     CalculationStrategy,
     SensorType,
 )
@@ -43,13 +42,17 @@ class DeviceName:
     placeholders: dict[str, str] | None = None
 
 
-def get_device_naming_error(hass: HomeAssistant, config: ConfigType, entry: ConfigEntry) -> str | None:
+def get_device_naming_error(
+    hass: HomeAssistant,
+    config: ConfigType,
+    entry: ConfigEntry,
+    source: SourceEntity,
+    device: AnyDeviceEntry | None,
+) -> str | None:
     """Validate the effective configuration without changing existing naming choices."""
     if config.get(CONF_SENSOR_TYPE) != SensorType.VIRTUAL_POWER:
         return "device_naming_unsupported"
 
-    source = create_source_entity(config.get(CONF_ENTITY_ID, DUMMY_ENTITY_ID), hass)
-    device = get_device_entry(hass, config, source, entry)
     if device is None or not (device.name_by_user or device.name):
         return "device_naming_no_device"
 
@@ -58,9 +61,6 @@ def get_device_naming_error(hass: HomeAssistant, config: ConfigType, entry: Conf
 
     # A named channel is not the main feature of a device. Do not discard its qualifier.
     if source.entity_entry and source.entity_entry.has_entity_name and source.entity_entry.original_name:
-        return "device_naming_ambiguous"
-
-    if has_other_virtual_power_entry(hass, entry, device.id):
         return "device_naming_ambiguous"
 
     patterns = [
@@ -72,6 +72,8 @@ def get_device_naming_error(hass: HomeAssistant, config: ConfigType, entry: Conf
     for naming_key, friendly_key, default in patterns:
         if config.get(friendly_key, config.get(naming_key, default)) != default:
             return "device_naming_custom_pattern"
+    if has_other_virtual_power_entry(hass, entry, device.id):
+        return "device_naming_ambiguous"
     return None
 
 
@@ -89,23 +91,22 @@ def has_other_virtual_power_entry(hass: HomeAssistant, entry: ConfigEntry, devic
     return False
 
 
-def resolve_naming_device(
+def should_follow_device_name(
     hass: HomeAssistant,
     config: ConfigType,
     entry: ConfigEntry | None,
-) -> AnyDeviceEntry | None:
+    source: SourceEntity,
+) -> bool:
     """Use the global naming option, retaining configured names for unsupported entries."""
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
     if entry is None or not global_config.get(CONF_FOLLOW_DEVICE_NAME):
-        return None
-    if error := get_device_naming_error(hass, config, entry):
+        return False
+    device = get_device_entry(hass, config, source, entry)
+    if error := get_device_naming_error(hass, config, entry, source, device):
         configured_device_missing = (
-            error == "device_naming_no_device"
-            and config.get(CONF_DEVICE) is not None
-            and get_device_entry(hass, config, config_entry=entry) is None
+            error == "device_naming_no_device" and config.get(CONF_DEVICE) is not None and device is None
         )
         log = _LOGGER.warning if configured_device_missing else _LOGGER.debug
         log("Cannot follow device name for %s: %s; using configured names", entry.title, error)
-        return None
-    source = create_source_entity(config.get(CONF_ENTITY_ID, DUMMY_ENTITY_ID), hass)
-    return get_device_entry(hass, config, source, entry)
+        return False
+    return True

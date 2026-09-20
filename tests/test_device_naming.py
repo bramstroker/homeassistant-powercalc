@@ -21,6 +21,7 @@ from pytest_homeassistant_custom_component.components.recorder.common import (
 )
 from sqlalchemy.orm import Session
 
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
@@ -46,9 +47,11 @@ from custom_components.powercalc.const import (
     DOMAIN,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SERVICE_CALIBRATE_ENERGY,
+    SERVICE_RESET_ENERGY,
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.device_binding import get_device_entry
 from custom_components.powercalc.device_naming import get_device_naming_error
 from custom_components.powercalc.flow_helper.common import Step
 from tests.common import create_mock_config_entry, create_mock_group_entry, run_powercalc_setup
@@ -372,7 +375,9 @@ async def test_naming_eligibility(
     hass: HomeAssistant, source_device: DeviceEntry, config: dict, error: str | None
 ) -> None:
     entry = await create_mock_config_entry(hass, {**entry_config(), **config}, setup=False)
-    assert get_device_naming_error(hass, entry.data, entry) == error
+    source = create_source_entity("light.patio", hass)
+    device = get_device_entry(hass, entry.data, source, entry)
+    assert get_device_naming_error(hass, entry.data, entry, source, device) == error
 
 
 async def test_named_channels_and_multiple_entries_are_rejected(
@@ -382,10 +387,12 @@ async def test_named_channels_and_multiple_entries_are_rejected(
 ) -> None:
     entry = await create_mock_config_entry(hass, entry_config(), setup=False)
     entity_registry.async_update_entity("light.patio", original_name="Left channel")
-    assert get_device_naming_error(hass, entry.data, entry) == "device_naming_ambiguous"
+    source = create_source_entity("light.patio", hass)
+    assert get_device_naming_error(hass, entry.data, entry, source, source_device) == "device_naming_ambiguous"
     entity_registry.async_update_entity("light.patio", original_name=None)
+    source = create_source_entity("light.patio", hass)
     other = await create_mock_config_entry(hass, {**entry_config(), CONF_ENTITY_ID: "light.other"}, setup=False)
-    assert get_device_naming_error(hass, entry.data, entry) is None
+    assert get_device_naming_error(hass, entry.data, entry, source, source_device) is None
     entity_registry.async_get_or_create(
         "light",
         "test",
@@ -393,10 +400,10 @@ async def test_named_channels_and_multiple_entries_are_rejected(
         device_id=source_device.id,
         suggested_object_id="other",
     )
-    assert get_device_naming_error(hass, entry.data, entry) == "device_naming_ambiguous"
+    assert get_device_naming_error(hass, entry.data, entry, source, source_device) == "device_naming_ambiguous"
     entity_registry.async_remove("light.other")
     hass.config_entries.async_update_entry(other, data={**other.data, CONF_DEVICE: source_device.id})
-    assert get_device_naming_error(hass, entry.data, entry) == "device_naming_ambiguous"
+    assert get_device_naming_error(hass, entry.data, entry, source, source_device) == "device_naming_ambiguous"
 
 
 async def test_global_naming_preserves_custom_patterns(
@@ -460,15 +467,24 @@ async def test_global_naming_preserves_profile_patterns(
     assert not entity_registry.async_get("sensor.patio_custom").has_entity_name
 
 
-async def test_calibrated_energy_survives_naming_reload(hass: HomeAssistant, source_device: DeviceEntry) -> None:
+@pytest.mark.parametrize("energy_id", ["sensor.patio_energy", "sensor.patio_standby_energy"])
+@pytest.mark.parametrize(
+    "service,value", [(SERVICE_CALIBRATE_ENERGY, "100"), (SERVICE_CALIBRATE_ENERGY, "0"), (SERVICE_RESET_ENERGY, "0")]
+)
+async def test_corrected_energy_survives_naming_reload(
+    hass: HomeAssistant, source_device: DeviceEntry, energy_id: str, service: str, value: str
+) -> None:
     await create_mock_config_entry(hass, entry_config())
-    energy_id = "sensor.patio_energy"
     await hass.services.async_call(
         DOMAIN, SERVICE_CALIBRATE_ENERGY, {CONF_ENTITY_ID: energy_id, "value": "100"}, blocking=True
     )
+    service_data = {CONF_ENTITY_ID: energy_id}
+    if service == SERVICE_CALIBRATE_ENERGY:
+        service_data["value"] = value
+    await hass.services.async_call(DOMAIN, service, service_data, blocking=True)
     for enabled in [True, False]:
         await set_follow_device_name(hass, enabled)
-        assert float(hass.states.get(energy_id).state) == 100
+        assert float(hass.states.get(energy_id).state) == float(value)
 
 
 async def test_totals_and_statistics_survive_naming_changes(
