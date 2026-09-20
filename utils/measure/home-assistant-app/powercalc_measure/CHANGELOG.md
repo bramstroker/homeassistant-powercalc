@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 0.7.1 - 2026-09-20
+
+- #4751 Tapo smart support @TheLexus
+- #4760 Rename profile EAN field to GTIN @bramstroker
+- #4790 Improve vacuum recording entity capture @bramstroker
+- #4796 Simplify measurement package layout and app routes @bramstroker
+- #4801 Extend measurement backend behavior coverage @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4780 Wait for Home Assistant entities after restart @bramstroker
+- #4781 Retry transient Shelly rate limits @bramstroker
+- #4806 Recover unavailable light standby measurements @bramstroker
+- #4813 Keep standby failures from discarding a finished session @bramstroker
+
 ## 0.7.0 - 2026-09-13
 
 - #4724 Clean up measure frontend components @bramstroker
