@@ -33,7 +33,7 @@
     "SLEEP_TIME": 3.0,
     "VERSION": "v0.7.1:app"
   },
-  "name": "Hue White Bulb A19 E26",
+  "name": "Hue White Bulb A19 E26 1100lm with Bluetooth",
   "standby_power": 0.25,
   "standby_power_estimated": true,
   "voltage_range": {
