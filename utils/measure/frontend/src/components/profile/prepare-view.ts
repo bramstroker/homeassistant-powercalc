@@ -2,7 +2,7 @@ import { LitElement, css, html, nothing } from "lit";
 import type { PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type {
-  DummyLoadCalibration,
+  StandbyCalibrationActions,
   LightMeasurementRequest,
   ContributionAuthState,
   ContributionDraft,
@@ -45,8 +45,7 @@ export class ProfilePrepareView extends LitElement {
   @property({ attribute: false }) deviceSpecificationFields: Record<string, DeviceSpecificationField[]> = {};
   @property({ attribute: false }) loadStandbyEstimate?: (manufacturer: string, connectivity: string[]) => Promise<StandbyEstimate>;
   @property({ attribute: false }) measureStandby?: (sessionId: string, setup?: LightMeasurementRequest) => Promise<StandbyMeasurementResult>;
-  @property({ attribute: false }) calibrateStandby?: (sessionId: string, setup: LightMeasurementRequest, signal?: AbortSignal) => Promise<DummyLoadCalibration | null>;
-  @property({ attribute: false }) dummyLoadCalibration: DummyLoadCalibration | null = null;
+  @property({ attribute: false }) calibrationActions?: StandbyCalibrationActions;
   @state() private standbyBusy = false;
   @state() private standbyMessage = "";
   @state() private standbyEstimate?: StandbyEstimate;
@@ -272,8 +271,7 @@ export class ProfilePrepareView extends LitElement {
             .standbyEstimate=${this.standbyEstimate} @standby-estimate-apply=${this.applyStandbyEstimate}
             .standbyEstimateStale=${Boolean(this.appliedStandbyEstimateKey && this.appliedStandbyEstimateKey !== this.standbyEstimateKey)}
             .measurementRequest=${this.snapshot.request} .standbyBusy=${this.standbyBusy}
-            .dummyLoadCalibration=${this.dummyLoadCalibration}
-            .calibrateStandby=${(setup: LightMeasurementRequest, signal?: AbortSignal) => this.calibrateStandby?.(this.snapshot.session_id!, setup, signal) ?? Promise.resolve(null)}
+            .calibrationActions=${this.calibrationActions} .sessionId=${this.snapshot.session_id}
             .standbyMessage=${this.standbyMessage} @standby-measure=${this.retryStandby}
           ></measure-profile-measurement-fields>
           <measure-profile-device-specification-fields

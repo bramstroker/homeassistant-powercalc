@@ -727,3 +727,62 @@ def test_shelly_discovery_endpoint(app_client: TestClient) -> None:
 
     assert response.status_code == 200
     assert response.json() == {"devices": [], "available": True, "message": None}
+
+
+@pytest.mark.parametrize("saved", [False, True])
+def test_calibration_match_uses_requested_meter_not_settings(app_client: TestClient, saved: bool) -> None:
+    meter = HassPowerMeterSpec(entity_id="sensor.session_power", voltage_entity_id="sensor.session_voltage")
+    calibration = DummyLoadCalibration(
+        description="Warm bulb",
+        resistance=1322.5,
+        calibrated_at="2026-09-20T12:00:00Z",
+        power_meter_fingerprint=power_meter_fingerprint(meter),
+    )
+    if saved:
+        app_client.app.state.context.storage.save_dummy_load_calibration(calibration)
+    assert app_client.get("/api/dummy-load/calibration").json() is None
+    response = app_client.post("/api/dummy-load/calibration/match", json=meter.model_dump(mode="json"))
+    assert response.status_code == 200
+    assert response.json() == (calibration.model_dump(mode="json") if saved else None)
+    other_meter = meter.model_copy(update={"voltage_entity_id": "sensor.other_voltage"})
+    assert app_client.post("/api/dummy-load/calibration/match", json=other_meter.model_dump(mode="json")).json() is None
+
+
+@pytest.mark.parametrize("endpoint", ["preflight", "sessions"])
+@pytest.mark.parametrize("mismatch", ["missing", "meter", "description", "resistance", None])
+def test_new_measurement_reuse_requires_matching_saved_calibration(
+    app_client: TestClient,
+    endpoint: str,
+    mismatch: str | None,
+) -> None:
+    request = payload()
+    calibration = DummyLoadCalibration(
+        description="Warm bulb",
+        resistance=1322.5,
+        calibrated_at="2026-09-20T12:00:00Z",
+        power_meter_fingerprint=power_meter_fingerprint(
+            HassPowerMeterSpec(
+                entity_id="sensor.test_power",
+                voltage_entity_id="sensor.test_voltage",
+            )
+        ),
+    )
+    request["dummy_load"] = {
+        "mode": "reuse",
+        "description": calibration.description,
+        "resistance": calibration.resistance,
+    }
+    if mismatch == "meter":
+        calibration = calibration.model_copy(update={"power_meter_fingerprint": "other"})
+    elif mismatch == "description":
+        calibration = calibration.model_copy(update={"description": "Other bulb"})
+    elif mismatch == "resistance":
+        calibration = calibration.model_copy(update={"resistance": 2000})
+    if mismatch != "missing":
+        app_client.app.state.context.storage.save_dummy_load_calibration(calibration)
+    response = app_client.post(f"/api/{endpoint}", json=request)
+    if mismatch is None:
+        assert response.status_code == (200 if endpoint == "preflight" else 201)
+    else:
+        assert response.status_code == 422
+        assert "No compatible saved dummy-load calibration" in response.json()["message"]

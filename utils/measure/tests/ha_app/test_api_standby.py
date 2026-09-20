@@ -16,6 +16,7 @@ def create_session(
     client: TestClient, request: MeasurementRequest, state: SessionState = SessionState.COMPLETED
 ) -> None:
     context = client.app.state.context
+    context.developer_mode = True
     now = "2026-09-19T10:00:00Z"
     context.storage.create(SessionSnapshot(id="standby", state=state, created_at=now, updated_at=now), request)
     context.standby_measurement = MagicMock()
@@ -200,7 +201,8 @@ def test_calibration_is_separate_from_completed_session(app_client: TestClient) 
     setup = original.model_dump(mode="json")
     setup["dummy_load"] = {"mode": "calibrate", "description": "Heater"}
     response = app_client.post("/api/sessions/standby/standby/calibrate", json={"confirmed": True, "setup": setup})
-    assert response.status_code == 200
+    assert response.status_code == 202
+    assert wait_calibration(app_client)["status"] == "completed"
     assert context.storage.load_dummy_load_calibration() == calibration
     assert context.storage.load_session_dummy_load_calibration("standby") is None
     assert context.storage.load_request("standby") == original
@@ -257,7 +259,9 @@ def test_calibration_failure_preserves_session(app_client: TestClient, problem: 
             response = app_client.post("/api/sessions/standby/standby/calibrate", json=body)
     else:
         response = app_client.post("/api/sessions/standby/standby/calibrate", json=body)
-    assert response.status_code == (409 if problem in ["incomplete", "busy"] else 422)
+    assert response.status_code == (409 if problem in ["incomplete", "busy"] else 202 if problem == "voltage" else 422)
+    if problem == "voltage":
+        assert wait_calibration(app_client)["status"] == "failed"
     assert context.storage.load_dummy_load_calibration() is None
     assert context.storage.load_request("standby") == original
 
@@ -293,64 +297,128 @@ def test_record_write_failure_preserves_successful_reading(
     assert response.json()["power_w"] == 0.7
 
 
-@pytest.mark.parametrize("disconnect", [True, False])
-def test_calibration_disconnect_releases_devices(app_client: TestClient, disconnect: bool) -> None:
-    import asyncio
-    from threading import Event
-    from unittest.mock import AsyncMock
+def test_edited_dummy_setup_does_not_need_ha_entities(app_client: TestClient) -> None:
+    setup = standby_request().model_dump(mode="json")
+    setup.update(controller={"type": "dummy"}, power_meter={"type": "dummy"})
+    create_session(app_client, TypeAdapter(MeasurementRequest).validate_python(setup))
+    assert app_client.post("/api/sessions/standby/standby", json={"confirmed": True, "setup": setup}).status_code == 200
 
-    from fastapi import HTTPException, Request
+
+def wait_calibration(client: TestClient) -> dict[str, object]:
+    import time
+
+    for _ in range(200):
+        response = client.get("/api/sessions/standby/standby/calibrate")
+        assert response.status_code == 200
+        job = response.json()
+        if job["status"] not in ["running", "cancelling"]:
+            return job
+        time.sleep(0.005)
+    pytest.fail("Calibration did not finish")
+
+
+def test_background_calibration_survives_requests_and_can_be_cancelled(app_client: TestClient) -> None:
+    from threading import Event
+
     from measure.cancellation import MeasurementCancelledError
-    from measure.ha_app.routes.sessions import StandbyMeasurementRequest, calibrate_standby
 
     original = standby_request().model_copy(update={"dummy_load": DummyLoadCalibrationRequest(description="Heater")})
     create_session(app_client, original)
     context = app_client.app.state.context
     started = Event()
 
-    def calibrate(payload: MeasurementRequest, cancelled: Event) -> None:
+    def calibrate(request: MeasurementRequest, cancelled: Event) -> None:
         started.set()
         assert cancelled.wait(5)
-        raise MeasurementCancelledError("Calibration cancelled")
+        raise MeasurementCancelledError("cancelled")
 
     context.standby_measurement.calibrate.side_effect = calibrate
-    request = MagicMock(spec=Request)
-    request.app = app_client.app
-    request.is_disconnected = AsyncMock(return_value=disconnect)
-
-    async def run() -> None:
-        task = asyncio.create_task(calibrate_standby("standby", StandbyMeasurementRequest(confirmed=True), request))
-        assert await asyncio.to_thread(started.wait, 2)
-        if not disconnect:
-            task.cancel()
-        with pytest.raises((HTTPException, asyncio.CancelledError)):
-            await task
-
-    asyncio.run(run())
+    assert app_client.get("/api/sessions/standby/standby/calibrate").json() is None
+    response = app_client.post("/api/sessions/standby/standby/calibrate", json={"confirmed": True})
+    assert response.status_code == 202
+    assert started.wait(1)
+    job = response.json()
+    # The original response has ended, but another request can recover the active operation.
+    assert app_client.get("/api/sessions/standby/standby/calibrate").json()["id"] == job["id"]
+    assert app_client.post("/api/sessions/standby/standby/calibrate", json={"confirmed": True}).status_code == 409
+    assert app_client.post("/api/sessions/standby/standby", json={"confirmed": True}).status_code == 409
+    assert app_client.post("/api/sessions/standby/standby/calibrate/wrong/cancel").status_code == 404
+    assert app_client.post(f"/api/sessions/standby/standby/calibrate/{job['id']}/cancel").status_code == 200
+    assert wait_calibration(app_client)["status"] == "cancelled"
+    assert (
+        app_client.post(f"/api/sessions/standby/standby/calibrate/{job['id']}/cancel").json()["status"] == "cancelled"
+    )
     assert context.storage.load_dummy_load_calibration() is None
     with context.coordinator.reserve_devices():
         pass
 
 
-def test_cancelled_calibration_result_is_not_saved(app_client: TestClient) -> None:
+@pytest.mark.parametrize("finish", ["cancel_before_save", "shutdown", "save_failure", "thread_failure"])
+def test_calibration_cleanup_and_failed_persistence(
+    app_client: TestClient, monkeypatch: pytest.MonkeyPatch, finish: str
+) -> None:
     from threading import Event
 
-    from fastapi import HTTPException
-    from measure.ha_app.routes.sessions import StandbyMeasurementRequest, _calibrate_standby
+    from measure.cancellation import MeasurementCancelledError
+    from measure.ha_app.calibration import CalibrationJobs
 
     original = standby_request().model_copy(update={"dummy_load": DummyLoadCalibrationRequest(description="Heater")})
     create_session(app_client, original)
     context = app_client.app.state.context
-    cancelled = Event()
-    context.standby_measurement.calibrate.side_effect = lambda *_: cancelled.set()
-    with pytest.raises(HTTPException) as error:
-        _calibrate_standby(context, "standby", StandbyMeasurementRequest(confirmed=True), cancelled)
-    assert error.value.status_code == 499
-    assert context.storage.load_dummy_load_calibration() is None
+    save = MagicMock(side_effect=OSError("Disk full") if finish == "save_failure" else None)
+    calibration = DummyLoadCalibration(
+        description="Heater", resistance=2400, calibrated_at="today", power_meter_fingerprint="meter"
+    )
+    started = Event()
+
+    def calibrate(request: MeasurementRequest, cancelled: Event) -> DummyLoadCalibration:
+        started.set()
+        if finish == "cancel_before_save":
+            cancelled.set()
+        if finish == "shutdown":
+            assert cancelled.wait(5)
+            raise MeasurementCancelledError("shutdown")
+        return calibration
+
+    jobs = CalibrationJobs(context.coordinator.reserve_devices, calibrate, save)
+    context.calibration_jobs = jobs
+    if finish == "thread_failure":
+        monkeypatch.setattr(
+            "measure.ha_app.calibration.Thread.start", MagicMock(side_effect=RuntimeError("cannot start"))
+        )
+        with pytest.raises(RuntimeError, match="cannot start"):
+            jobs.start("standby", original)
+        assert jobs.get("standby") is None
+    else:
+        jobs.start("standby", original)
+        assert started.wait(1)
+        if finish == "shutdown":
+            jobs.shutdown()
+        assert wait_calibration(app_client)["status"] == ("failed" if finish == "save_failure" else "cancelled")
+        if finish != "save_failure":
+            save.assert_not_called()
+    with context.coordinator.reserve_devices():
+        pass
 
 
-def test_edited_dummy_setup_does_not_need_ha_entities(app_client: TestClient) -> None:
-    setup = standby_request().model_dump(mode="json")
-    setup.update(controller={"type": "dummy"}, power_meter={"type": "dummy"})
-    create_session(app_client, TypeAdapter(MeasurementRequest).validate_python(setup))
-    assert app_client.post("/api/sessions/standby/standby", json={"confirmed": True, "setup": setup}).status_code == 200
+@pytest.mark.parametrize(
+    "adapter",
+    [
+        {"type": "tuya", "device_id": "device", "device_ip": "192.0.2.1"},
+        {"type": "owh98xx", "port": "/dev/ttyUSB0", "baudrate": 9600, "channel": "1"},
+        {"type": "dummy"},
+        {"type": "hue", "bridge_ip": "192.0.2.1", "light": "1"},
+    ],
+)
+@pytest.mark.parametrize("action", ["", "/calibrate"])
+def test_retry_enforces_app_adapter_policy(app_client: TestClient, adapter: dict[str, object], action: str) -> None:
+    original = standby_request()
+    create_session(app_client, original)
+    context = app_client.app.state.context
+    context.developer_mode = False
+    setup = original.model_dump(mode="json")
+    setup["controller" if adapter["type"] == "hue" else "power_meter"] = adapter
+    response = app_client.post(f"/api/sessions/standby/standby{action}", json={"confirmed": True, "setup": setup})
+    assert response.status_code == 422, response.text
+    context.standby_measurement.measure.assert_not_called()
+    context.standby_measurement.calibrate.assert_not_called()

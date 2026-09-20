@@ -3,6 +3,7 @@ from dataclasses import dataclass, replace
 from fastapi import HTTPException
 
 from measure.controller.light.const import LutMode
+from measure.dummy_load import power_meter_fingerprint
 from measure.ha_app.context import AppContext
 from measure.ha_app.coordinator import SessionConflictError
 from measure.ha_app.light_probe import LightLoadProbeResult
@@ -10,7 +11,7 @@ from measure.ha_app.preflight import ActiveSessionError, MeasurementPreflight, P
 from measure.ha_app.session import is_active_session
 from measure.home_assistant.entities import DeviceClass, EntityDescriptor, EntityDomain, HomeAssistantEntityCatalog
 from measure.powermeter.spec import DummyPowerMeterSpec
-from measure.request import LightMeasurementRequest, MeasurementRequest
+from measure.request import DummyLoadReuseRequest, LightMeasurementRequest, MeasurementRequest
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,15 @@ def run_preflight(context: AppContext, payload: MeasurementRequest, *, refresh: 
 
 
 def _run_preflight(context: AppContext, payload: MeasurementRequest, *, refresh: bool) -> PreflightAssessment:
+    if isinstance(payload.dummy_load, DummyLoadReuseRequest):
+        calibration = context.storage.load_dummy_load_calibration()
+        if (
+            calibration is None
+            or calibration.power_meter_fingerprint != power_meter_fingerprint(payload.power_meter)
+            or calibration.description != payload.dummy_load.description
+            or calibration.resistance != payload.dummy_load.resistance
+        ):
+            raise PreflightError("No compatible saved dummy-load calibration is available. Calibrate this setup first.")
     catalog = HomeAssistantEntityCatalog(context.home_assistant)
     snapshot = None
 
@@ -99,12 +109,13 @@ def apply_fast_test_mode(context: AppContext, request: MeasurementRequest) -> Me
     return request.model_copy(update={"fast_test_mode": enabled, "parameters": parameters})
 
 
-def validate_standby_setup(context: AppContext, payload: LightMeasurementRequest) -> None:
+def validate_standby_setup(context: AppContext, payload: MeasurementRequest) -> None:
     catalog = HomeAssistantEntityCatalog(context.home_assistant)
     try:
         MeasurementPreflight(
             has_active_session=lambda: False,
             verify_storage=lambda: None,
+            developer_mode=context.developer_mode,
             load_entities=lambda domain, device_class: catalog.load_snapshot().select(
                 domain=domain, device_class=device_class
             ),

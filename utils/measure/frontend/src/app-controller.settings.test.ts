@@ -1,5 +1,5 @@
 import { MeasureAppController, type MeasureAppApi } from "./app-controller";
-import type { PowerMeterDiagnostic, LightMeasurementRequest } from "./types";
+import type { PowerMeterDiagnostic, LightMeasurementRequest, CalibrationJob } from "./types";
 import { api, capabilities, connection, measurementDefaults, settings, state } from "./testing/controller";
 
 describe("measure app controller: settings", () => {
@@ -223,18 +223,21 @@ describe("measure app controller: settings", () => {
 });
 
 
-it("refreshes the saved calibration after a standby calibration", async () => {
+it("keeps settings calibration scoped to its meter after a standby calibration", async () => {
   const appState = state();
-  const calibration = { description: "New heater", resistance: 2300, calibrated_at: "today" };
-  appState.dummyLoadCalibration = { ...calibration, description: "Old heater" };
+  const calibration = { description: "Session meter heater", resistance: 2300, calibrated_at: "today" };
+  const job: CalibrationJob = { id: "job", session_id: "session-1", started_at: "today", status: "completed", calibration, error: null };
+  appState.dummyLoadCalibration = calibration;
   appState.dummyLoadCalibrationError = "Old error";
   const changed = vi.fn();
   const controller = new MeasureAppController(appState, () => api({
-    calibrateStandby: async () => calibration,
+    calibrateStandby: async () => job,
+    getStandbyCalibration: async () => job,
+    getDummyLoadCalibration: async () => null,
   }), () => connection(), changed);
-  const result = await controller.calibrateStandby("session-1", {} as LightMeasurementRequest);
-  expect(result).toEqual(calibration);
-  expect(appState.dummyLoadCalibration).toEqual(calibration);
+  expect(await controller.calibrateStandby("session-1", {} as LightMeasurementRequest)).toEqual(job);
+  expect(await controller.getStandbyCalibration("session-1")).toEqual(job);
+  expect(appState.dummyLoadCalibration).toBeNull();
   expect(appState.dummyLoadCalibrationError).toBe("");
   expect(changed).toHaveBeenCalledOnce();
 });

@@ -119,7 +119,7 @@ the completed session's configuration and LUT measurements are preserved.
 You can remove the dummy load, reuse the original or a compatible saved calibration, or calibrate a new resistive
 load. For a new calibration, preheat the dummy load until stable and disconnect the measured bulbs so only the dummy
 load is connected to the meter. Choose **Calibrate dummy load**, then reconnect the bulbs in parallel after calibration
-completes. Calibration can be cancelled in the dialog and stops if the browser disconnects or reloads. Keep the same warmed-up dummy load connected during standby measurement. Voltage support and calibration
+completes. Calibration continues if you close the dialog, disconnect, or reload the page. Reopen the same session’s standby dialog to check progress or cancel calibration. Stopping the app cancels an unfinished calibration. Keep the same warmed-up dummy load connected during standby measurement. Voltage support and calibration
 compatibility are checked before measurement. The result subtracts the dummy load and divides by the retry's bulb count.
 
 Confirm the selected devices and meter are connected correctly. Lights, speakers, and fans use their existing turn-off

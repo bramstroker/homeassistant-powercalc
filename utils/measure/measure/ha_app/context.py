@@ -6,6 +6,7 @@ from typing import cast
 from fastapi import HTTPException, Request
 
 from measure.assembler import MeasurementAssembler
+from measure.ha_app.calibration import CalibrationJobs
 from measure.ha_app.contribution.coordinator import ContributionApiCoordinator
 from measure.ha_app.coordinator import MeasurementCoordinator
 from measure.ha_app.library_catalog import (
@@ -74,6 +75,12 @@ class AppContext:
         self.coordinator = MeasurementCoordinator(
             self.storage,
             self._create_measurement_service,
+        )
+
+        self.calibration_jobs = CalibrationJobs(
+            lambda: self.coordinator.reserve_devices(),
+            lambda payload, cancelled: self.standby_measurement.calibrate(payload, cancelled),
+            self.storage.save_dummy_load_calibration,
         )
 
     def get_entity_integrations(self, entity_ids: Sequence[str]) -> dict[str, str | None]:

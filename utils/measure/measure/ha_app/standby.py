@@ -21,7 +21,7 @@ from measure.utils.sampling import MeasurementError, PowerSampler
 
 
 class CalibrationInteraction(ImmediateInteraction):
-    """Interrupt calibration samples and waits when the HTTP client disconnects."""
+    """Interrupt calibration samples and waits on cancellation or app shutdown."""
 
     def __init__(self, cancelled: Event) -> None:
         self.cancelled = cancelled

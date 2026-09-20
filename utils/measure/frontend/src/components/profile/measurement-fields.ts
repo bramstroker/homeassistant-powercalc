@@ -1,7 +1,7 @@
 import { html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { ProfileFormSection } from "./form-section";
-import type { DummyLoadCalibration, LightMeasurementRequest, MeasurementRequest, StandbyEstimate } from "../../types";
+import type { StandbyCalibrationActions, MeasurementRequest, StandbyEstimate } from "../../types";
 import { emit } from "../../utils/events";
 import { profileDeviceType } from "./device-specification-fields";
 import "../shared/combobox";
@@ -17,8 +17,8 @@ export class ProfileMeasurementFields extends ProfileFormSection {
   @property({ attribute: false }) measurementRequest?: MeasurementRequest;
   @property({ type: Boolean }) standbyBusy = false;
   @property({ type: String }) standbyMessage = "";
-  @property({ attribute: false }) calibrateStandby?: (setup: LightMeasurementRequest, signal?: AbortSignal) => Promise<DummyLoadCalibration | null>;
-  @property({ attribute: false }) dummyLoadCalibration: DummyLoadCalibration | null = null;
+  @property({ type: String }) sessionId = "";
+  @property({ attribute: false }) calibrationActions?: StandbyCalibrationActions;
   @state() private confirmingStandby = false;
 
   render() {
@@ -124,7 +124,7 @@ export class ProfileMeasurementFields extends ProfileFormSection {
   private renderStandbyConfirmation(request: MeasurementRequest | undefined, canMeasure: boolean) {
     if (!this.confirmingStandby || !canMeasure || !request) return nothing;
     if (request.measure_type === "light") return html`<measure-standby-setup
-      .request=${request} .savedCalibration=${this.dummyLoadCalibration} .calibrate=${this.calibrateStandby}
+      .request=${request} .calibrationActions=${this.calibrationActions} .sessionId=${this.sessionId}
       .measuring=${this.standbyBusy} .measurementMessage=${this.standbyMessage}
       @standby-close=${() => { this.confirmingStandby = false; }}></measure-standby-setup>`;
     const controlled = ["light", "speaker", "fan"].includes(request.measure_type);
