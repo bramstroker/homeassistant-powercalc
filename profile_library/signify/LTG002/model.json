@@ -29,6 +29,7 @@
   },
   "name": "Hue White Ambiance GU10 w/ BT",
   "standby_power": 0.3,
+  "standby_power_estimated": true,
   "authors": [
     {
       "name": "mariwing",
