@@ -6,9 +6,6 @@
     "Range extender Zi (WG001)"
   ],
   "product_url": "https://aeotec.com/products/aeotec-range-extender-zi/",
-  "compatible_integrations": [
-    "mqtt"
-  ],
   "discovery_by": "device",
   "device_specs": {
     "form_factor": "repeater",
