@@ -217,7 +217,7 @@
       "description": "Z-Wave and Zigbee sensor maker run from Hamburg, and the origin of the Aeon Labs range.",
       "models": [
         {
-          "name": "ZGA001-C15",
+          "name": "Range Extender Zi",
           "description": "Zigbee repeater for Type F sockets",
           "device_type": "network",
           "aliases": [
@@ -246,14 +246,14 @@
           ],
           "id": "ZGA001-C15",
           "manufacturer": "aeotec",
-          "updated_at": "2026-09-20T08:13:31",
+          "updated_at": "2026-09-20T08:49:56",
           "max_power": 0.48,
           "sub_profile_count": 0,
           "power_range": {
             "min": 0.48,
             "max": 0.48
           },
-          "hash": "b0218235ef969c9f2aab13f0fa2fe6a0"
+          "hash": "02e83257f63c2c40e7122a1317af902d"
         },
         {
           "calculation_strategy": "fixed",
