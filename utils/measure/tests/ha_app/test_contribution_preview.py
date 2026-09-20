@@ -50,6 +50,38 @@ def test_draft_without_artifact_directory(request_model: MeasurementRequest, tmp
 
 
 @pytest.mark.parametrize(
+    "specs,detected,expected",
+    [
+        (None, "zigbee", {"connectivity": ["zigbee"]}),
+        ({"rated_power": 9}, "zigbee", {"rated_power": 9, "connectivity": ["zigbee"]}),
+        ({"connectivity": ["wifi", "bluetooth"]}, "zigbee", {"connectivity": ["wifi", "bluetooth"]}),
+        ({"connectivity": []}, "zigbee", {"connectivity": []}),
+        ({"connectivity": None}, "zigbee", {"connectivity": None}),
+        (None, None, None),
+        ({"rated_power": 9}, None, {"rated_power": 9}),
+    ],
+)
+def test_connectivity_only_defaults_when_absent(
+    request_model: MeasurementRequest,
+    tmp_path: Path,
+    specs: dict[str, object] | None,
+    detected: str | None,
+    expected: dict[str, object] | None,
+) -> None:
+    artifact = {"device_specs": specs}
+    (tmp_path / "model.json").write_text(json.dumps(artifact))
+    preview = draft_from_request(
+        session_id="session",
+        request=request_model,
+        artifact_root=tmp_path,
+        auth=ContributionAuthStatus(authenticated=False),
+        default_connectivity=detected,
+    )
+    assert preview.device_specs == expected
+    assert json.loads((tmp_path / "model.json").read_text()) == artifact
+
+
+@pytest.mark.parametrize(
     "voltage_range,expected",
     [
         ({"min": 228, "max": 232}, {"min": 228.0, "max": 232.0}),

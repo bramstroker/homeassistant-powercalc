@@ -51,6 +51,14 @@ describe("measurement request boundary", () => {
 });
 
 describe("response boundary", () => {
+  it("accepts optional connectivity and rejects malformed detection results", () => {
+    const entity = { entity_id: "light.test", name: "Test light" };
+    for (const connectivity of [undefined, null, "zigbee", "zwave"]) {
+      expect(decodeEntities([{ ...entity, connectivity }])).toHaveLength(1);
+    }
+    expect(() => decodeEntities([{ ...entity, connectivity: ["zigbee"] }])).toThrow();
+  });
+
   it("accepts recording metadata and arbitrary Home Assistant device classes", () => {
     const entities = [{
       entity_id: "binary_sensor.robot_problem", name: "Robot problem", domain: "binary_sensor",

@@ -178,6 +178,7 @@ const isEntityDescriptor: Guard<EntityDescriptor> = objectOf({
   device_class: optionalNullable(isString),
   device_id: optionalNullable(isString),
   integration: optionalNullable(isString),
+  connectivity: optionalNullable(oneOf("zigbee", "zwave")),
   translation_key: optionalNullable(isString),
   disabled_by: optionalNullable(isString),
   has_live_state: optional(isBoolean),

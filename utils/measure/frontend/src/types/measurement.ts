@@ -18,6 +18,7 @@ export interface EntityDescriptor {
   device_class?: string | null;
   device_id?: string | null;
   integration?: string | null;
+  connectivity?: "zigbee" | "zwave" | null;
   translation_key?: string | null;
   disabled_by?: string | null;
   has_live_state?: boolean;

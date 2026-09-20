@@ -65,6 +65,7 @@ class ContributionApiCoordinator:
         resolve_integration: EntityValueResolver | None = None,
         resolve_manufacturer: EntityValueResolver | None = None,
         resolve_model_id: EntityValueResolver | None = None,
+        resolve_connectivity: EntityValueResolver | None = None,
         oauth_client_id: str | None = None,
     ) -> None:
         self._storage = storage
@@ -72,6 +73,7 @@ class ContributionApiCoordinator:
         self._resolve_integration = resolve_integration
         self._resolve_manufacturer = resolve_manufacturer
         self._resolve_model_id = resolve_model_id
+        self._resolve_connectivity = resolve_connectivity
         self._oauth_client_id = oauth_client_id if oauth_client_id is not None else os.environ.get(_OAUTH_CLIENT_ID_ENV)
         self._lock = Lock()
         self._device_flows: dict[str, _DeviceFlow] = {}
@@ -146,6 +148,7 @@ class ContributionApiCoordinator:
             auth=self.auth_status(),
             integration=self._integration(request),
             manufacturer=self._shared_entity_value(request, self._resolve_manufacturer),
+            default_connectivity=self._shared_entity_value(request, self._resolve_connectivity),
             default_model_id=(
                 self._shared_entity_value(request, self._resolve_model_id) if not request.model_id else None
             ),
