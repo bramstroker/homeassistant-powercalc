@@ -45,11 +45,7 @@ def _run_preflight(context: AppContext, payload: MeasurementRequest, *, refresh:
         developer_mode=context.developer_mode,
     ).validate(payload)
     light_load_probe = (
-        (
-            context.light_load_probe.evaluate(payload, refresh=True)
-            if refresh
-            else context.light_load_probe.evaluate(payload)
-        )
+        _evaluate_light_load_probe(context, payload, refresh=refresh)
         if isinstance(payload, LightMeasurementRequest)
         and payload.dummy_load is None
         and not payload.controller.is_dummy
@@ -58,6 +54,17 @@ def _run_preflight(context: AppContext, payload: MeasurementRequest, *, refresh:
         else None
     )
     return PreflightAssessment(result, light_load_probe)
+
+
+def _evaluate_light_load_probe(
+    context: AppContext,
+    payload: LightMeasurementRequest,
+    *,
+    refresh: bool,
+) -> LightLoadProbeResult:
+    if refresh:
+        return context.light_load_probe.evaluate(payload, refresh=True)
+    return context.light_load_probe.evaluate(payload)
 
 
 def apply_fast_test_mode(context: AppContext, request: MeasurementRequest) -> MeasurementRequest:

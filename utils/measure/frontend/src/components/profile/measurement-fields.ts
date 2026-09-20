@@ -67,6 +67,7 @@ export class ProfileMeasurementFields extends ProfileFormSection {
     const controlled = request?.measure_type === "light" || request?.measure_type === "speaker" || request?.measure_type === "fan";
     const canMeasure = request && !["manual", "ocr"].includes(request.power_meter.type);
     const simulated = request?.power_meter.type === "dummy" || request?.controller?.type === "dummy";
+    const estimateHint = this.standbyEstimateHint(estimate);
     return html`
       ${(isLight && !value) || (value && Number(value) < 0.05) ? html`<p class="notice warning">Standby power needs a correction before submitting. Your measurements are saved. Enter a separately measured value or use an estimate.</p>` : nothing}
       <div class="field-stack standby-field">
@@ -98,13 +99,18 @@ export class ProfileMeasurementFields extends ProfileFormSection {
         <small id="standby-hint" class="field-hint">${isLight ? "Enter watts for one light, even when measuring several together." : "Optional: enter standby watts for this device. Leave blank to keep the existing profile value or template."}
           <a href="https://docs.powercalc.nl/contributing/measure/low-power-measurements/" target="_blank" rel="noopener noreferrer">Low-power measurement guide</a>
         </small>
-        ${isLight ? html`<small class="field-hint" role="status">${estimate
-          ? estimate.basis === "fallback"
-            ? "Documented fallback; there are not enough comparable profiles or library suggestions are unavailable."
-            : `Median of ${estimate.profile_count} measured light profiles with the same connectivity${estimate.basis === "manufacturer" ? " and manufacturer" : " across manufacturers"}.`
-          : "Loading standby suggestion…"}</small>` : nothing}
+        ${isLight ? html`<small class="field-hint" role="status">${estimateHint}</small>` : nothing}
       </div>
     `;
+  }
+
+  private standbyEstimateHint(estimate?: StandbyEstimate): string {
+    if (!estimate) return "Loading standby suggestion…";
+    if (estimate.basis === "fallback") {
+      return "Documented fallback; there are not enough comparable profiles or library suggestions are unavailable.";
+    }
+    const scope = estimate.basis === "manufacturer" ? " and manufacturer" : " across manufacturers";
+    return `Median of ${estimate.profile_count} measured light profiles with the same connectivity${scope}.`;
   }
 
   private renderMainsVoltage() {

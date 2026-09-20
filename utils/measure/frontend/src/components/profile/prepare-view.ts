@@ -96,7 +96,8 @@ export class ProfilePrepareView extends LitElement {
     const manufacturer = formValue(this.contributionFormValues.manufacturer_name ?? draft.manufacturer_name);
     const selected = this.contributionFormValues["device_specs.connectivity"] ?? draft.device_specs?.connectivity;
     const connectivity = Array.isArray(selected) ? selected.filter((value): value is string => typeof value === "string") : [];
-    const key = JSON.stringify([this.snapshot.session_id, manufacturer, [...connectivity].sort()]);
+    const sortedConnectivity = [...connectivity].sort((left, right) => left.localeCompare(right));
+    const key = JSON.stringify([this.snapshot.session_id, manufacturer, sortedConnectivity]);
     if (key === this.standbyEstimateKey) return;
     this.standbyEstimateKey = key;
     const version = ++this.standbyEstimateVersion;

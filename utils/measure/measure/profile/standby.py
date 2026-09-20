@@ -37,20 +37,40 @@ class StandbyEstimate:
 
 def estimate_standby_power(library: object, manufacturer: str, connectivity: list[str]) -> StandbyEstimate:
     """Use matching measured lights, preferring at least three from the same manufacturer."""
-    if not connectivity or not isinstance(library, dict):
+    manufacturers = _library_manufacturers(library)
+    if not connectivity or manufacturers is None:
         return StandbyEstimate()
+    matching_power, manufacturer_power = _collect_matching_power(manufacturers, manufacturer, connectivity)
+    if len(manufacturer_power) >= 3:
+        return StandbyEstimate(
+            round(median(manufacturer_power), 2), StandbyEstimateBasis.MANUFACTURER, len(manufacturer_power)
+        )
+    if len(matching_power) >= 3:
+        return StandbyEstimate(round(median(matching_power), 2), StandbyEstimateBasis.CONNECTIVITY, len(matching_power))
+    return StandbyEstimate()
+
+
+def _library_manufacturers(library: object) -> list[object] | None:
+    if not isinstance(library, dict):
+        return None
     manufacturers = library.get("manufacturers")
-    if not isinstance(manufacturers, list):
-        return StandbyEstimate()
+    return manufacturers if isinstance(manufacturers, list) else None
+
+
+def _collect_matching_power(
+    manufacturers: list[object],
+    manufacturer: str,
+    connectivity: list[str],
+) -> tuple[list[float], list[float]]:
     matching_power: list[float] = []
     manufacturer_power: list[float] = []
     seen: set[tuple[str, str]] = set()
     for entry in manufacturers:
-        if not isinstance(entry, dict) or not isinstance(entry.get("models"), list):
+        details = _manufacturer_models(entry)
+        if details is None:
             continue
-        name = str(entry.get("full_name") or entry.get("name") or "")
-        directory = str(entry.get("dir_name") or name)
-        for model in _matching_models(entry["models"], connectivity):
+        name, directory, models = details
+        for model in _matching_models(models, connectivity):
             identity = (directory, str(model["id"]))
             if identity in seen:
                 continue
@@ -61,30 +81,41 @@ def estimate_standby_power(library: object, manufacturer: str, connectivity: lis
             matching_power.append(power)
             if name.casefold() == manufacturer.casefold():
                 manufacturer_power.append(power)
-    if len(manufacturer_power) >= 3:
-        return StandbyEstimate(
-            round(median(manufacturer_power), 2), StandbyEstimateBasis.MANUFACTURER, len(manufacturer_power)
-        )
-    if len(matching_power) >= 3:
-        return StandbyEstimate(round(median(matching_power), 2), StandbyEstimateBasis.CONNECTIVITY, len(matching_power))
-    return StandbyEstimate()
+    return matching_power, manufacturer_power
+
+
+def _manufacturer_models(entry: object) -> tuple[str, str, list[object]] | None:
+    if not isinstance(entry, dict):
+        return None
+    models = entry.get("models")
+    if not isinstance(models, list):
+        return None
+    name = str(entry.get("full_name") or entry.get("name") or "")
+    directory = str(entry.get("dir_name") or name)
+    return name, directory, models
 
 
 def _matching_models(models: list[object], connectivity: list[str]) -> list[dict[str, object]]:
-    matching = []
-    for model in models:
-        if not isinstance(model, dict) or model.get("device_type") != "light":
-            continue
-        if not model.get("id") or not is_valid_standby_power(model.get("standby_power")):
-            continue
-        if model.get("standby_power_estimated") is True:
-            continue
-        specs = model.get("device_specs")
-        if not isinstance(specs, dict):
-            continue
-        connections = specs.get("connectivity")
-        if not isinstance(connections, list) or not all(isinstance(value, str) for value in connections):
-            continue
-        if set(connections) == set(connectivity):
-            matching.append(model)
-    return matching
+    return [model for model in models if _is_matching_model(model, connectivity)]
+
+
+def _is_matching_model(model: object, connectivity: list[str]) -> TypeGuard[dict[str, object]]:
+    if not isinstance(model, dict):
+        return False
+    if model.get("device_type") != "light":
+        return False
+    if not model.get("id"):
+        return False
+    if not is_valid_standby_power(model.get("standby_power")):
+        return False
+    if model.get("standby_power_estimated") is True:
+        return False
+    specs = model.get("device_specs")
+    if not isinstance(specs, dict):
+        return False
+    connections = specs.get("connectivity")
+    if not isinstance(connections, list):
+        return False
+    if not all(isinstance(value, str) for value in connections):
+        return False
+    return set(connections) == set(connectivity)

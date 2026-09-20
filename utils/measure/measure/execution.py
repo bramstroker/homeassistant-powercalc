@@ -182,23 +182,32 @@ class MeasurementExecution:
                     ),
                 )
             if request.generate_model_json and output_directory is not None:
-                standby = runner.measure_standby_power()
-                voltages = list(result.voltages or []) + (standby.voltages if standby is not None else [])
-                write_model_json(
-                    output_directory,
-                    standby_power=standby.power if standby is not None else None,
-                    name=request.model_name,
-                    measure_device=request.measure_device,
-                    parameters=request.parameters,
-                    extra_json_data=result.model_json_data,
-                    voltages=voltages,
-                    num_lights=request.multiple_light_count if isinstance(request, LightMeasurementRequest) else None,
-                    dummy_load=request.dummy_load is not None,
-                    dummy_load_resistance=self._get_dummy_load_resistance(),
-                )
+                self._write_model(output_directory, runner, request, result)
             return result
         finally:
             runner.cleanup()
+
+    def _write_model(
+        self,
+        output_directory: Path,
+        runner: MeasurementRunner[Any],
+        request: MeasurementRequest,
+        result: RunnerResult,
+    ) -> None:
+        standby = runner.measure_standby_power()
+        voltages = list(result.voltages or []) + (standby.voltages if standby is not None else [])
+        write_model_json(
+            output_directory,
+            standby_power=standby.power if standby is not None else None,
+            name=request.model_name,
+            measure_device=request.measure_device,
+            parameters=request.parameters,
+            extra_json_data=result.model_json_data,
+            voltages=voltages,
+            num_lights=request.multiple_light_count if isinstance(request, LightMeasurementRequest) else None,
+            dummy_load=request.dummy_load is not None,
+            dummy_load_resistance=self._get_dummy_load_resistance(),
+        )
 
     def _get_dummy_load_resistance(self) -> float | None:
         if isinstance(self.measurement.request.dummy_load, DummyLoadReuseRequest):
