@@ -13,7 +13,8 @@
     ],
     "form_factor": "spot",
     "rated_power": 5,
-    "socket": "GU10"
+    "socket": "GU10",
+    "lumens": 345
   },
   "device_type": "light",
   "gtin": [
