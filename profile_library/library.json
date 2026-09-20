@@ -217,6 +217,45 @@
       "description": "Z-Wave and Zigbee sensor maker run from Hamburg, and the origin of the Aeon Labs range.",
       "models": [
         {
+          "name": "ZGA001-C15",
+          "description": "Zigbee repeater for Type F sockets",
+          "device_type": "network",
+          "aliases": [
+            "WG001"
+          ],
+          "product_url": "https://aeotec.com/products/aeotec-range-extender-zi/",
+          "discovery_by": "device",
+          "device_specs": {
+            "form_factor": "repeater",
+            "rated_power": 1.0,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "measure_method": "script",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_description": "measured using the PowerCalc HA app with a resistive dummy load (25W Osram E14 incandescent oven bulb)",
+          "mains_voltage": 230,
+          "calculation_strategy": "fixed",
+          "created_at": "2026-09-19T18:55:44Z",
+          "authors": [
+            {
+              "name": "ps1noob",
+              "github": "ps1noob"
+            }
+          ],
+          "id": "ZGA001-C15",
+          "manufacturer": "aeotec",
+          "updated_at": "2026-09-20T08:13:31",
+          "max_power": 0.48,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.48,
+            "max": 0.48
+          },
+          "hash": "b0218235ef969c9f2aab13f0fa2fe6a0"
+        },
+        {
           "calculation_strategy": "fixed",
           "created_at": "2026-01-25T14:45:00Z",
           "device_type": "network",
