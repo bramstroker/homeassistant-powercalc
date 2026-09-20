@@ -3,6 +3,20 @@ import { MeasureAppController } from "./app-controller";
 import { api, capabilities, connection, state } from "./testing/controller";
 
 describe("measure app controller: navigation", () => {
+  it("forces a fresh setup check for the unchanged request", async () => {
+    const appState = state();
+    const preflight = vi.fn(api().preflight);
+    const controller = new MeasureAppController(appState, () => api({ preflight }), () => connection(), () => undefined);
+    await controller.preflight({
+      measure_type: "average", duration: 60, model_id: "", product_name: "", measure_device: "Test meter",
+      generate_model: false, parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+    });
+    await controller.recheckSetup();
+    expect(preflight).toHaveBeenLastCalledWith(appState.request, true);
+    expect(appState.view).toBe("review");
+    expect(appState.busy).toBe(false);
+  });
+
   it.each(["snapshot", "request"] as const)("prevents profile navigation for average measurements from %s", (source) => {
     const appState = state();
     const request = {

@@ -80,11 +80,19 @@ def test_preflight_exposes_quality_warnings_and_start_reuses_diagnostics(app_cli
         "checked_variations": 1,
         "minimum_aggregate_power_w": 1.25,
         "points": [{"label": "Brightness 1", "mode": "brightness", "power_w": 1.25}],
+        "standby": {"status": "skipped", "power_w": None},
     }
     assert "did not report often enough" in response.json()["warnings"][0]
     assert home_assistant.state_calls == 2
     assert app_client.post("/api/sessions", json=payload()).status_code == 201
     assert home_assistant.state_calls == 2
+
+
+def test_recheck_forces_a_fresh_active_probe(app_client: TestClient) -> None:
+    response = app_client.post("/api/preflight?refresh=true", json=payload())
+    assert response.status_code == 200
+    probe = app_client.app.state.context.light_load_probe.evaluate
+    assert probe.call_args.kwargs == {"refresh": True}
 
 
 def test_preflight_maps_low_load_probe_failure_to_actionable_error(app_client: TestClient) -> None:

@@ -31,6 +31,7 @@ from measure.ha_app.contribution.models import (
 )
 from measure.profile.model_json import mains_voltage_from_range
 from measure.profile.models import RenderedProfileFile
+from measure.profile.standby import is_valid_standby_power
 from measure.request import MeasurementRequest
 
 MODEL_FILENAME = "model.json"
@@ -97,6 +98,8 @@ def metadata_from_request(
             product_url=payload.product_url if payload is not None else None,
             mains_voltage=payload.mains_voltage if payload is not None else None,
             device_specs=payload.device_specs if payload is not None else None,
+            standby_power=payload.standby_power if payload is not None else None,
+            standby_power_estimated=payload.standby_power_estimated if payload is not None else None,
             measure_device=_requested_measure_device(request, payload),
             measure_device_firmware=payload.measure_device_firmware if payload is not None else None,
             measure_description=payload.measure_description if payload is not None else None,
@@ -154,6 +157,8 @@ class _PreviewContent:
     voltage_range: dict[str, float] | None
     device_specs: dict[str, Any] | None
     device_type: str
+    standby_power: float | None
+    standby_power_estimated: bool
     measure_device: str
     measure_device_firmware: str
     measure_description: str
@@ -202,6 +207,10 @@ def draft_from_request(
         voltage_range=voltage_range,
         device_specs=_artifact_device_specs(artifact_model),
         device_type=str(artifact_model.get("device_type") or ""),
+        standby_power=artifact_model.get("standby_power")
+        if is_valid_standby_power(artifact_model.get("standby_power"))
+        else None,
+        standby_power_estimated=artifact_model.get("standby_power_estimated") is True,
         measure_device=str(artifact_model.get("measure_device") or request.measure_device),
         measure_device_firmware=str(
             artifact_model.get("measure_device_firmware") or default_measure_device_firmware or ""
@@ -281,6 +290,8 @@ def preview_from_job(
         voltage_range=_voltage_range(prepared_model),
         device_specs=job.metadata.device_specs,
         device_type=str(prepared_model.get("device_type") or ""),
+        standby_power=job.preview.standby_power,
+        standby_power_estimated=prepared_model.get("standby_power_estimated") is True,
         measure_device=job.metadata.measure_device or request.measure_device,
         measure_device_firmware=job.metadata.measure_device_firmware or "",
         measure_description=job.metadata.measure_description or "",
@@ -354,6 +365,8 @@ def _build_preview_response(
         voltage_range=content.voltage_range,
         device_specs=content.device_specs,
         device_type=content.device_type,
+        standby_power=content.standby_power,
+        standby_power_estimated=content.standby_power_estimated,
         measure_device=content.measure_device,
         measure_device_firmware=content.measure_device_firmware,
         measure_description=content.measure_description,

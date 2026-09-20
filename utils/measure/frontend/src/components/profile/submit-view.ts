@@ -267,6 +267,8 @@ ${preview.pr_body}</pre>
       product_url: draft.product_url ?? "",
       mains_voltage: draft.mains_voltage ?? null,
       device_specs: draft.device_specs ?? null,
+      standby_power: draft.standby_power,
+      standby_power_estimated: draft.standby_power_estimated,
       measure_device: draft.measure_device ?? "",
       measure_device_firmware: draft.measure_device_firmware ?? "",
       measure_description: draft.measure_description ?? "",

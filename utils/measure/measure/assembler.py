@@ -119,7 +119,7 @@ class MeasurementAssembler:
             on_sample=self._on_sample,
             on_calibration_sample=self._on_calibration_sample,
         )
-        runner = self._create_runner(request, parameters, sampler)
+        runner = self.create_runner(request, parameters, sampler)
         preparations: list[MeasurementPreparation] = (
             [
                 DummyLoadPreparation(
@@ -184,7 +184,7 @@ class MeasurementAssembler:
             return OwonOwh98xxPowerMeter(spec.port, spec.baudrate, spec.timeout, spec.channel)
         assert_never(spec)  # pragma: no cover - all PowerMeterSpec variants handled
 
-    def _create_runner(
+    def create_runner(
         self,
         request: MeasurementRequest,
         parameters: MeasurementParameters,
@@ -193,13 +193,15 @@ class MeasurementAssembler:
         interaction = self._interaction
         if isinstance(request, LightMeasurementRequest):
             light_controller = self.create_light_controller(request.controller)
-            return LightRunner(
+            runner = LightRunner(
                 sampler,
                 parameters,
                 light_controller,
                 interaction,
                 resume=request.resume_policy == ResumePolicy.RESUME,
             )
+            runner.num_lights = request.multiple_light_count
+            return runner
         if isinstance(request, SpeakerMeasurementRequest):
             media_controller = self._create_media_controller(request.controller)
             return SpeakerRunner(sampler, parameters, media_controller, interaction)

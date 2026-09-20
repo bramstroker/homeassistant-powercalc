@@ -4,11 +4,14 @@ import json
 import mimetypes
 from pathlib import Path
 import re
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse, Response, StreamingResponse
+from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 
+from measure.dummy_load import power_meter_fingerprint
 from measure.ha_app.api_models import (
     ERROR_RESPONSE,
     CalibrationSampleResponse,
@@ -23,6 +26,7 @@ from measure.ha_app.api_models import (
 from measure.ha_app.context import AppContext, get_app_context, require_session
 from measure.ha_app.coordinator import SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
+from measure.ha_app.light_probe import StandbyProbeResult
 from measure.ha_app.preparation import apply_fast_test_mode, run_preflight
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
@@ -33,9 +37,51 @@ from measure.ha_app.session import (
     is_active_session,
 )
 from measure.ha_app.storage import SESSION_LOAD_ERRORS
+from measure.powermeter.spec import ManualPowerMeterSpec, OcrPowerMeterSpec
+from measure.request import (
+    DummyLoadReuseRequest,
+)
 from measure.visualization import build_session_plots
 
 router = APIRouter()
+
+
+class StandbyMeasurementRequest(BaseModel):
+    confirmed: Literal[True]
+
+
+@router.post(
+    "/sessions/{session_id}/standby", responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE, 422: ERROR_RESPONSE}
+)
+async def measure_standby(session_id: str, payload: StandbyMeasurementRequest, request: Request) -> StandbyProbeResult:
+    return await run_in_threadpool(_measure_standby, get_app_context(request), session_id)
+
+
+def _measure_standby(context: AppContext, session_id: str) -> StandbyProbeResult:
+    try:
+        with context.coordinator.reserve_devices():
+            snapshot = require_session(context, session_id)
+            if snapshot.state != SessionState.COMPLETED:
+                raise HTTPException(status_code=409, detail="Standby can only be remeasured for a completed session")
+            payload = context.storage.load_request(session_id)
+            if isinstance(payload.power_meter, ManualPowerMeterSpec | OcrPowerMeterSpec):
+                raise HTTPException(status_code=422, detail="Standby measurement requires an app-supported power meter")
+            resistance = None
+            if payload.dummy_load is not None:
+                calibration = context.storage.load_session_dummy_load_calibration(session_id)
+                if calibration is not None and calibration.power_meter_fingerprint == power_meter_fingerprint(
+                    payload.power_meter
+                ):
+                    resistance = calibration.resistance
+                elif isinstance(payload.dummy_load, DummyLoadReuseRequest):
+                    resistance = payload.dummy_load.resistance
+                else:
+                    raise HTTPException(
+                        status_code=422, detail="No matching session dummy-load calibration is available"
+                    )
+            return context.standby_measurement.measure(payload, resistance)
+    except SessionConflictError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
 
 
 @router.post("/sessions", status_code=201, responses={409: ERROR_RESPONSE, 422: ERROR_RESPONSE})

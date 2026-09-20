@@ -24,6 +24,8 @@ import {
   decodeSessionSummaries,
   decodeSettings,
   decodeShellyDiscovery,
+  decodeStandbyEstimate,
+  decodeStandbyMeasurement,
 } from "./api-decoders";
 import type { Decoder } from "./api-decoders";
 import type {
@@ -175,8 +177,20 @@ export class MeasureApiClient {
     return this.requestJson("api/dummy-load/calibration", decodeDummyLoadCalibration);
   }
 
-  preflight(request: MeasurementRequest): Promise<PreflightResponse> {
-    return this.requestJson("api/preflight", decodePreflight, { method: "POST", body: JSON.stringify(request) });
+  preflight(request: MeasurementRequest, refresh = false): Promise<PreflightResponse> {
+    return this.requestJson(`api/preflight${refresh ? "?refresh=true" : ""}`, decodePreflight, { method: "POST", body: JSON.stringify(request) });
+  }
+
+  getStandbyEstimate(manufacturer: string, connectivity: string[]) {
+    const query = new URLSearchParams({ manufacturer });
+    for (const value of connectivity) query.append("connectivity", value);
+    return this.requestJson(`api/library/standby-estimate?${query}`, decodeStandbyEstimate);
+  }
+
+  measureStandby(sessionId: string) {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby`, decodeStandbyMeasurement, {
+      method: "POST", body: JSON.stringify({ confirmed: true }),
+    });
   }
 
   start(request: MeasurementRequest): Promise<SessionSnapshot> {

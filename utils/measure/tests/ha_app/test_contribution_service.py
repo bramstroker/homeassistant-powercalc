@@ -1,3 +1,4 @@
+import base64
 from dataclasses import dataclass
 from functools import partial
 from io import BytesIO
@@ -96,6 +97,60 @@ def test_preview_archive_and_submission_share_pinned_profile(session: Contributi
     submitted = session.service.submit(preview=preview, artifact_root=session.artifacts)
     assert submitted.pull_request_url == "https://github.test/pr/1"
     assert submitted.branch_name == preview.branch_name
+
+
+@pytest.mark.parametrize("original_power", [None, 0, 0.3])
+@pytest.mark.parametrize("estimated", [False, True])
+def test_standby_correction_is_shared_by_preview_archive_and_submission(
+    session: ContributionSession, original_power: float | None, estimated: bool
+) -> None:
+    model_path = session.artifacts / "model.json"
+    model = json.loads(model_path.read_text())
+    model.update(device_type="light", standby_power_estimated=True)
+    if original_power is not None:
+        model["standby_power"] = original_power
+    model_path.write_text(json.dumps(model))
+    raw = model_path.read_bytes()
+    session.payload = session.payload.model_copy(update={"standby_power": 0.05, "standby_power_estimated": estimated})
+
+    preview = session.preview()
+
+    assert preview.standby_power == 0.05
+    assert preview.standby_power_estimated is estimated
+    assert preview.model_json["standby_power"] == 0.05
+    assert preview.model_json["standby_power_estimated"] is estimated
+    assert ("Standby power is estimated: 0.05 W" in preview.pr_body) is estimated
+    with ZipFile(BytesIO(session.service.prepared_archive(preview.job_id))) as archive:
+        prepared = archive.read("profile_library/acme/test-model/model.json")
+    assert json.loads(prepared) == preview.model_json
+    with patch.object(session.github, "create_blob", wraps=session.github.create_blob) as create_blob:
+        session.service.submit(preview=preview, artifact_root=session.artifacts)
+    assert any(base64.b64decode(call.args[2]) == prepared for call in create_blob.call_args_list)
+    assert model_path.read_bytes() == raw
+
+
+def test_omitted_standby_overrides_preserve_estimate_and_disclose_it(session: ContributionSession) -> None:
+    model_path = session.artifacts / "model.json"
+    model = json.loads(model_path.read_text())
+    model.update(device_type="light", standby_power=0.4, standby_power_estimated=True)
+    model_path.write_text(json.dumps(model))
+
+    preview = session.preview()
+
+    assert preview.standby_power == 0.4
+    assert preview.standby_power_estimated is True
+    assert "Standby power is estimated: 0.4 W" in preview.pr_body
+
+
+@pytest.mark.parametrize("power", [None, 0])
+def test_missing_light_standby_requires_correction(session: ContributionSession, power: float | None) -> None:
+    model_path = session.artifacts / "model.json"
+    model = json.loads(model_path.read_text())
+    model.update(device_type="light", standby_power=power)
+    model_path.write_text(json.dumps(model))
+    with pytest.raises(ContributionApiError) as error:
+        session.preview()
+    assert error.value.field == "standby_power"
 
 
 def test_refresh_reuses_reference_and_expires_previous_archive(session: ContributionSession, tmp_path: Path) -> None:

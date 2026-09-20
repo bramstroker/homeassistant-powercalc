@@ -1,12 +1,13 @@
 import { ProfilePrepareView } from "./prepare-view";
 import type { Combobox } from "../shared/combobox";
 import type { StringListInput } from "../shared/string-list-input";
-import type { ContributionPreview } from "../../types";
+import type { ContributionPreview, StandbyEstimate, StandbyMeasurementResult } from "../../types";
 
 const preview: ContributionPreview = {
   eligible: true, manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010",
   product_name: "Hue lamp", contributor: "Tester", contributor_github: "tester", measure_device: "Test meter",
   mains_voltage: 230, notes: "", device_info: {}, home_assistant: {}, device_type: "light", files: [], warnings: [],
+  standby_power: 0.3, standby_power_estimated: false,
   repository: "bramstroker/homeassistant-powercalc", base_branch: "master", aliases: ["Alias"],
   commit_message: "Add profile", pr_title: "Add profile", pr_body: "Measured profile", branch_name: "measure/test",
 };
@@ -30,6 +31,114 @@ function submit(element: ProfilePrepareView): void {
 }
 
 describe("profile validation", () => {
+  it("applies a retry result, clears estimated, and requires validation again", async () => {
+    const element = await mount();
+    let resolve!: (result: StandbyMeasurementResult) => void;
+    element.measureStandby = vi.fn(() => new Promise<StandbyMeasurementResult>(done => { resolve = done; }));
+    element.contributionFormValues = { standby_power: "0.4", standby_power_estimated: "true" };
+    await element.updateComplete;
+    const fields = element.shadowRoot!.querySelector("measure-profile-measurement-fields")!;
+    fields.dispatchEvent(new CustomEvent("standby-measure", { bubbles: true }));
+    await element.updateComplete;
+    expect(element.measureStandby).toHaveBeenCalledWith("session-1");
+    expect(element.shadowRoot!.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
+    resolve({ status: "measured", power_w: 0.65 });
+    await vi.waitFor(() => expect(input(element, "standby_power").value).toBe("0.65"));
+    expect(input(element, "standby_power_estimated").checked).toBe(false);
+    expect(element.previewDirty).toBe(true);
+  });
+
+  it.each(["unavailable", "error", "stale"])("preserves entered standby after a %s retry", async outcome => {
+    const element = await mount();
+    let resolve!: (result: StandbyMeasurementResult) => void;
+    let reject!: (error: Error) => void;
+    element.measureStandby = vi.fn(() => new Promise<StandbyMeasurementResult>((done, fail) => { resolve = done; reject = fail; }));
+    element.shadowRoot!.querySelector("measure-profile-measurement-fields")!.dispatchEvent(new CustomEvent("standby-measure", { bubbles: true }));
+    if (outcome === "stale") element.snapshot = { state: "completed", session_id: "session-2" };
+    if (outcome === "error") reject(new Error("Meter offline"));
+    else resolve({ status: outcome === "stale" ? "measured" : "unavailable", power_w: outcome === "stale" ? 0.9 : null });
+    await Promise.resolve();
+    await element.updateComplete;
+    expect(input(element, "standby_power").value).toBe("0.3");
+  });
+
+  it("allows standby overrides for non-light profiles and preserves omitted values", async () => {
+    const element = await mount();
+    element.contributionDraft = { ...preview, device_type: "fan", standby_power: null };
+    const onPreview = vi.fn();
+    element.addEventListener("contribution-preview", onPreview);
+    await element.updateComplete;
+    submit(element);
+    expect(onPreview.mock.lastCall![0].detail).not.toHaveProperty("standby_power");
+    input(element, "standby_power").value = "1.2";
+    input(element, "standby_power_estimated").checked = true;
+    submit(element);
+    expect(onPreview.mock.lastCall![0].detail).toMatchObject({ standby_power: 1.2, standby_power_estimated: true });
+  });
+  it("requires a correction for legacy zero standby and applies estimates only on request", async () => {
+    const element = await mount();
+    element.contributionDraft = { ...preview, standby_power: null };
+    await element.updateComplete;
+    const onPreview = vi.fn();
+    element.addEventListener("contribution-preview", onPreview);
+    submit(element);
+    await element.updateComplete;
+    expect(onPreview).not.toHaveBeenCalled();
+    expect(input(element, "standby_power").getAttribute("aria-invalid")).toBe("true");
+    await vi.waitFor(() => expect(element.shadowRoot!.activeElement).toBe(input(element, "standby_power")));
+    expect(input(element, "standby_power").value).toBe("");
+    const apply = [...element.shadowRoot!.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent!.includes("Use estimated standby"))!;
+    apply.click();
+    await element.updateComplete;
+    expect(input(element, "standby_power").value).toBe("0.4");
+    expect(input(element, "standby_power_estimated").checked).toBe(true);
+    expect(element.previewDirty).toBe(true);
+    submit(element);
+    expect(onPreview.mock.calls[0]![0].detail).toMatchObject({ standby_power: 0.4, standby_power_estimated: true });
+
+    input(element, "standby_power").value = "0.05";
+    input(element, "standby_power").dispatchEvent(new Event("input", { bubbles: true }));
+    input(element, "standby_power_estimated").checked = false;
+    input(element, "standby_power_estimated").dispatchEvent(new Event("change", { bubbles: true }));
+    await element.updateComplete;
+    submit(element);
+    expect(onPreview.mock.lastCall![0].detail).toMatchObject({ standby_power: 0.05, standby_power_estimated: false });
+  });
+
+  it("refreshes suggestions without overwriting edits and ignores stale responses", async () => {
+    const element = await mount();
+    let resolveFirst!: (estimate: StandbyEstimate) => void;
+    let resolveSecond!: (estimate: StandbyEstimate) => void;
+    const loader = vi.fn()
+      .mockImplementationOnce(() => new Promise<StandbyEstimate>(resolve => { resolveFirst = resolve; }))
+      .mockImplementationOnce(() => new Promise<StandbyEstimate>(resolve => { resolveSecond = resolve; }));
+    element.loadStandbyEstimate = loader;
+    element.contributionDraft = { ...preview, device_specs: { connectivity: ["zigbee"] } };
+    await element.updateComplete;
+    element.contributionFormValues = { manufacturer_name: "Acme", standby_power: "0.8", standby_power_estimated: "false", "device_specs.connectivity": ["wifi"] };
+    await element.updateComplete;
+    expect(loader).toHaveBeenLastCalledWith("Acme", ["wifi"]);
+    resolveSecond({ power_w: 0.5, basis: "manufacturer", profile_count: 3 });
+    await vi.waitFor(() => expect(element.shadowRoot!.textContent).toContain("Use estimated standby: 0.5 W"));
+    resolveFirst({ power_w: 0.2, basis: "connectivity", profile_count: 5 });
+    await Promise.resolve();
+    await element.updateComplete;
+    expect(element.shadowRoot!.textContent).toContain("Use estimated standby: 0.5 W");
+    expect(input(element, "standby_power").value).toBe("0.8");
+    expect(input(element, "standby_power_estimated").checked).toBe(false);
+  });
+
+  it("offers a fallback after a library outage but only suggests estimates for lights", async () => {
+    const element = await mount();
+    element.loadStandbyEstimate = vi.fn().mockRejectedValue(new Error("offline"));
+    element.contributionDraft = { ...preview, device_specs: { connectivity: ["wifi"] } };
+    await vi.waitFor(() => expect(element.shadowRoot!.textContent).toContain("Use estimated standby: 0.4 W"));
+    element.contributionDraft = { ...preview, device_type: "generic" };
+    await element.updateComplete;
+    expect(input(element, "standby_power")).not.toBeNull();
+    expect(element.shadowRoot!.textContent).not.toContain("Use estimated standby");
+  });
+
   it("marks required fields, lists missing values together and focuses the first error", async () => {
     const element = await mount();
     const onPreview = vi.fn();
@@ -128,7 +237,7 @@ describe("profile validation", () => {
   it("always shows server errors even when their field is not editable", async () => {
     const element = await mount();
     element.contributionError = "Generated calculation strategy is invalid.";
-    element.contributionErrorField = "standby_power";
+    element.contributionErrorField = "calculation_strategy";
     await element.updateComplete;
     expect(element.shadowRoot!.querySelector(".validation-summary")!.textContent).toContain(element.contributionError);
     await vi.waitFor(() => expect(element.shadowRoot!.activeElement).toBe(element.shadowRoot!.querySelector(".validation-summary")));

@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
+from enum import StrEnum
 import json
 import logging
 from threading import RLock
@@ -11,10 +12,12 @@ from measure.controller.light.controller import LightController
 from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.errors import ZeroReadingError
+from measure.profile.standby import is_valid_standby_power
 from measure.request import LightMeasurementRequest
 from measure.runner.interaction import ImmediateInteraction
 from measure.runner.light.plan import Variation, build_light_plan, low_load_probe_variations
 from measure.runner.light.runner import LightControl
+from measure.runner.light.standby import measure_light_standby
 from measure.utils.sampling import PowerSampler
 
 LIGHT_LOAD_PROBE_CACHE_SECONDS = 600
@@ -29,11 +32,24 @@ class LightLoadProbePoint:
     power_w: float
 
 
+class StandbyProbeStatus(StrEnum):
+    MEASURED = "measured"
+    UNAVAILABLE = "unavailable"
+    SKIPPED = "skipped"
+
+
+@dataclass(frozen=True)
+class StandbyProbeResult:
+    status: StandbyProbeStatus = StandbyProbeStatus.SKIPPED
+    power_w: float | None = None
+
+
 @dataclass(frozen=True)
 class LightLoadProbeResult:
     checked_variations: int
     minimum_aggregate_power_w: float
     points: tuple[LightLoadProbePoint, ...]
+    standby: StandbyProbeResult = StandbyProbeResult()
 
 
 @dataclass(frozen=True)
@@ -73,12 +89,17 @@ class LightLoadProbe:
         self._cache: dict[str, CachedLightLoadProbe] = {}
         self._lock = RLock()
 
-    def evaluate(self, request: LightMeasurementRequest) -> LightLoadProbeResult:
+    def evaluate(self, request: LightMeasurementRequest, *, refresh: bool = False) -> LightLoadProbeResult:
         key = self._cache_key(request)
         with self._lock:
             cached = self._cache.get(key)
-            if cached is not None and self._monotonic() - cached.cached_at < LIGHT_LOAD_PROBE_CACHE_SECONDS:
+            if (
+                not refresh
+                and cached is not None
+                and self._monotonic() - cached.cached_at < LIGHT_LOAD_PROBE_CACHE_SECONDS
+            ):
                 return cached.result
+            self._cache.pop(key, None)
 
         result = self._probe(request)
         with self._lock:
@@ -128,6 +149,7 @@ class LightLoadProbe:
                 checked_variations=len(points),
                 minimum_aggregate_power_w=min(point.power_w for point in points),
                 points=tuple(points),
+                standby=self._measure_standby(controller, sampler, request),
             )
         except ZeroReadingError as error:
             raise LightLoadProbeError(
@@ -167,6 +189,22 @@ class LightLoadProbe:
         if initial:
             self._wait(request.parameters.sleep_initial)
         return sampler.take_measurement(start_timestamp=start_timestamp).power
+
+    def _measure_standby(
+        self, controller: LightController, sampler: PowerSampler, request: LightMeasurementRequest
+    ) -> StandbyProbeResult:
+        result = measure_light_standby(
+            controller,
+            sampler,
+            request.parameters,
+            wait=self._wait,
+            checkpoint=ImmediateInteraction().checkpoint,
+            now=self._now,
+        )
+        power = round(result.power / request.multiple_light_count, 2) if result is not None else None
+        if not is_valid_standby_power(power):
+            return StandbyProbeResult(StandbyProbeStatus.UNAVAILABLE)
+        return StandbyProbeResult(StandbyProbeStatus.MEASURED, power)
 
     @staticmethod
     def _cache_key(request: LightMeasurementRequest) -> str:

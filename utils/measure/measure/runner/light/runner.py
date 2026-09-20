@@ -12,6 +12,7 @@ from measure.powermeter.errors import (
     PowerMeterError,
     ZeroReadingError,
 )
+from measure.profile.standby import STANDBY_UNAVAILABLE_WARNING
 from measure.request import LightMeasurementRequest
 from measure.runner.errors import RunnerError
 from measure.runner.interaction import ImmediateInteraction, LightOperatingPoint, RunInteraction
@@ -33,6 +34,7 @@ from measure.runner.light.plan import (
     estimate_light_time_left,
     variations_after,
 )
+from measure.runner.light.standby import measure_light_standby
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.tuning import MeasurementParameters
 from measure.utils.sampling import AverageMeasurementConvergence, MeasurementResult, PowerSampler
@@ -477,29 +479,20 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
 
         return MeasurementResult(power=round(power, 2), voltages=result.voltages)
 
-    def measure_standby_power(self) -> MeasurementResult:
-        """Measures the standby power (when the light is OFF)"""
-        self._checkpoint()
-        self.light_controller.change_light_state(LutMode.BRIGHTNESS, on=False)
+    def measure_standby_power(self) -> MeasurementResult | None:
+        """Measure standby per light, leaving an unmeasurable load unavailable."""
         self.interaction.operating_point(LightOperatingPoint(type="light", on=False))
-        start_time = time.time()
         _LOGGER.info(
             "Measuring standby power. Waiting for %d seconds...",
             self.config.sleep_standby,
         )
-        self._wait(self.config.sleep_standby)
-        try:
-            self._checkpoint()
-            return self.take_power_measurement(LutMode.BRIGHTNESS, start_time)
-        except OutdatedMeasurementError:
-            return self.nudge_and_remeasure(LutMode.BRIGHTNESS, Variation(0))
-        except ZeroReadingError:
-            _LOGGER.error(
-                "Measured 0 watt as standby usage, continuing now, "
-                "but you probably need to have a look into measuring multiple lights at the same time "
-                "or using a dummy load.",
-            )
-            return MeasurementResult(power=0, voltages=[])
+        result = measure_light_standby(
+            self.light_controller, self.sampler, self.config, wait=self._wait, checkpoint=self._checkpoint
+        )
+        if result is None:
+            _LOGGER.warning(STANDBY_UNAVAILABLE_WARNING)
+            return None
+        return MeasurementResult(power=round(result.power / self.num_lights, 2), voltages=result.voltages)
 
     @staticmethod
     def _build_operating_point(mode: LutMode, variation: Variation) -> LightOperatingPoint:

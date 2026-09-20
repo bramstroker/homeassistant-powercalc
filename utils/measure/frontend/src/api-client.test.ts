@@ -50,6 +50,23 @@ function sessionSnapshot(overrides: Record<string, unknown> = {}): Record<string
 }
 
 describe("MeasureApiClient", () => {
+  it("confirms a standalone standby reading under the ingress prefix", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ status: "measured", power_w: 0.7 }));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+    await expect(client.measureStandby("session 1")).resolves.toEqual({ status: "measured", power_w: 0.7 });
+    expect(fetcher).toHaveBeenCalledWith(new URL("http://ha.local/prefix/api/sessions/session%201/standby"),
+      expect.objectContaining({ method: "POST", body: JSON.stringify({ confirmed: true }) }));
+  });
+  it("encodes standby suggestion inputs below the ingress prefix", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ power_w: 0.3, basis: "manufacturer", profile_count: 4 }));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+    expect(await client.getStandbyEstimate("Brand & Co", ["zigbee", "bluetooth"])).toEqual({ power_w: 0.3, basis: "manufacturer", profile_count: 4 });
+    const url = fetcher.mock.calls[0]![0] as URL;
+    expect(url.pathname).toBe("/prefix/api/library/standby-estimate");
+    expect(url.searchParams.get("manufacturer")).toBe("Brand & Co");
+    expect(url.searchParams.getAll("connectivity")).toEqual(["zigbee", "bluetooth"]);
+  });
+
   it("binds the browser fetch implementation to its global receiver", async () => {
     const browserFetch = vi.fn<typeof fetch>().mockResolvedValue(response(capabilitiesResponse));
     vi.stubGlobal("fetch", browserFetch);

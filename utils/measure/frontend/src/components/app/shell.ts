@@ -291,6 +291,7 @@ export class AppShell extends LitElement implements MeasureAppState {
         .confirmationAction=${this.confirmationAction()}
         .busy=${this.busy} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         @back=${() => this.controller.backToSetup()} @start=${() => void this.controller.start()}
+        @recheck=${() => void this.controller.recheckSetup()}
       ></measure-preflight-view>`;
   }
 
@@ -336,7 +337,10 @@ export class AppShell extends LitElement implements MeasureAppState {
         .manufacturers=${this.manufacturers ?? []}
         .measureDevices=${this.measureDevices} .measureDevicesLoading=${this.measureDevicesLoading} .measureDevicesError=${this.measureDevicesError}
         .deviceSpecificationFields=${this.deviceSpecificationFields}
+        .loadStandbyEstimate=${this.loadStandbyEstimate}
+        .measureStandby=${this.measureStandby}
         @back=${() => this.controller.backToResult()}
+        @open-settings=${this.openSettings}
         @profile-submit=${() => this.controller.openSubmit()}
         @contribution-edit=${(event: CustomEvent<ContributionFormValues>) => this.controller.editContribution(event.detail)}
         @contribution-preview=${(event: CustomEvent<ContributionPreviewRequest>) => void this.controller.previewContribution(event.detail)}
@@ -435,6 +439,11 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
 
   private readonly resultFileUrl = (name: string): string => this.api.fileUrl(this.snapshot?.session_id ?? "", name);
+
+  private readonly loadStandbyEstimate = (manufacturer: string, connectivity: string[]) =>
+    this.api.getStandbyEstimate(manufacturer, connectivity);
+
+  private readonly measureStandby = (sessionId: string) => this.api.measureStandby(sessionId);
 
   private readonly inspectResultJsonFile = (name: string): Promise<unknown> =>
     this.api.getJsonFile(this.snapshot?.session_id ?? "", name);
