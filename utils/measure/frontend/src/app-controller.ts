@@ -18,6 +18,7 @@ import type {
   ContributionStatus,
   ContributionSubmitRequest,
   DummyLoadCalibration,
+  CalibrationJob,
   LightMeasurementRequest,
   DeviceSpecificationField,
   EntityDescriptor,
@@ -562,12 +563,17 @@ export class MeasureAppController {
     });
   }
 
-  async calibrateStandby(sessionId: string, setup: LightMeasurementRequest, signal?: AbortSignal): Promise<DummyLoadCalibration | null> {
-    const calibration = await this.api().calibrateStandby(sessionId, setup, signal);
-    this.state.dummyLoadCalibration = calibration;
-    this.state.dummyLoadCalibrationError = "";
-    this.changed();
-    return calibration;
+  async calibrateStandby(sessionId: string, setup: LightMeasurementRequest): Promise<CalibrationJob> {
+    return this.api().calibrateStandby(sessionId, setup);
+  }
+
+  async getStandbyCalibration(sessionId: string): Promise<CalibrationJob | null> {
+    const job = await this.api().getStandbyCalibration(sessionId);
+    if (job?.status === "completed") {
+      await this.refreshDummyLoadCalibration();
+      this.changed();
+    }
+    return job;
   }
 
   async retryDummyLoadCalibration(): Promise<void> {

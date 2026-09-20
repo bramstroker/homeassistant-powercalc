@@ -6,7 +6,6 @@ import logging
 import mimetypes
 from pathlib import Path
 import re
-from threading import Event
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
@@ -14,7 +13,6 @@ from fastapi.responses import FileResponse, Response, StreamingResponse
 from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 
-from measure.cancellation import MeasurementCancelledError
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.ha_app.api_models import (
     ERROR_RESPONSE,
@@ -27,6 +25,7 @@ from measure.ha_app.api_models import (
     SessionSnapshotResponse,
     SessionSummary,
 )
+from measure.ha_app.calibration import CalibrationJob
 from measure.ha_app.context import AppContext, get_app_context, require_session
 from measure.ha_app.coordinator import SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
@@ -42,7 +41,6 @@ from measure.ha_app.session import (
 )
 from measure.ha_app.storage import SESSION_LOAD_ERRORS
 from measure.powermeter.errors import PowerMeterError
-from measure.powermeter.spec import ManualPowerMeterSpec, OcrPowerMeterSpec
 from measure.request import (
     DummyLoadReuseRequest,
     LightMeasurementRequest,
@@ -77,8 +75,6 @@ def _measure_standby(context: AppContext, session_id: str, retry: StandbyMeasure
                 raise HTTPException(status_code=409, detail="Standby can only be remeasured for a completed session")
             payload = _standby_setup(context, session_id, retry)
             original = context.storage.load_request(session_id)
-            if isinstance(payload.power_meter, ManualPowerMeterSpec | OcrPowerMeterSpec):
-                raise HTTPException(status_code=422, detail="Standby measurement requires an app-supported power meter")
             resistance = None
             calibration = None
             if payload.dummy_load is not None:
@@ -135,6 +131,7 @@ def _save_standby_retry(
 def _standby_setup(context: AppContext, session_id: str, retry: StandbyMeasurementRequest) -> MeasurementRequest:
     original = context.storage.load_request(session_id)
     if retry.setup is None:
+        validate_standby_setup(context, original)
         return original
     if not isinstance(original, LightMeasurementRequest):
         raise HTTPException(status_code=422, detail="Only light sessions support changing the standby setup")
@@ -172,53 +169,46 @@ def _compatible_calibration(
     return None
 
 
-@router.post("/sessions/{session_id}/standby/calibrate", responses={409: ERROR_RESPONSE, 422: ERROR_RESPONSE})
+@router.post(
+    "/sessions/{session_id}/standby/calibrate", status_code=202, responses={409: ERROR_RESPONSE, 422: ERROR_RESPONSE}
+)
 async def calibrate_standby(
     session_id: str,
     payload: StandbyMeasurementRequest,
     request: Request,
-) -> DummyLoadCalibration:
-    cancelled = Event()
-    worker = asyncio.create_task(
-        run_in_threadpool(_calibrate_standby, get_app_context(request), session_id, payload, cancelled)
-    )
-    try:
-        while not worker.done():
-            if await request.is_disconnected():
-                cancelled.set()
-            await asyncio.wait({worker}, timeout=0.25)
-        return await worker
-    finally:
-        cancelled.set()
-        # Keep the worker owned until it releases its device reservation.
-        if not worker.done():
-            await asyncio.shield(worker)
+) -> CalibrationJob:
+    return await run_in_threadpool(_start_standby_calibration, get_app_context(request), session_id, payload)
 
 
-def _calibrate_standby(
+def _start_standby_calibration(
     context: AppContext,
     session_id: str,
     retry: StandbyMeasurementRequest,
-    cancelled: Event,
-) -> DummyLoadCalibration:
+) -> CalibrationJob:
+    if require_session(context, session_id).state != SessionState.COMPLETED:
+        raise HTTPException(status_code=409, detail="Standby requires a completed session")
+    payload = _standby_setup(context, session_id, retry)
+    if payload.dummy_load is None:
+        raise HTTPException(status_code=422, detail="Select a dummy load")
     try:
-        with context.coordinator.reserve_devices():
-            if require_session(context, session_id).state != SessionState.COMPLETED:
-                raise HTTPException(status_code=409, detail="Standby requires a completed session")
-            payload = _standby_setup(context, session_id, retry)
-            if payload.dummy_load is None or isinstance(payload.power_meter, ManualPowerMeterSpec | OcrPowerMeterSpec):
-                raise HTTPException(status_code=422, detail="Select a dummy load and an app-supported meter")
-            calibration = context.standby_measurement.calibrate(payload, cancelled)
-            if cancelled.is_set():
-                raise MeasurementCancelledError("Calibration cancelled")
-            context.storage.save_dummy_load_calibration(calibration)
-            return calibration
+        return context.calibration_jobs.start(session_id, payload)
     except SessionConflictError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
-    except MeasurementCancelledError as error:
-        raise HTTPException(status_code=499, detail=str(error)) from error
-    except PowerMeterError as error:
-        raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@router.get("/sessions/{session_id}/standby/calibrate")
+def standby_calibration_status(session_id: str, request: Request) -> CalibrationJob | None:
+    context = get_app_context(request)
+    require_session(context, session_id)
+    return context.calibration_jobs.get(session_id)
+
+
+@router.post("/sessions/{session_id}/standby/calibrate/{job_id}/cancel")
+def cancel_standby_calibration(session_id: str, job_id: str, request: Request) -> CalibrationJob:
+    try:
+        return get_app_context(request).calibration_jobs.cancel(session_id, job_id)
+    except KeyError as error:
+        raise HTTPException(status_code=404, detail="Calibration operation not found") from error
 
 
 @router.post("/sessions", status_code=201, responses={409: ERROR_RESPONSE, 422: ERROR_RESPONSE})

@@ -343,8 +343,12 @@ export class AppShell extends LitElement implements MeasureAppState {
         .deviceSpecificationFields=${this.deviceSpecificationFields}
         .loadStandbyEstimate=${this.loadStandbyEstimate}
         .measureStandby=${this.measureStandby}
-        .dummyLoadCalibration=${this.dummyLoadCalibration}
-        .calibrateStandby=${(sessionId: string, setup: LightMeasurementRequest, signal?: AbortSignal) => this.controller.calibrateStandby(sessionId, setup, signal)}
+        .calibrationActions=${{
+          start: (sessionId: string, setup: LightMeasurementRequest) => this.controller.calibrateStandby(sessionId, setup),
+          status: (sessionId: string) => this.controller.getStandbyCalibration(sessionId),
+          cancel: (sessionId: string, jobId: string) => this.api.cancelStandbyCalibration(sessionId, jobId),
+          loadSaved: (meter: LightMeasurementRequest["power_meter"]) => this.api.getCompatibleCalibration(meter),
+        }}
         @back=${() => this.controller.backToResult()}
         @open-settings=${this.openSettings}
         @profile-submit=${() => this.controller.openSubmit()}

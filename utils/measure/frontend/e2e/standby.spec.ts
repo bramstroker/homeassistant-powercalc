@@ -166,11 +166,16 @@ test("changes standby setup and calibrates a dummy load before reconnecting the 
   await mockApi(page);
   let calibrated = false;
   let measured = false;
+  const calibration = { description: "Resistive bulb", resistance: 2400, calibrated_at: "2026-09-20T12:00:00Z", power_meter_fingerprint: "meter" };
+  await page.route("**/api/dummy-load/calibration/match", route => route.fulfill({ json: calibrated ? calibration : null }));
   await page.route("**/api/sessions/session-completed/standby/calibrate", async route => {
-    const payload = route.request().postDataJSON();
-    expect(payload.setup).toMatchObject({ multiple_light_count: 1, dummy_load: { mode: "calibrate", description: "Resistive bulb" } });
-    calibrated = true;
-    await route.fulfill({ json: { description: "Resistive bulb", resistance: 2400, calibrated_at: "2026-09-20T12:00:00Z" } });
+    if (route.request().method() === "GET" && !calibrated) return route.fulfill({ json: null });
+    if (route.request().method() === "POST") {
+      const payload = route.request().postDataJSON();
+      expect(payload.setup).toMatchObject({ multiple_light_count: 1, dummy_load: { mode: "calibrate", description: "Resistive bulb" } });
+      calibrated = true;
+    }
+    await route.fulfill({ json: { id: "job", session_id: "session-completed", status: "completed", started_at: "2026-09-20T12:00:00Z", calibration, error: null } });
   });
   await page.route("**/api/sessions/session-completed/standby", async route => {
     expect(calibrated).toBe(true);
@@ -247,4 +252,50 @@ test("keeps standby progress and the result visible in the dialog", async ({ pag
   await dialog.getByRole("button", { name: "Done", exact: true }).click();
   await expect(dialog).not.toBeVisible();
   await expect(page.getByRole("spinbutton", { name: /Standby power/ })).toHaveValue("0.28");
+});
+
+
+test("reopens the dialog after a native close during standby measurement", async ({ page }) => {
+  await mockApi(page);
+  let finish!: () => void;
+  await page.route("**/api/sessions/session-completed/standby", async route => {
+    await new Promise<void>(resolve => { finish = resolve; });
+    await route.fulfill({ json: { status: "measured", power_w: 0.32 } });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+  await page.getByRole("button", { name: "Measure standby", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Standby measurement setup" });
+  await dialog.getByRole("button", { name: "Confirm and measure standby" }).click();
+  await expect(dialog.getByRole("progressbar")).toBeVisible();
+  await dialog.evaluate(element => (element as HTMLDialogElement).close());
+  await expect(dialog).toHaveCount(0);
+  finish();
+  await expect(page.getByRole("spinbutton", { name: /Standby power/ })).toHaveValue("0.32");
+  await page.getByRole("button", { name: "Measure standby", exact: true }).click();
+  await expect(dialog).toBeVisible();
+});
+
+test("recovers calibration after a reload and cancels it through a short request", async ({ page }) => {
+  await mockApi(page);
+  let status = "running";
+  const job = () => ({ id: "job", session_id: "session-completed", started_at: new Date().toISOString(), status, calibration: null, error: null });
+  await page.route("**/api/sessions/session-completed/standby/calibrate", route => route.fulfill({ json: job() }));
+  await page.route("**/api/sessions/session-completed/standby/calibrate/job/cancel", route => {
+    status = "cancelled";
+    return route.fulfill({ json: job() });
+  });
+  const open = async () => {
+    await page.getByRole("button", { name: "Open", exact: true }).click();
+    await page.getByRole("button", { name: "Prepare profile" }).click();
+    await page.getByRole("button", { name: "Measure standby", exact: true }).click();
+  };
+  await page.goto("/");
+  await open();
+  await expect(page.getByRole("button", { name: "Cancel calibration" })).toBeVisible();
+  await page.reload();
+  await open();
+  await page.getByRole("button", { name: "Cancel calibration" }).click();
+  await expect(page.getByText("Calibration cancelled.", { exact: true })).toBeVisible();
 });
