@@ -4,8 +4,9 @@ from dataclasses import dataclass
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 
 from .common import AnyDeviceEntry, create_source_entity
@@ -33,6 +34,8 @@ from .const import (
 )
 from .device_binding import get_device_entry
 
+_LOGGER = logging.getLogger(__name__)
+
 
 @dataclass(frozen=True)
 class DeviceName:
@@ -57,13 +60,8 @@ def get_device_naming_error(hass: HomeAssistant, config: ConfigType, entry: Conf
     if source.entity_entry and source.entity_entry.has_entity_name and source.entity_entry.original_name:
         return "device_naming_ambiguous"
 
-    for other in hass.config_entries.async_entries(DOMAIN):
-        if other.entry_id == entry.entry_id or other.data.get(CONF_SENSOR_TYPE) != SensorType.VIRTUAL_POWER:
-            continue
-        other_source = create_source_entity(other.data.get(CONF_ENTITY_ID, DUMMY_ENTITY_ID), hass)
-        other_device = get_device_entry(hass, dict(other.data), other_source, other)
-        if other_device and other_device.id == device.id:
-            return "device_naming_ambiguous"
+    if has_other_virtual_power_entry(hass, entry, device.id):
+        return "device_naming_ambiguous"
 
     patterns = [
         [CONF_POWER_SENSOR_NAMING, CONF_POWER_SENSOR_FRIENDLY_NAMING, DEFAULT_POWER_NAME_PATTERN],
@@ -77,6 +75,20 @@ def get_device_naming_error(hass: HomeAssistant, config: ConfigType, entry: Conf
     return None
 
 
+def has_other_virtual_power_entry(hass: HomeAssistant, entry: ConfigEntry, device_id: str) -> bool:
+    """Check whether another virtual power entry is assigned to the device."""
+    source_entity_ids = {entity.entity_id for entity in er.async_entries_for_device(er.async_get(hass), device_id)}
+    for other in hass.config_entries.async_entries(DOMAIN):
+        if other.entry_id == entry.entry_id or other.data.get(CONF_SENSOR_TYPE) != SensorType.VIRTUAL_POWER:
+            continue
+        configured_device_id = other.data.get(CONF_DEVICE)
+        if configured_device_id == device_id:
+            return True
+        if configured_device_id is None and other.data.get(CONF_ENTITY_ID) in source_entity_ids:
+            return True
+    return False
+
+
 def resolve_naming_device(
     hass: HomeAssistant,
     config: ConfigType,
@@ -87,11 +99,8 @@ def resolve_naming_device(
     if entry is None or not global_config.get(CONF_FOLLOW_DEVICE_NAME):
         return None
     if error := get_device_naming_error(hass, config, entry):
-        logging.getLogger(__name__).warning(
-            "Cannot follow device name for %s: %s; using configured names",
-            entry.title,
-            error,
-        )
+        log = _LOGGER.warning if error == "device_naming_no_device" else _LOGGER.debug
+        log("Cannot follow device name for %s: %s; using configured names", entry.title, error)
         return None
     source = create_source_entity(config.get(CONF_ENTITY_ID, DUMMY_ENTITY_ID), hass)
     return get_device_entry(hass, config, source, entry)

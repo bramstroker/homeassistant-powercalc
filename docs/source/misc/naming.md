@@ -88,6 +88,6 @@ the same device. These configurations retain their existing naming behavior.
 Custom entity-ID patterns can be used if their corresponding friendly-name patterns explicitly
 retain the standard display names, such as `power_sensor_friendly_naming: "{} power"`.
 
-If the device is missing at startup, or the configuration no longer supports this option,
-Powercalc logs a warning and uses the configured names for that load. The option remains enabled
+If the device is missing at startup, Powercalc logs a warning and uses the configured names for
+that load. Other unsupported configurations are logged at debug level. The option remains enabled
 and is tried again on the next reload or restart.

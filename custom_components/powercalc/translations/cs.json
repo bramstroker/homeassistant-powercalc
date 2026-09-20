@@ -807,7 +807,11 @@
               "power_sensor_naming": "Vzor názvu senzoru výkonu",
               "power_sensor_friendly_naming": "Vzor přívětivého názvu senzoru výkonu",
               "power_sensor_category": "Kategorie senzoru výkonu",
-              "power_sensor_precision": "Přesnost senzoru výkonu"
+              "power_sensor_precision": "Přesnost senzoru výkonu",
+              "follow_device_name": "Používat název zařízení"
+            },
+            "data_description": {
+              "follow_device_name": "Použít název přiřazeného zařízení pro generované entity podporovaných virtuálních senzorů výkonu nakonfigurovaných v uživatelském rozhraní. ID entit a vlastní názvy entit se nezmění. Vypnutím se obnoví nakonfigurované názvy."
             }
           },
           "features": {

@@ -807,7 +807,11 @@
               "power_sensor_naming": "Tehoanturin nimimalli",
               "power_sensor_friendly_naming": "Tehoanturin näyttönimen malli",
               "power_sensor_category": "Tehoanturin luokka",
-              "power_sensor_precision": "Tehoanturin tarkkuus"
+              "power_sensor_precision": "Tehoanturin tarkkuus",
+              "follow_device_name": "Käytä laitteen nimeä"
+            },
+            "data_description": {
+              "follow_device_name": "Käytä liitetyn laitteen nimeä käyttöliittymässä määritettyjen tuettujen virtuaalisten tehoanturien luoduille entiteeteille. Entiteettitunnukset ja mukautetut entiteettien nimet eivät muutu. Asetuksen poistaminen käytöstä palauttaa määritetyt nimet."
             }
           },
           "features": {

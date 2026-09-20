@@ -807,7 +807,11 @@
               "power_sensor_naming": "Namnmönster för effektsensor",
               "power_sensor_friendly_naming": "Strömsensorvänligt namnmönster",
               "power_sensor_category": "Effektsensorkategori",
-              "power_sensor_precision": "Effektsensorns precision"
+              "power_sensor_precision": "Effektsensorns precision",
+              "follow_device_name": "Följ enhetens namn"
+            },
+            "data_description": {
+              "follow_device_name": "Använd namnet på den tilldelade enheten för genererade entiteter till virtuella effektsensorer som stöds och har konfigurerats i användargränssnittet. Entitets-ID:n och anpassade entitetsnamn förblir oförändrade. När inställningen stängs av återställs de konfigurerade namnen."
             }
           },
           "features": {

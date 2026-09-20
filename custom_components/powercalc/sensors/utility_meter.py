@@ -47,6 +47,7 @@ def create_utility_meters(
     sensor_config: ConfigType,
     config_entry: ConfigEntry | None = None,
     naming_device: AnyDeviceEntry | None = None,
+    device_entry: AnyDeviceEntry | None = None,
 ) -> list[VirtualUtilityMeter]:
     """Create the utility meters."""
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
@@ -71,7 +72,8 @@ def create_utility_meters(
                     unique_id,
                     meter_type,
                     tariffs,
-                    naming_device,
+                    device_entry=device_entry,
+                    naming_device=naming_device,
                 ),
             )
 
@@ -109,6 +111,7 @@ def create_meters_for_type(
     meter_type: str,
     tariffs: list[str],
     naming_device: AnyDeviceEntry | None = None,
+    device_entry: AnyDeviceEntry | None = None,
 ) -> list[VirtualUtilityMeter]:
     """Create meters for a specific meter type."""
     name = f"{energy_sensor.name} {meter_type}"
@@ -143,7 +146,8 @@ def create_meters_for_type(
             meter_type,
             unique_id,
             tariffs,
-            naming_device,
+            device_entry=device_entry,
+            naming_device=naming_device,
         )
         tariff_sensors.extend(new_tariff_sensors)
         utility_meters.extend(new_tariff_sensors)
@@ -163,11 +167,19 @@ def create_tariff_meters(
     unique_id: str | None,
     tariffs: list[str],
     naming_device: AnyDeviceEntry | None = None,
+    device_entry: AnyDeviceEntry | None = None,
 ) -> list[VirtualUtilityMeter]:
     """Create utility meters for specific tariffs."""
     filtered_tariffs = [t for t in tariffs if t != GENERAL_TARIFF]
     tariff_select = create_tariff_select(
-        config_entry, filtered_tariffs, hass, name, unique_id, naming_device, meter_type
+        config_entry,
+        filtered_tariffs,
+        hass,
+        name,
+        unique_id,
+        device_entry=device_entry,
+        naming_device=naming_device,
+        meter_type=meter_type,
     )
 
     tariff_sensors = []
@@ -196,6 +208,7 @@ def create_tariff_select(
     unique_id: str | None,
     naming_device: AnyDeviceEntry | None = None,
     meter_type: str = "",
+    device_entry: AnyDeviceEntry | None = None,
 ) -> TariffSelect:
     """Create tariff selection entity."""
     _LOGGER.debug("Creating utility_meter tariff select: %s", name)
@@ -213,8 +226,8 @@ def create_tariff_select(
     if select_unique_id:
         existing_entity_id = er.async_get(hass).async_get_entity_id("select", DOMAIN, select_unique_id)
     tariff_select.entity_id = existing_entity_id or async_generate_entity_id("select.{}", name, hass=hass)
+    tariff_select.device_entry = device_entry
     if naming_device:
-        tariff_select.device_entry = naming_device
         tariff_select.device_name = DeviceName("utility_meter_cycle", {"period": meter_type})
         tariff_select.enable_device_naming()
 

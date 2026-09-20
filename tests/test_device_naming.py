@@ -1,4 +1,5 @@
 from datetime import timedelta
+import logging
 from unittest.mock import PropertyMock, patch
 
 from _pytest.fixtures import SubRequest
@@ -25,6 +26,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_STANDBY_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_PRICE,
     CONF_ENERGY_SENSOR_ID,
     CONF_FIXED,
@@ -39,6 +41,7 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
+    CONF_VALUE,
     DOMAIN,
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SERVICE_CALIBRATE_ENERGY,
@@ -129,6 +132,7 @@ async def test_follow_device_name_lifecycle(
     entity_registry.async_update_entity("sensor.patio_energy", new_entity_id="sensor.my_energy")
     if tariffs:
         entity_registry.async_update_entity("select.patio_energy_daily", new_entity_id="select.my_tariff")
+        assert entity_registry.async_get("select.my_tariff").device_id == source_device.id
     await hass.async_block_till_done()
     original_ids = {
         item.unique_id: item.entity_id for item in er.async_entries_for_config_entry(entity_registry, entry.entry_id)
@@ -173,6 +177,8 @@ async def test_follow_device_name_lifecycle(
     await set_follow_device_name(hass, False)
     assert entity_registry.async_get("sensor.patio_power").original_name == original_names["sensor.patio_power"]
     assert entity_registry.async_get("sensor.my_energy").original_name == original_names["sensor.patio_energy"]
+    if tariffs:
+        assert entity_registry.async_get("select.my_tariff").device_id == source_device.id
     await set_follow_device_name(hass, True)
     assert hass.states.get("sensor.my_energy").name == "Garden Energy"
 
@@ -198,6 +204,25 @@ async def test_missing_device_falls_back_to_configured_names(hass: HomeAssistant
     await create_mock_config_entry(hass, entry_config())
     assert hass.states.get("sensor.patio_power").name == "Patio power"
     await set_follow_device_name(hass, False)
+
+
+async def test_expected_ineligible_entry_does_not_log_warning(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    await create_mock_global_config_entry(hass, {CONF_FOLLOW_DEVICE_NAME: True})
+    with caplog.at_level(logging.WARNING, logger="custom_components.powercalc.device_naming"):
+        await create_mock_config_entry(
+            hass,
+            {
+                CONF_NAME: "Daily energy",
+                CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
+                CONF_DAILY_FIXED_ENERGY: {CONF_VALUE: 1},
+            },
+        )
+
+    assert hass.states.get("sensor.daily_energy_energy") is not None
+    assert "Cannot follow device name" not in caplog.text
 
 
 async def test_global_naming_toggle_reloads_entries(
@@ -278,6 +303,15 @@ async def test_named_channels_and_multiple_entries_are_rejected(
     entity_registry.async_update_entity("light.patio", original_name=None)
     other = await create_mock_config_entry(hass, {**entry_config(), CONF_ENTITY_ID: "light.other"}, setup=False)
     assert get_device_naming_error(hass, entry.data, entry) is None
+    entity_registry.async_get_or_create(
+        "light",
+        "test",
+        "other",
+        device_id=source_device.id,
+        suggested_object_id="other",
+    )
+    assert get_device_naming_error(hass, entry.data, entry) == "device_naming_ambiguous"
+    entity_registry.async_remove("light.other")
     hass.config_entries.async_update_entry(other, data={**other.data, CONF_DEVICE: source_device.id})
     assert get_device_naming_error(hass, entry.data, entry) == "device_naming_ambiguous"
 

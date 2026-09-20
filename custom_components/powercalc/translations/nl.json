@@ -807,7 +807,11 @@
               "power_sensor_naming": "Vermogensensor naampatroon",
               "power_sensor_friendly_naming": "Vermogensensor vriendelijke naampatroon",
               "power_sensor_category": "Vermogensensor categorie",
-              "power_sensor_precision": "Precisie van vermogenssensor"
+              "power_sensor_precision": "Precisie van vermogenssensor",
+              "follow_device_name": "Apparaatnaam volgen"
+            },
+            "data_description": {
+              "follow_device_name": "Gebruik de naam van het gekoppelde apparaat voor gegenereerde entiteiten van ondersteunde virtuele vermogenssensoren die via de gebruikersinterface zijn ingesteld. Entiteits-ID’s en aangepaste entiteitsnamen blijven ongewijzigd. Uitschakelen herstelt de ingestelde namen."
             }
           },
           "features": {

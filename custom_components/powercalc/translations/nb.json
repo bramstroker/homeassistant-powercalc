@@ -807,7 +807,11 @@
               "power_sensor_naming": "Navnemønster for effektsensor",
               "power_sensor_friendly_naming": "Mønster for visningsnavn på effektsensor",
               "power_sensor_category": "Strømsensorkategori",
-              "power_sensor_precision": "Kraftsensor presisjon"
+              "power_sensor_precision": "Kraftsensor presisjon",
+              "follow_device_name": "Følg enhetsnavnet"
+            },
+            "data_description": {
+              "follow_device_name": "Bruk navnet på den tilordnede enheten for genererte entiteter til støttede virtuelle effektsensorer konfigurert i brukergrensesnittet. Entitets-ID-er og egendefinerte entitetsnavn forblir uendret. Når innstillingen slås av, gjenopprettes de konfigurerte navnene."
             }
           },
           "features": {

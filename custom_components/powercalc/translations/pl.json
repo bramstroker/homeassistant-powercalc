@@ -807,7 +807,11 @@
               "power_sensor_naming": "Wzorzec nazwy sensora mocy",
               "power_sensor_friendly_naming": "Wzorzec przyjaznej nazwy sensora mocy",
               "power_sensor_category": "Kategoria czujników mocy",
-              "power_sensor_precision": "Dokładność czujnika mocy"
+              "power_sensor_precision": "Dokładność czujnika mocy",
+              "follow_device_name": "Używaj nazwy urządzenia"
+            },
+            "data_description": {
+              "follow_device_name": "Używaj nazwy przypisanego urządzenia dla generowanych encji obsługiwanych wirtualnych czujników mocy skonfigurowanych w interfejsie. Identyfikatory encji i własne nazwy encji pozostają bez zmian. Wyłączenie przywraca skonfigurowane nazwy."
             }
           },
           "features": {
