@@ -3,7 +3,7 @@
   "description": "Zigbee repeater for Type F sockets",
   "device_type": "network",
   "aliases": [
-    "Range extender Zi (WG001)"
+    "WG001"
   ],
   "product_url": "https://aeotec.com/products/aeotec-range-extender-zi/",
   "discovery_by": "device",
