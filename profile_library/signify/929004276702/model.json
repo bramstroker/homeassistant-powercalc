@@ -1,0 +1,46 @@
+{
+  "aliases": [
+    "929004276702"
+  ],
+  "authors": [
+    {
+      "email": "rens@renssies.nl",
+      "github": "renssies",
+      "name": "Rens Verhoeven"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-19T22:52:54Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee",
+      "bluetooth"
+    ],
+    "form_factor": "strip",
+    "lumens": 4800,
+    "rated_power": 48,
+    "socket": "integrated"
+  },
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_device_firmware": "2.0.0",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 7.16,
+    "DUMMY_LOAD_RESISTANCE": 7715.07,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.7.0:app"
+  },
+  "name": "Hue Flux Ultra Bright (5m)",
+  "product_url": "https://www.philips-hue.com/nl-nl/p/lightstrips-flux-ultraheldere-lightstrip-5-m/8721103088413",
+  "standby_power": 0.26,
+  "voltage_range": {
+    "max": 240.1,
+    "min": 229.1
+  }
+}
