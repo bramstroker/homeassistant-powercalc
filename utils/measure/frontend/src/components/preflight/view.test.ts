@@ -39,6 +39,32 @@ describe("preflight power meter diagnostics", () => {
     expect((element.shadowRoot.querySelector(".actions button") as HTMLButtonElement).disabled).toBe(true);
   });
 
+  it("separates a setup recheck from starting the session", async () => {
+    const element = new PreflightView();
+    element.busy = true;
+    element.rechecking = true;
+    document.body.append(element);
+    await element.updateComplete;
+
+    const status = element.shadowRoot!.querySelector(".starting");
+    expect(status?.textContent).toContain("Rechecking setup");
+    expect(status?.textContent).not.toContain("Initializing measurement session");
+    expect(element.shadowRoot!.querySelector("button.primary")?.textContent).toBe("Rechecking\u2026");
+  });
+
+  it("blocks starting on results left behind by a failed recheck", async () => {
+    const element = new PreflightView();
+    element.stale = true;
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot!.textContent).toContain("The setup check did not complete");
+    expect(element.shadowRoot!.querySelector<HTMLButtonElement>("button.primary")!.disabled).toBe(true);
+    const recheck = [...element.shadowRoot!.querySelectorAll<HTMLButtonElement>("button")]
+      .find(button => button.textContent === "Recheck setup")!;
+    expect(recheck.disabled).toBe(false);
+  });
+
   it("keeps direct measurements as a single Start measurement action", async () => {
     const element = document.createElement("measure-preflight-view") as HTMLElement & {
       updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;

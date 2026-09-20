@@ -118,7 +118,10 @@ def test_standby_correction_is_shared_by_preview_archive_and_submission(
     assert preview.standby_power == 0.05
     assert preview.standby_power_estimated is estimated
     assert preview.model_json["standby_power"] == 0.05
-    assert preview.model_json["standby_power_estimated"] is estimated
+    if estimated:
+        assert preview.model_json["standby_power_estimated"] is True
+    else:
+        assert "standby_power_estimated" not in preview.model_json
     assert ("Standby power is estimated: 0.05 W" in preview.pr_body) is estimated
     with ZipFile(BytesIO(session.service.prepared_archive(preview.job_id))) as archive:
         prepared = archive.read("profile_library/acme/test-model/model.json")

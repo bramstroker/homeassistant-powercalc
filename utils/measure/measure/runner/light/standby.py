@@ -5,7 +5,7 @@ from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController
 from measure.powermeter.errors import OutdatedMeasurementError, ZeroReadingError
 from measure.tuning import MeasurementParameters
-from measure.utils.sampling import MeasurementResult, PowerSampler
+from measure.utils.sampling import MeasurementError, MeasurementResult, PowerSampler
 
 
 def measure_light_standby(
@@ -26,7 +26,9 @@ def measure_light_standby(
         checkpoint()
         try:
             return sampler.take_measurement(start_timestamp=started)
-        except ZeroReadingError:
+        except ZeroReadingError, MeasurementError:
+            # Too little load to read: a bare zero, or a dummy-load correction
+            # that leaves nothing measurable. Nudging cannot recover either.
             return None
         except OutdatedMeasurementError:
             if attempt == parameters.max_nudges:

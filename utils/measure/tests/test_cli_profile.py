@@ -126,6 +126,60 @@ def test_interactive_preparation_reprompts_required_fields_and_accepts_edits(
     assert next(answers, None) is None
 
 
+@pytest.mark.parametrize("standby_power", [None, 0.02])
+def test_cli_asks_for_standby_power_when_the_light_measurement_has_none(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    standby_power: float | None,
+) -> None:
+    artifacts = tmp_path / "MODEL-1"
+    model = write_artifacts(artifacts)
+    model["device_type"] = "light"
+    if standby_power is not None:
+        model["standby_power"] = standby_power
+    (artifacts / "model.json").write_text(json.dumps(model), encoding="utf-8")
+    library = tmp_path / "profile_library"
+    write_library(library)
+    questions: list[str] = []
+    answers = iter(["Acme", "", "", "", "", "", "230", "0.01", "0.4", "yes", "", "", "", "Test User", "tester", ""])
+
+    def prompt(question: str) -> str:
+        questions.append(question)
+        return next(answers)
+
+    result = prepare_profile(["prepare", str(artifacts), "--library-root", str(library)], prompt=prompt)
+
+    prepared = json.loads(
+        (result.output_directory / "profile_library" / "acme" / "MODEL-1" / "model.json").read_text(encoding="utf-8")
+    )
+    assert prepared["standby_power"] == 0.4
+    assert prepared["standby_power_estimated"] is True
+    assert any("Standby power in W per light" in question for question in questions)
+    assert "Standby power must be at least 0.05 W per light." in capsys.readouterr().out
+    assert next(answers, None) is None
+
+
+def test_cli_keeps_a_measured_standby_value_without_marking_it_estimated(tmp_path: Path) -> None:
+    artifacts = tmp_path / "MODEL-1"
+    model = write_artifacts(artifacts)
+    model.update({"device_type": "light", "standby_power": 0.3})
+    (artifacts / "model.json").write_text(json.dumps(model), encoding="utf-8")
+    library = tmp_path / "profile_library"
+    write_library(library)
+    answers = iter(["Acme", "", "", "", "", "", "230", "", "", "", "", "Test User", "tester", ""])
+
+    result = prepare_profile(
+        ["prepare", str(artifacts), "--library-root", str(library)],
+        prompt=lambda _: next(answers),
+    )
+
+    prepared = json.loads(
+        (result.output_directory / "profile_library" / "acme" / "MODEL-1" / "model.json").read_text(encoding="utf-8")
+    )
+    assert prepared["standby_power"] == 0.3
+    assert "standby_power_estimated" not in prepared
+
+
 @pytest.mark.parametrize(
     "field,answers,default,expected,feedback",
     [

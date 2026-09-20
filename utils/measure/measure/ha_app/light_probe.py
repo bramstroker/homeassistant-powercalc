@@ -9,9 +9,10 @@ import time
 from measure.assembler import MeasurementAssembler
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController
+from measure.controller.light.errors import LightControllerError
 from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.credentials import TapoCredentials
-from measure.powermeter.errors import ZeroReadingError
+from measure.powermeter.errors import PowerMeterError, ZeroReadingError
 from measure.profile.standby import is_valid_standby_power
 from measure.request import LightMeasurementRequest
 from measure.runner.interaction import ImmediateInteraction
@@ -193,14 +194,20 @@ class LightLoadProbe:
     def _measure_standby(
         self, controller: LightController, sampler: PowerSampler, request: LightMeasurementRequest
     ) -> StandbyProbeResult:
-        result = measure_light_standby(
-            controller,
-            sampler,
-            request.parameters,
-            wait=self._wait,
-            checkpoint=ImmediateInteraction().checkpoint,
-            now=self._now,
-        )
+        try:
+            result = measure_light_standby(
+                controller,
+                sampler,
+                request.parameters,
+                wait=self._wait,
+                checkpoint=ImmediateInteraction().checkpoint,
+                now=self._now,
+            )
+        except (PowerMeterError, LightControllerError) as error:
+            # An unreadable standby is reported as a warning, never a reason to
+            # block a session whose low-load points all passed.
+            _LOGGER.warning("Could not measure standby power during the active light check: %s", error)
+            return StandbyProbeResult(StandbyProbeStatus.UNAVAILABLE)
         power = round(result.power / request.multiple_light_count, 2) if result is not None else None
         if not is_valid_standby_power(power):
             return StandbyProbeResult(StandbyProbeStatus.UNAVAILABLE)

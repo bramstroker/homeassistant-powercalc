@@ -15,6 +15,27 @@ describe("measure app controller: navigation", () => {
     expect(preflight).toHaveBeenLastCalledWith(appState.request, true);
     expect(appState.view).toBe("review");
     expect(appState.busy).toBe(false);
+    expect(appState.rechecking).toBe(false);
+    expect(appState.preflightStale).toBe(false);
+  });
+
+  it("marks the shown setup check stale when a recheck fails", async () => {
+    const appState = state();
+    const preflight = vi.fn(api().preflight);
+    const controller = new MeasureAppController(appState, () => api({ preflight }), () => connection(), () => undefined);
+    await controller.preflight({
+      measure_type: "average", duration: 60, model_id: "", product_name: "", measure_device: "Test meter",
+      generate_model: false, parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+    });
+    const shown = appState.preflight;
+    preflight.mockRejectedValueOnce(new Error("meter offline"));
+
+    await controller.recheckSetup();
+
+    expect(appState.preflight).toBe(shown);
+    expect(appState.preflightStale).toBe(true);
+    expect(appState.rechecking).toBe(false);
+    expect(appState.errorMessage).toContain("meter offline");
   });
 
   it.each(["snapshot", "request"] as const)("prevents profile navigation for average measurements from %s", (source) => {

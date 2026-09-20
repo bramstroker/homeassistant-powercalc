@@ -51,6 +51,8 @@ export class AppShell extends LitElement implements MeasureAppState {
   errorMessage = "";
   errorHelp?: ErrorHelp;
   busy = false;
+  rechecking = false;
+  preflightStale = false;
   lastAnalysedSessionId?: string;
   connectedToEvents = false;
   snapshot?: SessionSnapshot;
@@ -289,7 +291,8 @@ export class AppShell extends LitElement implements MeasureAppState {
         .warnings=${this.preflight?.warnings ?? []} .powerMeterDiagnostic=${this.preflight?.power_meter_diagnostic}
         .lightLoadProbe=${this.preflight?.light_load_probe}
         .confirmationAction=${this.confirmationAction()}
-        .busy=${this.busy} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
+        .busy=${this.busy} .rechecking=${this.rechecking} .stale=${this.preflightStale}
+        .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         @back=${() => this.controller.backToSetup()} @start=${() => void this.controller.start()}
         @recheck=${() => void this.controller.recheckSetup()}
       ></measure-preflight-view>`;
