@@ -52,7 +52,12 @@ export class ProfileMeasurementFields extends ProfileFormSection {
           ${this.renderMainsVoltage()}
         </div>
         ${this.renderStandby()}
-        ${this.renderTextarea("measure_description", "Measurement description", this.draft.measure_description)}
+        ${this.renderTextarea(
+          "measure_description",
+          "Measurement description",
+          this.draft.measure_description,
+          "Add any relevant details about your measurement setup, device settings, or test conditions.",
+        )}
       </div>
     </fieldset>`;
   }

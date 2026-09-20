@@ -1,4 +1,5 @@
 import { ProfilePrepareView } from "./prepare-view";
+import type { ProfileMeasurementFields } from "./measurement-fields";
 import type { Combobox } from "../shared/combobox";
 import type { StringListInput } from "../shared/string-list-input";
 import type { ContributionPreview, StandbyEstimate, StandbyMeasurementResult } from "../../types";
@@ -31,6 +32,23 @@ function submit(element: ProfilePrepareView): void {
 }
 
 describe("profile validation", () => {
+  it("keeps measurement guidance accessible when the description fails validation", async () => {
+    const element = await mount();
+    const description = element.shadowRoot!.querySelector<HTMLTextAreaElement>('textarea[name="measure_description"]')!;
+    const hint = element.shadowRoot!.querySelector("#measure_description-hint")!;
+    expect(description.getAttribute("aria-describedby")).toBe(hint.id);
+
+    description.value = "a".repeat(2001);
+    submit(element);
+    await element.updateComplete;
+    await element.shadowRoot!.querySelector<ProfileMeasurementFields>("measure-profile-measurement-fields")!.updateComplete;
+
+    expect(description.getAttribute("aria-invalid")).toBe("true");
+    expect(description.getAttribute("aria-describedby")).toBe("measure_description-hint measure_description-error");
+    expect(hint.textContent).toContain("measurement setup, device settings, or test conditions");
+    expect(element.shadowRoot!.querySelector("#measure_description-error")!.textContent).toContain("2000");
+  });
+
   it("applies a retry result, clears estimated, and requires validation again", async () => {
     const element = await mount();
     let resolve!: (result: StandbyMeasurementResult) => void;
