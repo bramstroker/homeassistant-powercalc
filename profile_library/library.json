@@ -19530,10 +19530,10 @@
           },
           "id": "dreame.vacuum.r2427a",
           "manufacturer": "mova",
-          "updated_at": "2026-09-20T09:02:17",
+          "updated_at": "2026-09-20T09:03:43",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "139b1ae32330e273d30f66f827168a29"
+          "hash": "6d54badb2e284c045376a03a60a87692"
         }
       ],
       "device_types": [
@@ -27343,6 +27343,75 @@
             "color_temp": 98.2
           },
           "hash": "f71e5eb6bf8b00cbbca66ac53abeb325"
+        },
+        {
+          "aliases": [
+            "929004276702"
+          ],
+          "authors": [
+            {
+              "email": "rens@renssies.nl",
+              "github": "renssies",
+              "name": "Rens Verhoeven"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-19T22:52:54Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "bluetooth"
+            ],
+            "form_factor": "strip",
+            "lumens": 4800,
+            "rated_power": 48,
+            "socket": "integrated"
+          },
+          "device_type": "light",
+          "gtin": [
+            "8721103088413"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_device_firmware": "2.0.0",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 7.16,
+            "DUMMY_LOAD_RESISTANCE": 7715.07,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.7.0:app"
+          },
+          "name": "Hue Flux Ultra Bright (5m)",
+          "product_url": "https://www.philips-hue.com/nl-nl/p/lightstrips-flux-ultraheldere-lightstrip-5-m/8721103088413",
+          "standby_power": 0.26,
+          "voltage_range": {
+            "max": 240.1,
+            "min": 229.1
+          },
+          "id": "929004276702",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-20T11:06:27",
+          "max_power": 51.21,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-20T11:01:40",
+          "power_range": {
+            "min": 0.95,
+            "max": 51.21
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "b659c4c36ccea4c86f2465f845a58c59"
         },
         {
           "calculation_strategy": "lut",
