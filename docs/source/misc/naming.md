@@ -61,8 +61,13 @@ will create:
 
 ## Follow device name
 
-For a virtual power sensor configured through the UI, open **Configure → Basic options**
-and enable **Follow device name**. This option is off by default, including for existing entries.
+Open the **Global configuration → Power sensor** section and enable **Follow device name**
+to use device naming for supported virtual power sensors configured through the UI.
+This option is off by default, including for existing entries. Changing the global setting
+reloads existing entries to apply it.
+
+This setting applies globally; there is no per-entry toggle. Unsupported configurations
+keep their configured names.
 
 Powercalc uses Home Assistant's device naming for the generated power, energy, standby energy,
 utility meter, cost, and tariff selection entities. For example, an entity named **Patio Power**

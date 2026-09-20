@@ -26,6 +26,7 @@ from .const import (
     DEFAULT_POWER_NAME_PATTERN,
     DEFAULT_STANDBY_ENERGY_NAME_PATTERN,
     DOMAIN,
+    DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
     SensorType,
@@ -81,8 +82,9 @@ def resolve_naming_device(
     config: ConfigType,
     entry: ConfigEntry | None,
 ) -> AnyDeviceEntry | None:
-    """Fall back to configured names if a previously enabled option cannot be applied."""
-    if entry is None or not config.get(CONF_FOLLOW_DEVICE_NAME):
+    """Use the global naming option, retaining configured names for unsupported entries."""
+    global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+    if entry is None or not global_config.get(CONF_FOLLOW_DEVICE_NAME):
         return None
     if error := get_device_naming_error(hass, config, entry):
         logging.getLogger(__name__).warning(

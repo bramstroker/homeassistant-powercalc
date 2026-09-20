@@ -108,7 +108,11 @@
               "power_sensor_naming": "Vzor názvu senzoru výkonu",
               "power_sensor_friendly_naming": "Vzor přívětivého názvu senzoru výkonu",
               "power_sensor_category": "Kategorie senzoru výkonu",
-              "power_sensor_precision": "Přesnost senzoru výkonu"
+              "power_sensor_precision": "Přesnost senzoru výkonu",
+              "follow_device_name": "Používat název zařízení"
+            },
+            "data_description": {
+              "follow_device_name": "Použít název přiřazeného zařízení pro generované entity podporovaných virtuálních senzorů výkonu nakonfigurovaných v uživatelském rozhraní. ID entit a vlastní názvy entit se nezmění. Vypnutím se obnoví nakonfigurované názvy."
             }
           },
           "features": {
@@ -625,33 +629,33 @@
         }
       },
       "power": {
-        "name": "Power"
+        "name": "Výkon"
       },
       "energy": {
-        "name": "Energy"
+        "name": "Energie"
       },
       "standby_energy": {
-        "name": "Standby energy"
+        "name": "Energie v pohotovostním režimu"
       },
       "cost": {
-        "name": "Cost"
+        "name": "Náklady"
       },
-      "energy_period": {
-        "name": "Energy {period}"
+      "utility_meter_cycle": {
+        "name": "Energie {period}"
       },
-      "energy_period_tariff": {
-        "name": "Energy {period} {tariff}"
+      "utility_meter_tariff": {
+        "name": "Energie {period} {tariff}"
       },
-      "energy_period_cost": {
-        "name": "Energy {period} cost"
+      "utility_meter_cycle_cost": {
+        "name": "Energie {period} náklady"
       },
-      "energy_period_tariff_cost": {
-        "name": "Energy {period} {tariff} cost"
+      "utility_meter_tariff_cost": {
+        "name": "Energie {period} {tariff} náklady"
       }
     },
     "select": {
-      "energy_period": {
-        "name": "Energy {period}"
+      "utility_meter_cycle": {
+        "name": "Energie {period}"
       }
     }
   },
@@ -713,11 +717,7 @@
       "linear_mandatory": "Musíte zadat alespoň jednu z možností max_power nebo calibrate",
       "linear_min_higher_as_max": "Maximální spotřeba nebůže být nižší, nežli minimální spotřeba",
       "linear_unsupported_domain": "Doména entity není pro lineární režim podporována. Musí být jedna z: fan, light nebo mediaplayer. Můžete však použít možnost calibrate",
-      "unknown": "Došlo k neznámé chybě. Více informací najdete v logu",
-      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
-      "device_naming_no_device": "Assign a device with a name before enabling this option.",
-      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
-      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
+      "unknown": "Došlo k neznámé chybě. Více informací najdete v logu"
     },
     "step": {
       "advanced_options": {
@@ -747,8 +747,7 @@
           "create_utility_meters": "Vytvořit měřiče spotřeby",
           "entity_id": "Zdrojová entita",
           "name": "Název",
-          "standby_power": "Výkon v pohotovostním režimu",
-          "follow_device_name": "Follow device name"
+          "standby_power": "Výkon v pohotovostním režimu"
         },
         "data_description": {
           "create_energy_sensor": "Zda má Powercalc vytvořit senzor kWh",
@@ -756,8 +755,7 @@
           "create_utility_meters": "Nechat Powercalc vytvořit měřiče spotřeby s denními, hodinovými apod. cykly",
           "entity_id": "Entita, na které je virtuální výkon založen. Senzor výkonu bude poslouchat změny stavu této entity, aby se aktualizoval",
           "name": "Při ponechání prázdné hodnoty se použije název ze zdrojové entity",
-          "standby_power": "Definujte množství výkonu, které zařízení spotřebovává ve vypnutém stavu",
-          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
+          "standby_power": "Definujte množství výkonu, které zařízení spotřebovává ve vypnutém stavu"
         }
       },
       "daily_energy": {

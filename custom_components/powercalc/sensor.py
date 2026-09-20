@@ -735,9 +735,9 @@ async def create_individual_sensors(
 
 
 def _enable_device_naming(entities: list[Entity]) -> None:
-    for entity in entities:
-        if isinstance(entity, BaseEntity):
-            entity.enable_device_naming()
+    powercalc_entities = [entity for entity in entities if isinstance(entity, BaseEntity)]
+    for entity in powercalc_entities:
+        entity.enable_device_naming()
 
 
 async def _create_daily_fixed_energy_sensors(

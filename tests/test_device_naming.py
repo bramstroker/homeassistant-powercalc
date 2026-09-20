@@ -6,7 +6,6 @@ from freezegun import freeze_time
 from homeassistant.components.recorder import Recorder, migration
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import recorder as recorder_helper
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 import homeassistant.helpers.entity_registry as er
@@ -41,6 +40,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SERVICE_CALIBRATE_ENERGY,
     CalculationStrategy,
     SensorType,
@@ -48,7 +48,8 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.device_naming import get_device_naming_error
 from custom_components.powercalc.flow_helper.common import Step
 from tests.common import create_mock_config_entry
-from tests.config_flow.common import initialize_options_flow
+from tests.config_flow.common import handle_options_flow_update, initialize_options_flow
+from tests.config_flow.test_global_configuration import create_mock_global_config_entry
 
 
 @pytest.fixture
@@ -103,12 +104,11 @@ def entry_config() -> dict:
     }
 
 
-async def set_follow_device_name(hass: HomeAssistant, entry: MockConfigEntry, enabled: bool) -> None:
-    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
-    values = {str(key): entry.data[str(key)] for key in result["data_schema"].schema if str(key) in entry.data}
-    values[CONF_FOLLOW_DEVICE_NAME] = enabled
-    result = await hass.config_entries.options.async_configure(result["flow_id"], user_input=values)
-    assert result["type"] == FlowResultType.CREATE_ENTRY
+async def set_follow_device_name(hass: HomeAssistant, enabled: bool) -> None:
+    entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
+    if entry is None:
+        entry = await create_mock_global_config_entry(hass, {})
+    await handle_options_flow_update(hass, entry, Step.GLOBAL_CONFIGURATION, {CONF_FOLLOW_DEVICE_NAME: enabled})
     await hass.async_block_till_done()
 
 
@@ -134,7 +134,7 @@ async def test_follow_device_name_lifecycle(
         item.unique_id: item.entity_id for item in er.async_entries_for_config_entry(entity_registry, entry.entry_id)
     }
 
-    await set_follow_device_name(hass, entry, True)
+    await set_follow_device_name(hass, True)
     for device_name in ["Terrace", "Garden"]:
         device_registry.async_update_device(source_device.id, name_by_user=device_name)
         await hass.async_block_till_done()
@@ -170,10 +170,10 @@ async def test_follow_device_name_lifecycle(
     assert entry.data[CONF_NAME] == entry.title == "Patio"
     assert hass.states.get("sensor.my_energy").attributes["source"] == "sensor.patio_power"
 
-    await set_follow_device_name(hass, entry, False)
+    await set_follow_device_name(hass, False)
     assert entity_registry.async_get("sensor.patio_power").original_name == original_names["sensor.patio_power"]
     assert entity_registry.async_get("sensor.my_energy").original_name == original_names["sensor.patio_energy"]
-    await set_follow_device_name(hass, entry, True)
+    await set_follow_device_name(hass, True)
     assert hass.states.get("sensor.my_energy").name == "Garden Energy"
 
 
@@ -183,10 +183,10 @@ async def test_user_overrides_are_preserved(
     device_registry: DeviceRegistry,
     entity_registry: er.EntityRegistry,
 ) -> None:
-    entry = await create_mock_config_entry(hass, entry_config())
+    await create_mock_config_entry(hass, entry_config())
     entity_registry.async_update_entity("sensor.patio_power", name="My consumption")
     for enabled in [True, False, True]:
-        await set_follow_device_name(hass, entry, enabled)
+        await set_follow_device_name(hass, enabled)
         device_registry.async_update_device(source_device.id, name_by_user="Terrace")
         await hass.async_block_till_done()
         assert entity_registry.async_get("sensor.patio_power").name == "My consumption"
@@ -194,10 +194,59 @@ async def test_user_overrides_are_preserved(
 
 
 async def test_missing_device_falls_back_to_configured_names(hass: HomeAssistant) -> None:
-    entry = await create_mock_config_entry(hass, {**entry_config(), CONF_FOLLOW_DEVICE_NAME: True})
+    await create_mock_global_config_entry(hass, {CONF_FOLLOW_DEVICE_NAME: True})
+    await create_mock_config_entry(hass, entry_config())
     assert hass.states.get("sensor.patio_power").name == "Patio power"
-    assert entry.data[CONF_FOLLOW_DEVICE_NAME] is True
-    await set_follow_device_name(hass, entry, False)
+    await set_follow_device_name(hass, False)
+
+
+async def test_global_naming_toggle_reloads_entries(
+    hass: HomeAssistant,
+    source_device: DeviceEntry,
+    device_registry: DeviceRegistry,
+    entity_registry: er.EntityRegistry,
+) -> None:
+    config = entry_config()
+    entry = await create_mock_config_entry(hass, config)
+    original_config = dict(entry.data)
+    global_entry = await create_mock_global_config_entry(hass, {})
+    assert await hass.config_entries.async_setup(global_entry.entry_id)
+    await hass.async_block_till_done()
+    original_ids = {
+        item.unique_id: item.entity_id for item in er.async_entries_for_config_entry(entity_registry, entry.entry_id)
+    }
+    device_registry.async_update_device(source_device.id, name_by_user="Terrace")
+
+    for enabled in [True, False, True]:
+        await handle_options_flow_update(
+            hass, global_entry, Step.GLOBAL_CONFIGURATION, {CONF_FOLLOW_DEVICE_NAME: enabled}
+        )
+        await hass.async_block_till_done()
+        power_entry = entity_registry.async_get("sensor.patio_power")
+        assert power_entry.has_entity_name is enabled
+        if enabled:
+            assert hass.states.get("sensor.patio_power").name == "Terrace Power"
+        else:
+            assert power_entry.original_name == "Patio power"
+        assert {
+            item.unique_id: item.entity_id
+            for item in er.async_entries_for_config_entry(entity_registry, entry.entry_id)
+        } == original_ids
+        result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
+        assert CONF_FOLLOW_DEVICE_NAME not in result["data_schema"].schema
+
+    assert dict(entry.data) == original_config
+
+
+async def test_global_naming_allows_editing_unsupported_entries(hass: HomeAssistant) -> None:
+    await create_mock_global_config_entry(hass, {CONF_FOLLOW_DEVICE_NAME: True})
+    entry = await create_mock_config_entry(hass, entry_config())
+    assert hass.states.get("sensor.patio_power").name == "Patio power"
+    await handle_options_flow_update(hass, entry, Step.BASIC_OPTIONS, {CONF_STANDBY_POWER: 2})
+    await hass.async_block_till_done()
+    assert entry.data[CONF_STANDBY_POWER] == 2
+    assert CONF_FOLLOW_DEVICE_NAME not in entry.data
+    assert hass.states.get("sensor.patio_power").name == "Patio power"
 
 
 @pytest.mark.parametrize(
@@ -233,18 +282,13 @@ async def test_named_channels_and_multiple_entries_are_rejected(
     assert get_device_naming_error(hass, entry.data, entry) == "device_naming_ambiguous"
 
 
-async def test_options_validate_device_and_patterns(hass: HomeAssistant, source_device: DeviceEntry) -> None:
-    entry = await create_mock_config_entry(hass, {**entry_config(), CONF_POWER_SENSOR_NAMING: "{} custom"})
-    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], user_input={CONF_FOLLOW_DEVICE_NAME: True}
-    )
-    assert result["errors"] == {CONF_FOLLOW_DEVICE_NAME: "device_naming_custom_pattern"}
-    assert not entry.data.get(CONF_FOLLOW_DEVICE_NAME)
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], user_input={CONF_FOLLOW_DEVICE_NAME: False}
-    )
-    assert result["type"] == FlowResultType.CREATE_ENTRY
+async def test_global_naming_preserves_custom_patterns(
+    hass: HomeAssistant, source_device: DeviceEntry, entity_registry: er.EntityRegistry
+) -> None:
+    await create_mock_global_config_entry(hass, {CONF_FOLLOW_DEVICE_NAME: True})
+    await create_mock_config_entry(hass, {**entry_config(), CONF_POWER_SENSOR_NAMING: "{} custom"})
+    assert entity_registry.async_get("sensor.patio_custom").original_name == "Patio custom"
+    assert not entity_registry.async_get("sensor.patio_custom").has_entity_name
 
 
 async def test_reused_energy_entity_is_untouched(
@@ -252,36 +296,35 @@ async def test_reused_energy_entity_is_untouched(
     source_device: DeviceEntry,
     entity_registry: er.EntityRegistry,
 ) -> None:
+    await create_mock_global_config_entry(hass, {CONF_FOLLOW_DEVICE_NAME: True})
     energy = entity_registry.async_get_or_create("sensor", "test", "existing_energy", original_name="Existing energy")
-    await create_mock_config_entry(
-        hass, {**entry_config(), CONF_ENERGY_SENSOR_ID: energy.entity_id, CONF_FOLLOW_DEVICE_NAME: True}
-    )
+    await create_mock_config_entry(hass, {**entry_config(), CONF_ENERGY_SENSOR_ID: energy.entity_id})
     assert entity_registry.async_get(energy.entity_id) == energy
     assert hass.states.get("sensor.patio_power").name == "Patio Power"
 
 
-async def test_profile_naming_override_is_validated(hass: HomeAssistant, source_device: DeviceEntry) -> None:
-    entry = await create_mock_config_entry(hass, {**entry_config(), CONF_MANUFACTURER: "signify", CONF_MODEL: "LCT010"})
-    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
+async def test_global_naming_preserves_profile_patterns(
+    hass: HomeAssistant, source_device: DeviceEntry, entity_registry: er.EntityRegistry
+) -> None:
+    await create_mock_global_config_entry(hass, {CONF_FOLLOW_DEVICE_NAME: True})
     with patch(
         "custom_components.powercalc.power_profile.power_profile.PowerProfile.sensor_config",
         new_callable=PropertyMock,
         return_value={CONF_POWER_SENSOR_NAMING: "{} custom"},
     ):
-        result = await hass.config_entries.options.async_configure(
-            result["flow_id"], user_input={CONF_FOLLOW_DEVICE_NAME: True}
-        )
-    assert result["errors"] == {CONF_FOLLOW_DEVICE_NAME: "device_naming_custom_pattern"}
+        await create_mock_config_entry(hass, {**entry_config(), CONF_MANUFACTURER: "signify", CONF_MODEL: "LCT010"})
+    assert entity_registry.async_get("sensor.patio_custom").original_name == "Patio custom"
+    assert not entity_registry.async_get("sensor.patio_custom").has_entity_name
 
 
 async def test_calibrated_energy_survives_naming_reload(hass: HomeAssistant, source_device: DeviceEntry) -> None:
-    entry = await create_mock_config_entry(hass, entry_config())
+    await create_mock_config_entry(hass, entry_config())
     energy_id = "sensor.patio_energy"
     await hass.services.async_call(
         DOMAIN, SERVICE_CALIBRATE_ENERGY, {CONF_ENTITY_ID: energy_id, "value": "100"}, blocking=True
     )
     for enabled in [True, False]:
-        await set_follow_device_name(hass, entry, enabled)
+        await set_follow_device_name(hass, enabled)
         assert float(hass.states.get(energy_id).state) == 100
 
 
@@ -295,7 +338,7 @@ async def test_totals_and_statistics_survive_naming_changes(
     recorder_mock.engine.echo = False
     start = get_start_time(dt_util.utcnow()) + timedelta(minutes=5)
     with freeze_time(start) as freezer:
-        entry = await create_mock_config_entry(
+        await create_mock_config_entry(
             hass, {**entry_config(), CONF_FIXED: {CONF_POWER: 3600}, CONF_STANDBY_POWER: 1800}
         )
         energy_id = "sensor.patio_energy"
@@ -315,7 +358,7 @@ async def test_totals_and_statistics_survive_naming_changes(
         }
         assert all(float(value) > 0 for value in totals.values()), totals
         for enabled in [True, False, True]:
-            await set_follow_device_name(hass, entry, enabled)
+            await set_follow_device_name(hass, enabled)
             device_registry.async_update_device(source_device.id, name_by_user="Garden")
             await hass.async_block_till_done()
             assert {entity_id: hass.states.get(entity_id).state for entity_id in totals} == totals

@@ -215,7 +215,7 @@ def create_tariff_select(
     tariff_select.entity_id = existing_entity_id or async_generate_entity_id("select.{}", name, hass=hass)
     if naming_device:
         tariff_select.device_entry = naming_device
-        tariff_select.device_name = DeviceName("energy_period", {"period": meter_type})
+        tariff_select.device_name = DeviceName("utility_meter_cycle", {"period": meter_type})
         tariff_select.enable_device_naming()
 
     key = config_entry.entry_id if config_entry else ""
@@ -279,9 +279,9 @@ def create_utility_meter(
     )
     utility_meter._sensor_config = sensor_config  # noqa: SLF001
     utility_meter.entity_id = entity_id
-    utility_meter.device_name = DeviceName("energy_period", {"period": meter_type})
+    utility_meter.device_name = DeviceName("utility_meter_cycle", {"period": meter_type})
     if tariff:
-        utility_meter.device_name = DeviceName("energy_period_tariff", {"period": meter_type, "tariff": tariff})
+        utility_meter.device_name = DeviceName("utility_meter_tariff", {"period": meter_type, "tariff": tariff})
 
     return utility_meter
 
@@ -291,7 +291,7 @@ class VirtualTariffSelect(BaseEntity, TariffSelect):
 
 
 class VirtualUtilityMeter(BaseEntity, UtilityMeterSensor):
-    device_name = DeviceName("energy_period")
+    device_name = DeviceName("utility_meter_cycle")
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
     _sensor_config: ConfigType
 

@@ -108,7 +108,11 @@
               "power_sensor_naming": "Power sensor name pattern",
               "power_sensor_friendly_naming": "Power sensor friendly name pattern",
               "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_precision": "Power sensor precision",
+              "follow_device_name": "Follow device name"
+            },
+            "data_description": {
+              "follow_device_name": "Use the assigned device name for generated entities of supported virtual power sensors configured in the UI. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
             }
           },
           "features": {
@@ -636,21 +640,21 @@
       "cost": {
         "name": "Cost"
       },
-      "energy_period": {
+      "utility_meter_cycle": {
         "name": "Energy {period}"
       },
-      "energy_period_tariff": {
+      "utility_meter_tariff": {
         "name": "Energy {period} {tariff}"
       },
-      "energy_period_cost": {
+      "utility_meter_cycle_cost": {
         "name": "Energy {period} cost"
       },
-      "energy_period_tariff_cost": {
+      "utility_meter_tariff_cost": {
         "name": "Energy {period} {tariff} cost"
       }
     },
     "select": {
-      "energy_period": {
+      "utility_meter_cycle": {
         "name": "Energy {period}"
       }
     }
@@ -713,11 +717,7 @@
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
       "linear_min_higher_as_max": "Max power cannot be lower than min power",
       "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "unknown": "Unknown error occured, please see the logs for additional information",
-      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
-      "device_naming_no_device": "Assign a device with a name before enabling this option.",
-      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
-      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
+      "unknown": "Unknown error occured, please see the logs for additional information"
     },
     "step": {
       "advanced_options": {
@@ -747,8 +747,7 @@
           "create_utility_meters": "Create utility meters",
           "entity_id": "Source entity",
           "name": "Name",
-          "standby_power": "Standby power",
-          "follow_device_name": "Follow device name"
+          "standby_power": "Standby power"
         },
         "data_description": {
           "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
@@ -756,8 +755,7 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "entity_id": "Entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
           "name": "Leaving blank will take the name from the source entity",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state",
-          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
+          "standby_power": "Define the amount of power the device is consuming when in an OFF state"
         }
       },
       "daily_energy": {

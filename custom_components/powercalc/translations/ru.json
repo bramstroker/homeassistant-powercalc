@@ -108,7 +108,11 @@
               "power_sensor_naming": "Шаблон имени сенсора мощности",
               "power_sensor_friendly_naming": "Шаблон понятного имени сенсора мощности",
               "power_sensor_category": "Категория сенсора мощности",
-              "power_sensor_precision": "Точность датчика мощности"
+              "power_sensor_precision": "Точность датчика мощности",
+              "follow_device_name": "Использовать имя устройства"
+            },
+            "data_description": {
+              "follow_device_name": "Использовать имя назначенного устройства для создаваемых сущностей поддерживаемых виртуальных датчиков мощности, настроенных через интерфейс. Идентификаторы и пользовательские имена сущностей не изменяются. При отключении восстанавливаются настроенные имена."
             }
           },
           "features": {
@@ -625,33 +629,33 @@
         }
       },
       "power": {
-        "name": "Power"
+        "name": "Мощность"
       },
       "energy": {
-        "name": "Energy"
+        "name": "Энергия"
       },
       "standby_energy": {
-        "name": "Standby energy"
+        "name": "Энергия в режиме ожидания"
       },
       "cost": {
-        "name": "Cost"
+        "name": "Стоимость"
       },
-      "energy_period": {
-        "name": "Energy {period}"
+      "utility_meter_cycle": {
+        "name": "Энергия {period}"
       },
-      "energy_period_tariff": {
-        "name": "Energy {period} {tariff}"
+      "utility_meter_tariff": {
+        "name": "Энергия {period} {tariff}"
       },
-      "energy_period_cost": {
-        "name": "Energy {period} cost"
+      "utility_meter_cycle_cost": {
+        "name": "Энергия {period} стоимость"
       },
-      "energy_period_tariff_cost": {
-        "name": "Energy {period} {tariff} cost"
+      "utility_meter_tariff_cost": {
+        "name": "Энергия {period} {tariff} стоимость"
       }
     },
     "select": {
-      "energy_period": {
-        "name": "Energy {period}"
+      "utility_meter_cycle": {
+        "name": "Энергия {period}"
       }
     }
   },
@@ -713,11 +717,7 @@
       "linear_mandatory": "Необходимо указать хотя бы одно из: max_power или calibrate",
       "linear_min_higher_as_max": "Максимальная мощность не может быть меньше минимальной",
       "linear_unsupported_domain": "Домен объекта не поддерживается для линейного режима. Должен быть одним из: fan, light или mediaplayer. Однако можно использовать опцию калибровки",
-      "unknown": "Произошла неизвестная ошибка, подробности см. в логах",
-      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
-      "device_naming_no_device": "Assign a device with a name before enabling this option.",
-      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
-      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
+      "unknown": "Произошла неизвестная ошибка, подробности см. в логах"
     },
     "step": {
       "advanced_options": {
@@ -747,8 +747,7 @@
           "create_utility_meters": "Создать счётчики",
           "entity_id": "Исходный объект",
           "name": "Название",
-          "standby_power": "Мощность в режиме ожидания",
-          "follow_device_name": "Follow device name"
+          "standby_power": "Мощность в режиме ожидания"
         },
         "data_description": {
           "create_energy_sensor": "Создавать ли сенсор потребления в кВт·ч",
@@ -756,8 +755,7 @@
           "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами",
           "entity_id": "Объект, на котором основана виртуальная мощность. Сенсор мощности будет обновляться при изменении состояния этого объекта",
           "name": "Если оставить пустым, будет использовано имя исходного объекта",
-          "standby_power": "Потребление мощности устройством в выключенном состоянии",
-          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
+          "standby_power": "Потребление мощности устройством в выключенном состоянии"
         }
       },
       "daily_energy": {

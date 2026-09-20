@@ -108,7 +108,11 @@
               "power_sensor_naming": "Navnemønster for effektsensor",
               "power_sensor_friendly_naming": "Mønster for visningsnavn på effektsensor",
               "power_sensor_category": "Kategori for effektsensor",
-              "power_sensor_precision": "Presisjon for effektsensor"
+              "power_sensor_precision": "Presisjon for effektsensor",
+              "follow_device_name": "Følg enhetsnavnet"
+            },
+            "data_description": {
+              "follow_device_name": "Bruk navnet på den tilordnede enheten for genererte entiteter til støttede virtuelle effektsensorer konfigurert i brukergrensesnittet. Entitets-ID-er og egendefinerte entitetsnavn forblir uendret. Når innstillingen slås av, gjenopprettes de konfigurerte navnene."
             }
           },
           "features": {
@@ -625,33 +629,33 @@
         }
       },
       "power": {
-        "name": "Power"
+        "name": "Effekt"
       },
       "energy": {
-        "name": "Energy"
+        "name": "Energi"
       },
       "standby_energy": {
-        "name": "Standby energy"
+        "name": "Standbyenergi"
       },
       "cost": {
-        "name": "Cost"
+        "name": "Kostnad"
       },
-      "energy_period": {
-        "name": "Energy {period}"
+      "utility_meter_cycle": {
+        "name": "Energi {period}"
       },
-      "energy_period_tariff": {
-        "name": "Energy {period} {tariff}"
+      "utility_meter_tariff": {
+        "name": "Energi {period} {tariff}"
       },
-      "energy_period_cost": {
-        "name": "Energy {period} cost"
+      "utility_meter_cycle_cost": {
+        "name": "Energi {period} kostnad"
       },
-      "energy_period_tariff_cost": {
-        "name": "Energy {period} {tariff} cost"
+      "utility_meter_tariff_cost": {
+        "name": "Energi {period} {tariff} kostnad"
       }
     },
     "select": {
-      "energy_period": {
-        "name": "Energy {period}"
+      "utility_meter_cycle": {
+        "name": "Energi {period}"
       }
     }
   },
@@ -713,11 +717,7 @@
       "linear_mandatory": "Du må oppgi minst én av max_power eller calibrate",
       "linear_min_higher_as_max": "Maks effekt kan ikke være lavere enn min effekt",
       "linear_unsupported_domain": "Entitetsdomenet støttes ikke i lineær modus. Det må være ett av følgende: fan, light eller media_player. Du kan likevel bruke calibrate",
-      "unknown": "Ukjent feil oppstod. Se loggene for mer informasjon",
-      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
-      "device_naming_no_device": "Assign a device with a name before enabling this option.",
-      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
-      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
+      "unknown": "Ukjent feil oppstod. Se loggene for mer informasjon"
     },
     "step": {
       "advanced_options": {
@@ -747,8 +747,7 @@
           "create_utility_meters": "Opprett forbruksmålere",
           "entity_id": "Kildeentitet",
           "name": "Navn",
-          "standby_power": "Standbyeffekt",
-          "follow_device_name": "Follow device name"
+          "standby_power": "Standbyeffekt"
         },
         "data_description": {
           "create_energy_sensor": "Om Powercalc trenger å lage en kWh-sensor",
@@ -756,8 +755,7 @@
           "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser",
           "entity_id": "Entiteten den virtuelle effekten er basert på. Effektsensoren oppdateres når tilstanden til denne entiteten endres",
           "name": "Hvis du lar det stå tomt, hentes navnet fra kildeentiteten",
-          "standby_power": "Definer mengden effekt enheten bruker når den er i AV-tilstand",
-          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
+          "standby_power": "Definer mengden effekt enheten bruker når den er i AV-tilstand"
         }
       },
       "daily_energy": {

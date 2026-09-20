@@ -108,7 +108,11 @@
               "power_sensor_naming": "Tehoanturin nimimalli",
               "power_sensor_friendly_naming": "Tehoanturin näyttönimen malli",
               "power_sensor_category": "Tehoanturin luokka",
-              "power_sensor_precision": "Tehoanturin tarkkuus"
+              "power_sensor_precision": "Tehoanturin tarkkuus",
+              "follow_device_name": "Käytä laitteen nimeä"
+            },
+            "data_description": {
+              "follow_device_name": "Käytä liitetyn laitteen nimeä käyttöliittymässä määritettyjen tuettujen virtuaalisten tehoanturien luoduille entiteeteille. Entiteettitunnukset ja mukautetut entiteettien nimet eivät muutu. Asetuksen poistaminen käytöstä palauttaa määritetyt nimet."
             }
           },
           "features": {
@@ -625,33 +629,33 @@
         }
       },
       "power": {
-        "name": "Power"
+        "name": "Teho"
       },
       "energy": {
-        "name": "Energy"
+        "name": "Energia"
       },
       "standby_energy": {
-        "name": "Standby energy"
+        "name": "Valmiustilan energia"
       },
       "cost": {
-        "name": "Cost"
+        "name": "Kustannukset"
       },
-      "energy_period": {
-        "name": "Energy {period}"
+      "utility_meter_cycle": {
+        "name": "Energia {period}"
       },
-      "energy_period_tariff": {
-        "name": "Energy {period} {tariff}"
+      "utility_meter_tariff": {
+        "name": "Energia {period} {tariff}"
       },
-      "energy_period_cost": {
-        "name": "Energy {period} cost"
+      "utility_meter_cycle_cost": {
+        "name": "Energia {period} kustannukset"
       },
-      "energy_period_tariff_cost": {
-        "name": "Energy {period} {tariff} cost"
+      "utility_meter_tariff_cost": {
+        "name": "Energia {period} {tariff} kustannukset"
       }
     },
     "select": {
-      "energy_period": {
-        "name": "Energy {period}"
+      "utility_meter_cycle": {
+        "name": "Energia {period}"
       }
     }
   },
@@ -713,11 +717,7 @@
       "linear_mandatory": "Anna vähintään max_power tai calibrate",
       "linear_min_higher_as_max": "Enimmäisteho ei voi olla pienempi kuin vähimmäisteho",
       "linear_unsupported_domain": "Entiteetin toimialuetta ei tueta lineaarisessa tilassa. Sen on oltava fan, light tai media_player. Voit kuitenkin käyttää calibrate-asetusta",
-      "unknown": "Tapahtui tuntematon virhe, katso lisätietoja lokeista",
-      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
-      "device_naming_no_device": "Assign a device with a name before enabling this option.",
-      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
-      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
+      "unknown": "Tapahtui tuntematon virhe, katso lisätietoja lokeista"
     },
     "step": {
       "advanced_options": {
@@ -747,8 +747,7 @@
           "create_utility_meters": "Luo kulutusmittarit",
           "entity_id": "Lähde-entiteetti",
           "name": "Nimi",
-          "standby_power": "Valmiustilan teho",
-          "follow_device_name": "Follow device name"
+          "standby_power": "Valmiustilan teho"
         },
         "data_description": {
           "create_energy_sensor": "Määrittää, luoko Powercalc kWh-anturin",
@@ -756,8 +755,7 @@
           "create_utility_meters": "Anna Powercalcin luoda kulutusmittarit, joiden jaksot ovat esimerkiksi päivä ja tunti",
           "entity_id": "Entiteetti, johon virtuaalinen teho perustuu, tehoanturi kuuntelee tämän entiteetin tilamuutoksia päivitettäväksi",
           "name": "Jos kenttä jätetään tyhjäksi, nimi otetaan lähde-entiteetistä",
-          "standby_power": "Määritä laitteen tehonkulutus, kun se on pois päältä",
-          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
+          "standby_power": "Määritä laitteen tehonkulutus, kun se on pois päältä"
         }
       },
       "daily_energy": {

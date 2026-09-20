@@ -108,7 +108,11 @@
               "power_sensor_naming": "Padrão de nome do sensor de energia",
               "power_sensor_friendly_naming": "Padrão de nome amigável para sensor de potência",
               "power_sensor_category": "Categoria do sensor de energia",
-              "power_sensor_precision": "Precisão do sensor de potência"
+              "power_sensor_precision": "Precisão do sensor de potência",
+              "follow_device_name": "Usar o nome do dispositivo"
+            },
+            "data_description": {
+              "follow_device_name": "Usar o nome do dispositivo atribuído para as entidades geradas dos sensores virtuais de potência compatíveis configurados pela interface. Os IDs das entidades e os nomes personalizados permanecem inalterados. Desativar esta opção restaura os nomes configurados."
             }
           },
           "features": {
@@ -625,33 +629,33 @@
         }
       },
       "power": {
-        "name": "Power"
+        "name": "Potência"
       },
       "energy": {
-        "name": "Energy"
+        "name": "Energia"
       },
       "standby_energy": {
-        "name": "Standby energy"
+        "name": "Energia em espera"
       },
       "cost": {
-        "name": "Cost"
+        "name": "Custo"
       },
-      "energy_period": {
-        "name": "Energy {period}"
+      "utility_meter_cycle": {
+        "name": "Energia {period}"
       },
-      "energy_period_tariff": {
-        "name": "Energy {period} {tariff}"
+      "utility_meter_tariff": {
+        "name": "Energia {period} {tariff}"
       },
-      "energy_period_cost": {
-        "name": "Energy {period} cost"
+      "utility_meter_cycle_cost": {
+        "name": "Energia {period} custo"
       },
-      "energy_period_tariff_cost": {
-        "name": "Energy {period} {tariff} cost"
+      "utility_meter_tariff_cost": {
+        "name": "Energia {period} {tariff} custo"
       }
     },
     "select": {
-      "energy_period": {
-        "name": "Energy {period}"
+      "utility_meter_cycle": {
+        "name": "Energia {period}"
       }
     }
   },
@@ -713,11 +717,7 @@
       "linear_mandatory": "Você deve fornecer pelo menos um de max_power ou calibrar",
       "linear_min_higher_as_max": "A potência máxima não pode ser inferior à potência mínima",
       "linear_unsupported_domain": "Domínio da entidade não suportado para o modo linear. Deve ser um entre: fan, light ou mediaplayer. No entanto, você pode usar a opção de calibração",
-      "unknown": "Ocorreu um erro desconhecido. Consulte os logs para obter informações adicionais",
-      "device_naming_unsupported": "Following the device name is only supported for virtual power entries configured in the UI.",
-      "device_naming_no_device": "Assign a device with a name before enabling this option.",
-      "device_naming_ambiguous": "This device has a named channel, multiple Powercalc entries, or a multi-switch configuration. Keep configured names to distinguish its measurements.",
-      "device_naming_custom_pattern": "This option requires the standard display-name patterns. Remove custom friendly-name patterns or keep configured names."
+      "unknown": "Ocorreu um erro desconhecido. Consulte os logs para obter informações adicionais"
     },
     "step": {
       "advanced_options": {
@@ -747,8 +747,7 @@
           "create_utility_meters": "Criar medidores de utilidade",
           "entity_id": "Entidade de origem",
           "name": "Nome",
-          "standby_power": "Potência em standby",
-          "follow_device_name": "Follow device name"
+          "standby_power": "Potência em standby"
         },
         "data_description": {
           "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh",
@@ -756,8 +755,7 @@
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "entity_id": "entidade onde a potência virtual se baseia, o sensor de potência acompanhará as mudanças de estado desta entidade para ser atualizado",
           "name": "Deixar em branco usará o nome da entidade de origem",
-          "standby_power": "Defina a quantidade de energia que o dispositivo está consumindo quando estiver DESLIGADO",
-          "follow_device_name": "Use the assigned device name for generated entities. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names."
+          "standby_power": "Defina a quantidade de energia que o dispositivo está consumindo quando estiver DESLIGADO"
         }
       },
       "daily_energy": {
