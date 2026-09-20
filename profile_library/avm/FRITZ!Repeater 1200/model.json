@@ -2,7 +2,6 @@
   "calculation_strategy": "fixed",
   "created_at": "2026-09-20T10:00:00Z",
   "device_type": "network",
-  "manufacturer": "AVM",
   "device_specs": {
     "form_factor": "repeater",
     "rated_power": 11.5,
