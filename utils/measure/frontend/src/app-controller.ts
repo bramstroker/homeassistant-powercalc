@@ -46,6 +46,10 @@ export interface MeasureAppState {
   errorMessage: string;
   errorHelp?: ErrorHelp;
   busy: boolean;
+  /** A setup recheck shares the busy flag but must not read as starting a session. */
+  rechecking?: boolean;
+  /** The shown preflight result predates a failed recheck, so it may no longer hold. */
+  preflightStale?: boolean;
   lastAnalysedSessionId?: string;
   connectedToEvents: boolean;
   snapshot?: SessionSnapshot;
@@ -212,6 +216,7 @@ export class MeasureAppController {
     this.state.request = request;
     await this.run(async () => {
       this.state.preflight = await this.api().preflight(request);
+      this.state.preflightStale = false;
       this.state.view = "review";
     });
   }
@@ -219,9 +224,14 @@ export class MeasureAppController {
   async recheckSetup(): Promise<void> {
     const request = this.state.request;
     if (!request) return;
+    this.state.rechecking = true;
+    this.state.preflightStale = true;
     await this.run(async () => {
       this.state.preflight = await this.api().preflight(request, true);
+      this.state.preflightStale = false;
     });
+    this.state.rechecking = false;
+    this.changed();
   }
 
   backToSetup(): void {

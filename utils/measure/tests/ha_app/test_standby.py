@@ -6,7 +6,7 @@ from measure.ha_app.standby import StandbyMeasurement
 from measure.powermeter.errors import OutdatedMeasurementError, PowerMeterError, ZeroReadingError
 from measure.request import MeasurementRequest
 from measure.runner.interaction import RunInteraction
-from measure.utils.sampling import MeasurementResult
+from measure.utils.sampling import DummyLoadMeasurementError, MeasurementResult, NoValidReadingsError
 from pydantic import TypeAdapter
 import pytest
 
@@ -75,7 +75,15 @@ def test_multiple_lights_are_normalized_and_calibration_reused() -> None:
 
 
 @pytest.mark.parametrize("kind", ["fan", "recorder"])
-@pytest.mark.parametrize("error", [ZeroReadingError("zero"), OutdatedMeasurementError("stale")])
+@pytest.mark.parametrize(
+    "error",
+    [
+        ZeroReadingError("zero"),
+        OutdatedMeasurementError("stale"),
+        DummyLoadMeasurementError("non-positive target power"),
+        NoValidReadingsError("no readings"),
+    ],
+)
 def test_unavailable_readings_do_not_become_measurements(kind: str, error: Exception) -> None:
     assembler = MagicMock(spec=MeasurementAssembler)
     runner = assembler.create_runner.return_value

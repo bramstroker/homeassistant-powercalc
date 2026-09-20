@@ -33,6 +33,12 @@ export class PreflightView extends LitElement {
   @property({ type: Boolean })
   busy = false;
 
+  @property({ type: Boolean })
+  rechecking = false;
+
+  @property({ type: Boolean })
+  stale = false;
+
   @property({ type: String })
   errorMessage = "";
 
@@ -98,22 +104,31 @@ export class PreflightView extends LitElement {
           </div>
         ` : nothing}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
+        ${!this.busy && this.stale ? html`
+          <div class="notice warning" role="status">
+            <strong>The setup check did not complete</strong>
+            <p>The results above are from the previous check and may no longer match the bench. Recheck the setup before starting.</p>
+          </div>
+        ` : nothing}
         ${this.busy ? html`
           <div class="notice starting" role="status" aria-live="polite">
             <span class="starting-indicator" aria-hidden="true"></span>
-            <span><strong>Initializing measurement session</strong><span>This can take a few seconds while Powercalc prepares the measurement devices.</span></span>
+            ${this.rechecking
+              ? html`<span><strong>Rechecking setup</strong><span>Powercalc is probing the configured devices again.</span></span>`
+              : html`<span><strong>Initializing measurement session</strong><span>This can take a few seconds while Powercalc prepares the measurement devices.</span></span>`}
           </div>
         ` : nothing}
         <div class="actions">
           <button type="button" @click=${() => this.emit("back")} ?disabled=${this.busy}>Back</button>
           <button type="button" @click=${() => this.emit("recheck")} ?disabled=${this.busy}>Recheck setup</button>
-          <button class="primary" type="button" @click=${() => this.emit("start")} ?disabled=${this.busy}>${this.startButtonLabel()}</button>
+          <button class="primary" type="button" @click=${() => this.emit("start")} ?disabled=${this.busy || this.stale}>${this.startButtonLabel()}</button>
         </div>
       </section>
     `;
   }
 
   private startButtonLabel(): string {
+    if (this.rechecking) return "Rechecking…";
     if (this.busy) return "Preparing…";
     return this.confirmationAction ? "Prepare measurement" : "Start measurement";
   }

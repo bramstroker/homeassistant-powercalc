@@ -166,6 +166,10 @@ class ProfilePreparer:
             ("measure_description", metadata.measure_description),
         )
         model.update({key: value for key, value in optional_values if value is not None})
+        # The flag marks a standby estimate. An explicit false carries no meaning
+        # and would end up in every newly contributed profile.
+        if model.get("standby_power_estimated") is not True:
+            model.pop("standby_power_estimated", None)
         derived_mains_voltage = mains_voltage_from_range(model.get("voltage_range"))
         if derived_mains_voltage is not None:
             model["mains_voltage"] = derived_mains_voltage

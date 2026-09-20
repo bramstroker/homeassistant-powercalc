@@ -11,7 +11,7 @@ from measure.request import (
     MeasurementRequest,
     SpeakerMeasurementRequest,
 )
-from measure.utils.sampling import PowerSampler
+from measure.utils.sampling import MeasurementError, PowerSampler
 
 
 class StandbyMeasurement:
@@ -50,7 +50,7 @@ class StandbyMeasurement:
             if not is_valid_standby_power(power):
                 return StandbyProbeResult(StandbyProbeStatus.UNAVAILABLE)
             return StandbyProbeResult(StandbyProbeStatus.MEASURED, power)
-        except ZeroReadingError, OutdatedMeasurementError:
+        except ZeroReadingError, OutdatedMeasurementError, MeasurementError:
             return StandbyProbeResult(StandbyProbeStatus.UNAVAILABLE)
         finally:
             if runner is not None:

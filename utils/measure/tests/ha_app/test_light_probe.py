@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from measure.assembler import MeasurementAssembler
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightInfo
+from measure.controller.light.errors import LightControllerError
 from measure.controller.light.spec import HassLightControllerSpec
 from measure.ha_app.light_probe import (
     LIGHT_LOAD_PROBE_CACHE_SECONDS,
@@ -26,6 +27,7 @@ from measure.runner.light.plan import (
     low_load_probe_variations,
 )
 from measure.tuning import MeasurementParameters
+from measure.utils.sampling import DummyLoadMeasurementError
 import pytest
 
 
@@ -196,6 +198,25 @@ def test_standby_probe_is_nonblocking_and_reports_per_light(standby: float) -> N
     assert result.checked_variations == 1
     assert result.standby.status == ("measured" if standby == 0.6 else "unavailable")
     assert result.standby.power_w == (0.3 if standby == 0.6 else None)
+    assert controller.closed
+
+
+@pytest.mark.parametrize(
+    "error",
+    [DummyLoadMeasurementError("non-positive target power"), LightControllerError("turn-off failed")],
+)
+def test_standby_failure_never_blocks_the_session(error: Exception) -> None:
+    controller = FakeLightController()
+    meter = FakePowerMeter([1.2])
+    probe = LightLoadProbe(lambda: FakeAssembler(controller, meter), wait=lambda _: None, now=lambda: 10)
+    measurement = request(modes={LutMode.BRIGHTNESS}, parameters=MeasurementParameters(max_retries=1))
+
+    with patch("measure.ha_app.light_probe.measure_light_standby", side_effect=error):
+        result = probe.evaluate(measurement)
+
+    assert result.checked_variations == 1
+    assert result.standby.status == "unavailable"
+    assert result.standby.power_w is None
     assert controller.closed
 
 

@@ -31,7 +31,12 @@ from measure.runner.light.plan import (
 )
 from measure.runner.light.runner import LightRunner, LightRunProgress, MeasurementRunInput
 from measure.tuning import MeasurementParameters
-from measure.utils.sampling import AverageMeasurementConvergence, MeasurementResult, PowerSampler
+from measure.utils.sampling import (
+    AverageMeasurementConvergence,
+    DummyLoadMeasurementError,
+    MeasurementResult,
+    PowerSampler,
+)
 import pytest
 
 
@@ -124,7 +129,10 @@ def test_outdated_standby_reading_is_remeasured_after_nudge() -> None:
     ]
 
 
-@pytest.mark.parametrize("last_error", [ZeroReadingError("zero"), OutdatedMeasurementError("stale")])
+@pytest.mark.parametrize(
+    "last_error",
+    [ZeroReadingError("zero"), OutdatedMeasurementError("stale"), DummyLoadMeasurementError("dummy load")],
+)
 def test_unavailable_standby_after_nudge_warns_once(last_error: Exception, caplog: pytest.LogCaptureFixture) -> None:
     sampler = MagicMock(spec=PowerSampler)
     sampler.take_measurement.side_effect = [OutdatedMeasurementError("stale"), last_error]
