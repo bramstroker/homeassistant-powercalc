@@ -1,3 +1,4 @@
+import type { LightMeasurementRequest } from "./types";
 import { SESSION_EVENT_TYPES } from "./types";
 import {
   decodeApiError,
@@ -187,9 +188,15 @@ export class MeasureApiClient {
     return this.requestJson(`api/library/standby-estimate?${query}`, decodeStandbyEstimate);
   }
 
-  measureStandby(sessionId: string) {
+  measureStandby(sessionId: string, setup?: LightMeasurementRequest) {
     return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby`, decodeStandbyMeasurement, {
-      method: "POST", body: JSON.stringify({ confirmed: true }),
+      method: "POST", body: JSON.stringify({ confirmed: true, setup }),
+    });
+  }
+
+  calibrateStandby(sessionId: string, setup: LightMeasurementRequest) {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby/calibrate`, decodeDummyLoadCalibration, {
+      method: "POST", body: JSON.stringify({ confirmed: true, setup }),
     });
   }
 

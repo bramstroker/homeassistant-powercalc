@@ -2,6 +2,8 @@ from collections.abc import Callable
 import time
 
 from measure.assembler import MeasurementAssembler
+from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
+from measure.execution import DummyLoadPreparation
 from measure.ha_app.light_probe import StandbyProbeResult, StandbyProbeStatus
 from measure.powermeter.errors import OutdatedMeasurementError, ZeroReadingError
 from measure.profile.standby import is_valid_standby_power
@@ -11,6 +13,8 @@ from measure.request import (
     MeasurementRequest,
     SpeakerMeasurementRequest,
 )
+from measure.runner.interaction import ImmediateInteraction
+from measure.utils.clock import utc_now
 from measure.utils.sampling import MeasurementError, PowerSampler
 
 
@@ -25,6 +29,20 @@ class StandbyMeasurement:
     ) -> None:
         self._build_assembler = build_assembler
         self._wait = wait
+
+    def calibrate(self, request: MeasurementRequest) -> DummyLoadCalibration:
+        """Measure a preheated dummy load with the target devices disconnected."""
+        assert request.dummy_load is not None
+        meter = self._build_assembler().create_power_meter(request.power_meter)
+        sampler = PowerSampler(meter, request.parameters, wait=self._wait)
+        sampler.validate_dummy_load_support()
+        resistance = DummyLoadPreparation(request, request.dummy_load, sampler).calibrate(ImmediateInteraction())
+        return DummyLoadCalibration(
+            description=request.dummy_load.description,
+            resistance=resistance,
+            calibrated_at=utc_now(),
+            power_meter_fingerprint=power_meter_fingerprint(request.power_meter),
+        )
 
     def measure(self, request: MeasurementRequest, resistance: float | None = None) -> StandbyProbeResult:
         assembler = self._build_assembler()

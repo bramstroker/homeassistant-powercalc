@@ -184,7 +184,7 @@ def test_execution_records_new_dummy_load_calibration_in_measure_settings(
         resistance,
     )
     preparation = DummyLoadPreparation(request=request, spec=request.dummy_load, sampler=sampler)
-    monkeypatch.setattr(DummyLoadPreparation, "_calibrate", lambda self, interaction: 529.0)
+    monkeypatch.setattr(DummyLoadPreparation, "calibrate", lambda self, interaction: 529.0)
     runner = MagicMock(spec=MeasurementRunner)
     runner.run.return_value = RunnerResult(model_json_data={"device_type": "generic"}, voltages=[230.0])
     runner.measure_standby_power.return_value = MeasurementResult(power=0.3, voltages=[230.0])
