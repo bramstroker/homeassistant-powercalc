@@ -17,7 +17,7 @@ export class ProfileMeasurementFields extends ProfileFormSection {
   @property({ attribute: false }) measurementRequest?: MeasurementRequest;
   @property({ type: Boolean }) standbyBusy = false;
   @property({ type: String }) standbyMessage = "";
-  @property({ attribute: false }) calibrateStandby?: (setup: LightMeasurementRequest) => Promise<DummyLoadCalibration | null>;
+  @property({ attribute: false }) calibrateStandby?: (setup: LightMeasurementRequest, signal?: AbortSignal) => Promise<DummyLoadCalibration | null>;
   @property({ attribute: false }) dummyLoadCalibration: DummyLoadCalibration | null = null;
   @state() private confirmingStandby = false;
 

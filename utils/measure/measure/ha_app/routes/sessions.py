@@ -2,9 +2,11 @@ import asyncio
 from collections.abc import AsyncIterator
 from dataclasses import asdict
 import json
+import logging
 import mimetypes
 from pathlib import Path
 import re
+from threading import Event
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
@@ -12,6 +14,7 @@ from fastapi.responses import FileResponse, Response, StreamingResponse
 from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 
+from measure.cancellation import MeasurementCancelledError
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.ha_app.api_models import (
     ERROR_RESPONSE,
@@ -28,7 +31,7 @@ from measure.ha_app.context import AppContext, get_app_context, require_session
 from measure.ha_app.coordinator import SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
 from measure.ha_app.light_probe import StandbyProbeResult, StandbyProbeStatus
-from measure.ha_app.preparation import apply_fast_test_mode, run_preflight
+from measure.ha_app.preparation import apply_fast_test_mode, run_preflight, validate_standby_setup
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
     RESUMABLE_SESSION_STATES,
@@ -48,6 +51,8 @@ from measure.request import (
 from measure.utils.clock import utc_now
 from measure.utils.files import write_json_atomic
 from measure.visualization import build_session_plots
+
+_LOGGER = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -96,23 +101,35 @@ def _measure_standby(context: AppContext, session_id: str, retry: StandbyMeasure
                     )
             result = context.standby_measurement.measure(payload, resistance)
             if result.status == StandbyProbeStatus.MEASURED:
-                write_json_atomic(
-                    context.storage.session_directory(session_id) / "standby_retry.json",
-                    {
-                        "measured_at": utc_now(),
-                        "setup": payload.model_dump(mode="json"),
-                        "calibration": calibration.model_dump(mode="json")
-                        if payload.dummy_load and calibration
-                        else None,
-                        "resistance": resistance,
-                        "result": asdict(result),
-                    },
-                )
+                _save_standby_retry(context, session_id, payload, calibration, resistance, result)
             return result
     except SessionConflictError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
     except PowerMeterError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+def _save_standby_retry(
+    context: AppContext,
+    session_id: str,
+    payload: MeasurementRequest,
+    calibration: DummyLoadCalibration | None,
+    resistance: float | None,
+    result: StandbyProbeResult,
+) -> None:
+    try:
+        write_json_atomic(
+            context.storage.session_directory(session_id) / "standby_retry.json",
+            {
+                "measured_at": utc_now(),
+                "setup": payload.model_dump(mode="json"),
+                "calibration": calibration.model_dump(mode="json") if payload.dummy_load and calibration else None,
+                "resistance": resistance,
+                "result": asdict(result),
+            },
+        )
+    except OSError:
+        _LOGGER.exception("Could not save standby retry record for session %s", session_id)
 
 
 def _standby_setup(context: AppContext, session_id: str, retry: StandbyMeasurementRequest) -> MeasurementRequest:
@@ -121,7 +138,7 @@ def _standby_setup(context: AppContext, session_id: str, retry: StandbyMeasureme
         return original
     if not isinstance(original, LightMeasurementRequest):
         raise HTTPException(status_code=422, detail="Only light sessions support changing the standby setup")
-    return original.model_copy(
+    setup = original.model_copy(
         update={
             "controller": retry.setup.controller,
             "power_meter": retry.setup.power_meter,
@@ -130,6 +147,8 @@ def _standby_setup(context: AppContext, session_id: str, retry: StandbyMeasureme
             "parameters": retry.setup.parameters,
         }
     )
+    validate_standby_setup(context, setup)
+    return setup
 
 
 def _compatible_calibration(
@@ -159,13 +178,28 @@ async def calibrate_standby(
     payload: StandbyMeasurementRequest,
     request: Request,
 ) -> DummyLoadCalibration:
-    return await run_in_threadpool(_calibrate_standby, get_app_context(request), session_id, payload)
+    cancelled = Event()
+    worker = asyncio.create_task(
+        run_in_threadpool(_calibrate_standby, get_app_context(request), session_id, payload, cancelled)
+    )
+    try:
+        while not worker.done():
+            if await request.is_disconnected():
+                cancelled.set()
+            await asyncio.wait({worker}, timeout=0.25)
+        return await worker
+    finally:
+        cancelled.set()
+        # Keep the worker owned until it releases its device reservation.
+        if not worker.done():
+            await asyncio.shield(worker)
 
 
 def _calibrate_standby(
     context: AppContext,
     session_id: str,
     retry: StandbyMeasurementRequest,
+    cancelled: Event,
 ) -> DummyLoadCalibration:
     try:
         with context.coordinator.reserve_devices():
@@ -174,11 +208,15 @@ def _calibrate_standby(
             payload = _standby_setup(context, session_id, retry)
             if payload.dummy_load is None or isinstance(payload.power_meter, ManualPowerMeterSpec | OcrPowerMeterSpec):
                 raise HTTPException(status_code=422, detail="Select a dummy load and an app-supported meter")
-            calibration = context.standby_measurement.calibrate(payload)
+            calibration = context.standby_measurement.calibrate(payload, cancelled)
+            if cancelled.is_set():
+                raise MeasurementCancelledError("Calibration cancelled")
             context.storage.save_dummy_load_calibration(calibration)
             return calibration
     except SessionConflictError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
+    except MeasurementCancelledError as error:
+        raise HTTPException(status_code=499, detail=str(error)) from error
     except PowerMeterError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
 

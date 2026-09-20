@@ -119,13 +119,14 @@ the completed session's configuration and LUT measurements are preserved.
 You can remove the dummy load, reuse the original or a compatible saved calibration, or calibrate a new resistive
 load. For a new calibration, preheat the dummy load until stable and disconnect the measured bulbs so only the dummy
 load is connected to the meter. Choose **Calibrate dummy load**, then reconnect the bulbs in parallel after calibration
-completes. Keep the same warmed-up dummy load connected during standby measurement. Voltage support and calibration
+completes. Calibration can be cancelled in the dialog and stops if the browser disconnects or reloads. Keep the same warmed-up dummy load connected during standby measurement. Voltage support and calibration
 compatibility are checked before measurement. The result subtracts the dummy load and divides by the retry's bulb count.
 
 Confirm the selected devices and meter are connected correctly. Lights, speakers, and fans use their existing turn-off
 routines; for charging and recorded devices, put the device into standby yourself before confirming. Lights may briefly
 pulse on and off to refresh stale readings. A successful reading fills the field and clears **Estimated**, and its
-effective setup and calibration are recorded separately in the session's `standby_retry.json`. Cancelling the setup,
+effective setup and calibration are recorded separately in the session's `standby_retry.json`. If saving this optional
+record fails, the measured value is still returned and the storage error is logged. Cancelling the setup,
 an unavailable reading, or an error leaves your standby entry and completed measurements unchanged. Dummy meters and
 controllers are allowed for testing, with a simulation notice; their results must not be submitted as real measurements.
 

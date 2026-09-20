@@ -7,7 +7,7 @@ import { emit } from "../../utils/events";
 @customElement("measure-standby-setup")
 export class StandbySetup extends LitElement {
   @property({ attribute: false }) request!: LightMeasurementRequest;
-  @property({ attribute: false }) calibrate?: (setup: LightMeasurementRequest) => Promise<DummyLoadCalibration | null>;
+  @property({ attribute: false }) calibrate?: (setup: LightMeasurementRequest, signal?: AbortSignal) => Promise<DummyLoadCalibration | null>;
   @property({ attribute: false }) savedCalibration: DummyLoadCalibration | null = null;
   @property({ type: Boolean }) measuring = false;
   @property({ type: String }) measurementMessage = "";
@@ -19,6 +19,7 @@ export class StandbySetup extends LitElement {
   @state() private busy = false;
   @state() private message = "";
   @state() private loadMode = "original";
+  private calibrationAbort?: AbortController;
   private calibration?: DummyLoadCalibration;
   static readonly styles = [sharedStyles, css`
     dialog { width: min(720px, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); padding: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); color: var(--ink); box-shadow: 0 24px 80px rgb(0 0 0 / 0.45); }
@@ -62,6 +63,7 @@ export class StandbySetup extends LitElement {
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
+    this.calibrationAbort?.abort();
     this.stopProgress();
   }
 
@@ -162,7 +164,7 @@ export class StandbySetup extends LitElement {
       <p class="status" role="status" ?hidden=${this.busy || this.measurementStarted || !this.message}>${this.message}</p>
       </div>
       <footer>
-        ${this.measurementStarted && !this.measuring ? html`
+        ${this.busy ? html`<button type="button" @click=${this.cancelCalibration}>Cancel calibration</button>` : this.measurementStarted && !this.measuring ? html`
           <button type="button" @click=${this.showSetup}>Measure again</button>
           <button type="button" class="primary" @click=${this.close}>Done</button>
         ` : html`
@@ -215,6 +217,10 @@ export class StandbySetup extends LitElement {
     return setup;
   }
 
+  private cancelCalibration(): void {
+    this.calibrationAbort?.abort();
+  }
+
   private async calibrateLoad() {
     if (this.busy || this.measuring) return;
     try {
@@ -223,14 +229,16 @@ export class StandbySetup extends LitElement {
       this.message = "";
       this.startProgress();
       this.calibration = undefined;
-      const calibration = await this.calibrate?.(setup);
+      this.calibrationAbort = new AbortController();
+      const calibration = await this.calibrate?.(setup, this.calibrationAbort.signal);
       if (!calibration) throw new Error("Calibration did not return a result.");
       this.calibration = calibration;
       this.message = `Calibration complete: ${calibration.resistance} Ω. Reconnect the measured bulbs in parallel, then confirm the standby measurement.`;
     } catch (error) {
-      this.message = error instanceof Error ? error.message : "Calibration failed.";
+      this.message = this.calibrationAbort?.signal.aborted ? "Calibration cancelled." : error instanceof Error ? error.message : "Calibration failed.";
     } finally {
       this.busy = false;
+      this.calibrationAbort = undefined;
       this.stopProgress();
     }
   }

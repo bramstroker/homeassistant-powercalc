@@ -79,6 +79,24 @@ describe("standby setup", () => {
     expect(measure.mock.calls[0]![0].detail.dummy_load).toEqual({ mode: "reuse", description: "Heater", resistance: 2400 });
   });
 
+  it.each(["cancel", "disconnect"])("aborts calibration on %s", async (action) => {
+    const element = await mount();
+    let activeSignal: AbortSignal | undefined;
+    element.calibrate = (_setup, signal) => new Promise((_resolve, reject) => {
+      activeSignal = signal;
+      signal!.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")));
+    });
+    set(element, "load", "calibrate");
+    await element.updateComplete;
+    set(element, "description", "Heater");
+    click(element, "Calibrate dummy load");
+    await element.updateComplete;
+    if (action === "cancel") click(element, "Cancel calibration");
+    else element.remove();
+    expect(activeSignal?.aborted).toBe(true);
+    await vi.waitFor(() => expect(element.shadowRoot!.textContent).toContain("Calibration cancelled"));
+  });
+
   it("preserves the setup after calibration failure", async () => {
     const element = await mount();
     element.calibrate = vi.fn(async () => { throw new Error("Voltage unavailable"); });

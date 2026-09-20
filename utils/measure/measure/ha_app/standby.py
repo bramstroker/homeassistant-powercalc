@@ -1,7 +1,9 @@
 from collections.abc import Callable
+from threading import Event
 import time
 
 from measure.assembler import MeasurementAssembler
+from measure.cancellation import MeasurementCancelledError
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
 from measure.execution import DummyLoadPreparation
 from measure.ha_app.light_probe import StandbyProbeResult, StandbyProbeStatus
@@ -18,6 +20,21 @@ from measure.utils.clock import utc_now
 from measure.utils.sampling import MeasurementError, PowerSampler
 
 
+class CalibrationInteraction(ImmediateInteraction):
+    """Interrupt calibration samples and waits when the HTTP client disconnects."""
+
+    def __init__(self, cancelled: Event) -> None:
+        self.cancelled = cancelled
+
+    def checkpoint(self) -> None:
+        if self.cancelled.is_set():
+            raise MeasurementCancelledError("Calibration cancelled")
+
+    def wait(self, seconds: float) -> None:
+        self.cancelled.wait(seconds)
+        self.checkpoint()
+
+
 class StandbyMeasurement:
     """Remeasure only standby, without changing a completed session or its artifacts."""
 
@@ -30,13 +47,16 @@ class StandbyMeasurement:
         self._build_assembler = build_assembler
         self._wait = wait
 
-    def calibrate(self, request: MeasurementRequest) -> DummyLoadCalibration:
+    def calibrate(self, request: MeasurementRequest, cancelled: Event) -> DummyLoadCalibration:
         """Measure a preheated dummy load with the target devices disconnected."""
         assert request.dummy_load is not None
+        interaction = CalibrationInteraction(cancelled)
+        interaction.checkpoint()
         meter = self._build_assembler().create_power_meter(request.power_meter)
-        sampler = PowerSampler(meter, request.parameters, wait=self._wait)
+        sampler = PowerSampler(meter, request.parameters, wait=interaction.wait)
         sampler.validate_dummy_load_support()
-        resistance = DummyLoadPreparation(request, request.dummy_load, sampler).calibrate(ImmediateInteraction())
+        resistance = DummyLoadPreparation(request, request.dummy_load, sampler).calibrate(interaction)
+        interaction.checkpoint()
         return DummyLoadCalibration(
             description=request.dummy_load.description,
             resistance=resistance,

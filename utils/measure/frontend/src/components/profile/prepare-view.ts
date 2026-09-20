@@ -45,7 +45,7 @@ export class ProfilePrepareView extends LitElement {
   @property({ attribute: false }) deviceSpecificationFields: Record<string, DeviceSpecificationField[]> = {};
   @property({ attribute: false }) loadStandbyEstimate?: (manufacturer: string, connectivity: string[]) => Promise<StandbyEstimate>;
   @property({ attribute: false }) measureStandby?: (sessionId: string, setup?: LightMeasurementRequest) => Promise<StandbyMeasurementResult>;
-  @property({ attribute: false }) calibrateStandby?: (sessionId: string, setup: LightMeasurementRequest) => Promise<DummyLoadCalibration | null>;
+  @property({ attribute: false }) calibrateStandby?: (sessionId: string, setup: LightMeasurementRequest, signal?: AbortSignal) => Promise<DummyLoadCalibration | null>;
   @property({ attribute: false }) dummyLoadCalibration: DummyLoadCalibration | null = null;
   @state() private standbyBusy = false;
   @state() private standbyMessage = "";
@@ -273,7 +273,7 @@ export class ProfilePrepareView extends LitElement {
             .standbyEstimateStale=${Boolean(this.appliedStandbyEstimateKey && this.appliedStandbyEstimateKey !== this.standbyEstimateKey)}
             .measurementRequest=${this.snapshot.request} .standbyBusy=${this.standbyBusy}
             .dummyLoadCalibration=${this.dummyLoadCalibration}
-            .calibrateStandby=${(setup: LightMeasurementRequest) => this.calibrateStandby?.(this.snapshot.session_id!, setup) ?? Promise.resolve(null)}
+            .calibrateStandby=${(setup: LightMeasurementRequest, signal?: AbortSignal) => this.calibrateStandby?.(this.snapshot.session_id!, setup, signal) ?? Promise.resolve(null)}
             .standbyMessage=${this.standbyMessage} @standby-measure=${this.retryStandby}
           ></measure-profile-measurement-fields>
           <measure-profile-device-specification-fields

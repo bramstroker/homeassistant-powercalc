@@ -1,5 +1,5 @@
 import { MeasureAppController, type MeasureAppApi } from "./app-controller";
-import type { PowerMeterDiagnostic } from "./types";
+import type { PowerMeterDiagnostic, LightMeasurementRequest } from "./types";
 import { api, capabilities, connection, measurementDefaults, settings, state } from "./testing/controller";
 
 describe("measure app controller: settings", () => {
@@ -220,4 +220,21 @@ describe("measure app controller: settings", () => {
     expect(appState.shellyDiscoveryDevices.map((device) => device.id)).toEqual(["new"]);
   });
 
+});
+
+
+it("refreshes the saved calibration after a standby calibration", async () => {
+  const appState = state();
+  const calibration = { description: "New heater", resistance: 2300, calibrated_at: "today" };
+  appState.dummyLoadCalibration = { ...calibration, description: "Old heater" };
+  appState.dummyLoadCalibrationError = "Old error";
+  const changed = vi.fn();
+  const controller = new MeasureAppController(appState, () => api({
+    calibrateStandby: async () => calibration,
+  }), () => connection(), changed);
+  const result = await controller.calibrateStandby("session-1", {} as LightMeasurementRequest);
+  expect(result).toEqual(calibration);
+  expect(appState.dummyLoadCalibration).toEqual(calibration);
+  expect(appState.dummyLoadCalibrationError).toBe("");
+  expect(changed).toHaveBeenCalledOnce();
 });

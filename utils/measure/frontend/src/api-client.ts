@@ -194,9 +194,9 @@ export class MeasureApiClient {
     });
   }
 
-  calibrateStandby(sessionId: string, setup: LightMeasurementRequest) {
+  calibrateStandby(sessionId: string, setup: LightMeasurementRequest, signal?: AbortSignal) {
     return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby/calibrate`, decodeDummyLoadCalibration, {
-      method: "POST", body: JSON.stringify({ confirmed: true, setup }),
+      method: "POST", signal, body: JSON.stringify({ confirmed: true, setup }),
     });
   }
 
