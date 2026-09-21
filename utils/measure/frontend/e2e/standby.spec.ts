@@ -1,6 +1,31 @@
 import { expect, test } from "@playwright/test";
 import { completedSnapshot, contributionPreview, mockApi } from "./mock-api";
 
+test("uses detected connectivity for the first standby suggestion and preserves clearing", async ({ page }) => {
+  await mockApi(page);
+  await page.route("**/api/sessions/session-completed/contribution", route => route.fulfill({
+    json: { ...contributionPreview, job_id: null, device_specs: { connectivity: ["zigbee"] } },
+  }));
+  const estimates: string[][] = [];
+  await page.route("**/api/library/standby-estimate?*", route => {
+    estimates.push(new URL(route.request().url()).searchParams.getAll("connectivity"));
+    return route.fulfill({ json: { power_w: 0.25, basis: "connectivity", profile_count: 8 } });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+  await expect(page.getByRole("button", { name: "Use estimated standby: 0.25 W" })).toBeVisible();
+  expect(estimates).toEqual([["zigbee"]]);
+  await page.getByText("Device specifications (optional)", { exact: true }).click();
+  await page.getByRole("button", { name: "Remove Zigbee", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Use estimated standby: 0.4 W" })).toBeVisible();
+  await page.getByRole("button", { name: "Back to result", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+  await page.getByText("Device specifications (optional)", { exact: true }).click();
+  await expect(page.getByRole("button", { name: "Remove Zigbee", exact: true })).toHaveCount(0);
+  expect(estimates).toEqual([["zigbee"]]);
+});
+
 for (const kind of ["light", "fan", "recorder"] as const) {
   test(`confirms standby retry for a simulated ${kind} session`, async ({ page }) => {
     await mockApi(page);
@@ -18,7 +43,7 @@ for (const kind of ["light", "fan", "recorder"] as const) {
     }
     let attempts = 0;
     await page.route("**/api/sessions/session-completed/standby", async route => {
-      expect(route.request().postDataJSON()).toEqual({ confirmed: true });
+      expect(route.request().postDataJSON()).toMatchObject({ confirmed: true });
       attempts++;
       await route.fulfill({ json: { status: attempts === 1 ? "measured" : "unavailable", power_w: attempts === 1 ? 0.65 : null } });
     });
@@ -37,6 +62,10 @@ for (const kind of ["light", "fan", "recorder"] as const) {
     await page.getByRole("button", { name: "Confirm and measure standby" }).click();
     await expect(page.getByRole("spinbutton", { name: /Standby power/ })).toHaveValue("0.65");
     await expect(page.getByRole("checkbox", { name: "Estimated", exact: true })).not.toBeChecked();
+    if (kind === "light") {
+      await expect(page.getByRole("dialog").getByText(/Measured 0.65 W per light/)).toBeVisible();
+      await page.getByRole("button", { name: "Done", exact: true }).click();
+    }
     await retry.click();
     await page.getByRole("button", { name: "Confirm and measure standby" }).click();
     await expect(page.getByText(/Your entered value is unchanged/)).toBeVisible();
@@ -131,4 +160,142 @@ test("recovers a completed session with zero standby without starting another me
   await page.locator('input[name="confirm_contribution"]').check();
   await page.getByRole("button", { name: "Confirm and open PR" }).click();
   await expect.poll(() => submitted).toBe(true);
+});
+
+test("changes standby setup and calibrates a dummy load before reconnecting the bulbs", async ({ page }) => {
+  await mockApi(page);
+  let calibrated = false;
+  let measured = false;
+  const calibration = { description: "Resistive bulb", resistance: 2400, calibrated_at: "2026-09-20T12:00:00Z", power_meter_fingerprint: "meter" };
+  await page.route("**/api/dummy-load/calibration/match", route => route.fulfill({ json: calibrated ? calibration : null }));
+  await page.route("**/api/sessions/session-completed/standby/calibrate", async route => {
+    if (route.request().method() === "GET" && !calibrated) return route.fulfill({ json: null });
+    if (route.request().method() === "POST") {
+      const payload = route.request().postDataJSON();
+      expect(payload.setup).toMatchObject({ multiple_light_count: 1, dummy_load: { mode: "calibrate", description: "Resistive bulb" } });
+      calibrated = true;
+    }
+    await route.fulfill({ json: { id: "job", session_id: "session-completed", status: "completed", started_at: "2026-09-20T12:00:00Z", calibration, error: null } });
+  });
+  await page.route("**/api/sessions/session-completed/standby", async route => {
+    expect(calibrated).toBe(true);
+    expect(route.request().postDataJSON().setup).toMatchObject({
+      multiple_light_count: 1, parameters: { sleep_standby: 25, sample_count: 3 },
+      dummy_load: { mode: "reuse", description: "Resistive bulb", resistance: 2400 },
+    });
+    measured = true;
+    await route.fulfill({ json: { status: "measured", power_w: 0.32 } });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+  await page.getByRole("button", { name: "Measure standby", exact: true }).click();
+  const setup = page.getByRole("dialog", { name: "Standby measurement setup" });
+  await setup.getByRole("spinbutton", { name: "Number of bulbs" }).fill("1");
+  await setup.getByRole("spinbutton", { name: "Standby settling time (seconds)" }).fill("25");
+  await setup.getByRole("spinbutton", { name: "Samples", exact: true }).fill("3");
+  await setup.getByRole("combobox", { name: "Resistive dummy load" }).selectOption("calibrate");
+  await setup.getByRole("textbox", { name: "Dummy-load description" }).fill("Resistive bulb");
+  await setup.getByRole("button", { name: "Calibrate dummy load" }).click();
+  await expect(setup.getByText(/Calibration complete/)).toBeVisible();
+  expect(measured).toBe(false);
+  await setup.getByRole("button", { name: "Confirm and measure standby" }).click();
+  await expect(page.getByRole("spinbutton", { name: /Standby power/ })).toHaveValue("0.32");
+});
+
+for (const width of [1280, 390]) {
+  test(`shows standby setup as a modal at ${width}px`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 900 });
+    await mockApi(page);
+    await page.goto("/");
+    await page.getByRole("button", { name: "Open", exact: true }).click();
+    await page.getByRole("button", { name: "Prepare profile" }).click();
+    const trigger = page.getByRole("button", { name: "Measure standby", exact: true });
+    await trigger.click();
+    const dialog = page.getByRole("dialog", { name: "Standby measurement setup" });
+    await expect(dialog).toBeVisible();
+    expect(await dialog.evaluate(element => element.matches(":modal"))).toBe(true);
+    await dialog.getByRole("combobox", { name: "Resistive dummy load" }).selectOption("calibrate");
+    const confirm = dialog.getByRole("button", { name: "Confirm and measure standby" });
+    await expect(confirm).toBeInViewport();
+    expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath("standby-dialog.png") });
+    await page.keyboard.press("Escape");
+    await expect(dialog).not.toBeVisible();
+    await expect(trigger).toBeFocused();
+  });
+}
+
+test("keeps standby progress and the result visible in the dialog", async ({ page }) => {
+  await mockApi(page);
+  let finish!: () => void;
+  const reading = new Promise<void>(resolve => { finish = resolve; });
+  await page.route("**/api/sessions/session-completed/standby", async route => {
+    await reading;
+    await route.fulfill({ json: { status: "measured", power_w: 0.28 } });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+  await page.getByRole("button", { name: "Measure standby", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Standby measurement setup" });
+  await dialog.getByRole("button", { name: "Confirm and measure standby" }).click();
+  await expect(dialog.getByRole("progressbar")).toBeVisible();
+  await expect(dialog.getByText(/Allow about 20s/)).toBeVisible();
+  await expect(dialog.getByText("Elapsed: 1s", { exact: true })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Measuring standby…" })).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeVisible();
+  finish();
+  await expect(dialog.getByRole("progressbar")).toHaveCount(0);
+  await expect(dialog.getByText(/Measured 0.28 W per light/)).toBeVisible();
+  await dialog.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page.getByRole("spinbutton", { name: /Standby power/ })).toHaveValue("0.28");
+});
+
+
+test("reopens the dialog after a native close during standby measurement", async ({ page }) => {
+  await mockApi(page);
+  let finish!: () => void;
+  await page.route("**/api/sessions/session-completed/standby", async route => {
+    await new Promise<void>(resolve => { finish = resolve; });
+    await route.fulfill({ json: { status: "measured", power_w: 0.32 } });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare profile" }).click();
+  await page.getByRole("button", { name: "Measure standby", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Standby measurement setup" });
+  await dialog.getByRole("button", { name: "Confirm and measure standby" }).click();
+  await expect(dialog.getByRole("progressbar")).toBeVisible();
+  await dialog.evaluate(element => (element as HTMLDialogElement).close());
+  await expect(dialog).toHaveCount(0);
+  finish();
+  await expect(page.getByRole("spinbutton", { name: /Standby power/ })).toHaveValue("0.32");
+  await page.getByRole("button", { name: "Measure standby", exact: true }).click();
+  await expect(dialog).toBeVisible();
+});
+
+test("recovers calibration after a reload and cancels it through a short request", async ({ page }) => {
+  await mockApi(page);
+  let status = "running";
+  const job = () => ({ id: "job", session_id: "session-completed", started_at: new Date().toISOString(), status, calibration: null, error: null });
+  await page.route("**/api/sessions/session-completed/standby/calibrate", route => route.fulfill({ json: job() }));
+  await page.route("**/api/sessions/session-completed/standby/calibrate/job/cancel", route => {
+    status = "cancelled";
+    return route.fulfill({ json: job() });
+  });
+  const open = async () => {
+    await page.getByRole("button", { name: "Open", exact: true }).click();
+    await page.getByRole("button", { name: "Prepare profile" }).click();
+    await page.getByRole("button", { name: "Measure standby", exact: true }).click();
+  };
+  await page.goto("/");
+  await open();
+  await expect(page.getByRole("button", { name: "Cancel calibration" })).toBeVisible();
+  await page.reload();
+  await open();
+  await page.getByRole("button", { name: "Cancel calibration" }).click();
+  await expect(page.getByText("Calibration cancelled.", { exact: true })).toBeVisible();
 });

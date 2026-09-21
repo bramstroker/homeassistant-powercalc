@@ -18,6 +18,7 @@ export interface EntityDescriptor {
   device_class?: string | null;
   device_id?: string | null;
   integration?: string | null;
+  connectivity?: "zigbee" | "zwave" | null;
   translation_key?: string | null;
   disabled_by?: string | null;
   has_live_state?: boolean;
@@ -244,3 +245,20 @@ export type MeasurementRequest =
   | SpeakerMeasurementRequest
   | ChargingMeasurementRequest
   | FanMeasurementRequest;
+
+
+export interface CalibrationJob {
+  id: string;
+  session_id: string;
+  started_at: string;
+  status: "running" | "cancelling" | "completed" | "cancelled" | "failed";
+  calibration: DummyLoadCalibration | null;
+  error: string | null;
+}
+
+export interface StandbyCalibrationActions {
+  start(sessionId: string, setup: LightMeasurementRequest): Promise<CalibrationJob>;
+  status(sessionId: string): Promise<CalibrationJob | null>;
+  cancel(sessionId: string, jobId: string): Promise<CalibrationJob>;
+  loadSaved(meter: PowerMeterSpec): Promise<DummyLoadCalibration | null>;
+}

@@ -206,6 +206,21 @@ def test_measurement_can_complete_without_product_identity(app_client: TestClien
     assert draft.json()["product_name"] == ""
 
 
+def test_initial_contribution_draft_includes_detected_connectivity(app_client: TestClient) -> None:
+    context = app_client.app.state.context
+    started = app_client.post("/api/sessions", json=payload())
+    assert started.status_code == 201
+    session_id = started.json()["session_id"]
+    assert context.coordinator._worker is not None  # noqa: SLF001
+    context.coordinator._worker.join(timeout=5)  # noqa: SLF001
+    devices = [{"id": "light-device", "connections": [["mac", "00:17:88:01:02:03:04:05"]], "via_device_id": "bridge"}]
+    with patch.object(context.home_assistant, "get_device_registry", return_value=devices):
+        draft = app_client.get(f"/api/sessions/{session_id}/contribution")
+
+    assert draft.status_code == 200
+    assert draft.json()["device_specs"] == {"connectivity": ["zigbee"]}
+
+
 @pytest.mark.parametrize(
     "preview_details,submitted_details,matches",
     [

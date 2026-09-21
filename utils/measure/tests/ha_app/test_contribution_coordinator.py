@@ -15,8 +15,53 @@ from measure.ha_app.contribution.models import (
 from measure.ha_app.session import SessionSnapshot, SessionState
 from measure.ha_app.storage import SessionStorage
 from measure.powermeter.spec import DummyPowerMeterSpec
-from measure.request import AverageMeasurementRequest, LightMeasurementRequest
+from measure.request import AverageMeasurementRequest, LightMeasurementRequest, parse_measurement_request
 import pytest
+
+
+@pytest.mark.parametrize(
+    "connections,recorder,expected",
+    [
+        ({"light.one": "zigbee", "light.two": "zigbee"}, False, {"connectivity": ["zigbee"]}),
+        ({"light.one": "zigbee", "light.two": "zwave"}, False, None),
+        ({"light.one": "zigbee", "light.two": None}, False, None),
+        ({"light.one": "zigbee"}, False, None),
+        ({}, False, None),
+        ({"light.one": "zigbee", "light.two": "zwave"}, True, {"connectivity": ["zigbee"]}),
+    ],
+)
+def test_draft_connectivity_requires_consensus_among_contributed_entities(
+    tmp_path: Path, connections: dict[str, str | None], recorder: bool, expected: dict[str, object] | None
+) -> None:
+    entity_ids = ["light.one", "light.two"]
+    request = parse_measurement_request(
+        {
+            "measure_type": "recorder",
+            "recorder_purpose": "complex_profile",
+            "profile_recipe": "generic",
+            "tracked_entity_ids": entity_ids,
+            "power_meter": {"type": "dummy"},
+        }
+        if recorder
+        else {
+            "measure_type": "light",
+            "measure_device": "Test meter",
+            "controller": {"type": "hass_multi", "entity_ids": entity_ids},
+            "power_meter": {"type": "dummy"},
+        }
+    )
+    storage = SessionStorage(tmp_path)
+    snapshot = SessionSnapshot(
+        id="session", state=SessionState.COMPLETED, created_at="2026-09-20", updated_at="2026-09-20"
+    )
+    storage.create(snapshot, request)
+    service = create_service()
+    service.auth_status.return_value = ContributionAuthStatus(authenticated=False)
+    resolver = MagicMock(return_value=connections)
+    coordinator = ContributionApiCoordinator(storage, service_factory=lambda: service, resolve_connectivity=resolver)
+
+    assert coordinator.draft(snapshot).device_specs == expected
+    resolver.assert_called_once_with(entity_ids[:1] if recorder else entity_ids)
 
 
 def create_service() -> MagicMock:

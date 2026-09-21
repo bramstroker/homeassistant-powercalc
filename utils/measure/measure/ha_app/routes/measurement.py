@@ -156,6 +156,14 @@ async def discover_shelly_power_meters(request: Request) -> ShellyDiscoveryRespo
     return await ShellyDiscoveryService(get_app_context(request).home_assistant).discover()
 
 
+@router.post("/dummy-load/calibration/match")
+def matching_dummy_load_calibration(payload: PowerMeterSpec, request: Request) -> DummyLoadCalibration | None:
+    calibration = get_app_context(request).storage.load_dummy_load_calibration()
+    if calibration is not None and calibration.power_meter_fingerprint == power_meter_fingerprint(payload):
+        return calibration
+    return None
+
+
 @router.get("/dummy-load/calibration")
 async def dummy_load_calibration(request: Request) -> DummyLoadCalibration | None:
     return await run_in_threadpool(_matching_dummy_load_calibration, get_app_context(request))

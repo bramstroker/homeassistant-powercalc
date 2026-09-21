@@ -19484,63 +19484,6 @@
       ]
     },
     {
-      "aliases": [],
-      "name": "mova",
-      "full_name": "Mova",
-      "dir_name": "mova",
-      "models": [
-        {
-          "aliases": [
-            "E30 Ultra"
-          ],
-          "authors": [
-            {
-              "github": "Maxik933",
-              "name": "Maxik933"
-            }
-          ],
-          "calculation_strategy": "composite",
-          "compatible_integrations": [
-            "dreame_vacuum"
-          ],
-          "created_at": "2026-09-15T17:58:57Z",
-          "device_specs": {
-            "connectivity": [
-              "wifi"
-            ],
-            "rated_power": 1000
-          },
-          "device_type": "vacuum_robot",
-          "mains_voltage": 230,
-          "measure_description": "Measured with the PowerCalc measurement app over a complete cleaning and charging cycle and an additional station recording with washing, three auto-empty runs, and drying. Uses the Dreame state entity, washing/drying/status attributes, and a battery-calibrated charging curve. Fixed powers are training-sample medians from these two recordings; drying and awake docked power vary between recordings, and short auto-empty transitions can be missed by delayed status updates.",
-          "measure_device": "Shelly Plug S Gen3",
-          "measure_method": "script",
-          "measure_settings": {
-            "DUMMY_LOAD": false,
-            "SAMPLE_COUNT": 1,
-            "SLEEP_TIME": 2.0,
-            "VERSION": "v0.7.0:app"
-          },
-          "name": "E30 Ultra",
-          "product_url": "https://www.mova.tech/products/mova-e30-ultra-robot-vacuum",
-          "standby_power": 0.27,
-          "voltage_range": {
-            "max": 231.8,
-            "min": 227.4
-          },
-          "id": "dreame.vacuum.r2427a",
-          "manufacturer": "mova",
-          "updated_at": "2026-09-20T09:03:43",
-          "max_power": null,
-          "sub_profile_count": 0,
-          "hash": "6d54badb2e284c045376a03a60a87692"
-        }
-      ],
-      "device_types": [
-        "vacuum_robot"
-      ]
-    },
-    {
       "aliases": [
         "mueller-licht",
         "MLI"
@@ -27394,7 +27337,7 @@
           },
           "id": "929004276702",
           "manufacturer": "signify",
-          "updated_at": "2026-09-20T11:06:27",
+          "updated_at": "2026-09-20T11:53:07",
           "max_power": 51.21,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-20T11:01:40",
@@ -27411,7 +27354,7 @@
             "score": 98.9,
             "color_temp": 98.9
           },
-          "hash": "b659c4c36ccea4c86f2465f845a58c59"
+          "hash": "52abbc90598b46c6b71e8dc4f81a3a70"
         },
         {
           "calculation_strategy": "lut",
@@ -33773,6 +33716,66 @@
         },
         {
           "aliases": [
+            "9290018215"
+          ],
+          "authors": [
+            {
+              "github": "jimstrang",
+              "name": "Jim Strang"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-20T19:15:39Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 800,
+            "rated_power": 10,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "KAUF PLF12",
+          "measure_device_firmware": "2.13(y) (ESPHome 2026.9.0)",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 2,
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.7.1:app"
+          },
+          "name": "Hue White Bulb A19 E26 800lm with Bluetooth",
+          "standby_power": 0.25,
+          "voltage_range": {
+            "max": 124.89,
+            "min": 121.07
+          },
+          "id": "LWA002",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-21T06:06:08",
+          "max_power": 10.22,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-20T19:24:31",
+          "power_range": {
+            "min": 1.16,
+            "max": 10.22
+          },
+          "color_modes": [
+            "brightness"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "brightness": 98.8
+          },
+          "hash": "a8fc796ba63cf84fa41ad5df47f40892"
+        },
+        {
+          "aliases": [
             "9290022268"
           ],
           "calculation_strategy": "lut",
@@ -34327,6 +34330,67 @@
             "brightness": 98.7
           },
           "hash": "581322254a38d560e5783e15541d5eb9"
+        },
+        {
+          "aliases": [
+            "9290024691"
+          ],
+          "authors": [
+            {
+              "github": "jimstrang",
+              "name": "Jim Strang"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-20T20:12:35Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 1100,
+            "rated_power": 10.5,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "KAUF PLF12",
+          "measure_device_firmware": "2.13(y) (ESPHome 2026.9.0)",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.7.1:app"
+          },
+          "name": "Hue White Bulb A19 E26 1100lm with Bluetooth",
+          "standby_power": 0.25,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 126.17,
+            "min": 122.89
+          },
+          "id": "LWA019",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-20T20:26:05",
+          "max_power": 10.47,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-20T20:22:16",
+          "power_range": {
+            "min": 0.72,
+            "max": 10.47
+          },
+          "color_modes": [
+            "brightness"
+          ],
+          "lut_quality": {
+            "score": 99.2,
+            "brightness": 99.2
+          },
+          "hash": "abac3f31e1078c6549b26cdc39dbae45"
         },
         {
           "aliases": [

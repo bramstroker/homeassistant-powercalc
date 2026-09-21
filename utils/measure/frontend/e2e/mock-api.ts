@@ -382,6 +382,8 @@ const fixedRoutes = new Map<string, unknown>([
   ["library/device-specifications", deviceSpecifications],
   ["library/standby-estimate", { power_w: 0.4, basis: "fallback", profile_count: 0 }],
   ["dummy-load/calibration", null],
+  ["dummy-load/calibration/match", null],
+  ["sessions/session-completed/standby/calibrate", null],
   ["preflight", preflight],
   ["sessions/session-running", startedSnapshot],
   ["sessions/session-completed", completedSnapshot],

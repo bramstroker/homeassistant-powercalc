@@ -1,3 +1,4 @@
+from threading import Event
 from unittest.mock import MagicMock, patch
 
 from measure.assembler import MeasurementAssembler
@@ -20,7 +21,7 @@ def standby_request(kind: str = "light") -> MeasurementRequest:
     }
     payload = {
         "measure_type": kind,
-        "power_meter": {"type": "hass", "entity_id": "sensor.power"},
+        "power_meter": {"type": "hass", "entity_id": "sensor.test_power", "voltage_entity_id": "sensor.test_voltage"},
         "model_id": "TEST",
         "product_name": "Test device",
         "measure_device": "Test meter",
@@ -116,3 +117,42 @@ def test_operational_failure_propagates_and_cleans_up() -> None:
     with pytest.raises(PowerMeterError, match="offline"):
         measurement.measure(request)
     runner.cleanup.assert_called_once()
+
+
+def test_standby_calibration_validates_voltage_and_uses_stability_flow() -> None:
+    from measure.dummy_load import power_meter_fingerprint
+    from measure.request import DummyLoadCalibrationRequest
+
+    request = standby_request().model_copy(update={"dummy_load": DummyLoadCalibrationRequest(description="Heater")})
+    assembler = MagicMock(spec=MeasurementAssembler)
+    with (
+        patch("measure.ha_app.standby.PowerSampler") as sampler,
+        patch("measure.ha_app.standby.DummyLoadPreparation") as preparation,
+    ):
+        preparation.return_value.calibrate.return_value = 2400
+        result = StandbyMeasurement(lambda: assembler).calibrate(request, Event())
+    sampler.return_value.validate_dummy_load_support.assert_called_once()
+    preparation.return_value.calibrate.assert_called_once()
+    assert result.resistance == 2400
+    assert result.description == "Heater"
+    assert result.power_meter_fingerprint == power_meter_fingerprint(request.power_meter)
+
+
+def test_calibration_cancellation_interrupts_sampling_wait() -> None:
+    from measure.cancellation import MeasurementCancelledError
+    from measure.ha_app.standby import CalibrationInteraction
+
+    cancelled = Event()
+    interaction = CalibrationInteraction(cancelled)
+    interaction.checkpoint()
+    interaction.wait(0)
+    cancelled.set()
+    with pytest.raises(MeasurementCancelledError):
+        interaction.wait(30)
+    assembler = MagicMock(spec=MeasurementAssembler)
+    from measure.request import DummyLoadCalibrationRequest
+
+    request = standby_request().model_copy(update={"dummy_load": DummyLoadCalibrationRequest(description="Heater")})
+    with pytest.raises(MeasurementCancelledError):
+        StandbyMeasurement(lambda: assembler).calibrate(request, cancelled)
+    assembler.create_power_meter.assert_not_called()

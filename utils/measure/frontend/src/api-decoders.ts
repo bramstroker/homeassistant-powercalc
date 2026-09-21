@@ -2,6 +2,7 @@ import type {
   ApiErrorBody,
   AppSettings,
   Capabilities,
+  CalibrationJob,
   ContributionAuthDeviceStatus,
   ContributionAuthState,
   ContributionDeviceFlow,
@@ -178,6 +179,7 @@ const isEntityDescriptor: Guard<EntityDescriptor> = objectOf({
   device_class: optionalNullable(isString),
   device_id: optionalNullable(isString),
   integration: optionalNullable(isString),
+  connectivity: optionalNullable(oneOf("zigbee", "zwave")),
   translation_key: optionalNullable(isString),
   disabled_by: optionalNullable(isString),
   has_live_state: optional(isBoolean),
@@ -432,6 +434,14 @@ export const decodeEntities = decoder("entity list", arrayOf(isEntityDescriptor)
 export const decodeDummyLoadCalibration: Decoder<DummyLoadCalibration | null> = decoder("dummy-load calibration", nullable(objectOf({
   description: isString, resistance: isNumber, calibrated_at: isString, power_meter_fingerprint: optional(isString),
 })));
+const isCalibrationJob = objectOf({
+  id: isString, session_id: isString, started_at: isString,
+  status: oneOf("running", "cancelling", "completed", "cancelled", "failed"),
+  calibration: nullable(objectOf({ description: isString, resistance: isNumber, calibrated_at: isString, power_meter_fingerprint: optional(isString) })),
+  error: nullable(isString),
+});
+export const decodeCalibrationJob: Decoder<CalibrationJob> = decoder("calibration operation", isCalibrationJob);
+export const decodeOptionalCalibrationJob: Decoder<CalibrationJob | null> = decoder("calibration operation", nullable(isCalibrationJob));
 export const decodePreflight = decoder("preflight", isPreflight);
 export const decodeSessionSnapshot = decoder("session snapshot", isSessionSnapshot);
 export const decodeSessionSummaries = decoder("session list", arrayOf(isSessionSummary));

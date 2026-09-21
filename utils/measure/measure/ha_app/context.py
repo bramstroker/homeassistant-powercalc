@@ -6,6 +6,7 @@ from typing import cast
 from fastapi import HTTPException, Request
 
 from measure.assembler import MeasurementAssembler
+from measure.ha_app.calibration import CalibrationJobs
 from measure.ha_app.contribution.coordinator import ContributionApiCoordinator
 from measure.ha_app.coordinator import MeasurementCoordinator
 from measure.ha_app.library_catalog import (
@@ -69,10 +70,17 @@ class AppContext:
             resolve_integration=self.get_entity_integrations,
             resolve_manufacturer=self.get_entity_manufacturers,
             resolve_model_id=self.get_entity_model_ids,
+            resolve_connectivity=self.get_entity_connectivity,
         )
         self.coordinator = MeasurementCoordinator(
             self.storage,
             self._create_measurement_service,
+        )
+
+        self.calibration_jobs = CalibrationJobs(
+            lambda: self.coordinator.reserve_devices(),
+            lambda payload, cancelled: self.standby_measurement.calibrate(payload, cancelled),
+            self.storage.save_dummy_load_calibration,
         )
 
     def get_entity_integrations(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
@@ -91,6 +99,12 @@ class AppContext:
     def get_entity_model_ids(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
         entities = self._load_entity_descriptors(entity_ids, "model ID")
         return {entity_id: entity.model_id if entity is not None else None for entity_id, entity in entities.items()}
+
+    def get_entity_connectivity(self, entity_ids: Sequence[str]) -> dict[str, str | None]:
+        entities = self._load_entity_descriptors(entity_ids, "connectivity")
+        return {
+            entity_id: entity.connectivity if entity is not None else None for entity_id, entity in entities.items()
+        }
 
     def _load_entity_descriptors(self, entity_ids: Sequence[str], purpose: str) -> dict[str, EntityDescriptor | None]:
         """Read one entity snapshot for the whole batch, rather than one per entity."""

@@ -1,7 +1,10 @@
+import type { LightMeasurementRequest } from "./types";
 import { SESSION_EVENT_TYPES } from "./types";
 import {
   decodeApiError,
   decodeCapabilities,
+  decodeCalibrationJob,
+  decodeOptionalCalibrationJob,
   decodeContributionAuth,
   decodeContributionAuthDeviceStatus,
   decodeContributionDeviceFlow,
@@ -44,6 +47,7 @@ import type {
   ContributionTokenRequest,
   DeviceClass,
   DummyLoadCalibration,
+  PowerMeterSpec,
   DeviceSpecificationCatalog,
   EntityCatalog,
   EntityDescriptor,
@@ -187,10 +191,28 @@ export class MeasureApiClient {
     return this.requestJson(`api/library/standby-estimate?${query}`, decodeStandbyEstimate);
   }
 
-  measureStandby(sessionId: string) {
+  measureStandby(sessionId: string, setup?: LightMeasurementRequest) {
     return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby`, decodeStandbyMeasurement, {
-      method: "POST", body: JSON.stringify({ confirmed: true }),
+      method: "POST", body: JSON.stringify({ confirmed: true, setup }),
     });
+  }
+
+  calibrateStandby(sessionId: string, setup: LightMeasurementRequest) {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby/calibrate`, decodeCalibrationJob, {
+      method: "POST", body: JSON.stringify({ confirmed: true, setup }),
+    });
+  }
+
+  getStandbyCalibration(sessionId: string) {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby/calibrate`, decodeOptionalCalibrationJob);
+  }
+
+  cancelStandbyCalibration(sessionId: string, jobId: string) {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby/calibrate/${encodeURIComponent(jobId)}/cancel`, decodeCalibrationJob, { method: "POST" });
+  }
+
+  getCompatibleCalibration(meter: PowerMeterSpec) {
+    return this.requestJson("api/dummy-load/calibration/match", decodeDummyLoadCalibration, { method: "POST", body: JSON.stringify(meter) });
   }
 
   start(request: MeasurementRequest): Promise<SessionSnapshot> {

@@ -2,6 +2,8 @@ import { LitElement, css, html, nothing } from "lit";
 import type { PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type {
+  StandbyCalibrationActions,
+  LightMeasurementRequest,
   ContributionAuthState,
   ContributionDraft,
   ContributionFormValues,
@@ -42,7 +44,8 @@ export class ProfilePrepareView extends LitElement {
   @property({ type: String }) measureDevicesError = "";
   @property({ attribute: false }) deviceSpecificationFields: Record<string, DeviceSpecificationField[]> = {};
   @property({ attribute: false }) loadStandbyEstimate?: (manufacturer: string, connectivity: string[]) => Promise<StandbyEstimate>;
-  @property({ attribute: false }) measureStandby?: (sessionId: string) => Promise<StandbyMeasurementResult>;
+  @property({ attribute: false }) measureStandby?: (sessionId: string, setup?: LightMeasurementRequest) => Promise<StandbyMeasurementResult>;
+  @property({ attribute: false }) calibrationActions?: StandbyCalibrationActions;
   @state() private standbyBusy = false;
   @state() private standbyMessage = "";
   @state() private standbyEstimate?: StandbyEstimate;
@@ -119,13 +122,13 @@ export class ProfilePrepareView extends LitElement {
     this.applyStandbyValue(event.detail, true);
   }
 
-  private async retryStandby(): Promise<void> {
+  private async retryStandby(event: CustomEvent<LightMeasurementRequest | undefined>): Promise<void> {
     const sessionId = this.snapshot.session_id;
     if (!sessionId || !this.measureStandby || this.standbyBusy) return;
     this.standbyBusy = true;
     this.standbyMessage = "";
     try {
-      const result = await this.measureStandby(sessionId);
+      const result = await (event.detail ? this.measureStandby(sessionId, event.detail) : this.measureStandby(sessionId));
       if (!this.isConnected || this.snapshot.session_id !== sessionId) return;
       if (result.status === "measured" && result.power_w !== null && result.power_w >= 0.05) {
         this.applyStandbyValue(result.power_w, false);
@@ -268,6 +271,7 @@ export class ProfilePrepareView extends LitElement {
             .standbyEstimate=${this.standbyEstimate} @standby-estimate-apply=${this.applyStandbyEstimate}
             .standbyEstimateStale=${Boolean(this.appliedStandbyEstimateKey && this.appliedStandbyEstimateKey !== this.standbyEstimateKey)}
             .measurementRequest=${this.snapshot.request} .standbyBusy=${this.standbyBusy}
+            .calibrationActions=${this.calibrationActions} .sessionId=${this.snapshot.session_id}
             .standbyMessage=${this.standbyMessage} @standby-measure=${this.retryStandby}
           ></measure-profile-measurement-fields>
           <measure-profile-device-specification-fields

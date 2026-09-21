@@ -7,6 +7,7 @@ from typing import cast
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
+from starlette.concurrency import run_in_threadpool
 
 from measure.ha_app.access import is_loopback_address, trusted_ingress_only_enabled
 from measure.ha_app.api_models import ErrorResponse
@@ -26,6 +27,7 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
         yield
     finally:
         await status_publisher.async_stop()
+        await run_in_threadpool(context.calibration_jobs.shutdown)
         context.home_assistant.close()
 
 

@@ -1,5 +1,5 @@
 import { MeasureAppController, type MeasureAppApi } from "./app-controller";
-import type { PowerMeterDiagnostic } from "./types";
+import type { PowerMeterDiagnostic, LightMeasurementRequest, CalibrationJob } from "./types";
 import { api, capabilities, connection, measurementDefaults, settings, state } from "./testing/controller";
 
 describe("measure app controller: settings", () => {
@@ -220,4 +220,24 @@ describe("measure app controller: settings", () => {
     expect(appState.shellyDiscoveryDevices.map((device) => device.id)).toEqual(["new"]);
   });
 
+});
+
+
+it("keeps settings calibration scoped to its meter after a standby calibration", async () => {
+  const appState = state();
+  const calibration = { description: "Session meter heater", resistance: 2300, calibrated_at: "today" };
+  const job: CalibrationJob = { id: "job", session_id: "session-1", started_at: "today", status: "completed", calibration, error: null };
+  appState.dummyLoadCalibration = calibration;
+  appState.dummyLoadCalibrationError = "Old error";
+  const changed = vi.fn();
+  const controller = new MeasureAppController(appState, () => api({
+    calibrateStandby: async () => job,
+    getStandbyCalibration: async () => job,
+    getDummyLoadCalibration: async () => null,
+  }), () => connection(), changed);
+  expect(await controller.calibrateStandby("session-1", {} as LightMeasurementRequest)).toEqual(job);
+  expect(await controller.getStandbyCalibration("session-1")).toEqual(job);
+  expect(appState.dummyLoadCalibration).toBeNull();
+  expect(appState.dummyLoadCalibrationError).toBe("");
+  expect(changed).toHaveBeenCalledOnce();
 });

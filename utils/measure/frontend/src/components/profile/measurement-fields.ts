@@ -1,10 +1,11 @@
 import { html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { ProfileFormSection } from "./form-section";
-import type { MeasurementRequest, StandbyEstimate } from "../../types";
+import type { StandbyCalibrationActions, MeasurementRequest, StandbyEstimate } from "../../types";
 import { emit } from "../../utils/events";
 import { profileDeviceType } from "./device-specification-fields";
 import "../shared/combobox";
+import "./standby-setup";
 
 @customElement("measure-profile-measurement-fields")
 export class ProfileMeasurementFields extends ProfileFormSection {
@@ -16,6 +17,8 @@ export class ProfileMeasurementFields extends ProfileFormSection {
   @property({ attribute: false }) measurementRequest?: MeasurementRequest;
   @property({ type: Boolean }) standbyBusy = false;
   @property({ type: String }) standbyMessage = "";
+  @property({ type: String }) sessionId = "";
+  @property({ attribute: false }) calibrationActions?: StandbyCalibrationActions;
   @state() private confirmingStandby = false;
 
   render() {
@@ -72,7 +75,7 @@ export class ProfileMeasurementFields extends ProfileFormSection {
     const request = this.measurementRequest;
     const canMeasure = Boolean(request && !["manual", "ocr"].includes(request.power_meter.type));
     const measureTitle = canMeasure
-      ? "Measure using this session's original device and meter setup"
+      ? "Review the setup and measure standby"
       : "Requires an app-supported power meter";
     const measureLabel = this.standbyBusy ? "Measuring standby…" : "Measure standby";
     return html`
@@ -120,6 +123,10 @@ export class ProfileMeasurementFields extends ProfileFormSection {
 
   private renderStandbyConfirmation(request: MeasurementRequest | undefined, canMeasure: boolean) {
     if (!this.confirmingStandby || !canMeasure || !request) return nothing;
+    if (request.measure_type === "light") return html`<measure-standby-setup
+      .request=${request} .calibrationActions=${this.calibrationActions} .sessionId=${this.sessionId}
+      .measuring=${this.standbyBusy} .measurementMessage=${this.standbyMessage}
+      @standby-close=${() => { this.confirmingStandby = false; }}></measure-standby-setup>`;
     const controlled = ["light", "speaker", "fan"].includes(request.measure_type);
     const simulated = request.power_meter.type === "dummy" || request.controller?.type === "dummy";
     const simulatedNotice = simulated
@@ -128,15 +135,12 @@ export class ProfileMeasurementFields extends ProfileFormSection {
     const instructions = controlled
       ? "This will turn off this session's device(s), wait for standby, and read the original power meter. The devices are left off."
       : "Put the device into its intended standby state first (not actively charging or running). This reads the original power meter without controlling the device.";
-    const staleReadingNotice = request.measure_type === "light"
-      ? "Stale readings may trigger brief full-brightness on/off pulses."
-      : nothing;
     const dummyLoadNotice = request.dummy_load
       ? "Keep the same warmed-up dummy load and wiring in place; the session calibration will be reused."
       : nothing;
     return html`<div class="notice warning" role="group" aria-label="Confirm standby measurement">
       ${simulatedNotice}
-      <p>${instructions} ${staleReadingNotice} No other measurements will be rerun.</p>
+      <p>${instructions} No other measurements will be rerun.</p>
       <p>Confirm the same devices and meter are connected, with no other changing loads. ${dummyLoadNotice}</p>
       <div class="actions">
         <button type="button" @click=${() => { this.confirmingStandby = false; emit(this, "standby-measure"); }}>Confirm and measure standby</button>
@@ -146,7 +150,7 @@ export class ProfileMeasurementFields extends ProfileFormSection {
   }
 
   private renderStandbyStatus() {
-    if (!this.standbyBusy && !this.standbyMessage) return nothing;
+    if (this.confirmingStandby || (!this.standbyBusy && !this.standbyMessage)) return nothing;
     const message = this.standbyBusy
       ? "Waiting for fresh standby readings. This may take a little while."
       : this.standbyMessage;
