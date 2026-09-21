@@ -33757,7 +33757,7 @@
           },
           "id": "LWA002",
           "manufacturer": "signify",
-          "updated_at": "2026-09-20T20:26:03",
+          "updated_at": "2026-09-21T06:06:08",
           "max_power": 10.22,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-20T19:24:31",
@@ -33772,7 +33772,7 @@
             "score": 98.8,
             "brightness": 98.8
           },
-          "hash": "53220828520ab3f24b5131234dc8ec92"
+          "hash": "a8fc796ba63cf84fa41ad5df47f40892"
         },
         {
           "aliases": [
@@ -34330,6 +34330,67 @@
             "brightness": 98.7
           },
           "hash": "581322254a38d560e5783e15541d5eb9"
+        },
+        {
+          "aliases": [
+            "9290024691"
+          ],
+          "authors": [
+            {
+              "github": "jimstrang",
+              "name": "Jim Strang"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-20T20:12:35Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 1100,
+            "rated_power": 10.5,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "KAUF PLF12",
+          "measure_device_firmware": "2.13(y) (ESPHome 2026.9.0)",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.7.1:app"
+          },
+          "name": "Hue White Bulb A19 E26 1100lm with Bluetooth",
+          "standby_power": 0.25,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 126.17,
+            "min": 122.89
+          },
+          "id": "LWA019",
+          "manufacturer": "signify",
+          "updated_at": "2026-09-20T20:26:05",
+          "max_power": 10.47,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-20T20:22:16",
+          "power_range": {
+            "min": 0.72,
+            "max": 10.47
+          },
+          "color_modes": [
+            "brightness"
+          ],
+          "lut_quality": {
+            "score": 99.2,
+            "brightness": 99.2
+          },
+          "hash": "abac3f31e1078c6549b26cdc39dbae45"
         },
         {
           "aliases": [
