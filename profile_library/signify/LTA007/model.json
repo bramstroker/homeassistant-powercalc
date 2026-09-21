@@ -25,7 +25,7 @@
     "046677563578"
   ],
   "mains_voltage": 120,
-  "measure_description": "Measured with utils/measure script",
+  "measure_description": "Color temperature and effects measured with utils/measure script",
   "measure_device": "KAUF PLF12",
   "measure_device_firmware": "2.13(y) (ESPHome 2026.9.0)",
   "measure_method": "script",
@@ -41,7 +41,7 @@
   "standby_power": 0.05,
   "standby_power_estimated": true,
   "voltage_range": {
-    "max": 124.89,
-    "min": 121.43
+    "max": 125.4,
+    "min": 120.95
   }
 }
