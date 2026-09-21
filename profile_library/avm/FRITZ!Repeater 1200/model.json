@@ -4,7 +4,7 @@
   "device_type": "network",
   "device_specs": {
     "form_factor": "repeater",
-    "rated_power": 11.5,
+    "rated_power": 3.8,
     "connectivity": [
       "wifi",
       "ethernet"
