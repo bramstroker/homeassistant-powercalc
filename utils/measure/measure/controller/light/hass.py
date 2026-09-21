@@ -15,7 +15,9 @@ from measure.controller.light.capabilities import (
 )
 from measure.controller.light.const import LutMode
 from measure.controller.light.controller import LightController, LightInfo
+from measure.controller.light.effects import filter_recordable_effects
 from measure.home_assistant.client import HomeAssistantManager
+from measure.home_assistant.const import HASS_DEVICE_REGISTRY_ID
 
 
 class HassLightController(HassControllerBase, LightController):
@@ -80,9 +82,29 @@ class HassLightController(HassControllerBase, LightController):
         return True
 
     def get_effect_list(self) -> list[str]:
-        return common_effects(
-            [[str(effect) for effect in (state.attributes.get("effect_list") or [])] for state in self._states()],
-        )
+        data = self.client.get_entity_data()
+        registry = {entry.entity_id: entry for entry in data.entity_registry}
+        devices = {
+            str(device_id): device
+            for device in data.device_registry
+            if (device_id := device.get(HASS_DEVICE_REGISTRY_ID)) is not None
+        }
+        effect_lists: list[list[str]] = []
+        for state in self._states():
+            effects = [str(effect) for effect in (state.attributes.get("effect_list") or [])]
+            entry = registry.get(state.entity_id)
+            if entry is None:
+                effect_lists.append(effects)
+                continue
+            device = devices.get(getattr(entry, "device_id", None) or "", {})
+            effect_lists.append(
+                filter_recordable_effects(
+                    effects,
+                    integration=getattr(entry, "platform", None),
+                    device=device,
+                )
+            )
+        return common_effects(effect_lists)
 
     def close(self) -> None:
         return

@@ -30,7 +30,7 @@ INTEGRATION_CONNECTIVITY = {"zha": Connectivity.ZIGBEE, "zwave_js": Connectivity
 _IEEE_ADDRESS = r"(?:[0-9a-fA-F]{2}:){7}[0-9a-fA-F]{2}"
 
 
-def _is_zigbee2mqtt_device(metadata: DeviceConnectivityMetadata) -> bool:
+def _matches_zigbee2mqtt_device(metadata: DeviceConnectivityMetadata) -> bool:
     # Zigbee2MQTT's getDevicePayload uses zigbee2mqtt_<IEEE address> for devices;
     # groups and the bridge use different identifiers. MQTT itself is not evidence.
     # https://github.com/Koenkk/zigbee2mqtt/blob/master/lib/extension/homeassistant.ts
@@ -63,10 +63,29 @@ def _has_zigbee_connection(metadata: DeviceConnectivityMetadata) -> bool:
 
 
 CONNECTIVITY_RULES = [
-    ConnectivityRule("mqtt", Connectivity.ZIGBEE, _is_zigbee2mqtt_device),
+    ConnectivityRule("mqtt", Connectivity.ZIGBEE, _matches_zigbee2mqtt_device),
     ConnectivityRule("hue", Connectivity.ZIGBEE, _is_hue_zigbee_device),
     ConnectivityRule("deconz", Connectivity.ZIGBEE, _has_zigbee_connection),
 ]
+
+
+def is_zigbee2mqtt_device(integration: str | None, device: Mapping[str, object]) -> bool:
+    """Return whether registry metadata identifies a physical Zigbee2MQTT device."""
+
+    if integration != "mqtt" or device.get("entry_type") is not None:
+        return False
+    identifiers = _read_pairs(device.get("identifiers", []))
+    connections = _read_pairs(device.get("connections", []))
+    if identifiers is None or connections is None:
+        return False
+    return _matches_zigbee2mqtt_device(
+        DeviceConnectivityMetadata(
+            integration=integration,
+            identifiers=identifiers,
+            connections=connections,
+            is_child_device=isinstance(device.get("via_device_id"), str) and bool(device["via_device_id"]),
+        ),
+    )
 
 
 def detect_connectivity(integration: str | None, device: Mapping[str, object]) -> Connectivity | None:

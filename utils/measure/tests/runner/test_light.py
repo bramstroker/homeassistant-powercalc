@@ -291,9 +291,13 @@ def test_light_info_limits_color_temperature_to_supported_bounds(property_name: 
 
 
 @pytest.mark.parametrize("effects", [None, []])
-def test_effect_plan_requires_available_effects(effects: list[str] | None) -> None:
-    with pytest.raises(RunnerError, match="No effects found for the light"):
-        build_light_plan({LutMode.EFFECT}, _parameters(), LightInfo("test-light"), effects)
+def test_effect_plan_skips_mode_without_recordable_effects(effects: list[str] | None) -> None:
+    plan = build_light_plan({LutMode.EFFECT}, _parameters(), LightInfo("test-light"), effects)
+
+    assert plan.modes == []
+    assert plan.effects == []
+    assert plan.variation_count == 0
+    assert estimate_light_time_left(plan, _parameters()) == 0
 
 
 def test_empty_light_plan_has_no_remaining_measurement_time() -> None:
@@ -301,6 +305,31 @@ def test_empty_light_plan_has_no_remaining_measurement_time() -> None:
 
     assert plan.variation_count == 0
     assert estimate_light_time_left(plan, _parameters()) == 0
+
+
+def test_run_skips_empty_effect_mode_without_creating_csv(tmp_path: Path) -> None:
+    controller = MagicMock(spec=LightController)
+    controller.get_light_info.return_value = LightInfo("test-light")
+    controller.get_effect_list.return_value = []
+    runner = LightRunner(
+        MagicMock(spec=PowerSampler),
+        _parameters(),
+        controller,
+        MagicMock(spec=RunInteraction),
+    )
+    request = LightMeasurementRequest(
+        model_id="test-light",
+        product_name="Test light",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyLightControllerSpec(),
+        modes={LutMode.EFFECT},
+    )
+
+    runner.run(request, str(tmp_path))
+
+    assert not (tmp_path / "effect.csv").exists()
+    assert not (tmp_path / "effect.csv.gz").exists()
 
 
 @pytest.mark.parametrize(

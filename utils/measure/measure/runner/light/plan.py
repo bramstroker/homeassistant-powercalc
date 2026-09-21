@@ -149,7 +149,7 @@ def build_light_plan(
                 variations=_variations_for_mode(mode, parameters, light_info, effect_list),
             )
             for mode in LIGHT_MODE_ORDER
-            if mode in mode_set
+            if mode in mode_set and (mode != LutMode.EFFECT or effect_list)
         ],
         effects=effect_list,
     )
@@ -259,8 +259,6 @@ def _variations_for_mode(
             )
         ]
     if mode == LutMode.EFFECT:
-        if not effects:
-            raise RunnerError("No effects found for the light")
         return [
             EffectVariation(bri=bri, effect=effect)
             for effect in effects
