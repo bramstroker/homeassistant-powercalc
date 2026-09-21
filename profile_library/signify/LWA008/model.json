@@ -32,7 +32,7 @@
   },
   "mains_voltage": 120,
   "name": "Hue White Bulb A21 E26 1600lm with Bluetooth",
-  "standby_power": 0.045,
+  "standby_power": 0.05,
   "voltage_range": {
     "max": 123.63,
     "min": 120.6
