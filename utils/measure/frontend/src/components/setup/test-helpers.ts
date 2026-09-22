@@ -72,6 +72,7 @@ export const recorderDefinition: MeasureDefinition = {
       name: "additional_entity_ids", role: "attribute", label: "Additional entity", plural_label: "Additional entities (optional)",
       control: "entity", required: false, multiple: true, all_entities: true, related_to: "vacuum_entity_id",
       visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["vacuum_robot"] }, options: [], review: true,
+      hint: "Select entities that can affect power use: charging or task status, dock washing, drying and auto-empty states, and relevant settings.",
     },
   ],
 };

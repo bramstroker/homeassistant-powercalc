@@ -58,3 +58,6 @@ def test_recorder_definition_starts_with_purpose_and_declares_vacuum_relationshi
     assert fields["tracked_entity_ids"].multiple is True
     assert fields["battery_entity_id"].related_to == "vacuum_entity_id"
     assert fields["battery_entity_id"].same_device_only is True
+    assert "manually selected" in (fields["profile_recipe"].options[1].description or "")
+    assert "Select every entity" in fields["profile_recipe"].options[1].guidance[1]
+    assert "charging or task status" in (fields["additional_entity_ids"].hint or "")
