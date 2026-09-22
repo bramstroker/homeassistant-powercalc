@@ -142,7 +142,7 @@ def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_u
     assert preview.manufacturer_directory == "signify"
     assert [file.path for file in preview.files] == [
         "profile_library/signify/LCT999/model.json",
-        "profile_library/signify/LCT999/brightness.csv.gz",
+        "profile_library/signify/LCT999/brightness.csv",
     ]
     assert seen_model["authors"] == [{"name": "Test User", "github": "test-user", "email": "test@example.com"}]
     assert seen_model["name"] == "Hue test lamp"
@@ -153,6 +153,7 @@ def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_u
     prepared_model = json.loads(prepared_contents[preview.files[0].path])
     assert prepared_model["name"] == "Hue test lamp"
     assert "aliases" not in prepared_model
+    assert prepared_contents["profile_library/signify/LCT999/brightness.csv"] == b"bri,watt\n1,1.0\n"
     assert all(file.sha for file in preview.files)
 
 
@@ -290,7 +291,7 @@ def test_preparer_reports_artifact_removed_after_preview(tmp_path: Path) -> None
     preview = preparer.prepare(artifacts, profile_metadata)
     (artifacts / "brightness.csv.gz").unlink()
 
-    with pytest.raises(ProfilePreparationError, match=r"Artifact file is missing: brightness.csv.gz"):
+    with pytest.raises(ProfilePreparationError, match=r"Artifact file is missing: brightness.csv"):
         preparer.render_contents(artifacts, profile_metadata, preview)
 
 
@@ -405,7 +406,7 @@ def test_preparer_can_prepare_contribution_without_a_local_library(tmp_path: Pat
     assert set(contents) == {
         "profile_library/acme/manufacturer.json",
         "profile_library/acme/LCT999/model.json",
-        "profile_library/acme/LCT999/brightness.csv.gz",
+        "profile_library/acme/LCT999/brightness.csv",
     }
     assert json.loads(contents["profile_library/acme/manufacturer.json"]) == {"name": "Acme", "aliases": []}
     assert json.loads(contents["profile_library/acme/LCT999/model.json"])["name"] == "New lamp"
@@ -559,8 +560,8 @@ def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts
 
     preview = preparer.prepare(artifacts, metadata())
 
-    assert [file.path for file in preview.files].count("profile_library/signify/LCT999/brightness.csv.gz") == 1
-    assert "profile_library/signify/LCT999/brightness.csv" not in {file.path for file in preview.files}
+    assert [file.path for file in preview.files].count("profile_library/signify/LCT999/brightness.csv") == 1
+    assert "profile_library/signify/LCT999/brightness.csv.gz" not in {file.path for file in preview.files}
 
     (artifacts / "debug.txt").write_text("not a profile artifact", encoding="utf-8")
     profile_metadata = metadata()
@@ -568,7 +569,7 @@ def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts
         preparer.prepare(artifacts, profile_metadata)
 
 
-def test_preparer_compresses_raw_csv_for_profile_library(tmp_path: Path) -> None:
+def test_preparer_keeps_raw_csv_for_profile_library(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
     write_library(tmp_path)
     write_profile_artifacts(artifacts)
@@ -580,7 +581,19 @@ def test_preparer_compresses_raw_csv_for_profile_library(tmp_path: Path) -> None
     preview = preparer.prepare(artifacts, metadata())
     contents = {file.path: file.content for file in preparer.render_contents(artifacts, metadata(), preview)}
 
-    assert gzip.decompress(contents["profile_library/signify/LCT999/brightness.csv.gz"]) == raw_content
+    assert contents["profile_library/signify/LCT999/brightness.csv"] == raw_content
+
+
+def test_preparer_rejects_invalid_gzip_when_rendering_profile(tmp_path: Path) -> None:
+    artifacts = tmp_path / "artifacts"
+    write_library(tmp_path)
+    write_profile_artifacts(artifacts)
+    (artifacts / "brightness.csv.gz").write_bytes(b"not gzip")
+    preparer = make_preparer(tmp_path)
+    profile_metadata = metadata()
+
+    with pytest.raises(ProfilePreparationError, match="not valid gzip"):
+        preparer.prepare(artifacts, profile_metadata)
 
 
 def test_preparer_blocks_case_insensitive_index_collisions(tmp_path: Path) -> None:

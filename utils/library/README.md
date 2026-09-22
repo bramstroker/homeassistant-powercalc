@@ -41,7 +41,7 @@ uv run --group library python -m utils.library.validate_model_json
 
 ### `validate_lut_files.py`
 
-Validate the structure of every LUT (`*.csv.gz`) file in the library: the columns and
+Validate the structure of every LUT (`*.csv`) file in the library: the columns and
 value ranges required for its color mode, whether the measurements reach the top of the
 brightness range, and whether each profile exposes a color mode combination Home
 Assistant can report. Accepts an optional directory; defaults to the whole library.
@@ -76,7 +76,7 @@ URL immediately. Local runs remain strict and fail on the first error unless
 
 ### `scan_lut_quality.py`
 
-Scan LUT (`*.csv.gz`) files for rough curves and outliers. Accepts an optional
+Scan LUT (`*.csv`) files for rough curves and outliers. Accepts an optional
 path (a profile directory or a single CSV file); defaults to the whole library.
 
 ```bash

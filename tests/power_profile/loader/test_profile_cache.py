@@ -1,3 +1,4 @@
+import gzip
 import json
 import os
 from pathlib import Path
@@ -8,9 +9,12 @@ import pytest
 
 from custom_components.powercalc.power_profile.error import ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.profile_cache import (
+    METADATA_FILE,
+    compress_installed_profile_csv_files,
     create_staging_directory,
     install_profile,
     read_installed_profile,
+    save_resource,
 )
 
 VERSION = AwesomeVersion("1.0.0")
@@ -111,3 +115,63 @@ def test_legacy_cache_ignores_abandoned_downloads(tmp_path: Path) -> None:
     installed = read_installed_profile(tmp_path, "model", "old", VERSION)
     assert installed is not None
     assert installed.metadata["hash"] == "old"
+
+
+def test_compresses_installed_csv_files_and_updates_manifest(tmp_path: Path) -> None:
+    installed = install_profile(tmp_path, stage_profile(tmp_path), METADATA, VERSION)
+
+    compress_installed_profile_csv_files(installed)
+    compress_installed_profile_csv_files(installed)
+
+    csv_path = installed.directory / "hs.csv"
+    gzip_path = installed.directory / "hs.csv.gz"
+    assert not csv_path.exists()
+    with gzip.open(gzip_path, "rt") as csv_file:
+        assert csv_file.read() == "original LUT"
+    manifest = json.loads((installed.directory / METADATA_FILE).read_text())
+    assert "hs.csv" not in manifest["resources"]
+    assert "hs.csv.gz" in manifest["resources"]
+
+
+def test_compresses_legacy_installed_csv_files_without_manifest(tmp_path: Path) -> None:
+    (tmp_path / "model.json").write_text(json.dumps(PROFILE))
+    (tmp_path / "nested").mkdir()
+    (tmp_path / "nested" / "brightness.csv").write_text("legacy LUT")
+    installed = read_installed_profile(tmp_path, "model", "old", VERSION)
+    assert installed is not None
+
+    compress_installed_profile_csv_files(installed)
+
+    assert not (tmp_path / "nested" / "brightness.csv").exists()
+    with gzip.open(tmp_path / "nested" / "brightness.csv.gz", "rt") as csv_file:
+        assert csv_file.read() == "legacy LUT"
+
+
+def test_failed_manifest_update_keeps_raw_csv_usable(tmp_path: Path) -> None:
+    installed = install_profile(tmp_path, stage_profile(tmp_path), METADATA, VERSION)
+    real_save_resource = save_resource
+
+    def fail_manifest_update(data: bytes, path: Path) -> None:
+        if path.name == METADATA_FILE:
+            raise OSError("cannot update manifest")
+        real_save_resource(data, path)
+
+    with (
+        patch(
+            "custom_components.powercalc.power_profile.loader.profile_cache.save_resource",
+            side_effect=fail_manifest_update,
+        ),
+        pytest.raises(OSError, match="cannot update manifest"),
+    ):
+        compress_installed_profile_csv_files(installed)
+
+    assert (installed.directory / "hs.csv").read_text() == "original LUT"
+    assert read_installed_profile(tmp_path, "model", None, VERSION) is not None
+
+    compress_installed_profile_csv_files(installed)
+
+    assert not (installed.directory / "hs.csv").exists()
+    with gzip.open(installed.directory / "hs.csv.gz", "rt") as csv_file:
+        assert csv_file.read() == "original LUT"
+    manifest = json.loads((installed.directory / METADATA_FILE).read_text())
+    assert manifest["resources"].count("hs.csv.gz") == 1

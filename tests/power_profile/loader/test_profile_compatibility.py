@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+import gzip
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -120,8 +121,8 @@ async def test_installed_profile_survives_update_restart_and_force_then_upgrades
         data, updated_directory = await restarted.load_model("test", "model")
         assert data == NEW_PROFILE
         assert directory == updated_directory
-        assert not await hass.async_add_executor_job((Path(directory) / "obsolete.csv").exists)
-        assert await hass.async_add_executor_job((Path(directory) / "hs.csv").is_file)
+        assert not await hass.async_add_executor_job((Path(directory) / "obsolete.csv.gz").exists)
+        assert await hass.async_add_executor_job((Path(directory) / "hs.csv.gz").is_file)
 
     # Installed metadata is sufficient even if the old hash cache was lost before shutdown.
     await hass.async_add_executor_job(Path(restarted._get_profile_hashes_path()).unlink)  # noqa: SLF001
@@ -241,7 +242,8 @@ async def test_failed_update_preserves_files_and_metadata(hass: HomeAssistant, f
         ):
             assert (await loader.load_model("test", "model", force_update=True))[0] == OLD_PROFILE
 
-    assert await hass.async_add_executor_job((Path(directory) / "hs.csv").read_bytes) == b"old data"
+    compressed_lut = await hass.async_add_executor_job((Path(directory) / "hs.csv.gz").read_bytes)
+    assert gzip.decompress(compressed_lut) == b"old data"
     assert await hass.async_add_executor_job((Path(directory) / ".installed.json").read_bytes) == original_metadata
     with aioresponses() as response:
         # Subsequent incompatible library updates must still find the original installed metadata.

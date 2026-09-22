@@ -15,6 +15,7 @@ on:
     paths:
       - '**/model.json'
       - '**/manufacturer.json'
+      - '**/*.csv'
       - '**/*.csv.gz'
     branches:
       - master

@@ -7,9 +7,9 @@ import pytest
 
 
 def test_resolve_plot_input_finds_profile_library_path() -> None:
-    path = cli.resolve_plot_input("ledvance/AC41293/brightness.csv.gz")
+    path = cli.resolve_plot_input("ledvance/AC41293/brightness.csv")
 
-    assert path.name == "brightness.csv.gz"
+    assert path.name == "brightness.csv"
     assert path.parent.name == "AC41293"
 
 

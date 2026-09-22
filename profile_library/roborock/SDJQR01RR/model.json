@@ -28,7 +28,7 @@
       "playbook": {
         "autostart": "tapering",
         "playbooks": {
-          "tapering": "tapering.csv.gz"
+          "tapering": "tapering.csv"
         }
       }
     },
