@@ -37572,7 +37572,7 @@
           "gtin": [
             "046135758072"
           ],
-          "measure_description": "Originally measured with utils/measure script on 2024-01-28, with a Shelly Plug US from a bad batch that inflates power readings by a constant factor of 1.22x. Corrected on 2026-09-10 by dividing every LUT value and the standby power by 1.22. The correction factor was determined on 2026-09-06 on the sister profile sylvania/A19CCECWF, by remeasuring on a Sonoff S31 and cross-checking the bad Shelly Plug US against a Kill-A-Watt (1.22x at 1 W, 1.22x at 100 W, 1.20x at 950 W); this model was not remeasured. The corrected 8.05 W -> 6.60 W peak now sits underneath the lamp's 7 W rating. The G25 (40G25FILCCLWIFI) and ST19 (40ST19FILCCLWIFI) variants share this profile's data: SYLVANIA ships one lamp in three glass shapes with identical electrical specs, the same FCC ID, and a byte-identical firmware image, so the filament and the power readings are the same. Only the Tuya product id differs, one per SKU.",
+          "measure_description": "Originally measured with utils/measure script on 2024-01-28, with a Shelly Plug US from a bad batch that inflates power readings by a constant factor of 1.22x. Corrected on 2026-09-10 by dividing every LUT value and the standby power by 1.22. The correction factor was determined on 2026-09-06 on the sister profile sylvania/A19CCECWF, by remeasuring on a Sonoff S31 and cross-checking the bad Shelly Plug US against a Kill-A-Watt (1.22x at 1 W, 1.22x at 100 W, 1.20x at 950 W); this model was not remeasured. The corrected 8.05 W -> 6.60 W peak now sits underneath the lamp's 7 W rating. The G25 (40G25FILCCLWIFI) and ST19 (40ST19FILCCLWIFI) variants share this profile's data: SYLVANIA ships one lamp in three glass shapes with identical electrical specs, the same FCC ID, and a byte-identical firmware image, so the filament and the power readings are the same. Only the Tuya product id differs, one per SKU. The brightness.csv (added 2026-09-22) is not a new measurement: it simply averages the color_temp LUT's 499 and 500 mired readings (both the same fixed 2000K output), so the bulb can be an RGBCT with a fixed 2000K (localtuya) or an RGBW with white mode (ESPHome).",
           "measure_device": "Shelly Plug US",
           "measure_method": "script",
           "mains_voltage": 120,
@@ -37592,23 +37592,25 @@
           ],
           "id": "40A19FILCCLWIFI",
           "manufacturer": "sylvania",
-          "updated_at": "2026-09-22T01:35:49",
+          "updated_at": "2026-09-22T13:55:14",
           "max_power": 6.6,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2026-09-13T14:46:55",
+          "measurement_updated_at": "2026-09-22T13:55:14",
           "power_range": {
             "min": 0.57,
             "max": 6.6
           },
           "color_modes": [
+            "brightness",
             "color_temp",
             "hs"
           ],
           "lut_quality": {
-            "score": 98.7,
+            "score": 98.3,
+            "brightness": 98.3,
             "color_temp": 98.7
           },
-          "hash": "9249f81ae835c8f7385d2d43d27b61dd"
+          "hash": "b5464a4eb6182195f1bbc45e7a5d2cc2"
         },
         {
           "aliases": [
@@ -37645,23 +37647,25 @@
           ],
           "id": "40G25FILCCLWIFI",
           "manufacturer": "sylvania",
-          "updated_at": "2026-09-22T01:35:49",
+          "updated_at": "2026-09-22T13:55:14",
           "max_power": 6.6,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2026-09-13T14:46:55",
+          "measurement_updated_at": "2026-09-22T13:55:14",
           "power_range": {
             "min": 0.57,
             "max": 6.6
           },
           "color_modes": [
+            "brightness",
             "color_temp",
             "hs"
           ],
           "lut_quality": {
-            "score": 98.7,
+            "score": 98.3,
+            "brightness": 98.3,
             "color_temp": 98.7
           },
-          "hash": "1cacbb9459b4a77ae381bb794d7e10b5"
+          "hash": "7faa2827f28eb864b5b9a0ba2c1d5132"
         },
         {
           "aliases": [
@@ -37698,23 +37702,25 @@
           ],
           "id": "40ST19FILCCLWIFI",
           "manufacturer": "sylvania",
-          "updated_at": "2026-09-22T01:35:49",
+          "updated_at": "2026-09-22T13:55:14",
           "max_power": 6.6,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2026-09-13T14:46:55",
+          "measurement_updated_at": "2026-09-22T13:55:14",
           "power_range": {
             "min": 0.57,
             "max": 6.6
           },
           "color_modes": [
+            "brightness",
             "color_temp",
             "hs"
           ],
           "lut_quality": {
-            "score": 98.7,
+            "score": 98.3,
+            "brightness": 98.3,
             "color_temp": 98.7
           },
-          "hash": "73e3e8beedd09a5e9f53c2da8fa4e7f1"
+          "hash": "f638d765dcccc415a7dd32f1f9965b63"
         },
         {
           "aliases": [
