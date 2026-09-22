@@ -312,10 +312,12 @@ export class AppShell extends LitElement implements MeasureAppState {
 
   private renderResult(snapshot: SessionSnapshot) {
     const sessionId = snapshot.session_id ?? "";
+    const request = snapshot.request ?? this.request;
     return html`
       <measure-result-view
         .snapshot=${snapshot} .files=${this.files} .plotCollection=${this.plotCollection}
-        .canPrepareProfile=${this.measurementType() !== "average"}
+        .canPrepareProfile=${this.measurementType() !== "average"
+          && !(request?.measure_type === "recorder" && request.recorder_purpose === "playbook")}
         .fileUrl=${this.resultFileUrl} .downloadAll=${this.downloadAllFiles}
         .inspectJsonFile=${this.inspectResultJsonFile}
         .diagnosticsUrl=${this.api.diagnosticsUrl(sessionId)}

@@ -56,6 +56,25 @@ describe("measure app controller: navigation", () => {
     expect(appState.view).toBe("result");
   });
 
+  it("prevents profile navigation when analysis produced no model", () => {
+    const appState = state();
+    appState.view = "result";
+    appState.snapshot = { state: "completed", session_id: "session-1" };
+    appState.files = [{ name: "analyser.json", size: 100, media_type: "application/json" }];
+    const controller = new MeasureAppController(appState, () => api(), () => connection(), () => undefined);
+
+    controller.openProfile();
+    expect(appState.view).toBe("result");
+
+    appState.files.push({ name: "profile/model.json", size: 200, media_type: "application/json" });
+    appState.busy = true;
+    controller.openProfile();
+    expect(appState.view).toBe("result");
+    appState.busy = false;
+    controller.openProfile();
+    expect(appState.view).toBe("profile");
+  });
+
   it("preserves structured help from API errors", async () => {
     const appState = state();
     const help = {

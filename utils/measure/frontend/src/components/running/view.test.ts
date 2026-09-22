@@ -1,4 +1,5 @@
 import type { SessionSnapshot } from "../../types";
+import { capabilities } from "../../testing/controller";
 import "./view";
 
 describe("running view", () => {
@@ -255,5 +256,24 @@ describe("running view", () => {
     const notice = element.shadowRoot.querySelector(".notice.warning");
     expect(notice?.getAttribute("role")).toBe("alert");
     expect(notice?.textContent).toContain(warning);
+  });
+
+  it("adds low-power guidance to a vacuum recording's zero-reading warning", async () => {
+    const warning = "Discarding measurement: 0 watt was read from the power meter";
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = {
+      state: "running", warnings: [warning],
+      request: {
+        measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+        model_id: "Eureka", product_name: "Vacuum", measure_device: "Dock", generate_model: true,
+        parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+      },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const notice = element.shadowRoot!.querySelector(".notice.warning")!;
+    expect(notice.textContent).toContain("not assumed to be the dock's actual use");
+    expect(notice.querySelector("a")?.getAttribute("href")).toBe("https://docs.powercalc.nl/contributing/measure/low-power-measurements/");
   });
 });

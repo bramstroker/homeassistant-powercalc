@@ -508,4 +508,25 @@ describe("app shell", () => {
       expect(steps.at(-1)?.getAttribute("aria-current")).toBe("step");
     }
   });
+
+  it("does not suggest profile preparation for a recorder playbook", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.view = "result";
+    element.snapshot = {
+      state: "completed",
+      request: {
+        measure_type: "recorder", recorder_purpose: "playbook", model_id: "", product_name: "",
+        measure_device: "Test meter", generate_model: false, parameters: capabilities.defaults,
+        resume_policy: "new", power_meter: { type: "dummy" },
+      },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const result = element.shadowRoot!.querySelector("measure-result-view") as HTMLElement & { updateComplete: Promise<boolean>; shadowRoot: ShadowRoot };
+    await result.updateComplete;
+    expect(result.shadowRoot.querySelector(".contribution")).toBeNull();
+    expect(result.shadowRoot.textContent).not.toContain("No model.json is available yet");
+  });
 });
