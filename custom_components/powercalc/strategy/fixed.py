@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from homeassistant.const import STATE_OFF
 from homeassistant.core import State
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import TrackTemplate
@@ -77,3 +78,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             )
 
         return track_templates
+
+    def can_calculate_standby(self) -> bool:
+        """Return whether an explicit off-state power value is configured."""
+        return self._per_state_power is not None and STATE_OFF in self._per_state_power

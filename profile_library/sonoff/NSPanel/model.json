@@ -1,0 +1,69 @@
+{
+  "aliases": [
+    "NSPanel-EU"
+  ],
+  "compatible_integrations": [
+    "esphome"
+  ],
+  "calculation_strategy": "composite",
+  "composite_config": {
+    "mode": "sum_all",
+    "strategies": [
+      {
+        "lut": {}
+      },
+      {
+        "fixed": {
+          "power": "{{ 0.3 * ((is_state('[[relay_1]]', 'on') | int) + (is_state('[[relay_2]]', 'on') | int)) }}",
+          "states_power": {
+            "off": "{{ 1.16 + 0.3 * ((is_state('[[relay_1]]', 'on') | int) + (is_state('[[relay_2]]', 'on') | int)) }}"
+          }
+        }
+      }
+    ]
+  },
+  "created_at": "2026-09-06T12:03:37Z",
+  "device_type": "light",
+  "fields": {
+    "relay_1": {
+      "label": "Relay 1",
+      "description": "Select the NSPanel relay 1 switch entity.",
+      "selector": {
+        "entity": {
+          "domain": "switch"
+        }
+      }
+    },
+    "relay_2": {
+      "label": "Relay 2",
+      "description": "Select the NSPanel relay 2 switch entity.",
+      "selector": {
+        "entity": {
+          "domain": "switch"
+        }
+      }
+    }
+  },
+  "measure_description": "The display brightness was measured with both relays off. Relay increments were measured without connected loads and add 0.3 W per active relay.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 50,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.6.0:app"
+  },
+  "mains_voltage": 230,
+  "min_version": "1.26.0",
+  "name": "NSPanel (EU, ESPHome / NSPanel-Easy)",
+  "standby_power": 1.16,
+  "voltage_range": {
+    "min": 234.0,
+    "max": 235.7
+  },
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
+  ]
+}
