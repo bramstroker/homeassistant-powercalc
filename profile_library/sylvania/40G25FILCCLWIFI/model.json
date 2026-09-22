@@ -1,0 +1,34 @@
+{
+  "aliases": [
+    "eiy7vo6ilyocf9ts"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-21T00:00:00Z",
+  "device_type": "light",
+  "device_specs": {
+    "socket": "E26",
+    "form_factor": "filament",
+    "rated_power": 7.0,
+    "lumens": 500,
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "gtin": [
+    "046135758089"
+  ],
+  "linked_profile": "sylvania/40A19FILCCLWIFI",
+  "measure_description": "Uses the measurement data of sylvania/40A19FILCCLWIFI. SYLVANIA ships one lamp in three glass shapes (A19, G25, ST19) with identical electrical specs, the same FCC ID, and a byte-identical firmware image, so the filament and the power readings are the same. Only the Tuya product id differs, one per SKU. The G25 was not measured separately.",
+  "measure_device": "Shelly Plug US",
+  "measure_method": "script",
+  "mains_voltage": 120,
+  "name": "SMART+ WiFi RGBW Color Filament G25 LED Bulb (7W, 2000K)",
+  "standby_power": 0.41,
+  "authors": [
+    {
+      "name": "Ryan Ronnander",
+      "email": "rronnander@gmail.com",
+      "github": "ryan-ronnander"
+    }
+  ]
+}
