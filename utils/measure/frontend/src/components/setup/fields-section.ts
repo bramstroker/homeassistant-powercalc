@@ -30,7 +30,6 @@ import {
   selectedOptions,
   selectValue,
   visible,
-  vacuumRecordingEntityIds,
   type FieldState,
 } from "./options";
 import "./tuning-section";
@@ -326,8 +325,7 @@ export class SetupFieldsSection extends LitElement {
     const disabled = state ? disabledVacuumEntityCount(state) : 0;
     const disabledHint = disabled ? `${disabled} disabled entities are listed in recording metadata only.` : "";
     return html`<p class="muted">
-      ${selected} additional entities selected. Available device entities are selected by default;
-      you can remove them or add dock entities. Camera and image entities are not selected automatically.
+      ${field.hint} ${selected} additional entities selected.
       ${disabledHint}
     </p>`;
   }
@@ -363,9 +361,7 @@ export class SetupFieldsSection extends LitElement {
     const select = event.currentTarget as HTMLInputElement;
     this.changeEntities(select.name, [select.value]);
     for (const dependent of this.definition?.fields.filter((field) => field.related_to === select.name) ?? []) {
-      this.changeEntities(dependent.name, dependent.name === "additional_entity_ids"
-        ? vacuumRecordingEntityIds(this.deviceEntities["*"] ?? [], select.value)
-        : []);
+      this.changeEntities(dependent.name, []);
     }
     if (select.name === "battery_entity_id" && this.fieldState) {
       const additional = this.definition?.fields.find((field) => field.name === "additional_entity_ids");

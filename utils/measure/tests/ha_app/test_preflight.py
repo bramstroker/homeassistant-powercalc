@@ -327,7 +327,7 @@ def test_preflight_rejects_missing_hass_power_entity_for_non_light_kind() -> Non
 def test_preflight_warns_instead_of_failing_for_unusable_optional_recorder_entity(
     extra: Entity | None, message: str
 ) -> None:
-    """A stored request must stay runnable when an auto-selected device entity goes away.
+    """A stored request must stay runnable when an additional entity goes away.
 
     The runner records such an entity as "unavailable", so record-more and resume would be
     permanently blocked if preflight rejected the whole request over it.
