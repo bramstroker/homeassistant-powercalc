@@ -54,10 +54,12 @@ export class Combobox extends LitElement {
     input[readonly] { cursor: pointer; }
     .tag {
       display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.35rem 0.5rem;
+      max-width: 100%; min-width: 0;
       border-radius: 999px; background: color-mix(in srgb, var(--signal) 18%, var(--surface-raised));
       font-size: 0.78rem; white-space: nowrap;
     }
-    .tag button { min-height: 0; padding: 0; border: 0; background: transparent; color: var(--muted); font: inherit; line-height: 1; }
+    .tag-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .tag button { flex: none; min-height: 0; padding: 0; border: 0; background: transparent; color: var(--muted); font: inherit; line-height: 1; }
     .tag button:hover:not(:disabled) { border: 0; background: transparent; color: var(--ink); transform: none; }
     .toggle {
       position: absolute; inset: 1px 1px 1px auto; width: 2.65rem; min-height: 0; padding: 0; border: 0;
@@ -150,12 +152,15 @@ export class Combobox extends LitElement {
 
   private renderSelectedValues() {
     if (!this.multiple) return nothing;
-    return this.values().map((value) => html`
-      <span class="tag">
-        ${this.displayValue(value)}
-        <button type="button" ?disabled=${this.disabled} aria-label=${`Remove ${this.displayValue(value)}`} @click=${() => this.removeValue(value)}>×</button>
-      </span>
-    `);
+    return this.values().map((value) => {
+      const label = this.displayValue(value);
+      return html`
+        <span class="tag">
+          <span class="tag-label" title=${label}>${label}</span>
+          <button type="button" ?disabled=${this.disabled} aria-label=${`Remove ${label}`} @click=${() => this.removeValue(value)}>×</button>
+        </span>
+      `;
+    });
   }
 
   private inputPlaceholder(): string {
