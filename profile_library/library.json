@@ -2414,6 +2414,44 @@
         },
         {
           "calculation_strategy": "fixed",
+          "created_at": "2026-09-20T10:00:00Z",
+          "device_type": "network",
+          "device_specs": {
+            "form_factor": "repeater",
+            "rated_power": 3.8,
+            "connectivity": [
+              "wifi",
+              "ethernet"
+            ]
+          },
+          "discovery_by": "device",
+          "gtin": [
+            "04023125028540"
+          ],
+          "measure_description": "Manually measured standby power for FRITZ!Repeater 1200",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "name": "FRITZ!Repeater 1200",
+          "authors": [
+            {
+              "github": "Maxik933",
+              "name": "Maxik933"
+            }
+          ],
+          "id": "FRITZ!Repeater 1200",
+          "manufacturer": "avm",
+          "updated_at": "2026-09-21T11:12:58",
+          "max_power": 2.94,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 2.94,
+            "max": 2.94
+          },
+          "hash": "86ca4d2b043576880e978c34ff807fb7"
+        },
+        {
+          "calculation_strategy": "fixed",
           "created_at": "2023-06-24T08:34:14Z",
           "device_type": "network",
           "device_specs": {
@@ -19061,6 +19099,68 @@
             "color_temp": 98.5
           },
           "hash": "0cf2b55cc5edfe3c6333534b2c13d077"
+        },
+        {
+          "authors": [
+            {
+              "github": "rugk",
+              "name": "rugk"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-15T16:27:27Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ],
+            "form_factor": "spot",
+            "rated_power": 5,
+            "socket": "GU10",
+            "lumens": 345
+          },
+          "device_type": "light",
+          "gtin": [
+            "4260212349205"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with utils/measure script/app",
+          "measure_device": "Shelly Plug M Gen3",
+          "measure_device_firmware": "1.8.99-plugmg3prod0",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 3,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.7.0:app"
+          },
+          "name": "LIGHTWAY smart home LED-lamp - spot",
+          "standby_power": 0.33,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 237.6,
+            "min": 231.3
+          },
+          "id": "L122FF63H11A5.0W",
+          "manufacturer": "megos",
+          "updated_at": "2026-09-21T22:15:47",
+          "max_power": 5.3,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-21T22:15:47",
+          "power_range": {
+            "min": 0.37,
+            "max": 5.3
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 99.0,
+            "color_temp": 99.0
+          },
+          "hash": "270c7194af18bc4ed6947d8b88db9bed"
         }
       ],
       "device_types": [
@@ -37592,7 +37692,7 @@
           ],
           "id": "40A19FILCCLWIFI",
           "manufacturer": "sylvania",
-          "updated_at": "2026-09-22T13:55:14",
+          "updated_at": "2026-09-22T15:13:11",
           "max_power": 6.6,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-22T13:55:14",
@@ -37610,7 +37710,7 @@
             "brightness": 98.3,
             "color_temp": 98.7
           },
-          "hash": "b5464a4eb6182195f1bbc45e7a5d2cc2"
+          "hash": "becf92c19418939dc65453c8cd8ac544"
         },
         {
           "aliases": [
@@ -37647,7 +37747,7 @@
           ],
           "id": "40G25FILCCLWIFI",
           "manufacturer": "sylvania",
-          "updated_at": "2026-09-22T13:55:14",
+          "updated_at": "2026-09-22T15:13:11",
           "max_power": 6.6,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-22T13:55:14",
@@ -37665,7 +37765,7 @@
             "brightness": 98.3,
             "color_temp": 98.7
           },
-          "hash": "7faa2827f28eb864b5b9a0ba2c1d5132"
+          "hash": "31e449d50a7c078967f254a97d68cb56"
         },
         {
           "aliases": [
@@ -37702,7 +37802,7 @@
           ],
           "id": "40ST19FILCCLWIFI",
           "manufacturer": "sylvania",
-          "updated_at": "2026-09-22T13:55:14",
+          "updated_at": "2026-09-22T15:13:11",
           "max_power": 6.6,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-22T13:55:14",
@@ -37720,7 +37820,7 @@
             "brightness": 98.3,
             "color_temp": 98.7
           },
-          "hash": "f638d765dcccc415a7dd32f1f9965b63"
+          "hash": "4917f3ed7e77642533ded947eabc46f0"
         },
         {
           "aliases": [
