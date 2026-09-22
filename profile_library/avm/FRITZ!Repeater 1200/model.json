@@ -1,0 +1,31 @@
+{
+  "calculation_strategy": "fixed",
+  "created_at": "2026-09-20T10:00:00Z",
+  "device_type": "network",
+  "device_specs": {
+    "form_factor": "repeater",
+    "rated_power": 3.8,
+    "connectivity": [
+      "wifi",
+      "ethernet"
+    ]
+  },
+  "discovery_by": "device",
+  "gtin": [
+    "04023125028540"
+  ],
+  "fixed_config": {
+    "power": 2.94
+  },
+  "measure_description": "Manually measured standby power for FRITZ!Repeater 1200",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "manual",
+  "mains_voltage": 230,
+  "name": "FRITZ!Repeater 1200",
+  "authors": [
+    {
+      "github": "Maxik933",
+      "name": "Maxik933"
+    }
+  ]
+}
