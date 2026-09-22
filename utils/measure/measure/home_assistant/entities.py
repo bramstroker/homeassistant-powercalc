@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from measure.controller.light.capabilities import light_info_from_attributes, supported_light_modes
 from measure.controller.light.const import LutMode
+from measure.controller.light.effects import filter_recordable_effects
 from measure.home_assistant.client import HomeAssistantManager
 from measure.home_assistant.connectivity import Connectivity, detect_connectivity
 from measure.home_assistant.const import (
@@ -300,13 +301,15 @@ def _describe_entity(
     light_info = light_info_from_attributes(attributes) if domain == EntityDomain.LIGHT else None
     unit = attributes.get(HASS_ENTITY_UNIT_OF_MEASUREMENT)
     members = attributes.get(HASS_ENTITY_GROUP_MEMBERS)
+    integration = str(registry_entry.platform) if registry_entry is not None and registry_entry.platform else None
+    effects = [str(effect) for effect in (attributes.get("effect_list") or [])]
     return EntityDescriptor(
         entity_id=entity.entity_id,
         name=str(attributes.get("friendly_name", entity.entity_id)),
         domain=domain,
         device_class=device_class,
         device_id=device_id,
-        integration=str(registry_entry.platform) if registry_entry is not None and registry_entry.platform else None,
+        integration=integration,
         connectivity=(detect_connectivity(getattr(registry_entry, "platform", None), device) if not members else None),
         translation_key=getattr(registry_entry, "translation_key", None),
         disabled_by=getattr(registry_entry, "disabled_by", None),
@@ -317,7 +320,9 @@ def _describe_entity(
         unit=str(unit) if unit else None,
         attribute_names=sorted(attributes) if detailed else [],
         supported_modes=supported_modes,
-        effect_list=[str(effect) for effect in (attributes.get("effect_list") or [])] or None if detailed else None,
+        effect_list=(
+            filter_recordable_effects(effects, integration=integration, device=device) or None if detailed else None
+        ),
         min_mired=light_info.get_min_mired() if light_info is not None else None,
         max_mired=light_info.get_max_mired() if light_info is not None else None,
         member_entity_ids=[str(member) for member in members] if detailed and isinstance(members, list) else [],

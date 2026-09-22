@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 from homeassistant_api import State
@@ -54,6 +55,36 @@ def test_effect_list_handles_null_value(hass_client: MagicMock) -> None:
     hass_client.get_state.return_value = mocked_state
 
     assert _get_instance(hass_client).get_effect_list() == []
+
+
+def test_effect_list_filters_zigbee2mqtt_commands(hass_client: MagicMock) -> None:
+    hass_client.get_state.return_value = State(
+        entity_id="light.test",
+        state="on",
+        attributes={
+            "effect_list": [
+                "blink",
+                "breathe",
+                "okay",
+                "channel_change",
+                "finish_effect",
+                "stop_effect",
+                "stop_colorloop",
+                "colorloop",
+            ]
+        },
+    )
+    hass_client.get_entity_data.return_value = SimpleNamespace(
+        entity_registry=[SimpleNamespace(entity_id="light.test", device_id="device", platform="mqtt")],
+        device_registry=[
+            {
+                "id": "device",
+                "identifiers": [["mqtt", "zigbee2mqtt_0x0017880102030405"]],
+            }
+        ],
+    )
+
+    assert _get_instance(hass_client).get_effect_list() == ["colorloop"]
 
 
 def test_has_effect_support(hass_client: MagicMock) -> None:

@@ -289,6 +289,30 @@ def test_catalog_handles_light_with_null_effect_list() -> None:
     assert lights[0].effect_list is None
 
 
+def test_catalog_filters_unrecordable_zigbee2mqtt_effects() -> None:
+    data = _entity_data()
+    data.entity_registry[0].platform = "mqtt"
+    data.device_registry[0]["identifiers"] = [["mqtt", "zigbee2mqtt_0x0017880102030405"]]
+    data.entities["light"].entities["desk"].state.attributes["effect_list"] = [
+        "blink",
+        "breathe",
+        "okay",
+        "channel_change",
+        "finish_effect",
+        "stop_effect",
+        "stop_colorloop",
+        "colorloop",
+    ]
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+
+    light = HomeAssistantEntityCatalog(home_assistant).load_snapshot().get("light.desk")
+
+    assert light is not None
+    assert light.effect_list == ["colorloop"]
+    assert LutMode.EFFECT in (light.supported_modes or [])
+
+
 def test_catalog_exposes_group_members_and_infers_their_shared_model() -> None:
     data = _entity_data()
     data.entities["light"].entities["second"] = _entity(

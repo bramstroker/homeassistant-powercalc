@@ -829,6 +829,25 @@ def test_hs_preflight_uses_default_native_resolution() -> None:
     assert result.estimated_variations == 2_025
 
 
+@pytest.mark.parametrize("effects,expected_variations", [(["colorloop"], 8), ([], 0)])
+def test_effect_preflight_uses_recordable_effects(effects: list[str], expected_variations: int) -> None:
+    entities = base_entities()
+    entities[("light", None)] = [Entity("light.test", [LutMode.EFFECT], effect_list=effects)]
+    request = LightMeasurementRequest(
+        model_id="L122FF63H11A5.0W",
+        product_name="Test light",
+        measure_device="Test meter",
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        controller=HassLightControllerSpec(entity_id="light.test"),
+        modes={LutMode.EFFECT},
+    )
+
+    result = preflight(entities).validate(request)
+
+    assert result.estimated_variations == expected_variations
+    assert result.estimated_duration_seconds == (1471 if effects else 0)
+
+
 def test_multi_light_preflight_uses_common_capabilities_and_models() -> None:
     entities = base_entities()
     entities[("light", None)] = [
