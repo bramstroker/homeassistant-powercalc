@@ -320,8 +320,8 @@ class RecorderMeasurementRequest(BaseMeasurementRequest):
     def required_entity_ids(self) -> list[str]:
         """Recorded entities a sample cannot be written without.
 
-        A vacuum recipe only needs the vacuum and its battery; the additional entities the
-        frontend preselects from the device are best effort and may disappear mid-session.
+        A vacuum recipe only needs the vacuum and its battery; manually selected additional
+        entities are best effort and may disappear mid-session.
         """
 
         entity_ids = self.recorded_entity_ids

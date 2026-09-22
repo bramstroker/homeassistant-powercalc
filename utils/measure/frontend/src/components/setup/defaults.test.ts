@@ -79,6 +79,9 @@ describe("setup view defaults", () => {
       { entity_id: "sensor.robot_battery", name: "Robot battery", domain: "sensor", device_id: "robot-device", device_class: "battery", state: "42", unit: "%" },
       { entity_id: "sensor.other_battery", name: "Other battery", domain: "sensor", device_id: "other-device", device_class: "battery", state: "80", unit: "%" },
       { entity_id: "sensor.dock_state", name: "Dock state", domain: "sensor", device_id: "robot-device", state: "idle" },
+      ...Array.from({ length: 160 }, (_, index) => ({
+        entity_id: `sensor.robot_${index}`, name: `Robot ${index}`, domain: "sensor", device_id: "robot-device", state: "idle",
+      })),
       { entity_id: "vacuum.other", name: "Other robot", domain: "vacuum", device_id: "other-device", state: "docked" },
       { entity_id: "sensor.other_state", name: "Other state", domain: "sensor", device_id: "other-device", state: "idle" },
     ] };
@@ -101,20 +104,21 @@ describe("setup view defaults", () => {
     expect(element.shadowRoot.querySelectorAll('select[name="additional_entity_ids"]')).toHaveLength(0);
     const additional = entityCombobox(element, "additional_entity_ids");
     expect(additional.label).toBe("Additional entities (optional)");
-    expect(additional.value).toEqual(["sensor.dock_state"]);
+    expect(additional.value).toEqual([]);
+    expect(element.shadowRoot.textContent).toContain("Select entities that can affect power use");
     const submitted = new Promise<MeasurementRequest>((resolve) => element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail)));
     (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     expect(await submitted).toMatchObject({
-      vacuum_entity_id: "vacuum.robot", battery_entity_id: "sensor.robot_battery", additional_entity_ids: ["sensor.dock_state"],
+      vacuum_entity_id: "vacuum.robot", battery_entity_id: "sensor.robot_battery", additional_entity_ids: [],
     });
 
-    additional.dispatchEvent(new CustomEvent("combobox-change", { detail: { value: [] } }));
+    additional.dispatchEvent(new CustomEvent("combobox-change", { detail: { value: ["sensor.dock_state"] } }));
     await element.updateComplete;
-    expect(entityCombobox(element, "additional_entity_ids").value).toEqual([]);
+    expect(entityCombobox(element, "additional_entity_ids").value).toEqual(["sensor.dock_state"]);
 
     selectEntity(entityCombobox(element, "vacuum_entity_id"), "vacuum.other");
     await element.updateComplete;
-    expect(entityCombobox(element, "additional_entity_ids").value).toEqual(["sensor.other_state"]);
+    expect(entityCombobox(element, "additional_entity_ids").value).toEqual([]);
     expect(entityCombobox(element, "battery_entity_id").value).toBe("sensor.other_battery");
   });
 
