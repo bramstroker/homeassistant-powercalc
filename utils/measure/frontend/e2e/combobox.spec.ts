@@ -76,3 +76,44 @@ test("updates FormData before dispatching a single-select change event", async (
 
   await expect(page.locator("#single-combobox-test")).toHaveAttribute("data-value-at-change", "profile");
 });
+
+test("keeps long selected entity names inside a multi-select field", async ({ page }) => {
+  await mockApi(page);
+  await page.goto("/");
+  await page.getByRole("heading", { name: "Your measurements" }).waitFor();
+  const label = "Pushcel Trigger Auto Empty Dock · button.valetudo_eurekaj15proultramax_trigger_auto_empty_dock";
+  await page.evaluate(async (selectedLabel) => {
+    const form = document.createElement("form");
+    form.id = "long-entity-test";
+    form.style.cssText = "display: grid; grid-template-columns: 280px 280px; gap: 20px; width: 580px";
+    const picker = document.createElement("measure-combobox");
+    picker.name = "entities";
+    picker.label = "Additional entities";
+    picker.multiple = true;
+    picker.options = [{ value: "button.valetudo", label: selectedLabel }];
+    picker.value = ["button.valetudo"];
+    const nextField = document.createElement("input");
+    nextField.id = "next-field";
+    form.append(picker, nextField);
+    document.body.append(form);
+    await picker.updateComplete;
+  }, label);
+
+  const form = page.locator("#long-entity-test");
+  const bounds = await form.evaluate((element) => {
+    const picker = element.querySelector("measure-combobox")!;
+    const tag = picker.shadowRoot!.querySelector(".tag")!;
+    const control = picker.shadowRoot!.querySelector(".control")!;
+    const remove = picker.shadowRoot!.querySelector(".tag button")!;
+    return {
+      tagRight: tag.getBoundingClientRect().right,
+      controlRight: control.getBoundingClientRect().right,
+      removeRight: remove.getBoundingClientRect().right,
+      nextLeft: element.querySelector("#next-field")!.getBoundingClientRect().left,
+    };
+  });
+  expect(bounds.tagRight).toBeLessThanOrEqual(bounds.controlRight);
+  expect(bounds.removeRight).toBeLessThanOrEqual(bounds.controlRight);
+  expect(bounds.tagRight).toBeLessThan(bounds.nextLeft);
+  await expect(form.locator("measure-combobox").locator(".tag-label")).toHaveAttribute("title", label);
+});
