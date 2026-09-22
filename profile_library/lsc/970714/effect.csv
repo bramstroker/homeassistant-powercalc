@@ -1,0 +1,193 @@
+effect,bri,watt
+Default,5,0.99
+Default,45,1.11
+Default,85,1.32
+Default,125,1.53
+Default,165,1.71
+Default,205,1.91
+Default,245,2.08
+Default,255,2.15
+Mode Color,5,0.94
+Mode Color,45,1.11
+Mode Color,85,1.33
+Mode Color,125,1.53
+Mode Color,165,1.72
+Mode Color,205,1.88
+Mode Color,245,2.1
+Mode Color,255,2.1
+Mode Scene,5,0.91
+Mode Scene,45,1.1
+Mode Scene,85,1.33
+Mode Scene,125,1.5
+Mode Scene,165,1.7
+Mode Scene,205,1.87
+Mode Scene,245,2.07
+Mode Scene,255,2.1
+Night 1,5,0.93
+Night 1,45,1.12
+Night 1,85,1.32
+Night 1,125,1.5
+Night 1,165,1.68
+Night 1,205,1.9
+Night 1,245,2.06
+Night 1,255,2.12
+Night 2,5,0.95
+Night 2,45,1.1
+Night 2,85,1.32
+Night 2,125,1.5
+Night 2,165,1.67
+Night 2,205,1.86
+Night 2,245,2.06
+Night 2,255,2.09
+Read 1,5,0.91
+Read 1,45,1.11
+Read 1,85,1.31
+Read 1,125,1.49
+Read 1,165,1.69
+Read 1,205,1.88
+Read 1,245,2.07
+Read 1,255,2.09
+Read 2,5,0.91
+Read 2,45,1.1
+Read 2,85,1.31
+Read 2,125,1.49
+Read 2,165,1.66
+Read 2,205,1.85
+Read 2,245,2.04
+Read 2,255,2.1
+Meeting,5,0.91
+Meeting,45,1.1
+Meeting,85,1.34
+Meeting,125,1.54
+Meeting,165,1.67
+Meeting,205,1.87
+Meeting,245,2.05
+Meeting,255,2.08
+Working,5,0.94
+Working,45,1.13
+Working,85,1.31
+Working,125,1.5
+Working,165,1.69
+Working,205,1.86
+Working,245,2.04
+Working,255,2.09
+Leisure 1,5,0.9
+Leisure 1,45,1.11
+Leisure 1,85,1.31
+Leisure 1,125,1.52
+Leisure 1,165,1.68
+Leisure 1,205,1.86
+Leisure 1,245,2.05
+Leisure 1,255,2.08
+Leisure 2,5,0.9
+Leisure 2,45,1.09
+Leisure 2,85,1.33
+Leisure 2,125,1.49
+Leisure 2,165,1.68
+Leisure 2,205,1.84
+Leisure 2,245,2.05
+Leisure 2,255,2.1
+Soft,5,0.93
+Soft,45,1.12
+Soft,85,1.31
+Soft,125,1.51
+Soft,165,1.68
+Soft,205,1.88
+Soft,245,2.03
+Soft,255,2.12
+Rainbow,5,0.92
+Rainbow,45,1.13
+Rainbow,85,1.33
+Rainbow,125,1.5
+Rainbow,165,1.68
+Rainbow,205,1.86
+Rainbow,245,2.06
+Rainbow,255,2.05
+Colorful,5,0.91
+Colorful,45,1.09
+Colorful,85,1.33
+Colorful,125,1.47
+Colorful,165,1.68
+Colorful,205,1.83
+Colorful,245,2.05
+Colorful,255,2.07
+Beautiful,5,0.93
+Beautiful,45,1.09
+Beautiful,85,1.3
+Beautiful,125,1.48
+Beautiful,165,1.66
+Beautiful,205,1.87
+Beautiful,245,2.04
+Beautiful,255,2.08
+Forest,5,0.9
+Forest,45,1.1
+Forest,85,1.33
+Forest,125,1.49
+Forest,165,1.68
+Forest,205,1.85
+Forest,245,2.04
+Forest,255,2.05
+Dream,5,0.92
+Dream,45,1.11
+Dream,85,1.32
+Dream,125,1.53
+Dream,165,1.7
+Dream,205,1.87
+Dream,245,2.07
+Dream,255,2.08
+F Style,5,0.94
+F Style,45,1.1
+F Style,85,1.29
+F Style,125,1.48
+F Style,165,1.67
+F Style,205,1.87
+F Style,245,2.03
+F Style,255,2.08
+A Style,5,0.91
+A Style,45,1.1
+A Style,85,1.31
+A Style,125,1.49
+A Style,165,1.66
+A Style,205,1.85
+A Style,245,2.05
+A Style,255,2.07
+Halloween,5,0.94
+Halloween,45,1.07
+Halloween,85,1.35
+Halloween,125,1.49
+Halloween,165,1.68
+Halloween,205,1.85
+Halloween,245,2.03
+Halloween,255,2.09
+Christmas,5,0.94
+Christmas,45,1.12
+Christmas,85,1.33
+Christmas,125,1.49
+Christmas,165,1.67
+Christmas,205,1.83
+Christmas,245,2.05
+Christmas,255,2.09
+Birthday,5,0.92
+Birthday,45,1.1
+Birthday,85,1.3
+Birthday,125,1.48
+Birthday,165,1.7
+Birthday,205,1.83
+Birthday,245,2.04
+Birthday,255,2.1
+Wedding Anniversary,5,0.92
+Wedding Anniversary,45,1.08
+Wedding Anniversary,85,1.3
+Wedding Anniversary,125,1.54
+Wedding Anniversary,165,1.66
+Wedding Anniversary,205,1.87
+Wedding Anniversary,245,2.02
+Wedding Anniversary,255,2.07
+Music,5,0.94
+Music,45,1.13
+Music,85,1.32
+Music,125,1.48
+Music,165,1.7
+Music,205,1.85
+Music,245,2.05
+Music,255,2.08

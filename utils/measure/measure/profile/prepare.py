@@ -96,7 +96,7 @@ class ProfilePreparer:
         manufacturer = self._resolve_manufacturer(metadata.manufacturer)
         self._validate_product_name(str(model.get("name", "")), metadata.manufacturer, manufacturer.primary_names)
         if model.get("calculation_strategy") == "lut" and not csv_names:
-            raise ProfilePreparationError("At least one .csv.gz artifact is required for LUT profiles")
+            raise ProfilePreparationError("At least one CSV artifact is required for LUT profiles")
         self.validator(model, self._read_object(self.model_schema_path))
 
         manufacturer_directory = manufacturer.directory
@@ -136,7 +136,7 @@ class ProfilePreparer:
 
     @staticmethod
     def _artifact_csv_names(artifact_directory: Path) -> list[str]:
-        """Validate the artifact directory layout and return the gzipped CSV file names."""
+        """Validate the artifact directory layout and return plain CSV file names."""
         if not artifact_directory.is_dir():
             raise ProfilePreparationError("Artifact directory does not exist")
         names = {path.name for path in artifact_directory.iterdir() if path.is_file() and not path.is_symlink()}
@@ -147,7 +147,7 @@ class ProfilePreparer:
         unexpected = sorted(names - csv_names - {MODEL_JSON, MANUFACTURER_JSON} - recorder_sources)
         if unexpected:
             raise ProfilePreparationError(f"Unexpected artifact file(s): {', '.join(unexpected)}")
-        return sorted({f"{name.removesuffix('.gz')}.gz" for name in csv_names})
+        return sorted({name.removesuffix(".gz") for name in csv_names})
 
     @staticmethod
     def _apply_metadata(model: dict[str, Any], metadata: ProfileMetadata) -> dict[str, Any]:
@@ -343,9 +343,12 @@ class ProfilePreparer:
         artifact_path = artifact_directory / relative_path.name
         if artifact_path.exists():
             return artifact_path.read_bytes()
-        raw_path = artifact_directory / relative_path.name.removesuffix(".gz")
-        if relative_path.name.endswith(".csv.gz") and raw_path.exists():
-            return gzip.compress(raw_path.read_bytes(), mtime=0)
+        compressed_path = artifact_directory / f"{relative_path.name}.gz"
+        if relative_path.name.endswith(".csv") and compressed_path.exists():
+            try:
+                return gzip.decompress(compressed_path.read_bytes())
+            except (OSError, EOFError) as error:
+                raise ProfilePreparationError(f"Artifact file is not valid gzip: {compressed_path.name}") from error
         raise ProfilePreparationError(f"Artifact file is missing: {relative_path.name}")
 
     def _artifact_aliases(self, artifact_directory: Path) -> list[Any]:

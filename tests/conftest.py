@@ -2,10 +2,12 @@ import asyncio
 from collections.abc import Generator
 import contextlib
 from functools import lru_cache
+import gzip
 import inspect
 import json
 import logging
 import os
+from pathlib import Path
 import shutil
 from typing import Any, cast
 from unittest.mock import AsyncMock, Mock, patch
@@ -140,6 +142,10 @@ def mock_remote_loader(request: SubRequest) -> Generator:
     def side_effect(manufacturer: str, model: str, storage_path: str, _: str) -> None:
         source_dir = get_library_path(f"{manufacturer}/{model}")
         shutil.copytree(source_dir, storage_path, dirs_exist_ok=True)
+        for csv_path in Path(storage_path).rglob("*.csv"):
+            compressed_path = csv_path.with_name(f"{csv_path.name}.gz")
+            compressed_path.write_bytes(gzip.compress(csv_path.read_bytes(), mtime=0))
+            csv_path.unlink()
 
     remote_loader_class = "custom_components.powercalc.power_profile.loader.remote.RemoteLoader"
     with (

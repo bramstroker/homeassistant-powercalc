@@ -61,7 +61,7 @@
     ],
     "rated_power": 36
   },
-  "measure_description": "Fan: Shelly Plug S Gen3 polled every 2 s while a Home Assistant automation stepped through all 12 speeds. Oscillation: on/off delta at the same speed. RGB light (hs.csv.gz): fan at lowest speed, one light command per step, each verified in HA before reading, fan-only baseline re-measured before every saturation row and subtracted. The light only has 3 brightness levels (51/102/153). Its measured range is 0.55-5.88 W. Standby power is an estimate.",
+  "measure_description": "Fan: Shelly Plug S Gen3 polled every 2 s while a Home Assistant automation stepped through all 12 speeds. Oscillation: on/off delta at the same speed. RGB light (hs.csv): fan at lowest speed, one light command per step, each verified in HA before reading, fan-only baseline re-measured before every saturation row and subtracted. The light only has 3 brightness levels (51/102/153). Its measured range is 0.55-5.88 W. Standby power is an estimate.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "mains_voltage": 230,

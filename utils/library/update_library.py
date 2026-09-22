@@ -451,7 +451,10 @@ async def get_power_range(model_directory: str, model_data: dict[str, Any]) -> t
     calculation_strategy = model_data.get("calculation_strategy", "lut")
     if calculation_strategy == "lut":
         max_power = 0
-        paths = glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True)
+        paths = [
+            *glob.glob(f"{model_directory}/**/*.csv", recursive=True),
+            *glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True),
+        ]
 
         # Process CSV files concurrently
         if paths:

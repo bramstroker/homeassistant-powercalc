@@ -1,0 +1,1017 @@
+effect,bri,watt
+Custom,2,1.55
+Custom,3,1.5
+Custom,4,1.6
+Custom,5,1.65
+Custom,6,1.55
+Custom,7,1.6
+Custom,8,1.7
+Custom,9,1.75
+Custom,10,1.9
+Custom,11,1.85
+Custom,12,1.85
+Custom,13,1.75
+Custom,14,1.85
+Custom,15,1.9
+Custom,16,2.05
+Custom,17,1.9
+Custom,18,1.95
+Custom,19,1.9
+Custom,20,2.05
+Custom,21,2.05
+Custom,22,2.15
+Custom,23,2.1
+Custom,24,2.3
+Custom,25,2.35
+Custom,26,2.35
+Custom,27,2.3
+Custom,28,2.3
+Custom,29,2.45
+Custom,30,2.5
+Custom,31,2.45
+Custom,32,2.65
+Custom,33,2.45
+Custom,34,2.5
+Custom,35,2.6
+Custom,36,2.65
+Custom,37,2.65
+Custom,38,2.7
+Custom,39,2.7
+Custom,40,2.7
+Custom,41,2.75
+Custom,42,2.75
+Custom,43,2.8
+Custom,44,2.85
+Custom,45,2.8
+Custom,46,2.8
+Custom,47,3
+Custom,48,2.85
+Custom,49,2.95
+Custom,50,2.95
+Custom,51,3.05
+Custom,52,3.2
+Custom,53,3.1
+Custom,54,3
+Custom,55,3.3
+Custom,56,3.2
+Custom,57,3.3
+Custom,58,3.3
+Custom,59,3.25
+Custom,60,3.4
+Custom,61,3.35
+Custom,62,3.25
+Custom,63,3.35
+Custom,64,3.4
+Custom,65,3.3
+Custom,66,3.35
+Custom,67,3.5
+Custom,68,3.6
+Custom,69,3.6
+Custom,70,3.65
+Custom,71,3.7
+Custom,72,3.8
+Custom,73,3.85
+Custom,74,3.7
+Custom,75,3.75
+Custom,76,3.9
+Custom,77,4
+Custom,78,4
+Custom,79,3.9
+Custom,80,3.9
+Custom,81,3.95
+Custom,82,4
+Custom,83,4.15
+Custom,84,4.1
+Custom,85,4.05
+Custom,86,4.1
+Custom,87,4.1
+Custom,88,4.3
+Custom,89,4.3
+Custom,90,4.4
+Custom,91,4.3
+Custom,92,4.5
+Custom,93,4.3
+Custom,94,4.4
+Custom,95,4.55
+Custom,96,4.45
+Custom,97,4.55
+Custom,98,4.4
+Custom,99,4.65
+Custom,100,4.6
+Custom,101,4.8
+Custom,102,4.7
+Custom,103,4.65
+Custom,104,4.8
+Custom,105,4.9
+Custom,106,4.8
+Custom,107,5
+Custom,108,4.9
+Custom,109,5.1
+Custom,110,5.05
+Custom,111,5
+Custom,112,5.1
+Custom,113,5.1
+Custom,114,5.25
+Custom,115,5.2
+Custom,116,5.15
+Custom,117,5.3
+Custom,118,5.35
+Custom,119,5.35
+Custom,120,5.3
+Custom,121,5.3
+Custom,122,5.4
+Custom,123,5.45
+Custom,124,5.5
+Custom,125,5.55
+Custom,126,5.4
+Custom,127,5.5
+Custom,128,5.55
+Custom,129,5.6
+Custom,130,5.6
+Custom,131,5.65
+Custom,132,5.65
+Custom,133,5.65
+Custom,134,5.75
+Custom,135,5.7
+Custom,136,5.7
+Custom,137,5.85
+Custom,138,5.8
+Custom,139,6.1
+Custom,140,6.05
+Custom,141,6.1
+Custom,142,6
+Custom,143,6
+Custom,144,6.2
+Custom,145,6.2
+Custom,146,6.3
+Custom,147,6.2
+Custom,148,6.3
+Custom,149,6.2
+Custom,150,6.5
+Custom,151,6.5
+Custom,152,6.5
+Custom,153,6.5
+Custom,154,6.55
+Custom,155,6.6
+Custom,156,6.6
+Custom,157,6.65
+Custom,158,6.65
+Custom,159,6.65
+Custom,160,6.6
+Custom,161,6.8
+Custom,162,6.75
+Custom,163,6.8
+Custom,164,6.8
+Custom,165,6.95
+Custom,166,6.85
+Custom,167,6.8
+Custom,168,7
+Custom,169,6.9
+Custom,170,7
+Custom,171,7.1
+Custom,172,7.05
+Custom,173,7.05
+Custom,174,7.15
+Custom,175,7.15
+Custom,176,7.1
+Custom,177,7.3
+Custom,178,7.2
+Custom,179,7.25
+Custom,180,7.35
+Custom,181,7.45
+Custom,182,7.25
+Custom,183,7.4
+Custom,184,7.45
+Custom,185,7.55
+Custom,186,7.5
+Custom,187,7.5
+Custom,188,7.5
+Custom,189,7.5
+Custom,190,7.6
+Custom,191,7.7
+Custom,192,7.6
+Custom,193,7.65
+Custom,194,7.8
+Custom,195,7.75
+Custom,196,7.85
+Custom,197,7.85
+Custom,198,7.95
+Custom,199,7.85
+Custom,200,8
+Custom,201,7.95
+Custom,202,7.9
+Custom,203,8.1
+Custom,204,8
+Custom,205,8.2
+Custom,206,8.15
+Custom,207,8.15
+Custom,208,8.35
+Custom,209,8.3
+Custom,210,8.2
+Custom,211,8.3
+Custom,212,8.5
+Custom,213,8.55
+Custom,214,8.35
+Custom,215,8.5
+Custom,216,8.6
+Custom,217,8.55
+Custom,218,8.6
+Custom,219,8.65
+Custom,220,8.7
+Custom,221,8.7
+Custom,222,8.8
+Custom,223,8.7
+Custom,224,8.9
+Custom,225,8.8
+Custom,226,8.85
+Custom,227,8.95
+Custom,228,8.9
+Custom,229,8.95
+Custom,230,9
+Custom,231,9
+Custom,232,9.1
+Custom,233,9.05
+Custom,234,9.25
+Custom,235,9.2
+Custom,236,9.25
+Custom,237,9.35
+Custom,238,9.4
+Custom,239,9.4
+Custom,240,9.45
+Custom,241,9.45
+Custom,242,9.45
+Custom,243,9.45
+Custom,244,9.5
+Custom,245,9.6
+Custom,246,9.5
+Custom,247,9.6
+Custom,248,9.6
+Custom,249,9.65
+Custom,250,9.6
+Custom,251,9.65
+Custom,252,9.55
+Custom,253,9.55
+Custom,254,9.55
+Custom,255,9.7
+Mobile Phone Computer,2,1.55
+Mobile Phone Computer,3,1.5
+Mobile Phone Computer,4,1.6
+Mobile Phone Computer,5,1.65
+Mobile Phone Computer,6,1.55
+Mobile Phone Computer,7,1.6
+Mobile Phone Computer,8,1.7
+Mobile Phone Computer,9,1.75
+Mobile Phone Computer,10,1.9
+Mobile Phone Computer,11,1.85
+Mobile Phone Computer,12,1.85
+Mobile Phone Computer,13,1.75
+Mobile Phone Computer,14,1.85
+Mobile Phone Computer,15,1.9
+Mobile Phone Computer,16,2.05
+Mobile Phone Computer,17,1.9
+Mobile Phone Computer,18,1.95
+Mobile Phone Computer,19,1.9
+Mobile Phone Computer,20,2.05
+Mobile Phone Computer,21,2.05
+Mobile Phone Computer,22,2.15
+Mobile Phone Computer,23,2.1
+Mobile Phone Computer,24,2.3
+Mobile Phone Computer,25,2.35
+Mobile Phone Computer,26,2.35
+Mobile Phone Computer,27,2.3
+Mobile Phone Computer,28,2.3
+Mobile Phone Computer,29,2.45
+Mobile Phone Computer,30,2.5
+Mobile Phone Computer,31,2.45
+Mobile Phone Computer,32,2.65
+Mobile Phone Computer,33,2.45
+Mobile Phone Computer,34,2.5
+Mobile Phone Computer,35,2.6
+Mobile Phone Computer,36,2.65
+Mobile Phone Computer,37,2.65
+Mobile Phone Computer,38,2.7
+Mobile Phone Computer,39,2.7
+Mobile Phone Computer,40,2.7
+Mobile Phone Computer,41,2.75
+Mobile Phone Computer,42,2.75
+Mobile Phone Computer,43,2.8
+Mobile Phone Computer,44,2.85
+Mobile Phone Computer,45,2.8
+Mobile Phone Computer,46,2.8
+Mobile Phone Computer,47,3
+Mobile Phone Computer,48,2.85
+Mobile Phone Computer,49,2.95
+Mobile Phone Computer,50,2.95
+Mobile Phone Computer,51,3.05
+Mobile Phone Computer,52,3.2
+Mobile Phone Computer,53,3.1
+Mobile Phone Computer,54,3
+Mobile Phone Computer,55,3.3
+Mobile Phone Computer,56,3.2
+Mobile Phone Computer,57,3.3
+Mobile Phone Computer,58,3.3
+Mobile Phone Computer,59,3.25
+Mobile Phone Computer,60,3.4
+Mobile Phone Computer,61,3.35
+Mobile Phone Computer,62,3.25
+Mobile Phone Computer,63,3.35
+Mobile Phone Computer,64,3.4
+Mobile Phone Computer,65,3.3
+Mobile Phone Computer,66,3.35
+Mobile Phone Computer,67,3.5
+Mobile Phone Computer,68,3.6
+Mobile Phone Computer,69,3.6
+Mobile Phone Computer,70,3.65
+Mobile Phone Computer,71,3.7
+Mobile Phone Computer,72,3.8
+Mobile Phone Computer,73,3.85
+Mobile Phone Computer,74,3.7
+Mobile Phone Computer,75,3.75
+Mobile Phone Computer,76,3.9
+Mobile Phone Computer,77,4
+Mobile Phone Computer,78,4
+Mobile Phone Computer,79,3.9
+Mobile Phone Computer,80,3.9
+Mobile Phone Computer,81,3.95
+Mobile Phone Computer,82,4
+Mobile Phone Computer,83,4.15
+Mobile Phone Computer,84,4.1
+Mobile Phone Computer,85,4.05
+Mobile Phone Computer,86,4.1
+Mobile Phone Computer,87,4.1
+Mobile Phone Computer,88,4.3
+Mobile Phone Computer,89,4.3
+Mobile Phone Computer,90,4.4
+Mobile Phone Computer,91,4.3
+Mobile Phone Computer,92,4.5
+Mobile Phone Computer,93,4.3
+Mobile Phone Computer,94,4.4
+Mobile Phone Computer,95,4.55
+Mobile Phone Computer,96,4.45
+Mobile Phone Computer,97,4.55
+Mobile Phone Computer,98,4.4
+Mobile Phone Computer,99,4.65
+Mobile Phone Computer,100,4.6
+Mobile Phone Computer,101,4.8
+Mobile Phone Computer,102,4.7
+Mobile Phone Computer,103,4.65
+Mobile Phone Computer,104,4.8
+Mobile Phone Computer,105,4.9
+Mobile Phone Computer,106,4.8
+Mobile Phone Computer,107,5
+Mobile Phone Computer,108,4.9
+Mobile Phone Computer,109,5.1
+Mobile Phone Computer,110,5.05
+Mobile Phone Computer,111,5
+Mobile Phone Computer,112,5.1
+Mobile Phone Computer,113,5.1
+Mobile Phone Computer,114,5.25
+Mobile Phone Computer,115,5.2
+Mobile Phone Computer,116,5.15
+Mobile Phone Computer,117,5.3
+Mobile Phone Computer,118,5.35
+Mobile Phone Computer,119,5.35
+Mobile Phone Computer,120,5.3
+Mobile Phone Computer,121,5.3
+Mobile Phone Computer,122,5.4
+Mobile Phone Computer,123,5.45
+Mobile Phone Computer,124,5.5
+Mobile Phone Computer,125,5.55
+Mobile Phone Computer,126,5.4
+Mobile Phone Computer,127,5.5
+Mobile Phone Computer,128,5.55
+Mobile Phone Computer,129,5.6
+Mobile Phone Computer,130,5.6
+Mobile Phone Computer,131,5.65
+Mobile Phone Computer,132,5.65
+Mobile Phone Computer,133,5.65
+Mobile Phone Computer,134,5.75
+Mobile Phone Computer,135,5.7
+Mobile Phone Computer,136,5.7
+Mobile Phone Computer,137,5.85
+Mobile Phone Computer,138,5.8
+Mobile Phone Computer,139,6.1
+Mobile Phone Computer,140,6.05
+Mobile Phone Computer,141,6.1
+Mobile Phone Computer,142,6
+Mobile Phone Computer,143,6
+Mobile Phone Computer,144,6.2
+Mobile Phone Computer,145,6.2
+Mobile Phone Computer,146,6.3
+Mobile Phone Computer,147,6.2
+Mobile Phone Computer,148,6.3
+Mobile Phone Computer,149,6.2
+Mobile Phone Computer,150,6.5
+Mobile Phone Computer,151,6.5
+Mobile Phone Computer,152,6.5
+Mobile Phone Computer,153,6.5
+Mobile Phone Computer,154,6.55
+Mobile Phone Computer,155,6.6
+Mobile Phone Computer,156,6.6
+Mobile Phone Computer,157,6.65
+Mobile Phone Computer,158,6.65
+Mobile Phone Computer,159,6.65
+Mobile Phone Computer,160,6.6
+Mobile Phone Computer,161,6.8
+Mobile Phone Computer,162,6.75
+Mobile Phone Computer,163,6.8
+Mobile Phone Computer,164,6.8
+Mobile Phone Computer,165,6.95
+Mobile Phone Computer,166,6.85
+Mobile Phone Computer,167,6.8
+Mobile Phone Computer,168,7
+Mobile Phone Computer,169,6.9
+Mobile Phone Computer,170,7
+Mobile Phone Computer,171,7.1
+Mobile Phone Computer,172,7.05
+Mobile Phone Computer,173,7.05
+Mobile Phone Computer,174,7.15
+Mobile Phone Computer,175,7.15
+Mobile Phone Computer,176,7.1
+Mobile Phone Computer,177,7.3
+Mobile Phone Computer,178,7.2
+Mobile Phone Computer,179,7.25
+Mobile Phone Computer,180,7.35
+Mobile Phone Computer,181,7.45
+Mobile Phone Computer,182,7.25
+Mobile Phone Computer,183,7.4
+Mobile Phone Computer,184,7.45
+Mobile Phone Computer,185,7.55
+Mobile Phone Computer,186,7.5
+Mobile Phone Computer,187,7.5
+Mobile Phone Computer,188,7.5
+Mobile Phone Computer,189,7.5
+Mobile Phone Computer,190,7.6
+Mobile Phone Computer,191,7.7
+Mobile Phone Computer,192,7.6
+Mobile Phone Computer,193,7.65
+Mobile Phone Computer,194,7.8
+Mobile Phone Computer,195,7.75
+Mobile Phone Computer,196,7.85
+Mobile Phone Computer,197,7.85
+Mobile Phone Computer,198,7.95
+Mobile Phone Computer,199,7.85
+Mobile Phone Computer,200,8
+Mobile Phone Computer,201,7.95
+Mobile Phone Computer,202,7.9
+Mobile Phone Computer,203,8.1
+Mobile Phone Computer,204,8
+Mobile Phone Computer,205,8.2
+Mobile Phone Computer,206,8.15
+Mobile Phone Computer,207,8.15
+Mobile Phone Computer,208,8.35
+Mobile Phone Computer,209,8.3
+Mobile Phone Computer,210,8.2
+Mobile Phone Computer,211,8.3
+Mobile Phone Computer,212,8.5
+Mobile Phone Computer,213,8.55
+Mobile Phone Computer,214,8.35
+Mobile Phone Computer,215,8.5
+Mobile Phone Computer,216,8.6
+Mobile Phone Computer,217,8.55
+Mobile Phone Computer,218,8.6
+Mobile Phone Computer,219,8.65
+Mobile Phone Computer,220,8.7
+Mobile Phone Computer,221,8.7
+Mobile Phone Computer,222,8.8
+Mobile Phone Computer,223,8.7
+Mobile Phone Computer,224,8.9
+Mobile Phone Computer,225,8.8
+Mobile Phone Computer,226,8.85
+Mobile Phone Computer,227,8.95
+Mobile Phone Computer,228,8.9
+Mobile Phone Computer,229,8.95
+Mobile Phone Computer,230,9
+Mobile Phone Computer,231,9
+Mobile Phone Computer,232,9.1
+Mobile Phone Computer,233,9.05
+Mobile Phone Computer,234,9.25
+Mobile Phone Computer,235,9.2
+Mobile Phone Computer,236,9.25
+Mobile Phone Computer,237,9.35
+Mobile Phone Computer,238,9.4
+Mobile Phone Computer,239,9.4
+Mobile Phone Computer,240,9.45
+Mobile Phone Computer,241,9.45
+Mobile Phone Computer,242,9.45
+Mobile Phone Computer,243,9.45
+Mobile Phone Computer,244,9.5
+Mobile Phone Computer,245,9.6
+Mobile Phone Computer,246,9.5
+Mobile Phone Computer,247,9.6
+Mobile Phone Computer,248,9.6
+Mobile Phone Computer,249,9.65
+Mobile Phone Computer,250,9.6
+Mobile Phone Computer,251,9.65
+Mobile Phone Computer,252,9.55
+Mobile Phone Computer,253,9.55
+Mobile Phone Computer,254,9.55
+Mobile Phone Computer,255,9.7
+Child Mode,2,1.55
+Child Mode,3,1.5
+Child Mode,4,1.6
+Child Mode,5,1.65
+Child Mode,6,1.55
+Child Mode,7,1.6
+Child Mode,8,1.7
+Child Mode,9,1.75
+Child Mode,10,1.9
+Child Mode,11,1.85
+Child Mode,12,1.85
+Child Mode,13,1.75
+Child Mode,14,1.85
+Child Mode,15,1.9
+Child Mode,16,2.05
+Child Mode,17,1.9
+Child Mode,18,1.95
+Child Mode,19,1.9
+Child Mode,20,2.05
+Child Mode,21,2.05
+Child Mode,22,2.15
+Child Mode,23,2.1
+Child Mode,24,2.3
+Child Mode,25,2.35
+Child Mode,26,2.35
+Child Mode,27,2.3
+Child Mode,28,2.3
+Child Mode,29,2.45
+Child Mode,30,2.5
+Child Mode,31,2.45
+Child Mode,32,2.65
+Child Mode,33,2.45
+Child Mode,34,2.5
+Child Mode,35,2.6
+Child Mode,36,2.65
+Child Mode,37,2.65
+Child Mode,38,2.7
+Child Mode,39,2.7
+Child Mode,40,2.7
+Child Mode,41,2.75
+Child Mode,42,2.75
+Child Mode,43,2.8
+Child Mode,44,2.85
+Child Mode,45,2.8
+Child Mode,46,2.8
+Child Mode,47,3
+Child Mode,48,2.85
+Child Mode,49,2.95
+Child Mode,50,2.95
+Child Mode,51,3.05
+Child Mode,52,3.2
+Child Mode,53,3.1
+Child Mode,54,3
+Child Mode,55,3.3
+Child Mode,56,3.2
+Child Mode,57,3.3
+Child Mode,58,3.3
+Child Mode,59,3.25
+Child Mode,60,3.4
+Child Mode,61,3.35
+Child Mode,62,3.25
+Child Mode,63,3.35
+Child Mode,64,3.4
+Child Mode,65,3.3
+Child Mode,66,3.35
+Child Mode,67,3.5
+Child Mode,68,3.6
+Child Mode,69,3.6
+Child Mode,70,3.65
+Child Mode,71,3.7
+Child Mode,72,3.8
+Child Mode,73,3.85
+Child Mode,74,3.7
+Child Mode,75,3.75
+Child Mode,76,3.9
+Child Mode,77,4
+Child Mode,78,4
+Child Mode,79,3.9
+Child Mode,80,3.9
+Child Mode,81,3.95
+Child Mode,82,4
+Child Mode,83,4.15
+Child Mode,84,4.1
+Child Mode,85,4.05
+Child Mode,86,4.1
+Child Mode,87,4.1
+Child Mode,88,4.3
+Child Mode,89,4.3
+Child Mode,90,4.4
+Child Mode,91,4.3
+Child Mode,92,4.5
+Child Mode,93,4.3
+Child Mode,94,4.4
+Child Mode,95,4.55
+Child Mode,96,4.45
+Child Mode,97,4.55
+Child Mode,98,4.4
+Child Mode,99,4.65
+Child Mode,100,4.6
+Child Mode,101,4.8
+Child Mode,102,4.7
+Child Mode,103,4.65
+Child Mode,104,4.8
+Child Mode,105,4.9
+Child Mode,106,4.8
+Child Mode,107,5
+Child Mode,108,4.9
+Child Mode,109,5.1
+Child Mode,110,5.05
+Child Mode,111,5
+Child Mode,112,5.1
+Child Mode,113,5.1
+Child Mode,114,5.25
+Child Mode,115,5.2
+Child Mode,116,5.15
+Child Mode,117,5.3
+Child Mode,118,5.35
+Child Mode,119,5.35
+Child Mode,120,5.3
+Child Mode,121,5.3
+Child Mode,122,5.4
+Child Mode,123,5.45
+Child Mode,124,5.5
+Child Mode,125,5.55
+Child Mode,126,5.4
+Child Mode,127,5.5
+Child Mode,128,5.55
+Child Mode,129,5.6
+Child Mode,130,5.6
+Child Mode,131,5.65
+Child Mode,132,5.65
+Child Mode,133,5.65
+Child Mode,134,5.75
+Child Mode,135,5.7
+Child Mode,136,5.7
+Child Mode,137,5.85
+Child Mode,138,5.8
+Child Mode,139,6.1
+Child Mode,140,6.05
+Child Mode,141,6.1
+Child Mode,142,6
+Child Mode,143,6
+Child Mode,144,6.2
+Child Mode,145,6.2
+Child Mode,146,6.3
+Child Mode,147,6.2
+Child Mode,148,6.3
+Child Mode,149,6.2
+Child Mode,150,6.5
+Child Mode,151,6.5
+Child Mode,152,6.5
+Child Mode,153,6.5
+Child Mode,154,6.55
+Child Mode,155,6.6
+Child Mode,156,6.6
+Child Mode,157,6.65
+Child Mode,158,6.65
+Child Mode,159,6.65
+Child Mode,160,6.6
+Child Mode,161,6.8
+Child Mode,162,6.75
+Child Mode,163,6.8
+Child Mode,164,6.8
+Child Mode,165,6.95
+Child Mode,166,6.85
+Child Mode,167,6.8
+Child Mode,168,7
+Child Mode,169,6.9
+Child Mode,170,7
+Child Mode,171,7.1
+Child Mode,172,7.05
+Child Mode,173,7.05
+Child Mode,174,7.15
+Child Mode,175,7.15
+Child Mode,176,7.1
+Child Mode,177,7.3
+Child Mode,178,7.2
+Child Mode,179,7.25
+Child Mode,180,7.35
+Child Mode,181,7.45
+Child Mode,182,7.25
+Child Mode,183,7.4
+Child Mode,184,7.45
+Child Mode,185,7.55
+Child Mode,186,7.5
+Child Mode,187,7.5
+Child Mode,188,7.5
+Child Mode,189,7.5
+Child Mode,190,7.6
+Child Mode,191,7.7
+Child Mode,192,7.6
+Child Mode,193,7.65
+Child Mode,194,7.8
+Child Mode,195,7.75
+Child Mode,196,7.85
+Child Mode,197,7.85
+Child Mode,198,7.95
+Child Mode,199,7.85
+Child Mode,200,8
+Child Mode,201,7.95
+Child Mode,202,7.9
+Child Mode,203,8.1
+Child Mode,204,8
+Child Mode,205,8.2
+Child Mode,206,8.15
+Child Mode,207,8.15
+Child Mode,208,8.35
+Child Mode,209,8.3
+Child Mode,210,8.2
+Child Mode,211,8.3
+Child Mode,212,8.5
+Child Mode,213,8.55
+Child Mode,214,8.35
+Child Mode,215,8.5
+Child Mode,216,8.6
+Child Mode,217,8.55
+Child Mode,218,8.6
+Child Mode,219,8.65
+Child Mode,220,8.7
+Child Mode,221,8.7
+Child Mode,222,8.8
+Child Mode,223,8.7
+Child Mode,224,8.9
+Child Mode,225,8.8
+Child Mode,226,8.85
+Child Mode,227,8.95
+Child Mode,228,8.9
+Child Mode,229,8.95
+Child Mode,230,9
+Child Mode,231,9
+Child Mode,232,9.1
+Child Mode,233,9.05
+Child Mode,234,9.25
+Child Mode,235,9.2
+Child Mode,236,9.25
+Child Mode,237,9.35
+Child Mode,238,9.4
+Child Mode,239,9.4
+Child Mode,240,9.45
+Child Mode,241,9.45
+Child Mode,242,9.45
+Child Mode,243,9.45
+Child Mode,244,9.5
+Child Mode,245,9.6
+Child Mode,246,9.5
+Child Mode,247,9.6
+Child Mode,248,9.6
+Child Mode,249,9.65
+Child Mode,250,9.6
+Child Mode,251,9.65
+Child Mode,252,9.55
+Child Mode,253,9.55
+Child Mode,254,9.55
+Child Mode,255,9.7
+Adult Reading,2,1.55
+Adult Reading,3,1.5
+Adult Reading,4,1.6
+Adult Reading,5,1.65
+Adult Reading,6,1.55
+Adult Reading,7,1.6
+Adult Reading,8,1.7
+Adult Reading,9,1.75
+Adult Reading,10,1.9
+Adult Reading,11,1.85
+Adult Reading,12,1.85
+Adult Reading,13,1.75
+Adult Reading,14,1.85
+Adult Reading,15,1.9
+Adult Reading,16,2.05
+Adult Reading,17,1.9
+Adult Reading,18,1.95
+Adult Reading,19,1.9
+Adult Reading,20,2.05
+Adult Reading,21,2.05
+Adult Reading,22,2.15
+Adult Reading,23,2.1
+Adult Reading,24,2.3
+Adult Reading,25,2.35
+Adult Reading,26,2.35
+Adult Reading,27,2.3
+Adult Reading,28,2.3
+Adult Reading,29,2.45
+Adult Reading,30,2.5
+Adult Reading,31,2.45
+Adult Reading,32,2.65
+Adult Reading,33,2.45
+Adult Reading,34,2.5
+Adult Reading,35,2.6
+Adult Reading,36,2.65
+Adult Reading,37,2.65
+Adult Reading,38,2.7
+Adult Reading,39,2.7
+Adult Reading,40,2.7
+Adult Reading,41,2.75
+Adult Reading,42,2.75
+Adult Reading,43,2.8
+Adult Reading,44,2.85
+Adult Reading,45,2.8
+Adult Reading,46,2.8
+Adult Reading,47,3
+Adult Reading,48,2.85
+Adult Reading,49,2.95
+Adult Reading,50,2.95
+Adult Reading,51,3.05
+Adult Reading,52,3.2
+Adult Reading,53,3.1
+Adult Reading,54,3
+Adult Reading,55,3.3
+Adult Reading,56,3.2
+Adult Reading,57,3.3
+Adult Reading,58,3.3
+Adult Reading,59,3.25
+Adult Reading,60,3.4
+Adult Reading,61,3.35
+Adult Reading,62,3.25
+Adult Reading,63,3.35
+Adult Reading,64,3.4
+Adult Reading,65,3.3
+Adult Reading,66,3.35
+Adult Reading,67,3.5
+Adult Reading,68,3.6
+Adult Reading,69,3.6
+Adult Reading,70,3.65
+Adult Reading,71,3.7
+Adult Reading,72,3.8
+Adult Reading,73,3.85
+Adult Reading,74,3.7
+Adult Reading,75,3.75
+Adult Reading,76,3.9
+Adult Reading,77,4
+Adult Reading,78,4
+Adult Reading,79,3.9
+Adult Reading,80,3.9
+Adult Reading,81,3.95
+Adult Reading,82,4
+Adult Reading,83,4.15
+Adult Reading,84,4.1
+Adult Reading,85,4.05
+Adult Reading,86,4.1
+Adult Reading,87,4.1
+Adult Reading,88,4.3
+Adult Reading,89,4.3
+Adult Reading,90,4.4
+Adult Reading,91,4.3
+Adult Reading,92,4.5
+Adult Reading,93,4.3
+Adult Reading,94,4.4
+Adult Reading,95,4.55
+Adult Reading,96,4.45
+Adult Reading,97,4.55
+Adult Reading,98,4.4
+Adult Reading,99,4.65
+Adult Reading,100,4.6
+Adult Reading,101,4.8
+Adult Reading,102,4.7
+Adult Reading,103,4.65
+Adult Reading,104,4.8
+Adult Reading,105,4.9
+Adult Reading,106,4.8
+Adult Reading,107,5
+Adult Reading,108,4.9
+Adult Reading,109,5.1
+Adult Reading,110,5.05
+Adult Reading,111,5
+Adult Reading,112,5.1
+Adult Reading,113,5.1
+Adult Reading,114,5.25
+Adult Reading,115,5.2
+Adult Reading,116,5.15
+Adult Reading,117,5.3
+Adult Reading,118,5.35
+Adult Reading,119,5.35
+Adult Reading,120,5.3
+Adult Reading,121,5.3
+Adult Reading,122,5.4
+Adult Reading,123,5.45
+Adult Reading,124,5.5
+Adult Reading,125,5.55
+Adult Reading,126,5.4
+Adult Reading,127,5.5
+Adult Reading,128,5.55
+Adult Reading,129,5.6
+Adult Reading,130,5.6
+Adult Reading,131,5.65
+Adult Reading,132,5.65
+Adult Reading,133,5.65
+Adult Reading,134,5.75
+Adult Reading,135,5.7
+Adult Reading,136,5.7
+Adult Reading,137,5.85
+Adult Reading,138,5.8
+Adult Reading,139,6.1
+Adult Reading,140,6.05
+Adult Reading,141,6.1
+Adult Reading,142,6
+Adult Reading,143,6
+Adult Reading,144,6.2
+Adult Reading,145,6.2
+Adult Reading,146,6.3
+Adult Reading,147,6.2
+Adult Reading,148,6.3
+Adult Reading,149,6.2
+Adult Reading,150,6.5
+Adult Reading,151,6.5
+Adult Reading,152,6.5
+Adult Reading,153,6.5
+Adult Reading,154,6.55
+Adult Reading,155,6.6
+Adult Reading,156,6.6
+Adult Reading,157,6.65
+Adult Reading,158,6.65
+Adult Reading,159,6.65
+Adult Reading,160,6.6
+Adult Reading,161,6.8
+Adult Reading,162,6.75
+Adult Reading,163,6.8
+Adult Reading,164,6.8
+Adult Reading,165,6.95
+Adult Reading,166,6.85
+Adult Reading,167,6.8
+Adult Reading,168,7
+Adult Reading,169,6.9
+Adult Reading,170,7
+Adult Reading,171,7.1
+Adult Reading,172,7.05
+Adult Reading,173,7.05
+Adult Reading,174,7.15
+Adult Reading,175,7.15
+Adult Reading,176,7.1
+Adult Reading,177,7.3
+Adult Reading,178,7.2
+Adult Reading,179,7.25
+Adult Reading,180,7.35
+Adult Reading,181,7.45
+Adult Reading,182,7.25
+Adult Reading,183,7.4
+Adult Reading,184,7.45
+Adult Reading,185,7.55
+Adult Reading,186,7.5
+Adult Reading,187,7.5
+Adult Reading,188,7.5
+Adult Reading,189,7.5
+Adult Reading,190,7.6
+Adult Reading,191,7.7
+Adult Reading,192,7.6
+Adult Reading,193,7.65
+Adult Reading,194,7.8
+Adult Reading,195,7.75
+Adult Reading,196,7.85
+Adult Reading,197,7.85
+Adult Reading,198,7.95
+Adult Reading,199,7.85
+Adult Reading,200,8
+Adult Reading,201,7.95
+Adult Reading,202,7.9
+Adult Reading,203,8.1
+Adult Reading,204,8
+Adult Reading,205,8.2
+Adult Reading,206,8.15
+Adult Reading,207,8.15
+Adult Reading,208,8.35
+Adult Reading,209,8.3
+Adult Reading,210,8.2
+Adult Reading,211,8.3
+Adult Reading,212,8.5
+Adult Reading,213,8.55
+Adult Reading,214,8.35
+Adult Reading,215,8.5
+Adult Reading,216,8.6
+Adult Reading,217,8.55
+Adult Reading,218,8.6
+Adult Reading,219,8.65
+Adult Reading,220,8.7
+Adult Reading,221,8.7
+Adult Reading,222,8.8
+Adult Reading,223,8.7
+Adult Reading,224,8.9
+Adult Reading,225,8.8
+Adult Reading,226,8.85
+Adult Reading,227,8.95
+Adult Reading,228,8.9
+Adult Reading,229,8.95
+Adult Reading,230,9
+Adult Reading,231,9
+Adult Reading,232,9.1
+Adult Reading,233,9.05
+Adult Reading,234,9.25
+Adult Reading,235,9.2
+Adult Reading,236,9.25
+Adult Reading,237,9.35
+Adult Reading,238,9.4
+Adult Reading,239,9.4
+Adult Reading,240,9.45
+Adult Reading,241,9.45
+Adult Reading,242,9.45
+Adult Reading,243,9.45
+Adult Reading,244,9.5
+Adult Reading,245,9.6
+Adult Reading,246,9.5
+Adult Reading,247,9.6
+Adult Reading,248,9.6
+Adult Reading,249,9.65
+Adult Reading,250,9.6
+Adult Reading,251,9.65
+Adult Reading,252,9.55
+Adult Reading,253,9.55
+Adult Reading,254,9.55
+Adult Reading,255,9.7
