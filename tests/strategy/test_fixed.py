@@ -70,6 +70,20 @@ async def test_states_power(hass: HomeAssistant) -> None:
     assert await strategy.calculate(State(source_entity.entity_id, "whatever")) == 20
 
 
+async def test_off_state_power_can_calculate_standby(hass: HomeAssistant) -> None:
+    source_entity = create_source_entity("light.test", hass)
+    strategy = await _create_strategy(
+        hass,
+        {
+            CONF_POWER: 20,
+            CONF_STATES_POWER: {STATE_OFF: 1.5},
+        },
+        source_entity,
+    )
+
+    assert strategy.can_calculate_standby()
+
+
 async def test_states_power_with_template(hass: HomeAssistant) -> None:
     assert await async_setup_component(
         hass,

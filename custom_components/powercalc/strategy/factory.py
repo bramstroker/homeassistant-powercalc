@@ -300,7 +300,11 @@ class PowerCalculatorStrategyFactory:
     def _create_multi_switch(self, config: ConfigType, power_profile: PowerProfile | None) -> MultiSwitchStrategy:
         """Create instance of multi switch strategy."""
         multi_switch_config: ConfigType = {}
-        if power_profile and power_profile.multi_switch_config:
+        if (
+            power_profile
+            and power_profile.is_strategy_supported(CalculationStrategy.MULTI_SWITCH)
+            and power_profile.multi_switch_config
+        ):
             # Copy to avoid mutating the (potentially cached) profile config with the user's config below.
             multi_switch_config = dict(power_profile.multi_switch_config)
         multi_switch_config.update(config.get(CONF_MULTI_SWITCH, {}))
@@ -319,7 +323,7 @@ class PowerCalculatorStrategyFactory:
             self._hass,
             entities,
             on_power=Decimal(on_power),
-            off_power=Decimal(off_power) if off_power else None,
+            off_power=Decimal(off_power) if off_power is not None else None,
         )
 
     def _resolve_template(self, value: Any) -> Any:  # noqa: ANN401
