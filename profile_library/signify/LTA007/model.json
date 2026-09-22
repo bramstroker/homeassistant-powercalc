@@ -1,6 +1,7 @@
 {
   "aliases": [
-    "929002478301"
+    "929002478301",
+    "9290024783"
   ],
   "authors": [
     {
@@ -15,7 +16,7 @@
       "zigbee",
       "bluetooth"
     ],
-    "form_factor": "bulb",
+    "form_factor": "filament",
     "lumens": 550,
     "rated_power": 7,
     "socket": "E26"
@@ -38,7 +39,7 @@
   },
   "name": "Hue White Ambiance A19 Filament with Bluetooth",
   "product_url": "https://www.philips-hue.com/en-us/p/hue-white-ambiance-filament-a19-e26-smart-bulb/046677563578",
-  "standby_power": 0.05,
+  "standby_power": 0.25,
   "standby_power_estimated": true,
   "voltage_range": {
     "max": 125.4,
