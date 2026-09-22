@@ -34,7 +34,6 @@
     "VERSION": "v0.7.1:app"
   },
   "name": "Hue White Ambiance BR30 with Bluetooth",
-  "product_url": "https://www.bestbuy.com/product/philips-hue-br30-bluetooth-smart-led-bulb-white/J7GHXK9SJ8",
   "standby_power": 0.18,
   "voltage_range": {
     "max": 125.27,
