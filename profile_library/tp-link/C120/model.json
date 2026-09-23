@@ -1,0 +1,41 @@
+{
+  "calculation_strategy": "fixed",
+  "compatible_integrations": [
+    "tapo_control"
+  ],
+  "created_at": "2026-09-23T21:30:00Z",
+  "device_type": "camera",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "discovery_by": "device",
+  "fields": {
+    "privacy_entity": {
+      "label": "Privacy mode switch",
+      "description": "The camera's Privacy switch (tapo_control creates it as switch.<camera>_privacy). While it is on, the lens is closed and the image sensor and IR LEDs are off.",
+      "selector": {
+        "entity": {
+          "domain": "switch"
+        }
+      }
+    }
+  },
+  "fixed_config": {
+    "power": "{{ 2.1 if is_state('[[privacy_entity]]', 'on') else (3.2 if is_state('sun.sun', 'below_horizon') else 2.3) }}"
+  },
+  "measure_description": "Measured manually with a Shelly Plus Plug UK, polling its Switch.GetStatus apower every 2 s and averaging, with the camera on its own USB adapter (the adapter's draw is included). Privacy mode on: 2.1 W; watching by day (night vision forced off, colour image): 2.3 W; watching at night (night vision forced on, IR LEDs lit, black-and-white image): 3.2 W. 60-90 s per state after settling, repeated privacy readings agreed within 0.05 W. tapo_control exposes no day/night sensor, so with night vision on auto the sun is used as the proxy for IR. Firmware 1.9.3 Build 260521. ",
+  "measure_device": "Shelly Plus Plug UK",
+  "measure_method": "manual",
+  "mains_voltage": 230,
+  "min_version": "1.20.3",
+  "name": "Tapo C120 Indoor/Outdoor Home Security Wi-Fi Camera",
+  "product_url": "https://www.tp-link.com/uk/home-networking/cloud-camera/tapo-c120/",
+  "authors": [
+    {
+      "name": "Laurens",
+      "github": "LaurensBot"
+    }
+  ]
+}
