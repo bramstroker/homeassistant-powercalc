@@ -24,7 +24,7 @@
   },
   "name": "Outdoor spotlights 2",
   "product_url": "https://eu.govee.com/products/govee-outdoor-spotlights-2",
-  "standby_power": 0,
+  "standby_power": 0.7,
   "voltage_range": {
     "max": 234.3,
     "min": 221.4
