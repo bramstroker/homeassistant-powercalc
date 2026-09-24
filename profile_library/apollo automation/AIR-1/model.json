@@ -1,0 +1,43 @@
+{
+  "calculation_strategy": "fixed",
+  "compatible_integrations": [
+    "esphome"
+  ],
+  "created_at": "2026-09-24T07:30:00Z",
+  "device_type": "generic_iot",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
+  },
+  "discovery_by": "device",
+  "fields": {
+    "rgb_light": {
+      "label": "RGB LED light",
+      "description": "The AIR-1's RGB LED light entity (ESPHome names it '<device> RGB Light'). Its colour and brightness change the draw.",
+      "selector": {
+        "entity": {
+          "domain": "light"
+        }
+      }
+    }
+  },
+  "fixed_config": {
+    "power": "{% if is_state('[[rgb_light]]', 'on') %}{% set b = state_attr('[[rgb_light]]', 'brightness') | int(255) %}{% set c = state_attr('[[rgb_light]]', 'rgb_color') or [255, 255, 255] %}{{ (1.15 + 0.66 * (b / 255) ** 2 * (c | sum) / 765) | round(2) }}{% else %}1.15{% endif %}"
+  },
+  "measure_description": "Measured manually with a Shelly Plus Plug UK (230 V UK mains, AIR-1 on its own USB adapter, adapter included), polling the plug's Switch.GetStatus apower every 2 s and averaging 45-60 s per state after settling. Firmware 26.7.23.1 (ESPHome 2026.9.0), SEN55 and SCD40 fitted, Bluetooth proxy enabled. LED off: 1.15 W (1.14-1.16 over five runs). At brightness 255: red 1.42 W, green 1.39 W, blue 1.38 W, orange (255,120,0) 1.42 W, white 1.80 W. White at brightness 75/50/25/1 %: 1.49/1.30/1.14/1.11 W. Power rises with brightness squared (ESPHome gamma) and roughly with the sum of the colour channels, so the template is 1.15 + 0.66 * (brightness/255)^2 * (R+G+B)/765, which fits every point within 0.05 W. With the Bluetooth proxy or the SEN55 disabled the base draw will be somewhat lower.",
+  "measure_device": "Shelly Plus Plug UK",
+  "measure_method": "manual",
+  "mains_voltage": 230,
+  "min_version": "1.20.3",
+  "name": "AIR-1",
+  "product_url": "https://apolloautomation.com/products/air-1",
+  "standby_power": 1.15,
+  "authors": [
+    {
+      "name": "Laurens",
+      "github": "LaurensBot"
+    }
+  ]
+}
