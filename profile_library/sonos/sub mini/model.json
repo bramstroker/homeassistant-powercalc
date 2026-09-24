@@ -1,0 +1,42 @@
+{
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2026-09-24T10:45:00Z",
+  "description": "Compact Sonos subwoofer. It is bonded to a Sonos soundbar and has no media_player entity of its own, so add it manually and select the soundbar's media_player as the source: the sub plays when the bar plays and follows the bar's volume.",
+  "device_type": "smart_speaker",
+  "device_specs": {
+    "form_factor": "subwoofer",
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "discovery_by": "manual",
+  "linear_config": {
+    "calibrate": [
+      "0 -> 5.80",
+      "10 -> 5.83",
+      "20 -> 5.73",
+      "30 -> 5.81",
+      "40 -> 5.78",
+      "50 -> 5.69",
+      "60 -> 5.75",
+      "70 -> 5.87",
+      "80 -> 5.72",
+      "90 -> 5.80",
+      "100 -> 5.85"
+    ]
+  },
+  "measure_description": "Measured manually with a Shelly Plus Plug UK on the Sub Mini's own mains lead (230 V UK), polling its Switch.GetStatus apower every 2 s and averaging 20 s per volume step. The sub was bonded to a Sonos Beam (sub enabled, gain -1); the calibration keys are the BEAM's volume, stepped 0-100 % while playing a bass-heavy track (Massive Attack - Angel) streamed to the Beam over AirPlay by Music Assistant. The Beam's own volume_level was confirmed at every step, and the plug was verified to feed the sub: switched off, the Beam's live ZoneGroupTopology lost its SW satellite; switched back on, it rejoined. The draw stayed flat at 5.69-5.87 W across the whole range (a quieter track at 14 % and 40 % read 5.79 W). Paused/idle: 5.62 W. Unlike the Sub (Gen 1) and Sub 4 profiles there is no rise at high volume in this setup.",
+  "measure_device": "Shelly Plus Plug UK",
+  "measure_method": "manual",
+  "mains_voltage": 230,
+  "name": "Sub Mini",
+  "product_url": "https://www.sonos.com/en-gb/shop/sub-mini",
+  "standby_power": 5.62,
+  "authors": [
+    {
+      "name": "Laurens",
+      "github": "LaurensBot"
+    }
+  ]
+}
