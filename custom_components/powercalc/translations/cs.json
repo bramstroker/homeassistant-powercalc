@@ -108,7 +108,11 @@
               "power_sensor_naming": "Vzor názvu senzoru výkonu",
               "power_sensor_friendly_naming": "Vzor přívětivého názvu senzoru výkonu",
               "power_sensor_category": "Kategorie senzoru výkonu",
-              "power_sensor_precision": "Přesnost senzoru výkonu"
+              "power_sensor_precision": "Přesnost senzoru výkonu",
+              "follow_device_name": "Používat název zařízení"
+            },
+            "data_description": {
+              "follow_device_name": "Použít název přiřazeného zařízení pro generované entity podporovaných virtuálních senzorů výkonu nakonfigurovaných v uživatelském rozhraní. ID entit a vlastní názvy entit se nezmění. Vypnutím se obnoví nakonfigurované názvy. Vlastní vzory zobrazovaných názvů, včetně globálních vzorů, mají přednost: dotčené položky si ponechají nakonfigurované názvy."
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Výkon"
+      },
+      "energy": {
+        "name": "Energie"
+      },
+      "standby_energy": {
+        "name": "Energie v pohotovostním režimu"
+      },
+      "cost": {
+        "name": "Náklady"
+      },
+      "utility_meter_cycle": {
+        "name": "Energie {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Energie {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Energie {period} náklady"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Energie {period} {tariff} náklady"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Energie {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "Vzor názvu senzoru výkonu",
               "power_sensor_friendly_naming": "Vzor přívětivého názvu senzoru výkonu",
               "power_sensor_category": "Kategorie senzoru výkonu",
-              "power_sensor_precision": "Přesnost senzoru výkonu"
+              "power_sensor_precision": "Přesnost senzoru výkonu",
+              "follow_device_name": "Používat název zařízení"
+            },
+            "data_description": {
+              "follow_device_name": "Použít název přiřazeného zařízení pro generované entity podporovaných virtuálních senzorů výkonu nakonfigurovaných v uživatelském rozhraní. ID entit a vlastní názvy entit se nezmění. Vypnutím se obnoví nakonfigurované názvy. Vlastní vzory zobrazovaných názvů, včetně globálních vzorů, mají přednost: dotčené položky si ponechají nakonfigurované názvy."
             }
           },
           "features": {

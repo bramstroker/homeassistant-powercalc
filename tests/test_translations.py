@@ -9,6 +9,13 @@ TRANSLATIONS_DIR = Path("custom_components/powercalc/translations")
 PLACEHOLDER_PATTERN = re.compile(r"\{([A-Za-z0-9_]+)\}")
 
 
+def test_translations_keep_english_keys() -> None:
+    english_keys = _flatten_strings(_load_translation("en.json")).keys()
+    for translation_file in TRANSLATIONS_DIR.glob("*.json"):
+        translated_keys = _flatten_strings(_load_translation(translation_file.name)).keys()
+        assert translated_keys == english_keys, translation_file.name
+
+
 def test_translated_strings_keep_english_placeholders() -> None:
     english_strings = _flatten_strings(_load_translation("en.json"))
 

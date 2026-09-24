@@ -108,7 +108,11 @@
               "power_sensor_naming": "Patroon voor naam vermogenssensor",
               "power_sensor_friendly_naming": "Patroon voor vriendelijke naam vermogenssensor",
               "power_sensor_category": "Vermogenssensor categorie",
-              "power_sensor_precision": "Precisie van vermogenssensor"
+              "power_sensor_precision": "Precisie van vermogenssensor",
+              "follow_device_name": "Apparaatnaam volgen"
+            },
+            "data_description": {
+              "follow_device_name": "Gebruik de naam van het gekoppelde apparaat voor gegenereerde entiteiten van ondersteunde virtuele vermogenssensoren die via de gebruikersinterface zijn ingesteld. Entiteits-ID’s en aangepaste entiteitsnamen blijven ongewijzigd. Uitschakelen herstelt de ingestelde namen. Aangepaste patronen voor weergavenamen, inclusief globale patronen, hebben voorrang: de betreffende configuraties behouden hun ingestelde namen."
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Mislukt",
           "resumable": "Hervatbaar"
         }
+      },
+      "power": {
+        "name": "Vermogen"
+      },
+      "energy": {
+        "name": "Energie"
+      },
+      "standby_energy": {
+        "name": "Stand-by-energie"
+      },
+      "cost": {
+        "name": "Kosten"
+      },
+      "utility_meter_cycle": {
+        "name": "Energie {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Energie {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Energie {period} kosten"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Energie {period} {tariff} kosten"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Energie {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "Vermogensensor naampatroon",
               "power_sensor_friendly_naming": "Vermogensensor vriendelijke naampatroon",
               "power_sensor_category": "Vermogensensor categorie",
-              "power_sensor_precision": "Precisie van vermogenssensor"
+              "power_sensor_precision": "Precisie van vermogenssensor",
+              "follow_device_name": "Apparaatnaam volgen"
+            },
+            "data_description": {
+              "follow_device_name": "Gebruik de naam van het gekoppelde apparaat voor gegenereerde entiteiten van ondersteunde virtuele vermogenssensoren die via de gebruikersinterface zijn ingesteld. Entiteits-ID’s en aangepaste entiteitsnamen blijven ongewijzigd. Uitschakelen herstelt de ingestelde namen. Aangepaste patronen voor weergavenamen, inclusief globale patronen, hebben voorrang: de betreffende configuraties behouden hun ingestelde namen."
             }
           },
           "features": {

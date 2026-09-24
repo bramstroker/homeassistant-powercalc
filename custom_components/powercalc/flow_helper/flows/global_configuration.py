@@ -29,6 +29,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_UPDATE_INTERVAL,
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
+    CONF_FOLLOW_DEVICE_NAME,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_GROUP_POWER_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -72,6 +73,7 @@ SECTION_GLOBAL_ADVANCED = "advanced"
 
 SCHEMA_GLOBAL_CONFIGURATION_POWER = vol.Schema(
     {
+        vol.Optional(CONF_FOLLOW_DEVICE_NAME, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_POWER_SENSOR_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.SelectSelector(

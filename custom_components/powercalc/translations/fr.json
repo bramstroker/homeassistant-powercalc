@@ -108,7 +108,11 @@
               "power_sensor_naming": "Modèle de nom du capteur de puissance",
               "power_sensor_friendly_naming": "Modèle de nom convivial du capteur de puissance",
               "power_sensor_category": "Catégorie du capteur de puissance",
-              "power_sensor_precision": "Précision du capteur de puissance"
+              "power_sensor_precision": "Précision du capteur de puissance",
+              "follow_device_name": "Utiliser le nom de l’appareil"
+            },
+            "data_description": {
+              "follow_device_name": "Utiliser le nom de l’appareil associé pour les entités générées des capteurs de puissance virtuels pris en charge configurés dans l’interface. Les identifiants et les noms personnalisés des entités restent inchangés. Désactiver cette option rétablit les noms configurés. Les modèles de noms d’affichage personnalisés, y compris les modèles globaux, sont prioritaires : les entrées concernées conservent leurs noms configurés."
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Puissance"
+      },
+      "energy": {
+        "name": "Énergie"
+      },
+      "standby_energy": {
+        "name": "Énergie en veille"
+      },
+      "cost": {
+        "name": "Coût"
+      },
+      "utility_meter_cycle": {
+        "name": "Énergie {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Énergie {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Énergie {period} coût"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Énergie {period} {tariff} coût"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Énergie {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "Modèle de nom du capteur de puissance",
               "power_sensor_friendly_naming": "Modèle de nom convivial du capteur de puissance",
               "power_sensor_category": "Catégorie du capteur de puissance",
-              "power_sensor_precision": "Précision du capteur de puissance"
+              "power_sensor_precision": "Précision du capteur de puissance",
+              "follow_device_name": "Utiliser le nom de l’appareil"
+            },
+            "data_description": {
+              "follow_device_name": "Utiliser le nom de l’appareil associé pour les entités générées des capteurs de puissance virtuels pris en charge configurés dans l’interface. Les identifiants et les noms personnalisés des entités restent inchangés. Désactiver cette option rétablit les noms configurés. Les modèles de noms d’affichage personnalisés, y compris les modèles globaux, sont prioritaires : les entrées concernées conservent leurs noms configurés."
             }
           },
           "features": {

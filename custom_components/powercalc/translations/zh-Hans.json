@@ -108,7 +108,11 @@
               "power_sensor_naming": "功率传感器名称模式",
               "power_sensor_friendly_naming": "功率传感器友好名称模式",
               "power_sensor_category": "功率传感器类别",
-              "power_sensor_precision": "功率传感器精度"
+              "power_sensor_precision": "功率传感器精度",
+              "follow_device_name": "跟随设备名称"
+            },
+            "data_description": {
+              "follow_device_name": "对于通过用户界面配置且受支持的虚拟功率传感器，使用所关联设备的名称来命名生成的实体。实体 ID 和自定义实体名称保持不变。关闭此选项将恢复配置的名称。自定义显示名称模式（包括全局模式）优先：受影响的配置项将保留其配置的名称。"
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "功率"
+      },
+      "energy": {
+        "name": "电能"
+      },
+      "standby_energy": {
+        "name": "待机电能"
+      },
+      "cost": {
+        "name": "费用"
+      },
+      "utility_meter_cycle": {
+        "name": "电能 {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "电能 {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "电能 {period} 费用"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "电能 {period} {tariff} 费用"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "电能 {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "功率传感器名称模式",
               "power_sensor_friendly_naming": "功率传感器友好名称模式",
               "power_sensor_category": "功率传感器类别",
-              "power_sensor_precision": "功率传感器精度"
+              "power_sensor_precision": "功率传感器精度",
+              "follow_device_name": "跟随设备名称"
+            },
+            "data_description": {
+              "follow_device_name": "对于通过用户界面配置且受支持的虚拟功率传感器，使用所关联设备的名称来命名生成的实体。实体 ID 和自定义实体名称保持不变。关闭此选项将恢复配置的名称。自定义显示名称模式（包括全局模式）优先：受影响的配置项将保留其配置的名称。"
             }
           },
           "features": {

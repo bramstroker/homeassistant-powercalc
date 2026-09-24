@@ -18,6 +18,7 @@ import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.util import slugify
 
+from custom_components.powercalc.common import AnyDeviceEntry
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_PRECISION,
@@ -29,6 +30,7 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_SENSOR_PRECISION,
     DOMAIN,
 )
+from custom_components.powercalc.device_naming import DeviceName
 from custom_components.powercalc.select import DATA_PENDING_SELECT_ENTITIES, SIGNAL_CREATE_SELECT_ENTITIES
 
 from .abstract import BaseEntity
@@ -44,6 +46,8 @@ def create_utility_meters(
     energy_sensor: EnergySensor,
     sensor_config: ConfigType,
     config_entry: ConfigEntry | None = None,
+    follow_device_name: bool = False,
+    device_entry: AnyDeviceEntry | None = None,
 ) -> list[VirtualUtilityMeter]:
     """Create the utility meters."""
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
@@ -68,6 +72,8 @@ def create_utility_meters(
                     unique_id,
                     meter_type,
                     tariffs,
+                    device_entry=device_entry,
+                    follow_device_name=follow_device_name,
                 ),
             )
 
@@ -104,6 +110,8 @@ def create_meters_for_type(
     unique_id: str | None,
     meter_type: str,
     tariffs: list[str],
+    follow_device_name: bool = False,
+    device_entry: AnyDeviceEntry | None = None,
 ) -> list[VirtualUtilityMeter]:
     """Create meters for a specific meter type."""
     name = f"{energy_sensor.name} {meter_type}"
@@ -138,6 +146,8 @@ def create_meters_for_type(
             meter_type,
             unique_id,
             tariffs,
+            device_entry=device_entry,
+            follow_device_name=follow_device_name,
         )
         tariff_sensors.extend(new_tariff_sensors)
         utility_meters.extend(new_tariff_sensors)
@@ -156,10 +166,21 @@ def create_tariff_meters(
     meter_type: str,
     unique_id: str | None,
     tariffs: list[str],
+    follow_device_name: bool = False,
+    device_entry: AnyDeviceEntry | None = None,
 ) -> list[VirtualUtilityMeter]:
     """Create utility meters for specific tariffs."""
     filtered_tariffs = [t for t in tariffs if t != GENERAL_TARIFF]
-    tariff_select = create_tariff_select(config_entry, filtered_tariffs, hass, name, unique_id)
+    tariff_select = create_tariff_select(
+        config_entry,
+        filtered_tariffs,
+        hass,
+        name,
+        unique_id,
+        device_entry=device_entry,
+        follow_device_name=follow_device_name,
+        meter_type=meter_type,
+    )
 
     tariff_sensors = []
     for tariff in filtered_tariffs:
@@ -185,6 +206,9 @@ def create_tariff_select(
     hass: HomeAssistant,
     name: str,
     unique_id: str | None,
+    follow_device_name: bool = False,
+    meter_type: str = "",
+    device_entry: AnyDeviceEntry | None = None,
 ) -> TariffSelect:
     """Create tariff selection entity."""
     _LOGGER.debug("Creating utility_meter tariff select: %s", name)
@@ -193,12 +217,21 @@ def create_tariff_select(
     if unique_id:
         select_unique_id = f"{unique_id}_select"
 
-    tariff_select = TariffSelect(
+    tariff_select = VirtualTariffSelect(
         name,
         tariffs,
         unique_id=select_unique_id,
     )
-    tariff_select.entity_id = async_generate_entity_id("select.{}", name, hass=hass)
+    existing_entity_id = None
+    if select_unique_id:
+        existing_entity_id = er.async_get(hass).async_get_entity_id("select", DOMAIN, select_unique_id)
+    tariff_select.entity_id = existing_entity_id or async_generate_entity_id("select.{}", name, hass=hass)
+    # Platform entities (YAML and group selects) cannot attach a device directly.
+    if config_entry:
+        tariff_select.device_entry = device_entry
+    if follow_device_name:
+        tariff_select.device_name = DeviceName("utility_meter_cycle", {"period": meter_type})
+        tariff_select.enable_device_naming()
 
     key = config_entry.entry_id if config_entry else ""
     pending = hass.data[DOMAIN].setdefault(DATA_PENDING_SELECT_ENTITIES, {}).setdefault(key, [])
@@ -261,11 +294,19 @@ def create_utility_meter(
     )
     utility_meter._sensor_config = sensor_config  # noqa: SLF001
     utility_meter.entity_id = entity_id
+    utility_meter.device_name = DeviceName("utility_meter_cycle", {"period": meter_type})
+    if tariff:
+        utility_meter.device_name = DeviceName("utility_meter_tariff", {"period": meter_type, "tariff": tariff})
 
     return utility_meter
 
 
+class VirtualTariffSelect(BaseEntity, TariffSelect):
+    """Tariff selector supporting opt-in device naming."""
+
+
 class VirtualUtilityMeter(BaseEntity, UtilityMeterSensor):
+    device_name = DeviceName("utility_meter_cycle")
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
     _sensor_config: ConfigType
 

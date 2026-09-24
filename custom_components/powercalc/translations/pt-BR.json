@@ -108,7 +108,11 @@
               "power_sensor_naming": "Padrão de nome do sensor de energia",
               "power_sensor_friendly_naming": "Padrão de nome amigável para sensor de potência",
               "power_sensor_category": "Categoria do sensor de energia",
-              "power_sensor_precision": "Precisão do sensor de potência"
+              "power_sensor_precision": "Precisão do sensor de potência",
+              "follow_device_name": "Usar o nome do dispositivo"
+            },
+            "data_description": {
+              "follow_device_name": "Usar o nome do dispositivo atribuído para as entidades geradas dos sensores virtuais de potência compatíveis configurados pela interface. Os IDs das entidades e os nomes personalizados permanecem inalterados. Desativar esta opção restaura os nomes configurados. Os padrões personalizados de nomes de exibição, incluindo os globais, têm prioridade: as entradas afetadas mantêm os nomes configurados."
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Potência"
+      },
+      "energy": {
+        "name": "Energia"
+      },
+      "standby_energy": {
+        "name": "Energia em espera"
+      },
+      "cost": {
+        "name": "Custo"
+      },
+      "utility_meter_cycle": {
+        "name": "Energia {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Energia {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Energia {period} custo"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Energia {period} {tariff} custo"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Energia {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "Padrão de nome do sensor de potência",
               "power_sensor_friendly_naming": "Padrão de nome amigável para sensor de potência",
               "power_sensor_category": "Categoria do sensor de potência",
-              "power_sensor_precision": "Precisão do sensor de potência"
+              "power_sensor_precision": "Precisão do sensor de potência",
+              "follow_device_name": "Usar o nome do dispositivo"
+            },
+            "data_description": {
+              "follow_device_name": "Usar o nome do dispositivo atribuído para as entidades geradas dos sensores virtuais de potência compatíveis configurados pela interface. Os IDs das entidades e os nomes personalizados permanecem inalterados. Desativar esta opção restaura os nomes configurados. Os padrões personalizados de nomes de exibição, incluindo os globais, têm prioridade: as entradas afetadas mantêm os nomes configurados."
             }
           },
           "features": {

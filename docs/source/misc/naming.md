@@ -58,3 +58,42 @@ will create:
 
 - sensor.patio_light_power (Patio light power)
 - sensor.patio_light_energy (Patio light energy)
+
+## Follow device name
+
+Open the **Global configuration → Power sensor** section and enable **Follow device name**
+to use device naming for supported virtual power sensors configured through the UI.
+This option is off by default, including for existing entries. Changing the global setting
+reloads existing entries to apply it.
+
+This setting applies globally; there is no per-entry toggle. Unsupported configurations
+keep their configured names.
+
+Powercalc uses Home Assistant's device naming for the generated power, energy, standby energy,
+utility meter, cost, and tariff selection entities. For example, an entity named **Patio Power**
+will become **Terrace Power** when you rename its assigned device from **Patio** to **Terrace**.
+Renaming the source entity alone does not rename these entities.
+
+Entity IDs, unique IDs, energy totals, and statistics remain unchanged. Custom names set in the
+entity settings are preserved and follow Home Assistant's normal naming rules.
+The Powercalc configuration title and stored name remain unchanged; turning the option off
+returns to the configured naming behavior. Home Assistant may still format names using its own
+device naming settings.
+
+The first version supports virtual power entries associated with a named device and using the
+standard display-name patterns. It does not support YAML entries, groups, standalone cost entries,
+named source channels, multi-switch configurations, or multiple virtual power entries assigned to
+the same device. These configurations retain their existing naming behavior.
+
+The shared-device check considers UI entries only, not YAML sensors. Eligibility is checked
+on entry setup: after adding or removing another entry on the same device, reload existing
+entries or restart Home Assistant to update their naming behavior.
+
+Custom display-name patterns, including inherited global patterns, take precedence over this option.
+Custom entity-ID patterns can be used if their corresponding friendly-name patterns explicitly
+retain the standard display names, such as `power_sensor_friendly_naming: "{} power"`.
+
+If an explicitly configured device cannot be found at startup, Powercalc logs a warning and uses
+the configured names for that load. Sources without a device, unnamed devices, and other unsupported
+configurations are logged at debug level. The option remains enabled
+and is tried again on the next reload or restart.

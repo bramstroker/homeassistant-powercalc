@@ -108,7 +108,11 @@
               "power_sensor_naming": "Muster für den Namen des Leistungssensors",
               "power_sensor_friendly_naming": "Muster für den freundlichen Namen des Leistungssensors",
               "power_sensor_category": "Leistungssensor-Kategorie",
-              "power_sensor_precision": "Genauigkeit des Leistungssensors"
+              "power_sensor_precision": "Genauigkeit des Leistungssensors",
+              "follow_device_name": "Gerätenamen übernehmen"
+            },
+            "data_description": {
+              "follow_device_name": "Den Namen des zugewiesenen Geräts für erzeugte Entitäten unterstützter virtueller Leistungssensoren verwenden, die über die Benutzeroberfläche konfiguriert wurden. Entitäts-IDs und benutzerdefinierte Entitätsnamen bleiben unverändert. Beim Ausschalten werden die konfigurierten Namen wiederhergestellt. Benutzerdefinierte Muster für Anzeigenamen, einschließlich globaler Muster, haben Vorrang: Betroffene Einträge behalten ihre konfigurierten Namen."
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Leistung"
+      },
+      "energy": {
+        "name": "Energie"
+      },
+      "standby_energy": {
+        "name": "Standby-Energie"
+      },
+      "cost": {
+        "name": "Kosten"
+      },
+      "utility_meter_cycle": {
+        "name": "Energie {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Energie {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Energie {period} Kosten"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Energie {period} {tariff} Kosten"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Energie {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "Muster für den Namen des Leistungssensors",
               "power_sensor_friendly_naming": "Muster für den freundlichen Namen des Leistungssensors",
               "power_sensor_category": "Leistungssensor-Kategorie",
-              "power_sensor_precision": "Genauigkeit des Leistungssensors"
+              "power_sensor_precision": "Genauigkeit des Leistungssensors",
+              "follow_device_name": "Gerätenamen übernehmen"
+            },
+            "data_description": {
+              "follow_device_name": "Den Namen des zugewiesenen Geräts für erzeugte Entitäten unterstützter virtueller Leistungssensoren verwenden, die über die Benutzeroberfläche konfiguriert wurden. Entitäts-IDs und benutzerdefinierte Entitätsnamen bleiben unverändert. Beim Ausschalten werden die konfigurierten Namen wiederhergestellt. Benutzerdefinierte Muster für Anzeigenamen, einschließlich globaler Muster, haben Vorrang: Betroffene Einträge behalten ihre konfigurierten Namen."
             }
           },
           "features": {

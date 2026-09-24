@@ -5,6 +5,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_CREATE_COST_SENSOR
+from custom_components.powercalc.device_binding import get_device_entry
 
 from .cost import create_cost_sensor
 from .energy import EnergySensor
@@ -19,6 +20,7 @@ def create_energy_related_sensors(
     config_entry: ConfigEntry | None = None,
     utility_meter_config: ConfigType | None = None,
     cost_name: str | None = None,
+    follow_device_name: bool = False,
 ) -> list[Entity]:
     """Create optional utility meters and cost sensor for an energy sensor.
 
@@ -27,7 +29,15 @@ def create_energy_related_sensors(
     """
     entities: list[Entity] = []
     meter_config = sensor_config if utility_meter_config is None else utility_meter_config
-    utility_meters = create_utility_meters(hass, energy_sensor, meter_config, config_entry)
+    device_entry = get_device_entry(hass, sensor_config, source_entity, config_entry)
+    utility_meters = create_utility_meters(
+        hass,
+        energy_sensor,
+        meter_config,
+        config_entry,
+        device_entry=device_entry,
+        follow_device_name=follow_device_name,
+    )
     entities.extend(utility_meters)
 
     cost_sensor = create_cost_sensor_if_needed(hass, sensor_config, energy_sensor, source_entity, cost_name)

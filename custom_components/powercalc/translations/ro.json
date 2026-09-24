@@ -108,7 +108,11 @@
               "power_sensor_naming": "Modelul numelui senzorului de putere",
               "power_sensor_friendly_naming": "Model de nume prietenos pentru senzorul de putere",
               "power_sensor_category": "Categoria senzorului de putere",
-              "power_sensor_precision": "Precizia senzorului de putere"
+              "power_sensor_precision": "Precizia senzorului de putere",
+              "follow_device_name": "Folosește numele dispozitivului"
+            },
+            "data_description": {
+              "follow_device_name": "Folosește numele dispozitivului asociat pentru entitățile generate ale senzorilor virtuali de putere acceptați, configurați în interfață. ID-urile entităților și numele personalizate rămân neschimbate. Dezactivarea restabilește numele configurate. Modelele personalizate pentru numele afișate, inclusiv cele globale, au prioritate: intrările afectate își păstrează numele configurate."
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Putere"
+      },
+      "energy": {
+        "name": "Energie"
+      },
+      "standby_energy": {
+        "name": "Energie în standby"
+      },
+      "cost": {
+        "name": "Cost"
+      },
+      "utility_meter_cycle": {
+        "name": "Energie {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Energie {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Energie {period} cost"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Energie {period} {tariff} cost"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Energie {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "Modelul numelui senzorului de putere",
               "power_sensor_friendly_naming": "Model de nume prietenos pentru senzorul de putere",
               "power_sensor_category": "Categoria senzorului de putere",
-              "power_sensor_precision": "Precizia senzorului de putere"
+              "power_sensor_precision": "Precizia senzorului de putere",
+              "follow_device_name": "Folosește numele dispozitivului"
+            },
+            "data_description": {
+              "follow_device_name": "Folosește numele dispozitivului asociat pentru entitățile generate ale senzorilor virtuali de putere acceptați, configurați în interfață. ID-urile entităților și numele personalizate rămân neschimbate. Dezactivarea restabilește numele configurate. Modelele personalizate pentru numele afișate, inclusiv cele globale, au prioritate: intrările afectate își păstrează numele configurate."
             }
           },
           "features": {

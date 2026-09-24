@@ -4,7 +4,7 @@ import inspect
 import logging
 from typing import Any
 
-from homeassistant.components.integration.sensor import IntegrationSensor
+from homeassistant.components.integration.sensor import IntegrationSensor, IntegrationSensorExtraStoredData
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
@@ -39,6 +39,7 @@ from custom_components.powercalc.const import (
     UNAVAILABLE_STATES,
     UnitPrefix,
 )
+from custom_components.powercalc.device_naming import DeviceName
 from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.filter.outlier import OutlierFilter
 
@@ -282,8 +283,19 @@ class EnergySensor(BaseEntity):
     """Class which all energy sensors should extend from."""
 
 
+class VirtualEnergyExtraStoredData(IntegrationSensorExtraStoredData):
+    """Preserve zero totals which HA's integration serializer treats as missing."""
+
+    def as_dict(self) -> dict[str, Any]:
+        data = super().as_dict()
+        data["last_valid_state"] = str(self.last_valid_state) if self.last_valid_state is not None else None
+        return data
+
+
 class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     """Virtual energy sensor, totalling kWh."""
+
+    device_name = DeviceName("energy")
 
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _unrecorded_attributes = frozenset({ATTR_SOURCE_DOMAIN, ATTR_SOURCE_ENTITY})
@@ -439,6 +451,15 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         return attrs
 
     @property
+    def extra_restore_state_data(self) -> VirtualEnergyExtraStoredData:
+        return VirtualEnergyExtraStoredData(
+            self.native_value,
+            self.native_unit_of_measurement,
+            self._source_entity,
+            self._last_valid_state,
+        )
+
+    @property
     def icon(self) -> str:
         return ENERGY_ICON
 
@@ -446,16 +467,20 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     def async_reset(self) -> None:
         _LOGGER.debug("%s: Reset energy sensor", self.entity_id)
         self._state = Decimal(0)
+        self._last_valid_state = self._state
         self.async_write_ha_state()
 
     async def async_calibrate(self, value: str) -> None:
         _LOGGER.debug("%s: Calibrate energy sensor to: %s", self.entity_id, value)
         self._state = Decimal(value)
+        self._last_valid_state = self._state
         self.async_write_ha_state()
 
 
 class VirtualStandbyEnergySensor(VirtualEnergySensor):
     """Energy sensor integrating only the standby portion of a virtual power sensor."""
+
+    device_name = DeviceName("standby_energy")
 
     def __init__(
         self,
