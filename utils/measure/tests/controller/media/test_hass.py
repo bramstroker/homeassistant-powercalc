@@ -65,9 +65,10 @@ def test_mute_volume_is_not_replayed_after_disconnect(hass_client: MagicMock) ->
 
     hass_client.trigger_service.assert_called_once_with(
         "media_player",
-        "mute_volume",
+        "volume_mute",
         retry_on_disconnect=False,
         entity_id="media_player.test",
+        is_volume_muted=True,
     )
 
 

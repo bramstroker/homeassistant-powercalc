@@ -29,9 +29,10 @@ class HassMediaController(HassControllerBase, MediaController):
     def mute_volume(self) -> None:
         self.client.trigger_service(
             "media_player",
-            "mute_volume",
+            "volume_mute",
             retry_on_disconnect=False,
             entity_id=self.entity_id,
+            is_volume_muted=True,
         )
 
     def play_audio(self, stream_url: str) -> None:
