@@ -7,7 +7,8 @@
   "device_specs": {
     "form_factor": "subwoofer",
     "connectivity": [
-      "wifi"
+      "wifi",
+      "ethernet"
     ]
   },
   "discovery_by": "manual",
@@ -38,5 +39,6 @@
       "name": "Laurens",
       "github": "LaurensBot"
     }
-  ]
+  ],
+  "min_version": "v1.25.2"
 }
