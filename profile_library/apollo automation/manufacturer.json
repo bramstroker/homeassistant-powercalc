@@ -1,0 +1,9 @@
+{
+  "name": "Apollo Automation",
+  "aliases": [
+    "ApolloAutomation"
+  ],
+  "website": "https://apolloautomation.com",
+  "country": "US",
+  "description": "American maker of open-source ESPHome sensors for Home Assistant, such as the AIR-1 air quality sensor and the MSR multisensors."
+}
