@@ -1,4 +1,5 @@
 import type { SessionSnapshot } from "../../types";
+import { capabilities } from "../../testing/controller";
 import type { ResultView } from "./view";
 import "./view";
 
@@ -107,6 +108,7 @@ describe("result view", () => {
       files: { name: string; size: number; media_type: string }[];
       fileUrl: (name: string) => string;
       downloadAll: () => void;
+      busy: boolean;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
@@ -129,6 +131,9 @@ describe("result view", () => {
     const contribution = element.shadowRoot.querySelector(".contribution");
     expect(contribution?.textContent).toContain("Prepare the profile");
     expect(element.shadowRoot.querySelector(".contribution-next")).toBeNull();
+    element.busy = true;
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector<HTMLButtonElement>(".contribution button")?.disabled).toBe(true);
   });
 
 
@@ -140,7 +145,7 @@ describe("result view", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.querySelector(".contribution-next")).toBeNull();
+    expect(element.shadowRoot.querySelector(".contribution")).toBeNull();
   });
 
   it("renders a summary readout for a file-less measurement", async () => {
@@ -159,7 +164,59 @@ describe("result view", () => {
     expect(element.shadowRoot.querySelector(".readout")?.textContent).toContain("42.3 W");
     expect(element.shadowRoot.querySelector("#result-title")?.textContent).toContain("Measurement complete");
     expect(element.shadowRoot.textContent).not.toContain("No downloadable files");
-    expect(element.shadowRoot.querySelector(".contribution")?.textContent).toContain("Prepare the profile");
+    expect(element.shadowRoot.querySelector(".contribution")).toBeNull();
+  });
+
+  it("explains a vacuum zero reading without treating it as actual zero power", async () => {
+    const element = document.createElement("measure-result-view") as ResultView;
+    element.snapshot = {
+      state: "failed",
+      error: "0 watt was read from the power meter",
+      request: {
+        measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+        model_id: "Eureka", product_name: "Vacuum", measure_device: "Dock", generate_model: true,
+        parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+      },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const notice = element.shadowRoot!.querySelector(".notice.error")!;
+    expect(notice.textContent).toContain("does not prove the dock uses no power");
+    expect(notice.textContent).toContain("calibrated resistive dummy load");
+    expect(notice.textContent).not.toContain("identical lights");
+    expect(notice.querySelector("a")?.getAttribute("href")).toBe("https://docs.powercalc.nl/contributing/measure/low-power-measurements/");
+  });
+
+  it("explains missing vacuum episodes and withholds Prepare profile until a model exists", async () => {
+    const element = document.createElement("measure-result-view") as ResultView;
+    element.snapshot = {
+      state: "completed",
+      request: {
+        measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+        model_id: "Eureka", product_name: "Vacuum", measure_device: "Dock", generate_model: true,
+        parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+      },
+      summary: {
+        "Recording analysis": "More data needed",
+        "Recording analysis reason": "Record at least two independent episodes of at least five samples for: away",
+      },
+    };
+    element.canAnalyse = true;
+    element.files = [{ name: "analyser.json", size: 100, media_type: "application/json" }];
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot!.textContent).toContain("No model.json is available yet");
+    expect(element.shadowRoot!.querySelector(".contribution")).toBeNull();
+    expect(element.shadowRoot!.querySelector(".analysis-panel")?.textContent).toMatch(/another run with the\s+same setup will not fix that/);
+    expect(element.shadowRoot!.querySelector(".analysis-panel a")?.getAttribute("href"))
+      .toBe("https://docs.powercalc.nl/contributing/measure/low-power-measurements/");
+    expect(element.shadowRoot!.querySelectorAll(".analysis-retry")[1]?.textContent).toContain("Once the meter can reliably read");
+
+    element.files = [...element.files, { name: "profile/model.json", size: 200, media_type: "application/json" }];
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector(".contribution")?.textContent).toContain("Prepare the profile");
   });
 
   it("separates recording analysis from measurement results", async () => {

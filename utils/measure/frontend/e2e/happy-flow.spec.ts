@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { contributionPreview, mockApi, startedSnapshot } from "./mock-api";
+import { completedSnapshot, contributionPreview, mockApi, parameters, startedSnapshot } from "./mock-api";
 import type { SessionSnapshot, SessionSummary } from "../src/types";
 
 /**
@@ -338,6 +338,34 @@ test("opens a completed session and shows its result artifacts", async ({ page }
   // Located by download link: the plot header repeats the source file name as plain text.
   await expect(page.getByRole("link", { name: "Download brightness.csv" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Download model.json" })).toBeVisible();
+});
+
+test("explains incomplete vacuum analysis without offering profile preparation", async ({ page }) => {
+  const snapshot: SessionSnapshot = {
+    ...completedSnapshot, can_analyse: true, mode: "Recording",
+    summary: {
+      "Samples recorded": "2099",
+      "Recording analysis": "More data needed",
+      "Recording analysis reason": "Record at least two independent episodes of at least five samples for: away",
+    },
+    request: {
+      measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+      model_id: "Eureka", product_name: "Vacuum", measure_device: "Dock", generate_model: true,
+      parameters, resume_policy: "new", power_meter: { type: "hass", entity_id: "sensor.plug_power" },
+    },
+  };
+  await page.route("**/api/sessions/session-completed", (route) => route.fulfill({ json: snapshot }));
+  await page.route("**/api/sessions/session-completed/files", (route) => route.fulfill({ json: [
+    { name: "analyser.json", size: 100, media_type: "application/json" },
+    { name: "record.jsonl", size: 1000, media_type: "application/x-ndjson" },
+  ] }));
+
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+
+  await expect(page.getByText("No model.json is available yet")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Prepare profile" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "low-power measurement guide" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Record more" })).toBeVisible();
 });
 
 test("offers a graceful stop for average measurements", async ({ page }) => {

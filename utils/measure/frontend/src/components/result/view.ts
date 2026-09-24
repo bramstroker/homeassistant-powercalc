@@ -2,13 +2,17 @@ import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SessionState } from "../../types";
 import { emit } from "../../utils/events";
+import { hasModelArtifact } from "../../utils/artifacts";
 import { fileSize } from "../../utils/format";
 import { diagnosticsDownload, sharedStyles } from "../../styles";
 import { errorHelpLink } from "../shared/error-help-link";
 import "./plot";
 
 const TROUBLESHOOTING_URL = "https://docs.powercalc.nl/contributing/measure/troubleshooting/";
+const LOW_POWER_URL = "https://docs.powercalc.nl/contributing/measure/low-power-measurements/";
 const ZERO_READING_ERROR_PREFIX = "Aborting measurement session after repeated 0 W readings.";
+const ZERO_READING_METER_ERROR = "0 watt was read from the power meter";
+const MISSING_EPISODES_PREFIX = "Record at least two independent episodes of at least five samples for:";
 
 interface AnalysisDetailDefinition {
   label?: string;
@@ -209,7 +213,9 @@ export class ResultView extends LitElement {
         ${showArtifacts ? this.renderPlots() : nothing}
         ${showArtifacts ? this.renderFiles() : nothing}
         ${this.renderJsonInspector()}
-        ${showArtifacts && state === "completed" && this.canPrepareProfile ? this.renderPrepareAction() : nothing}
+        ${showArtifacts && state === "completed" && this.canPrepareProfile
+          ? hasModelArtifact(this.files) ? this.renderPrepareAction() : this.renderMissingModelNotice()
+          : nothing}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${diagnosticsDownload(this.diagnosticsUrl)}
         <div class="actions">
@@ -227,11 +233,27 @@ export class ResultView extends LitElement {
         <p class="eyebrow">What's next?</p>
         <h3 id="prepare-profile-title">Prepare the profile</h3>
         <p class="muted">Add product and measurement metadata, validate the result, and then download it or open a pull request.</p>
-        <div class="actions"><button class="primary" type="button" @click=${() => this.emit("prepare")}>Prepare profile</button></div>
+        <div class="actions"><button class="primary" type="button" ?disabled=${this.busy} @click=${() => this.emit("prepare")}>Prepare profile</button></div>
       </section>`;
   }
 
+  private renderMissingModelNotice() {
+    return html`<p class="notice" role="status">
+      No <code>model.json</code> is available yet, so there is no profile to prepare.
+      ${this.canAnalyse ? "Review the analysis above before recording again." : "Review the saved output for details."}
+    </p>`;
+  }
+
   private renderError(error: string) {
+    if (error.includes(ZERO_READING_METER_ERROR) && this.isVacuumRecording()) {
+      return html`
+        The power meter reported 0 W during the vacuum recording. This may mean the dock's draw is below the meter's
+        useful range; it does not prove the dock uses no power. Check the meter and setup with a known small load.
+        Use a safely installed, calibrated resistive dummy load or a meter that reliably measures low loads before
+        recording again. See the
+        <a href=${LOW_POWER_URL} target="_blank" rel="noopener noreferrer">low-power measurement guide</a>.
+      `;
+    }
     if (!error.startsWith(ZERO_READING_ERROR_PREFIX)) return error;
     return html`
       Aborting measurement session after repeated 0 W readings. The power meter may not resolve this low load.
@@ -240,6 +262,16 @@ export class ResultView extends LitElement {
       <a href=${TROUBLESHOOTING_URL} target="_blank" rel="noopener noreferrer">Troubleshooting guide</a>
       for troubleshooting guidance.
     `;
+  }
+
+  private isVacuumRecording(): boolean {
+    const request = this.snapshot.request;
+    return request?.measure_type === "recorder" && request.profile_recipe === "vacuum_robot";
+  }
+
+  private hasMissingAwayEpisodes(reason?: string): boolean {
+    return Boolean(reason?.startsWith(MISSING_EPISODES_PREFIX)
+      && reason.slice(MISSING_EPISODES_PREFIX.length).split(",").some((activity) => activity.trim() === "away"));
   }
 
   private renderFiles() {
@@ -360,6 +392,14 @@ export class ResultView extends LitElement {
         </p>
         ${result ? html`<p class="analysis-outcome"><span>Result</span><strong>${this.analysisResult(result)}</strong></p>` : nothing}
         ${reason ? html`<p class="analysis-reason"><strong>Why:</strong> ${reason}</p>` : nothing}
+        ${this.isVacuumRecording() && this.hasMissingAwayEpisodes(reason) ? html`
+          <p class="analysis-reason">
+            The analyser needs two separate periods of each listed activity with at least five usable samples each.
+            If the meter reports 0 W while the robot is away, those readings are discarded; another run with the
+            same setup will not fix that. First check the dock's low-power draw with a known load, a calibrated
+            resistive dummy load, or a more sensitive meter. See the
+            <a href=${LOW_POWER_URL} target="_blank" rel="noopener noreferrer">low-power measurement guide</a>.
+          </p>` : nothing}
         ${details.length ? html`<dl class="analysis-details" aria-label="Recording analysis details">
           ${details.map(([label, value]) => {
             const definition = ANALYSIS_DETAILS[label];
@@ -390,7 +430,9 @@ export class ResultView extends LitElement {
             </button>
           </div>
           <div class="analysis-retry">
-            <p>Record another run using the same entities and settings. Previous recordings are kept and all runs are analysed together.</p>
+            <p>${this.isVacuumRecording() && this.hasMissingAwayEpisodes(reason)
+              ? "Once the meter can reliably read the lowest-load activity, record enough separate activity periods. Previous recordings are kept and all runs are analysed together."
+              : "Record another run using the same entities and settings. Previous recordings are kept and all runs are analysed together."}</p>
             <button type="button" @click=${() => this.emit("record-more")} ?disabled=${this.busy}>Record more</button>
           </div>
         ` : nothing}
@@ -432,7 +474,7 @@ export class ResultView extends LitElement {
   /** How this outcome is announced. A completed run reads differently with and without a readout. */
   private outcome(state: SessionState): ResultOutcome {
     if (state !== "completed") return OUTCOMES[state] ?? CANCELLED;
-    return this.summaryEntries().length ? COMPLETED_WITH_READOUT : COMPLETED;
+    return this.summaryEntries().length || !hasModelArtifact(this.files) ? COMPLETED_WITH_READOUT : COMPLETED;
   }
 
   private emit(name: "sessions" | "new" | "resume" | "analyse" | "record-more" | "prepare"): void {

@@ -253,7 +253,17 @@ export class RunningView extends LitElement {
 
   private renderLatestWarning() {
     const warning = this.snapshot.warnings?.at(-1);
-    return warning ? html`<div class="notice warning" role="alert">${warning}</div>` : nothing;
+    if (!warning) return nothing;
+    const request = this.snapshot.request;
+    if (warning.includes("0 watt was read from the power meter")
+      && request?.measure_type === "recorder" && request.profile_recipe === "vacuum_robot") {
+      return html`<div class="notice warning" role="alert">
+        ${warning}. The meter may not resolve the dock's low-power draw; 0 W is not assumed to be the dock's actual use.
+        Check the setup with a known small load before recording more. See the
+        <a href="https://docs.powercalc.nl/contributing/measure/low-power-measurements/" target="_blank" rel="noopener noreferrer">low-power measurement guide</a>.
+      </div>`;
+    }
+    return html`<div class="notice warning" role="alert">${warning}</div>`;
   }
 
   private cancel(): void {

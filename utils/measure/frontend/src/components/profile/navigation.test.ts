@@ -39,6 +39,7 @@ async function mount(preview?: ContributionPreview, initialDraft = draft) {
   vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
   const app = new AppShell();
   app.snapshot = { state: "completed", session_id: "session-1" };
+  app.files = [{ name: "model.json", size: 2, media_type: "application/json" }];
   app.view = "profile";
   app.settings = defaultSettings;
   app.contributionDraft = { ...initialDraft };
@@ -49,6 +50,7 @@ async function mount(preview?: ContributionPreview, initialDraft = draft) {
   }] };
   const api = {
     diagnosticsUrl: () => "/diagnostics",
+    fileUrl: (_sessionId: string, name: string) => `/files/${name}`,
     getMeasureDevices: vi.fn(async () => ({ devices: [] })),
     getStandbyEstimate: vi.fn(async () => ({ power_w: 0.4, basis: "fallback", profile_count: 0 })),
     saveSettings: vi.fn(async (settings: AppSettings) => settings),
