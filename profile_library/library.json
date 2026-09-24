@@ -1160,6 +1160,68 @@
       ]
     },
     {
+      "aliases": [
+        "ApolloAutomation"
+      ],
+      "name": "apollo automation",
+      "full_name": "Apollo Automation",
+      "dir_name": "apollo automation",
+      "website": "https://apolloautomation.com",
+      "country": "US",
+      "description": "American maker of open-source ESPHome sensors for Home Assistant, such as the AIR-1 air quality sensor and the MSR multisensors.",
+      "models": [
+        {
+          "calculation_strategy": "fixed",
+          "compatible_integrations": [
+            "esphome"
+          ],
+          "created_at": "2026-09-24T07:30:00Z",
+          "device_type": "generic_iot",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "bluetooth"
+            ]
+          },
+          "discovery_by": "device",
+          "fields": {
+            "rgb_light": {
+              "label": "RGB LED light",
+              "description": "The AIR-1's RGB LED light entity (ESPHome names it '<device> RGB Light'). Its colour and brightness change the draw.",
+              "selector": {
+                "entity": {
+                  "domain": "light"
+                }
+              }
+            }
+          },
+          "measure_description": "Measured manually with a Shelly Plus Plug UK (230 V UK mains, AIR-1 on its own USB adapter, adapter included), polling the plug's Switch.GetStatus apower every 2 s and averaging 45-60 s per state after settling. Firmware 26.7.23.1 (ESPHome 2026.9.0), SEN55 and SCD40 fitted, Bluetooth proxy enabled. LED off: 1.15 W (1.14-1.16 over five runs). At brightness 255: red 1.42 W, green 1.39 W, blue 1.38 W, orange (255,120,0) 1.42 W, white 1.80 W. White at brightness 75/50/25/1 %: 1.49/1.30/1.14/1.11 W. Power rises with brightness squared (ESPHome gamma) and roughly with the sum of the colour channels, so the template is 1.15 + 0.66 * (brightness/255)^2 * (R+G+B)/765, which fits every point within 0.05 W. With the Bluetooth proxy or the SEN55 disabled the base draw will be somewhat lower.",
+          "measure_device": "Shelly Plus Plug UK",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "min_version": "1.20.3",
+          "name": "Air Quality Sensor",
+          "product_url": "https://apolloautomation.com/products/air-1",
+          "standby_power": 1.15,
+          "authors": [
+            {
+              "name": "Laurens",
+              "github": "LaurensBot"
+            }
+          ],
+          "id": "AIR-1",
+          "manufacturer": "apollo automation",
+          "updated_at": "2026-09-24T18:53:37",
+          "max_power": 0.0,
+          "sub_profile_count": 0,
+          "hash": "41ed53e8f10eda87923dbb6f6dd77b92"
+        }
+      ],
+      "device_types": [
+        "generic_iot"
+      ]
+    },
+    {
       "aliases": [],
       "name": "apple",
       "full_name": "Apple",
