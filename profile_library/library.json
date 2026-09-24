@@ -38526,6 +38526,59 @@
       "models": [
         {
           "calculation_strategy": "fixed",
+          "compatible_integrations": [
+            "tapo_control"
+          ],
+          "created_at": "2026-09-23T21:30:00Z",
+          "device_type": "camera",
+          "device_specs": {
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "discovery_by": "device",
+          "fields": {
+            "privacy_entity": {
+              "label": "Privacy mode switch",
+              "description": "The camera's Privacy switch (tapo_control creates it as switch.<camera>_privacy). While it is on, the lens is closed and the image sensor and IR LEDs are off.",
+              "selector": {
+                "entity": {
+                  "domain": "switch"
+                }
+              }
+            },
+            "night_vision_entity": {
+              "label": "Night vision switching select",
+              "description": "The camera's Night Vision Switching select (tapo_control creates it as select.<camera>_night_vision_switching, options auto/on/off). Forced on or off is honoured; on auto the sun is used as the proxy for IR.",
+              "selector": {
+                "entity": {
+                  "domain": "select"
+                }
+              }
+            }
+          },
+          "measure_description": "Measured manually with a Shelly Plus Plug UK, polling its Switch.GetStatus apower every 2 s and averaging, with the camera on its own USB adapter (the adapter's draw is included). Privacy mode on: 1.95 W; watching by day (night vision forced off, colour image): 2.23 W; watching at night (night vision forced on, IR LEDs lit, black-and-white image): 3.32 W. 60-90 s per state after settling, repeated privacy readings agreed within 0.05 W. tapo_control has no day/night sensor, so the Night Vision Switching select decides: forced on uses the IR figure, forced off the day figure, and on auto the sun is the proxy for IR. Firmware 1.4.2 Build 260302.",
+          "measure_device": "Shelly Plus Plug UK",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "min_version": "1.20.3",
+          "name": "Tapo C125 AI Home Security Wi-Fi Camera",
+          "product_url": "https://www.tp-link.com/uk/home-networking/cloud-camera/tapo-c125/",
+          "authors": [
+            {
+              "name": "Laurens",
+              "github": "LaurensBot"
+            }
+          ],
+          "id": "C125",
+          "manufacturer": "tp-link",
+          "updated_at": "2026-09-24T18:54:26",
+          "max_power": 0.0,
+          "sub_profile_count": 0,
+          "hash": "c3c8b0a1e59cd651db1e2d00b33ca85b"
+        },
+        {
+          "calculation_strategy": "fixed",
           "created_at": "2025-01-20T10:00:00Z",
           "device_type": "smart_switch",
           "device_specs": {
@@ -39307,6 +39360,7 @@
         }
       ],
       "device_types": [
+        "camera",
         "smart_switch",
         "light"
       ]
