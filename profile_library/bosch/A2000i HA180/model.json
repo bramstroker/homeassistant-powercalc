@@ -1,0 +1,41 @@
+{
+  "aliases": [
+    "Air 2000i"
+  ],
+  "calculation_strategy": "fixed",
+  "compatible_integrations": [
+    "matter"
+  ],
+  "created_at": "2026-09-23T21:30:00Z",
+  "device_type": "air_purifier",
+  "device_specs": {
+    "form_factor": "air_purifier",
+    "connectivity": [
+      "wifi",
+      "matter"
+    ]
+  },
+  "measure_description": "Measured manually with a Shelly Plus Plug UK at the wall, 230 V UK mains, the purifier driven from Home Assistant over Matter. Time-weighted means per state from the Home Assistant recorder: off (standby) 0.9 W over 10 min; sleep_wind 2.9 W over 5 min; low 5.7 W over 3.5 min; medium 9.5 W over 5 min; high 20.0 W over 25 min (19.7-21.0). In auto the unit picks a speed itself and reports it as percentage 33/66/100: auto at 33 % measured 5.7 W over 5 min (the same speed as low), auto at 66 % about 10.1 W over 80 s, and auto at 100 % is taken as high. sleep_wind also reports 33 %, so the preset is checked before the percentage. Hardware G10-3, firmware 1.0.0. HEPA filter condition 97 % during the measurement; a heavily loaded filter may change the fan's draw.",
+  "measure_device": "Shelly Plus Plug UK",
+  "measure_method": "manual",
+  "mains_voltage": 230,
+  "min_version": "v1.25.3",
+  "name": "Air 2000i",
+  "product_url": "https://www.bosch-homecomfort.com/de/de/ocs/wohngebaeude/air-2000i-21044271-p/",
+  "standby_power": 0.9,
+  "fixed_config": {
+    "states_power": {
+      "preset_mode|sleep_wind": 2.9,
+      "preset_mode|low": 5.7,
+      "preset_mode|medium": 9.5,
+      "preset_mode|high": 20.0,
+      "preset_mode|auto": "{{ {66: 10.1, 100: 20.0}.get(state_attr('[[entity]]', 'percentage') | int(33), 5.7) }}"
+    }
+  },
+  "authors": [
+    {
+      "name": "Laurens",
+      "github": "LaurensBot"
+    }
+  ]
+}
