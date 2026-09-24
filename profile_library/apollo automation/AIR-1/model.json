@@ -31,7 +31,7 @@
   "measure_method": "manual",
   "mains_voltage": 230,
   "min_version": "1.20.3",
-  "name": "AIR-1",
+  "name": "Air Quality Sensor",
   "product_url": "https://apolloautomation.com/products/air-1",
   "standby_power": 1.15,
   "authors": [
