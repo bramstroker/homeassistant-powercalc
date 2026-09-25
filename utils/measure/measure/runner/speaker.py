@@ -62,6 +62,10 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
 
         disable_streaming = request.disable_streaming
 
+        # A previous run (or the user) may have left the speaker muted; setting the
+        # volume does not unmute it, so the volume steps would measure silence.
+        self.media_controller.unmute_volume()
+
         for completed_steps, volume in enumerate(volumes, start=1):
             _LOGGER.info("Setting volume to %d", volume)
             self.media_controller.set_volume(volume)
@@ -95,6 +99,7 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
         voltages.extend(result.voltages)
         self.interaction.progress(total_steps, total_steps, phase=VOLUME_MEASUREMENT_PHASE, remaining_seconds=0)
 
+        self.media_controller.unmute_volume()
         self.media_controller.set_volume(10)
         self.interaction.operating_point(SpeakerOperatingPoint(type="speaker", volume=10, muted=False))
 

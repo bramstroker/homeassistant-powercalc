@@ -72,6 +72,18 @@ def test_mute_volume_is_not_replayed_after_disconnect(hass_client: MagicMock) ->
     )
 
 
+def test_unmute_volume_is_not_replayed_after_disconnect(hass_client: MagicMock) -> None:
+    _get_instance(hass_client).unmute_volume()
+
+    hass_client.trigger_service.assert_called_once_with(
+        "media_player",
+        "volume_mute",
+        retry_on_disconnect=False,
+        entity_id="media_player.test",
+        is_volume_muted=False,
+    )
+
+
 def test_play_audio_is_not_replayed_after_disconnect(hass_client: MagicMock) -> None:
     _get_instance(hass_client).play_audio("https://example.com/audio.mp3")
 
