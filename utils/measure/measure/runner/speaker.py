@@ -64,7 +64,12 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
 
         # A previous run (or the user) may have left the speaker muted; setting the
         # volume does not unmute it, so the volume steps would measure silence.
-        self.media_controller.unmute_volume()
+        # Speakers without the VOLUME_MUTE feature reject the call; that must not
+        # stop the volume levels from being measured.
+        try:
+            self.media_controller.unmute_volume()
+        except Exception as err:  # noqa: BLE001
+            _LOGGER.warning("Could not unmute the speaker before measuring, continuing: %s", err)
 
         for completed_steps, volume in enumerate(volumes, start=1):
             _LOGGER.info("Setting volume to %d", volume)

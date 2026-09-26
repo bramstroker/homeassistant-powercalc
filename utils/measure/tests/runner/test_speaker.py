@@ -100,6 +100,17 @@ def test_run_unmutes_before_measuring_and_after_the_muted_baseline() -> None:
     assert calls.index("mute_volume") < len(calls) - 1 - calls[::-1].index("unmute_volume")
 
 
+def test_run_continues_when_the_speaker_cannot_be_unmuted() -> None:
+    media_controller = MagicMock(MediaController)
+    # First unmute rejected (no VOLUME_MUTE feature); the final one is not reached with an error.
+    media_controller.unmute_volume.side_effect = [RuntimeError("ServiceNotSupported"), None]
+
+    model_data = _run(media_controller)
+
+    assert media_controller.set_volume.call_count == 11
+    assert model_data["linear_config"]["calibrate"][0] == "10 -> 10.5"
+
+
 def test_streaming_is_started_for_every_volume_level() -> None:
     media_controller = MagicMock(MediaController)
 
