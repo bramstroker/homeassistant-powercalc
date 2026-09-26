@@ -94,6 +94,40 @@ The profile then calculates the power usage based on the number provided.
 
 When the user provides the number `2`, the template will be ``{{ 2 * 0.20 }}`` which will result in `0.40`.
 
+#### Scaling per-unit measurements
+
+Profiles with measurements for one panel, strip segment, or bulb can use a custom field as their default `multiply_factor`.
+This also works with LUT profiles, whose CSV values cannot contain placeholders.
+
+```json
+{
+  "min_version": "v1.26.0",
+  "multiply_factor": "[[panel_count]]",
+  "standby_power_on": 1.6,
+  "fields": {
+    "panel_count": {
+      "label": "Number of panels",
+      "description": "Number of light panels connected to the controller",
+      "selector": {
+        "number": {
+          "min": 1,
+          "max": 500,
+          "step": 1
+        }
+      }
+    }
+  }
+}
+```
+
+This fragment multiplies calculated power by the panel count, then adds the controller's 1.6 W once.
+The LUT must contain per-panel power with the controller's consumption already removed.
+Standby power is multiplied only when the user enables `multiply_factor_standby`.
+An explicit sensor `multiply_factor` overrides the profile default.
+
+The profile value can also be a literal number. After field substitution, it must be a finite number.
+Set `min_version` to `v1.26.0` or higher so older Powercalc versions skip profiles using this option.
+
 #### Example entity selector
 
 In the example below we have a profile that asks the user to select a binary sensor.

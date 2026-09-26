@@ -581,6 +581,18 @@
       ],
       "additionalProperties": false
     },
+    "multiply_factor": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "pattern": "^\\[\\[[a-zA-Z0-9_]+\\]\\]$"
+        }
+      ],
+      "description": "Default multiplier for calculated power, as a number or custom field placeholder. An explicit sensor multiply_factor overrides this value. Standby power is not multiplied unless multiply_factor_standby is enabled."
+    },
     "only_self_usage": {
       "type": "boolean",
       "description": "Indicates if profile only provides power usage for the device itself"

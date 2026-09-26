@@ -2,6 +2,10 @@
 
 This feature allows you to multiply the calculated power.
 
+A library profile can provide a default multiplier, including one based on a custom field such as the number of panels.
+An explicit `multiply_factor` in your sensor configuration overrides the profile's value.
+Standby power, including the controller's `standby_power_on`, is added once unless you enable `multiply_factor_standby`.
+
 This can be useful in the following use cases:
 
 - You have a bunch of similar lights which you control as a group and want a single power sensor.
