@@ -1,0 +1,142 @@
+{
+  "aliases": [
+    "roborock.vacuum.a65"
+  ],
+  "authors": [
+    {
+      "name": "Laurens",
+      "github": "LaurensBot"
+    }
+  ],
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'docked') }}",
+  "calculation_strategy": "composite",
+  "compatible_integrations": [
+    "roborock"
+  ],
+  "config_flow_discovery_remarks": "**Warning:** this profile assumes mop drying is switched OFF in the Roborock app. Warm-air drying is not modelled: after a mop run with drying on, the dock draws roughly 55-60 W more than this profile reports for the whole drying time (2-4 h).",
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:status]]",
+          "state": "emptying_the_bin"
+        },
+        "fixed": {
+          "power": 905
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:status]]",
+          "state": "washing_the_mop"
+        },
+        "fixed": {
+          "power": 10.4
+        }
+      },
+      {
+        "linear": {
+          "calibrate": [
+            "26 -> 28.63",
+            "27 -> 28.73",
+            "28 -> 28.80",
+            "29 -> 28.85",
+            "30 -> 28.90",
+            "31 -> 28.93",
+            "32 -> 28.97",
+            "33 -> 29.02",
+            "34 -> 29.02",
+            "35 -> 29.07",
+            "36 -> 29.10",
+            "37 -> 29.10",
+            "38 -> 29.18",
+            "39 -> 29.23",
+            "40 -> 29.24",
+            "41 -> 29.25",
+            "42 -> 29.30",
+            "43 -> 29.34",
+            "44 -> 29.42",
+            "45 -> 29.45",
+            "46 -> 29.50",
+            "47 -> 29.53",
+            "48 -> 29.54",
+            "49 -> 29.62",
+            "50 -> 29.65",
+            "51 -> 29.72",
+            "52 -> 29.78",
+            "53 -> 29.85",
+            "54 -> 29.91",
+            "55 -> 29.99",
+            "56 -> 30.05",
+            "57 -> 30.10",
+            "58 -> 30.22",
+            "59 -> 30.29",
+            "60 -> 30.34",
+            "61 -> 30.40",
+            "62 -> 30.48",
+            "63 -> 30.55",
+            "64 -> 30.63",
+            "65 -> 30.70",
+            "66 -> 30.79",
+            "67 -> 30.84",
+            "68 -> 30.92",
+            "69 -> 31.02",
+            "70 -> 31.13",
+            "71 -> 31.18",
+            "72 -> 31.26",
+            "73 -> 31.33",
+            "74 -> 31.40",
+            "75 -> 31.49",
+            "76 -> 31.58",
+            "77 -> 31.64",
+            "78 -> 29.56",
+            "79 -> 21.13",
+            "80 -> 16.66",
+            "81 -> 15.06",
+            "82 -> 14.22",
+            "83 -> 13.47",
+            "84 -> 12.77",
+            "85 -> 12.10",
+            "86 -> 11.55",
+            "87 -> 11.01",
+            "88 -> 10.51",
+            "89 -> 10.04",
+            "90 -> 9.59",
+            "91 -> 9.17",
+            "92 -> 3.97",
+            "93 -> 2.83",
+            "94 -> 2.81",
+            "95 -> 2.85",
+            "96 -> 2.81",
+            "97 -> 2.78",
+            "98 -> 2.81",
+            "99 -> 2.79",
+            "100 -> 2.77"
+          ]
+        }
+      }
+    ]
+  },
+  "created_at": "2026-09-24T16:00:00Z",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "device_type": "vacuum_robot",
+  "mains_voltage": 230,
+  "measure_description": "Measured manually with a Shelly Plus Plug UK on the dock's mains lead (UK, 232-242 V), so every figure covers the whole RockDock Ultra plus robot, polling the plug's Switch.GetStatus apower every 2 s and joining it to the Home Assistant roborock integration's battery and status history. Charging: one continuous charge from 25 % to 100 % with mop drying switched OFF, averaged per reported battery percent (29-67 samples per step, sd under 0.2 W). The robot's gauge rescales near the top: real charging ends around a reported 92 %, after which the dock holds 2.77 W while the percentage climbs to 100 %, so 93-100 % is the docked-and-full draw. The first minutes after docking show a 9.6 W pause before charging ramps up; that is not modelled. Below 26 % the curve holds its first point (the only sub-26 % charge overlapped drying). Emptying the bin: two 32 s cycles, energy-averaged 947 and 864 W (peak 1188 W). Mop washing: five cycles of 131-157 s, 10.0-10.7 W. Robot away from the dock: 0.35 W (standby_power). NOT MODELLED: warm-air mop drying. The core roborock integration does report it (the dock device's Mop drying switch, translation key mop_drying, tracked this unit's drying exactly: on 12:53:46, off 13:37:38), but it lives on the separate dock device, and Powercalc's entity placeholders only search the vacuum's own device. The vacuum's status keeps reading 'charging' throughout. With drying enabled, a charge from 19 % averaged 88.5 W instead of ~29 W: an ~8 W fan plus a ~76 W heater at about 65 % duty (113 W on / 37 W off), so with drying on this profile under-reads by roughly 55-60 W for the configured drying time. The charging curve was measured with drying switched OFF. Robot label Q100TSC, dock label EWFD04HRR (UK 230 V), Home Assistant 2026.9.3, robot firmware 02.26.80.",
+  "measure_device": "Shelly Plus Plug UK",
+  "measure_method": "manual",
+  "name": "S7 Max Ultra",
+  "product_url": "https://global.roborock.com/pages/roborock-s7-max-ultra",
+  "standby_power": 0.35,
+  "voltage_range": {
+    "min": 232.2,
+    "max": 242.0
+  },
+  "min_version": "v1.20.13"
+}
