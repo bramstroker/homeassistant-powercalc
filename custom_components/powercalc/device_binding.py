@@ -136,6 +136,43 @@ def get_related_devices(hass: HomeAssistant, device_id: str) -> list[DeviceEntry
     return list(devices.values())
 
 
+def get_profile_related_devices(hass: HomeAssistant, device_id: str) -> list[AnyDeviceEntry]:
+    """Return native children and known docks that a profile may reference."""
+    device_reg = device_registry.async_get(hass)
+    device = device_reg.async_get(device_id)
+    if device is None:
+        return []
+
+    related: dict[str, AnyDeviceEntry] = {}
+    if _HAS_CHILD_DEVICES:
+        for child in device_registry.async_entries_for_parent_device(device_reg, device_id):
+            related[child.id] = child
+
+    for dock in _get_roborock_docks(hass, device):
+        related[dock.id] = dock
+
+    related.pop(device_id, None)
+    return list(related.values())
+
+
+def _get_roborock_docks(hass: HomeAssistant, device: AnyDeviceEntry) -> list[AnyDeviceEntry]:
+    """Match Roborock's dock identifier convention within the source's config entries."""
+    dock_identifiers = {
+        (domain, f"{identifier}_dock") for domain, identifier in device.identifiers if domain == "roborock"
+    }
+    if not dock_identifiers:
+        return []
+
+    device_reg = device_registry.async_get(hass)
+    docks: list[AnyDeviceEntry] = []
+    for config_entry_id in get_config_entry_ids(device):
+        candidates: list[AnyDeviceEntry] = list(get_devices_for_config_entry(hass, config_entry_id))
+        if _HAS_CHILD_DEVICES:
+            candidates.extend(device_registry.async_child_entries_for_config_entry(device_reg, config_entry_id))
+        docks.extend(candidate for candidate in candidates if candidate.identifiers & dock_identifiers)
+    return docks
+
+
 def resolve_source_device(
     hass: HomeAssistant,
     sensor_config: ConfigType,

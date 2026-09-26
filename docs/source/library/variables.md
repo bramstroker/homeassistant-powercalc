@@ -8,10 +8,10 @@ You can use the following built-in variables in the `model.json` file.
 
 `[[entity]]`: The entity ID of the entity for which the power sensor is being created.
 
-`[[entity_by_device_class:{device_class}]]`: Finds an entity with the specified device class in the same device as `[[entity]]`.
+`[[entity_by_device_class:{device_class}]]`: Finds an entity with the specified device class, preferring the same device as `[[entity]]`.
 For example, `[[entity_by_device_class:temperature]]` will find a temperature sensor in the same device, and `[[entity_by_device_class:battery]]` will find a battery sensor.
 
-`[[entity_by_translation_key:{translation_key}]]`: Finds the first entity with the specified translation key on the same device as `[[entity]]`.
+`[[entity_by_translation_key:{translation_key}]]`: Finds an entity with the specified translation key, preferring the same device as `[[entity]]`.
 This is useful when an integration exposes multiple related entities for one device and the profile needs to reference one of them without asking the user to configure an extra entity manually.
 
 For example, NUT UPS entities can expose translation keys such as `ups_load` and `ups_power_nominal`:
@@ -25,9 +25,28 @@ For example, NUT UPS entities can expose translation keys such as `ups_load` and
 }
 ```
 
-!!! note
-    `entity_by_translation_key` only works for entities that belong to the same Home Assistant device as `[[entity]]`.
-    When multiple entities on the same device share the same translation key, the first match is used.
+### Related-device lookup
+
+Both placeholders search enabled entities on the source device first. If multiple entities on that device match, the first match is used.
+If there is no match, Powercalc searches:
+
+- Native child devices whose `parent_device_id` is the source device, on Home Assistant versions that support child devices.
+- Roborock docks whose identifier is the source's Roborock identifier plus `_dock`, within the same integration config entry.
+
+The fallback must find exactly one matching entity. If several entities match, Powercalc logs the candidates and leaves the placeholder unresolved, so profile setup cannot silently select the wrong entity.
+Disabled entities are excluded from both searches. Shared config-entry membership alone does not establish a relationship, and Powercalc does not search parents, siblings, or devices connected through `via_device_id`.
+
+For example, a Roborock profile can reference the dock's active drying switch in a composite condition:
+
+```json
+{
+  "condition": "state",
+  "entity_id": "[[entity_by_translation_key:mop_drying]]",
+  "state": "on"
+}
+```
+
+The `_dock` identifier rule is specific to the Roborock integration. Other integrations may expose dock entities directly on the vacuum device or as native child devices.
 
 ## Custom fields
 

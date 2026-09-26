@@ -20,6 +20,7 @@ from custom_components.powercalc.const import (
     PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY,
     CalculationStrategy,
 )
+from custom_components.powercalc.device_binding import get_profile_related_devices
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
@@ -158,7 +159,7 @@ def replace_placeholders(
 
 
 def iter_related_entity_placeholders(placeholders: Iterable[str]) -> Iterator[str]:
-    """Yield placeholders that need lookup against entities on the same device."""
+    """Yield placeholders that need lookup against related entities."""
     for placeholder in placeholders:
         if parse_related_entity_placeholder(placeholder):
             yield placeholder
@@ -241,7 +242,7 @@ def get_related_entity_by_device_class(
     source_entity: SourceEntity,
     device_class: SensorDeviceClass | BinarySensorDeviceClass,
 ) -> str | None:
-    """Get related entity from same device by device class."""
+    """Find an entity by device class, preferring the source device."""
     return _get_related_entity_for_device(
         hass,
         source_entity=source_entity,
@@ -256,7 +257,7 @@ def get_related_entity_by_translation_key(
     source_entity: SourceEntity,
     translation_key: str,
 ) -> str | None:
-    """Get related entity from same device by translation key."""
+    """Find an entity by translation key, preferring the source device."""
     return _get_related_entity_for_device(
         hass,
         source_entity=source_entity,
@@ -273,18 +274,23 @@ def _get_related_entity_for_device(
     match_value: SensorDeviceClass | BinarySensorDeviceClass | str,
     matcher: Callable[[RegistryEntry], bool],
 ) -> str | None:
-    """Get the first related entity on the same device matching the given predicate."""
+    """Prefer a source-device match, otherwise require one unambiguous linked-device match."""
     entity_reg = entity_registry.async_get(hass)
     device_id = source_entity.device_id
     if not device_id:
         _LOGGER.debug("No device_id available, cannot find related entity")
         return None
 
-    related_entities = [
-        entity_entry.entity_id
-        for entity_entry in entity_registry.async_entries_for_device(entity_reg, device_id)
-        if matcher(entity_entry)
-    ]
+    for entity_entry in entity_registry.async_entries_for_device(entity_reg, device_id):
+        if matcher(entity_entry):
+            return entity_entry.entity_id
+
+    related_entities: set[str] = set()
+    for device in get_profile_related_devices(hass, device_id):
+        for entity_entry in entity_registry.async_entries_for_device(entity_reg, device.id):
+            if matcher(entity_entry):
+                related_entities.add(entity_entry.entity_id)
+
     if not related_entities:
         _LOGGER.debug(
             "No related entities found for device %s with %s %s",
@@ -294,4 +300,14 @@ def _get_related_entity_for_device(
         )
         return None
 
-    return related_entities[0]
+    if len(related_entities) > 1:
+        _LOGGER.warning(
+            "Ambiguous related entities for %s with %s %s: %s",
+            source_entity.entity_id,
+            match_label,
+            match_value,
+            ", ".join(sorted(related_entities)),
+        )
+        return None
+
+    return next(iter(related_entities))

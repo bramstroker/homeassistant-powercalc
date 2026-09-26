@@ -1,8 +1,9 @@
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.selector import SelectSelector
+import pytest
 from pytest_homeassistant_custom_component.common import mock_device_registry
 import voluptuous as vol
 
@@ -19,6 +20,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SensorType,
 )
+from custom_components.powercalc.device_binding import get_config_entry_ids
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
@@ -28,7 +30,9 @@ from tests.common import (
     get_test_profile_dir,
     mock_device,
     mock_device_with_entities,
+    mock_devices,
     mock_entities_in_registry,
+    requires_child_devices,
 )
 from tests.config_flow.common import (
     DEFAULT_ENTITY_ID,
@@ -77,16 +81,27 @@ async def test_discovery_flow_remarks_are_shown(hass: HomeAssistant) -> None:
     assert result["description_placeholders"]["remarks"] is not None
 
 
-async def _setup_ups_discovery_flow(hass: HomeAssistant) -> tuple[SourceEntity, data_entry_flow.FlowResult]:
+async def _setup_ups_discovery_flow(
+    hass: HomeAssistant,
+    use_child_device: bool = False,
+) -> tuple[SourceEntity, data_entry_flow.FlowResult]:
     """Set up UPS device with translation key entities and initialize discovery flow."""
     device_entry = mock_device(hass, "ups-device", model="discovery_translation_key", name="UPS")
+    sensor_device_id = device_entry.id
+    if use_child_device:
+        child = dr.async_get(hass).async_get_or_create_child(
+            config_entry_id=next(iter(get_config_entry_ids(device_entry))),
+            parent_device_id=device_entry.id,
+            identifiers={("test", "ups-output")},
+        )
+        sensor_device_id = child.id
     mock_entities_in_registry(
         hass,
         {
             "sensor.ups_output": {"unique_id": "ups_output", "device_id": device_entry.id, "platform": "test"},
             "sensor.ups_nominal_power": {
                 "unique_id": "ups_nominal_power",
-                "device_id": device_entry.id,
+                "device_id": sensor_device_id,
                 "platform": "test",
                 "translation_key": "ups_power_nominal",
             },
@@ -157,8 +172,50 @@ async def test_discovery_flow_remarks_are_shown_when_translation_key_entity_miss
     assert result["description_placeholders"]["remarks"] == "\n\nEnable the Nominal Power entity first."
 
 
-async def test_discovery_flow_auto_resolves_availability_entity_from_translation_key(hass: HomeAssistant) -> None:
-    _, result = await _setup_ups_discovery_flow(hass)
+@pytest.mark.parametrize("matching_entities", [0, 1, 2])
+async def test_discovery_flow_resolves_dock_entities(
+    hass: HomeAssistant,
+    matching_entities: int,
+) -> None:
+    mock_devices(
+        hass,
+        {
+            "robot": {"identifiers": {("roborock", "robot")}, "model": "vacuum_dock"},
+            "dock": {"identifiers": {("roborock", "robot_dock")}},
+        },
+    )
+    entities = {"vacuum.robot": {"platform": "roborock", "device_id": "robot"}}
+    for index in range(matching_entities):
+        entities[f"switch.dock_drying_{index}"] = {
+            "platform": "roborock",
+            "device_id": "dock",
+            "translation_key": "mop_drying",
+        }
+    mock_entities_in_registry(hass, entities)
+    source = create_source_entity("vacuum.robot", hass)
+    profile = await get_power_profile(
+        hass,
+        {CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("vacuum_dock")},
+        source,
+        ModelInfo("test", "vacuum_dock"),
+        process_variables=False,
+    )
+
+    result = await initialize_discovery_flow(hass, source, profile)
+
+    expected_remarks = None if matching_entities == 1 else "\n\nEnable the dock drying switch."
+    assert result["description_placeholders"]["remarks"] == expected_remarks
+    if matching_entities == 1:
+        result = await confirm_auto_discovered_model(hass, result)
+        assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
+
+@pytest.mark.parametrize("use_child_device", [False, pytest.param(True, marks=requires_child_devices)])
+async def test_discovery_flow_auto_resolves_availability_entity_from_translation_key(
+    hass: HomeAssistant,
+    use_child_device: bool,
+) -> None:
+    _, result = await _setup_ups_discovery_flow(hass, use_child_device)
     result = await confirm_auto_discovered_model(hass, result)
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
