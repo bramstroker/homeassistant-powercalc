@@ -19,7 +19,6 @@ def load_recording(path: Path) -> LoadedRecording:
 
     samples: list[RecordingSample] = []
     invalid_records: list[str] = []
-    unverified = 0
     metadata: dict[str, object] | None = None
     with path.open(encoding="utf-8") as recording:
         for line_number, line in enumerate(recording, start=1):
@@ -30,9 +29,6 @@ def load_recording(path: Path) -> LoadedRecording:
                 if record.get("record_type") == "metadata":
                     metadata = record
                     continue
-                if record.get("record_type") == "unverified_zero_power":
-                    unverified += 1
-                    continue
                 if record.get("record_type") not in (None, "sample"):
                     continue
                 sample = _parse_sample(record)
@@ -41,8 +37,6 @@ def load_recording(path: Path) -> LoadedRecording:
                 continue
             samples.append(sample)
     warnings: list[str] = []
-    if unverified:
-        warnings.append(f"Excluded {unverified} unverified 0 W sample(s) from power analysis")
     if invalid_records:
         warnings.append(f"Skipped {len(invalid_records)} invalid recorder line(s); first was {invalid_records[0]}")
     return LoadedRecording(RecordingDataset(samples, metadata), warnings)

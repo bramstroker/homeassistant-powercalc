@@ -210,7 +210,6 @@ class AverageMeasurementRequest(BaseMeasurementRequest):
 class RecorderMeasurementRequest(BaseMeasurementRequest):
     measure_type: Literal[MeasureType.RECORDER] = MeasureType.RECORDER
     controller: None = None
-    continue_on_zero_power: bool = False
     recorder_purpose: RecorderPurpose = RecorderPurpose.PLAYBOOK
     profile_recipe: RecorderProfileRecipe | None = None
     tracked_entity_ids: tuple[str, ...] = Field(default=(), max_length=100)
@@ -260,8 +259,6 @@ class RecorderMeasurementRequest(BaseMeasurementRequest):
     @model_validator(mode="after")
     def validate_recorder_selection(self) -> RecorderMeasurementRequest:
         if self.recorder_purpose == RecorderPurpose.PLAYBOOK:
-            if self.continue_on_zero_power:
-                raise ValueError("Continuing through 0 W requires a complex-profile recording")
             if self._has_profile_selection():
                 raise ValueError("Playbook recordings cannot include complex-profile entity selections")
             return self

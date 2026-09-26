@@ -20,6 +20,7 @@ export const measurementDefaults = { sleep_time: 1, sample_count: 5, sleep_time_
 export const defaultSettings: AppSettings = {
   default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null, kasa_ip: null,
   fast_test_mode: false,
+  allow_zero_power: false,
   measurement_defaults: measurementDefaults,
 };
 export const capabilities: Capabilities = {

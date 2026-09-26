@@ -27,7 +27,7 @@ from measure.ha_app.library_catalog import (
     LibraryCatalogError,
 )
 from measure.ha_app.preferences import AppPreferences, AppSettingsResponse, AppSettingsUpdate
-from measure.ha_app.preparation import apply_fast_test_mode, run_preflight
+from measure.ha_app.preparation import apply_developer_settings, run_preflight
 from measure.ha_app.registry import measurement_definitions
 from measure.ha_app.shelly_credentials import ShellyCredentials
 from measure.ha_app.shelly_discovery import ShellyDiscoveryResponse, ShellyDiscoveryService
@@ -143,6 +143,8 @@ async def update_settings(payload: AppSettingsUpdate, request: Request) -> AppSe
     context = get_app_context(request)
     if payload.fast_test_mode and not context.developer_mode:
         raise HTTPException(status_code=400, detail="Fast test mode requires developer mode")
+    if payload.allow_zero_power and not context.developer_mode:
+        raise HTTPException(status_code=400, detail="Accepting 0 W readings requires developer mode")
     return await run_in_threadpool(_save_settings, context, payload)
 
 
@@ -209,7 +211,7 @@ async def entities(
 @router.post("/preflight", responses={409: ERROR_RESPONSE, 422: ERROR_RESPONSE})
 async def preflight(payload: MeasurementRequestPayload, request: Request, refresh: bool = False) -> PreflightResponse:
     context = get_app_context(request)
-    prepared = await run_in_threadpool(apply_fast_test_mode, context, payload)
+    prepared = await run_in_threadpool(apply_developer_settings, context, payload)
     assessment = await run_in_threadpool(run_preflight, context, prepared, refresh=refresh)
     result = assessment.checks
     return PreflightResponse(

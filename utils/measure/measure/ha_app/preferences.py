@@ -50,6 +50,7 @@ class AppPreferences(BaseModel):
     shelly_username: str = Field(default="admin", min_length=1, max_length=50)
     kasa_ip: str | None = Field(default=None, max_length=255)
     fast_test_mode: bool = False
+    allow_zero_power: bool = False
     measurement_defaults: AppMeasurementDefaults = Field(default_factory=AppMeasurementDefaults)
 
 

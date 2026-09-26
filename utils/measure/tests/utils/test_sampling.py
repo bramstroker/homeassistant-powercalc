@@ -6,12 +6,7 @@ from unittest.mock import MagicMock, patch
 
 from measure.cancellation import MeasurementCancelledError
 from measure.const import RETRY_COUNT_LIMIT, Trend
-from measure.powermeter.errors import (
-    ApiConnectionError,
-    UnsupportedFeatureError,
-    ZeroPowerReadingError,
-    ZeroReadingError,
-)
+from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError, ZeroReadingError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.tuning import MeasurementParameters
 from measure.utils.sampling import (
@@ -562,15 +557,40 @@ def test_average_measurement_excludes_failed_readings_from_average(
     assert result.power == 7.0
 
 
-@pytest.mark.parametrize("power", [0, 0.004, -1])
-def test_sampler_distinguishes_unverified_zero_power_from_negative_power(power: float) -> None:
+@pytest.mark.parametrize("power,accepted", [(0, True), (0.004, True), (-0.1, False)])
+def test_sampler_accepts_zero_power_only_when_allowed(power: float, accepted: bool) -> None:
     meter = MagicMock(spec=PowerMeter)
     meter.get_power.return_value = PowerMeasurementResult(power=power, voltage=230, updated=0)
-    sampler = PowerSampler(meter, MeasurementParameters(max_retries=0))
-    with pytest.raises(ZeroReadingError) as raised:
-        sampler.take_measurement()
-    if power >= 0:
-        assert isinstance(raised.value, ZeroPowerReadingError)
-        assert raised.value.power == power
+    sampler = PowerSampler(meter, MeasurementParameters(max_retries=0, allow_zero_power=True))
+
+    if accepted:
+        assert sampler.take_measurement().power == power
     else:
-        assert not isinstance(raised.value, ZeroPowerReadingError)
+        with pytest.raises(ZeroReadingError):
+            sampler.take_measurement()
+
+
+def test_average_includes_zero_power_when_allowed() -> None:
+    clock = SamplingClock()
+    meter = MagicMock(spec=PowerMeter)
+    meter.get_power.side_effect = [
+        PowerMeasurementResult(power=0, voltage=10, updated=0),
+        PowerMeasurementResult(power=6, voltage=10, updated=0),
+    ]
+    sampler = PowerSampler(meter, MeasurementParameters(sleep_time=2, allow_zero_power=True), wait=clock.wait)
+
+    with patch("measure.utils.sampling.time.time", side_effect=lambda: clock.elapsed):
+        result = sampler.take_average_measurement(4)
+
+    assert result.power == 3
+
+
+def test_allowed_zero_power_does_not_bypass_dummy_load_correction() -> None:
+    meter = MagicMock(spec=PowerMeter)
+    meter.has_voltage_support.return_value = True
+    meter.get_power.return_value = PowerMeasurementResult(power=0, voltage=230, updated=0)
+    sampler = PowerSampler(meter, MeasurementParameters(max_retries=0, allow_zero_power=True))
+    sampler.set_dummy_load_resistance(10)
+
+    with pytest.raises(DummyLoadMeasurementError):
+        sampler.take_measurement()

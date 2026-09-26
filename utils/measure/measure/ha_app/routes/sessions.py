@@ -30,7 +30,7 @@ from measure.ha_app.context import AppContext, get_app_context, require_session
 from measure.ha_app.coordinator import SessionConflictError
 from measure.ha_app.diagnostics import DIAGNOSTIC_EVENT_LIMIT, build_session_diagnostics
 from measure.ha_app.light_probe import StandbyProbeResult, StandbyProbeStatus
-from measure.ha_app.preparation import apply_fast_test_mode, run_preflight, validate_standby_setup
+from measure.ha_app.preparation import apply_developer_settings, run_preflight, validate_standby_setup
 from measure.ha_app.session import (
     ACTIVE_SESSION_STATES,
     RESUMABLE_SESSION_STATES,
@@ -214,7 +214,7 @@ def cancel_standby_calibration(session_id: str, job_id: str, request: Request) -
 @router.post("/sessions", status_code=201, responses={409: ERROR_RESPONSE, 422: ERROR_RESPONSE})
 async def start_session(payload: MeasurementRequestPayload, request: Request) -> SessionSnapshotResponse:
     context = get_app_context(request)
-    prepared = await run_in_threadpool(apply_fast_test_mode, context, payload)
+    prepared = await run_in_threadpool(apply_developer_settings, context, payload)
     await run_in_threadpool(run_preflight, context, prepared)
     try:
         snapshot = context.coordinator.start(prepared)

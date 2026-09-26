@@ -8,27 +8,17 @@ export class SetupDeveloperOptions extends LitElement {
   @property({ type: Boolean }) fastTestMode = false;
   @property({ type: Boolean }) hasController = false;
   @property({ type: Boolean }) dummyController = false;
-  @property({ type: Boolean }) complexRecorder = false;
-  @property({ type: Boolean }) continueOnZeroPower = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
     return this;
   }
 
   render() {
-    if (!(this.developerMode && (this.hasController || this.complexRecorder)) && !this.fastTestMode) return nothing;
+    if (!(this.developerMode && this.hasController) && !this.fastTestMode) return nothing;
     return html`<details class="developer-options">
       <summary>Developer options</summary>
       <div class="developer-content">
         ${this.developerMode && this.hasController ? this.renderDummyController() : nothing}
-        ${this.developerMode && this.complexRecorder ? html`
-          <label class="check toggle-pill">
-            <input type="checkbox" name="continue_on_zero_power" .checked=${this.continueOnZeroPower}
-              @change=${this.continueOnZeroPowerChanged} />
-            Continue recording through 0 W readings
-          </label>
-          <p class="muted">For development only. Zero readings retain entity states but remain unverified and are excluded from power analysis. Reliable low-power measurements are still needed for a finished profile.</p>
-        ` : nothing}
         ${this.fastTestMode
           ? html`<p class="notice"><strong>Fast test mode is enabled.</strong> Dummy light, fan, speaker and charging runs use minimal waits and measurement points. Their output is for app testing only.</p>`
           : nothing}
@@ -54,10 +44,6 @@ export class SetupDeveloperOptions extends LitElement {
       </div>
     `;
   }
-
-  private readonly continueOnZeroPowerChanged = (event: Event): void => {
-    this.continueOnZeroPower = (event.currentTarget as HTMLInputElement).checked;
-  };
 
   private readonly dummyControllerChanged = (event: Event): void => {
     emit<boolean>(this, "dummy-controller-change", (event.currentTarget as HTMLInputElement).checked);

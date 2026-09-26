@@ -443,8 +443,3 @@ def test_export_filename_rejects_unsafe_characters(filename: str) -> None:
 
 def test_export_filename_preserves_safe_basename_and_trims_whitespace() -> None:
     assert validate_export_filename("  Record (run-1)+2.csv  ") == "Record (run-1)+2.csv"
-
-
-def test_playbook_cannot_continue_through_unverified_zero_power() -> None:
-    with pytest.raises(ValueError, match="requires a complex-profile recording"):
-        RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec(), continue_on_zero_power=True)

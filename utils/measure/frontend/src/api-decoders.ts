@@ -168,8 +168,7 @@ export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is
         && optionalNullable(isString)(value.vacuum_entity_id)
         && optionalNullable(isString)(value.battery_entity_id)
         && optional(isStringArray)(value.additional_entity_ids)
-        && optional(isString)(value.export_filename)
-        && optional(isBoolean)(value.continue_on_zero_power);
+        && optional(isString)(value.export_filename);
   }
 };
 
@@ -261,6 +260,7 @@ const isAppSettings: Guard<AppSettings> = objectOf({
   kasa_ip: nullable(isString),
   tapo_credentials_configured: optional(isBoolean),
   fast_test_mode: isBoolean,
+  allow_zero_power: isBoolean,
   measurement_defaults: isAppMeasurementDefaults,
 });
 

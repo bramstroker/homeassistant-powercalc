@@ -227,7 +227,6 @@ export interface RecorderMeasurementRequest extends BaseMeasurementRequest {
   measure_type: "recorder";
   controller?: null;
   recorder_purpose: "playbook" | "complex_profile";
-  continue_on_zero_power?: boolean;
   profile_recipe?: "generic" | "vacuum_robot" | null;
   tracked_entity_ids?: string[];
   vacuum_entity_id?: string | null;

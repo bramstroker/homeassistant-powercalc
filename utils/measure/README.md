@@ -141,13 +141,6 @@ Open http://localhost:5173. The Vite dev server proxies `/api` (including the SS
 
 To run the app locally with a single origin and no hot-reload, build the frontend with `npm run build` and start the backend with `create_app(..., static_root=Path("frontend/dist"), trusted_ingress_only=False)` on `127.0.0.1:8099`, with Uvicorn proxy headers disabled. The UI is then served by FastAPI on port 8099, and requests must come from loopback.
 
-With developer mode enabled, complex-profile recorder setup offers **Continue
-recording through 0 W readings** (off by default). It keeps entity states for
-workflow debugging when the meter repeatedly reports zero. These JSONL records
-use `record_type: "unverified_zero_power"`; the analyser excludes them and reports
-their count. Reliable low-power measurements are still needed for a finished
-profile. Voltage, dummy-load correction, and connection errors still stop the run.
-
 ### Checks
 
 ```

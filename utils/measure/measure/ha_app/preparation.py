@@ -79,7 +79,8 @@ def _evaluate_light_load_probe(
     return context.light_load_probe.evaluate(payload)
 
 
-def apply_fast_test_mode(context: AppContext, request: MeasurementRequest) -> MeasurementRequest:
+def apply_developer_settings(context: AppContext, request: MeasurementRequest) -> MeasurementRequest:
+    """Apply developer-only settings, forcing them off when developer mode is disabled."""
     settings = context.storage.load_settings()
     controller = request.controller
     supported_dummy_controller = controller is not None and controller.is_dummy
@@ -89,10 +90,11 @@ def apply_fast_test_mode(context: AppContext, request: MeasurementRequest) -> Me
         and isinstance(request.power_meter, DummyPowerMeterSpec)
         and supported_dummy_controller
     )
-    parameters = replace(request.parameters, fast_test_mode=False)
+    allow_zero_power = context.developer_mode and settings.allow_zero_power
+    parameters = replace(request.parameters, fast_test_mode=False, allow_zero_power=allow_zero_power)
     if enabled:
         parameters = replace(
-            request.parameters,
+            parameters,
             fast_test_mode=True,
             sleep_time=0,
             sleep_time_sample=0,

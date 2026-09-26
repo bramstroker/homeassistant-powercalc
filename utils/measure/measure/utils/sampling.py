@@ -15,7 +15,6 @@ from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
     UnsupportedFeatureError,
-    ZeroPowerReadingError,
     ZeroReadingError,
 )
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
@@ -335,13 +334,11 @@ class PowerSampler:
                     "Dummy-load correction produced non-positive target power; "
                     "verify the selected calibration and wiring",
                 )
-        elif round(power, 2) <= 0:
+        elif round(power, 2) < 0 or (round(power, 2) == 0 and not self.config.allow_zero_power):
             if ignore_zero:
                 _LOGGER.info("Skipped a %.2f W sample", power)
                 return None
-            if power >= 0:
-                raise ZeroPowerReadingError(power)
-            raise ZeroReadingError("Negative power was read from the power meter")
+            raise ZeroReadingError("0 watt was read from the power meter")
 
         _LOGGER.info("Measured power: %.2f W", power)
         self._emit_sample(power)

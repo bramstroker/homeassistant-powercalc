@@ -280,6 +280,13 @@ export class SettingsView extends LitElement {
                       Synthetic light, fan, and charging workflows only. Skips waits and reduces measurement points so the output is not valid for contribution or real use.
                     </span>
                   </label>
+                  <label class="check">
+                    <input type="checkbox" name="allow_zero_power" .checked=${this.settings?.allow_zero_power ?? false} />
+                    <span>
+                      <strong>Accept 0 W readings</strong><br />
+                      Keep measuring when the power meter reports 0 W instead of stopping. These readings are stored as 0 W, so the output is not valid for contribution.
+                    </span>
+                  </label>
                 </div>
               ` : nothing}
               <div class="grid">
@@ -352,6 +359,7 @@ export class SettingsView extends LitElement {
       tapo_password: meter.power_meter === "kasa" ? tapoPassword || null : null,
       clear_tapo_credentials: formChecked(data, "clear_tapo_credentials"),
       fast_test_mode: formChecked(data, "fast_test_mode"),
+      allow_zero_power: formChecked(data, "allow_zero_power"),
       measurement_defaults: {
         sleep_time: formNumber(data, "sleep_time"),
         sample_count: formNumber(data, "sample_count"),

@@ -77,6 +77,7 @@ const settings: AppSettings = {
   shelly_ip: null,
   kasa_ip: null,
   fast_test_mode: false,
+  allow_zero_power: false,
   measurement_defaults: {
     sleep_time: 2, sample_count: 1, sleep_time_sample: 1, max_retries: 5, max_nudges: 0,
   },
