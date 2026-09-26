@@ -10,9 +10,11 @@ from homeassistant.const import (
     STATE_PLAYING,
     STATE_STANDBY,
     STATE_UNKNOWN,
+    EntityCategory,
     UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_registry import EntityRegistry
 
 from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP
 from custom_components.powercalc.const import (
@@ -24,6 +26,7 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_MODEL,
     CONF_POWER,
+    CONF_POWER_SENSOR_CATEGORY,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
     CONF_UTILITY_METER_TYPES,
@@ -64,6 +67,23 @@ async def test_standby_group(hass: HomeAssistant) -> None:
 
     await set_states(hass, [("input_boolean.test2", STATE_ON)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.20")
+
+
+async def test_standby_group_entity_category(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test1",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 20},
+        },
+        {CONF_POWER_SENSOR_CATEGORY: EntityCategory.DIAGNOSTIC},
+    )
+
+    power_entry = entity_registry.async_get("sensor.all_standby_power")
+    assert power_entry
+    assert power_entry.entity_category == EntityCategory.DIAGNOSTIC
 
 
 async def test_debug_standby_group_action(hass: HomeAssistant) -> None:
