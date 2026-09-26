@@ -37488,14 +37488,14 @@
           "min_version": "v1.25.2",
           "id": "sub mini",
           "manufacturer": "sonos",
-          "updated_at": "2026-09-25T18:30:09",
+          "updated_at": "2026-09-26T06:27:09",
           "max_power": 27.65,
           "sub_profile_count": 0,
           "power_range": {
             "min": 5.74,
             "max": 27.65
           },
-          "hash": "b2103d5ea1734340e85703f024f945bc"
+          "hash": "c6c0208e6fbd319460c00395dac7997a"
         },
         {
           "aliases": [
