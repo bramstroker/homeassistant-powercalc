@@ -200,6 +200,8 @@ class MeasurementPreflight:
         """Return warnings and estimates, or raise a typed preflight error."""
 
         self._validate_adapters(request)
+        if request.parameters.allow_zero_power and not self._developer_mode:
+            raise PreflightError("Accepting 0 W readings requires developer mode")
         if self._has_active_session():
             raise ActiveSessionError("A measurement session is already active")
         try:

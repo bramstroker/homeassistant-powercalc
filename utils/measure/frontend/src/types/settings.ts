@@ -16,6 +16,7 @@ export interface AppSettings {
   kasa_ip: string | null;
   tapo_credentials_configured?: boolean;
   fast_test_mode: boolean;
+  allow_zero_power: boolean;
   measurement_defaults: AppMeasurementDefaults;
 }
 

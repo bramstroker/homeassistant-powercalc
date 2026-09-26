@@ -260,6 +260,7 @@ const isAppSettings: Guard<AppSettings> = objectOf({
   kasa_ip: nullable(isString),
   tapo_credentials_configured: optional(isBoolean),
   fast_test_mode: isBoolean,
+  allow_zero_power: isBoolean,
   measurement_defaults: isAppMeasurementDefaults,
 });
 

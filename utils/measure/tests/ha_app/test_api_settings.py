@@ -150,6 +150,7 @@ def test_settings_default_and_update(app_client: TestClient) -> None:
         "kasa_ip": None,
         "tapo_credentials_configured": False,
         "fast_test_mode": False,
+        "allow_zero_power": False,
         "measurement_defaults": {
             "sleep_time": 2.0,
             "sample_count": 1,
@@ -310,6 +311,31 @@ def test_fast_test_mode_does_not_modify_real_measurement_requests(app_client_fac
     assert started.json()["request"]["fast_test_mode"] is False
     assert started.json()["request"]["parameters"]["fast_test_mode"] is False
     assert started.json()["request"]["parameters"]["sleep_time"] == 7
+
+
+def test_zero_power_setting_requires_developer_mode(app_client_factory: AppClientFactory) -> None:
+    rejected = app_client_factory().put("/api/settings", json={"allow_zero_power": True})
+
+    assert rejected.status_code == 400
+    assert rejected.json()["message"] == "Accepting 0 W readings requires developer mode"
+
+
+@pytest.mark.parametrize(
+    "developer_mode,setting,expected", [(True, True, True), (True, False, False), (False, False, False)]
+)
+def test_zero_power_setting_overrides_request_parameters(
+    app_client_factory: AppClientFactory, developer_mode: bool, setting: bool, expected: bool
+) -> None:
+    test_client = app_client_factory(developer_mode=developer_mode)
+    assert test_client.put("/api/settings", json={"allow_zero_power": setting}).status_code == 200
+
+    request = payload() | {
+        "parameters": payload()["parameters"] | {"allow_zero_power": not setting},  # type: ignore[operator]
+    }
+    started = test_client.post("/api/sessions", json=request)
+
+    assert started.status_code == 201
+    assert started.json()["request"]["parameters"]["allow_zero_power"] is expected
 
 
 def test_settings_rejects_invalid_entity(app_client: TestClient) -> None:

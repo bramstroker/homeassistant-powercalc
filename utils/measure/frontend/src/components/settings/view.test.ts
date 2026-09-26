@@ -143,7 +143,7 @@ describe("settings view", () => {
     expect(element.shadowRoot.textContent).toContain("manual entry still works");
   });
 
-  it("shows fast test mode only in developer mode and saves the toggle", async () => {
+  it("shows developer settings only in developer mode and saves the toggles", async () => {
     const element = document.createElement("measure-settings-view") as HTMLElement & {
       settings: AppSettings;
       capabilities: Capabilities;
@@ -160,6 +160,7 @@ describe("settings view", () => {
     await element.updateComplete;
 
     expect(element.shadowRoot.querySelector('input[name="fast_test_mode"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('input[name="allow_zero_power"]')).toBeNull();
 
     element.capabilities = { ...capabilities, developer_mode: true };
     await element.updateComplete;
@@ -168,12 +169,13 @@ describe("settings view", () => {
     expect(element.shadowRoot.textContent).toContain("output is not valid for contribution or real use");
 
     toggle.checked = true;
+    (element.shadowRoot.querySelector('input[name="allow_zero_power"]') as HTMLInputElement).checked = true;
     const saved = new Promise<AppSettings>((resolve) => {
       element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettings>).detail));
     });
     (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
 
-    expect((await saved).fast_test_mode).toBe(true);
+    expect(await saved).toMatchObject({ fast_test_mode: true, allow_zero_power: true });
   });
 
   it("renders GitHub device login, token fallback, identity, and disconnect", async () => {
