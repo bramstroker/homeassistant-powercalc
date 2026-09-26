@@ -1,6 +1,9 @@
 from datetime import timedelta
 from decimal import Decimal
+import json
 import logging
+from pathlib import Path
+import shutil
 import uuid
 
 from homeassistant.components.light import (
@@ -66,6 +69,7 @@ from custom_components.powercalc.const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
+    CONF_VARIABLES,
     DOMAIN,
     DUMMY_ENTITY_ID,
     SERVICE_SWITCH_SUB_PROFILE,
@@ -242,6 +246,86 @@ async def test_multiply_factor(hass: HomeAssistant) -> None:
 
     await set_states(hass, [("input_boolean.test", STATE_ON)])
     assert_entity_state(hass, "sensor.test_power", "15.00")
+
+
+@pytest.mark.parametrize(
+    "profile_factor,user_factor,multiply_standby,expected_on,expected_off",
+    [
+        (3, None, False, "4.48", "0.40"),
+        ("[[panel_count]]", None, False, "4.48", "0.40"),
+        ("[[panel_count]]", 2, False, "3.52", "0.40"),
+        ("[[panel_count]]", 0, False, "1.60", "0.40"),
+        (0, None, False, "1.60", "0.40"),
+        ("[[panel_count]]", None, True, "7.68", "1.20"),
+        ("invalid", 2, False, "3.52", "0.40"),
+    ],
+)
+async def test_profile_multiply_factor(
+    hass: HomeAssistant,
+    tmp_path: Path,
+    profile_factor: int | str,
+    user_factor: int | None,
+    multiply_standby: bool,
+    expected_on: str,
+    expected_off: str,
+) -> None:
+    """Scale LUT power using substituted fields while preserving controller standby and user overrides."""
+    shutil.copytree(get_test_profile_dir("signify_LCA001"), tmp_path, dirs_exist_ok=True)
+    model_file = tmp_path / "model.json"
+    model = json.loads(model_file.read_text())
+    model.update(
+        multiply_factor=profile_factor,
+        standby_power=0.4,
+        standby_power_on=1.6,
+        fields={"panel_count": {"label": "Number of panels", "selector": {"number": {"min": 1, "max": 500}}}},
+    )
+    model_file.write_text(json.dumps(model))
+    config = {
+        CONF_ENTITY_ID: "light.test",
+        CONF_MANUFACTURER: "signify",
+        CONF_MODEL: "LCA001",
+        CONF_CUSTOM_MODEL_DIRECTORY: str(tmp_path),
+        CONF_VARIABLES: {"panel_count": "3"},
+        CONF_MULTIPLY_FACTOR_STANDBY: multiply_standby,
+    }
+    if user_factor is not None:
+        config[CONF_MULTIPLY_FACTOR] = user_factor
+    await run_powercalc_setup(hass, config)
+
+    await set_states(
+        hass,
+        [
+            (
+                "light.test",
+                STATE_ON,
+                {ATTR_BRIGHTNESS: 1, ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_COLOR_TEMP_KELVIN: 6536},
+            )
+        ],
+    )
+    assert_entity_state(hass, "sensor.test_power", expected_on)
+
+    await set_states(hass, [("light.test", STATE_OFF)])
+    assert_entity_state(hass, "sensor.test_power", expected_off)
+
+
+async def test_invalid_profile_multiply_factor_skips_sensor_setup(
+    hass: HomeAssistant,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    model = {"calculation_strategy": "fixed", "fixed_config": {"power": 5}, "multiply_factor": "invalid"}
+    (tmp_path / "model.json").write_text(json.dumps(model))
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "panels",
+            CONF_CUSTOM_MODEL_DIRECTORY: str(tmp_path),
+        },
+    )
+    assert hass.states.get("sensor.test_power") is None
+    assert "Skipping sensor setup: Invalid multiply_factor 'invalid' for test/panels" in caplog.text
 
 
 async def test_error_when_no_strategy_has_been_configured(
