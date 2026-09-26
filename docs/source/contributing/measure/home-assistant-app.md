@@ -4,6 +4,8 @@ The Powercalc Measure app is the recommended way to run measurements on Home Ass
 
 The app guides you through configuring, running, and reviewing measurements. It uses Home Assistant entities to control devices and can read power from a Home Assistant sensor or directly from a Shelly, Kasa, or Tapo plug. Home Assistant supplies authentication and Core API access, so you do not create or paste a long-lived access token.
 
+![Powercalc Measure result view](../../img/measure_app_result.png)
+
 - [App settings](home-assistant-app/settings.md): power meters, connection checks, and developer options.
 - [Results and sessions](home-assistant-app/sessions.md): GitHub contributions, resume, downloads, and backups.
 - [Measurement automations](home-assistant-app/automations.md): notifications and flashing the measured lights.
