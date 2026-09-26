@@ -75,7 +75,7 @@ def profile_pull_request_body(
         f"{home_assistant}\n"
         "## Checklist\n\n"
         "- [x] I have created a single PR per device.\n"
-        "- [x] For lights, only generated gzipped lookup tables are included.\n"
+        "- [x] For lights, only generated lookup tables are included.\n"
         "- [x] I reviewed the generated files and JSON in Powercalc Measure.\n\n"
         "## Additional info\n\n"
         f"{additional_info}\n\n"

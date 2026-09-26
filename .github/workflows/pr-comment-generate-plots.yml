@@ -3,6 +3,7 @@ name: Generate PR plots
 on:
   pull_request:
     paths:
+      - 'profile_library/**/*.csv'
       - 'profile_library/**/*.csv.gz'
       - 'profile_library/**/model.json'
 
@@ -53,7 +54,7 @@ jobs:
               pull_number: context.payload.pull_request.number
             })
             const files = changed.map((entry) => entry.filename).filter((file) => {
-              if (/^profile_library\/.+\/(brightness|color_temp|hs|effect)\.csv\.gz$/.test(file)) {
+              if (/^profile_library\/.+\/(brightness|color_temp|hs|effect)\.csv(?:\.gz)?$/.test(file)) {
                 return fs.existsSync(`pr/${file}`)
               }
               if (!/^profile_library\/.+\/model\.json$/.test(file) || !fs.existsSync(`pr/${file}`)) return false
@@ -98,7 +99,8 @@ jobs:
                 fi
                 output="plot-artifacts/${relative%model.json}calibration.png"
               else
-                output="plot-artifacts/${relative%.csv.gz}.png"
+                csv_path="${relative%.gz}"
+                output="plot-artifacts/${csv_path%.csv}.png"
               fi
               uv --project base/utils/measure run --group visualize powercalc-visualize \
                 "${source}" --output="${output}"

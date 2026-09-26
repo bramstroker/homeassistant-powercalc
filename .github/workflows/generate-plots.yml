@@ -3,6 +3,7 @@ name: Generate plots
 on:
   push:
     paths:
+      - 'profile_library/**/*.csv'
       - 'profile_library/**/*.csv.gz'
       - 'profile_library/**/model.json'
     branches:

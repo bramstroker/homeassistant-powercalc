@@ -78,8 +78,8 @@ For example:
 ```text
 profile_library/acme/LED1837R5/
   model.json
-  hs.csv.gz
-  color_temp.csv.gz
+  hs.csv
+  color_temp.csv
 ```
 
 If the manufacturer does not exist yet, also add:
@@ -147,7 +147,7 @@ Before submitting, confirm that:
 - `measure_device` uses an existing library value when the same meter is already listed;
 - `model.json` describes the measured product and calculation strategy correctly;
 - generated CSV files match the capabilities and modes of the device;
-- compressed `.csv.gz` files do not have uncompressed `.csv` duplicates;
+- lookup tables are included as plain `.csv` files, not compressed `.csv.gz` files;
 - standby power is realistic and was not recorded as `0` because of meter limitations;
 - only the profile and, when necessary, `manufacturer.json` are included;
 - diagnostics, screenshots, temporary files, and `library.json` are not included;
