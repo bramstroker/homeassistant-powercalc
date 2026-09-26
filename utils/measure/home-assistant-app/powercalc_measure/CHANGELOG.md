@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 0.8.0 - 2026-09-26
+
+### 🚀 Features
+
+- #4826 Autofill device connectivity in PowerCalc Measure @bramstroker
+- #4827 Allow changing the setup when remeasuring standby @bramstroker
+- #4839 Exclude transient effect commands from Measure recordings @bramstroker
+- #4858 Store profile LUTs as plain CSV and compress on installation @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4818 Clarify measurement description and setup guidance @bramstroker
+- #4824 Warn when standby estimate metadata changes @bramstroker
+- #4828 Make standby calibration recoverable and tighten setup validation @bramstroker
+- #4850 Clarify vacuum measurement results and profile preparation @bramstroker
+
 ## 0.7.1 - 2026-09-20
 
 - #4751 Tapo smart support @TheLexus
