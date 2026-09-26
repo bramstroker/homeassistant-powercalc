@@ -10,6 +10,10 @@ class DummyMediaController(MediaController):
         # Dummy controller intentionally performs no media device action.
         pass
 
+    def unmute_volume(self) -> None:
+        # Dummy controller intentionally performs no media device action.
+        pass
+
     def play_audio(self, stream_url: str) -> None:
         # Dummy controller intentionally performs no media device action.
         pass
