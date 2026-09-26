@@ -9116,14 +9116,14 @@
           ],
           "id": "MFP 3301",
           "manufacturer": "hp",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-09-26T16:17:03",
           "max_power": 2.2,
           "sub_profile_count": 0,
           "power_range": {
             "min": 2.2,
             "max": 2.2
           },
-          "hash": "d9f2f8d9eece606a50c6b45962c9b69a"
+          "hash": "435a5a744f950d43ad361147ed24ecd6"
         }
       ],
       "device_types": [
