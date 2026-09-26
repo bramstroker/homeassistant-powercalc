@@ -58,6 +58,10 @@ export function prepareRequest(options: RequestOptions): RequestResult {
   } catch (error) {
     return { error: error instanceof Error ? error.message : "The measurement form produced an invalid request." };
   }
+  if (request.measure_type === "recorder") {
+    request.continue_on_zero_power = Boolean(options.capabilities.developer_mode)
+      && request.recorder_purpose === "complex_profile" && form.has("continue_on_zero_power");
+  }
   const defaults = profileDefaults(options);
   const previous = previousRequest(options.initialRequest, definition, request);
   request.model_id ||= previous?.model_id || defaults.model_id;

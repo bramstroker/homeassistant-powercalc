@@ -15,6 +15,7 @@ from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
     UnsupportedFeatureError,
+    ZeroPowerReadingError,
     ZeroReadingError,
 )
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
@@ -338,7 +339,9 @@ class PowerSampler:
             if ignore_zero:
                 _LOGGER.info("Skipped a %.2f W sample", power)
                 return None
-            raise ZeroReadingError("0 watt was read from the power meter")
+            if power >= 0:
+                raise ZeroPowerReadingError(power)
+            raise ZeroReadingError("Negative power was read from the power meter")
 
         _LOGGER.info("Measured power: %.2f W", power)
         self._emit_sample(power)

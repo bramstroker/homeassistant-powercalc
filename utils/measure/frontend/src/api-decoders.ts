@@ -168,7 +168,8 @@ export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is
         && optionalNullable(isString)(value.vacuum_entity_id)
         && optionalNullable(isString)(value.battery_entity_id)
         && optional(isStringArray)(value.additional_entity_ids)
-        && optional(isString)(value.export_filename);
+        && optional(isString)(value.export_filename)
+        && optional(isBoolean)(value.continue_on_zero_power);
   }
 };
 

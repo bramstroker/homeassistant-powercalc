@@ -4,7 +4,9 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
+from measure.analyser.recording import load_recording
 from measure.cancellation import MeasurementCancelledError
+from measure.powermeter.errors import ApiConnectionError, ZeroPowerReadingError, ZeroReadingError
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.recording.models import RecordedEntity, RecordingContext
 from measure.request import AverageMeasurementRequest, RecorderMeasurementRequest
@@ -338,3 +340,54 @@ def test_recorder_requires_state_reader_for_complex_recording(tmp_path: Path) ->
 
     with pytest.raises(ValueError, match="state reader is required"):
         runner.run(request, str(tmp_path))
+
+
+@pytest.mark.parametrize("enabled", [False, True])
+def test_recorder_continues_through_unverified_zero_power(tmp_path: Path, enabled: bool) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.side_effect = [
+        ZeroPowerReadingError(0),
+        ZeroPowerReadingError(0),
+        MeasurementResult(power=12, voltages=[230]),
+    ]
+    interaction = MagicMock(spec=RunInteraction)
+    interaction.wait.side_effect = [None, None, KeyboardInterrupt]
+    reader = MagicMock(return_value={"switch.dock": RecorderEntityState("on", {})})
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("switch.dock",),
+        continue_on_zero_power=enabled,
+    )
+    runner = RecorderRunner(sampler, interaction, reader)
+    if not enabled:
+        with pytest.raises(ZeroPowerReadingError):
+            runner.run(request, str(tmp_path))
+        return
+    result = runner.run(request, str(tmp_path))
+    assert result.summary["Samples recorded"] == "1"
+    assert result.summary["Unverified 0 W samples (excluded from analysis)"] == "2"
+    records = [json.loads(line) for line in (tmp_path / "record.jsonl").read_text().splitlines()]
+    assert records[1]["record_type"] == "unverified_zero_power"
+    assert records[1]["power"] == 0
+    assert records[1]["entities"]["switch.dock"]["state"] == "on"
+    assert interaction.entity_states.call_count == 3
+    loaded = load_recording(tmp_path / "record.jsonl")
+    assert [sample.power for sample in loaded.dataset.samples] == [12]
+    assert loaded.warnings == ["Excluded 2 unverified 0 W sample(s) from power analysis"]
+
+
+@pytest.mark.parametrize("error", [ZeroReadingError("0 Volt"), ApiConnectionError("offline")])
+def test_zero_power_option_does_not_hide_other_meter_errors(tmp_path: Path, error: Exception) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.side_effect = error
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("switch.dock",),
+        continue_on_zero_power=True,
+    )
+    with pytest.raises(type(error), match=str(error)):
+        RecorderRunner(sampler, MagicMock(spec=RunInteraction), MagicMock()).run(request, str(tmp_path))

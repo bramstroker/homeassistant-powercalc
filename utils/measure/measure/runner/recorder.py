@@ -8,6 +8,7 @@ import time
 from typing import TextIO
 
 from measure.cancellation import MeasurementCancelledError
+from measure.powermeter.errors import ZeroPowerReadingError
 from measure.recording.capture import build_vacuum_attribute_policy, filter_vacuum_recording_attributes
 from measure.recording.context import build_recording_context
 from measure.recording.files import DEFAULT_EXPORT_FILENAME
@@ -83,6 +84,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         start_time = time.time()
         voltages: list[float] = []
         recorded = 0
+        unverified = 0
         # Both Ctrl-C in the CLI and the app's Stop recording action are successful
         # terminal conditions for this intentionally open-ended runner.
         try:
@@ -92,7 +94,12 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
                 while True:
                     timestamp = time.time()
                     self.interaction.notify("Measurement")
-                    measurement = self.sampler.take_measurement(timestamp)
+                    try:
+                        measurement = self.sampler.take_measurement(timestamp)
+                    except ZeroPowerReadingError as error:
+                        unverified += self._write_unverified_sample(output_file, request, timestamp - start_time, error)
+                        self.interaction.wait(INTERVAL)
+                        continue
                     _LOGGER.info("Measurement %.2f", measurement.power)
                     elapsed_seconds = timestamp - start_time
                     if self._write_sample(output_file, request, elapsed_seconds, measurement.power):
@@ -108,12 +115,31 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
             "Samples recorded": str(recorded),
             "Duration": f"{round(time.time() - start_time)} s",
         }
+        if unverified:
+            summary["Unverified 0 W samples (excluded from analysis)"] = str(unverified)
         if self._missing_optional_entities:
             summary["Optional entities missing during recording"] = ", ".join(sorted(self._missing_optional_entities))
         return RunnerResult(model_json_data={}, voltages=voltages, summary=summary)
 
+    def _write_unverified_sample(
+        self,
+        output_file: TextIO,
+        request: RecorderMeasurementRequest,
+        elapsed_seconds: float,
+        error: ZeroPowerReadingError,
+    ) -> int:
+        if not request.continue_on_zero_power:
+            raise error
+        return int(self._write_sample(output_file, request, elapsed_seconds, error.power, verified=False))
+
     def _write_sample(
-        self, output_file: TextIO, request: RecorderMeasurementRequest, elapsed_seconds: float, power: float
+        self,
+        output_file: TextIO,
+        request: RecorderMeasurementRequest,
+        elapsed_seconds: float,
+        power: float,
+        *,
+        verified: bool = True,
     ) -> bool:
         """Write one sample, returning False when entity capture requires skipping it."""
         entity_ids = request.recorded_entity_ids
@@ -129,7 +155,7 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         _write_jsonl(
             output_file,
             {
-                "record_type": "sample",
+                "record_type": "sample" if verified else "unverified_zero_power",
                 "elapsed_seconds": elapsed_seconds,
                 "power": power,
                 "entities": captured.recorded,

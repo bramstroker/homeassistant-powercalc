@@ -978,3 +978,20 @@ def test_non_hass_power_meter_does_not_require_power_entity() -> None:
     result = preflight({}).validate(request)
 
     assert result.warnings == []
+
+
+@pytest.mark.parametrize("developer_mode", [False, True])
+def test_continuing_through_zero_power_requires_developer_mode(developer_mode: bool) -> None:
+    request = RecorderMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("light.test",),
+        continue_on_zero_power=True,
+    )
+    checker = preflight(base_entities(), developer_mode=developer_mode)
+    if developer_mode:
+        checker.validate(request)
+    else:
+        with pytest.raises(PreflightError, match="0 W requires developer mode"):
+            checker.validate(request)

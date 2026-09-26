@@ -280,6 +280,8 @@ export class SetupView extends LitElement {
           .fastTestMode=${this.capabilities.fast_test_mode ?? false}
           .hasController=${definition.fields.some((field) => field.role === "controller")}
           .dummyController=${this.dummyController}
+          .complexRecorder=${type === "recorder" && (this.selectValues.recorder_purpose ?? (run?.measure_type === "recorder" ? run.recorder_purpose : undefined)) === "complex_profile"}
+          .continueOnZeroPower=${run?.measure_type === "recorder" && (run.continue_on_zero_power ?? false)}
           @dummy-controller-change=${this.dummyControllerChanged}
         ></measure-setup-developer-options>
 

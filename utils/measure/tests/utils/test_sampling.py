@@ -6,7 +6,12 @@ from unittest.mock import MagicMock, patch
 
 from measure.cancellation import MeasurementCancelledError
 from measure.const import RETRY_COUNT_LIMIT, Trend
-from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError, ZeroReadingError
+from measure.powermeter.errors import (
+    ApiConnectionError,
+    UnsupportedFeatureError,
+    ZeroPowerReadingError,
+    ZeroReadingError,
+)
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 from measure.tuning import MeasurementParameters
 from measure.utils.sampling import (
@@ -555,3 +560,17 @@ def test_average_measurement_excludes_failed_readings_from_average(
 
     # Average should be exactly 7.0 since all successful readings are 7.0
     assert result.power == 7.0
+
+
+@pytest.mark.parametrize("power", [0, 0.004, -1])
+def test_sampler_distinguishes_unverified_zero_power_from_negative_power(power: float) -> None:
+    meter = MagicMock(spec=PowerMeter)
+    meter.get_power.return_value = PowerMeasurementResult(power=power, voltage=230, updated=0)
+    sampler = PowerSampler(meter, MeasurementParameters(max_retries=0))
+    with pytest.raises(ZeroReadingError) as raised:
+        sampler.take_measurement()
+    if power >= 0:
+        assert isinstance(raised.value, ZeroPowerReadingError)
+        assert raised.value.power == power
+    else:
+        assert not isinstance(raised.value, ZeroPowerReadingError)
