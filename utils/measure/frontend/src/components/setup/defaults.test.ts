@@ -247,6 +247,7 @@ describe("setup view defaults", () => {
       { entity_id: "camera.porch", name: "Porch", domain: "camera", state: "idle", device_id: "porch",
         related_device_ids: ["porch-child", "porch-parent"] },
       { entity_id: "sensor.mode", name: "Mode", domain: "sensor", state: "day", device_id: "porch" },
+      { entity_id: "sensor.calculated", name: "Calculated power", domain: "sensor", state: "4", device_id: "porch", integration: "powercalc" },
       { entity_id: "sensor.child", name: "Child", domain: "sensor", state: "on", device_id: "porch-child" },
       { entity_id: "sensor.parent", name: "Parent", domain: "sensor", state: "on", device_id: "porch-parent" },
       { entity_id: "sensor.other", name: "Other", domain: "sensor", state: "on", device_id: "unrelated" },
