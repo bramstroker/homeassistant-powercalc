@@ -39,7 +39,13 @@ def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None
     )
     progress: list[SessionEvent] = []
     control = SessionControl()
-    control.subscribe(progress.append)
+
+    def confirm_light_measurement(event: SessionEvent) -> None:
+        progress.append(event)
+        if event.type == SessionEventType.CHECKPOINT:
+            control.continue_run()
+
+    control.subscribe(confirm_light_measurement)
     logger = logging.getLogger("measure")
     previous_level = logger.level
     previous_handlers = list(logger.handlers)
@@ -64,6 +70,9 @@ def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None
         logger.setLevel(previous_level)
 
     assert result.model_json_data["device_type"] == "light"
+    assert [event.data["message"] for event in progress if event.type == SessionEventType.CHECKPOINT] == [
+        "Ready to measure the light. PowerCalc will control the selected light settings after you start."
+    ]
     assert (tmp_path / "custom-artifacts" / "brightness.csv").is_file()
     progress_events = [event for event in progress if event.type == SessionEventType.PROGRESS]
     assert progress_events[-1].data["completed"] == progress_events[-1].data["total"]

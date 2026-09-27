@@ -126,6 +126,9 @@ class LightRunner(MeasurementRunner[LightMeasurementRequest]):
     def run(self, request: LightMeasurementRequest, export_directory: str) -> RunnerResult:
         self._configure(request)
         assert self.plan is not None
+        self.interaction.confirm(
+            "Ready to measure the light. PowerCalc will control the selected light settings after you start."
+        )
         measurements_to_run = [
             self.prepare_measurements_for_mode(export_directory, mode_plan.mode) for mode_plan in self.plan.modes
         ]

@@ -278,6 +278,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         icon="💡",
         model_id_example="LWA017",
         product_name_example="Hue White Ambiance A60 E27",
+        confirmation_action="Start light measurement",
         parameters=LIGHT_PARAMETERS,
         fields=(
             POWER_FIELD,

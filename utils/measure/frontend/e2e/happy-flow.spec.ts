@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { completedSession, completedSnapshot, contributionPreview, mockApi, parameters, startedSnapshot } from "./mock-api";
+import { completedSession, completedSnapshot, contributionPreview, lightRequest, mockApi, parameters, startedSnapshot } from "./mock-api";
 import type { SessionSnapshot, SessionSummary } from "../src/types";
 
 /**
@@ -64,6 +64,30 @@ test("shows vacuum recording steps before the start button on mobile", async ({ 
   await expect(page.getByRole("button", { name: "Start recording" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await page.screenshot({ path: testInfo.outputPath("vacuum-recording-guidance.png"), fullPage: true });
+});
+
+test("guides light measurement before allowing PowerCalc to control the lights", async ({ page }, testInfo) => {
+  const pending: SessionSnapshot = {
+    ...startedSnapshot,
+    state: "awaiting_confirmation",
+    confirmation_message: "Ready to measure the light. PowerCalc will control the selected light settings after you start.",
+    confirmation_action: "Start light measurement",
+    request: lightRequest,
+  };
+  await mockApi(page, { sessions: [{
+    ...completedSession, session_id: "session-running", state: "awaiting_confirmation",
+    measure_type: "light", active: true,
+  }] });
+  await page.route("**/api/sessions/session-running", (route) => route.fulfill({ json: pending }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+
+  const guidance = page.getByLabel("Light measurement guidance");
+  await expect(guidance).toContainText("Disable automations");
+  await expect(guidance).toContainText("settings selected for this run");
+  await expect(page.getByRole("button", { name: "Start light measurement" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.screenshot({ path: testInfo.outputPath("light-measurement-guidance.png"), fullPage: true });
 });
 
 test("preserves unfinished setup through settings and resets it for a new measurement", async ({ page }) => {

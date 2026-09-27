@@ -367,6 +367,9 @@ def test_run(export_path: str) -> None:
         modes={LutMode.BRIGHTNESS},
     )
     result = runner.run(request, export_path)
+    interaction.confirm.assert_called_once_with(
+        "Ready to measure the light. PowerCalc will control the selected light settings after you start."
+    )
     assert result.model_json_data == {
         "device_type": "light",
         "calculation_strategy": "lut",

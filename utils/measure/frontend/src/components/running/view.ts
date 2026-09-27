@@ -73,10 +73,10 @@ export class RunningView extends LitElement {
     .ready-card.warning .ready-icon svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .ready-card.warning .ready-eyebrow { color: var(--warning); }
     .ready-message { max-width: 620px; color: var(--muted); line-height: 1.6; white-space: pre-line; }
-    .recording-guidance { width: min(680px, 100%); padding: 1rem 1.2rem; border: 1px solid var(--line); border-radius: 12px; background: var(--field); text-align: left; }
-    .recording-guidance h4 { margin: 0 0 0.55rem; font-size: 0.9rem; }
-    .recording-guidance ol { margin: 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.5; }
-    .recording-guidance li + li { margin-top: 0.4rem; }
+    .measurement-guidance { width: min(680px, 100%); padding: 1rem 1.2rem; border: 1px solid var(--line); border-radius: 12px; background: var(--field); text-align: left; }
+    .measurement-guidance h4 { margin: 0 0 0.55rem; font-size: 0.9rem; }
+    .measurement-guidance ol { margin: 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.5; }
+    .measurement-guidance li + li { margin-top: 0.4rem; }
     .ready-topline { display: flex; justify-content: flex-end; align-items: center; gap: 0.9rem; width: 100%; }
     @keyframes prepare { 0% { transform: translateX(-105%); } 50% { transform: translateX(165%); } 100% { transform: translateX(-105%); } }
     @media (max-width: 640px) { .metrics { grid-template-columns: 1fr 1fr; } .topline { align-items: flex-start; flex-direction: column; } }
@@ -151,7 +151,14 @@ export class RunningView extends LitElement {
             <h3>${warning ? "Protect your hearing" : "Everything is ready"}</h3>
             <p class="ready-message">${message}</p>
           </div>
-          ${guidance ? html`<div class="recording-guidance" aria-label="Recording guidance">
+          ${this.snapshot.request?.measure_type === "light" ? html`<div class="measurement-guidance" aria-label="Light measurement guidance">
+            <h4>Before starting</h4>
+            <ol>
+              <li>Disable automations and other controls for the selected lights so they cannot change them during measurement.</li>
+              <li>PowerCalc will control the lights automatically and cycle through the settings selected for this run (brightness, color temperature, color, or effects). Keep the lights powered until the measurement finishes.</li>
+            </ol>
+          </div>` : nothing}
+          ${guidance ? html`<div class="measurement-guidance" aria-label="Recording guidance">
             <h4>What to record</h4>
             <ol>${guidance.map((step) => html`<li>${step}</li>`)}</ol>
           </div>` : nothing}

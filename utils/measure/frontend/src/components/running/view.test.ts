@@ -95,6 +95,22 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector("progress")).toBeNull();
   });
 
+  it("guides the operator before PowerCalc starts controlling a light", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      request: { measure_type: "light" } as SessionSnapshot["request"],
+    };
+    element.confirmationAction = "Start light measurement";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const guidance = element.shadowRoot!.querySelector('[aria-label="Light measurement guidance"]');
+    expect(guidance?.textContent).toContain("Disable automations");
+    expect(guidance?.textContent).toContain("cycle through the settings selected for this run");
+    expect(element.shadowRoot!.querySelector("button.confirm")?.textContent).toBe("Start light measurement");
+  });
+
   it.each([
     ["vacuum_robot", "vacuum_robot", "low-battery", "Record more"],
     ["generic", "cover", "Open the cover fully", "Return to idle"],
@@ -110,7 +126,7 @@ describe("running view", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    const guidance = element.shadowRoot!.querySelector(".recording-guidance");
+    const guidance = element.shadowRoot!.querySelector(".measurement-guidance");
     expect(guidance?.textContent).toContain(action);
     expect(guidance?.textContent).toContain(finish);
     expect(guidance?.querySelectorAll("li").length).toBeGreaterThanOrEqual(3);
@@ -125,7 +141,7 @@ describe("running view", () => {
     };
     document.body.append(element);
     await element.updateComplete;
-    expect(element.shadowRoot!.querySelector(".recording-guidance")).toBeNull();
+    expect(element.shadowRoot!.querySelector(".measurement-guidance")).toBeNull();
   });
 
   it("renders speaker confirmation as a high-volume warning", async () => {

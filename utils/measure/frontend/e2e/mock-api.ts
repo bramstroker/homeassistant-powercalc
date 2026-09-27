@@ -109,6 +109,7 @@ const lightDefinition: MeasureDefinition = {
   icon: "💡",
   model_id_example: "LWA017",
   product_name_example: "Hue White Ambiance A60 E27",
+  confirmation_action: "Start light measurement",
   parameters: [
     { name: "sleep_time", label: "Settle time (seconds)", step: "0.1", group: "Sampling" },
     { name: "bri_bri_steps", label: "Brightness mode step", group: "Profile resolution" },
@@ -451,4 +452,4 @@ export async function mockApi(page: Page, options: MockApiOptions = {}): Promise
   });
 }
 
-export { completedSession, settings, startedSnapshot, parameters, contributionPreview };
+export { completedSession, settings, startedSnapshot, parameters, contributionPreview, lightRequest };

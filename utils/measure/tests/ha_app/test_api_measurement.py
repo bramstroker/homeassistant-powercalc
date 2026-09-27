@@ -35,7 +35,7 @@ def test_measure_definitions_and_average_request(app_client: TestClient) -> None
     assert {item["measure_type"] for item in definitions.json()} == {item.value for item in MeasureType}
     actions = {item["measure_type"]: item["confirmation_action"] for item in definitions.json()}
     assert actions == {
-        "light": None,
+        "light": "Start light measurement",
         "speaker": "Start speaker measurement",
         "recorder": "Start recording",
         "average": "Start averaging",
