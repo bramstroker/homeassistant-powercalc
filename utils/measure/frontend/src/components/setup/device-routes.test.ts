@@ -50,14 +50,15 @@ describe("device-first measurement routes", () => {
   it("offers specialist and recorder routes where both exist", () => {
     expect(routesForDevice("smart_speaker", definitions).map((route) => route.id)).toEqual(["speaker", "complex_profile"]);
     expect(routesForDevice("fan", definitions).map((route) => route.id)).toEqual(["fan", "complex_profile"]);
-    expect(routesForDevice("vacuum_robot", definitions).map((route) => route.id)).toEqual(["charging", "vacuum_profile"]);
+    expect(routesForDevice("vacuum_robot", definitions).map((route) => route.id)).toEqual(["vacuum_profile", "charging"]);
     expect(routesForDevice("lawn_mower_robot", definitions).map((route) => route.id)).toEqual(["charging", "complex_profile"]);
     expect(routesForDevice("camera", definitions)[0]?.preset).toEqual({
       recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: "camera",
     });
-    expect(routesForDevice("vacuum_robot", definitions)[1]?.preset).toEqual({
+    expect(routesForDevice("vacuum_robot", definitions)[0]?.preset).toEqual({
       recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
     });
+    expect(routesForDevice("vacuum_robot", definitions)[0]?.recommended).toBe(true);
   });
 
   it("keeps average and Playbook under free measurement", () => {

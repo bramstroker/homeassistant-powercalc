@@ -15,6 +15,8 @@ export const setupChromeStyles = css`
   .type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 1.25rem 0 0.25rem; }
   .type-card { display: grid; gap: 0.25rem; text-align: left; align-items: start; padding: 1rem; min-height: auto; background: var(--field); }
   .type-card:hover:not(:disabled) { border-color: var(--signal); }
+  .route-card.recommended { border-color: var(--signal); }
+  .route-recommended { color: var(--signal-strong); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
   .device-card, .device-choice { grid-template-columns: 1.6rem 1fr; align-items: center; column-gap: 0.65rem; }
   .device-choice .type-desc { grid-column: 2; }
   .device-icon { display: grid; place-items: center; width: 1.35rem; height: 1.35rem; color: var(--ink); }
@@ -100,7 +102,8 @@ export function renderRoutePicker(device: DeviceChoice, routes: MeasurementRoute
       : `How do you want to measure ${device.label.toLowerCase()}?`}</p>
     <button type="button" @click=${onBack}>Change device</button>
     <div class="type-grid">
-      ${routes.map((route) => html`<button type="button" class="type-card route-card" @click=${() => onSelect(route.id)}>
+      ${routes.map((route) => html`<button type="button" class="type-card route-card ${route.recommended ? "recommended" : ""}" @click=${() => onSelect(route.id)}>
+        ${route.recommended ? html`<span class="route-recommended">Recommended</span>` : ""}
         <span class="type-label">${route.label}</span>
         <span class="type-desc">${route.description}</span>
       </button>`)}

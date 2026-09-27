@@ -65,6 +65,21 @@ describe("device-first setup", () => {
     });
   });
 
+  it("recommends recording vacuum activity when charging measurement is also available", async () => {
+    const element = createSetup();
+    element.definitions = [recorderDefinition, { ...lightDefinition, measure_type: "charging" }];
+    await element.updateComplete;
+    [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".device-card")]
+      .find((card) => card.querySelector(".type-label")?.textContent === "Robot vacuum")!.click();
+    await element.updateComplete;
+
+    const routes = [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".route-card")];
+    expect(routes).toHaveLength(2);
+    expect(routes[0]!.textContent).toContain("Recommended");
+    expect(routes[0]!.textContent).toContain("Record vacuum and dock activity");
+    expect(routes[1]!.textContent).toContain("Measure charging power");
+  });
+
   it("restores a saved generic recording in the matching device route", async () => {
     const element = createSetup();
     element.initialRequest = {

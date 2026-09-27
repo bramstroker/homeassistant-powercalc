@@ -13,6 +13,7 @@ export interface MeasurementRoute {
   label: string;
   description: string;
   preset: Record<string, string>;
+  recommended?: boolean;
 }
 
 export interface RouteSelection {
@@ -80,18 +81,20 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
     id: "fan", measureType: "fan", label: "Measure fan speeds",
     description: "Automatically calibrate power across percentage levels.", preset: {},
   });
+  if (deviceId === "vacuum_robot" && available.has("recorder")) {
+    routes.push({
+      id: "vacuum_profile", measureType: "recorder", label: "Record vacuum and dock activity",
+      description: "Capture activity states and charging for a complex profile.",
+      preset: { recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot" },
+      recommended: true,
+    });
+  }
   if (["vacuum_robot", "lawn_mower_robot"].includes(deviceId) && available.has("charging")) routes.push({
     id: "charging", measureType: "charging", label: "Measure charging power",
     description: "Calibrate power against battery level while charging.", preset: { charging_device_type: deviceId },
   });
   if (!available.has("recorder")) return routes;
-  if (deviceId === "vacuum_robot") {
-    routes.push({
-      id: "vacuum_profile", measureType: "recorder", label: "Record vacuum and dock activity",
-      description: "Capture activity states and charging for a complex profile.",
-      preset: { recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot" },
-    });
-  } else if (fieldOptions(definitions.find((item) => item.measure_type === "recorder"), "profile_device_type")
+  if (deviceId !== "vacuum_robot" && fieldOptions(definitions.find((item) => item.measure_type === "recorder"), "profile_device_type")
     .some((option) => option.value === deviceId)) {
     routes.push({
       id: "complex_profile", measureType: "recorder", label: "Record device states",
