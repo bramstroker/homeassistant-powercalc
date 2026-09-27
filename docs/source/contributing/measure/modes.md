@@ -107,7 +107,20 @@ This is useful for:
 
 ### Complex-profile recordings
 
-Choose **Generic device** to track one or more entities from any Home Assistant domain.
+Choose **Generic device**, select the primary entity the Powercalc profile will use, and choose the output device
+type, such as camera, printer, or heating. The analyser considers the primary entity's state and scalar attributes.
+Robot vacuums use the dedicated recipe, which sets their profile device type automatically.
+The primary entity list follows the domains Powercalc supports for the selected profile type: a camera profile
+uses a `camera` entity, while a smart switch may use a `switch` or `light` entity.
+Optionally add secondary entities whose states explain power changes, such as a camera's day/night sensor or a
+printer's operation-state sensor. The picker shows entities on the primary entity's device or its immediate parent
+or children. These need an unambiguous portable reference;
+installation-specific entity IDs are never written into the generated profile.
+
+Record every relevant state in two separate runs, using **Record more** after the first run. Earlier recordings
+train the model; the latest recording validates it without changing the fitted powers. Every learned value needs
+at least five samples in training and five in the latest run. A single recording is retained with guidance to
+record more. Older saved generic configurations still use their first selected entity as the primary entity.
 
 Choose **Robot vacuum** for guided entity selection and dock activity analysis. See [Recording a vacuum and dock](#recording-a-vacuum-and-dock) below for setup and analysis requirements.
 
@@ -118,7 +131,16 @@ Complex recordings use JSON Lines (`.jsonl`). The first record describes the rec
 {"record_type":"sample","elapsed_seconds":0.0,"power":4.2,"entities":{"vacuum.robot":{"state":"cleaning","attributes":{"battery_level":42}},"sensor.robot_battery":{"state":"42","attributes":{"unit_of_measurement":"%"}}}}
 ```
 
-Stopping the recording starts analysis automatically. The result includes `analyser.json`. A `model.json` is added only when the candidate covers at least 90% of validation samples and improves mean absolute error enough over a constant-power baseline. Each learned value needs at least five recorded samples. Vacuum analysis additionally holds out whole episodes and checks error and coverage for every activity, so a long idle period cannot hide a bad short dock cycle. If those checks fail, the recording still completes and explains what additional evidence is needed.
+Stopping the recording starts analysis automatically. The result includes `analyser.json`. Generic profiles require
+at least 90% validation coverage and enough improvement over a constant-power baseline. Each learned state's
+mean absolute error must also stay within the larger of 20% of its measured mean power or 0.5 W. Vacuum analysis
+uses independent recordings or whole episodes and checks error and coverage for every activity. A `model.json`
+is added only when the applicable checks pass. Otherwise, the recording completes with an explanation of what
+additional evidence is needed.
+
+Generic analysis fits one categorical input at a time, with 2–20 distinct values. A primary state or attribute
+produces a fixed profile; a secondary entity state produces a `stop_at_first` composite. It does not yet combine
+multiple signals or fit continuous curves. Device type selects the profile category, not a different fitting recipe.
 
 Because this includes entity attributes, inspect the file for installation-specific or sensitive values before sharing it.
 While recording, the measurement screen shows the latest state of every tracked entity beneath the live power chart. Recorded attributes remain in the JSON Lines file rather than the live view.
@@ -149,8 +171,7 @@ entity IDs and other device data: review them before sharing. If an optional ent
 as `unavailable`, with a warning, while power readings continue. Missing required vacuum or battery entities cause
 that sample to be skipped.
 
-Automatic analysis is experimental. The generic recipe still fits one state or scalar attribute with a fixed
-`states_power` model. The vacuum recipe can generate a small `stop_at_first` composite profile: measured dock
+Automatic analysis is experimental. The vacuum recipe can generate a small `stop_at_first` composite profile: measured dock
 activities use a fixed power, their time-weighted average, and charging uses a battery-level calibration curve.
 The average keeps the energy of cycling loads, such as a drying heater that switches on and off.
 
@@ -167,8 +188,8 @@ activity.
 
 Selected entities become portable profile placeholders when PowerCalc resolves them to exactly that entity: a unique
 translation key or battery device class on the vacuum's device. Entities on a related device qualify when the
-vacuum's device has no match and the key is unique across related devices. Related devices are native child devices
-and Roborock docks, the devices that PowerCalc searches for profile entities. The recording stores these devices and
+vacuum's device has no match and the key is unique across related devices. Related devices are immediate parent or child
+devices and Roborock docks, the devices that PowerCalc searches for profile entities. The recording stores these devices and
 their entities, so recordings made before this was supported cannot use dock entities. For older recordings,
 matching `battery_level` attributes can supply charging data.
 Unrecognised modes or unreliable overlaps cause a request for more data; the analyser does not infer an additive

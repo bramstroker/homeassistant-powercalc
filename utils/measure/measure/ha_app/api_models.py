@@ -162,6 +162,7 @@ class FormFieldOption(BaseModel):
     value: str
     label: str
     entity_domain: str | None = None
+    entity_domains: list[str] = Field(default_factory=list)
     enables: list[str] = Field(default_factory=list)
     description: str = ""
     guidance: list[str] = Field(default_factory=list)

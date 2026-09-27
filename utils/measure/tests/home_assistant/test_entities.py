@@ -463,8 +463,10 @@ def test_related_devices_follow_powercalc_child_and_roborock_dock_rules() -> Non
 
     assert map_profile_related_devices(registry) == {
         "robot": ["dock"],
+        "dock": ["robot"],
         "legacy": ["legacy_dock"],
         "ups": ["battery"],
+        "battery": ["ups"],
     }
 
 
@@ -476,7 +478,8 @@ def test_catalog_snapshot_exposes_related_devices() -> None:
 
     snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
 
-    assert snapshot.related_device_ids == {"meter-device": ["child"]}
+    assert snapshot.related_device_ids == {"meter-device": ["child"], "child": ["meter-device"]}
+    assert snapshot.get("sensor.desk_power").related_device_ids == ["child"]
 
 
 @pytest.mark.parametrize("live", [True, False])

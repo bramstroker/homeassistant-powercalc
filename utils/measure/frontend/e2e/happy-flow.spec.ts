@@ -192,16 +192,21 @@ test("selects a Home Assistant light with the shared combobox", async ({ page })
   await expect(page.getByText("Desk lamp", { exact: true })).toBeVisible();
 });
 
-test("loads tracked recorder entities after choosing the complex-profile flow", async ({ page }) => {
+test("loads related recorder entities after choosing a primary device entity", async ({ page }) => {
   await page.getByRole("button", { name: "New measurement" }).click();
   await page.getByRole("button", { name: /Recorder/ }).click();
 
   await page.getByRole("combobox", { name: "What do you want to create?" }).click();
   await page.getByRole("option", { name: "Data for a complex power profile (experimental)" }).click();
 
+  await page.getByRole("combobox", { name: "Profile device type" }).click();
+  await page.getByRole("option", { name: "Heating" }).click();
+  await page.getByRole("combobox", { name: "Primary entity" }).click();
+  await page.getByRole("option", { name: "Living room thermostat · climate.living_room" }).click();
+
   const tracked = page.getByRole("combobox", { name: "Tracked entities" });
   await tracked.click();
-  await expect(page.getByRole("option", { name: "Living room thermostat · climate.living_room" })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Thermostat mode · sensor.thermostat_mode" })).toBeVisible();
   await expect(page.locator('input[name="model_id"]')).toHaveCount(0);
   await expect(page.locator('input[name="product_name"]')).toHaveCount(0);
 });

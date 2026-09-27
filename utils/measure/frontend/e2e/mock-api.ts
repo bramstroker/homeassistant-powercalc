@@ -150,8 +150,21 @@ const recorderDefinition: MeasureDefinition = {
       options: [{ value: "generic", label: "Generic device" }],
     },
     {
+      name: "profile_device_type", role: "attribute", label: "Profile device type", control: "select", required: true,
+      default: "generic_iot", visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["generic"] },
+      options: [
+        { value: "generic_iot", label: "Generic IoT", entity_domains: ["sensor"] },
+        { value: "heating", label: "Heating", entity_domains: ["climate"] },
+      ],
+    },
+    {
+      name: "primary_entity_id", role: "attribute", label: "Primary entity", control: "entity", required: true,
+      all_entities: true, narrowed_by: "profile_device_type", options: [],
+      visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["generic"] },
+    },
+    {
       name: "tracked_entity_ids", role: "attribute", label: "Tracked entity", plural_label: "Tracked entities",
-      control: "entity", required: true, multiple: true, all_entities: true, options: [],
+      control: "entity", required: false, multiple: true, all_entities: true, related_to: "primary_entity_id", options: [],
       visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["generic"] },
     },
   ],
@@ -160,7 +173,8 @@ const recorderDefinition: MeasureDefinition = {
 };
 
 const allEntities: EntityDescriptor[] = [
-  { entity_id: "climate.living_room", name: "Living room thermostat", domain: "climate", state: "heat" },
+  { entity_id: "climate.living_room", name: "Living room thermostat", domain: "climate", state: "heat", device_id: "thermostat" },
+  { entity_id: "sensor.thermostat_mode", name: "Thermostat mode", domain: "sensor", state: "eco", device_id: "thermostat" },
 ];
 
 const completedSession: SessionSummary = {

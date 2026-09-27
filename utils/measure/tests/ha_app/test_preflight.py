@@ -38,10 +38,12 @@ class Entity(EntityRecord):
     state: str = "available"
     attribute_names: list[str] = field(default_factory=list)
     device_id: str | None = None
+    related_device_ids: list[str] = field(default_factory=list)
     model_id: str | None = None
     member_entity_ids: list[str] = field(default_factory=list)
     domain: str = ""
     device_class: str | None = None
+    unit: str | None = None
     disabled_by: str | None = None
     has_live_state: bool = True
 
@@ -467,6 +469,67 @@ def test_preflight_accepts_generic_recorder_entity_from_complete_catalog() -> No
     )
 
     assert preflight(entities).validate(request).warnings == []
+
+
+@pytest.mark.parametrize("unit,accepted", [(None, True), ("pages", False)])
+def test_printer_recorder_requires_unitless_primary_sensor(unit: str | None, accepted: bool) -> None:
+    entities = base_entities()
+    entities[("sensor", None)] = [Entity("sensor.printer_state", domain="sensor", unit=unit)]
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        profile_device_type="printer",
+        primary_entity_id="sensor.printer_state",
+    )
+
+    if accepted:
+        assert preflight(entities).validate(request).warnings == []
+    else:
+        with pytest.raises(PreflightError, match="without a unit of measurement"):
+            preflight(entities).validate(request)
+
+
+@pytest.mark.parametrize(
+    "signal_device,accepted", [("main", True), ("parent", True), ("child", True), ("elsewhere", False)]
+)
+def test_generic_recorder_signals_require_same_or_related_device(signal_device: str, accepted: bool) -> None:
+    entities = base_entities()
+    entities[("sensor", None)] = [
+        Entity("sensor.primary", domain="sensor", device_id="main", related_device_ids=["parent", "child"]),
+        Entity("sensor.signal", domain="sensor", device_id=signal_device),
+    ]
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        primary_entity_id="sensor.primary",
+        tracked_entity_ids=("sensor.signal",),
+    )
+
+    if accepted:
+        assert preflight(entities).validate(request).warnings == []
+    else:
+        with pytest.raises(PreflightError, match="primary device or its parent or child"):
+            preflight(entities).validate(request)
+
+
+def test_generic_recorder_signals_require_primary_device_metadata() -> None:
+    entities = base_entities()
+    entities[("sensor", None)] = [
+        Entity("sensor.primary", domain="sensor"),
+        Entity("sensor.signal", domain="sensor", device_id="other"),
+    ]
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        primary_entity_id="sensor.primary",
+        tracked_entity_ids=("sensor.signal",),
+    )
+
+    with pytest.raises(PreflightError, match="primary entity with a Home Assistant device"):
+        preflight(entities).validate(request)
 
 
 def test_preflight_rejects_missing_complex_recorder_entity() -> None:

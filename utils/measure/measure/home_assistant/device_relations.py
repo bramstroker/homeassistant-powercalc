@@ -21,7 +21,7 @@ class _Device:
 
 
 def map_profile_related_devices(device_registry: Sequence[Mapping[str, object]]) -> dict[str, list[str]]:
-    """Mirror PowerCalc's get_profile_related_devices using native children and Roborock docks."""
+    """Mirror PowerCalc's immediate parent, children, and Roborock dock lookup."""
     devices = []
     for entry in device_registry:
         device_id = _get_device_string(entry, HASS_DEVICE_REGISTRY_ID)
@@ -46,9 +46,11 @@ def map_profile_related_devices(device_registry: Sequence[Mapping[str, object]])
 
 def _map_native_children(devices: Sequence[_Device]) -> dict[str, list[str]]:
     related: dict[str, list[str]] = {}
+    known_ids = {device.device_id for device in devices}
     for device in devices:
-        if device.parent_id is not None and device.parent_id != device.device_id:
+        if device.parent_id is not None and device.parent_id != device.device_id and device.parent_id in known_ids:
             related.setdefault(device.parent_id, []).append(device.device_id)
+            related.setdefault(device.device_id, []).append(device.parent_id)
     return related
 
 

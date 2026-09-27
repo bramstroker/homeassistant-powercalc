@@ -409,6 +409,7 @@ def test_completed_recording_can_be_analysed_again(app_client: TestClient) -> No
         "".join(f"{json.dumps(record)}\n" for record in records),
         encoding="utf-8",
     )
+    (output / "record-1.jsonl").write_text((output / "record.jsonl").read_text())
     (output / "model.json").write_text(
         json.dumps({"voltage_range": {"min": 229.5, "max": 231.0}}),
         encoding="utf-8",
@@ -428,8 +429,9 @@ def test_completed_recording_can_be_analysed_again(app_client: TestClient) -> No
         "Analysed feature": "switch.device.state",
         "Validation MAE": "0.00 W",
         "Validation coverage": "100%",
-        "Recordings analysed": "1",
-        "Samples analysed": "20",
+        "Validation method": "held_out_recording",
+        "Recordings analysed": "2",
+        "Samples analysed": "40",
     }
     model = json.loads((output / "model.json").read_text(encoding="utf-8"))
     assert model["fixed_config"] == {"power": 5.2}

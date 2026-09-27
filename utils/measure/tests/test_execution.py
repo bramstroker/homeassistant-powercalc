@@ -297,6 +297,8 @@ def test_execution_analyses_complex_recording_and_writes_schema_valid_model(
         )
         return RunnerResult(model_json_data={}, voltages=[229.5, 231.0], summary={"Samples recorded": "20"})
 
+    write_recording(request, str(tmp_path))
+    (tmp_path / "record.jsonl").rename(tmp_path / "record-1.jsonl")
     runner.run.side_effect = write_recording
     interaction = MagicMock(spec=RunInteraction)
     prepared = PreparedMeasurement(request=request, runner=runner, interaction=interaction)
@@ -431,7 +433,8 @@ def test_execution_completes_without_model_when_recording_is_insufficient(
         "Samples analysed": "10",
         "Recording analysis": "More data needed",
         "Recording analysis reason": (
-            "No state or scalar attribute had 2-20 usable values with at least 4 training samples per value"
+            "Use Record more to capture a second independent recording. Include every relevant state "
+            "for at least five samples in each run; the latest run is reserved for validation."
         ),
     }
     assert "Profile was not created" in caplog.text

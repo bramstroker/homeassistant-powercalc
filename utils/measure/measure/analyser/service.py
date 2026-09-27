@@ -1,11 +1,11 @@
-from collections import Counter
+from collections import Counter, defaultdict
 from collections.abc import Sequence
 import logging
 import math
 from pathlib import Path
 from statistics import median
 
-from measure.analyser.fixed import FixedStatesPowerStrategy
+from measure.analyser.fixed import FixedStatesPowerCandidate, FixedStatesPowerStrategy
 from measure.analyser.models import (
     ActivityReport,
     AnalysisCandidate,
@@ -79,7 +79,7 @@ class RecorderAnalyser:
             model_config_fragment=selected.build_model_config_fragment(),
             standby_power=selected.standby_power,
             warnings=loaded.warnings,
-            features=selected.features if isinstance(selected, VacuumCompositeCandidate) else [],
+            features=selected.features,
             validation_method=split.method,
             activity_reports=evaluation.activity_reports,
         )
@@ -87,8 +87,7 @@ class RecorderAnalyser:
     def _select_strategies(self, context: RecordingContext) -> list[ProfileAnalysisStrategy]:
         if not self._default_strategies:
             return self.strategies
-        # Vacuum recipes require independent cycles and runtime signals; they
-        # must not fall back to adjacent-sample fixed validation.
+        # Vacuum recipes require their activity-specific models and validation.
         is_vacuum = context.recipe == RecorderProfileRecipe.VACUUM_ROBOT
         return [strategy for strategy in self.strategies if (strategy.strategy_id == "vacuum_composite") == is_vacuum]
 
@@ -114,6 +113,11 @@ def _evaluate_strategy(
             else []
         )
         evaluation = EvaluatedCandidate(candidate, metrics, reports)
+        if isinstance(candidate, FixedStatesPowerCandidate):
+            failure = _find_generic_validation_failure(candidate, split.validation)
+            if failure is not None:
+                outcomes.append(AnalysisFailure(failure))
+                continue
         failure = _find_candidate_failure(evaluation, samples, baseline)
         outcomes.append(AnalysisFailure(failure, reports) if failure is not None else evaluation)
     return outcomes
@@ -126,7 +130,49 @@ def _split_analysis_samples(
         if any(sample.power < 0 for sample in samples):
             return StrategyNotApplicable("Vacuum power must be non-negative; check the meter or dummy-load correction")
         return split_vacuum_samples(samples, context)
-    return _split_samples(samples)
+    recording_ids = sorted({sample.recording_id for sample in samples})
+    if len(recording_ids) < 2:
+        return StrategyNotApplicable(
+            "Use Record more to capture a second independent recording. Include every relevant state "
+            "for at least five samples in each run; the latest run is reserved for validation."
+        )
+    latest = recording_ids[-1]
+    return TrainingValidationSplit(
+        training=[sample for sample in samples if sample.recording_id != latest],
+        validation=[sample for sample in samples if sample.recording_id == latest],
+        method=ValidationMethod.HELD_OUT_RECORDING,
+    )
+
+
+def _find_generic_validation_failure(
+    candidate: FixedStatesPowerCandidate, validation: Sequence[RecordingSample]
+) -> str | None:
+    counts: Counter[str] = Counter()
+    errors: dict[str, float] = defaultdict(float)
+    powers: dict[str, float] = defaultdict(float)
+    for sample in validation:
+        key = candidate.get_support_key(sample)
+        estimate = candidate.estimate_power(sample)
+        if key is not None and estimate is not None:
+            counts[key] += 1
+            errors[key] += abs(estimate - sample.power)
+            powers[key] += sample.power
+    # Every fitted value must be exercised in the independent run, even when
+    # missing a rare high-power state would still pass overall coverage.
+    if any(counts[key] < MIN_SAMPLES_PER_MODEL_VALUE for key in candidate.powers):
+        return (
+            "Record every learned state for at least five samples in the latest recording. "
+            "Use Record more to capture a complete validation run."
+        )
+    for key in candidate.powers:
+        mean_power = powers[key] / counts[key]
+        if errors[key] / counts[key] > max(0.5, 0.2 * mean_power):
+            return (
+                f"The power for {candidate.feature.identifier} value {key!r} did not repeat reliably in the latest "
+                "recording (mean error exceeds 20% or 0.5 W). Record more representative runs or select a "
+                "signal that explains the power changes."
+            )
+    return None
 
 
 def _find_candidate_failure(
@@ -142,14 +188,6 @@ def _find_candidate_failure(
         return f"{candidate.strategy_id} needs at least {MIN_SAMPLES_PER_MODEL_VALUE} samples for every value"
     prediction_range = _calculate_prediction_range(candidate, samples)
     return _find_model_credibility_failure(candidate.strategy_id, metrics, baseline, prediction_range)
-
-
-def _split_samples(
-    samples: Sequence[RecordingSample],
-) -> TrainingValidationSplit:
-    training = [sample for index, sample in enumerate(samples) if index % 5 != 4]
-    validation = [sample for index, sample in enumerate(samples) if index % 5 == 4]
-    return TrainingValidationSplit(training=training, validation=validation)
 
 
 def _calculate_baseline_metrics(

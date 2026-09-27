@@ -5,6 +5,7 @@ from measure.const import MEASURE_TYPE_LABELS, MeasureType
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.spec import charging_entity_domain
 from measure.controller.light.const import LutMode
+from measure.profile.device_type import PROFILE_DEVICE_DOMAINS, ProfileDeviceType
 from measure.request import RecorderProfileRecipe, RecorderPurpose
 
 
@@ -36,6 +37,7 @@ class FieldOption:
     value: str
     label: str
     entity_domain: str | None = None
+    entity_domains: tuple[str, ...] = ()
     #: Measurement parameters that only apply while this option is selected.
     enables: tuple[str, ...] = ()
     description: str = ""
@@ -341,8 +343,10 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                         label="Data for a complex power profile (experimental)",
                         description=(
                             "This experimental workflow records JSON Lines source data. Generic devices can create "
-                            "a fixed states_power model; vacuums can create activity-based composite profiles with "
-                            "battery charging calibration. Hold every relevant state for at least five samples. "
+                            "a fixed states_power model or a composite from a secondary signal; vacuums can create "
+                            "activity-based composite profiles with "
+                            "battery charging calibration. For generic devices, record every relevant state for at "
+                            "least five samples in each of two separate runs, using Record more after the first. "
                             "For vacuums, repeat every activity in at least two independent episodes."
                         ),
                     ),
@@ -352,7 +356,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
             ),
             FormFieldDefinition(
                 name="profile_recipe",
-                label="Device type",
+                label="Recording recipe",
                 control=FieldControl.SELECT,
                 options=(
                     FieldOption(
@@ -377,17 +381,56 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                 review=True,
             ),
             FormFieldDefinition(
-                name="tracked_entity_ids",
-                label="Tracked entity",
-                plural_label="Tracked entities",
-                control=FieldControl.ENTITY,
-                multiple=True,
-                all_entities=True,
+                name="profile_device_type",
+                label="Profile device type",
+                control=FieldControl.SELECT,
+                options=tuple(
+                    FieldOption(
+                        value=device_type,
+                        label=device_type.replace("_", " ").capitalize(),
+                        entity_domains=PROFILE_DEVICE_DOMAINS[device_type],
+                    )
+                    for device_type in ProfileDeviceType
+                    if device_type != ProfileDeviceType.VACUUM_ROBOT
+                ),
+                default=ProfileDeviceType.GENERIC_IOT,
                 visible_when=(
                     ("recorder_purpose", (RecorderPurpose.COMPLEX_PROFILE,)),
                     ("profile_recipe", (RecorderProfileRecipe.GENERIC,)),
                 ),
-                hint="Select at least one entity whose state or attributes may explain the device's power use.",
+                review=True,
+            ),
+            FormFieldDefinition(
+                name="primary_entity_id",
+                label="Primary entity",
+                control=FieldControl.ENTITY,
+                all_entities=True,
+                narrowed_by="profile_device_type",
+                visible_when=(
+                    ("recorder_purpose", (RecorderPurpose.COMPLEX_PROFILE,)),
+                    ("profile_recipe", (RecorderProfileRecipe.GENERIC,)),
+                ),
+                hint="The device entity the generated power profile will be attached to.",
+                review=True,
+            ),
+            FormFieldDefinition(
+                name="tracked_entity_ids",
+                label="Additional power signal",
+                plural_label="Additional power signals (optional)",
+                control=FieldControl.ENTITY,
+                required=False,
+                multiple=True,
+                all_entities=True,
+                related_to="primary_entity_id",
+                visible_when=(
+                    ("recorder_purpose", (RecorderPurpose.COMPLEX_PROFILE,)),
+                    ("profile_recipe", (RecorderProfileRecipe.GENERIC,)),
+                ),
+                hint=(
+                    "The primary entity's state and attributes are analysed automatically. Select other entities "
+                    "whose states may explain power changes, such as a day/night sensor. Library profiles need "
+                    "an unambiguous reference to each selected signal on the device or a related device."
+                ),
                 review=True,
             ),
             FormFieldDefinition(

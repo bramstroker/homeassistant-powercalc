@@ -463,7 +463,14 @@ export class ResultView extends LitElement {
   }
 
   private renderWarnings() {
-    return (this.snapshot.warnings ?? []).map((warning) => html`<p class="notice" role="status">${warning}</p>`);
+    const reason = this.snapshot.summary?.["Recording analysis reason"]
+      ?? this.snapshot.summary?.["Profile analysis reason"];
+    const repeatedMessages = reason
+      ? new Set([`Profile was not created: ${reason}`, `Profile model was not created: ${reason}`])
+      : new Set<string>();
+    return (this.snapshot.warnings ?? [])
+      .filter((warning) => !repeatedMessages.has(warning))
+      .map((warning) => html`<p class="notice" role="status">${warning}</p>`);
   }
 
   private renderResume(state: SessionState) {

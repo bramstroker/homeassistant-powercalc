@@ -17,6 +17,7 @@ export interface EntityDescriptor {
   domain?: string;
   device_class?: string | null;
   device_id?: string | null;
+  related_device_ids?: string[];
   integration?: string | null;
   connectivity?: "zigbee" | "zwave" | null;
   translation_key?: string | null;
@@ -109,6 +110,7 @@ export interface FormFieldOption {
   value: string;
   label: string;
   entity_domain?: string | null;
+  entity_domains?: string[];
   /** Measurement parameters that only apply while this option is selected. */
   enables?: string[];
   description?: string;
@@ -230,6 +232,8 @@ export interface RecorderMeasurementRequest extends BaseMeasurementRequest {
   controller?: null;
   recorder_purpose: "playbook" | "complex_profile";
   profile_recipe?: "generic" | "vacuum_robot" | null;
+  primary_entity_id?: string | null;
+  profile_device_type?: string | null;
   tracked_entity_ids?: string[];
   vacuum_entity_id?: string | null;
   battery_entity_id?: string | null;

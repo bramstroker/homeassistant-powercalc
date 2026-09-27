@@ -81,6 +81,7 @@ class EntityDescriptor(BaseModel):
     max_mired: int | None = None
     related_voltage_entity_id: str | None = None
     member_entity_ids: list[str] = Field(default_factory=list)
+    related_device_ids: list[str] = Field(default_factory=list)
     suggested_recording_entity_ids: list[str] = Field(default_factory=list)
     disabled_recording_entity_ids: list[str] = Field(default_factory=list)
 
@@ -93,9 +94,14 @@ class EntityCatalogSnapshot:
         entities: list[EntityDescriptor],
         related_device_ids: Mapping[str, list[str]] | None = None,
     ) -> None:
-        self._entities = tuple(entities)
-        self._by_id = {entity.entity_id: entity for entity in entities}
         self._related_device_ids = dict(related_device_ids or {})
+        self._entities = tuple(
+            entity.model_copy(
+                update={"related_device_ids": list(self._related_device_ids.get(entity.device_id or "", []))}
+            )
+            for entity in entities
+        )
+        self._by_id = {entity.entity_id: entity for entity in self._entities}
 
     @property
     def related_device_ids(self) -> Mapping[str, list[str]]:

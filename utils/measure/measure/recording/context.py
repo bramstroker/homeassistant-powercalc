@@ -1,6 +1,7 @@
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 
+from measure.profile.device_type import ProfileDeviceType
 from measure.recording.models import EntityRole, RecordedEntity, RecordingContext
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe
 
@@ -43,7 +44,11 @@ def build_recording_context(
     return RecordingContext(
         recipe=request.profile_recipe,
         primary_entity_id=entity_ids[0],
-        device_type="vacuum_robot" if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT else "generic_iot",
+        device_type=(
+            ProfileDeviceType.VACUUM_ROBOT
+            if request.profile_recipe == RecorderProfileRecipe.VACUUM_ROBOT
+            else request.profile_device_type or ProfileDeviceType.GENERIC_IOT
+        ),
         entities=[build_recorded_entity(entity_id, roles[entity_id], by_id.get(entity_id)) for entity_id in entity_ids],
         device_entities=device_entities,
         related_device_ids=related,

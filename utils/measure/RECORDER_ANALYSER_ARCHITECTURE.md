@@ -178,22 +178,33 @@ Prediction and export must agree on missing values, integer conversion, branch p
 and range guards.
 
 Generic acceptance thresholds require 90% validation coverage, at least five
-covered samples per model value, at least 0.1 W prediction range, and a reduction
+training and five validation samples per model value, at least 0.1 W prediction range, and a reduction
 in baseline MAE of at least 0.1 W **or** 15%. The baseline predicts the median training power.
+Each value's validation MAE must be within the larger of 0.5 W or 20% of its measured mean power.
 When several model families are accepted, a more complex candidate needs at least 0.1 W
 **and** 15% improvement over the simpler one. These thresholds are engineering heuristics.
 
 ## 7. Fixed fitter: one categorical input
 
 [FixedStatesPowerStrategy](measure/analyser/fixed.py) examines the primary entity's state
-and scalar attributes. It supports 2–20 distinct usable values with at least four training
+and scalar attributes, plus states of selected secondary entities with portable references.
+It supports 2–20 distinct usable values with at least five training
 samples each. Each value gets the median observed training power, rounded to two decimals.
 Every fitted feature goes through validation before selection. A sparse attribute cannot
 discard a credible state model merely because it has a lower training error on fewer samples.
-Generic validation preserves the existing deterministic every-fifth-sample holdout.
+Generic validation holds out the latest recording in full and trains on all earlier recordings.
+Single recordings remain insufficient regardless of sample count. Every learned value must appear
+in the held-out recording, so common states cannot hide an untested rare state.
 
 An `on`/`off` lookup table can export `fixed_config.power` with explicit standby; other
 models export `states_power`. Attribute keys use the form `attribute|value`.
+Secondary states export a `stop_at_first` composite with portable state conditions. Each branch
+models total outlet power, including when the primary entity is off. Missing or ambiguous references
+exclude the secondary feature; secondary attributes and combinations of features are not fitted.
+
+The generic request explicitly stores `primary_entity_id` and `profile_device_type`; `tracked_entity_ids`
+contains only additional signals. Legacy requests promote their first tracked entity to primary.
+The standalone device-type enum mirrors the profile schema and is checked for parity in tests.
 
 ## 8. Vacuum fitter: known semantics, learned parameters
 

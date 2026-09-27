@@ -286,7 +286,7 @@ class RecorderAnalysisResult:
         assert self.feature is not None
         assert self.metrics is not None
         assert self.model_config_fragment is not None
-        if self.model_config_fragment.calculation_strategy == "composite":
+        if self.strategy == "vacuum_composite":
             return {
                 RECORDING_ANALYSIS_LABEL: "Composite vacuum profile created",
                 "Analysed inputs": ", ".join(feature.identifier for feature in self.features),
@@ -299,9 +299,12 @@ class RecorderAnalysisResult:
             }
         fixed_config = self.model_config_fragment.configuration
         profile_type = "Fixed power" if "power" in fixed_config else "Fixed states_power"
+        if self.model_config_fragment.calculation_strategy == "composite":
+            profile_type = "State-based composite"
         return {
             RECORDING_ANALYSIS_LABEL: f"{profile_type} profile created",
             "Analysed feature": self.feature.identifier,
             "Validation MAE": f"{self.metrics.mae_w:.2f} W",
             "Validation coverage": f"{self.metrics.coverage:.0%}",
+            "Validation method": self.validation_method.value if self.validation_method else "unknown",
         }

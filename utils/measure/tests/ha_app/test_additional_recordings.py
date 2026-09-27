@@ -47,17 +47,18 @@ def test_recording_names_are_ordered_and_exclude_unrelated_files() -> None:
     ) == ["record-1.jsonl", "record-2.jsonl", "record-10.jsonl", "record.jsonl"]
 
 
-def write_recording(path: Path, request: RecorderMeasurementRequest, state: str) -> None:
+def write_recording(path: Path, request: RecorderMeasurementRequest, state: str, *, both_states: bool = False) -> None:
     records = [build_recording_context(request).build_metadata_record()]
-    records.extend(
-        {
-            "record_type": "sample",
-            "elapsed_seconds": index * 2,
-            "power": 5.2 if state == "on" else 0.2,
-            "entities": {"switch.device": {"state": state, "attributes": {}}},
-        }
-        for index in range(10)
-    )
+    for index in range(10):
+        current = ("on" if index < 5 else "off") if both_states else state
+        records.append(
+            {
+                "record_type": "sample",
+                "elapsed_seconds": index * 2,
+                "power": 5.2 if current == "on" else 0.2,
+                "entities": {"switch.device": {"state": current, "attributes": {}}},
+            }
+        )
     path.write_text("".join(json.dumps(record) + "\n" for record in records))
 
 
@@ -85,6 +86,7 @@ def test_record_more_keeps_session_and_fits_both_runs(
     storage = SessionStorage(tmp_path)
     previous = retained_session(storage, recorder_request)
     output = storage.artifact_directory(previous.id, recorder_request.model_id)
+    write_recording(output / "record.jsonl", recorder_request, "off", both_states=True)
     original = (output / "record.jsonl").read_bytes()
     service = MagicMock()
     release = Event()
@@ -95,7 +97,7 @@ def test_record_more_keeps_session_and_fits_both_runs(
         assert release.wait(2)
         assert request == recorder_request
         assert context.session_id == previous.id
-        write_recording(context.artifact_directory / request.export_filename, request, "on")
+        write_recording(context.artifact_directory / request.export_filename, request, "on", both_states=True)
         return RunnerResult(
             model_json_data={}, summary=RecorderAnalysisExecution().run(request, context.artifact_directory)
         )
@@ -266,8 +268,8 @@ def test_record_more_rejects_ineligible_sessions(tmp_path: Path, recorder_reques
 def test_combined_analysis_keeps_existing_voltage_range(
     tmp_path: Path, recorder_request: RecorderMeasurementRequest
 ) -> None:
-    write_recording(tmp_path / "record-1.jsonl", recorder_request, "off")
-    write_recording(tmp_path / "record.jsonl", recorder_request, "on")
+    write_recording(tmp_path / "record-1.jsonl", recorder_request, "off", both_states=True)
+    write_recording(tmp_path / "record.jsonl", recorder_request, "on", both_states=True)
     (tmp_path / "model.json").write_text(json.dumps({"voltage_range": {"min": 220, "max": 240}}))
 
     RecorderAnalysisExecution().run(recorder_request, tmp_path, voltages=[229, 231])
