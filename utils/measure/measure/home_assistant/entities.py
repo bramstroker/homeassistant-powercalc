@@ -66,6 +66,7 @@ class EntityDescriptor(BaseModel):
     integration: str | None = None
     connectivity: Connectivity | None = None
     translation_key: str | None = None
+    unique_id: str | None = None
     disabled_by: str | None = None
     has_live_state: bool = True
     manufacturer: str | None = None
@@ -234,6 +235,7 @@ class HomeAssistantEntityCatalog:
 
 def _describe_registry_entity(entry: EntityRegistryEntry, devices: dict[str, dict[str, object]]) -> EntityDescriptor:
     """Describe an inventory-only entity with no live Home Assistant state."""
+    manufacturer = devices.get(entry.device_id or "", {}).get(HASS_DEVICE_REGISTRY_MANUFACTURER)
     return EntityDescriptor(
         entity_id=entry.entity_id,
         name=getattr(entry, "name", None) or getattr(entry, "original_name", None) or entry.entity_id,
@@ -242,6 +244,8 @@ def _describe_registry_entity(entry: EntityRegistryEntry, devices: dict[str, dic
         integration=entry.platform,
         connectivity=detect_connectivity(entry.platform, devices.get(entry.device_id or "", {})),
         translation_key=getattr(entry, "translation_key", None),
+        unique_id=getattr(entry, "unique_id", None),
+        manufacturer=str(manufacturer) if manufacturer else None,
         disabled_by=getattr(entry, "disabled_by", None),
         has_live_state=False,
         state="unavailable",
@@ -330,6 +334,7 @@ def _describe_entity(
         integration=integration,
         connectivity=(detect_connectivity(getattr(registry_entry, "platform", None), device) if not members else None),
         translation_key=getattr(registry_entry, "translation_key", None),
+        unique_id=getattr(registry_entry, "unique_id", None),
         disabled_by=getattr(registry_entry, "disabled_by", None),
         manufacturer=str(manufacturer) if manufacturer else None,
         model_id=str(model_id) if model_id else None,

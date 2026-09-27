@@ -477,3 +477,27 @@ def test_catalog_snapshot_exposes_related_devices() -> None:
     snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
 
     assert snapshot.related_device_ids == {"meter-device": ["child"]}
+
+
+@pytest.mark.parametrize("live", [True, False])
+def test_catalog_preserves_valetudo_identity(live: bool) -> None:
+    data = _entity_data()
+    data.device_registry.append({"id": "robot-device", "manufacturer": "Valetudo"})
+    data.entity_registry.append(
+        SimpleNamespace(
+            entity_id="sensor.renamed_dock",
+            device_id="robot-device",
+            platform="mqtt",
+            unique_id="RobotA_sensor_dock_status",
+            disabled_by=None if live else "user",
+        )
+    )
+    if live:
+        data.entities["sensor"].entities["renamed_dock"] = _entity("sensor.renamed_dock", "drying")
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = data
+    descriptor = HomeAssistantEntityCatalog(home_assistant).load_snapshot().get("sensor.renamed_dock")
+    assert descriptor.unique_id == "RobotA_sensor_dock_status"
+    assert descriptor.manufacturer == "Valetudo"
+    assert descriptor.integration == "mqtt"
+    assert descriptor.has_live_state is live

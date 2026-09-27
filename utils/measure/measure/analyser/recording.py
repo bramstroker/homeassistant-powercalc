@@ -138,6 +138,8 @@ def _parse_metadata_entities(value: object) -> list[RecordedEntity]:
                 "device_id",
                 "unit",
                 "disabled_by",
+                "unique_id",
+                "manufacturer",
             )
         }
         result.append(

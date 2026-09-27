@@ -1,11 +1,55 @@
 import json
+from pathlib import Path
 
-from measure.home_assistant.entities import EntityDescriptor
+from measure.analyser.recording import load_recording, restore_recording_context
+from measure.analyser.vacuum.signals import suggest_recording_entities
+from measure.ha_app.entity_suggestions import add_recording_suggestions
+from measure.home_assistant.entities import EntityCatalogSnapshot, EntityDescriptor
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.recording.context import build_recording_context
 from measure.recording.models import EntityRole
 from measure.request import RecorderMeasurementRequest, RecorderProfileRecipe, RecorderPurpose
 import pytest
+
+
+def test_valetudo_identity_survives_recording_round_trip(tmp_path: Path) -> None:
+    descriptors = [
+        EntityDescriptor(
+            entity_id=entity_id,
+            name=entity_id,
+            domain=entity_id.partition(".")[0],
+            device_id="robot",
+            integration="mqtt",
+            manufacturer="Valetudo",
+            unique_id=unique_id,
+            state="idle",
+            attribute_names=[],
+        )
+        for entity_id, unique_id in [
+            ("vacuum.robot", "RobotA_vacuum"),
+            ("sensor.battery", "RobotA_sensor_battery_level"),
+            ("sensor.renamed_dock", "RobotA_sensor_dock_status"),
+        ]
+    ]
+    suggested = add_recording_suggestions(EntityCatalogSnapshot(descriptors))
+    vacuum = next(entity for entity in suggested if entity.domain == "vacuum")
+    assert vacuum.suggested_recording_entity_ids == ["sensor.renamed_dock"]
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="vacuum_robot",
+        vacuum_entity_id="vacuum.robot",
+        battery_entity_id="sensor.battery",
+        additional_entity_ids=("sensor.renamed_dock",),
+    )
+    context = build_recording_context(request, descriptors)
+    path = tmp_path / "record.jsonl"
+    path.write_text(json.dumps(context.build_metadata_record()) + "\n")
+    metadata = load_recording(path).dataset.metadata
+    restored = restore_recording_context(build_recording_context(request), metadata)
+    assert restored.entities == context.entities
+    assert restored.device_entities == context.device_entities
+    assert suggest_recording_entities(restored).selected == ["sensor.renamed_dock"]
 
 
 def test_vacuum_context_records_selected_metadata_and_complete_device_inventory() -> None:

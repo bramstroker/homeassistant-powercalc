@@ -1,16 +1,19 @@
 """Resolve recorded entities to portable profile placeholders."""
 
 from collections.abc import Callable, Sequence
+import re
 
 from measure.recording.models import RecordedEntity, RecordingContext
 
 
-def resolve_portable_entity(entity_id: str, context: RecordingContext) -> str | None:
+def resolve_portable_entity(
+    entity_id: str, context: RecordingContext, *, unique_id_suffix: str | None = None
+) -> str | None:
     """Map a recorded entity ID to a profile placeholder reusable in other HA installations.
 
     Use [[entity]] for the vacuum, otherwise a translation key or supported battery
-    device class that PowerCalc resolves to exactly this entity. Return None when no
-    safe mapping exists.
+    device class that PowerCalc resolves to exactly this entity. An explicitly
+    supplied semantic suffix can identify entities on the primary device and integration.
     """
     if entity_id == context.primary_entity_id:
         return "[[entity]]"
@@ -39,7 +42,31 @@ def resolve_portable_entity(entity_id: str, context: RecordingContext) -> str | 
         candidates, shadowing, lambda item: item.device_class == device_class
     ):
         return f"[[entity_by_device_class:{device_class}]]"
+    if _has_unique_id_suffix_match(entity, primary, source_entities, unique_id_suffix):
+        return f"[[entity_by_unique_id_suffix:{unique_id_suffix}]]"
     return None
+
+
+def _has_unique_id_suffix_match(
+    entity: RecordedEntity,
+    primary: RecordedEntity,
+    source_entities: Sequence[RecordedEntity],
+    suffix: str | None,
+) -> bool:
+    """Allow a mapped suffix only when it identifies one entity on the vacuum's device."""
+    if not suffix or re.fullmatch(r"[A-Za-z_]\w*", suffix) is None:
+        return False
+    if entity.device_id != primary.device_id or not primary.integration:
+        return False
+    if entity.integration != primary.integration or not entity.unique_id or not entity.unique_id.endswith(suffix):
+        return False
+    return _is_unique_match(
+        source_entities,
+        [],
+        lambda item: (
+            item.integration == primary.integration and item.unique_id is not None and item.unique_id.endswith(suffix)
+        ),
+    )
 
 
 def _is_unique_match(

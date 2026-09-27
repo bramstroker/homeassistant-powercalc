@@ -55,7 +55,7 @@ class ActivitySignal:
         return False if _contains(self.inactive, value) else None
 
     def build_condition(self, context: RecordingContext, *, active: bool = True) -> dict[str, object]:
-        entity = resolve_portable_entity(self.feature.entity_id, context)
+        entity = _resolve_signal_entity(self.feature.entity_id, context)
         assert entity is not None
         values = self.active if active else self.inactive
         if self.feature.source == FeatureSource.STATE:
@@ -85,6 +85,16 @@ class RecordingEntitySuggestions:
     disabled: list[str]
 
 
+def _resolve_signal_entity(entity_id: str, context: RecordingContext) -> str | None:
+    if entity_id == context.primary_entity_id:
+        return "[[entity]]"
+    entity = next((item for item in context.entities if item.entity_id == entity_id), None)
+    rule = get_entity_signal_rule(entity) if entity is not None else None
+    if rule is None:
+        return None
+    return resolve_portable_entity(entity_id, context, unique_id_suffix=rule.unique_id_suffix)
+
+
 def suggest_recording_entities(context: RecordingContext) -> RecordingEntitySuggestions:
     """Suggest portable activity signals using metadata, before any samples exist."""
     candidates = [
@@ -92,8 +102,7 @@ def suggest_recording_entities(context: RecordingContext) -> RecordingEntitySugg
         for entity in context.entities
         if entity.entity_id != context.primary_entity_id
         and entity.integration != "powercalc"
-        and get_entity_signal_rule(entity) is not None
-        and resolve_portable_entity(entity.entity_id, context) is not None
+        and _resolve_signal_entity(entity.entity_id, context) is not None
     ]
     available_priorities: dict[Activity, SignalPriority] = {}
     for entity in candidates:
@@ -163,7 +172,7 @@ def discover_signals(samples: Sequence[RecordingSample], context: RecordingConte
         if entity.disabled_by is None
         and entity.has_live_state is not False
         and entity.integration != "powercalc"
-        and resolve_portable_entity(entity.entity_id, context) is not None
+        and _resolve_signal_entity(entity.entity_id, context) is not None
     ]
     primary = context.primary_entity_id
     candidates = _discover_entity_signals(samples, entities, primary)
