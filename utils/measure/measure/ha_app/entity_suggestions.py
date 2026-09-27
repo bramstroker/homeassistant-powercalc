@@ -1,6 +1,6 @@
 """Enrich the recorder's entity catalogue with defaults from the analyser."""
 
-from measure.analyser.vacuum_signals import suggest_recording_entities
+from measure.analyser.vacuum.signals import suggest_recording_entities
 from measure.home_assistant.entities import EntityCatalogSnapshot, EntityDescriptor
 from measure.recording.context import build_recorded_entity
 from measure.recording.models import EntityRole, RecorderProfileRecipe, RecordingContext

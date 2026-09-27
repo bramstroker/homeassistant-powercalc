@@ -20,8 +20,8 @@ from measure.analyser.models import (
     ValidationMethod,
 )
 from measure.analyser.recording import load_recordings, restore_recording_context
-from measure.analyser.vacuum import VacuumCompositeCandidate, VacuumCompositeStrategy, split_vacuum_samples
-from measure.analyser.vacuum_validation import build_activity_reports, find_credibility_failure
+from measure.analyser.vacuum.strategy import VacuumCompositeCandidate, VacuumCompositeStrategy, split_vacuum_samples
+from measure.analyser.vacuum.validation import build_activity_reports, find_credibility_failure
 from measure.recording.models import RecorderProfileRecipe, RecordingContext, RecordingSample
 
 MIN_VALIDATION_COVERAGE = 0.9

@@ -19,7 +19,13 @@ from measure.analyser.models import (
 from measure.analyser.recording import load_recordings, restore_recording_context
 from measure.analyser.sample_intervals import calculate_sample_durations
 from measure.analyser.service import RecorderAnalyser
-from measure.analyser.vacuum import (
+from measure.analyser.vacuum.signals import (
+    Activity,
+    ActivitySignal,
+    discover_signals,
+    resolve_activity,
+)
+from measure.analyser.vacuum.strategy import (
     ChargingBranch,
     ChargingPoint,
     FixedBranch,
@@ -30,13 +36,7 @@ from measure.analyser.vacuum import (
     group_vacuum_episodes,
     split_vacuum_samples,
 )
-from measure.analyser.vacuum_signals import (
-    Activity,
-    ActivitySignal,
-    discover_signals,
-    resolve_activity,
-)
-from measure.analyser.vacuum_validation import build_activity_reports, find_credibility_failure
+from measure.analyser.vacuum.validation import build_activity_reports, find_credibility_failure
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.recording.models import (
     RecordedEntity,
