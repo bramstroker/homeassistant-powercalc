@@ -391,7 +391,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                         entity_domains=PROFILE_DEVICE_DOMAINS[device_type],
                     )
                     for device_type in ProfileDeviceType
-                    if device_type != ProfileDeviceType.VACUUM_ROBOT
+                    if device_type not in (ProfileDeviceType.VACUUM_ROBOT, ProfileDeviceType.AIR_CONDITIONER)
                 ),
                 default=ProfileDeviceType.GENERIC_IOT,
                 visible_when=(

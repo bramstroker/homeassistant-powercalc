@@ -24,6 +24,7 @@ const recorder: MeasureDefinition = {
     ...field,
     options: [
       ...field.options,
+      { value: "air_conditioner", label: "Air conditioner", entity_domains: ["climate"] },
       { value: "fan", label: "Fan", entity_domains: ["fan"] },
       { value: "smart_speaker", label: "Smart speaker", entity_domains: ["media_player"] },
       { value: "lawn_mower_robot", label: "Lawn mower robot", entity_domains: ["lawn_mower"] },
@@ -40,6 +41,11 @@ describe("device-first measurement routes", () => {
       "vacuum_robot", "smart_speaker", "smart_switch",
     ]);
     expect(choices.filter((choice) => choice.id === "vacuum_robot")).toHaveLength(1);
+    expect(choices.find((choice) => choice.id === "camera")?.experimental).toBe(true);
+    expect(choices.find((choice) => choice.id === "light")?.experimental).toBe(false);
+    expect(choices.find((choice) => choice.id === "vacuum_robot")?.experimental).toBe(true);
+    expect(choices.find((choice) => choice.id === "lawn_mower_robot")?.experimental).toBe(true);
+    expect(choices.find((choice) => choice.id === "fan")?.experimental).toBe(true);
   });
 
   it("offers only the automated measurement for lights", () => {
@@ -63,6 +69,8 @@ describe("device-first measurement routes", () => {
       recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
     });
     expect(routesForDevice("vacuum_robot", definitions)[0]?.recommended).toBe(true);
+    expect(routesForDevice("vacuum_robot", definitions)[0]?.experimental).toBe(true);
+    expect(routesForDevice("fan", definitions)[1]?.experimental).toBe(true);
   });
 
   it("keeps average and Playbook under free measurement", () => {

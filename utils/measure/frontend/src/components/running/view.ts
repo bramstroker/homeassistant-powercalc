@@ -7,6 +7,7 @@ import { diagnosticsDownload, sharedStyles } from "../../styles";
 import "./chart";
 import "./log";
 import "./operating-point";
+import { recordingGuidance } from "./recording-guidance";
 
 @customElement("measure-running-view")
 export class RunningView extends LitElement {
@@ -72,6 +73,10 @@ export class RunningView extends LitElement {
     .ready-card.warning .ready-icon svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .ready-card.warning .ready-eyebrow { color: var(--warning); }
     .ready-message { max-width: 620px; color: var(--muted); line-height: 1.6; white-space: pre-line; }
+    .recording-guidance { width: min(680px, 100%); padding: 1rem 1.2rem; border: 1px solid var(--line); border-radius: 12px; background: var(--field); text-align: left; }
+    .recording-guidance h4 { margin: 0 0 0.55rem; font-size: 0.9rem; }
+    .recording-guidance ol { margin: 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.5; }
+    .recording-guidance li + li { margin-top: 0.4rem; }
     .ready-topline { display: flex; justify-content: flex-end; align-items: center; gap: 0.9rem; width: 100%; }
     @keyframes prepare { 0% { transform: translateX(-105%); } 50% { transform: translateX(165%); } 100% { transform: translateX(-105%); } }
     @media (max-width: 640px) { .metrics { grid-template-columns: 1fr 1fr; } .topline { align-items: flex-start; flex-direction: column; } }
@@ -128,6 +133,7 @@ export class RunningView extends LitElement {
   private renderReady() {
     const message = this.snapshot.confirmation_message ?? "Preparation is complete. Start the measurement when the device is ready.";
     const warning = this.warningConfirmation;
+    const guidance = recordingGuidance(this.snapshot.request);
     return html`
       <section class="panel" aria-labelledby="running-title">
         <p class="eyebrow">03 / Measurement</p>
@@ -145,6 +151,10 @@ export class RunningView extends LitElement {
             <h3>${warning ? "Protect your hearing" : "Everything is ready"}</h3>
             <p class="ready-message">${message}</p>
           </div>
+          ${guidance ? html`<div class="recording-guidance" aria-label="Recording guidance">
+            <h4>What to record</h4>
+            <ol>${guidance.map((step) => html`<li>${step}</li>`)}</ol>
+          </div>` : nothing}
           <button class="primary confirm" type="button" @click=${this.confirm} ?disabled=${this.busy}>${this.busy ? "Starting…" : this.confirmationAction || "Start measurement"}</button>
         </div>
         ${this.renderFooter(false)}

@@ -1,6 +1,14 @@
-import type { SessionSnapshot } from "../../types";
+import type { RecorderMeasurementRequest, SessionSnapshot } from "../../types";
 import { capabilities } from "../../testing/controller";
 import "./view";
+
+function recorderRequest(profileRecipe: "generic" | "vacuum_robot", deviceType?: string): RecorderMeasurementRequest {
+  return {
+    measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: profileRecipe,
+    profile_device_type: deviceType, model_id: "", product_name: "", measure_device: "",
+    generate_model: true, parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+  };
+}
 
 describe("running view", () => {
   it("explains a disconnected stream and labels the last received update", async () => {
@@ -85,6 +93,37 @@ describe("running view", () => {
     expect(ready?.querySelector("button.confirm")?.textContent).toBe("Start recording");
     expect(element.shadowRoot.querySelector(".instrument")).toBeNull();
     expect(element.shadowRoot.querySelector("progress")).toBeNull();
+  });
+
+  it.each([
+    ["vacuum_robot", "vacuum_robot", "low-battery", "Record more"],
+    ["generic", "cover", "Open the cover fully", "Return to idle"],
+    ["generic", "set_top_box", "live viewing", "Return to idle"],
+    ["generic", "lawn_mower_robot", "mowing run", "Return to idle"],
+    ["generic", "smart_switch", "no load should be connected", "switch's own consumption"],
+  ] as const)("guides a %s recording before it starts", async (recipe, deviceType, action, finish) => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = { state: "awaiting_confirmation", request: recorderRequest(recipe, deviceType) };
+    element.confirmationAction = "Start recording";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const guidance = element.shadowRoot!.querySelector(".recording-guidance");
+    expect(guidance?.textContent).toContain(action);
+    expect(guidance?.textContent).toContain(finish);
+    expect(guidance?.querySelectorAll("li").length).toBeGreaterThanOrEqual(3);
+    expect(element.shadowRoot!.querySelector("button.confirm")?.textContent).toBe("Start recording");
+  });
+
+  it("omits complex-profile instructions for a Playbook recording", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      request: { ...recorderRequest("generic", "camera"), recorder_purpose: "playbook" },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector(".recording-guidance")).toBeNull();
   });
 
   it("renders speaker confirmation as a high-volume warning", async () => {

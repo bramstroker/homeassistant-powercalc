@@ -1,7 +1,6 @@
 import { svg } from "lit";
 
 const ICONS: Record<string, ReturnType<typeof svg>> = {
-  air_conditioner: svg`<path d="M12 2v20M3.3 7l17.4 10M20.7 7 3.3 17M9 4l3 3 3-3M9 20l3-3 3 3M4 10l4 1-1-4m13 7-4-1 1 4M7 17l1-4-4 1m13-7-1 4 4-1"/>`,
   air_purifier: svg`<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M8 17h8"/>`,
   camera: svg`<path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3"/>`,
   cover: svg`<rect x="5" y="3" width="14" height="18" rx="1"/><path d="M5 9h14M5 13h14M5 17h14"/>`,

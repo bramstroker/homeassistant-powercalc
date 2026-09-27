@@ -32,6 +32,7 @@ describe("device-first setup", () => {
     await element.updateComplete;
     expect([...element.shadowRoot.querySelectorAll(".device-card")].map((card) => card.querySelector(".type-label")?.textContent))
       .toEqual(["Camera"]);
+    expect(element.shadowRoot.querySelector(".device-card .experimental-badge")?.textContent).toBe("Experimental");
     search.value = "";
     search.dispatchEvent(new Event("input"));
     await element.updateComplete;
@@ -41,6 +42,7 @@ describe("device-first setup", () => {
     expect(element.shadowRoot.querySelector("form")).toBeTruthy();
     expect(element.shadowRoot.querySelector(".route-card")).toBeNull();
     expect(element.shadowRoot.textContent).toContain("Automated light measurement");
+    expect(element.shadowRoot.querySelector(".type-chip .experimental-badge")).toBeNull();
   });
 
   it("submits the device and recorder recipe selected in the entry flow", async () => {
@@ -53,6 +55,7 @@ describe("device-first setup", () => {
     expect(element.shadowRoot.querySelector('select[name="recorder_purpose"]')).toBeNull();
     expect(element.shadowRoot.querySelector('select[name="profile_device_type"]')).toBeNull();
     expect(element.shadowRoot.querySelector(".type-chip .device-icon svg[stroke='currentColor']")).toBeTruthy();
+    expect(element.shadowRoot.querySelector(".type-chip .experimental-badge")?.textContent).toBe("Experimental");
     selectEntity(entityCombobox(element, "primary_entity_id"), camera.entity_id);
     await element.updateComplete;
     const submitted = new Promise<MeasurementRequest>((resolve) => {
@@ -76,8 +79,10 @@ describe("device-first setup", () => {
     const routes = [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".route-card")];
     expect(routes).toHaveLength(2);
     expect(routes[0]!.textContent).toContain("Recommended");
+    expect(routes[0]!.textContent).toContain("Experimental");
     expect(routes[0]!.textContent).toContain("Record vacuum and dock activity");
     expect(routes[1]!.textContent).toContain("Measure charging power");
+    expect(routes[1]!.textContent).not.toContain("Experimental");
   });
 
   it("restores a saved generic recording in the matching device route", async () => {
@@ -120,6 +125,24 @@ describe("device-first setup", () => {
     await element.updateComplete;
     expect(element.selectedType).toBe("light");
     expect(element.shadowRoot.querySelector(".route-card")).toBeNull();
+  });
+
+  it("keeps a saved air conditioner recording editable without offering new ones", async () => {
+    const element = createSetup();
+    element.initialRequest = {
+      measure_type: "recorder", controller: null, model_id: "", product_name: "", measure_device: "",
+      power_meter: { type: "dummy" }, generate_model: true, parameters: capabilities.defaults, resume_policy: "new",
+      recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: "air_conditioner",
+      primary_entity_id: "climate.ac", tracked_entity_ids: [],
+    };
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector("form")).toBeTruthy();
+    expect(element.shadowRoot.querySelector('input[name="profile_device_type"]')).toHaveProperty("value", "air_conditioner");
+
+    (element.shadowRoot.querySelector(".selection-actions button") as HTMLButtonElement).click();
+    await element.updateComplete;
+    expect([...element.shadowRoot.querySelectorAll(".device-card .type-label")]
+      .map((label) => label.textContent)).not.toContain("Air conditioner");
   });
 
   it("offers only volume measurement for smart speakers while preserving saved recordings", async () => {

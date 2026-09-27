@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { completedSnapshot, contributionPreview, mockApi, parameters, startedSnapshot } from "./mock-api";
+import { completedSession, completedSnapshot, contributionPreview, mockApi, parameters, startedSnapshot } from "./mock-api";
 import type { SessionSnapshot, SessionSummary } from "../src/types";
 
 /**
@@ -20,6 +20,50 @@ async function startAverageSetup(page: Page): Promise<void> {
 test.beforeEach(async ({ page }) => {
   await mockApi(page);
   await page.goto("/");
+});
+
+test("keeps experimental device labels above the device names", async ({ page }) => {
+  await page.getByRole("button", { name: "New measurement" }).click();
+  const heating = page.getByRole("button", { name: /Heating Experimental/ });
+  const badge = heating.locator(".experimental-badge");
+  const name = heating.locator(".type-label");
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    const badgeBounds = await badge.boundingBox();
+    const nameBounds = await name.boundingBox();
+    expect(badgeBounds).not.toBeNull();
+    expect(nameBounds).not.toBeNull();
+    expect(badgeBounds!.y + badgeBounds!.height).toBeLessThan(nameBounds!.y);
+  }
+});
+
+test("shows vacuum recording steps before the start button on mobile", async ({ page }, testInfo) => {
+  const pending: SessionSnapshot = {
+    ...startedSnapshot,
+    state: "awaiting_confirmation",
+    mode: "Recording",
+    confirmation_message: "Ready to start recording. Stop the measurement when you are finished.",
+    confirmation_action: "Start recording",
+    request: {
+      measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+      model_id: "", product_name: "Robot vacuum", measure_device: "Dock", generate_model: true,
+      parameters, resume_policy: "new", power_meter: { type: "dummy" },
+    },
+  };
+  await mockApi(page, { sessions: [{
+    ...completedSession, session_id: "session-running", state: "awaiting_confirmation",
+    measure_type: "recorder", product_name: "Robot vacuum", active: true,
+  }] });
+  await page.route("**/api/sessions/session-running", (route) => route.fulfill({ json: pending }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+
+  const guidance = page.getByLabel("Recording guidance");
+  await expect(guidance).toContainText("before docking a low-battery vacuum");
+  await expect(guidance).toContainText("at least 20 battery percentage points");
+  await expect(page.getByRole("button", { name: "Start recording" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.screenshot({ path: testInfo.outputPath("vacuum-recording-guidance.png"), fullPage: true });
 });
 
 test("preserves unfinished setup through settings and resets it for a new measurement", async ({ page }) => {
@@ -196,7 +240,7 @@ test("selects a Home Assistant light with the shared combobox", async ({ page })
 
 test("loads related recorder entities after choosing a device type", async ({ page }) => {
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: "Heating", exact: true }).click();
+  await page.getByRole("button", { name: /Heating Experimental/ }).click();
   await expect(page.locator('input[name="recorder_purpose"]')).toHaveValue("complex_profile");
   await expect(page.locator('input[name="profile_device_type"]')).toHaveValue("heating");
   const primary = page.getByRole("combobox", { name: "Primary entity" });

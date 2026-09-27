@@ -5,6 +5,7 @@ export const FREE_MEASUREMENT = "free_measurement";
 export interface DeviceChoice {
   id: string;
   label: string;
+  experimental?: boolean;
 }
 
 export interface MeasurementRoute {
@@ -14,6 +15,7 @@ export interface MeasurementRoute {
   description: string;
   preset: Record<string, string>;
   recommended?: boolean;
+  experimental?: boolean;
 }
 
 export interface RouteSelection {
@@ -35,6 +37,7 @@ function fieldOptions(definition: MeasureDefinition | undefined, name: string) {
 export function deviceChoices(definitions: MeasureDefinition[]): DeviceChoice[] {
   const choices = new Map<string, DeviceChoice>();
   for (const option of fieldOptions(definitions.find((item) => item.measure_type === "recorder"), "profile_device_type")) {
+    if (option.value === "air_conditioner") continue;
     choices.set(option.value, { id: option.value, label: option.label });
   }
   for (const definition of definitions) {
@@ -49,7 +52,12 @@ export function deviceChoices(definitions: MeasureDefinition[]): DeviceChoice[] 
   if (fieldOptions(recorder, "profile_recipe").some((option) => option.value === "vacuum_robot")) {
     choices.set("vacuum_robot", { id: "vacuum_robot", label: "Robot vacuum" });
   }
-  return [...choices.values()].sort((left, right) => left.label.localeCompare(right.label));
+  return [...choices.values()]
+    .map((choice) => {
+      const routes = routesForDevice(choice.id, definitions);
+      return { ...choice, experimental: routes.some((route) => route.experimental) };
+    })
+    .sort((left, right) => left.label.localeCompare(right.label));
 }
 
 /** A route is offered only when its measurement definition is available. */
@@ -89,6 +97,7 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
       description: "Capture activity states and charging for a complex profile.",
       preset: { recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot" },
       recommended: true,
+      experimental: true,
     });
   }
   if (["vacuum_robot", "lawn_mower_robot"].includes(deviceId) && available.has("charging")) routes.push({
@@ -100,8 +109,9 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
     .some((option) => option.value === deviceId)) {
     routes.push({
       id: "complex_profile", measureType: "recorder", label: "Record device states",
-      description: "Record power and Home Assistant states for a complex profile (experimental).",
+      description: "Record power and Home Assistant states for a complex profile.",
       preset: { recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: deviceId },
+      experimental: true,
     });
   }
   return routes;

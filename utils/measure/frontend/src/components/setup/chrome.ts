@@ -16,8 +16,11 @@ export const setupChromeStyles = css`
   .type-card { display: grid; gap: 0.25rem; text-align: left; align-items: start; padding: 1rem; min-height: auto; background: var(--field); }
   .type-card:hover:not(:disabled) { border-color: var(--signal); }
   .route-card.recommended { border-color: var(--signal); }
-  .route-recommended { color: var(--signal-strong); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .route-badges { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
+  .route-recommended, .experimental-badge { color: var(--signal-strong); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
   .device-card, .device-choice { grid-template-columns: 1.6rem 1fr; align-items: center; column-gap: 0.65rem; }
+  .device-card { position: relative; padding-top: 1.55rem; }
+  .device-card .experimental-badge { position: absolute; top: 0.45rem; right: 0.7rem; font-size: 0.6rem; line-height: 1; }
   .device-choice .type-desc { grid-column: 2; }
   .device-icon { display: grid; place-items: center; width: 1.35rem; height: 1.35rem; color: var(--ink); }
   .device-icon svg, .power-meter-icon svg { display: block; width: 1.25rem; height: 1.25rem; }
@@ -81,6 +84,7 @@ export function renderDevicePicker(
         <button type="button" class="type-card device-card" @click=${() => onSelect(device.id)}>
           <span class="device-icon" aria-hidden="true">${deviceIcon(device.id)}</span>
           <span class="type-label">${device.label}</span>
+          ${device.experimental ? html`<span class="experimental-badge">Experimental</span>` : ""}
         </button>
       `)}
     </div>
@@ -103,7 +107,10 @@ export function renderRoutePicker(device: DeviceChoice, routes: MeasurementRoute
     <button type="button" @click=${onBack}>Change device</button>
     <div class="type-grid">
       ${routes.map((route) => html`<button type="button" class="type-card route-card ${route.recommended ? "recommended" : ""}" @click=${() => onSelect(route.id)}>
-        ${route.recommended ? html`<span class="route-recommended">Recommended</span>` : ""}
+        ${route.recommended || route.experimental ? html`<span class="route-badges">
+          ${route.recommended ? html`<span class="route-recommended">Recommended</span>` : ""}
+          ${route.experimental ? html`<span class="experimental-badge">Experimental</span>` : ""}
+        </span>` : ""}
         <span class="type-label">${route.label}</span>
         <span class="type-desc">${route.description}</span>
       </button>`)}
@@ -118,7 +125,7 @@ export function renderSelectionChip(device: DeviceChoice, route: MeasurementRout
       <span class="device-icon" aria-hidden="true">${deviceIcon(device.id)}</span>
       <span class="chip-body">
         <strong>${device.label}</strong>
-        <span class="type-desc">${route.label}</span>
+        <span class="type-desc">${route.label} ${route.experimental ? html`<span class="experimental-badge">Experimental</span>` : ""}</span>
       </span>
       <span class="selection-actions">
         ${multipleRoutes ? html`<button type="button" @click=${onChangeRoute}>Change method</button>` : ""}
