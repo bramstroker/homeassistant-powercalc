@@ -20,6 +20,15 @@ function createSetup(): SetupViewElement {
   return element;
 }
 
+function savedRecording(deviceType: string, primaryEntityId: string, trackedEntityIds: string[] = []): MeasurementRequest {
+  return {
+    measure_type: "recorder", controller: null, model_id: "", product_name: "", measure_device: "",
+    power_meter: { type: "dummy" }, generate_model: true, parameters: capabilities.defaults, resume_policy: "new",
+    recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: deviceType,
+    primary_entity_id: primaryEntityId, tracked_entity_ids: trackedEntityIds,
+  };
+}
+
 afterEach(() => document.body.replaceChildren());
 
 describe("device-first setup", () => {
@@ -87,12 +96,7 @@ describe("device-first setup", () => {
 
   it("restores a saved generic recording in the matching device route", async () => {
     const element = createSetup();
-    element.initialRequest = {
-      measure_type: "recorder", controller: null, model_id: "", product_name: "", measure_device: "",
-      power_meter: { type: "dummy" }, generate_model: true, parameters: capabilities.defaults, resume_policy: "new",
-      recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: "camera",
-      primary_entity_id: "camera.porch", tracked_entity_ids: ["sensor.porch_mode"],
-    };
+    element.initialRequest = savedRecording("camera", "camera.porch", ["sensor.porch_mode"]);
     await element.updateComplete;
     expect(element.shadowRoot.querySelector(".type-chip")?.textContent).toContain("Camera");
     expect(entityCombobox(element, "primary_entity_id").value).toBe(camera.entity_id);
@@ -108,12 +112,7 @@ describe("device-first setup", () => {
         ? { ...field, options: [...field.options, { value: "light", label: "Light", entity_domains: ["light"] }] }
         : field),
     }];
-    element.initialRequest = {
-      measure_type: "recorder", controller: null, model_id: "", product_name: "", measure_device: "",
-      power_meter: { type: "dummy" }, generate_model: true, parameters: capabilities.defaults, resume_policy: "new",
-      recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: "light",
-      primary_entity_id: "light.old", tracked_entity_ids: [],
-    };
+    element.initialRequest = savedRecording("light", "light.old");
     await element.updateComplete;
     expect(element.shadowRoot.querySelector("form")).toBeTruthy();
     expect(element.shadowRoot.querySelector('input[name="profile_device_type"]')).toHaveProperty("value", "light");
@@ -129,12 +128,7 @@ describe("device-first setup", () => {
 
   it("keeps a saved air conditioner recording editable without offering new ones", async () => {
     const element = createSetup();
-    element.initialRequest = {
-      measure_type: "recorder", controller: null, model_id: "", product_name: "", measure_device: "",
-      power_meter: { type: "dummy" }, generate_model: true, parameters: capabilities.defaults, resume_policy: "new",
-      recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: "air_conditioner",
-      primary_entity_id: "climate.ac", tracked_entity_ids: [],
-    };
+    element.initialRequest = savedRecording("air_conditioner", "climate.ac");
     await element.updateComplete;
     expect(element.shadowRoot.querySelector("form")).toBeTruthy();
     expect(element.shadowRoot.querySelector('input[name="profile_device_type"]')).toHaveProperty("value", "air_conditioner");
@@ -154,12 +148,7 @@ describe("device-first setup", () => {
         : field),
     };
     element.definitions = [{ ...lightDefinition, measure_type: "speaker" }, recorder];
-    element.initialRequest = {
-      measure_type: "recorder", controller: null, model_id: "", product_name: "", measure_device: "",
-      power_meter: { type: "dummy" }, generate_model: true, parameters: capabilities.defaults, resume_policy: "new",
-      recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: "smart_speaker",
-      primary_entity_id: "media_player.speaker", tracked_entity_ids: [],
-    };
+    element.initialRequest = savedRecording("smart_speaker", "media_player.speaker");
     await element.updateComplete;
     expect(element.shadowRoot.querySelector("form")).toBeTruthy();
     expect(element.shadowRoot.querySelector('input[name="profile_device_type"]')).toHaveProperty("value", "smart_speaker");
