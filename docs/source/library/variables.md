@@ -90,7 +90,6 @@ From Powercalc v1.26.0, an entity field can use `auto_select` to prefill its sel
 
 ```json
 {
-  "min_version": "v1.26.0",
   "fields": {
     "floodlight_entity": {
       "label": "Spotlight light",
