@@ -42,26 +42,31 @@ def resolve_portable_entity(
         candidates, shadowing, lambda item: item.device_class == device_class
     ):
         return f"[[entity_by_device_class:{device_class}]]"
-    if (
-        unique_id_suffix
-        and re.fullmatch(r"[A-Za-z_]\w*", unique_id_suffix)
-        and entity.device_id == primary.device_id
-        and primary.integration
-        and entity.integration == primary.integration
-        and entity.unique_id
-        and entity.unique_id.endswith(unique_id_suffix)
-        and _is_unique_match(
-            source_entities,
-            [],
-            lambda item: (
-                item.integration == primary.integration
-                and item.unique_id is not None
-                and item.unique_id.endswith(unique_id_suffix)
-            ),
-        )
-    ):
+    if _has_unique_id_suffix_match(entity, primary, source_entities, unique_id_suffix):
         return f"[[entity_by_unique_id_suffix:{unique_id_suffix}]]"
     return None
+
+
+def _has_unique_id_suffix_match(
+    entity: RecordedEntity,
+    primary: RecordedEntity,
+    source_entities: Sequence[RecordedEntity],
+    suffix: str | None,
+) -> bool:
+    """Allow a mapped suffix only when it identifies one entity on the vacuum's device."""
+    if not suffix or re.fullmatch(r"[A-Za-z_]\w*", suffix) is None:
+        return False
+    if entity.device_id != primary.device_id or not primary.integration:
+        return False
+    if entity.integration != primary.integration or not entity.unique_id or not entity.unique_id.endswith(suffix):
+        return False
+    return _is_unique_match(
+        source_entities,
+        [],
+        lambda item: (
+            item.integration == primary.integration and item.unique_id is not None and item.unique_id.endswith(suffix)
+        ),
+    )
 
 
 def _is_unique_match(

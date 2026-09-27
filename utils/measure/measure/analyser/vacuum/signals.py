@@ -86,9 +86,13 @@ class RecordingEntitySuggestions:
 
 
 def _resolve_signal_entity(entity_id: str, context: RecordingContext) -> str | None:
+    if entity_id == context.primary_entity_id:
+        return "[[entity]]"
     entity = next((item for item in context.entities if item.entity_id == entity_id), None)
     rule = get_entity_signal_rule(entity) if entity is not None else None
-    return resolve_portable_entity(entity_id, context, unique_id_suffix=rule.unique_id_suffix if rule else None)
+    if rule is None:
+        return None
+    return resolve_portable_entity(entity_id, context, unique_id_suffix=rule.unique_id_suffix)
 
 
 def suggest_recording_entities(context: RecordingContext) -> RecordingEntitySuggestions:
@@ -98,7 +102,6 @@ def suggest_recording_entities(context: RecordingContext) -> RecordingEntitySugg
         for entity in context.entities
         if entity.entity_id != context.primary_entity_id
         and entity.integration != "powercalc"
-        and get_entity_signal_rule(entity) is not None
         and _resolve_signal_entity(entity.entity_id, context) is not None
     ]
     available_priorities: dict[Activity, SignalPriority] = {}
