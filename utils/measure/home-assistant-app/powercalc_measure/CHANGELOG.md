@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.10.0 - 2026-09-27
+
+- #4881 Centralize vacuum entity rules and expand integration mappings @bramstroker
+
+### 🚀 Features
+
+- #4880 Automatically select vacuum recording entities @bramstroker
+- #4882 Support portable Valetudo dock entity references @bramstroker
+
 ## 0.9.0 - 2026-09-26
 
 - #4875 Improve analyser validation and simplify domain models @bramstroker
