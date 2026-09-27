@@ -12,7 +12,7 @@ from measure.analyser.models import (
     ScalarStateValue,
     StrategyNotApplicable,
 )
-from measure.analyser.vacuum_signals import ActivitySignal
+from measure.analyser.vacuum.signals import ActivitySignal
 from measure.recording.models import RecordingContext, RecordingSample
 
 MIN_SAMPLES_PER_VALUE = 4

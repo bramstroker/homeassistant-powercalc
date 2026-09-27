@@ -3,7 +3,13 @@
 from dataclasses import replace
 
 from measure.analyser.entity_references import resolve_portable_entity
-from measure.analyser.vacuum_signals import (
+from measure.analyser.vacuum.entity_rules import (
+    INTEGRATION_ENTITY_RULES,
+    EntitySignalRule,
+    EntitySignalType,
+    SignalPriority,
+)
+from measure.analyser.vacuum.signals import (
     ALIASES,
     Activity,
     discover_signals,
@@ -141,6 +147,41 @@ def test_deprecated_signal_is_not_suggested_when_same_activity_exists(
 def test_other_activity_does_not_replace_deprecated_signal() -> None:
     ctx = context(entity("mop_washing", "switch"), entity("mop_drying_status", "binary_sensor", "roborock"))
     assert suggest_recording_entities(ctx).selected == ["switch.mop_washing", "binary_sensor.mop_drying_status"]
+
+
+def test_deprecation_rule_is_scoped_to_roborock() -> None:
+    ctx = context(entity("drying", "switch"), entity("mop_drying_status", "binary_sensor", "other_integration"))
+    assert suggest_recording_entities(ctx).selected == ["switch.drying", "binary_sensor.mop_drying_status"]
+
+
+def test_integration_mapping_extends_selection_and_analysis(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(
+        INTEGRATION_ENTITY_RULES,
+        "test_integration",
+        [
+            EntitySignalRule(("switch",), EntitySignalType.ACTION, "dock_heater", activity=Activity.DRYING),
+        ],
+    )
+    heater = entity("dock_heater", "switch", "test_integration")
+    ctx = context(heater)
+    items = [sample(**{heater.entity_id: state}) for state in ["on", "off"]]
+    assert suggest_recording_entities(ctx).selected == [heater.entity_id]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [Activity.DRYING, Activity.DOCKED]
+    assert suggest_recording_entities(context(replace(heater, integration="other_integration"))).selected == []
+
+
+def test_integration_mapping_overrides_common_mapping(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(
+        INTEGRATION_ENTITY_RULES,
+        "test_integration",
+        [
+            EntitySignalRule(("switch",), EntitySignalType.ACTION, "drying", activity=Activity.WASHING),
+        ],
+    )
+    ctx = context(entity("drying", "switch", "test_integration"))
+    item = sample(**{"switch.drying": "on"})
+    assert resolve_activity(item, discover_signals([item], ctx)) == Activity.WASHING
 
 
 @pytest.mark.parametrize(
@@ -383,3 +424,204 @@ def test_numeric_action_attributes_are_not_interpreted_as_boolean_flags() -> Non
 
     assert all(signal.feature.attribute != "drying" for signal in signals)
     assert [resolve_activity(item, signals) for item in items] == [Activity.DOCKED, Activity.AWAY]
+
+
+def test_q7_status_selection_and_portable_activity_conditions() -> None:
+    descriptor = replace(entity("q7_status", integration="roborock"), entity_id="sensor.renamed_robot_mode")
+    ctx = context(descriptor)
+    states = ["mop_cleaning", "mop_airdrying", "charging", "moping", "sweep_moping", "sweep_moping_2", "sleeping"]
+    items = [sample(**{descriptor.entity_id: state}) for state in states]
+    assert suggest_recording_entities(ctx).selected == [descriptor.entity_id]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [
+        Activity.WASHING,
+        Activity.DRYING,
+        Activity.CHARGING,
+        Activity.AWAY,
+        Activity.AWAY,
+        Activity.AWAY,
+        Activity.SLEEPING,
+    ]
+    washing = next(signal for signal in signals if signal.activity == Activity.WASHING)
+    assert washing.build_condition(ctx) == {
+        "condition": "state",
+        "entity_id": "[[entity_by_translation_key:q7_status]]",
+        "state": ["mop_cleaning"],
+    }
+
+
+@pytest.mark.parametrize(
+    "key,integration", [("q7_status", "other"), ("status", "roborock"), ("state", "dreame_vacuum")]
+)
+def test_q7_labels_are_not_global_aliases(key: str, integration: str) -> None:
+    descriptor = entity(key, integration=integration)
+    items = [sample(**{descriptor.entity_id: state}) for state in ["charging", "mop_cleaning", "mop_airdrying"]]
+    signals = discover_signals(items, context(descriptor))
+    if key == "q7_status":
+        assert suggest_recording_entities(context(descriptor)).selected == []
+        assert all(signal.feature.entity_id != descriptor.entity_id for signal in signals)
+    else:
+        assert [resolve_activity(item, signals) for item in items] == [Activity.CHARGING, None, None]
+
+
+def test_roborock_waiting_to_charge_is_docked_not_charging() -> None:
+    ctx = context(entity("status", integration="roborock"))
+    items = [sample(**{"sensor.status": state}) for state in ["charging", "waiting_to_charge", "charging_complete"]]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [
+        Activity.CHARGING,
+        Activity.DOCKED,
+        Activity.COMPLETED,
+    ]
+    assert next(signal for signal in signals if signal.activity == Activity.CHARGING).inactive == [
+        "waiting_to_charge",
+        "charging_complete",
+    ]
+
+
+@pytest.mark.parametrize(
+    "state",
+    [
+        "clean_mop_cleaning",
+        "clean_mop_mopping",
+        "segment_mopping",
+        "segment_clean_mop_cleaning",
+        "segment_clean_mop_mopping",
+        "zoned_mopping",
+        "zoned_clean_mop_cleaning",
+        "zoned_clean_mop_mopping",
+        "back_to_dock_washing_duster",
+        "sweep_and_mop",
+    ],
+)
+def test_roborock_current_cleaning_vocabulary(state: str) -> None:
+    item = sample(**{"sensor.status": state})
+    assert (
+        resolve_activity(item, discover_signals([item], context(entity("status", integration="roborock"))))
+        == Activity.AWAY
+    )
+
+
+@pytest.mark.parametrize(
+    "integration,key,state",
+    [
+        ("roborock", "q7_status", "working_sleep"),
+        ("roborock", "q7_status", "updating"),
+        ("roborock", "status", "new_firmware_state"),
+        ("dreame_vacuum", "self_wash_base_status", "paused"),
+        ("dreame_vacuum", "self_wash_base_status", "cleaning"),
+        ("ecovacs", "station_state", "washing"),
+        ("ecovacs", "station_state", "cleaning"),
+    ],
+)
+def test_unmapped_scoped_states_do_not_become_docked(integration: str, key: str, state: str) -> None:
+    descriptor = entity(key, integration=integration)
+    item = sample(**{descriptor.entity_id: state})
+    assert resolve_activity(item, discover_signals([item], context(descriptor))) is None
+
+
+@pytest.mark.parametrize(
+    "integration,key,active",
+    [
+        ("ecovacs", "station_state", "washing_mop"),
+        ("dreame_vacuum", "self_wash_base_status", "washing"),
+    ],
+)
+def test_scoped_station_states_preserve_idle_and_unknown(integration: str, key: str, active: str) -> None:
+    descriptor = entity(key, integration=integration)
+    items = [sample(**{descriptor.entity_id: state}) for state in [active, "idle", "paused", "unknown"]]
+    signals = discover_signals(items, context(descriptor))
+    assert [resolve_activity(item, signals) for item in items] == [Activity.WASHING, Activity.DOCKED, None, None]
+    washing = next(signal for signal in signals if signal.activity == Activity.WASHING)
+    assert washing.inactive == ["idle"]
+
+
+@pytest.mark.parametrize(
+    "integration,key,domain",
+    [
+        ("roborock", "dust_collection", "switch"),
+        ("dreame_vacuum", "auto_drying", "switch"),
+        ("dreame_vacuum", "auto_dust_collecting", "switch"),
+        ("dreame_vacuum", "self_clean", "switch"),
+        ("dreame_vacuum", "hot_water_status", "sensor"),
+        ("ecovacs", "auto_empty", "select"),
+        ("ecovacs", "clean_base", "button"),
+    ],
+)
+def test_settings_and_commands_are_not_activity_signals(integration: str, key: str, domain: str) -> None:
+    descriptor = entity(key, domain, integration)
+    ctx = context(descriptor)
+    items = [sample(**{descriptor.entity_id: state}) for state in ["on", "active", "washing", "drying"]]
+    assert suggest_recording_entities(ctx).selected == []
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [Activity.DOCKED] * len(items)
+
+
+def test_rule_can_override_the_meaning_of_status_values(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(
+        INTEGRATION_ENTITY_RULES,
+        "test_integration",
+        [
+            EntitySignalRule(
+                ("sensor",),
+                EntitySignalType.STATION,
+                "station_state",
+                state_values={Activity.WASHING: frozenset({"cleaning"})},
+                inactive_states=frozenset({"idle"}),
+            ),
+        ],
+    )
+    ctx = context(entity("station_state", integration="test_integration"))
+    items = [sample(**{"sensor.station_state": state}) for state in ["cleaning", "idle", "paused"]]
+    assert suggest_recording_entities(ctx).selected == ["sensor.station_state"]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [Activity.WASHING, Activity.DOCKED, None]
+
+
+def test_explicit_exclusion_overrides_common_activity_mapping(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(
+        INTEGRATION_ENTITY_RULES,
+        "test_integration",
+        [
+            EntitySignalRule(("switch",), EntitySignalType.IGNORE, "drying"),
+        ],
+    )
+    ctx = context(entity("drying", "switch", "test_integration"))
+    item = sample(**{"switch.drying": "on"})
+    assert suggest_recording_entities(ctx).selected == []
+    assert resolve_activity(item, discover_signals([item], ctx)) == Activity.DOCKED
+
+
+@pytest.mark.parametrize("integration,has_live_state", [("powercalc", True), ("roborock", False)])
+def test_analysis_filters_unusable_entities(integration: str, has_live_state: bool) -> None:
+    descriptor = replace(entity("mop_drying", "switch", integration), has_live_state=has_live_state)
+    item = sample(**{descriptor.entity_id: "on"})
+    assert resolve_activity(item, discover_signals([item], context(descriptor))) == Activity.DOCKED
+
+
+def test_unmapped_main_status_blocks_supplemental_charging() -> None:
+    ctx = context(entity("state"), entity("charging_status"))
+    item = sample(**{"sensor.state": "new_station_activity", "sensor.charging_status": "charging_completed"})
+    assert resolve_activity(item, discover_signals([item], ctx)) is None
+
+
+def test_sleep_supplement_respects_scoped_value_mapping(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(
+        INTEGRATION_ENTITY_RULES,
+        "test_integration",
+        [
+            EntitySignalRule(
+                ("sensor",),
+                EntitySignalType.STATUS,
+                "status",
+                priority=SignalPriority.RELATED_STATUS,
+                state_values={Activity.SLEEPING: frozenset({"asleep"})},
+            )
+        ],
+    )
+    ctx = context(entity("state"), entity("status", integration="test_integration"))
+    items = [
+        sample(**{"sensor.state": "charging_completed", "sensor.status": state}) for state in ["asleep", "standby"]
+    ]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [Activity.SLEEPING, Activity.COMPLETED]

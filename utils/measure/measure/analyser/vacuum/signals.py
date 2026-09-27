@@ -1,12 +1,19 @@
 """Map recorded runtime signals to canonical vacuum activities."""
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from enum import IntEnum
 import json
 
 from measure.analyser.entity_references import resolve_portable_entity
 from measure.analyser.models import Activity as Activity, FeatureReference, FeatureSource, ScalarStateValue
+from measure.analyser.vacuum.entity_rules import (
+    ATTRIBUTE_FLAGS,
+    STATUS_ATTRIBUTES,
+    STATUS_VALUES as ALIASES,
+    EntitySignalType,
+    SignalPriority,
+    get_entity_signal_rule,
+)
 from measure.recording.models import EntityRole, RecordedEntity, RecordingContext, RecordingSample
 
 # The first matching activity determines total wall-outlet power.
@@ -21,110 +28,6 @@ ACTIVITY_PRIORITY = (
     Activity.DOCKED,
     Activity.AWAY,
 )
-ALIASES: dict[Activity, frozenset[str]] = {
-    Activity.AUTO_EMPTYING: frozenset(
-        {"auto_emptying", "auto_empty", "emptying", "emptying_the_bin", "emptying_dustbin"}
-    ),
-    Activity.STATION_CLEANING: frozenset({"station_cleaning"}),
-    Activity.WASHING: frozenset(
-        {
-            "washing",
-            "mop_washing",
-            "washing_mop",
-            "washing_the_mop",
-            "washing_the_mop_2",
-            "clean_add_water",
-            "adding_water",
-        }
-    ),
-    Activity.DRYING: frozenset({"drying", "mop_drying", "drying_mop"}),
-    Activity.CHARGING: frozenset({"charging"}),
-    Activity.SLEEPING: frozenset({"sleeping", "sleep"}),
-    Activity.COMPLETED: frozenset({"charging_completed", "charging_complete", "charging_done"}),
-    Activity.DOCKED: frozenset({"docked"}),
-    Activity.AWAY: frozenset(
-        {
-            "cleaning",
-            "room_cleaning",
-            "zone_cleaning",
-            "spot_cleaning",
-            "sweeping",
-            "mopping",
-            "sweeping_and_mopping",
-            "returning",
-            "returning_to_wash",
-            "returning_auto_empty",
-            "second_cleaning",
-            "paused",
-            "idle",
-            "returning_to_washing",
-            "building",
-            "fast_mapping",
-            "follow_wall_cleaning",
-            "remote_control",
-            "monitor_cruise",
-            "monitor_spot",
-            "summon_clean",
-            "returning_home",
-            "docking",
-            "zoned_cleaning",
-            "segment_cleaning",
-            "going_to_wash_the_mop",
-            "going_to_target",
-            "mapping",
-            "manual_mode",
-            "remote_control_active",
-            "patrol",
-            "robot_status_mopping",
-            "robot_status_clean_mop_cleaning",
-            "robot_status_clean_mop_mopping",
-            "robot_status_segment_mopping",
-            "robot_status_segment_clean_mop_cleaning",
-            "robot_status_segment_clean_mop_mopping",
-            "robot_status_zoned_mopping",
-            "robot_status_zoned_clean_mop_cleaning",
-            "robot_status_zoned_clean_mop_mopping",
-            "robot_status_back_to_dock_washing_duster",
-        }
-    ),
-}
-
-
-class _SourcePriority(IntEnum):
-    """Prefer dedicated action signals, then the most detailed status source."""
-
-    ACTION_ENTITY = 0
-    DEPRECATED_ACTION_ENTITY = 1
-    ACTIVITY_FLAG = 2
-    RELATED_STATE = 3
-    RELATED_STATUS = 4
-    VACUUM_STATE_ATTRIBUTE = 5
-    STATUS_ATTRIBUTE = 6
-    HA_STATE = 7
-
-
-_ATTRIBUTE_FLAGS = {"washing": Activity.WASHING, "drying": Activity.DRYING, "auto_empty_status": Activity.AUTO_EMPTYING}
-_STATUS_ENTITY_KEYS = {"state": _SourcePriority.RELATED_STATE, "status": _SourcePriority.RELATED_STATUS}
-_STATUS_ATTRIBUTES = {
-    "vacuum_state": _SourcePriority.VACUUM_STATE_ATTRIBUTE,
-    "status": _SourcePriority.STATUS_ATTRIBUTE,
-}
-_ACTION_ENTITY_KEYS = {
-    "auto_emptying": Activity.AUTO_EMPTYING,
-    "auto_empty": Activity.AUTO_EMPTYING,
-    "washing": Activity.WASHING,
-    "drying": Activity.DRYING,
-    "mop_washing": Activity.WASHING,
-    "mop_drying": Activity.DRYING,
-    "mop_drying_status": Activity.DRYING,
-    "dust_emptying": Activity.AUTO_EMPTYING,
-}
-# Home Assistant's Roborock integration deprecated this binary sensor in favour of the
-# mop_drying switch, so a profile should only fall back to it.
-_DEPRECATED_ACTION_ENTITY_KEYS = {"mop_drying_status"}
-_STATION_KEYS = {"station_state", "self_wash_base_status"}
-_STATION_ACTIVITIES = (Activity.AUTO_EMPTYING, Activity.STATION_CLEANING, Activity.WASHING, Activity.DRYING)
-_CHARGING_ACTIVITIES = (Activity.CHARGING, Activity.COMPLETED)
 
 
 def _normalise(value: ScalarStateValue) -> str:
@@ -172,7 +75,7 @@ class ActivitySignal:
 
 @dataclass(frozen=True)
 class _SignalCandidate:
-    priority: _SourcePriority
+    priority: SignalPriority
     signal: ActivitySignal
 
 
@@ -189,52 +92,33 @@ def suggest_recording_entities(context: RecordingContext) -> RecordingEntitySugg
         for entity in context.entities
         if entity.entity_id != context.primary_entity_id
         and entity.integration != "powercalc"
-        and _is_activity_entity(entity)
+        and get_entity_signal_rule(entity) is not None
         and resolve_portable_entity(entity.entity_id, context) is not None
     ]
-    available_priorities: dict[Activity, _SourcePriority] = {}
+    available_priorities: dict[Activity, SignalPriority] = {}
     for entity in candidates:
-        activity = _get_action_activity(entity)
-        if activity is not None and entity.disabled_by is None and entity.has_live_state is not False:
-            priority = _get_action_priority(entity)
-            previous = available_priorities.get(activity, priority)
-            available_priorities[activity] = min(previous, priority)
+        rule = get_entity_signal_rule(entity)
+        assert rule is not None
+        if (
+            rule.signal_type == EntitySignalType.ACTION
+            and rule.activity is not None
+            and entity.disabled_by is None
+            and entity.has_live_state is not False
+        ):
+            previous = available_priorities.get(rule.activity, rule.priority)
+            available_priorities[rule.activity] = min(previous, rule.priority)
     selected: list[str] = []
     disabled: list[str] = []
     for entity in candidates:
-        activity = _get_action_activity(entity)
-        if activity in available_priorities and _get_action_priority(entity) > available_priorities[activity]:
+        rule = get_entity_signal_rule(entity)
+        assert rule is not None
+        if rule.activity in available_priorities and rule.priority > available_priorities[rule.activity]:
             continue
         if entity.disabled_by is not None:
             disabled.append(entity.entity_id)
         elif entity.has_live_state is not False:
             selected.append(entity.entity_id)
     return RecordingEntitySuggestions(selected, disabled)
-
-
-def _is_activity_entity(entity: RecordedEntity) -> bool:
-    return (
-        _get_action_activity(entity) is not None
-        or (
-            entity.domain == "sensor"
-            and entity.translation_key in {*_STATUS_ENTITY_KEYS, *_STATION_KEYS, "charging_status"}
-        )
-        or _is_charging_sensor(entity)
-    )
-
-
-def _get_action_activity(entity: RecordedEntity) -> Activity | None:
-    if entity.domain in {"binary_sensor", "switch"}:
-        return _ACTION_ENTITY_KEYS.get(entity.translation_key or "")
-    if entity.domain == "sensor" and entity.translation_key == "auto_empty_status":
-        return Activity.AUTO_EMPTYING
-    return None
-
-
-def _get_action_priority(entity: RecordedEntity) -> _SourcePriority:
-    if entity.translation_key in _DEPRECATED_ACTION_ENTITY_KEYS:
-        return _SourcePriority.DEPRECATED_ACTION_ENTITY
-    return _SourcePriority.ACTION_ENTITY
 
 
 def _discover_entity_signals(
@@ -245,20 +129,24 @@ def _discover_entity_signals(
     candidates: list[_SignalCandidate] = []
     for entity in entities:
         feature = FeatureReference(entity.entity_id, FeatureSource.STATE)
-        key = entity.translation_key
-        activity = _get_action_activity(entity)
-        if activity is not None:
-            _add_flags(candidates, samples, feature, activity, _get_action_priority(entity))
-        elif entity.domain == "sensor" and entity.translation_key in _STATION_KEYS:
+        rule = get_entity_signal_rule(entity)
+        if rule is None:
+            continue
+        if rule.signal_type == EntitySignalType.ACTION and rule.state_values is None:
+            assert rule.activity is not None
+            _add_flags(candidates, samples, feature, rule.activity, rule.priority)
+        elif rule.signal_type in {EntitySignalType.ACTION, EntitySignalType.STATION}:
+            assert rule.state_values is not None
             _add_aux_states(
                 candidates,
                 samples,
                 feature,
-                _STATION_ACTIVITIES,
-                {"idle", "returning"},
+                rule.state_values,
+                rule.inactive_states,
+                priority=rule.priority,
             )
-        elif entity.entity_id != primary and entity.domain == "sensor" and key in _STATUS_ENTITY_KEYS:
-            _add_states(candidates, samples, feature, _STATUS_ENTITY_KEYS[str(key)])
+        elif entity.entity_id != primary and rule.signal_type == EntitySignalType.STATUS:
+            _add_states(candidates, samples, feature, rule.priority, rule.state_values)
     return candidates
 
 
@@ -272,25 +160,28 @@ def discover_signals(samples: Sequence[RecordingSample], context: RecordingConte
     entities = [
         entity
         for entity in context.entities
-        if entity.disabled_by is None and resolve_portable_entity(entity.entity_id, context) is not None
+        if entity.disabled_by is None
+        and entity.has_live_state is not False
+        and entity.integration != "powercalc"
+        and resolve_portable_entity(entity.entity_id, context) is not None
     ]
     primary = context.primary_entity_id
     candidates = _discover_entity_signals(samples, entities, primary)
     attributes = {key for sample in samples if (state := sample.entities.get(primary)) for key in state.attributes}
     for attribute in sorted(attributes):
         feature = FeatureReference(primary, FeatureSource.ATTRIBUTE, attribute)
-        if attribute in _ATTRIBUTE_FLAGS:
-            _add_flags(candidates, samples, feature, _ATTRIBUTE_FLAGS[attribute], _SourcePriority.ACTIVITY_FLAG)
-        elif attribute in _STATUS_ATTRIBUTES:
-            _add_states(candidates, samples, feature, _STATUS_ATTRIBUTES[attribute])
-    _add_states(candidates, samples, FeatureReference(primary, FeatureSource.STATE), _SourcePriority.HA_STATE)
+        if attribute in ATTRIBUTE_FLAGS:
+            _add_flags(candidates, samples, feature, ATTRIBUTE_FLAGS[attribute], SignalPriority.ACTIVITY_FLAG)
+        elif attribute in STATUS_ATTRIBUTES:
+            _add_states(candidates, samples, feature, STATUS_ATTRIBUTES[attribute])
+    _add_states(candidates, samples, FeatureReference(primary, FeatureSource.STATE), SignalPriority.HA_STATE)
     # Use one authoritative enum source, rather than combining a rich runtime
     # status sensor with stale vacuum attributes or the coarse HA docked state.
     status_feature = next(
         (
             candidate.signal.feature
             for candidate in sorted(candidates, key=lambda item: (item.priority, item.signal.feature.identifier))
-            if candidate.priority >= _SourcePriority.RELATED_STATE
+            if candidate.priority >= SignalPriority.RELATED_STATE
         ),
         None,
     )
@@ -301,7 +192,7 @@ def discover_signals(samples: Sequence[RecordingSample], context: RecordingConte
     chosen: dict[Activity, ActivitySignal] = {}
     for candidate in sorted(candidates, key=lambda item: (item.priority, item.signal.feature.identifier)):
         signal = candidate.signal
-        if candidate.priority >= _SourcePriority.RELATED_STATE and signal.feature != status_feature:
+        if candidate.priority >= SignalPriority.RELATED_STATE and signal.feature != status_feature:
             continue
         chosen.setdefault(signal.activity, signal)
     return [chosen[activity] for activity in ACTIVITY_PRIORITY if activity in chosen]
@@ -318,29 +209,31 @@ def _add_supplements(
         # Dreame/Mova can report charging_completed alongside an explicit sleep status.
         _add_sleep_flag(candidates, samples, FeatureReference(primary, FeatureSource.ATTRIBUTE, "status"))
         for entity in entities:
-            if entity.domain == "sensor" and entity.translation_key == "status":
-                _add_sleep_flag(candidates, samples, FeatureReference(entity.entity_id, FeatureSource.STATE))
+            rule = get_entity_signal_rule(entity)
+            if rule is not None and rule.signal_type == EntitySignalType.STATUS and entity.translation_key == "status":
+                _add_sleep_flag(
+                    candidates, samples, FeatureReference(entity.entity_id, FeatureSource.STATE), rule.state_values
+                )
     # Limited charging enums supplement the main status only where it has no
     # explicit charging/completion signal. A coarse HA docked state is preserved.
     for entity in entities:
         feature = FeatureReference(entity.entity_id, FeatureSource.STATE)
-        if entity.domain == "sensor" and entity.translation_key == "charging_status":
+        rule = get_entity_signal_rule(entity)
+        if rule is None:
+            continue
+        if rule.signal_type == EntitySignalType.CHARGING_STATUS:
+            assert rule.state_values is not None
             _add_aux_states(
                 candidates,
                 samples,
                 feature,
-                [activity for activity in _CHARGING_ACTIVITIES if activity not in status_activities],
-                {"not_charging", "return_to_charge"},
+                rule.state_values,
+                rule.inactive_states,
+                priority=rule.priority,
+                excluded_activities=status_activities,
             )
-        elif Activity.CHARGING not in status_activities and _is_charging_sensor(entity):
-            _add_flags(candidates, samples, feature, Activity.CHARGING, _SourcePriority.ACTIVITY_FLAG)
-
-
-def _is_charging_sensor(entity: RecordedEntity) -> bool:
-    return entity.domain == "binary_sensor" and (
-        (entity.translation_key == "charging_state" and entity.integration == "dreame_vacuum")
-        or (entity.device_class == "battery_charging" and entity.integration == "ecovacs")
-    )
+        elif Activity.CHARGING not in status_activities and rule.signal_type == EntitySignalType.CHARGING_FLAG:
+            _add_flags(candidates, samples, feature, Activity.CHARGING, rule.priority)
 
 
 def _collect_feature_values(samples: Sequence[RecordingSample], feature: FeatureReference) -> list[ScalarStateValue]:
@@ -361,7 +254,7 @@ def _add_flags(
     samples: Sequence[RecordingSample],
     feature: FeatureReference,
     activity: Activity,
-    priority: _SourcePriority,
+    priority: SignalPriority,
 ) -> None:
     values = _collect_feature_values(samples, feature)
     active: list[ScalarStateValue] = [
@@ -380,16 +273,21 @@ def _add_flags(
 
 
 def _add_sleep_flag(
-    candidates: list[_SignalCandidate], samples: Sequence[RecordingSample], feature: FeatureReference
+    candidates: list[_SignalCandidate],
+    samples: Sequence[RecordingSample],
+    feature: FeatureReference,
+    state_values: Mapping[Activity, frozenset[str]] | None = None,
 ) -> None:
     values = _collect_feature_values(samples, feature)
+    state_values = ALIASES if state_values is None else state_values
+    sleep_values = state_values.get(Activity.SLEEPING, frozenset())
     active: list[ScalarStateValue] = [
-        value for value in values if isinstance(value, str) and _normalise(value) in ALIASES[Activity.SLEEPING]
+        value for value in values if isinstance(value, str) and _normalise(value) in sleep_values
     ]
     if active:
         candidates.append(
             _SignalCandidate(
-                _SourcePriority.ACTIVITY_FLAG,
+                SignalPriority.ACTIVITY_FLAG,
                 ActivitySignal(
                     Activity.SLEEPING, feature, active, [value for value in values if not _contains(active, value)]
                 ),
@@ -401,19 +299,20 @@ def _add_aux_states(
     candidates: list[_SignalCandidate],
     samples: Sequence[RecordingSample],
     feature: FeatureReference,
-    activities: Sequence[Activity],
-    off_values: set[str],
+    state_values: Mapping[Activity, frozenset[str]],
+    off_values: frozenset[str],
+    *,
+    priority: SignalPriority = SignalPriority.ACTIVITY_FLAG,
+    excluded_activities: set[Activity] | None = None,
 ) -> None:
     values = _collect_feature_values(samples, feature)
-    recognised = off_values | set().union(*(ALIASES[activity] for activity in activities))
-    # Other explicit charging modes are inactive, even when the authoritative
-    # source already supplies that activity and we only supplement completion.
-    if Activity.CHARGING in activities or Activity.COMPLETED in activities:
-        recognised |= ALIASES[Activity.CHARGING] | ALIASES[Activity.COMPLETED]
+    # Include all known modes as inactive, even when only supplementing completion.
+    recognised = off_values | set().union(*state_values.values())
+    activities = [activity for activity in state_values if activity not in (excluded_activities or set())]
     signals: list[ActivitySignal] = []
     for activity in activities:
         active: list[ScalarStateValue] = [
-            value for value in values if isinstance(value, str) and _normalise(value) in ALIASES[activity]
+            value for value in values if isinstance(value, str) and _normalise(value) in state_values[activity]
         ]
         inactive: list[ScalarStateValue] = [
             value
@@ -422,22 +321,29 @@ def _add_aux_states(
         ]
         if active:
             signals.append(ActivitySignal(activity, feature, active, inactive))
-    # One inactive guard is sufficient when this recording only saw station idle.
+    # One guard is enough for an idle-only recording. Unmapped values stay unknown
+    # even when no active operation was observed, instead of falling back to docked.
     if not signals and activities:
         inactive = [value for value in values if isinstance(value, str) and _normalise(value) in recognised]
-        if inactive:
+        if inactive or values:
             signals.append(ActivitySignal(activities[0], feature, [], inactive))
-    candidates.extend(_SignalCandidate(_SourcePriority.ACTIVITY_FLAG, signal) for signal in signals)
+    candidates.extend(_SignalCandidate(priority, signal) for signal in signals)
 
 
 def _add_states(
     candidates: list[_SignalCandidate],
     samples: Sequence[RecordingSample],
     feature: FeatureReference,
-    priority: _SourcePriority,
+    priority: SignalPriority,
+    state_values: Mapping[Activity, frozenset[str]] | None = None,
 ) -> None:
     values = _collect_feature_values(samples, feature)
-    for activity, aliases in ALIASES.items():
+    state_values = ALIASES if state_values is None else state_values
+    recognised = set().union(*state_values.values())
+    if values and not any(isinstance(value, str) and _normalise(value) in recognised for value in values):
+        # A present but unmapped status must not fall back to the coarse HA state.
+        candidates.append(_SignalCandidate(priority, ActivitySignal(ACTIVITY_PRIORITY[0], feature, [], [])))
+    for activity, aliases in state_values.items():
         active: list[ScalarStateValue] = [
             value for value in values if isinstance(value, str) and _normalise(value) in aliases
         ]
@@ -446,7 +352,16 @@ def _add_states(
                 _SignalCandidate(
                     priority,
                     ActivitySignal(
-                        activity, feature, active, [value for value in values if not _contains(active, value)]
+                        activity,
+                        feature,
+                        active,
+                        [
+                            value
+                            for value in values
+                            if isinstance(value, str)
+                            and _normalise(value) in recognised
+                            and not _contains(active, value)
+                        ],
                     ),
                 )
             )

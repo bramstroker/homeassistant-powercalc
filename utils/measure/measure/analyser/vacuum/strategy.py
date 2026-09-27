@@ -20,7 +20,7 @@ from measure.analyser.models import (
     ValidationMethod,
 )
 from measure.analyser.sample_intervals import calculate_sample_durations
-from measure.analyser.vacuum_signals import (
+from measure.analyser.vacuum.signals import (
     Activity,
     ActivitySignal,
     discover_signals,

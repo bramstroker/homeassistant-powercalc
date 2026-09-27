@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 
 from measure.analyser.models import ActivityReport, EnergyMetrics
 from measure.analyser.sample_intervals import calculate_sample_durations
-from measure.analyser.vacuum import FixedBranch, VacuumCompositeCandidate, VacuumEpisode, group_vacuum_episodes
-from measure.analyser.vacuum_signals import Activity
+from measure.analyser.vacuum.signals import Activity
+from measure.analyser.vacuum.strategy import FixedBranch, VacuumCompositeCandidate, VacuumEpisode, group_vacuum_episodes
 from measure.recording.models import RecordingSample
 
 MAX_RELATIVE_ACTIVITY_ERROR = 0.2

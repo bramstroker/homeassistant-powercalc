@@ -197,7 +197,7 @@ models export `states_power`. Attribute keys use the form `attribute|value`.
 
 ## 8. Vacuum fitter: known semantics, learned parameters
 
-[vacuum_signals.py](measure/analyser/vacuum_signals.py) recognises runtime activities:
+[signals.py](measure/analyser/vacuum/signals.py) recognises runtime activities:
 auto-emptying, station cleaning, washing, drying, charging, sleeping, charging completed,
 docked, and operation away from the dock. Aliases normalise integration-specific labels.
 `Activity`, defined in the analyser models, is the shared string enum for signals, branches,
@@ -226,7 +226,7 @@ uses `[[entity]]`, `[[entity_by_translation_key:…]]`, or an unambiguous batter
 placeholder. Related dock entities are supported when no matching entity on the primary
 device shadows them and exactly one match exists across related devices.
 
-[VacuumCompositeStrategy](measure/analyser/vacuum.py) groups training observations by the
+[VacuumCompositeStrategy](measure/analyser/vacuum/strategy.py) groups training observations by the
 first matching activity in dock-priority order. Non-charging activities get a time-weighted mean fixed
 **total wall-outlet power**, preserving energy for cycling loads. Without consecutive usable
 intervals, fitting falls back to the arithmetic mean. Charging gets a bounded piecewise-linear battery calibration:
@@ -263,7 +263,7 @@ held out in full if it covers at least 10% of every activity's eligible recorded
 Otherwise, alternate qualifying episodes of each activity are held out.
 Training and validation use separate episodes, providing a check on repeated-cycle behaviour.
 
-[vacuum_validation.py](measure/analyser/vacuum_validation.py) reports each activity's sample
+[validation.py](measure/analyser/vacuum/validation.py) reports each activity's sample
 and episode counts, coverage, MAE, transition MAE, and energy. Each activity must have 90%
 coverage. Fixed activities require consecutive readings and compare measured versus predicted
 time-weighted average power; charging compares per-sample MAE. Both allow at most the larger

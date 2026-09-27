@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Protocol
 from measure.recording.models import RecordingContext, RecordingSample
 
 if TYPE_CHECKING:
-    from measure.analyser.vacuum_signals import ActivitySignal
+    from measure.analyser.vacuum.signals import ActivitySignal
 
 type ScalarStateValue = str | bool | int | float
 
