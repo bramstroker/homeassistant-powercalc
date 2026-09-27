@@ -73,6 +73,8 @@ Select the printer status entity that reports ready, printing, and sleep. Use th
 
 Record normal viewing and standby. Allow startup and standby transitions to finish before counting stable samples. Check that the `media_player` entity reports the on and standby states correctly. Keep the energy-saving or standby setting unchanged in both runs.
 
+If the box has energy-saving modes or a setting to enable or disable Wi-Fi that changes its power use, make a **separate measurement session for each configuration**. Keep that configuration fixed during both runs of its session; **Record more** within the same session is for validating the same settings. In your profile pull request, describe each setting and include the corresponding measurements. The app does not create subprofiles from these sessions yet, but the profile can be [assembled with subprofiles](../../library/sub-profiles.md) manually so users can select the configuration they use.
+
 ### Smart switch
 
 Leave the switch output empty: **connect no load**. Toggle its single relay off and on several times to measure the switch's own consumption. Keep indicator lights and other settings unchanged. A switch with multiple relays needs a different profile recipe.
