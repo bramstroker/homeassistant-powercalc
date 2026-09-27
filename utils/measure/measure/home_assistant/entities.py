@@ -80,6 +80,8 @@ class EntityDescriptor(BaseModel):
     max_mired: int | None = None
     related_voltage_entity_id: str | None = None
     member_entity_ids: list[str] = Field(default_factory=list)
+    suggested_recording_entity_ids: list[str] = Field(default_factory=list)
+    disabled_recording_entity_ids: list[str] = Field(default_factory=list)
 
 
 class EntityCatalogSnapshot:

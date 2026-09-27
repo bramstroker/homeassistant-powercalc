@@ -23,6 +23,7 @@ from measure.ha_app.api_models import (
     PreflightResponse,
 )
 from measure.ha_app.context import AppContext, get_app_context
+from measure.ha_app.entity_suggestions import add_recording_suggestions
 from measure.ha_app.library_catalog import (
     LibraryCatalogError,
 )
@@ -205,7 +206,9 @@ async def entities(
     snapshot = await run_in_threadpool(
         HomeAssistantEntityCatalog(get_app_context(request).home_assistant).load_snapshot,
     )
-    return snapshot.get_all() if all_entities else snapshot.select(domain=domain, device_class=device_class)
+    if all_entities:
+        return add_recording_suggestions(snapshot)
+    return snapshot.select(domain=domain, device_class=device_class)
 
 
 @router.post("/preflight", responses={409: ERROR_RESPONSE, 422: ERROR_RESPONSE})

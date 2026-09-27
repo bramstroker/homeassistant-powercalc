@@ -52,6 +52,15 @@ export function entityChoices(
     entities = entities.filter((entity) => matchesDeviceClass(entity, field.entity_device_classes ?? []));
   }
   const related = relatedEntity(field, state);
+  if (state.definition.measure_type === "recorder" && field.name === "additional_entity_ids") {
+    const batteryField = state.definition.fields.find((candidate) => candidate.name === "battery_entity_id");
+    let batteryId = batteryField ? selectedEntityId(batteryField, state) : "";
+    if (batteryField && !batteryId) {
+      const batteries = entityChoices(batteryField, state);
+      if (batteries.length === 1) batteryId = batteries[0]!.entity_id;
+    }
+    entities = entities.filter((entity) => entity.entity_id !== related?.entity_id && entity.entity_id !== batteryId);
+  }
   if (!related?.device_id) return field.same_device_only ? [] : entities;
   if (field.same_device_only) return entities.filter((entity) => entity.device_id === related.device_id);
   return entities.sort(
@@ -91,14 +100,12 @@ function hasEnabledLiveState(entity: EntityDescriptor): boolean {
   return !entity.disabled_by && entity.has_live_state !== false;
 }
 
-export function disabledVacuumEntityCount(state: FieldState): number {
+export function disabledVacuumEntityIds(state: FieldState): string[] {
   const vacuumField = state.definition.fields.find((field) => field.name === "vacuum_entity_id");
-  if (!vacuumField) return 0;
+  if (!vacuumField) return [];
   const entities = state.deviceEntities["*"] ?? [];
   const vacuumId = selectedEntityId(vacuumField, state);
-  const deviceId = entities.find((entity) => entity.entity_id === vacuumId)?.device_id;
-  if (!deviceId) return 0;
-  return entities.filter((entity) => entity.device_id === deviceId && entity.disabled_by).length;
+  return entities.find((entity) => entity.entity_id === vacuumId)?.disabled_recording_entity_ids ?? [];
 }
 
 export function selectedEntityId(field: FormField, state: FieldState): string {

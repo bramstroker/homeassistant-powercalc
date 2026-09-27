@@ -363,9 +363,7 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                     FieldOption(
                         value=RecorderProfileRecipe.VACUUM_ROBOT,
                         label="Robot vacuum",
-                        description=(
-                            "Capture the vacuum, its battery level, and manually selected dock or feature entities."
-                        ),
+                        description=("Capture the vacuum, its battery level, and suggested dock or activity entities."),
                         guidance=(
                             "Measure the complete dock or base station at the wall outlet.",
                             "Select every entity that could explain a change in power consumption.",
@@ -436,8 +434,8 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                     ("profile_recipe", (RecorderProfileRecipe.VACUUM_ROBOT,)),
                 ),
                 hint=(
-                    "Select entities that can affect power use: charging or task status, dock washing, drying and "
-                    "auto-empty states, and relevant settings. Include separately exposed dock entities if needed."
+                    "Known activity entities are selected automatically, including linked dock washing, drying and "
+                    "auto-empty states. You can change the selection or add other relevant entities."
                 ),
                 review=True,
             ),

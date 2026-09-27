@@ -5,6 +5,30 @@ import type { TestCombobox } from "./test-helpers";
 import { entityCombobox, recorderDefinition, selectEntity } from "./test-helpers";
 
 describe("setup view defaults", () => {
+  it.each([{ selection: [] }, { selection: ["sensor.manual"] }])("preserves saved vacuum selections $selection when suggestions exist", async ({ selection }) => {
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = capabilities;
+    element.definitions = [recorderDefinition];
+    element.deviceEntities = { "*": [
+      { entity_id: "vacuum.robot", name: "Robot", domain: "vacuum", device_id: "robot",
+        suggested_recording_entity_ids: ["sensor.status"] },
+      { entity_id: "sensor.battery", name: "Battery", domain: "sensor", device_id: "robot", device_class: "battery", unit: "%", state: "42" },
+      { entity_id: "sensor.status", name: "Status", domain: "sensor", device_id: "robot" },
+      { entity_id: "sensor.manual", name: "Manual", domain: "sensor", device_id: "robot" },
+    ] };
+    element.selectedType = "recorder";
+    element.initialRequest = {
+      measure_type: "recorder", controller: null, model_id: "", product_name: "", measure_device: "",
+      power_meter: { type: "dummy" }, generate_model: false, parameters: capabilities.defaults, resume_policy: "new",
+      recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot", vacuum_entity_id: "vacuum.robot",
+      battery_entity_id: "sensor.battery", additional_entity_ids: selection,
+    };
+    element.meter = { type: "dummy" };
+    document.body.append(element);
+    await element.updateComplete;
+    expect(entityCombobox(element, "additional_entity_ids").value).toEqual(selection);
+  });
+
   it("restores a duplicated recorder request with its persisted null controller", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
@@ -70,12 +94,15 @@ describe("setup view defaults", () => {
     expect(element.shadowRoot.querySelector('[name="export_filename"]')).toBeNull();
   });
 
-  it("guides a vacuum selection and prefills its single same-device battery sensor", async () => {
+  it("prefills the battery and suggested signals, preserves edits, and resets for another vacuum", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;
     element.definitions = [recorderDefinition];
     element.deviceEntities = { "*": [
-      { entity_id: "vacuum.robot", name: "Robot", domain: "vacuum", device_id: "robot-device", state: "docked" },
+      { entity_id: "vacuum.robot", name: "Robot", domain: "vacuum", device_id: "robot-device", state: "docked",
+        suggested_recording_entity_ids: ["sensor.dock_state", "switch.dock_drying"],
+        disabled_recording_entity_ids: ["switch.dock_washing"] },
+      { entity_id: "switch.dock_drying", name: "Drying", domain: "switch", device_id: "dock-device", state: "off" },
       { entity_id: "sensor.robot_battery", name: "Robot battery", domain: "sensor", device_id: "robot-device", device_class: "battery", state: "42", unit: "%" },
       { entity_id: "sensor.other_battery", name: "Other battery", domain: "sensor", device_id: "other-device", device_class: "battery", state: "80", unit: "%" },
       { entity_id: "sensor.dock_state", name: "Dock state", domain: "sensor", device_id: "robot-device", state: "idle" },
@@ -104,17 +131,27 @@ describe("setup view defaults", () => {
     expect(element.shadowRoot.querySelectorAll('select[name="additional_entity_ids"]')).toHaveLength(0);
     const additional = entityCombobox(element, "additional_entity_ids");
     expect(additional.label).toBe("Additional entities (optional)");
-    expect(additional.value).toEqual([]);
-    expect(element.shadowRoot.textContent).toContain("Select entities that can affect power use");
+    expect(additional.options.map((option) => option.value)).not.toContain("vacuum.robot");
+    expect(additional.options.map((option) => option.value)).not.toContain("sensor.robot_battery");
+    expect(additional.value).toEqual(["sensor.dock_state", "switch.dock_drying"]);
+    expect(element.shadowRoot.textContent).toContain("Useful activity entities are disabled: switch.dock_washing");
+    expect(element.shadowRoot.textContent).toContain("Known activity entities are selected automatically");
     const submitted = new Promise<MeasurementRequest>((resolve) => element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail)));
     (element.shadowRoot.querySelector("form") as HTMLFormElement).dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     expect(await submitted).toMatchObject({
-      vacuum_entity_id: "vacuum.robot", battery_entity_id: "sensor.robot_battery", additional_entity_ids: [],
+      vacuum_entity_id: "vacuum.robot", battery_entity_id: "sensor.robot_battery",
+      additional_entity_ids: ["sensor.dock_state", "switch.dock_drying"],
     });
 
     additional.dispatchEvent(new CustomEvent("combobox-change", { detail: { value: ["sensor.dock_state"] } }));
     await element.updateComplete;
     expect(entityCombobox(element, "additional_entity_ids").value).toEqual(["sensor.dock_state"]);
+
+    additional.dispatchEvent(new CustomEvent("combobox-change", { detail: { value: [] } }));
+    await element.updateComplete;
+    element.deviceEntities = { ...element.deviceEntities };
+    await element.updateComplete;
+    expect(entityCombobox(element, "additional_entity_ids").value).toEqual([]);
 
     selectEntity(entityCombobox(element, "vacuum_entity_id"), "vacuum.other");
     await element.updateComplete;
@@ -139,10 +176,15 @@ describe("setup view defaults", () => {
       selectEntity(entityCombobox(element, name), value);
       await element.updateComplete;
     }
+    expect(element.shadowRoot.querySelector('[role="alert"]')).toBeNull();
     selectEntity(entityCombobox(element, "vacuum_entity_id"), "vacuum.robot");
     await element.updateComplete;
 
     expect(element.shadowRoot.querySelector('[role="alert"]')?.textContent).toContain("PowerCalc vacuum profiles require one");
+
+    selectEntity(entityCombobox(element, "vacuum_entity_id"), "");
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector('[role="alert"]')).toBeNull();
   });
 
   it("submits a generic recorder entity list without hidden vacuum fields", async () => {
