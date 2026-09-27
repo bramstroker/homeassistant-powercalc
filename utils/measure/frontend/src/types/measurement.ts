@@ -168,6 +168,11 @@ export interface MeasureDefinition {
   supports_resume: boolean;
   confirmation_action?: string | null;
   confirmation_is_warning?: boolean;
+  confirmation_guidance?: string[];
+  confirmation_eyebrow?: string;
+  confirmation_title?: string;
+  confirmation_guidance_title?: string;
+  confirmation_guidance_label?: string;
   /** Placeholders shown in the profile fields, to steer the naming this type expects. */
   model_id_example: string;
   product_name_example: string;

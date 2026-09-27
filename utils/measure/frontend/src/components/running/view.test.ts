@@ -102,13 +102,32 @@ describe("running view", () => {
       request: { measure_type: "light" } as SessionSnapshot["request"],
     };
     element.confirmationAction = "Start light measurement";
+    element.guidance = [
+      "Disable automations for the selected lights.",
+      "PowerCalc will cycle through the settings selected for this run.",
+    ];
     document.body.append(element);
     await element.updateComplete;
 
-    const guidance = element.shadowRoot!.querySelector('[aria-label="Light measurement guidance"]');
+    const guidance = element.shadowRoot!.querySelector('[aria-label="Measurement guidance"]');
     expect(guidance?.textContent).toContain("Disable automations");
     expect(guidance?.textContent).toContain("cycle through the settings selected for this run");
     expect(element.shadowRoot!.querySelector("button.confirm")?.textContent).toBe("Start light measurement");
+  });
+
+  it("shows optional fan guidance on the same ready screen", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      request: { measure_type: "fan" } as SessionSnapshot["request"],
+    };
+    element.confirmationAction = "Start fan measurement";
+    element.guidance = ["Disable automations for the fan before PowerCalc cycles through its speeds."];
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot!.querySelector('[aria-label="Measurement guidance"]')?.textContent).toContain("Disable automations");
+    expect(element.shadowRoot!.querySelector("button.confirm")?.textContent).toBe("Start fan measurement");
   });
 
   it.each([
@@ -155,6 +174,8 @@ describe("running view", () => {
     };
     element.confirmationAction = "Start speaker measurement";
     element.warningConfirmation = true;
+    (element as unknown as import("./view").RunningView).confirmationEyebrow = "High volume warning";
+    (element as unknown as import("./view").RunningView).confirmationTitle = "Protect your hearing";
     document.body.append(element);
     await element.updateComplete;
 
@@ -164,6 +185,20 @@ describe("running view", () => {
     expect(warning?.textContent).toContain("High volume warning");
     expect(warning?.textContent).toContain("Protect your hearing");
     expect(warning?.querySelector(".ready-icon svg")).toBeTruthy();
+  });
+
+  it("uses configured headings for another warning", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = { state: "awaiting_confirmation", confirmation_message: "Keep clear of moving parts." };
+    element.warningConfirmation = true;
+    element.confirmationEyebrow = "Moving parts warning";
+    element.confirmationTitle = "Keep your distance";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot!.querySelector(".ready-eyebrow")?.textContent).toBe("Moving parts warning");
+    expect(element.shadowRoot!.querySelector(".ready-announcement h3")?.textContent).toBe("Keep your distance");
+    expect(element.shadowRoot!.textContent).not.toContain("Protect your hearing");
   });
 
   it("shows progress, phase, connection state, and cancellation", async () => {

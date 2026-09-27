@@ -302,6 +302,8 @@ describe("app shell", () => {
       supports_resume: false,
       confirmation_action: "Start speaker measurement",
       confirmation_is_warning: true,
+      confirmation_eyebrow: "High volume warning",
+      confirmation_title: "Protect your hearing",
     }];
     element.request = {
       measure_type: "speaker",
@@ -315,7 +317,7 @@ describe("app shell", () => {
       disable_streaming: false,
       resume_policy: "new",
     };
-    element.snapshot = { state: "awaiting_confirmation", request: element.request };
+    element.snapshot = { state: "awaiting_confirmation", request: element.request, confirmation_action: "Start speaker measurement" };
     element.view = "running";
     document.body.append(element);
     await element.updateComplete;
@@ -324,6 +326,18 @@ describe("app shell", () => {
       warningConfirmation: boolean; updateComplete: Promise<boolean>;
     };
     expect(running.warningConfirmation).toBe(true);
+    expect(running.shadowRoot?.textContent).toContain("Protect your hearing");
+
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      request: element.request,
+      confirmation_action: "Start dummy-load calibration",
+    };
+    element.requestUpdate();
+    await element.updateComplete;
+    await running.updateComplete;
+    expect(running.warningConfirmation).toBe(false);
+    expect(running.shadowRoot?.textContent).toContain("Everything is ready");
   });
 
   it("loads the Powercalc SVG logo", async () => {

@@ -82,7 +82,7 @@ test("guides light measurement before allowing PowerCalc to control the lights",
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload();
 
-  const guidance = page.getByLabel("Light measurement guidance");
+  const guidance = page.getByLabel("Measurement guidance");
   await expect(guidance).toContainText("Disable automations");
   await expect(guidance).toContainText("settings selected for this run");
   await expect(page.getByRole("button", { name: "Start light measurement" })).toBeVisible();

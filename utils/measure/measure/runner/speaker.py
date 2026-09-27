@@ -45,12 +45,8 @@ class SpeakerRunner(MeasurementRunner[SpeakerMeasurementRequest]):
         total_steps = len(volumes) + 1  # every volume level plus the muted baseline
 
         self.interaction.notify(
-            f"Prepare to start measuring the power for {duration} seconds on each volume level "
+            f"Measuring power for {duration} seconds on each volume level "
             "starting with 10 until 100 (with steps of 10 between)",
-        )
-        self.interaction.confirm(
-            "Speaker measurements can become very loud at higher volume levels. "
-            "Wear hearing protection or move to another room before starting.",
         )
         self.interaction.phase("Starting speaker measurement")
         self.interaction.progress(

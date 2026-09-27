@@ -30,7 +30,6 @@ class AverageRunner(MeasurementRunner[AverageMeasurementRequest]):
     ) -> RunnerResult:
         self.duration = request.duration
         self.elapsed = float(self.duration)
-        self.interaction.confirm("Ready to start the average measurement.")
         self.interaction.phase("Starting averaging")
 
         result = self.sampler.take_average_measurement(

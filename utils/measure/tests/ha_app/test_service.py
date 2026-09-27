@@ -73,6 +73,9 @@ def test_service_runs_light_measurement_without_terminal(tmp_path: Path) -> None
     assert [event.data["message"] for event in progress if event.type == SessionEventType.CHECKPOINT] == [
         "Ready to measure the light. PowerCalc will control the selected light settings after you start."
     ]
+    assert [event.data["action"] for event in progress if event.type == SessionEventType.CHECKPOINT] == [
+        "Start light measurement"
+    ]
     assert (tmp_path / "custom-artifacts" / "brightness.csv").is_file()
     progress_events = [event for event in progress if event.type == SessionEventType.PROGRESS]
     assert progress_events[-1].data["completed"] == progress_events[-1].data["total"]

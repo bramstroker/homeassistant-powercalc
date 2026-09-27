@@ -35,10 +35,6 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         request: ChargingMeasurementRequest,
         export_directory: str,
     ) -> RunnerResult:
-        self.interaction.notify(
-            "Make sure the device is as close to 0% charged as possible before starting the test.",
-        )
-        self.interaction.confirm("Ready to start charging measurement.")
         self.interaction.phase("Starting charging measurement")
 
         self.interaction.phase("Checking battery and charging state")

@@ -1,9 +1,11 @@
 from measure.const import MEASURE_TYPE_LABELS, MeasureType, parse_measure_type
 from measure.ha_app.registry import MEASUREMENT_REGISTRY
+from measure.start import MEASUREMENT_STARTS
 
 
 def test_registry_contains_every_stable_measurement_kind() -> None:
     assert set(MEASUREMENT_REGISTRY) == set(MeasureType)
+    assert set(MEASUREMENT_STARTS) == set(MeasureType)
     assert {kind.value for kind in MeasureType} == {"light", "speaker", "recorder", "average", "charging", "fan"}
 
 

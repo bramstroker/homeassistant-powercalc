@@ -40,8 +40,23 @@ def test_measure_definitions_and_average_request(app_client: TestClient) -> None
         "recorder": "Start recording",
         "average": "Start averaging",
         "charging": "Start charging measurement",
-        "fan": None,
+        "fan": "Start fan measurement",
     }
+    guidance = {item["measure_type"]: item["confirmation_guidance"] for item in definitions.json()}
+    assert "Disable automations" in guidance["light"][0]
+    assert "Disable automations" in guidance["fan"][0]
+    assert guidance["average"] == []
+    speaker = next(item for item in definitions.json() if item["measure_type"] == MeasureType.SPEAKER)
+    assert speaker["confirmation_is_warning"] is True
+    assert speaker["confirmation_eyebrow"] == "High volume warning"
+    assert speaker["confirmation_title"] == "Protect your hearing"
+    assert (
+        next(item for item in definitions.json() if item["measure_type"] == MeasureType.FAN)["confirmation_title"]
+        == "Everything is ready"
+    )
+    recorder_definition = next(item for item in definitions.json() if item["measure_type"] == MeasureType.RECORDER)
+    assert recorder_definition["confirmation_guidance_title"] == "What to record"
+    assert recorder_definition["confirmation_guidance_label"] == "Recording guidance"
     charging = next(item for item in definitions.json() if item["measure_type"] == MeasureType.CHARGING)
     fields = {field["name"]: field for field in charging["fields"]}
     assert "entity_domain" not in fields["charging_entity_id"]

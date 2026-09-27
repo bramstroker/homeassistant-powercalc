@@ -7,6 +7,7 @@ from measure.controller.charging.spec import charging_entity_domain
 from measure.controller.light.const import LutMode
 from measure.profile.device_type import PROFILE_DEVICE_DOMAINS, ProfileDeviceType
 from measure.request import RecorderProfileRecipe, RecorderPurpose
+from measure.start import MEASUREMENT_STARTS
 
 
 class FieldControl(StrEnum):
@@ -103,9 +104,6 @@ class MeasurementDefinition:
     measure_type: MeasureType
     description: str
     icon: str
-    confirmation_action: str | None = None
-    #: Present the confirmation as a warning, for a measurement that makes noise or mess.
-    confirmation_is_warning: bool = False
     #: Placeholders steering the profile fields, taken from real entries in the profile library.
     model_id_example: str = ""
     product_name_example: str = ""
@@ -118,6 +116,34 @@ class MeasurementDefinition:
     @property
     def label(self) -> str:
         return MEASURE_TYPE_LABELS[self.measure_type]
+
+    @property
+    def confirmation_action(self) -> str:
+        return MEASUREMENT_STARTS[self.measure_type].action
+
+    @property
+    def confirmation_is_warning(self) -> bool:
+        return MEASUREMENT_STARTS[self.measure_type].is_warning
+
+    @property
+    def confirmation_guidance(self) -> tuple[str, ...]:
+        return MEASUREMENT_STARTS[self.measure_type].guidance
+
+    @property
+    def confirmation_eyebrow(self) -> str:
+        return MEASUREMENT_STARTS[self.measure_type].eyebrow
+
+    @property
+    def confirmation_title(self) -> str:
+        return MEASUREMENT_STARTS[self.measure_type].title
+
+    @property
+    def confirmation_guidance_title(self) -> str:
+        return MEASUREMENT_STARTS[self.measure_type].guidance_title
+
+    @property
+    def confirmation_guidance_label(self) -> str:
+        return MEASUREMENT_STARTS[self.measure_type].guidance_label
 
 
 def _controller(
@@ -278,7 +304,6 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         icon="💡",
         model_id_example="LWA017",
         product_name_example="Hue White Ambiance A60 E27",
-        confirmation_action="Start light measurement",
         parameters=LIGHT_PARAMETERS,
         fields=(
             POWER_FIELD,
@@ -303,8 +328,6 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         icon="🔊",
         model_id_example="B7W64E",
         product_name_example="Amazon Echo Dot (Gen4)",
-        confirmation_action="Start speaker measurement",
-        confirmation_is_warning=True,
         parameters=(
             READING_INTERVAL,
             ParameterDefinition(name="sleep_standby", label="Standby stabilization (seconds)", group=SAMPLING),
@@ -325,7 +348,6 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         measure_type=MeasureType.RECORDER,
         description="Record power readings, optionally together with Home Assistant entity states.",
         icon="⏺",
-        confirmation_action="Start recording",
         parameters=(READING_INTERVAL, *POINT_SAMPLING),
         fields=(
             POWER_FIELD,
@@ -490,7 +512,6 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         measure_type=MeasureType.AVERAGE,
         description="Measure average power for a fixed duration.",
         icon="📊",
-        confirmation_action="Start averaging",
         parameters=(READING_INTERVAL,),
         fields=(
             POWER_FIELD,
@@ -511,7 +532,6 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         icon="🔋",
         model_id_example="s6_maxv",
         product_name_example="Roborock S6 MaxV",
-        confirmation_action="Start charging measurement",
         parameters=(READING_INTERVAL, *POINT_SAMPLING),
         fields=(
             POWER_FIELD,

@@ -20,6 +20,21 @@ export class RunningView extends LitElement {
   @property({ type: Boolean })
   warningConfirmation = false;
 
+  @property({ type: String })
+  confirmationEyebrow = "Preparation complete";
+
+  @property({ type: String })
+  confirmationTitle = "Everything is ready";
+
+  @property({ type: String })
+  guidanceTitle = "Before starting";
+
+  @property({ type: String })
+  guidanceLabel = "Measurement guidance";
+
+  @property({ attribute: false })
+  guidance: string[] = [];
+
   @property({ type: Boolean })
   connected = false;
 
@@ -133,7 +148,7 @@ export class RunningView extends LitElement {
   private renderReady() {
     const message = this.snapshot.confirmation_message ?? "Preparation is complete. Start the measurement when the device is ready.";
     const warning = this.warningConfirmation;
-    const guidance = recordingGuidance(this.snapshot.request);
+    const guidance = recordingGuidance(this.snapshot.request) ?? this.guidance;
     return html`
       <section class="panel" aria-labelledby="running-title">
         <p class="eyebrow">03 / Measurement</p>
@@ -147,19 +162,12 @@ export class RunningView extends LitElement {
                 <path d="M12 9v4"></path><path d="M12 17h.01"></path>
               </svg>
             ` : "✓"}</span>
-            <p class="eyebrow ready-eyebrow">${warning ? "High volume warning" : "Preparation complete"}</p>
-            <h3>${warning ? "Protect your hearing" : "Everything is ready"}</h3>
+            <p class="eyebrow ready-eyebrow">${this.confirmationEyebrow}</p>
+            <h3>${this.confirmationTitle}</h3>
             <p class="ready-message">${message}</p>
           </div>
-          ${this.snapshot.request?.measure_type === "light" ? html`<div class="measurement-guidance" aria-label="Light measurement guidance">
-            <h4>Before starting</h4>
-            <ol>
-              <li>Disable automations and other controls for the selected lights so they cannot change them during measurement.</li>
-              <li>PowerCalc will control the lights automatically and cycle through the settings selected for this run (brightness, color temperature, color, or effects). Keep the lights powered until the measurement finishes.</li>
-            </ol>
-          </div>` : nothing}
-          ${guidance ? html`<div class="measurement-guidance" aria-label="Recording guidance">
-            <h4>What to record</h4>
+          ${guidance.length ? html`<div class="measurement-guidance" aria-label=${this.guidanceLabel}>
+            <h4>${this.guidanceTitle}</h4>
             <ol>${guidance.map((step) => html`<li>${step}</li>`)}</ol>
           </div>` : nothing}
           <button class="primary confirm" type="button" @click=${this.confirm} ?disabled=${this.busy}>${this.busy ? "Starting…" : this.confirmationAction || "Start measurement"}</button>
