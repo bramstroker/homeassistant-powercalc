@@ -23,11 +23,11 @@ const recorder: MeasureDefinition = {
   fields: recorderDefinition.fields.map((field) => field.name === "profile_device_type" ? {
     ...field,
     options: [
-      ...field.options,
-      { value: "air_conditioner", label: "Air conditioner", entity_domains: ["climate"] },
+      ...field.options.filter((option) => option.value !== "generic_iot"),
+      { value: "air_purifier", label: "Air purifier", entity_domains: ["fan"] },
       { value: "fan", label: "Fan", entity_domains: ["fan"] },
-      { value: "smart_speaker", label: "Smart speaker", entity_domains: ["media_player"] },
-      { value: "lawn_mower_robot", label: "Lawn mower robot", entity_domains: ["lawn_mower"] },
+      { value: "printer", label: "Printer", entity_domains: ["sensor"] },
+      { value: "set_top_box", label: "Set top box", entity_domains: ["media_player"] },
     ],
   } : field),
 };
@@ -37,8 +37,8 @@ describe("device-first measurement routes", () => {
   it("lists server-supported profile types and a dedicated vacuum, without duplicating specialist types", () => {
     const choices = deviceChoices(definitions);
     expect(choices.map((choice) => choice.id)).toEqual([
-      "camera", "fan", "generic_iot", "heating", "lawn_mower_robot", "light",
-      "vacuum_robot", "smart_speaker", "smart_switch",
+      "air_purifier", "camera", "fan", "heating", "lawn_mower_robot", "light", "printer",
+      "vacuum_robot", "set_top_box", "smart_speaker", "smart_switch",
     ]);
     expect(choices.filter((choice) => choice.id === "vacuum_robot")).toHaveLength(1);
     expect(choices.find((choice) => choice.id === "camera")?.experimental).toBe(true);
@@ -61,7 +61,7 @@ describe("device-first measurement routes", () => {
   it("offers specialist and recorder routes where both exist", () => {
     expect(routesForDevice("fan", definitions).map((route) => route.id)).toEqual(["fan", "complex_profile"]);
     expect(routesForDevice("vacuum_robot", definitions).map((route) => route.id)).toEqual(["vacuum_profile", "charging"]);
-    expect(routesForDevice("lawn_mower_robot", definitions).map((route) => route.id)).toEqual(["charging", "complex_profile"]);
+    expect(routesForDevice("lawn_mower_robot", definitions).map((route) => route.id)).toEqual(["charging"]);
     expect(routesForDevice("camera", definitions)[0]?.preset).toEqual({
       recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: "camera",
     });
@@ -71,6 +71,27 @@ describe("device-first measurement routes", () => {
     expect(routesForDevice("vacuum_robot", definitions)[0]?.recommended).toBe(true);
     expect(routesForDevice("vacuum_robot", definitions)[0]?.experimental).toBe(true);
     expect(routesForDevice("fan", definitions)[1]?.experimental).toBe(true);
+  });
+
+  it("offers no route for device types deferred by the server", () => {
+    for (const deviceType of [
+      "air_conditioner", "ups", "television", "network", "power_meter", "smart_dimmer",
+      "cover", "generic_iot", "humidifier", "water_heater",
+    ]) {
+      expect(routesForDevice(deviceType, definitions)).toEqual([]);
+    }
+  });
+
+  it("offers no mower recording even with an older recorder definition", () => {
+    const oldRecorder = {
+      ...recorder,
+      fields: recorder.fields.map((field) => field.name === "profile_device_type" ? {
+        ...field,
+        options: [...field.options, { value: "lawn_mower_robot", label: "Lawn mower robot" }],
+      } : field),
+    };
+    expect(routesForDevice("lawn_mower_robot", [oldRecorder, charging]).map((route) => route.id)).toEqual(["charging"]);
+    expect(routesForDevice("lawn_mower_robot", [oldRecorder])).toEqual([]);
   });
 
   it("keeps average and Playbook under free measurement", () => {

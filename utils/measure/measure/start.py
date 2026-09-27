@@ -40,6 +40,13 @@ MEASUREMENT_STARTS: dict[MeasureType, MeasurementStart] = {
         is_warning=True,
         eyebrow="High volume warning",
         title="Protect your hearing",
+        guidance=(
+            (
+                "PowerCalc will change the speaker volume through the selected levels while test audio plays. "
+                "If automatic playback is disabled, start the test audio yourself."
+            ),
+            "Disable automations and other controls that could change playback or volume during measurement.",
+        ),
     ),
     MeasureType.RECORDER: MeasurementStart(
         action="Start recording",
@@ -54,7 +61,18 @@ MEASUREMENT_STARTS: dict[MeasureType, MeasurementStart] = {
     MeasureType.CHARGING: MeasurementStart(
         action="Start charging measurement",
         message="Ready to start charging measurement.",
-        guidance=("Start with the battery as close to empty as possible, then let the device charge to full.",),
+        guidance=(
+            (
+                "Measure the complete charging dock at the wall outlet. This captures mains power used for charging "
+                "and by the dock; it does not measure the robot's battery use while cleaning or mowing."
+            ),
+            (
+                "Start with the battery as close to empty as possible. Start the measurement before docking the robot, "
+                "then let it charge to full without interruption. Leave it docked until the measurement finishes; "
+                "PowerCalc also measures trickle charging for 30 minutes after it reaches full charge."
+            ),
+            "Keep other dock functions, such as washing or drying, off during the charging measurement.",
+        ),
     ),
     MeasureType.FAN: MeasurementStart(
         action="Start fan measurement",
@@ -63,6 +81,10 @@ MEASUREMENT_STARTS: dict[MeasureType, MeasurementStart] = {
             (
                 "Disable automations and other controls for the selected fan so they cannot change its speed "
                 "during measurement."
+            ),
+            (
+                "Use manual speed mode and keep oscillation, direction, lights, and other extra functions at the same "
+                "settings throughout the measurement. The resulting curve describes those settings."
             ),
             (
                 "PowerCalc will control the fan automatically, cycling from low to high speed. "

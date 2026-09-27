@@ -91,6 +91,8 @@ describe("running view", () => {
     expect(announcement?.getAttribute("aria-live")).toBe("polite");
     expect(ready?.textContent).toContain("Switch on the test signal, then start recording.");
     expect(ready?.querySelector("button.confirm")?.textContent).toBe("Start recording");
+    expect(element.shadowRoot.querySelector("measure-session-log")).toBeNull();
+    expect(element.shadowRoot.querySelector(".connection")).toBeNull();
     expect(element.shadowRoot.querySelector(".instrument")).toBeNull();
     expect(element.shadowRoot.querySelector("progress")).toBeNull();
   });
@@ -132,11 +134,12 @@ describe("running view", () => {
 
   it.each([
     ["vacuum_robot", "vacuum_robot", "low-battery", "Record more"],
-    ["generic", "cover", "Open the cover fully", "Return to idle"],
-    ["generic", "set_top_box", "live viewing", "Return to idle"],
-    ["generic", "lawn_mower_robot", "mowing run", "Return to idle"],
-    ["generic", "power_meter", "no load should be connected", "meter's own consumption"],
-    ["generic", "smart_dimmer", "no load should be connected", "dimmer's own consumption"],
+    ["generic", "camera", "infrared off from on", "recorded signal"],
+    ["generic", "air_purifier", "manual fan speed", "same settings"],
+    ["generic", "fan", "manual speed", "oscillation"],
+    ["generic", "heating", "heating power level", "thermostat idle"],
+    ["generic", "printer", "same representative print job", "printer status entity"],
+    ["generic", "set_top_box", "normal viewing", "standby mode unchanged"],
     ["generic", "smart_switch", "no load should be connected", "switch's own consumption"],
   ] as const)("guides a %s recording before it starts", async (recipe, deviceType, action, finish) => {
     const element = document.createElement("measure-running-view") as import("./view").RunningView;
@@ -148,6 +151,13 @@ describe("running view", () => {
     const guidance = element.shadowRoot!.querySelector(".measurement-guidance");
     expect(guidance?.textContent).toContain(action);
     expect(guidance?.textContent).toContain(finish);
+    if (recipe === "generic") {
+      expect(guidance?.textContent).toContain("Repeat every state");
+      expect(guidance?.textContent).toContain("at least five samples per state in both runs");
+    }
+    if (deviceType === "camera") {
+      expect(guidance?.textContent).not.toContain("live viewing");
+    }
     expect(guidance?.querySelectorAll("li").length).toBeGreaterThanOrEqual(3);
     expect(element.shadowRoot!.querySelector("button.confirm")?.textContent).toBe("Start recording");
   });

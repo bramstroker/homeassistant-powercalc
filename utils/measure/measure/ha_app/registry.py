@@ -413,10 +413,17 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                         label=device_type.replace("_", " ").capitalize(),
                         entity_domains=PROFILE_DEVICE_DOMAINS[device_type],
                     )
-                    for device_type in ProfileDeviceType
-                    if device_type not in (ProfileDeviceType.VACUUM_ROBOT, ProfileDeviceType.AIR_CONDITIONER)
+                    for device_type in (
+                        ProfileDeviceType.AIR_PURIFIER,
+                        ProfileDeviceType.CAMERA,
+                        ProfileDeviceType.FAN,
+                        ProfileDeviceType.HEATING,
+                        ProfileDeviceType.PRINTER,
+                        ProfileDeviceType.SET_TOP_BOX,
+                        ProfileDeviceType.SMART_SWITCH,
+                    )
                 ),
-                default=ProfileDeviceType.GENERIC_IOT,
+                default=ProfileDeviceType.AIR_PURIFIER,
                 visible_when=(
                     ("recorder_purpose", (RecorderPurpose.COMPLEX_PROFILE,)),
                     ("profile_recipe", (RecorderProfileRecipe.GENERIC,)),

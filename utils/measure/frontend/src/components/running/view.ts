@@ -79,7 +79,7 @@ export class RunningView extends LitElement {
     .preparation-spinner { width: 42px; height: 42px; border: 3px solid var(--track); border-top-color: var(--signal); border-radius: 50%; animation: spin 850ms linear infinite; }
     .preparation-track { position: relative; width: min(360px, 100%); height: 8px; margin-top: 0.4rem; overflow: hidden; border-radius: 99px; background: var(--track); }
     .preparation-bar { position: absolute; inset-block: 0; inset-inline-start: 0; width: 38%; border-radius: inherit; background: var(--signal); animation: prepare 1.35s ease-in-out infinite; }
-    .ready-card { display: grid; justify-items: center; gap: 0.8rem; padding: clamp(1.5rem, 6vw, 3rem); border: 1px solid color-mix(in srgb, var(--good) 42%, var(--line)); border-radius: 16px; background: color-mix(in srgb, var(--good) 6%, var(--well)); text-align: center; }
+    .ready-card { display: grid; justify-items: center; gap: 0.8rem; padding: clamp(1.5rem, 6vw, 3rem); padding-top: 1.25rem; border: 1px solid color-mix(in srgb, var(--good) 42%, var(--line)); border-radius: 16px; background: color-mix(in srgb, var(--good) 6%, var(--well)); text-align: center; }
     .ready-card.warning { border-color: color-mix(in srgb, var(--warning) 58%, var(--line)); background: color-mix(in srgb, var(--warning) 8%, var(--well)); }
     .ready-announcement { display: grid; justify-items: center; gap: 0.8rem; }
     .ready-announcement h3, .ready-announcement p { margin: 0; }
@@ -92,7 +92,6 @@ export class RunningView extends LitElement {
     .measurement-guidance h4 { margin: 0 0 0.55rem; font-size: 0.9rem; }
     .measurement-guidance ol { margin: 0; padding-left: 1.35rem; color: var(--muted); line-height: 1.5; }
     .measurement-guidance li + li { margin-top: 0.4rem; }
-    .ready-topline { display: flex; justify-content: flex-end; align-items: center; gap: 0.9rem; width: 100%; }
     @keyframes prepare { 0% { transform: translateX(-105%); } 50% { transform: translateX(165%); } 100% { transform: translateX(-105%); } }
     @media (max-width: 640px) { .metrics { grid-template-columns: 1fr 1fr; } .topline { align-items: flex-start; flex-direction: column; } }
     @media (prefers-reduced-motion: reduce) {
@@ -113,7 +112,7 @@ export class RunningView extends LitElement {
         <div class="instrument">
           <div class="topline">
             <span class="muted" aria-live="polite">${this.snapshot.phase ?? "Preparing measurement"}</span>
-            <span class="topline-right">${this.renderLog()}${this.renderConnection(true)}</span>
+            <span class="topline-right">${this.renderLog()}${this.renderConnection()}</span>
           </div>
           ${preparing ? this.renderPreparation() : this.renderMeasurement(openEnded, progress)}
         </div>
@@ -122,7 +121,7 @@ export class RunningView extends LitElement {
     `;
   }
 
-  /** Warnings, the log drawer, diagnostics and the stop control — the same on both screens. */
+  /** Warnings, diagnostics and the stop control shared by both screens. */
   private renderFooter(openEnded: boolean) {
     return html`
       ${!this.connected ? html`<p class="notice" role="status">
@@ -139,8 +138,8 @@ export class RunningView extends LitElement {
     return html`<measure-session-log .logs=${this.logs} .warnings=${this.snapshot.warnings ?? []}></measure-session-log>`;
   }
 
-  private renderConnection(announce: boolean) {
-    return html`<span class="connection ${this.connected ? "connected" : ""}" role=${announce ? "status" : nothing}>
+  private renderConnection() {
+    return html`<span class="connection ${this.connected ? "connected" : ""}" role="status">
       ${this.connected ? "Live" : "Reconnecting"}
     </span>`;
   }
@@ -154,7 +153,6 @@ export class RunningView extends LitElement {
         <p class="eyebrow">03 / Measurement</p>
         <h2 id="running-title">Ready when you are</h2>
         <div class="ready-card ${warning ? "warning" : ""}">
-          <span class="ready-topline">${this.renderLog()}${this.renderConnection(false)}</span>
           <div class="ready-announcement" role=${warning ? "alert" : "status"} aria-live=${warning ? "assertive" : "polite"}>
             <span class="ready-icon" aria-hidden="true">${warning ? svg`
               <svg viewBox="0 0 24 24">

@@ -37,7 +37,6 @@ function fieldOptions(definition: MeasureDefinition | undefined, name: string) {
 export function deviceChoices(definitions: MeasureDefinition[]): DeviceChoice[] {
   const choices = new Map<string, DeviceChoice>();
   for (const option of fieldOptions(definitions.find((item) => item.measure_type === "recorder"), "profile_device_type")) {
-    if (option.value === "air_conditioner") continue;
     choices.set(option.value, { id: option.value, label: option.label });
   }
   for (const definition of definitions) {
@@ -103,8 +102,9 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
   if (["vacuum_robot", "lawn_mower_robot"].includes(deviceId) && available.has("charging")) routes.push({
     id: "charging", measureType: "charging", label: "Measure charging power",
     description: "Calibrate power against battery level while charging.", preset: { charging_device_type: deviceId },
+    experimental: deviceId === "lawn_mower_robot",
   });
-  if (!available.has("recorder")) return routes;
+  if (deviceId === "lawn_mower_robot" || !available.has("recorder")) return routes;
   if (deviceId !== "vacuum_robot" && fieldOptions(definitions.find((item) => item.measure_type === "recorder"), "profile_device_type")
     .some((option) => option.value === deviceId)) {
     routes.push({
