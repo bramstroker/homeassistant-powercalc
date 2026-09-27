@@ -100,6 +100,8 @@ describe("running view", () => {
     ["generic", "cover", "Open the cover fully", "Return to idle"],
     ["generic", "set_top_box", "live viewing", "Return to idle"],
     ["generic", "lawn_mower_robot", "mowing run", "Return to idle"],
+    ["generic", "power_meter", "no load should be connected", "meter's own consumption"],
+    ["generic", "smart_dimmer", "no load should be connected", "dimmer's own consumption"],
     ["generic", "smart_switch", "no load should be connected", "switch's own consumption"],
   ] as const)("guides a %s recording before it starts", async (recipe, deviceType, action, finish) => {
     const element = document.createElement("measure-running-view") as import("./view").RunningView;
