@@ -6,7 +6,7 @@ from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 import logging
 import os
-from typing import Any, cast
+from typing import Any, TypedDict, cast
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
@@ -83,6 +83,12 @@ class DiscoveryBy(StrEnum):
     MANUAL = "manual"
 
 
+class EntityAutoSelectConfig(TypedDict, total=False):
+    integration: str
+    translation_key: str
+    unique_id_pattern: str
+
+
 @dataclass(frozen=True)
 class CustomField:
     key: str
@@ -90,6 +96,7 @@ class CustomField:
     selector: dict[str, Any]
     description: str | None = None
     default: Any = None
+    auto_select: EntityAutoSelectConfig | None = None
 
 
 DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {

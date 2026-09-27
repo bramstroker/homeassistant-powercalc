@@ -319,6 +319,7 @@ class LibraryFlow:
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_process_user_input,
                 form_kwarg=form_kwarg,
+                form_data=self.flow.sensor_config.get(CONF_VARIABLES, {}),
             ),
             user_input,
         )

@@ -84,6 +84,39 @@ After setup Powercalc will replace this with the value the user provided.
 !!! note
     Not all selectors are tested. Some might not be supported. `number` and `entity` are tested and should work.
 
+#### Automatically selecting an entity
+
+From Powercalc v1.26.0, an entity field can use `auto_select` to prefill its selector:
+
+```json
+{
+  "fields": {
+    "floodlight_entity": {
+      "label": "Spotlight light",
+      "selector": {
+        "entity": {
+          "domain": "light"
+        }
+      },
+      "auto_select": {
+        "integration": "tapo_control",
+        "unique_id_pattern": "-floodlight\\(timed\\)$"
+      }
+    }
+  }
+}
+```
+
+Use `translation_key` (for example, `"auto_select": {"translation_key": "ups_load"}`)
+or `unique_id_pattern` (a regex matching the entity's unique ID), optionally restricted by `integration`.
+When combining criteria, all must match.
+
+Only single-entity selectors are supported. Powercalc prefills the field when exactly one enabled
+entity on the source device matches. Selector filters for domain, integration, device class and
+included/excluded entities are supported; other filters require manual selection.
+
+Saved values and explicit defaults take precedence. YAML configurations still need explicit `variables`.
+
 #### Example number selector
 
 In the example below we have a profile that asks the user to provide a number.

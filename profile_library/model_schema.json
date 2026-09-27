@@ -372,6 +372,38 @@
             "type": "string",
             "description": "Label of the field"
           },
+          "auto_select": {
+            "type": "object",
+            "description": "Prefill a single entity field when exactly one enabled entity on the source device matches all supplied criteria.",
+            "properties": {
+              "integration": {
+                "type": "string",
+                "minLength": 1
+              },
+              "translation_key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "unique_id_pattern": {
+                "type": "string",
+                "format": "regex",
+                "minLength": 1
+              }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "translation_key"
+                ]
+              },
+              {
+                "required": [
+                  "unique_id_pattern"
+                ]
+              }
+            ],
+            "additionalProperties": false
+          },
           "selector": {
             "type": "object",
             "properties": {
@@ -394,6 +426,32 @@
                   },
                   "max": {
                     "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "if": {
+          "required": [
+            "auto_select"
+          ]
+        },
+        "then": {
+          "required": [
+            "selector"
+          ],
+          "properties": {
+            "selector": {
+              "required": [
+                "entity"
+              ],
+              "properties": {
+                "entity": {
+                  "properties": {
+                    "multiple": {
+                      "const": false
+                    }
                   }
                 }
               }
