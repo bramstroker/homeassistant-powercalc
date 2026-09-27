@@ -3,20 +3,7 @@ import { describe as describeMeter } from "../../power-meter/registry";
 import type { MeterContext } from "../../power-meter/registry";
 import type { PowerMeterSpec } from "../../types";
 import type { DeviceChoice, MeasurementRoute } from "./device-routes";
-
-const DEVICE_ICONS: Record<string, string> = {
-  air_conditioner: "❄️", air_purifier: "🌬️", camera: "📷", cover: "🪟",
-  fan: "🌀", generic_iot: "📡", heating: "♨️", humidifier: "💧",
-  lawn_mower_robot: "🌱", light: "💡", network: "🌐", power_meter: "⚡",
-  printer: "🖨️", set_top_box: "📺", smart_dimmer: "🎚️", smart_speaker: "🔊",
-  smart_switch: "🔘", television: "📺", ups: "🔋", vacuum_robot: "🧹",
-  water_heater: "🚿",
-};
-
-function deviceIcon(deviceId: string): string {
-  if (deviceId === "free_measurement") return "📊";
-  return DEVICE_ICONS[deviceId] ?? "🔌";
-}
+import { deviceIcon } from "./device-icons";
 
 /**
  * The framing around the measurement form: choosing what to measure, restating that choice, and
@@ -30,7 +17,8 @@ export const setupChromeStyles = css`
   .type-card:hover:not(:disabled) { border-color: var(--signal); }
   .device-card, .device-choice { grid-template-columns: 1.6rem 1fr; align-items: center; column-gap: 0.65rem; }
   .device-choice .type-desc { grid-column: 2; }
-  .device-icon { font-size: 1.1rem; line-height: 1; text-align: center; filter: grayscale(0.7); opacity: 0.8; }
+  .device-icon { display: grid; place-items: center; width: 1.35rem; height: 1.35rem; color: var(--ink); }
+  .device-icon svg, .power-meter-icon svg { display: block; width: 1.25rem; height: 1.25rem; }
   .type-label { font-weight: 700; color: var(--ink); }
   .type-desc { color: var(--muted); font-size: 0.82rem; font-weight: 500; line-height: 1.35; }
   .device-search { display: grid; gap: 0.4rem; max-width: 30rem; margin-top: 1rem; }
@@ -47,7 +35,7 @@ export const setupChromeStyles = css`
   .power-meter-required h3, .power-meter-required p { margin: 0; }
   .power-meter-summary { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
   .power-meter-icon { display: grid; place-items: center; flex: 0 0 28px; width: 28px; }
-  .power-meter-icon { color: var(--signal-strong); font-size: 1.05rem; }
+  .power-meter-icon { color: var(--ink); }
   .power-meter-details { display: grid; gap: 0.12rem; flex: 1; min-width: 0; }
   .power-meter-details strong { overflow-wrap: anywhere; color: var(--ink); font-size: 0.84rem; }
   .power-meter-details span { overflow-wrap: anywhere; color: var(--muted); font-size: 0.78rem; line-height: 1.35; }
@@ -148,7 +136,7 @@ export function renderPowerMeterSummary(options: PowerMeterSummaryOptions) {
   const { source, detail } = describeMeter(options.meter, options.context);
   return html`
     <div class="power-meter-summary">
-      <span class="power-meter-icon" aria-hidden="true">⚡</span>
+      <span class="power-meter-icon" aria-hidden="true">${deviceIcon("power_meter")}</span>
       <span class="power-meter-details">
         <strong>${source}</strong>
         <span class="power-meter-meta">

@@ -52,7 +52,7 @@ describe("device-first setup", () => {
 
     expect(element.shadowRoot.querySelector('select[name="recorder_purpose"]')).toBeNull();
     expect(element.shadowRoot.querySelector('select[name="profile_device_type"]')).toBeNull();
-    expect(element.shadowRoot.querySelector(".type-chip .device-icon")?.textContent).toBe("📷");
+    expect(element.shadowRoot.querySelector(".type-chip .device-icon svg[stroke='currentColor']")).toBeTruthy();
     selectEntity(entityCombobox(element, "primary_entity_id"), camera.entity_id);
     await element.updateComplete;
     const submitted = new Promise<MeasurementRequest>((resolve) => {
