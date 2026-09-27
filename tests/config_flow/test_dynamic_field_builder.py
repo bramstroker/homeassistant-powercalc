@@ -69,7 +69,7 @@ def test_auto_select_renamed_entity(hass: HomeAssistant, auto_select: dict[str, 
         ({"filter": {"domain": "switch"}}, {}, None),
         ({"domain": "switch", "filter": {"domain": "light"}}, {}, None),
         ({"filter": []}, {}, None),
-        ({"filter": {"device": {"manufacturer": "TP-Link"}}}, {}, None),
+        ({"filter": {"supported_features": ["light.LightEntityFeature.EFFECT"]}}, {}, None),
         ({}, {"translation_key": "different"}, None),
     ],
 )
