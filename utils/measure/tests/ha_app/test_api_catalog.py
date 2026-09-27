@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
@@ -24,6 +25,7 @@ import pytest
 from tests.ha_app.api_test_support import (
     AppClientFactory,
     FakeClient,
+    entity,
     payload,
 )
 
@@ -368,6 +370,55 @@ def test_capabilities_and_entity_filters(app_client_factory: AppClientFactory) -
         response = test_client.get(f"/api/entities?domain={domain}")
         assert response.status_code == 200, domain
         assert [item["entity_id"] for item in response.json()] == [expected]
+
+
+def test_vacuum_recording_suggestions_include_only_its_linked_dock(app_client_factory: AppClientFactory) -> None:
+    test_client = app_client_factory()
+    client = FakeClient()
+    test_client.app.state.context.home_assistant = client
+    live_entities = client.get_entities()
+    live_entities["switch"] = SimpleNamespace(
+        entities={
+            "drying": entity("switch.dock_drying", "off"),
+            "other": entity("switch.other_drying", "on"),
+        }
+    )
+    live_entities["sensor"].entities["status"] = entity("sensor.robot_status", "unknown")
+    registry = [
+        *client.list_entity_registry(),
+        SimpleNamespace(
+            entity_id="sensor.robot_status", device_id="vacuum-device", platform="roborock", translation_key="status"
+        ),
+        SimpleNamespace(
+            entity_id="switch.dock_drying", device_id="dock", platform="roborock", translation_key="mop_drying"
+        ),
+        SimpleNamespace(
+            entity_id="switch.other_drying", device_id="other-dock", platform="roborock", translation_key="mop_drying"
+        ),
+        SimpleNamespace(
+            entity_id="switch.dock_washing",
+            device_id="dock",
+            platform="roborock",
+            translation_key="mop_washing",
+            disabled_by="user",
+        ),
+    ]
+    devices = [
+        {"id": "vacuum-device", "identifiers": [["roborock", "robot"]], "config_entry_id": "account"},
+        {"id": "dock", "identifiers": [["roborock", "robot_dock"]], "config_entry_id": "account"},
+        {"id": "other-dock", "identifiers": [["roborock", "other_dock"]], "config_entry_id": "account"},
+    ]
+    with (
+        patch.object(client, "get_entities", return_value=live_entities),
+        patch.object(client, "list_entity_registry", return_value=registry),
+        patch.object(client, "get_device_registry", return_value=devices),
+    ):
+        response = test_client.get("/api/entities?all=true")
+    assert response.status_code == 200
+    vacuum = next(item for item in response.json() if item["entity_id"] == "vacuum.test")
+    assert vacuum["suggested_recording_entity_ids"] == ["sensor.robot_status", "switch.dock_drying"]
+    assert vacuum["disabled_recording_entity_ids"] == ["switch.dock_washing"]
+    assert client.entity_data_calls == 1
 
 
 def test_entity_catalog_categorizes_one_fresh_snapshot(app_client: TestClient) -> None:

@@ -22,7 +22,7 @@ import { renderEntityList } from "./entity-list-field";
 import {
   activeParameters,
   availableOptions,
-  disabledVacuumEntityCount,
+  disabledVacuumEntityIds,
   entityChoices,
   entityRows,
   selectedEntityId,
@@ -225,7 +225,10 @@ export class SetupFieldsSection extends LitElement {
       }
       let selected = field.multiple ? selectedEntityId(field, this.fieldState) || value : value;
       if (!selected && field.same_device_only && entities.length === 1) selected = entities[0]?.entity_id ?? "";
-      const relatedMissing = Boolean(field.same_device_only && field.related_to && entities.length === 0);
+      const relatedField = definition.fields.find((candidate) => candidate.name === field.related_to);
+      const relatedMissing = Boolean(
+        field.same_device_only && relatedField && selectedEntityId(relatedField, this.fieldState) && entities.length === 0,
+      );
       const selector = entitySelect(name, field.label, entities, {
         selected,
         required: field.required,
@@ -322,8 +325,10 @@ export class SetupFieldsSection extends LitElement {
   private renderVacuumRecordingHint(field: FormField) {
     const state = this.fieldState;
     const selected = state ? selectedEntityIds(field, state).length : 0;
-    const disabled = state ? disabledVacuumEntityCount(state) : 0;
-    const disabledHint = disabled ? `${disabled} disabled entities are listed in recording metadata only.` : "";
+    const disabled = state ? disabledVacuumEntityIds(state) : [];
+    const disabledHint = disabled.length
+      ? `Useful activity entities are disabled: ${disabled.join(", ")}. Enable them in Home Assistant and reload to include them.`
+      : "";
     return html`<p class="muted">
       ${field.hint} ${selected} additional entities selected.
       ${disabledHint}
@@ -361,7 +366,10 @@ export class SetupFieldsSection extends LitElement {
     const select = event.currentTarget as HTMLInputElement;
     this.changeEntities(select.name, [select.value]);
     for (const dependent of this.definition?.fields.filter((field) => field.related_to === select.name) ?? []) {
-      this.changeEntities(dependent.name, []);
+      const suggestions = dependent.name === "additional_entity_ids"
+        ? this.deviceEntities["*"]?.find((entity) => entity.entity_id === select.value)?.suggested_recording_entity_ids
+        : undefined;
+      this.changeEntities(dependent.name, suggestions ?? []);
     }
     if (select.name === "battery_entity_id" && this.fieldState) {
       const additional = this.definition?.fields.find((field) => field.name === "additional_entity_ids");

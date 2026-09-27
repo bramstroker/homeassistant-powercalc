@@ -176,6 +176,67 @@ class _SignalCandidate:
     signal: ActivitySignal
 
 
+@dataclass(frozen=True)
+class RecordingEntitySuggestions:
+    selected: list[str]
+    disabled: list[str]
+
+
+def suggest_recording_entities(context: RecordingContext) -> RecordingEntitySuggestions:
+    """Suggest portable activity signals using metadata, before any samples exist."""
+    candidates = [
+        entity
+        for entity in context.entities
+        if entity.entity_id != context.primary_entity_id
+        and entity.integration != "powercalc"
+        and _is_activity_entity(entity)
+        and resolve_portable_entity(entity.entity_id, context) is not None
+    ]
+    available_priorities: dict[Activity, _SourcePriority] = {}
+    for entity in candidates:
+        activity = _get_action_activity(entity)
+        if activity is not None and entity.disabled_by is None and entity.has_live_state is not False:
+            priority = _get_action_priority(entity)
+            previous = available_priorities.get(activity, priority)
+            available_priorities[activity] = min(previous, priority)
+    selected: list[str] = []
+    disabled: list[str] = []
+    for entity in candidates:
+        activity = _get_action_activity(entity)
+        if activity in available_priorities and _get_action_priority(entity) > available_priorities[activity]:
+            continue
+        if entity.disabled_by is not None:
+            disabled.append(entity.entity_id)
+        elif entity.has_live_state is not False:
+            selected.append(entity.entity_id)
+    return RecordingEntitySuggestions(selected, disabled)
+
+
+def _is_activity_entity(entity: RecordedEntity) -> bool:
+    return (
+        _get_action_activity(entity) is not None
+        or (
+            entity.domain == "sensor"
+            and entity.translation_key in {*_STATUS_ENTITY_KEYS, *_STATION_KEYS, "charging_status"}
+        )
+        or _is_charging_sensor(entity)
+    )
+
+
+def _get_action_activity(entity: RecordedEntity) -> Activity | None:
+    if entity.domain in {"binary_sensor", "switch"}:
+        return _ACTION_ENTITY_KEYS.get(entity.translation_key or "")
+    if entity.domain == "sensor" and entity.translation_key == "auto_empty_status":
+        return Activity.AUTO_EMPTYING
+    return None
+
+
+def _get_action_priority(entity: RecordedEntity) -> _SourcePriority:
+    if entity.translation_key in _DEPRECATED_ACTION_ENTITY_KEYS:
+        return _SourcePriority.DEPRECATED_ACTION_ENTITY
+    return _SourcePriority.ACTION_ENTITY
+
+
 def _discover_entity_signals(
     samples: Sequence[RecordingSample],
     entities: Sequence[RecordedEntity],
@@ -185,15 +246,9 @@ def _discover_entity_signals(
     for entity in entities:
         feature = FeatureReference(entity.entity_id, FeatureSource.STATE)
         key = entity.translation_key
-        if entity.domain in {"binary_sensor", "switch"} and key in _ACTION_ENTITY_KEYS:
-            priority = (
-                _SourcePriority.DEPRECATED_ACTION_ENTITY
-                if key in _DEPRECATED_ACTION_ENTITY_KEYS
-                else _SourcePriority.ACTION_ENTITY
-            )
-            _add_flags(candidates, samples, feature, _ACTION_ENTITY_KEYS[str(key)], priority)
-        elif entity.domain == "sensor" and entity.translation_key == "auto_empty_status":
-            _add_flags(candidates, samples, feature, Activity.AUTO_EMPTYING, _SourcePriority.ACTION_ENTITY)
+        activity = _get_action_activity(entity)
+        if activity is not None:
+            _add_flags(candidates, samples, feature, activity, _get_action_priority(entity))
         elif entity.domain == "sensor" and entity.translation_key in _STATION_KEYS:
             _add_aux_states(
                 candidates,

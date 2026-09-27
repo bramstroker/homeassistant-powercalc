@@ -34,6 +34,8 @@ export interface EntityDescriptor {
   max_mired?: number | null;
   related_voltage_entity_id?: string | null;
   member_entity_ids?: string[];
+  suggested_recording_entity_ids?: string[];
+  disabled_recording_entity_ids?: string[];
 }
 
 export interface EntityCatalog {

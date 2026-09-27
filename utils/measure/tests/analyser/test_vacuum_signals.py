@@ -8,6 +8,7 @@ from measure.analyser.vacuum_signals import (
     Activity,
     discover_signals,
     resolve_activity,
+    suggest_recording_entities,
 )
 from measure.recording.models import (
     RecordedEntity,
@@ -48,6 +49,98 @@ def sample(state: str = "docked", **states: str) -> RecordingSample:
             **{key: RecordedEntityState(value, {}) for key, value in states.items()},
         },
     )
+
+
+def test_suggest_roborock_activity_entities() -> None:
+    ctx = context(
+        entity("status", integration="roborock"),
+        *[
+            replace(entity(key, "switch", "roborock"), device_id="dock")
+            for key in ["mop_washing", "mop_drying", "dust_emptying"]
+        ],
+        replace(entity("mop_drying_status", "binary_sensor", "roborock"), device_id="dock"),
+        entity("mop_drying_remaining_time", integration="roborock"),
+        entity("in_cleaning", "binary_sensor", "roborock"),
+        replace(
+            entity("battery_charging", "binary_sensor", "roborock"),
+            translation_key=None,
+            device_class="battery_charging",
+        ),
+        entity("child_lock", "switch", "roborock"),
+        entity("routine", "button", "roborock"),
+        entity("cleaning_mode", "select", "roborock"),
+        replace(entity("status", integration="powercalc"), entity_id="sensor.estimated_power", device_id="other"),
+        replace(entity("mop_washing", "switch", "roborock"), entity_id="switch.other_robot_wash", device_id="other"),
+    )
+    ctx = replace(ctx, related_device_ids=["dock"])
+    suggestions = suggest_recording_entities(ctx)
+    assert suggestions.selected == ["sensor.status", "switch.mop_washing", "switch.mop_drying", "switch.dust_emptying"]
+    assert suggestions.disabled == []
+
+
+@pytest.mark.parametrize("disabled_by,has_live_state", [("user", False), (None, False)])
+def test_suggest_deprecated_drying_fallback(disabled_by: str | None, has_live_state: bool) -> None:
+    ctx = context(
+        replace(entity("mop_drying", "switch"), disabled_by=disabled_by, has_live_state=has_live_state),
+        entity("mop_drying_status", "binary_sensor", "roborock"),
+    )
+    suggestions = suggest_recording_entities(ctx)
+    assert suggestions.selected == ["binary_sensor.mop_drying_status"]
+    assert suggestions.disabled == (["switch.mop_drying"] if disabled_by else [])
+
+
+def test_suggest_supported_signals_across_integrations() -> None:
+    ctx = context(
+        entity("state"),
+        entity("status"),
+        entity("station_state"),
+        entity("self_wash_base_status"),
+        entity("auto_empty_status"),
+        entity("charging_status"),
+        entity("charging_state", "binary_sensor"),
+        replace(entity("charging", "binary_sensor", "ecovacs"), translation_key=None, device_class="battery_charging"),
+        entity("auto_drying", "switch"),
+    )
+    assert suggest_recording_entities(ctx).selected == [
+        "sensor.state",
+        "sensor.status",
+        "sensor.station_state",
+        "sensor.self_wash_base_status",
+        "sensor.auto_empty_status",
+        "sensor.charging_status",
+        "binary_sensor.charging_state",
+        "binary_sensor.charging",
+    ]
+
+
+def test_suggestions_require_unambiguous_portable_references() -> None:
+    ctx = context(
+        entity("status"),
+        replace(entity("status"), entity_id="sensor.duplicate_status", disabled_by="user"),
+        replace(entity("mop_drying", "switch"), device_id="dock"),
+        replace(entity("mop_drying", "switch"), entity_id="switch.second_dock_drying", device_id="second_dock"),
+        entity("state", integration="powercalc"),
+    )
+    ctx = replace(ctx, related_device_ids=["dock", "second_dock"])
+    assert suggest_recording_entities(ctx).selected == []
+
+
+@pytest.mark.parametrize("key,domain", [("mop_drying", "switch"), ("drying", "switch"), ("drying", "binary_sensor")])
+@pytest.mark.parametrize("disabled_by", [None, "user"])
+def test_deprecated_signal_is_not_suggested_when_same_activity_exists(
+    key: str, domain: str, disabled_by: str | None
+) -> None:
+    ctx = context(
+        entity(key, domain), replace(entity("mop_drying_status", "binary_sensor", "roborock"), disabled_by=disabled_by)
+    )
+    suggestions = suggest_recording_entities(ctx)
+    assert suggestions.selected == [f"{domain}.{key}"]
+    assert suggestions.disabled == []
+
+
+def test_other_activity_does_not_replace_deprecated_signal() -> None:
+    ctx = context(entity("mop_washing", "switch"), entity("mop_drying_status", "binary_sensor", "roborock"))
+    assert suggest_recording_entities(ctx).selected == ["switch.mop_washing", "binary_sensor.mop_drying_status"]
 
 
 @pytest.mark.parametrize(
