@@ -104,25 +104,30 @@ describe("device-first setup", () => {
     expect(element.shadowRoot.querySelector('input[name="profile_device_type"]')).toHaveProperty("value", "camera");
   });
 
-  it("keeps an older light recording editable while offering only automated light measurement to new sessions", async () => {
+  it.each([
+    ["light", "Light", "light.old", "light", "light"],
+    ["smart_speaker", "Smart speaker", "media_player.speaker", "speaker", "media_player"],
+  ] as const)("keeps a saved %s recording editable while offering only its specialized measurement", async (
+    deviceType, label, primaryEntityId, measureType, domain,
+  ) => {
     const element = createSetup();
-    element.definitions = [lightDefinition, {
+    element.definitions = [{ ...lightDefinition, measure_type: measureType }, {
       ...recorderDefinition,
       fields: recorderDefinition.fields.map((field) => field.name === "profile_device_type"
-        ? { ...field, options: [...field.options, { value: "light", label: "Light", entity_domains: ["light"] }] }
+        ? { ...field, options: [...field.options, { value: deviceType, label, entity_domains: [domain] }] }
         : field),
     }];
-    element.initialRequest = savedRecording("light", "light.old");
+    element.initialRequest = savedRecording(deviceType, primaryEntityId);
     await element.updateComplete;
     expect(element.shadowRoot.querySelector("form")).toBeTruthy();
-    expect(element.shadowRoot.querySelector('input[name="profile_device_type"]')).toHaveProperty("value", "light");
+    expect(element.shadowRoot.querySelector('input[name="profile_device_type"]')).toHaveProperty("value", deviceType);
 
     (element.shadowRoot.querySelector(".selection-actions button") as HTMLButtonElement).click();
     await element.updateComplete;
     [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".device-card")]
-      .find((card) => card.querySelector(".type-label")?.textContent === "Light")!.click();
+      .find((card) => card.querySelector(".type-label")?.textContent === label)!.click();
     await element.updateComplete;
-    expect(element.selectedType).toBe("light");
+    expect(element.selectedType).toBe(measureType);
     expect(element.shadowRoot.querySelector(".route-card")).toBeNull();
   });
 
@@ -137,29 +142,6 @@ describe("device-first setup", () => {
     await element.updateComplete;
     expect([...element.shadowRoot.querySelectorAll(".device-card .type-label")]
       .map((label) => label.textContent)).not.toContain("Air conditioner");
-  });
-
-  it("offers only volume measurement for smart speakers while preserving saved recordings", async () => {
-    const element = createSetup();
-    const recorder = {
-      ...recorderDefinition,
-      fields: recorderDefinition.fields.map((field) => field.name === "profile_device_type"
-        ? { ...field, options: [...field.options, { value: "smart_speaker", label: "Smart speaker", entity_domains: ["media_player"] }] }
-        : field),
-    };
-    element.definitions = [{ ...lightDefinition, measure_type: "speaker" }, recorder];
-    element.initialRequest = savedRecording("smart_speaker", "media_player.speaker");
-    await element.updateComplete;
-    expect(element.shadowRoot.querySelector("form")).toBeTruthy();
-    expect(element.shadowRoot.querySelector('input[name="profile_device_type"]')).toHaveProperty("value", "smart_speaker");
-
-    (element.shadowRoot.querySelector(".selection-actions button") as HTMLButtonElement).click();
-    await element.updateComplete;
-    [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".device-card")]
-      .find((card) => card.querySelector(".type-label")?.textContent === "Smart speaker")!.click();
-    await element.updateComplete;
-    expect(element.selectedType).toBe("speaker");
-    expect(element.shadowRoot.querySelector(".route-card")).toBeNull();
   });
 
   it("returns from the form to the device list and discards route-specific choices", async () => {
