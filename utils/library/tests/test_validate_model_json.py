@@ -19,6 +19,32 @@ NAME_SCHEMA = {"type": "object", "required": ["name"], "properties": {"name": {"
 MODEL_SCHEMA = Path(__file__).parents[3] / "profile_library" / "model_schema.json"
 
 
+@pytest.mark.parametrize(
+    "auto_select,selector,valid",
+    [
+        ({"translation_key": "floodlight"}, {"entity": {"domain": "light"}}, True),
+        ({"integration": "tapo_control", "unique_id_pattern": r"-floodlight\(timed\)$"}, {"entity": {}}, True),
+        ({"translation_key": "floodlight", "unique_id_pattern": "-floodlight"}, {"entity": {"multiple": False}}, True),
+        ({}, {"entity": {}}, False),
+        ({"integration": "tapo_control"}, {"entity": {}}, False),
+        ({"translation_key": ""}, {"entity": {}}, False),
+        ({"unique_id_pattern": "["}, {"entity": {}}, False),
+        ({"unique_id_pattern": ""}, {"entity": {}}, False),
+        ({"unique_id_pattern": 42}, {"entity": {}}, False),
+        ({"translation_key": "floodlight", "unknown": True}, {"entity": {}}, False),
+        ({"translation_key": "floodlight"}, {"number": {}}, False),
+        ({"translation_key": "floodlight"}, {"entity": {"multiple": True}}, False),
+    ],
+)
+def test_entity_auto_select_schema(tmp_path: Path, auto_select: object, selector: object, valid: bool) -> None:
+    profile = complete_model(
+        "camera",
+        fields={"spotlight": {"label": "Spotlight", "selector": selector, "auto_select": auto_select}},
+    )
+    path = write_json(tmp_path / "model.json", profile)
+    assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is valid
+
+
 def write_json(path: Path, data: object) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data), encoding="utf-8")

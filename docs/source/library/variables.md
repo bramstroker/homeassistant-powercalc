@@ -84,6 +84,51 @@ After setup Powercalc will replace this with the value the user provided.
 !!! note
     Not all selectors are tested. Some might not be supported. `number` and `entity` are tested and should work.
 
+#### Automatically selecting an entity
+
+From Powercalc v1.26.0, an entity field can use `auto_select` to prefill its selector:
+
+```json
+{
+  "min_version": "v1.26.0",
+  "fields": {
+    "floodlight_entity": {
+      "label": "Spotlight light",
+      "selector": {
+        "entity": {
+          "domain": "light"
+        }
+      },
+      "auto_select": {
+        "integration": "tapo_control",
+        "unique_id_pattern": "-floodlight\\(timed\\)$"
+      }
+    }
+  }
+}
+```
+
+Use `translation_key` when the integration supplies one, for example
+`"auto_select": {"translation_key": "ups_load"}`. For integrations without translation keys,
+`unique_id_pattern` searches the entity registry's unique ID using a regular expression, independently of the
+user-assigned entity ID or display name. Verify the pattern against the integration's entity implementation.
+Use `^floodlight` for a prefix, `floodlight$` for a suffix, or `^floodlight$` for an exact match.
+Without anchors, the pattern can match anywhere in the unique ID. Escape literal regex characters,
+and double backslashes in JSON, as shown for the parentheses above. Invalid regexes are rejected by profile validation.
+`integration` optionally restricts the providing integration. All supplied criteria must match,
+and matching is case-sensitive. At least one of `translation_key` or `unique_id_pattern` is required.
+
+Powercalc selects an entity only when exactly one enabled entity on the source device matches.
+The selector's domain, integration, device class, inclusion and exclusion filters still apply.
+Domain, integration and device class also work inside `filter`, including lists of alternative filters. Filters requiring
+other data, such as supported features or device properties, are left for manual selection.
+Missing device context, missing entities and ambiguous matches leave the field unselected.
+Only single-entity selectors support `auto_select`.
+
+The form remains editable. An explicit field `default` takes precedence over automatic selection,
+and saved field values take precedence over both. This feature only prefills the configuration form;
+YAML configurations still need to supply their `variables` explicitly.
+
 #### Example number selector
 
 In the example below we have a profile that asks the user to provide a number.
