@@ -107,26 +107,15 @@ From Powercalc v1.26.0, an entity field can use `auto_select` to prefill its sel
 }
 ```
 
-Use `translation_key` when the integration supplies one, for example
-`"auto_select": {"translation_key": "ups_load"}`. For integrations without translation keys,
-`unique_id_pattern` searches the entity registry's unique ID using a regular expression, independently of the
-user-assigned entity ID or display name. Verify the pattern against the integration's entity implementation.
-Use `^floodlight` for a prefix, `floodlight$` for a suffix, or `^floodlight$` for an exact match.
-Without anchors, the pattern can match anywhere in the unique ID. Escape literal regex characters,
-and double backslashes in JSON, as shown for the parentheses above. Invalid regexes are rejected by profile validation.
-`integration` optionally restricts the providing integration. All supplied criteria must match,
-and matching is case-sensitive. At least one of `translation_key` or `unique_id_pattern` is required.
+Use `translation_key` (for example, `"auto_select": {"translation_key": "ups_load"}`)
+or `unique_id_pattern` (a regex matching the entity's unique ID), optionally restricted by `integration`.
+When combining criteria, all must match.
 
-Powercalc selects an entity only when exactly one enabled entity on the source device matches.
-The selector's domain, integration, device class, inclusion and exclusion filters still apply.
-Domain, integration and device class also work inside `filter`, including lists of alternative filters. Filters requiring
-other data, such as supported features or device properties, are left for manual selection.
-Missing device context, missing entities and ambiguous matches leave the field unselected.
-Only single-entity selectors support `auto_select`.
+Only single-entity selectors are supported. Powercalc prefills the field when exactly one enabled
+entity on the source device matches. Selector filters for domain, integration, device class and
+included/excluded entities are supported; other filters require manual selection.
 
-The form remains editable. An explicit field `default` takes precedence over automatic selection,
-and saved field values take precedence over both. This feature only prefills the configuration form;
-YAML configurations still need to supply their `variables` explicitly.
+Saved values and explicit defaults take precedence. YAML configurations still need explicit `variables`.
 
 #### Example number selector
 
