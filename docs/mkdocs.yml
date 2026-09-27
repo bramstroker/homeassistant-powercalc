@@ -173,6 +173,7 @@ nav:
               - 'Troubleshooting': 'contributing/measure/home-assistant-app/troubleshooting.md'
           - 'CLI (Docker / Python)': 'contributing/measure/setup.md'
           - 'contributing/measure/lights.md'
+          - 'contributing/measure/device-types.md'
           - 'Measuring low-power devices': 'contributing/measure/low-power-measurements.md'
           - 'contributing/measure/modes.md'
           - 'contributing/measure/output.md'

@@ -31,11 +31,12 @@ There are two ways to run a measurement. Both share the same measurement core an
 ## Then continue with
 
 1. [Light profiles](lights.md) - create LUT profiles for lights, the most common contribution path.
-2. [Other measure modes](modes.md) - measure speakers, fans, charging devices, average readings, or recorder sessions.
-3. [Output and pull requests](output.md) - inspect the generated files and submit them to the library.
-4. [Measuring low-power devices](low-power-measurements.md) - handle sub-watt loads with multiple devices, a dummy
+2. [Measuring by device type](device-types.md) - prepare each supported device and follow its measurement steps in the app.
+3. [Other measure modes](modes.md) - measure speakers, fans, charging devices, average readings, or recorder sessions.
+4. [Output and pull requests](output.md) - inspect the generated files and submit them to the library.
+5. [Measuring low-power devices](low-power-measurements.md) - handle sub-watt loads with multiple devices, a dummy
    load, or a more precise meter.
-5. [Troubleshooting](troubleshooting.md) - fix common measurement problems.
+6. [Troubleshooting](troubleshooting.md) - fix common measurement problems.
 
 Developers can read [Architecture](architecture.md) to understand how the CLI and app share the same measurement pipeline.
 
