@@ -40,12 +40,12 @@ export const recorderDefinition: MeasureDefinition = {
         {
           value: "complex_profile",
           label: "Data for a complex power profile (experimental)",
-          description: "This workflow is not feature complete and only creates fixed states_power models.",
+          description: "This experimental workflow creates fixed states_power models or composites from a secondary signal.",
         },
       ],
     },
     {
-      name: "profile_recipe", role: "attribute", label: "Device type", control: "select", required: true,
+      name: "profile_recipe", role: "attribute", label: "Recording recipe", control: "select", required: true,
       default: "generic", visible_when: { recorder_purpose: ["complex_profile"] }, review: true,
       options: [
         { value: "generic", label: "Generic device", description: "Choose relevant entities." },
@@ -53,9 +53,25 @@ export const recorderDefinition: MeasureDefinition = {
       ],
     },
     {
-      name: "tracked_entity_ids", role: "attribute", label: "Tracked entity", plural_label: "Tracked entities",
-      control: "entity", required: true, multiple: true, all_entities: true,
+      name: "profile_device_type", role: "attribute", label: "Profile device type", control: "select", required: true,
+      default: "generic_iot", options: [
+        { value: "generic_iot", label: "Generic IoT", entity_domains: ["media_player", "sensor"] },
+        { value: "heating", label: "Heating", entity_domains: ["climate"] },
+        { value: "camera", label: "Camera", entity_domains: ["camera"] },
+        { value: "smart_switch", label: "Smart switch", entity_domains: ["light", "switch"] },
+      ],
+      visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["generic"] }, review: true,
+    },
+    {
+      name: "primary_entity_id", role: "attribute", label: "Primary entity", control: "entity", required: true,
+      all_entities: true, narrowed_by: "profile_device_type", options: [],
+      visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["generic"] }, review: true,
+    },
+    {
+      name: "tracked_entity_ids", role: "attribute", label: "Additional power signal", plural_label: "Additional power signals (optional)",
+      control: "entity", required: false, multiple: true, all_entities: true, related_to: "primary_entity_id",
       visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["generic"] }, options: [], review: true,
+      hint: "Select other entities whose states may explain power changes.",
     },
     {
       name: "vacuum_entity_id", role: "attribute", label: "Vacuum", control: "entity", required: true,

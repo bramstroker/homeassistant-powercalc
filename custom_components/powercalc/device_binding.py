@@ -137,13 +137,17 @@ def get_related_devices(hass: HomeAssistant, device_id: str) -> list[DeviceEntry
 
 
 def get_profile_related_devices(hass: HomeAssistant, device_id: str) -> list[AnyDeviceEntry]:
-    """Return native children and known docks that a profile may reference."""
+    """Return the immediate parent, children, and known docks a profile may reference."""
     device_reg = device_registry.async_get(hass)
     device = device_reg.async_get(device_id)
     if device is None:
         return []
 
     related: dict[str, AnyDeviceEntry] = {}
+    if parent_device_id := getattr(device, "parent_device_id", None):
+        parent = device_reg.async_get(parent_device_id)
+        if parent is not None:
+            related[parent.id] = parent
     if _HAS_CHILD_DEVICES:
         for child in device_registry.async_entries_for_parent_device(device_reg, device_id):
             related[child.id] = child

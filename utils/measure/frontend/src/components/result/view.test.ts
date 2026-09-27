@@ -253,6 +253,26 @@ describe("result view", () => {
     expect(element.shadowRoot.querySelector('.notice[role="status"]')?.textContent).toContain("warning");
   });
 
+  it("shows the analysis reason once while keeping other session warnings", async () => {
+    const reason = "No state or scalar attribute had enough usable values.";
+    const element = document.createElement("measure-result-view") as ResultView;
+    element.snapshot = {
+      state: "completed",
+      summary: {
+        "Recording analysis": "More data needed",
+        "Recording analysis reason": reason,
+      },
+      warnings: [`Profile was not created: ${reason}`, "One recording line was skipped"],
+    };
+    element.canPrepareProfile = false;
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot?.querySelector(".analysis-reason")?.textContent).toContain(reason);
+    expect([...element.shadowRoot!.querySelectorAll('.notice[role="status"]')].map((notice) => notice.textContent))
+      .toEqual(["One recording line was skipped"]);
+  });
+
   it("explains multi-input vacuum profiles and independent validation", async () => {
     const element = document.createElement("measure-result-view") as HTMLElement & {
       snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;

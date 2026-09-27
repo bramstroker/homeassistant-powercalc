@@ -347,6 +347,10 @@ export class SetupView extends LitElement {
 
   private selectValueChanged(event: CustomEvent<SelectValueChange>): void {
     this.selectValues = { ...this.selectValues, [event.detail.name]: event.detail.value };
+    if (event.detail.name === "profile_device_type") {
+      this.selectEntities("primary_entity_id", []);
+      this.selectEntities("tracked_entity_ids", []);
+    }
   }
 
   private multiSelectionChanged(event: CustomEvent<MultiSelectionChange>): void {

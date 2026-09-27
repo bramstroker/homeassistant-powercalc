@@ -55,6 +55,11 @@ def test_recorder_definition_starts_with_purpose_and_declares_vacuum_relationshi
     assert "battery charging calibration" in (complex_profile.description or "")
     assert "at least five samples" in (complex_profile.description or "")
     assert [option.value for option in fields["profile_recipe"].options] == ["generic", "vacuum_robot"]
+    assert "vacuum_robot" not in [option.value for option in fields["profile_device_type"].options]
+    assert fields["primary_entity_id"].narrowed_by == "profile_device_type"
+    options = {option.value: option for option in fields["profile_device_type"].options}
+    assert options["camera"].entity_domains == ("camera",)
+    assert options["smart_switch"].entity_domains == ("light", "switch")
     assert fields["tracked_entity_ids"].multiple is True
     assert fields["battery_entity_id"].related_to == "vacuum_entity_id"
     assert fields["battery_entity_id"].same_device_only is True

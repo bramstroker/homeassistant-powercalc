@@ -27,6 +27,7 @@ from measure.powermeter.spec import (
     PowerMeterSpec,
     ShellyPowerMeterSpec,
 )
+from measure.profile.device_type import ProfileDeviceType
 from measure.request import (
     ChargingMeasurementRequest,
     DummyLoadCalibrationRequest,
@@ -52,7 +53,9 @@ class EntityRecord(Protocol):
     entity_id: str
     domain: str
     device_class: str | None
+    unit: str | None
     device_id: str | None
+    related_device_ids: list[str]
     state: str
     attribute_names: list[str]
     supported_modes: list[LutMode] | None
@@ -355,6 +358,9 @@ class MeasurementPreflight:
             # the run, so this must not block record-more or resume on a stored request.
             warnings.append(f"{problem}. It will be recorded as unavailable.")
 
+        self._validate_printer_primary(request, all_entities)
+        self._validate_generic_signals(request, all_entities)
+
         if request.profile_recipe != RecorderProfileRecipe.VACUUM_ROBOT:
             return PreflightResult(warnings=warnings)
 
@@ -370,6 +376,29 @@ class MeasurementPreflight:
         if vacuum.device_id is None or battery.device_id != vacuum.device_id:
             raise PreflightError("Battery sensor must belong to the same Home Assistant device as the vacuum")
         return PreflightResult(warnings=warnings)
+
+    @staticmethod
+    def _validate_printer_primary(request: RecorderMeasurementRequest, entities: dict[str, EntityRecord]) -> None:
+        if request.profile_device_type != ProfileDeviceType.PRINTER:
+            return
+        primary = entities.get(request.primary_entity_id or "")
+        if primary is not None and primary.unit:
+            raise PreflightError("A printer profile needs a sensor without a unit of measurement")
+
+    @staticmethod
+    def _validate_generic_signals(request: RecorderMeasurementRequest, entities: dict[str, EntityRecord]) -> None:
+        if request.profile_recipe != RecorderProfileRecipe.GENERIC or not request.tracked_entity_ids:
+            return
+        primary = entities.get(request.primary_entity_id or "")
+        if primary is None or primary.device_id is None:
+            raise PreflightError("Additional power signals require a primary entity with a Home Assistant device")
+        allowed_devices = {primary.device_id, *primary.related_device_ids}
+        for entity_id in request.tracked_entity_ids:
+            signal = entities.get(entity_id)
+            if signal is not None and signal.device_id not in allowed_devices:
+                raise PreflightError(
+                    f"Additional power signal {entity_id} must belong to the primary device or its parent or child"
+                )
 
     def _validate_speaker(self, request: SpeakerMeasurementRequest) -> PreflightResult:
         if isinstance(request.controller, HassMediaControllerSpec):

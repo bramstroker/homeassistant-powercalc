@@ -1,5 +1,6 @@
 import {
   enabledParameters,
+  entityDomainsForOption,
   fieldOptions,
   fieldVisible,
   requestFieldValue,
@@ -41,17 +42,32 @@ export function entityChoices(
   state: FieldState,
   domains = field.entity_domains ?? [],
 ): EntityDescriptor[] {
+  const source = field.narrowed_by
+    ? state.definition.fields.find((candidate) => candidate.name === field.narrowed_by)
+    : undefined;
+  const allowedDomains = source?.control === "select"
+    ? entityDomainsForOption(state.definition, field, selectValue(source, state))
+    : domains;
   let entities = field.all_entities
     ? [...(state.deviceEntities["*"] ?? [])]
-    : domains.flatMap((domain) => (domain === "light" ? state.lights : state.deviceEntities[domain] ?? []));
+    : allowedDomains.flatMap((domain) => (domain === "light" ? state.lights : state.deviceEntities[domain] ?? []));
   entities = entities.filter(hasEnabledLiveState);
-  if (field.all_entities && domains.length) {
-    entities = entities.filter((entity) => entity.domain && domains.includes(entity.domain));
+  if (field.all_entities && source?.control === "select" && !allowedDomains.length) return [];
+  if (field.all_entities && allowedDomains.length) {
+    entities = entities.filter((entity) => entity.domain && allowedDomains.includes(entity.domain));
   }
   if (field.entity_device_classes?.length) {
     entities = entities.filter((entity) => matchesDeviceClass(entity, field.entity_device_classes ?? []));
   }
+  if (field.name === "primary_entity_id" && source && selectValue(source, state) === "printer") {
+    entities = entities.filter((entity) => !entity.unit);
+  }
   const related = relatedEntity(field, state);
+  if (state.definition.measure_type === "recorder" && field.name === "tracked_entity_ids") {
+    if (!related?.device_id) return [];
+    const allowedDevices = new Set([related.device_id, ...(related.related_device_ids ?? [])]);
+    entities = entities.filter((entity) => entity.entity_id !== related.entity_id && allowedDevices.has(entity.device_id ?? ""));
+  }
   if (state.definition.measure_type === "recorder" && field.name === "additional_entity_ids") {
     const batteryField = state.definition.fields.find((candidate) => candidate.name === "battery_entity_id");
     let batteryId = batteryField ? selectedEntityId(batteryField, state) : "";

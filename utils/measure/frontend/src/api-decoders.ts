@@ -164,6 +164,8 @@ export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is
       return (value.controller === null || value.controller === undefined)
         && oneOf("playbook", "complex_profile")(value.recorder_purpose)
         && optionalNullable(oneOf("generic", "vacuum_robot"))(value.profile_recipe)
+        && optionalNullable(isString)(value.primary_entity_id)
+        && optionalNullable(isString)(value.profile_device_type)
         && optional(isStringArray)(value.tracked_entity_ids)
         && optionalNullable(isString)(value.vacuum_entity_id)
         && optionalNullable(isString)(value.battery_entity_id)
@@ -178,6 +180,7 @@ const isEntityDescriptor: Guard<EntityDescriptor> = objectOf({
   domain: optional(isString),
   device_class: optionalNullable(isString),
   device_id: optionalNullable(isString),
+  related_device_ids: optional(isStringArray),
   integration: optionalNullable(isString),
   connectivity: optionalNullable(oneOf("zigbee", "zwave")),
   translation_key: optionalNullable(isString),
@@ -198,7 +201,7 @@ const isEntityDescriptor: Guard<EntityDescriptor> = objectOf({
 });
 
 const isFormFieldOption = objectOf({
-  value: isString, label: isString, entity_domain: optionalNullable(isString), enables: optional(isStringArray),
+  value: isString, label: isString, entity_domain: optionalNullable(isString), entity_domains: optional(isStringArray),
   description: optional(isString), guidance: optional(isStringArray),
 });
 const isFormField = objectOf({

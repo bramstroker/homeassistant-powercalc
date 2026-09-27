@@ -27,6 +27,13 @@ export function deviceFields(definition: MeasureDefinition): FormField[] {
  */
 export function requestFieldValue(request: MeasurementRequest, field: FormField): FieldValue | undefined {
   if (field.role === "controller") return controllerEntityId(request);
+  if (request.measure_type === "recorder" && request.profile_recipe === "generic") {
+    if (field.name === "profile_device_type") return request.profile_device_type ?? "generic_iot";
+    if (request.primary_entity_id === undefined) {
+      if (field.name === "primary_entity_id") return request.tracked_entity_ids?.[0];
+      if (field.name === "tracked_entity_ids") return request.tracked_entity_ids?.slice(1) ?? [];
+    }
+  }
   const value = Object.getOwnPropertyDescriptor(request, field.name)?.value;
   return isFieldValue(value) ? value : undefined;
 }
@@ -76,9 +83,17 @@ export function narrowingField(definition: MeasureDefinition, field: FormField):
 
 /** Domain an entity field accepts, taken from the option selected in the field that narrows it. */
 export function entityDomain(definition: MeasureDefinition, field: FormField, selectedOption?: string): string | undefined {
+  return entityDomainsForOption(definition, field, selectedOption)[0];
+}
+
+/** Domains accepted by the selected option, including types that use two entity domains. */
+export function entityDomainsForOption(definition: MeasureDefinition, field: FormField, selectedOption?: string): string[] {
   const source = narrowingField(definition, field);
-  if (source) return source.options.find((option) => option.value === selectedOption)?.entity_domain ?? undefined;
-  return field.entity_domains?.[0];
+  if (source) {
+    const option = source.options.find((candidate) => candidate.value === selectedOption);
+    return option?.entity_domains?.length ? option.entity_domains : option?.entity_domain ? [option.entity_domain] : [];
+  }
+  return field.entity_domains ?? [];
 }
 
 export function entityDomains(definition: MeasureDefinition, values?: FormData): string[] {

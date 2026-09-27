@@ -11,7 +11,7 @@ import type {
 } from "../../types";
 import {
   deviceFields,
-  entityDomain,
+  entityDomainsForOption,
   entityDomains,
   narrowingField,
   requestFieldValue,
@@ -211,7 +211,7 @@ export class SetupFieldsSection extends LitElement {
       const value = (stored ?? field.default ?? "").toString();
       const source = narrowingField(definition, field);
       const domains = source
-        ? [entityDomain(definition, field, selectValue(source, this.fieldState))].filter((domain): domain is string => Boolean(domain))
+        ? entityDomainsForOption(definition, field, selectValue(source, this.fieldState))
         : this.fieldDomains(field);
       const failed = field.all_entities
         ? (this.deviceEntityErrors["*"] ? "*" : undefined)
@@ -223,7 +223,8 @@ export class SetupFieldsSection extends LitElement {
       if (field.multiple && (field.role !== "controller" || this.multipleLights)) {
         return this.renderMultiEntity(field, entities);
       }
-      let selected = field.multiple ? selectedEntityId(field, this.fieldState) || value : value;
+      let selected = this.selectedEntities[name] !== undefined ? selectedEntityId(field, this.fieldState) : value;
+      if (source && selected && !entities.some((entity) => entity.entity_id === selected)) selected = "";
       if (!selected && field.same_device_only && entities.length === 1) selected = entities[0]?.entity_id ?? "";
       const relatedField = definition.fields.find((candidate) => candidate.name === field.related_to);
       const relatedMissing = Boolean(
@@ -243,14 +244,11 @@ export class SetupFieldsSection extends LitElement {
     }
     if (field.control === "select") {
       const value = selectValue(field, this.fieldState) ?? (stored ?? field.default ?? "").toString();
-      const affectsAnother = definition.fields.some(
-        (candidate) => candidate.narrowed_by === name || Object.hasOwn(candidate.visible_when ?? {}, name),
-      );
       const selectedOption = field.options.find((option) => option.value === value);
       return html`<div class="field-block">${optionSelect(name, field.label, field.options, {
         selected: value,
         required: field.required,
-        onChange: affectsAnother ? this.selectChanged : null,
+        onChange: this.selectChanged,
       })}${this.optionGuidance(selectedOption)}</div>`;
     }
     return this.valueField(field, (stored ?? field.default ?? "").toString());
@@ -293,11 +291,13 @@ export class SetupFieldsSection extends LitElement {
 
   private renderMultiEntity(field: FormField, entities: EntityDescriptor[]) {
     const vacuumAdditional = this.definition?.measure_type === "recorder" && field.name === "additional_entity_ids";
+    const genericAdditional = this.definition?.measure_type === "recorder" && field.name === "tracked_entity_ids";
     const lightController = this.definition?.measure_type === "light" && field.role === "controller";
-    if (vacuumAdditional || lightController) {
+    if (vacuumAdditional || genericAdditional || lightController) {
       return html`<div class="field-block">
-        ${this.renderEntityCombobox(field, entities, vacuumAdditional ? "Select additional entities" : "Select lights")}
+        ${this.renderEntityCombobox(field, entities, lightController ? "Select lights" : "Select additional entities")}
         ${vacuumAdditional ? this.renderVacuumRecordingHint(field) : nothing}
+        ${genericAdditional && field.hint ? fieldHint(field.hint) : nothing}
       </div>`;
     }
     return renderEntityList({

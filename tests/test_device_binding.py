@@ -1,4 +1,6 @@
 import logging
+from types import SimpleNamespace
+from unittest.mock import MagicMock
 
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
@@ -80,6 +82,19 @@ def test_get_profile_related_devices_for_unknown_device(hass: HomeAssistant) -> 
     assert get_profile_related_devices(hass, "missing-device") == []
 
 
+def test_profile_related_devices_skips_missing_parent(
+    hass: HomeAssistant,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    child = SimpleNamespace(id="child", parent_device_id="missing-parent", identifiers=set())
+    registry = MagicMock()
+    registry.async_get.side_effect = lambda device_id: child if device_id == "child" else None
+    monkeypatch.setattr(device_binding.device_registry, "async_get", lambda _: registry)
+    monkeypatch.setattr(device_binding, "_HAS_CHILD_DEVICES", False)
+
+    assert get_profile_related_devices(hass, "child") == []
+
+
 def test_roborock_dock_lookup_without_child_device_api(
     hass: HomeAssistant,
     monkeypatch: pytest.MonkeyPatch,
@@ -119,7 +134,7 @@ def test_profile_related_devices_deduplicate_roborock_child_dock(
     )
 
     assert get_profile_related_devices(hass, robot.id) == [dock, other_child]
-    assert get_profile_related_devices(hass, dock.id) == []
+    assert get_profile_related_devices(hass, dock.id) == [robot]
 
 
 def test_get_first_device_for_config_entry(hass: HomeAssistant) -> None:

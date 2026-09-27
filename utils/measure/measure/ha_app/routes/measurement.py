@@ -256,6 +256,7 @@ def _measure_definitions() -> list[MeasureDefinition]:
                             value=option.value,
                             label=option.label,
                             entity_domain=option.entity_domain,
+                            entity_domains=list(option.entity_domains),
                             enables=list(option.enables),
                             description=option.description,
                             guidance=list(option.guidance),

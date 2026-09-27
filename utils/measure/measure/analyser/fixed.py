@@ -3,6 +3,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from statistics import median
 
+from measure.analyser.entity_references import resolve_portable_entity
 from measure.analyser.models import (
     AnalysisCandidate,
     FeatureReference,
@@ -15,7 +16,7 @@ from measure.analyser.models import (
 from measure.analyser.vacuum.signals import ActivitySignal
 from measure.recording.models import RecordingContext, RecordingSample
 
-MIN_SAMPLES_PER_VALUE = 4
+MIN_SAMPLES_PER_VALUE = 5
 MAX_DISTINCT_VALUES = 20
 _IGNORED_VALUES = {"unknown", "unavailable"}
 
@@ -25,6 +26,7 @@ class FixedStatesPowerCandidate:
     feature: FeatureReference
     powers: Mapping[str, float]
     strategy_id: str = "fixed_states_power"
+    source_entity: str | None = None
 
     @property
     def features(self) -> list[FeatureReference]:
@@ -45,6 +47,19 @@ class FixedStatesPowerCandidate:
         return self.powers.get(self.feature.format_model_key(value))
 
     def build_model_config_fragment(self) -> ModelConfigFragment:
+        if self.source_entity is not None:
+            # Keep the primary source, including its off state. Conditions track the
+            # secondary entity without treating its "off" value as zero consumption.
+            strategies = [
+                {
+                    "condition": {"condition": "state", "entity_id": self.source_entity, "state": state},
+                    "fixed": {"power": power, "states_power": {"off": power}},
+                }
+                for state, power in self.powers.items()
+            ]
+            return ModelConfigFragment(
+                "composite", "composite_config", {"mode": "stop_at_first", "strategies": strategies}
+            )
         configuration: dict[str, object]
         if self.feature.source == FeatureSource.STATE and set(self.powers) == {"off", "on"}:
             configuration = {"power": self.powers["on"]}
@@ -58,7 +73,7 @@ class FixedStatesPowerCandidate:
 
     @property
     def standby_power(self) -> float | None:
-        if self.feature.source != FeatureSource.STATE:
+        if self.source_entity is not None or self.feature.source != FeatureSource.STATE:
             return None
         power = self.powers.get("off")
         return power if power is not None and power >= 0.05 else None
@@ -80,10 +95,20 @@ class FixedStatesPowerStrategy(ProfileAnalysisStrategy):
             for feature in _collect_features(samples, context.primary_entity_id)
             if (candidate := _fit_feature(samples, feature)) is not None
         ]
+        for entity in context.entities:
+            if entity.entity_id == context.primary_entity_id:
+                continue
+            reference = resolve_portable_entity(entity.entity_id, context)
+            if reference is None:
+                continue
+            feature = FeatureReference(entity.entity_id, FeatureSource.STATE)
+            if (candidate := _fit_feature(samples, feature, reference)) is not None:
+                candidates.append(candidate)
         if not candidates:
             return StrategyNotApplicable(
                 f"No state or scalar attribute had 2-{MAX_DISTINCT_VALUES} usable values with at least "
-                f"{MIN_SAMPLES_PER_VALUE} training samples per value",
+                f"{MIN_SAMPLES_PER_VALUE} training samples per value. Secondary states also need an unambiguous "
+                "portable entity reference.",
             )
         return candidates
 
@@ -103,6 +128,7 @@ def _collect_features(samples: Sequence[RecordingSample], primary_entity_id: str
 def _fit_feature(
     samples: Sequence[RecordingSample],
     feature: FeatureReference,
+    source_entity: str | None = None,
 ) -> FixedStatesPowerCandidate | None:
     grouped: dict[str, list[float]] = defaultdict(list)
     for sample in samples:
@@ -115,7 +141,7 @@ def _fit_feature(
     if any(len(powers) < MIN_SAMPLES_PER_VALUE for powers in grouped.values()):
         return None
     powers = {key: round(median(values), 2) for key, values in sorted(grouped.items())}
-    return FixedStatesPowerCandidate(feature, powers)
+    return FixedStatesPowerCandidate(feature, powers, source_entity=source_entity)
 
 
 def _is_usable(value: ScalarStateValue) -> bool:
