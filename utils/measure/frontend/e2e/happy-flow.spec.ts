@@ -13,7 +13,8 @@ import type { SessionSnapshot, SessionSummary } from "../src/types";
 
 async function startAverageSetup(page: Page): Promise<void> {
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: /Average/ }).click();
+  await page.getByRole("button", { name: /Free measurement/ }).click();
+  await page.getByRole("button", { name: "Measure average power" }).click();
 }
 
 test.beforeEach(async ({ page }) => {
@@ -159,7 +160,8 @@ test("configures a measurement and reaches the setup check", async ({ page }) =>
   await page.getByRole("button", { name: "New measurement" }).click();
   await expect(page.getByRole("heading", { name: "Configure the measurement" })).toBeVisible();
 
-  await page.getByRole("button", { name: /Average/ }).click();
+  await page.getByRole("button", { name: /Free measurement/ }).click();
+  await page.getByRole("button", { name: "Measure average power" }).click();
 
   // The power meter comes from settings rather than the form, and is restated here.
   await expect(page.getByText("Plug power · sensor.plug_power")).toBeVisible();
@@ -175,7 +177,7 @@ test("configures a measurement and reaches the setup check", async ({ page }) =>
 
 test("selects a Home Assistant light with the shared combobox", async ({ page }) => {
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: /Light bulb/ }).click();
+  await page.getByRole("button", { name: "Light", exact: true }).click();
 
   const light = page.getByRole("combobox", { name: "Light" });
   await light.click();
@@ -192,16 +194,13 @@ test("selects a Home Assistant light with the shared combobox", async ({ page })
   await expect(page.getByText("Desk lamp", { exact: true })).toBeVisible();
 });
 
-test("loads related recorder entities after choosing a primary device entity", async ({ page }) => {
+test("loads related recorder entities after choosing a device type", async ({ page }) => {
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: /Recorder/ }).click();
-
-  await page.getByRole("combobox", { name: "What do you want to create?" }).click();
-  await page.getByRole("option", { name: "Data for a complex power profile (experimental)" }).click();
-
-  await page.getByRole("combobox", { name: "Profile device type" }).click();
-  await page.getByRole("option", { name: "Heating" }).click();
-  await page.getByRole("combobox", { name: "Primary entity" }).click();
+  await page.getByRole("button", { name: "Heating", exact: true }).click();
+  await expect(page.locator('input[name="recorder_purpose"]')).toHaveValue("complex_profile");
+  await expect(page.locator('input[name="profile_device_type"]')).toHaveValue("heating");
+  const primary = page.getByRole("combobox", { name: "Primary entity" });
+  await primary.click();
   await page.getByRole("option", { name: "Living room thermostat · climate.living_room" }).click();
 
   const tracked = page.getByRole("combobox", { name: "Tracked entities" });
@@ -215,7 +214,7 @@ for (const width of [1280, 390]) {
   test(`keeps light setup compact and reveals contextual help at ${width}px`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 900 });
     await page.getByRole("button", { name: "New measurement" }).click();
-    await page.getByRole("button", { name: /Light bulb/ }).click();
+    await page.getByRole("button", { name: "Light", exact: true }).click();
 
     const setup = page.locator("measure-setup-view");
     const light = setup.locator('measure-combobox[name="light_entity_id"]');
@@ -281,7 +280,7 @@ for (const width of [1280, 390]) {
 
 test("submits light tags as distinct controller entities", async ({ page }) => {
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: /Light bulb/ }).click();
+  await page.getByRole("button", { name: "Light", exact: true }).click();
   await page.getByLabel("Measure multiple lights", { exact: true }).check();
   const picker = page.getByRole("combobox", { name: "Lights", exact: true });
   await picker.click();
@@ -301,7 +300,7 @@ test("keeps developer controls collapsed but virtual measurement status visible"
   await mockApi(page, { capabilities: { developer_mode: true, fast_test_mode: true } });
   await page.reload();
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: /Light bulb/ }).click();
+  await page.getByRole("button", { name: "Light", exact: true }).click();
   const setup = page.locator("measure-setup-view");
   const virtual = setup.getByLabel("Use virtual device (developer)");
   await expect(virtual).toBeHidden();

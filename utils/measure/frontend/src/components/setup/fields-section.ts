@@ -70,6 +70,7 @@ export class SetupFieldsSection extends LitElement {
   @property({ attribute: false }) deviceEntityErrors: Record<string, string> = {};
   @property({ attribute: false }) selectedEntities: Record<string, string[]> = {};
   @property({ attribute: false }) selectValues: Record<string, string> = {};
+  @property({ attribute: false }) presetValues: Record<string, string> = {};
   @property({ attribute: false }) multiSelection: Record<string, string[]> = {};
   @property({ attribute: false }) parameterValues: Partial<Record<MeasureParameterName, string>> = {};
   @property({ type: Boolean }) dummyController = false;
@@ -243,6 +244,9 @@ export class SetupFieldsSection extends LitElement {
       </div>`;
     }
     if (field.control === "select") {
+      if (name in this.presetValues) {
+        return html`<input type="hidden" name=${name} .value=${this.presetValues[name] ?? ""} />`;
+      }
       const value = selectValue(field, this.fieldState) ?? (stored ?? field.default ?? "").toString();
       const selectedOption = field.options.find((option) => option.value === value);
       return html`<div class="field-block">${optionSelect(name, field.label, field.options, {

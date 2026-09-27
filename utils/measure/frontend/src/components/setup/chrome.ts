@@ -1,7 +1,22 @@
 import { css, html } from "lit";
 import { describe as describeMeter } from "../../power-meter/registry";
 import type { MeterContext } from "../../power-meter/registry";
-import type { MeasureDefinition, MeasureType, PowerMeterSpec } from "../../types";
+import type { PowerMeterSpec } from "../../types";
+import type { DeviceChoice, MeasurementRoute } from "./device-routes";
+
+const DEVICE_ICONS: Record<string, string> = {
+  air_conditioner: "❄️", air_purifier: "🌬️", camera: "📷", cover: "🪟",
+  fan: "🌀", generic_iot: "📡", heating: "♨️", humidifier: "💧",
+  lawn_mower_robot: "🌱", light: "💡", network: "🌐", power_meter: "⚡",
+  printer: "🖨️", set_top_box: "📺", smart_dimmer: "🎚️", smart_speaker: "🔊",
+  smart_switch: "🔘", television: "📺", ups: "🔋", vacuum_robot: "🧹",
+  water_heater: "🚿",
+};
+
+function deviceIcon(deviceId: string): string {
+  if (deviceId === "free_measurement") return "📊";
+  return DEVICE_ICONS[deviceId] ?? "🔌";
+}
 
 /**
  * The framing around the measurement form: choosing what to measure, restating that choice, and
@@ -11,22 +26,27 @@ import type { MeasureDefinition, MeasureType, PowerMeterSpec } from "../../types
 
 export const setupChromeStyles = css`
   .type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 1.25rem 0 0.25rem; }
-  .type-card { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 0.75rem; row-gap: 0.25rem; text-align: left; align-items: start; padding: 1rem; min-height: auto; background: var(--field); }
+  .type-card { display: grid; gap: 0.25rem; text-align: left; align-items: start; padding: 1rem; min-height: auto; background: var(--field); }
   .type-card:hover:not(:disabled) { border-color: var(--signal); }
-  .type-icon { grid-row: 1 / span 2; font-size: 1.6rem; line-height: 1; }
+  .device-card, .device-choice { grid-template-columns: 1.6rem 1fr; align-items: center; column-gap: 0.65rem; }
+  .device-choice .type-desc { grid-column: 2; }
+  .device-icon { font-size: 1.1rem; line-height: 1; text-align: center; filter: grayscale(0.7); opacity: 0.8; }
   .type-label { font-weight: 700; color: var(--ink); }
   .type-desc { color: var(--muted); font-size: 0.82rem; font-weight: 500; line-height: 1.35; }
+  .device-search { display: grid; gap: 0.4rem; max-width: 30rem; margin-top: 1rem; }
+  .free-measurement { margin-top: 1.5rem; }
 
   .setup-summary { display: grid; gap: 0.5rem; margin: 1.25rem 0 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
   .type-chip { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
-  .type-chip .type-icon { grid-row: auto; font-size: 1.4rem; }
+  .type-chip .device-icon { display: grid; place-items: center; flex: 0 0 28px; width: 28px; }
   .type-chip .chip-body { display: grid; gap: 0.1rem; flex: 1; min-width: 0; }
   .type-chip button { min-height: 38px; padding: 0.4rem 0.9rem; }
+  .selection-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
   .power-meter-required { display: grid; justify-items: start; gap: 0.65rem; margin-top: 1.25rem; padding: 1.1rem; border: 1px solid var(--signal); border-radius: 12px; background: color-mix(in srgb, var(--signal) 8%, var(--field)); }
   .power-meter-required h3, .power-meter-required p { margin: 0; }
   .power-meter-summary { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
-  .power-meter-icon, .type-chip .type-icon { display: grid; place-items: center; flex: 0 0 28px; width: 28px; }
+  .power-meter-icon { display: grid; place-items: center; flex: 0 0 28px; width: 28px; }
   .power-meter-icon { color: var(--signal-strong); font-size: 1.05rem; }
   .power-meter-details { display: grid; gap: 0.12rem; flex: 1; min-width: 0; }
   .power-meter-details strong { overflow-wrap: anywhere; color: var(--ink); font-size: 0.84rem; }
@@ -52,31 +72,67 @@ export function renderPowerMeterRequired(onOpenSettings: () => void) {
   `;
 }
 
-export function renderTypePicker(definitions: MeasureDefinition[], onSelect: (type: MeasureType) => void) {
-  if (!definitions.length) return html`<p class="muted">Loading measurement types…</p>`;
+export function renderDevicePicker(
+  devices: DeviceChoice[],
+  search: string,
+  onSearch: (value: string) => void,
+  onSelect: (deviceId: string) => void,
+  hasFreeMeasurement: boolean,
+) {
+  if (!devices.length && !hasFreeMeasurement) return html`<p class="muted">Loading devices…</p>`;
+  const matches = devices.filter((device) => device.label.toLowerCase().includes(search.trim().toLowerCase()));
   return html`
-    <p class="muted">What do you want to measure?</p>
+    <p class="muted">What type of device do you want to measure?</p>
+    <label class="device-search"><span>Find a device type</span>
+      <input type="search" .value=${search} @input=${(event: Event) => onSearch((event.target as HTMLInputElement).value)} />
+    </label>
     <div class="type-grid">
-      ${definitions.map((definition) => html`
-        <button type="button" class="type-card" @click=${() => onSelect(definition.measure_type)}>
-          <span class="type-icon" aria-hidden="true">${definition.icon}</span>
-          <span class="type-label">${definition.label}</span>
-          <span class="type-desc">${definition.description}</span>
+      ${matches.map((device) => html`
+        <button type="button" class="type-card device-card" @click=${() => onSelect(device.id)}>
+          <span class="device-icon" aria-hidden="true">${deviceIcon(device.id)}</span>
+          <span class="type-label">${device.label}</span>
         </button>
       `)}
+    </div>
+    ${!matches.length ? html`<p class="muted">No matching device types.</p>` : ""}
+    ${hasFreeMeasurement ? html`<div class="free-measurement">
+      <button type="button" class="type-card device-choice" @click=${() => onSelect("free_measurement")}>
+        <span class="device-icon" aria-hidden="true">${deviceIcon("free_measurement")}</span>
+        <span class="type-label">Free measurement</span>
+        <span class="type-desc">Measure average power or record a Playbook cycle.</span>
+      </button>
+    </div>` : ""}
+  `;
+}
+
+export function renderRoutePicker(device: DeviceChoice, routes: MeasurementRoute[], onSelect: (routeId: string) => void, onBack: () => void) {
+  return html`
+    <p class="muted">${device.id === "free_measurement"
+      ? "What do you want to measure?"
+      : `How do you want to measure ${device.label.toLowerCase()}?`}</p>
+    <button type="button" @click=${onBack}>Change device</button>
+    <div class="type-grid">
+      ${routes.map((route) => html`<button type="button" class="type-card route-card" @click=${() => onSelect(route.id)}>
+        <span class="type-label">${route.label}</span>
+        <span class="type-desc">${route.description}</span>
+      </button>`)}
     </div>
   `;
 }
 
-/** The chosen type, restated compactly once the form below it has taken over the screen. */
-export function renderTypeChip(type: MeasureType, definition: MeasureDefinition | undefined, onChange: () => void) {
+/** Restate the chosen device and route while showing the measurement form. */
+export function renderSelectionChip(device: DeviceChoice, route: MeasurementRoute, onChangeDevice: () => void, onChangeRoute: () => void, multipleRoutes: boolean) {
   return html`
     <div class="type-chip">
-      <span class="type-icon" aria-hidden="true">${definition?.icon ?? ""}</span>
+      <span class="device-icon" aria-hidden="true">${deviceIcon(device.id)}</span>
       <span class="chip-body">
-        <strong>${definition?.label ?? type}</strong>
+        <strong>${device.label}</strong>
+        <span class="type-desc">${route.label}</span>
       </span>
-      <button type="button" aria-label="Change measurement type" @click=${onChange}>Change</button>
+      <span class="selection-actions">
+        ${multipleRoutes ? html`<button type="button" @click=${onChangeRoute}>Change method</button>` : ""}
+        <button type="button" @click=${onChangeDevice}>Change device</button>
+      </span>
     </div>
   `;
 }

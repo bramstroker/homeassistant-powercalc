@@ -112,14 +112,15 @@ describe("setup type picker", () => {
     await openSettings;
   });
 
-  it("shows a card per measurement type before a type is chosen", async () => {
+  it("shows device types and a separate free-measurement entry", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.querySelectorAll(".type-card")).toHaveLength(2);
-    expect(element.shadowRoot.textContent).toContain("Measure average power for a fixed duration.");
+    expect(element.shadowRoot.querySelectorAll(".device-card")).toHaveLength(1);
+    expect(element.shadowRoot.textContent).toContain("Light");
+    expect(element.shadowRoot.textContent).toContain("Free measurement");
     expect(element.shadowRoot.querySelector("form")).toBeNull();
   });
 

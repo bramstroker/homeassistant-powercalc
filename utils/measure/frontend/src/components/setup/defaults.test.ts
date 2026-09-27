@@ -286,8 +286,9 @@ describe("setup view defaults", () => {
     element.meter = { type: "hass", entity_id: "sensor.plug_power" };
     element.defaultMeasureDevice = "Shelly Plug S";
     element.definitions = [lightDefinition];
-    element.selectedType = "light";
     document.body.append(element);
+    await element.updateComplete;
+    (element.shadowRoot.querySelector(".device-card") as HTMLButtonElement).click();
     await element.updateComplete;
 
     expect(element.shadowRoot.querySelector('select[name="power_entity_id"]')).toBeNull();
@@ -351,8 +352,9 @@ describe("setup view defaults", () => {
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power" }];
     element.voltages = [];
     element.definitions = [lightDefinition];
-    element.selectedType = "light";
     document.body.append(element);
+    await element.updateComplete;
+    (element.shadowRoot.querySelector(".device-card") as HTMLButtonElement).click();
     await element.updateComplete;
 
     const profileSection = element.shadowRoot.querySelector(".device-section");

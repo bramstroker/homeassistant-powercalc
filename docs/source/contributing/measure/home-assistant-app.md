@@ -47,8 +47,8 @@ Keep people, automations, adaptive-lighting systems, and other controllers from 
 
 1. Configure and test the measurement device in [Settings](home-assistant-app/settings.md).
 2. Open **All sessions** and select **New measurement**.
-3. Select a measurement type and the Home Assistant entity when that measurement controls a device.
-4. Enter the profile details and measurement-specific options. Light measurements also let you choose the modes advertised by the selected entity. For loads too low for the meter, see [Measuring low-power devices](low-power-measurements.md).
+3. Choose the type of device you want to measure. Search the list of PowerCalc device types if needed. Choose **Free measurement** for a single average reading or a Playbook CSV.
+4. If the device has several measurement methods, choose one. Lights go directly to the automated light measurement. Select the Home Assistant entity and enter measurement-specific options. Light measurements also let you choose the modes advertised by the selected entity. For loads too low for the meter, see [Measuring low-power devices](low-power-measurements.md).
 5. Run the setup check and review its estimates, warnings, meter diagnostics, and timing settings. For lights without a dummy load, this checks representative low-load settings and standby, then leaves the lights off. Use **Recheck setup** after changing the physical setup. See [Measuring low-power devices](low-power-measurements.md) for check details and readings of `0` W.
 6. Start the session. Complete the dummy-load calibration or reuse confirmation when enabled. Average, recorder, speaker, and charging measurements also pause for an explicit confirmation when the physical device must be prepared or the actual sampling period is about to begin.
 7. Follow live progress, current operating values, recent power samples, and session logs. You can close or reload the browser; the app owns the job and restores its persisted status when you return.
