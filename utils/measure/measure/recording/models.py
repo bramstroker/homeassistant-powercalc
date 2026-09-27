@@ -30,6 +30,8 @@ class RecordedEntity:
     unit: str | None = None
     disabled_by: str | None = None
     has_live_state: bool | None = None
+    unique_id: str | None = None
+    manufacturer: str | None = None
 
     def to_dict(self) -> dict[str, object]:
         value: dict[str, object] = {
@@ -45,6 +47,8 @@ class RecordedEntity:
             "unit",
             "disabled_by",
             "has_live_state",
+            "unique_id",
+            "manufacturer",
         ):
             item = getattr(self, key)
             if item is not None:

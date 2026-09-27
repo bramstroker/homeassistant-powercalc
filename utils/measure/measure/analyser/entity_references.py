@@ -1,16 +1,19 @@
 """Resolve recorded entities to portable profile placeholders."""
 
 from collections.abc import Callable, Sequence
+import re
 
 from measure.recording.models import RecordedEntity, RecordingContext
 
 
-def resolve_portable_entity(entity_id: str, context: RecordingContext) -> str | None:
+def resolve_portable_entity(
+    entity_id: str, context: RecordingContext, *, unique_id_suffix: str | None = None
+) -> str | None:
     """Map a recorded entity ID to a profile placeholder reusable in other HA installations.
 
     Use [[entity]] for the vacuum, otherwise a translation key or supported battery
-    device class that PowerCalc resolves to exactly this entity. Return None when no
-    safe mapping exists.
+    device class that PowerCalc resolves to exactly this entity. An explicitly
+    supplied semantic suffix can identify entities on the primary device and integration.
     """
     if entity_id == context.primary_entity_id:
         return "[[entity]]"
@@ -39,6 +42,25 @@ def resolve_portable_entity(entity_id: str, context: RecordingContext) -> str | 
         candidates, shadowing, lambda item: item.device_class == device_class
     ):
         return f"[[entity_by_device_class:{device_class}]]"
+    if (
+        unique_id_suffix
+        and re.fullmatch(r"[A-Za-z_]\w*", unique_id_suffix)
+        and entity.device_id == primary.device_id
+        and primary.integration
+        and entity.integration == primary.integration
+        and entity.unique_id
+        and entity.unique_id.endswith(unique_id_suffix)
+        and _is_unique_match(
+            source_entities,
+            [],
+            lambda item: (
+                item.integration == primary.integration
+                and item.unique_id is not None
+                and item.unique_id.endswith(unique_id_suffix)
+            ),
+        )
+    ):
+        return f"[[entity_by_unique_id_suffix:{unique_id_suffix}]]"
     return None
 
 

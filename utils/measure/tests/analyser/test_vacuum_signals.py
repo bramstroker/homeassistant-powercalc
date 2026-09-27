@@ -625,3 +625,85 @@ def test_sleep_supplement_respects_scoped_value_mapping(monkeypatch: pytest.Monk
     ]
     signals = discover_signals(items, ctx)
     assert [resolve_activity(item, signals) for item in items] == [Activity.SLEEPING, Activity.COMPLETED]
+
+
+@pytest.mark.parametrize("robot_id", ["RobotA", "OtherRobot"])
+def test_valetudo_dock_states_export_portable_conditions(robot_id: str) -> None:
+    primary = RecordedEntity(
+        PRIMARY,
+        "vacuum",
+        "primary",
+        device_id="robot",
+        integration="mqtt",
+        manufacturer="Valetudo",
+        unique_id=f"{robot_id}_vacuum",
+    )
+    dock = RecordedEntity(
+        "sensor.renamed_station",
+        "sensor",
+        "tracked",
+        device_id="robot",
+        integration="mqtt",
+        manufacturer="Valetudo",
+        unique_id=f"{robot_id}_sensor_dock_status",
+    )
+    ctx = replace(context(), entities=[primary, dock])
+    assert suggest_recording_entities(ctx).selected == [dock.entity_id]
+    states = ["emptying", "cleaning", "drying", "idle", "pause", "error", "unknown", "new_state"]
+    items = [sample(**{dock.entity_id: state}) for state in states]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [
+        Activity.AUTO_EMPTYING,
+        Activity.STATION_CLEANING,
+        Activity.DRYING,
+        Activity.DOCKED,
+        None,
+        None,
+        None,
+        None,
+    ]
+    for activity, state in [
+        (Activity.AUTO_EMPTYING, "emptying"),
+        (Activity.STATION_CLEANING, "cleaning"),
+        (Activity.DRYING, "drying"),
+    ]:
+        signal = next(signal for signal in signals if signal.activity == activity)
+        assert signal.build_condition(ctx) == {
+            "condition": "state",
+            "entity_id": "[[entity_by_unique_id_suffix:_sensor_dock_status]]",
+            "state": [state],
+        }
+    disabled = replace(dock, disabled_by="user", has_live_state=False)
+    suggestions = suggest_recording_entities(replace(ctx, entities=[primary, disabled]))
+    assert suggestions.selected == []
+    assert suggestions.disabled == [dock.entity_id]
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"integration": "other"},
+        {"manufacturer": "Other"},
+        {"manufacturer": None},
+        {"domain": "switch", "entity_id": "switch.dock"},
+        {"unique_id": None},
+        {"unique_id": "RobotA_sensor_dock_status_extra"},
+        {"device_id": "other"},
+    ],
+)
+def test_valetudo_rule_requires_recognised_device_and_identity(change: dict[str, str | None]) -> None:
+    primary = RecordedEntity(PRIMARY, "vacuum", "primary", device_id="robot", integration="mqtt")
+    dock = RecordedEntity(
+        "sensor.renamed_station",
+        "sensor",
+        "tracked",
+        device_id="robot",
+        integration="mqtt",
+        manufacturer="Valetudo",
+        unique_id="RobotA_sensor_dock_status",
+    )
+    dock = replace(dock, **change)
+    ctx = replace(context(), entities=[primary, dock])
+    assert suggest_recording_entities(ctx).selected == []
+    item = sample(**{dock.entity_id: "drying"})
+    assert resolve_activity(item, discover_signals([item], ctx)) == Activity.DOCKED

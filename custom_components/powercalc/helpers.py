@@ -18,6 +18,7 @@ from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     PLACEHOLDER_ENTITY_BY_DEVICE_CLASS,
     PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY,
+    PLACEHOLDER_ENTITY_BY_UNIQUE_ID_SUFFIX,
     CalculationStrategy,
 )
 from custom_components.powercalc.device_binding import get_profile_related_devices
@@ -224,6 +225,11 @@ RELATED_ENTITY_PLACEHOLDER_DEFINITIONS = (
             translation_key,
         ),
     ),
+    RelatedEntityPlaceholderDefinition(
+        PLACEHOLDER_ENTITY_BY_UNIQUE_ID_SUFFIX,
+        "unique ID suffix",
+        lambda hass, source_entity, suffix: get_related_entity_by_unique_id_suffix(hass, source_entity, suffix),
+    ),
 )
 
 
@@ -265,6 +271,28 @@ def get_related_entity_by_translation_key(
         match_value=translation_key,
         matcher=lambda entity_entry: entity_entry.translation_key == translation_key,
     )
+
+
+def get_related_entity_by_unique_id_suffix(
+    hass: HomeAssistant,
+    source_entity: SourceEntity,
+    suffix: str,
+) -> str | None:
+    """Require one suffix match on the source device and integration."""
+    entity_reg = entity_registry.async_get(hass)
+    source_entry = entity_reg.async_get(source_entity.entity_id)
+    if not re.fullmatch(r"[A-Za-z_]\w*", suffix) or not source_entity.device_id or source_entry is None:
+        return None
+    matches = [
+        entry
+        for entry in entity_registry.async_entries_for_device(
+            entity_reg, source_entity.device_id, include_disabled_entities=True
+        )
+        if entry.platform == source_entry.platform and entry.unique_id.endswith(suffix)
+    ]
+    if len(matches) != 1 or matches[0].disabled_by is not None:
+        return None
+    return matches[0].entity_id
 
 
 def _get_related_entity_for_device(

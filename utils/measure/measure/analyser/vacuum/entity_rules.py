@@ -50,12 +50,19 @@ class EntitySignalRule:
     priority: SignalPriority = SignalPriority.ACTION_ENTITY
     state_values: Mapping[Activity, frozenset[str]] | None = None
     inactive_states: frozenset[str] = frozenset()
+    unique_id_suffix: str | None = None
+    manufacturer: str | None = None
 
     def matches(self, entity: RecordedEntity) -> bool:
         return (
             entity.domain in self.domains
             and (self.translation_key is None or entity.translation_key == self.translation_key)
             and (self.device_class is None or entity.device_class == self.device_class)
+            and (self.manufacturer is None or entity.manufacturer == self.manufacturer)
+            and (
+                self.unique_id_suffix is None
+                or (entity.unique_id is not None and entity.unique_id.endswith(self.unique_id_suffix))
+            )
         )
 
 
@@ -215,6 +222,22 @@ COMMON_ENTITY_RULES.extend(
 )
 
 INTEGRATION_ENTITY_RULES: dict[str, list[EntitySignalRule]] = {
+    "mqtt": [
+        # Valetudo 2026.08.0: cleaning combines model-dependent dock operations.
+        EntitySignalRule(
+            ("sensor",),
+            EntitySignalType.STATION,
+            manufacturer="Valetudo",
+            unique_id_suffix="_sensor_dock_status",
+            priority=SignalPriority.ACTIVITY_FLAG,
+            state_values={
+                Activity.AUTO_EMPTYING: frozenset({"emptying"}),
+                Activity.STATION_CLEANING: frozenset({"cleaning"}),
+                Activity.DRYING: frozenset({"drying"}),
+            },
+            inactive_states=frozenset({"idle"}),
+        ),
+    ],
     "roborock": [
         EntitySignalRule(
             ("sensor",),

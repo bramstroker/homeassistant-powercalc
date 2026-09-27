@@ -216,6 +216,7 @@ charging and sleeping signals fill specific gaps. Unknown inputs remain uncovere
 | Dreame | Detailed state/status aliases, auto-empty status, wash-base status, charging status and sleeping. |
 | Roborock | Detailed status aliases for cleaning/mapping/returning, mop washing, bin emptying and charging/completion. |
 | Ecovacs | Primary HA activity plus `station_state` for dustbin emptying, mop washing and drying. Legacy battery-charging binary sensors are supported. |
+| Valetudo (MQTT) | Dock status for emptying, drying and broad station cleaning. Pause and error remain unresolved; charging needs a separate explicit signal. |
 
 Station idle leaves the primary activity in control. `docked` alone does not identify
 charging or completion. Errors and unrecognised modes require better runtime signals.
@@ -225,6 +226,11 @@ using captured registry metadata and inventory, including disabled duplicates. T
 uses `[[entity]]`, `[[entity_by_translation_key:…]]`, or an unambiguous battery device-class
 placeholder. Related dock entities are supported when no matching entity on the primary
 device shadows them and exactly one match exists across related devices.
+Rules can also provide a known semantic unique-ID suffix, exported as
+`[[entity_by_unique_id_suffix:…]]`. This lookup requires one match on the primary
+device and integration, including disabled duplicates when checking ambiguity.
+Valetudo uses `_sensor_dock_status`; the recording preserves unique IDs and device
+manufacturer so offline analysis can apply the same mapping after entity renaming.
 
 [VacuumCompositeStrategy](measure/analyser/vacuum/strategy.py) groups training observations by the
 first matching activity in dock-priority order. Non-charging activities get a time-weighted mean fixed

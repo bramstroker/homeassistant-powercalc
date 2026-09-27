@@ -52,6 +52,7 @@ ENTRY_GLOBAL_CONFIG_UNIQUE_ID = "powercalc_global_configuration"
 
 PLACEHOLDER_ENTITY_BY_DEVICE_CLASS = "entity_by_device_class:"
 PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY = "entity_by_translation_key:"
+PLACEHOLDER_ENTITY_BY_UNIQUE_ID_SUFFIX = "entity_by_unique_id_suffix:"
 
 DUMMY_ENTITY_ID = "sensor.dummy"
 

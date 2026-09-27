@@ -65,4 +65,6 @@ def build_recorded_entity(entity_id: str, role: EntityRole, descriptor: EntityDe
         unit=descriptor.unit,
         disabled_by=descriptor.disabled_by,
         has_live_state=descriptor.has_live_state,
+        unique_id=descriptor.unique_id,
+        manufacturer=descriptor.manufacturer,
     )

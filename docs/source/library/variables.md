@@ -25,9 +25,22 @@ For example, NUT UPS entities can expose translation keys such as `ups_load` and
 }
 ```
 
+### Unique ID suffix lookup
+
+`[[entity_by_unique_id_suffix:{suffix}]]`: Finds exactly one entity whose registry unique ID ends with the suffix,
+on the source entity's device and integration. Entity renaming does not affect this lookup.
+
+For example, Valetudo gives its dock status sensor the unique ID `<robot identifier>_sensor_dock_status`.
+A profile can use `[[entity_by_unique_id_suffix:_sensor_dock_status]]` across robots with different identifiers.
+Use a suffix known to describe the same function for that integration; Powercalc does not derive one from entity names.
+Suffixes must start with a letter or underscore and contain only letters, digits, or underscores.
+
+This lookup does not search related devices. Missing or ambiguous matches remain unresolved, including ambiguity
+caused by disabled entities. A disabled entity cannot be resolved until it is enabled.
+
 ### Related-device lookup
 
-Both placeholders search enabled entities on the source device first. If multiple entities on that device match, the first match is used.
+The device-class and translation-key placeholders search enabled entities on the source device first. If multiple entities on that device match, the first match is used.
 If there is no match, Powercalc searches:
 
 - Native child devices whose `parent_device_id` is the source device, on Home Assistant versions that support child devices.
