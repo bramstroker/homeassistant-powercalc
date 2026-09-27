@@ -122,6 +122,34 @@ describe("device-first setup", () => {
     expect(element.shadowRoot.querySelector(".route-card")).toBeNull();
   });
 
+  it("offers only volume measurement for smart speakers while preserving saved recordings", async () => {
+    const element = createSetup();
+    const recorder = {
+      ...recorderDefinition,
+      fields: recorderDefinition.fields.map((field) => field.name === "profile_device_type"
+        ? { ...field, options: [...field.options, { value: "smart_speaker", label: "Smart speaker", entity_domains: ["media_player"] }] }
+        : field),
+    };
+    element.definitions = [{ ...lightDefinition, measure_type: "speaker" }, recorder];
+    element.initialRequest = {
+      measure_type: "recorder", controller: null, model_id: "", product_name: "", measure_device: "",
+      power_meter: { type: "dummy" }, generate_model: true, parameters: capabilities.defaults, resume_policy: "new",
+      recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: "smart_speaker",
+      primary_entity_id: "media_player.speaker", tracked_entity_ids: [],
+    };
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector("form")).toBeTruthy();
+    expect(element.shadowRoot.querySelector('input[name="profile_device_type"]')).toHaveProperty("value", "smart_speaker");
+
+    (element.shadowRoot.querySelector(".selection-actions button") as HTMLButtonElement).click();
+    await element.updateComplete;
+    [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".device-card")]
+      .find((card) => card.querySelector(".type-label")?.textContent === "Smart speaker")!.click();
+    await element.updateComplete;
+    expect(element.selectedType).toBe("speaker");
+    expect(element.shadowRoot.querySelector(".route-card")).toBeNull();
+  });
+
   it("returns from the form to the device list and discards route-specific choices", async () => {
     const element = createSetup();
     await element.updateComplete;

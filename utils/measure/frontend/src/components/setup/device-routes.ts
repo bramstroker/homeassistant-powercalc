@@ -73,10 +73,12 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
       description: "Measure brightness, color and effects for a light profile.", preset: {},
     }] : [];
   }
-  if (deviceId === "smart_speaker" && available.has("speaker")) routes.push({
-    id: "speaker", measureType: "speaker", label: "Measure volume levels",
-    description: "Automatically calibrate playback power across volume levels.", preset: {},
-  });
+  if (deviceId === "smart_speaker") {
+    return available.has("speaker") ? [{
+      id: "speaker", measureType: "speaker", label: "Measure volume levels",
+      description: "Automatically calibrate playback power across volume levels.", preset: {},
+    }] : [];
+  }
   if (deviceId === "fan" && available.has("fan")) routes.push({
     id: "fan", measureType: "fan", label: "Measure fan speeds",
     description: "Automatically calibrate power across percentage levels.", preset: {},

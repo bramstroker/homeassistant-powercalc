@@ -47,8 +47,12 @@ describe("device-first measurement routes", () => {
     expect(routesForDevice("light", definitions.filter((item) => item.measure_type !== "light"))).toEqual([]);
   });
 
+  it("offers only automated measurement for smart speakers", () => {
+    expect(routesForDevice("smart_speaker", definitions).map((route) => route.id)).toEqual(["speaker"]);
+    expect(routesForDevice("smart_speaker", definitions.filter((item) => item.measure_type !== "speaker"))).toEqual([]);
+  });
+
   it("offers specialist and recorder routes where both exist", () => {
-    expect(routesForDevice("smart_speaker", definitions).map((route) => route.id)).toEqual(["speaker", "complex_profile"]);
     expect(routesForDevice("fan", definitions).map((route) => route.id)).toEqual(["fan", "complex_profile"]);
     expect(routesForDevice("vacuum_robot", definitions).map((route) => route.id)).toEqual(["vacuum_profile", "charging"]);
     expect(routesForDevice("lawn_mower_robot", definitions).map((route) => route.id)).toEqual(["charging", "complex_profile"]);
