@@ -120,7 +120,7 @@ const lightDefinition: MeasureDefinition = {
   ],
   fields: [
     { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, entity_domains: ["sensor"], options: [] },
-    { name: "light_entity_id", role: "controller", label: "Light", plural_label: "Lights", control: "entity", required: true, multiple: true, entity_domains: ["light"], options: [] },
+    { name: "light_entity_id", role: "controller", label: "Light", plural_label: "Lights", control: "entity", required: true, multiple: true, multiple_toggle: true, entity_domains: ["light"], options: [] },
     { name: "multiple_light_count", role: "attribute", label: "Number of lights", control: "number", required: true, options: [], default: 1, minimum: 1, maximum: 100, derived_from: "light_entity_id" },
     {
       name: "modes", role: "attribute", label: "Lookup-table modes", control: "multi_select",
