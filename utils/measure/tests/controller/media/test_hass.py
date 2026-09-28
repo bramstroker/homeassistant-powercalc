@@ -33,9 +33,12 @@ def test_turn_off_uses_device_power_service(hass_client: MagicMock) -> None:
             "[service_validation_error] Validation error: "
             "Entity media_player.test does not support action media_player.turn_off"
         ),
+        ResponseError("[unauthorized] User is not authorized"),
+        ResponseError("[service_validation_error] Validation error: Entity media_player.test is unavailable"),
+        ResponseError("[unknown_error] Unexpected failure"),
     ],
 )
-def test_turn_off_stops_playback_when_power_service_is_unsupported(hass_client: MagicMock, error: Exception) -> None:
+def test_turn_off_stops_playback_when_power_service_fails(hass_client: MagicMock, error: Exception) -> None:
     hass_client.trigger_service.side_effect = [error, None]
 
     _get_instance(hass_client).turn_off()
@@ -56,33 +59,22 @@ def test_turn_off_propagates_connection_failure_without_fallback(hass_client: Ma
 
 
 @pytest.mark.parametrize(
-    "message",
+    "error",
     [
-        "[unauthorized] User is not authorized",
-        "[service_validation_error] Validation error: Entity media_player.test is unavailable",
-        "[unknown_error] Unexpected failure",
+        InternalServerError(500, "Cannot stop"),
+        ResponseError("[unknown_error] Cannot stop"),
     ],
 )
-def test_turn_off_propagates_other_response_errors_without_fallback(hass_client: MagicMock, message: str) -> None:
-    error = ResponseError(message)
-    hass_client.trigger_service.side_effect = error
+def test_turn_off_propagates_stop_playback_failure(hass_client: MagicMock, error: Exception) -> None:
+    hass_client.trigger_service.side_effect = [
+        InternalServerError(500, "Not supported"),
+        error,
+    ]
 
-    with pytest.raises(ResponseError) as exc_info:
+    with pytest.raises(type(error), match="Cannot stop") as exc_info:
         _get_instance(hass_client).turn_off()
 
     assert exc_info.value is error
-    hass_client.trigger_service.assert_called_once_with("media_player", "turn_off", entity_id="media_player.test")
-
-
-def test_turn_off_propagates_stop_playback_failure(hass_client: MagicMock) -> None:
-    hass_client.trigger_service.side_effect = [
-        InternalServerError(500, "Not supported"),
-        InternalServerError(500, "Cannot stop"),
-    ]
-
-    with pytest.raises(InternalServerError, match="Cannot stop"):
-        _get_instance(hass_client).turn_off()
-
     assert hass_client.trigger_service.call_args_list == [
         call("media_player", "turn_off", entity_id="media_player.test"),
         call("media_player", "media_stop", entity_id="media_player.test"),
