@@ -30,6 +30,21 @@ const SPECIALIZED_DEVICES: Partial<Record<MeasureType, DeviceChoice>> = {
   smart_switch: { id: "smart_switch", label: "Smart switch" },
 };
 
+const DEFAULT_SELECTIONS: Record<MeasureType, RouteSelection> = {
+  light: { deviceId: "light", routeId: "light" },
+  speaker: { deviceId: "smart_speaker", routeId: "speaker" },
+  fan: { deviceId: "fan", routeId: "fan" },
+  smart_switch: { deviceId: "smart_switch", routeId: "smart_switch" },
+  charging: { deviceId: "vacuum_robot", routeId: "charging" },
+  average: { deviceId: FREE_MEASUREMENT, routeId: "average" },
+  recorder: { deviceId: FREE_MEASUREMENT, routeId: "playbook" },
+};
+
+/** Route to show when a measure type is selected without a saved request. */
+export function selectionFromType(type: MeasureType): RouteSelection {
+  return DEFAULT_SELECTIONS[type];
+}
+
 function fieldOptions(definition: MeasureDefinition | undefined, name: string) {
   return definition?.fields.find((field) => field.name === name)?.options ?? [];
 }
@@ -126,16 +141,12 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
 
 /** Map old saved requests to the new entry flow without changing their schema. */
 export function selectionFromRequest(request: MeasurementRequest): RouteSelection {
-  switch (request.measure_type) {
-    case "light": return { deviceId: "light", routeId: "light" };
-    case "speaker": return { deviceId: "smart_speaker", routeId: "speaker" };
-    case "fan": return { deviceId: "fan", routeId: "fan" };
-    case "smart_switch": return { deviceId: "smart_switch", routeId: "smart_switch" };
-    case "charging": return { deviceId: request.charging_device_type, routeId: "charging" };
-    case "average": return { deviceId: FREE_MEASUREMENT, routeId: "average" };
-    case "recorder":
-      if (request.recorder_purpose === "playbook") return { deviceId: FREE_MEASUREMENT, routeId: "playbook" };
-      if (request.profile_recipe === "vacuum_robot") return { deviceId: "vacuum_robot", routeId: "vacuum_profile" };
-      return { deviceId: request.profile_device_type ?? "generic_iot", routeId: "complex_profile" };
+  if (request.measure_type === "charging") {
+    return { deviceId: request.charging_device_type, routeId: "charging" };
   }
+  if (request.measure_type === "recorder" && request.recorder_purpose !== "playbook") {
+    if (request.profile_recipe === "vacuum_robot") return { deviceId: "vacuum_robot", routeId: "vacuum_profile" };
+    return { deviceId: request.profile_device_type ?? "generic_iot", routeId: "complex_profile" };
+  }
+  return selectionFromType(request.measure_type);
 }

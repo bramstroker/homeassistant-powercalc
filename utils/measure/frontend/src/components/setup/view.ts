@@ -32,6 +32,7 @@ import {
   FREE_MEASUREMENT,
   routesForDevice,
   selectionFromRequest,
+  selectionFromType,
   type MeasurementRoute,
 } from "./device-routes";
 import { errorHelpLink } from "../shared/error-help-link";
@@ -200,7 +201,7 @@ export class SetupView extends LitElement {
     // Restore a saved route without changing the request's stable measure_type.
     if ((changed.has("initialType") || changed.has("initialRequest")) && this.selectedType === undefined) {
       const restored = this.initialRequest ? selectionFromRequest(this.initialRequest) : this.initialType
-        ? this.selectionFromType(this.initialType) : undefined;
+        ? selectionFromType(this.initialType) : undefined;
       if (restored) {
         this.selectedDeviceId = restored.deviceId;
         this.selectedRouteId = restored.routeId;
@@ -504,18 +505,6 @@ export class SetupView extends LitElement {
       id: this.selectedRouteId, measureType: "recorder", label: "Saved recording method",
       description: "Previously saved complex-profile recording.", preset,
     };
-  }
-
-  private selectionFromType(type: MeasureType): { deviceId: string; routeId: string } {
-    switch (type) {
-      case "light": return { deviceId: "light", routeId: "light" };
-      case "speaker": return { deviceId: "smart_speaker", routeId: "speaker" };
-      case "fan": return { deviceId: "fan", routeId: "fan" };
-      case "smart_switch": return { deviceId: "smart_switch", routeId: "smart_switch" };
-      case "charging": return { deviceId: "vacuum_robot", routeId: "charging" };
-      case "average": return { deviceId: FREE_MEASUREMENT, routeId: "average" };
-      case "recorder": return { deviceId: FREE_MEASUREMENT, routeId: "playbook" };
-    }
   }
 
   private selectEntities(name: string, rows: string[]): void {

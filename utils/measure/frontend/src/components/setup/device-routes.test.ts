@@ -1,7 +1,7 @@
 import type { MeasureDefinition, MeasurementRequest } from "../../types";
 import { lightDefinition } from "../testing/fixtures";
 import { recorderDefinition } from "./test-helpers";
-import { deviceChoices, FREE_MEASUREMENT, routesForDevice, selectionFromRequest } from "./device-routes";
+import { deviceChoices, FREE_MEASUREMENT, routesForDevice, selectionFromRequest, selectionFromType } from "./device-routes";
 
 const speaker: MeasureDefinition = { ...lightDefinition, measure_type: "speaker", label: "Smart speaker" };
 const fan: MeasureDefinition = { ...lightDefinition, measure_type: "fan", label: "Fan" };
@@ -89,6 +89,15 @@ describe("device-first measurement routes", () => {
   it("keeps average and Playbook under free measurement", () => {
     expect(routesForDevice(FREE_MEASUREMENT, definitions).map((route) => route.id)).toEqual(["average", "playbook"]);
     expect(routesForDevice("camera", definitions).map((route) => route.id)).not.toContain("playbook");
+  });
+
+  it("uses the same default route for a measure type and a saved specialist request", () => {
+    for (const type of ["light", "speaker", "fan", "smart_switch", "average"] as const) {
+      const saved = { measure_type: type } as MeasurementRequest;
+      expect(selectionFromRequest(saved)).toEqual(selectionFromType(type));
+    }
+    expect(selectionFromType("charging")).toEqual({ deviceId: "vacuum_robot", routeId: "charging" });
+    expect(selectionFromType("recorder")).toEqual({ deviceId: FREE_MEASUREMENT, routeId: "playbook" });
   });
 
   it("restores old requests to their device and route", () => {

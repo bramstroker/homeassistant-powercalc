@@ -16,6 +16,10 @@ import { formChecked, formList, formNumber, formText } from "../utils/form";
 /** A single submitted form value, before it is placed in a request. */
 type FieldValue = string | number | boolean | string[];
 
+export function isVacuumProfileRequest(request?: MeasurementRequest): boolean {
+  return request?.measure_type === "recorder" && request.profile_recipe === "vacuum_robot";
+}
+
 /** Fields the device form renders itself; the power meter has its own dedicated section. */
 export function deviceFields(definition: MeasureDefinition): FormField[] {
   return definition.fields.filter((field) => field.role !== "power_meter");

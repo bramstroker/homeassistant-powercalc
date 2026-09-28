@@ -1,4 +1,5 @@
 import type { MeasurementRequest } from "../../types";
+import { isVacuumProfileRequest } from "../../measurement/definition";
 
 const START = "Start recording with the device powered and in a stable state, before changing its settings.";
 const FINISH = "Keep every state long enough for at least five power samples. Return to the starting state, then stop recording.";
@@ -35,7 +36,7 @@ const DEVICE_ACTIONS: Record<string, string[]> = {
 /** Give the operator a practical sequence before a complex-profile recording begins. */
 export function recordingGuidance(request: MeasurementRequest | undefined): string[] | undefined {
   if (request?.measure_type !== "recorder" || request.recorder_purpose !== "complex_profile") return undefined;
-  if (request.profile_recipe === "vacuum_robot") {
+  if (isVacuumProfileRequest(request)) {
     return [
       "Measure the entire dock at the wall outlet. This measures mains power used by the dock, including charging. Start recording before docking a low-battery vacuum or starting a cleaning run.",
       "Run a cleaning trip and return to the dock. Include emptying, mop washing, and drying if supported; let each activity finish.",
