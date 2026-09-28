@@ -1,6 +1,6 @@
 import logging
 
-from homeassistant_api.errors import InternalServerError
+from homeassistant_api.errors import InternalServerError, ResponseError
 
 from measure.controller.hass_controller import HassControllerBase
 from measure.controller.media.controller import MediaController
@@ -61,10 +61,17 @@ class HassMediaController(HassControllerBase, MediaController):
                 "turn_off",
                 entity_id=self.entity_id,
             )
-        except InternalServerError:
+        except (InternalServerError, ResponseError) as error:
+            # The WebSocket API reports unsupported actions as validation errors.
+            # Other response errors must still fail the measurement.
+            if isinstance(error, ResponseError) and not (
+                str(error).startswith("[service_validation_error]")
+                and "does not support action media_player.turn_off" in str(error)
+            ):
+                raise
             _LOGGER.debug(
-                "Internal server error on media_player.turn_off service, probably because not "
-                "supported by device, Trying media_player.media_stop",
+                "Could not turn off speaker (%s), trying media_player.media_stop",
+                error,
             )
             self.client.trigger_service(
                 "media_player",

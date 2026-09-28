@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, call
 
-from homeassistant_api.errors import InternalServerError, WebsocketError
+from homeassistant_api.errors import InternalServerError, ResponseError, WebsocketError
 from measure.controller.media.hass import HassMediaController
 import pytest
 
@@ -25,8 +25,18 @@ def test_turn_off_uses_device_power_service(hass_client: MagicMock) -> None:
     hass_client.trigger_service.assert_called_once_with("media_player", "turn_off", entity_id="media_player.test")
 
 
-def test_turn_off_stops_playback_when_power_service_is_unsupported(hass_client: MagicMock) -> None:
-    hass_client.trigger_service.side_effect = [InternalServerError(500, "Not supported"), None]
+@pytest.mark.parametrize(
+    "error",
+    [
+        InternalServerError(500, "Not supported"),
+        ResponseError(
+            "[service_validation_error] Validation error: "
+            "Entity media_player.test does not support action media_player.turn_off"
+        ),
+    ],
+)
+def test_turn_off_stops_playback_when_power_service_is_unsupported(hass_client: MagicMock, error: Exception) -> None:
+    hass_client.trigger_service.side_effect = [error, None]
 
     _get_instance(hass_client).turn_off()
 
@@ -42,6 +52,25 @@ def test_turn_off_propagates_connection_failure_without_fallback(hass_client: Ma
     with pytest.raises(WebsocketError, match="Disconnected"):
         _get_instance(hass_client).turn_off()
 
+    hass_client.trigger_service.assert_called_once_with("media_player", "turn_off", entity_id="media_player.test")
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "[unauthorized] User is not authorized",
+        "[service_validation_error] Validation error: Entity media_player.test is unavailable",
+        "[unknown_error] Unexpected failure",
+    ],
+)
+def test_turn_off_propagates_other_response_errors_without_fallback(hass_client: MagicMock, message: str) -> None:
+    error = ResponseError(message)
+    hass_client.trigger_service.side_effect = error
+
+    with pytest.raises(ResponseError) as exc_info:
+        _get_instance(hass_client).turn_off()
+
+    assert exc_info.value is error
     hass_client.trigger_service.assert_called_once_with("media_player", "turn_off", entity_id="media_player.test")
 
 
