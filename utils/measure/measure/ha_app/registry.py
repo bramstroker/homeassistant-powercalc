@@ -12,6 +12,7 @@ from measure.start import MEASUREMENT_STARTS
 
 class FieldControl(StrEnum):
     ENTITY = "entity"
+    DEVICE = "device"
     NUMBER = "number"
     TEXT = "text"
     BOOLEAN = "boolean"
@@ -542,6 +543,47 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
             ),
         ),
         supports_profile=False,
+    ),
+    MeasureType.FIXED: MeasurementDefinition(
+        measure_type=MeasureType.FIXED,
+        description="Measure constant self consumption for a Home Assistant device.",
+        icon="mdi:devices",
+        model_id_example="LS120",
+        product_name_example="Youless LS120",
+        supports_dummy_controller=False,
+        parameters=(READING_INTERVAL,),
+        fields=(
+            POWER_FIELD,
+            FormFieldDefinition(
+                name="profile_device_type",
+                label="Device type",
+                control=FieldControl.SELECT,
+                options=(
+                    FieldOption(value=ProfileDeviceType.NETWORK, label="Network"),
+                    FieldOption(value=ProfileDeviceType.POWER_METER, label="Power meter"),
+                    FieldOption(value=ProfileDeviceType.GENERIC_IOT, label="Generic IoT"),
+                ),
+            ),
+            FormFieldDefinition(
+                name="device_id",
+                label="Home Assistant device",
+                control=FieldControl.DEVICE,
+                all_entities=True,
+                hint=(
+                    "Select the device whose own power use is measured. "
+                    "Its manufacturer and model are used for the profile."
+                ),
+                review=True,
+            ),
+            FormFieldDefinition(
+                name="duration",
+                label="Duration (seconds)",
+                control=FieldControl.NUMBER,
+                default=60,
+                minimum=1,
+                maximum=86_400,
+            ),
+        ),
     ),
     MeasureType.CHARGING: MeasurementDefinition(
         measure_type=MeasureType.CHARGING,

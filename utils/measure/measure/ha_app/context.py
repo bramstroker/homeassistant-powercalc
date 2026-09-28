@@ -113,7 +113,8 @@ class AppContext:
         except Exception as error:  # noqa: BLE001 - this metadata is optional context for a pull request
             _LOGGER.warning("Could not resolve the %s for %s: %s", purpose, ", ".join(entity_ids), error)
             return dict.fromkeys(entity_ids)
-        return {entity_id: snapshot.get(entity_id) for entity_id in entity_ids}
+        by_device = {entity.device_id: entity for entity in snapshot.get_all() if entity.device_id}
+        return {entity_id: snapshot.get(entity_id) or by_device.get(entity_id) for entity_id in entity_ids}
 
     def _resolve_canonical_manufacturer(self, manufacturer: str | None) -> str | None:
         if not manufacturer:

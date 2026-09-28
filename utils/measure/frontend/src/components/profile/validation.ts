@@ -28,7 +28,7 @@ export function validateMetadata(values: ContributionPreviewRequest): Record<str
     const value = values[name as keyof ContributionPreviewRequest];
     if (typeof value === "string" && value.length > limit) errors[name] = `Use ${limit} characters or fewer.`;
   }
-  if (values.model_id && !/^[A-Za-z0-9][A-Za-z0-9 ._()+-]*$/.test(values.model_id)) {
+  if (values.model_id && !/^[A-Za-z0-9][A-Za-z0-9 ._()+!-]*$/.test(values.model_id)) {
     errors.model_id = "Start with a letter or number. Use only letters, numbers, spaces, dots, underscores, parentheses, + or -.";
   }
   if (values.product_url && !values.product_url.startsWith("https://")) errors.product_url = "Enter a URL starting with https://.";

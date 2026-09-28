@@ -163,11 +163,13 @@ class Measure:
     def _select_measure_type(self) -> None:
         if self.config.selected_measure_type:
             self.measure_type = parse_measure_type(self.config.selected_measure_type)
+            if self.measure_type == MeasureType.FIXED:
+                raise ValueError("Fixed profiles are currently available only in the Home Assistant measure app")
             return
 
         self.measure_type = inquirer.list_input(
             "What kind of measurement session do you want to run?",
-            choices=[(MEASURE_TYPE_LABELS[kind], kind) for kind in MeasureType],
+            choices=[(MEASURE_TYPE_LABELS[kind], kind) for kind in MeasureType if kind != MeasureType.FIXED],
             render=self.console_render,
         )
 
@@ -260,7 +262,7 @@ class Measure:
         if (
             not answers.get(QUESTION_MODEL_ID)
             and len(model_id) <= 120
-            and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", model_id)
+            and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+!-]*", model_id)
         ):
             answers[QUESTION_MODEL_ID] = model_id
         if not answers.get(QUESTION_MODEL_NAME):

@@ -6,19 +6,20 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from measure.const import MeasureType
 from measure.contribution.github import UPSTREAM_BRANCH, UPSTREAM_OWNER, UPSTREAM_REPO
-from measure.request import MeasurementRequest, RecorderMeasurementRequest, RecorderPurpose
+from measure.request import FixedMeasurementRequest, MeasurementRequest, RecorderMeasurementRequest, RecorderPurpose
 
 SUPPORTED_MEASURE_TYPES = {
     MeasureType.LIGHT,
     MeasureType.SPEAKER,
     MeasureType.FAN,
     MeasureType.SMART_SWITCH,
+    MeasureType.FIXED,
     MeasureType.CHARGING,
     MeasureType.RECORDER,
 }
 
 AUTOMATIC_CONTRIBUTION_MESSAGE = (
-    "Automatic contribution is available for light, speaker, fan, smart switch, charging, "
+    "Automatic contribution is available for light, speaker, fan, smart switch, fixed, charging, "
     "and analysed recorder profiles"
 )
 
@@ -43,6 +44,8 @@ def contribution_entity_ids(request: MeasurementRequest) -> list[str]:
 
     if isinstance(request, RecorderMeasurementRequest):
         return request.recorded_entity_ids[:1]
+    if isinstance(request, FixedMeasurementRequest):
+        return [request.device_id]
     return request.controlled_entity_ids
 
 

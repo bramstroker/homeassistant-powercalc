@@ -6,8 +6,9 @@ from unittest.mock import MagicMock
 
 from measure.cancellation import MeasurementCancelledError
 from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.profile.device_type import ProfileDeviceType
 from measure.recording.models import RecordedEntity, RecorderProfileRecipe, RecordingContext
-from measure.request import AverageMeasurementRequest, RecorderMeasurementRequest
+from measure.request import AverageMeasurementRequest, FixedMeasurementRequest, RecorderMeasurementRequest
 from measure.runner.average import AverageRunner
 from measure.runner.interaction import RunInteraction
 from measure.runner.recorder import RecorderEntityState, RecorderRunner
@@ -19,7 +20,7 @@ def test_average_has_no_separate_standby_measurement() -> None:
     sampler = MagicMock(spec=PowerSampler)
     runner = AverageRunner(sampler)
 
-    assert runner.measure_standby_power() == MeasurementResult(power=0, voltages=[])
+    assert runner.measure_standby_power() is None
     sampler.take_measurement.assert_not_called()
     sampler.take_average_measurement.assert_not_called()
 
@@ -57,6 +58,51 @@ def test_average_summary_uses_elapsed_duration(unattended: bool) -> None:
     runner = AverageRunner(sampler, interaction)
     result = runner.run(AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), duration=60), "")
     assert result.summary == {"Average power": "4.2 W", "Duration": "6.5 s", "Average voltage": "231.0 V"}
+
+
+@pytest.mark.parametrize(
+    "device_type, expected",
+    [
+        (ProfileDeviceType.NETWORK, {"fixed_config": {"power": 4.2}}),
+        (ProfileDeviceType.GENERIC_IOT, {"fixed_config": {"power": 4.2}}),
+        (ProfileDeviceType.POWER_METER, {"standby_power": 4.2, "only_self_usage": True}),
+    ],
+)
+def test_fixed_profile_uses_average_power(device_type: ProfileDeviceType, expected: dict[str, object]) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_average_measurement.return_value = MeasurementResult(power=4.2, voltages=[230.0])
+    request = FixedMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(), device_id="ha-device", profile_device_type=device_type, duration=30
+    )
+
+    result = AverageRunner(sampler).run(request, "")
+
+    assert result.model_json_data == {
+        "device_type": device_type.value,
+        "calculation_strategy": "fixed",
+        "discovery_by": "device",
+        **expected,
+    }
+    assert result.voltages == [230.0]
+    assert sampler.take_average_measurement.call_args.args == (30,)
+
+
+@pytest.mark.parametrize(
+    "device_type, power, message",
+    [
+        (ProfileDeviceType.NETWORK, 0, "No positive self consumption"),
+        (ProfileDeviceType.POWER_METER, 0.04, "at least 0.05 W"),
+    ],
+)
+def test_fixed_profile_rejects_unusable_power(device_type: ProfileDeviceType, power: float, message: str) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_average_measurement.return_value = MeasurementResult(power=power, voltages=[])
+    request = FixedMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(), device_id="ha-device", profile_device_type=device_type
+    )
+
+    with pytest.raises(ValueError, match=message):
+        AverageRunner(sampler).run(request, "")
 
 
 def test_recorder_treats_app_stop_as_successful_completion(tmp_path: Path) -> None:

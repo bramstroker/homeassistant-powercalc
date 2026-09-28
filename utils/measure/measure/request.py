@@ -131,7 +131,7 @@ class BaseMeasurementRequest(BaseModel):
         value = value.strip()
         if not value:
             return value
-        if value in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", value):
+        if value in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+!-]*", value):
             raise ValueError("model_id contains unsafe characters")
         return value
 
@@ -202,6 +202,21 @@ class LightMeasurementRequest(BaseMeasurementRequest):
 class AverageMeasurementRequest(BaseMeasurementRequest):
     measure_type: Literal[MeasureType.AVERAGE] = MeasureType.AVERAGE
     controller: None = None
+    duration: int = Field(default=60, ge=1, le=86_400)
+
+
+class FixedMeasurementRequest(BaseMeasurementRequest):
+    """Measure a device's constant self consumption without controlling it."""
+
+    measure_type: Literal[MeasureType.FIXED] = MeasureType.FIXED
+    controller: None = None
+    generate_model: bool = True
+    device_id: str = Field(min_length=1)
+    profile_device_type: Literal[
+        ProfileDeviceType.NETWORK,
+        ProfileDeviceType.POWER_METER,
+        ProfileDeviceType.GENERIC_IOT,
+    ]
     duration: int = Field(default=60, ge=1, le=86_400)
 
 
@@ -388,6 +403,7 @@ class SmartSwitchMeasurementRequest(BaseMeasurementRequest):
 type MeasurementRequest = (
     LightMeasurementRequest
     | AverageMeasurementRequest
+    | FixedMeasurementRequest
     | RecorderMeasurementRequest
     | SpeakerMeasurementRequest
     | ChargingMeasurementRequest

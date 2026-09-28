@@ -21,6 +21,7 @@ from measure.request import (
     ChargingMeasurementRequest,
     DummyLoadCalibrationRequest,
     FanMeasurementRequest,
+    FixedMeasurementRequest,
     LightMeasurementRequest,
     RecorderMeasurementRequest,
     SmartSwitchMeasurementRequest,
@@ -92,6 +93,41 @@ def base_entities() -> dict[tuple[str | None, str | None], list[Entity]]:
         ("lawn_mower", None): [Entity("lawn_mower.test", attribute_names=["battery_level"])],
         ("sensor", None): [Entity("sensor.battery", state="75")],
     }
+
+
+def test_fixed_profile_requires_selected_device_and_external_meter() -> None:
+    entities = base_entities()
+    device = Entity("sensor.router_status", device_id="router-device")
+    meter = Entity("sensor.power", device_id="meter-device")
+    entities[("sensor", None)].append(device)
+    entities[(None, "power")] = [meter]
+    request = FixedMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
+        device_id="router-device",
+        profile_device_type="network",
+        duration=45,
+    )
+
+    assert preflight(entities).validate(request).estimated_duration_seconds == 45
+    with pytest.raises(PreflightError, match="external power meter"):
+        preflight(entities).validate(request.model_copy(update={"device_id": "meter-device"}))
+    with pytest.raises(PreflightError, match="no longer exists"):
+        preflight(entities).validate(request.model_copy(update={"device_id": "missing-device"}))
+
+
+def test_fixed_profile_requires_home_assistant_device_metadata() -> None:
+    checker = MeasurementPreflight(
+        has_active_session=lambda: False,
+        verify_storage=lambda: None,
+        load_entities=lambda _domain, _device_class: [],
+        developer_mode=True,
+    )
+    request = FixedMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(), device_id="router-device", profile_device_type="network"
+    )
+
+    with pytest.raises(PreflightError, match="device metadata is unavailable"):
+        checker.validate(request)
 
 
 def test_smart_switch_preflight_accepts_external_meter_and_same_device_relays() -> None:

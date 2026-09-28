@@ -13,6 +13,7 @@ class MeasureType(StrEnum):
     SPEAKER = "speaker"
     RECORDER = "recorder"
     AVERAGE = "average"
+    FIXED = "fixed"
     CHARGING = "charging"
     FAN = "fan"
     SMART_SWITCH = "smart_switch"
@@ -23,6 +24,7 @@ MEASURE_TYPE_LABELS: dict[MeasureType, str] = {
     MeasureType.SPEAKER: "Smart speaker",
     MeasureType.RECORDER: "Recorder",
     MeasureType.AVERAGE: "Average",
+    MeasureType.FIXED: "Fixed power profile",
     MeasureType.CHARGING: "Charging device",
     MeasureType.FAN: "Fan",
     MeasureType.SMART_SWITCH: "Smart switch",

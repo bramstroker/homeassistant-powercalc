@@ -99,7 +99,7 @@ export interface Capabilities {
   fast_test_mode?: boolean;
 }
 
-export type MeasureType = "light" | "speaker" | "recorder" | "average" | "charging" | "fan" | "smart_switch";
+export type MeasureType = "light" | "speaker" | "recorder" | "average" | "fixed" | "charging" | "fan" | "smart_switch";
 
 /** A plain value as it travels between the app and the API: form field values, device info, metadata. */
 export type PrimitiveValue = string | number | boolean | null;
@@ -121,7 +121,7 @@ export interface FormFieldOption {
 export interface FormField {
   name: string;
   label: string;
-  control: "entity" | "number" | "text" | "boolean" | "select" | "multi_select";
+  control: "entity" | "device" | "number" | "text" | "boolean" | "select" | "multi_select";
   role: FieldRole;
   /** Controller field whose selected entity limits this field's options to what it supports. */
   narrowed_by?: string | null;
@@ -239,6 +239,13 @@ export interface LightMeasurementRequest extends BaseMeasurementRequest {
 }
 
 export interface AverageMeasurementRequest extends BaseMeasurementRequest { measure_type: "average"; controller?: null; duration: number; }
+export interface FixedMeasurementRequest extends BaseMeasurementRequest {
+  measure_type: "fixed";
+  controller?: null;
+  device_id: string;
+  profile_device_type: "network" | "power_meter" | "generic_iot";
+  duration: number;
+}
 export interface RecorderMeasurementRequest extends BaseMeasurementRequest {
   measure_type: "recorder";
   controller?: null;
@@ -267,6 +274,7 @@ export interface SmartSwitchMeasurementRequest extends BaseMeasurementRequest {
 export type MeasurementRequest =
   | LightMeasurementRequest
   | AverageMeasurementRequest
+  | FixedMeasurementRequest
   | RecorderMeasurementRequest
   | SpeakerMeasurementRequest
   | ChargingMeasurementRequest

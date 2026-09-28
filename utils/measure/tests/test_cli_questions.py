@@ -21,6 +21,7 @@ from measure.cli.const import (
 from measure.cli.main import Measure
 from measure.cli.measurements import CLI_QUESTION_BUILDERS, measurement_questions
 from measure.cli.questions import average_questions, hue_light_controller_questions
+from measure.cli.request_adapter import request_from_answers
 from measure.const import MeasureType
 from measure.controller.charging.const import ChargingControllerType, ChargingDeviceType
 from measure.controller.fan.const import FanControllerType
@@ -76,7 +77,15 @@ def _catalog(*entities: EntityDescriptor) -> HomeAssistantEntityCatalog:
 
 
 def test_every_measure_type_has_an_explicit_cli_builder() -> None:
-    assert set(CLI_QUESTION_BUILDERS) == set(MeasureType)
+    assert set(CLI_QUESTION_BUILDERS) == set(MeasureType) - {MeasureType.FIXED}
+
+
+def test_cli_rejects_fixed_profile_without_device_selection(mock_config_factory: MockConfigFactory) -> None:
+    environment = mock_config_factory({"selected_measure_type": MeasureType.FIXED}, set_question_defaults=False)
+    with pytest.raises(ValueError, match="Home Assistant measure app"):
+        Measure(environment)._select_measure_type()  # noqa: SLF001
+    with pytest.raises(ValueError, match="Home Assistant measure app"):
+        request_from_answers(MeasureType.FIXED, {}, environment)
 
 
 def test_cli_smart_switch_questions_expose_relays_and_power_monitoring(mock_config_factory: MockConfigFactory) -> None:

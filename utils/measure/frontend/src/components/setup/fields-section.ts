@@ -216,6 +216,24 @@ export class SetupFieldsSection extends LitElement {
         ${field.hint ? fieldHint(field.hint) : nothing}
       </div>`;
     }
+    if (field.control === "device") {
+      if (this.deviceEntityErrors["*"]) {
+        return html`<div class="notice error" role="alert">Could not load Home Assistant devices: ${this.deviceEntityErrors["*"]}</div>`;
+      }
+      const devices = new Map<string, string>();
+      for (const entity of this.deviceEntities["*"] ?? []) {
+        if (entity.device_id && !devices.has(entity.device_id)) {
+          devices.set(entity.device_id, entity.device_name || entity.product_name || entity.name);
+        }
+      }
+      const options = [...devices].map(([value, label]) => ({ value, label }))
+        .sort((left, right) => left.label.localeCompare(right.label));
+      const selected = String(stored ?? field.default ?? "");
+      return html`<div class="field-block">
+        ${optionSelect(name, field.label, options, { selected, required: field.required, placeholder: "Select a device" })}
+        ${field.hint ? fieldHint(field.hint) : nothing}
+      </div>`;
+    }
     if (field.control === "entity") {
       const value = (stored ?? field.default ?? "").toString();
       const source = narrowingField(definition, field);

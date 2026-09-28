@@ -37,6 +37,7 @@ const DEFAULT_SELECTIONS: Record<MeasureType, RouteSelection> = {
   smart_switch: { deviceId: "smart_switch", routeId: "smart_switch" },
   charging: { deviceId: "vacuum_robot", routeId: "charging" },
   average: { deviceId: FREE_MEASUREMENT, routeId: "average" },
+  fixed: { deviceId: "network", routeId: "fixed" },
   recorder: { deviceId: FREE_MEASUREMENT, routeId: "playbook" },
 };
 
@@ -58,6 +59,10 @@ export function deviceChoices(definitions: MeasureDefinition[]): DeviceChoice[] 
   for (const definition of definitions) {
     const device = SPECIALIZED_DEVICES[definition.measure_type];
     if (device && !choices.has(device.id)) choices.set(device.id, device);
+  }
+  const fixed = definitions.find((item) => item.measure_type === "fixed");
+  for (const option of fieldOptions(fixed, "profile_device_type")) {
+    choices.set(option.value, { id: option.value, label: option.label });
   }
   const charging = definitions.find((item) => item.measure_type === "charging");
   for (const option of fieldOptions(charging, "charging_device_type")) {
@@ -89,6 +94,14 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
       description: "Save power over time as a Playbook CSV.", preset: { recorder_purpose: "playbook" },
     });
     return routes;
+  }
+  const fixed = definitions.find((item) => item.measure_type === "fixed");
+  if (fieldOptions(fixed, "profile_device_type").some((option) => option.value === deviceId)) {
+    return [{
+      id: "fixed", measureType: "fixed", label: "Measure constant self consumption",
+      description: "Measure idle power for a fixed profile without controlling the device.",
+      preset: { profile_device_type: deviceId },
+    }];
   }
   if (deviceId === "light") {
     return available.has("light") ? [{
@@ -141,6 +154,9 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
 
 /** Map old saved requests to the new entry flow without changing their schema. */
 export function selectionFromRequest(request: MeasurementRequest): RouteSelection {
+  if (request.measure_type === "fixed") {
+    return { deviceId: request.profile_device_type, routeId: "fixed" };
+  }
   if (request.measure_type === "charging") {
     return { deviceId: request.charging_device_type, routeId: "charging" };
   }

@@ -88,7 +88,7 @@ class ProfileMetadata(BaseModel):
     @field_validator("model_id")
     @classmethod
     def validate_model_id(cls, value: str) -> str:
-        if value in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", value):
+        if value in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+!-]*", value):
             raise ValueError("model_id contains unsafe characters")
         return value
 

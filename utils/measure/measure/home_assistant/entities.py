@@ -245,6 +245,7 @@ def _describe_registry_entity(entry: EntityRegistryEntry, devices: dict[str, dic
     """Describe an inventory-only entity with no live Home Assistant state."""
     device = devices.get(entry.device_id or "", {})
     manufacturer = device.get(HASS_DEVICE_REGISTRY_MANUFACTURER)
+    model_id = device.get(HASS_DEVICE_REGISTRY_MODEL_ID) or device.get(HASS_DEVICE_REGISTRY_MODEL)
     return EntityDescriptor(
         entity_id=entry.entity_id,
         name=getattr(entry, "name", None) or getattr(entry, "original_name", None) or entry.entity_id,
@@ -256,6 +257,8 @@ def _describe_registry_entity(entry: EntityRegistryEntry, devices: dict[str, dic
         translation_key=getattr(entry, "translation_key", None),
         unique_id=getattr(entry, "unique_id", None),
         manufacturer=str(manufacturer) if manufacturer else None,
+        model_id=str(model_id) if model_id else None,
+        product_name=str(device[HASS_DEVICE_REGISTRY_MODEL]) if device.get(HASS_DEVICE_REGISTRY_MODEL) else None,
         disabled_by=getattr(entry, "disabled_by", None),
         has_live_state=False,
         state="unavailable",
