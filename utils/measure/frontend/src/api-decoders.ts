@@ -17,6 +17,7 @@ import type {
   ManufacturerCatalog,
   MeasureDefinition,
   MeasureDeviceCatalog,
+  MeasureType,
   MeasurementRequest,
   OperatingPoint,
   PlotCollection,
@@ -91,6 +92,7 @@ function decoder<T>(description: string, guard: Guard<T>): Decoder<T> {
 
 const isStringArray = arrayOf(isString);
 const isStringRecord = recordOf(isString);
+const isMeasureType: Guard<MeasureType> = oneOf("light", "speaker", "recorder", "average", "charging", "fan", "smart_switch");
 const isPrimitive = (value: unknown): value is string | number | boolean | null =>
   value === null || isString(value) || isNumber(value) || isBoolean(value);
 
@@ -139,7 +141,7 @@ const isMeasurementParameters: Guard<Capabilities["defaults"]> = (value): value 
 
 export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is MeasurementRequest => {
   if (!isRecord(value)
-    || !oneOf("light", "speaker", "recorder", "average", "charging", "fan")(value.measure_type)
+    || !isMeasureType(value.measure_type)
     || !isString(value.model_id)
     || !isString(value.product_name)
     || !isString(value.measure_device)
@@ -159,6 +161,11 @@ export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is
     case "speaker": return isHassOrDummyController(value.controller) && isBoolean(value.disable_streaming);
     case "charging": return isHassOrDummyController(value.controller) && oneOf("vacuum_robot", "lawn_mower_robot")(value.charging_device_type);
     case "fan": return isHassOrDummyController(value.controller);
+    case "smart_switch": return isRecord(value.controller)
+      && ((value.controller.type === "hass" && isString(value.controller.entity_id))
+        || (value.controller.type === "hass_multi" && isStringArray(value.controller.entity_ids) && value.controller.entity_ids.length >= 2))
+      && isBoolean(value.power_monitoring)
+      && isInteger(value.samples_per_state) && isInteger(value.repeat_cycles) && isNumber(value.settle_seconds);
     case "average": return (value.controller === null || value.controller === undefined) && isInteger(value.duration);
     case "recorder":
       return (value.controller === null || value.controller === undefined)
@@ -180,6 +187,7 @@ const isEntityDescriptor: Guard<EntityDescriptor> = objectOf({
   domain: optional(isString),
   device_class: optionalNullable(isString),
   device_id: optionalNullable(isString),
+  device_name: optionalNullable(isString),
   related_device_ids: optional(isStringArray),
   integration: optionalNullable(isString),
   connectivity: optionalNullable(oneOf("zigbee", "zwave")),
@@ -217,6 +225,8 @@ const isFormField = objectOf({
   minimum: optionalNullable(isNumber),
   maximum: optionalNullable(isNumber),
   multiple: optional(isBoolean),
+  multiple_toggle: optional(isBoolean),
+  group_by_device: optional(isBoolean),
   plural_label: optional(isString),
   derived_from: optionalNullable(isString),
   hint: optional(isString),
@@ -232,7 +242,7 @@ const isMeasureParameter = objectOf({
   group: optional(isString), requires_multiple: optionalNullable(oneOf(...parameterNames)),
 });
 const isMeasureDefinition: Guard<MeasureDefinition> = objectOf({
-  measure_type: oneOf("light", "speaker", "recorder", "average", "charging", "fan"),
+  measure_type: isMeasureType,
   label: isString,
   description: isString,
   icon: isString,
@@ -240,6 +250,7 @@ const isMeasureDefinition: Guard<MeasureDefinition> = objectOf({
   parameters: arrayOf(isMeasureParameter),
   supports_profile: isBoolean,
   supports_resume: isBoolean,
+  supports_dummy_controller: optional(isBoolean),
   confirmation_action: optionalNullable(isString),
   confirmation_is_warning: optional(isBoolean),
   confirmation_guidance: optional(arrayOf(isString)),
@@ -397,7 +408,7 @@ const isSessionSummary: Guard<SessionSummary> = objectOf({
   session_id: isString,
   state: isSessionState,
   created_at: isString, updated_at: isString,
-  measure_type: oneOf("light", "speaker", "recorder", "average", "charging", "fan"),
+  measure_type: isMeasureType,
   model_id: isString, product_name: isString, measure_device: isString, completed: isNumber, total: isNumber,
   percent: isNumber, can_resume: isBoolean, file_count: isNumber, size: isNumber, active: isBoolean,
 });

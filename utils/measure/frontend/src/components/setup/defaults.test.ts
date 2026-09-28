@@ -1,10 +1,68 @@
-import type { MeasurementRequest } from "../../types";
+import type { MeasureDefinition, MeasurementRequest } from "../../types";
 import "./view";
 import { SetupViewElement, capabilities, lightDefinition, lights } from "../testing/fixtures";
 import type { TestCombobox } from "./test-helpers";
 import { entityCombobox, recorderDefinition, selectEntity } from "./test-helpers";
 
 describe("setup view defaults", () => {
+  it("uses definition flags for multi-relay selection and virtual controllers", async () => {
+    const definition: MeasureDefinition = {
+      ...lightDefinition,
+      measure_type: "smart_switch",
+      label: "Smart switch",
+      supports_dummy_controller: false,
+      fields: [
+        { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, options: [] },
+        { name: "switch_entity_id", role: "controller", label: "Relay", plural_label: "Relays", control: "entity", required: true, multiple: true, group_by_device: true, entity_domains: ["switch"], options: [] },
+        { name: "power_monitoring", role: "attribute", label: "Built-in power monitoring", control: "boolean", required: true, default: false, options: [] },
+      ],
+    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = { ...capabilities, developer_mode: true };
+    element.definitions = [definition];
+    element.selectedType = "smart_switch";
+    element.deviceEntities = { switch: [
+      { entity_id: "switch.one", name: "Relay 1", domain: "switch", device_id: "switch-device", device_name: "Dual relay" },
+      { entity_id: "switch.two", name: "Relay 2", domain: "switch", device_id: "switch-device", device_name: "Dual relay" },
+      { entity_id: "switch.other", name: "Other relay", domain: "switch", device_id: "other-device", device_name: "Other switch" },
+    ] };
+    element.meter = { type: "dummy" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(entityCombobox(element, "switch_entity_id")).toBeNull();
+    selectEntity(entityCombobox(element, "device_switch_entity_id"), "switch-device");
+    await element.updateComplete;
+    const relays = entityCombobox(element, "switch_entity_id");
+    expect(relays.hasAttribute("multiple")).toBe(true);
+    expect(relays.label).toBe("Relays");
+    expect(relays.options.map((option) => option.value)).toEqual(["switch.one", "switch.two"]);
+    expect(element.shadowRoot.querySelector(".add-entity")).toBeNull();
+    relays.dispatchEvent(new CustomEvent("combobox-change", {
+      detail: { value: ["switch.one", "switch.two"] }, bubbles: true, composed: true,
+    }));
+    await element.updateComplete;
+    expect(element.selectedEntities.switch_entity_id).toEqual(["switch.one", "switch.two"]);
+    selectEntity(entityCombobox(element, "device_switch_entity_id"), "other-device");
+    await element.updateComplete;
+    expect(element.selectedEntities.switch_entity_id).toEqual([]);
+    expect(entityCombobox(element, "switch_entity_id").options.map((option) => option.value)).toEqual(["switch.other"]);
+    expect(element.shadowRoot.querySelector('input[name="power_monitoring"]')).toBeTruthy();
+    expect(element.shadowRoot.querySelector('input[name="use_dummy_controller"]')).toBeNull();
+
+    element.selectedEntityDeviceIds = {};
+    element.selectedEntities = {};
+    element.initialRequest = {
+      measure_type: "smart_switch", controller: { type: "hass_multi", entity_ids: ["switch.one", "switch.two"] },
+      model_id: "", product_name: "", measure_device: "", power_meter: { type: "dummy" },
+      generate_model: false, parameters: capabilities.defaults, resume_policy: "new",
+      power_monitoring: false, samples_per_state: 12, repeat_cycles: 2, settle_seconds: 2,
+    };
+    await element.updateComplete;
+    expect(entityCombobox(element, "device_switch_entity_id").value).toBe("switch-device");
+    expect(entityCombobox(element, "switch_entity_id").value).toEqual(["switch.one", "switch.two"]);
+  });
+
   it.each([{ selection: [] }, { selection: ["sensor.manual"] }])("preserves saved vacuum selections $selection when suggestions exist", async ({ selection }) => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;

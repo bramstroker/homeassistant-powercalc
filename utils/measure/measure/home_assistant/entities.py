@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 
 
 class EntityDomain(StrEnum):
+    SWITCH = "switch"
     LIGHT = "light"
     MEDIA_PLAYER = "media_player"
     FAN = "fan"
@@ -62,6 +63,7 @@ class EntityDescriptor(BaseModel):
     domain: str
     device_class: str | None = None
     device_id: str | None = None
+    device_name: str | None = None
     #: Home Assistant integration providing the entity, as shown on the device page.
     integration: str | None = None
     connectivity: Connectivity | None = None
@@ -241,12 +243,14 @@ class HomeAssistantEntityCatalog:
 
 def _describe_registry_entity(entry: EntityRegistryEntry, devices: dict[str, dict[str, object]]) -> EntityDescriptor:
     """Describe an inventory-only entity with no live Home Assistant state."""
-    manufacturer = devices.get(entry.device_id or "", {}).get(HASS_DEVICE_REGISTRY_MANUFACTURER)
+    device = devices.get(entry.device_id or "", {})
+    manufacturer = device.get(HASS_DEVICE_REGISTRY_MANUFACTURER)
     return EntityDescriptor(
         entity_id=entry.entity_id,
         name=getattr(entry, "name", None) or getattr(entry, "original_name", None) or entry.entity_id,
         domain=entry.entity_id.partition(".")[0],
         device_id=entry.device_id,
+        device_name=_device_name(device),
         integration=entry.platform,
         connectivity=detect_connectivity(entry.platform, devices.get(entry.device_id or "", {})),
         translation_key=getattr(entry, "translation_key", None),
@@ -337,6 +341,7 @@ def _describe_entity(
         domain=domain,
         device_class=device_class,
         device_id=device_id,
+        device_name=_device_name(device),
         integration=integration,
         connectivity=(detect_connectivity(getattr(registry_entry, "platform", None), device) if not members else None),
         translation_key=getattr(registry_entry, "translation_key", None),
@@ -356,6 +361,11 @@ def _describe_entity(
         max_mired=light_info.get_max_mired() if light_info is not None else None,
         member_entity_ids=[str(member) for member in members] if detailed and isinstance(members, list) else [],
     )
+
+
+def _device_name(device: dict[str, object]) -> str | None:
+    name = device.get("name_by_user") or device.get("name")
+    return str(name) if name else None
 
 
 def _parse_device_class(value: object) -> str | None:

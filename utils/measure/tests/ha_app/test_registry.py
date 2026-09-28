@@ -6,7 +6,15 @@ from measure.start import MEASUREMENT_STARTS
 def test_registry_contains_every_stable_measurement_kind() -> None:
     assert set(MEASUREMENT_REGISTRY) == set(MeasureType)
     assert set(MEASUREMENT_STARTS) == set(MeasureType)
-    assert {kind.value for kind in MeasureType} == {"light", "speaker", "recorder", "average", "charging", "fan"}
+    assert {kind.value for kind in MeasureType} == {
+        "light",
+        "speaker",
+        "recorder",
+        "average",
+        "charging",
+        "fan",
+        "smart_switch",
+    }
 
 
 def test_registry_keeps_labels_separate_from_stable_ids() -> None:
@@ -37,7 +45,19 @@ def test_light_definition_allows_multiple_entities_and_explains_the_physical_cou
     fields = {field.name: field for field in MEASUREMENT_REGISTRY[MeasureType.LIGHT].fields}
 
     assert fields["light_entity_id"].multiple is True
+    assert fields["light_entity_id"].multiple_toggle is True
     assert "physical lights" in fields["multiple_light_count"].hint
+
+
+def test_smart_switch_definition_controls_multi_selection_and_virtual_device_availability() -> None:
+    definition = MEASUREMENT_REGISTRY[MeasureType.SMART_SWITCH]
+    fields = {field.name: field for field in definition.fields}
+
+    assert fields["switch_entity_id"].multiple is True
+    assert fields["switch_entity_id"].multiple_toggle is False
+    assert fields["switch_entity_id"].group_by_device is True
+    assert fields["power_monitoring"].control.value == "boolean"
+    assert definition.supports_dummy_controller is False
 
 
 def test_light_product_name_example_does_not_repeat_the_manufacturer() -> None:

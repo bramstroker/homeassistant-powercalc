@@ -97,6 +97,20 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector("progress")).toBeNull();
   });
 
+  it("starts a smart switch measurement from the ready view", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = { session_id: "first", state: "awaiting_confirmation" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const confirm = vi.fn();
+    element.addEventListener("confirm", confirm);
+    const button = element.shadowRoot!.querySelector<HTMLButtonElement>("button.confirm")!;
+    expect(button.disabled).toBe(false);
+    button.click();
+    expect(confirm).toHaveBeenCalledOnce();
+  });
+
   it("guides the operator before PowerCalc starts controlling a light", async () => {
     const element = document.createElement("measure-running-view") as import("./view").RunningView;
     element.snapshot = {

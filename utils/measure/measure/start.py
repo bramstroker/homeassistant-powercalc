@@ -92,4 +92,28 @@ MEASUREMENT_STARTS: dict[MeasureType, MeasurementStart] = {
             ),
         ),
     ),
+    MeasureType.SMART_SWITCH: MeasurementStart(
+        action="Start switch measurement",
+        message=(
+            "PowerCalc will switch the selected relays off and on several times to measure the switch's own power use."
+        ),
+        is_warning=True,
+        eyebrow="Relay output warning",
+        title="Disconnect all loads",
+        guidance=(
+            (
+                "Disconnect every load from every selected relay output. "
+                "The profile measures only the smart switch itself."
+            ),
+            "Disable automations and other controls that could operate these relays during measurement.",
+            (
+                "Use a precise external power meter that resolves small changes. If needed, connect a calibrated "
+                "resistive dummy load in parallel with the switch, never to a relay output."
+            ),
+            (
+                "PowerCalc measures all relays off, each relay on separately, and all relays on for a multi-relay "
+                "device. It restores their initial states afterwards."
+            ),
+        ),
+    ),
 }

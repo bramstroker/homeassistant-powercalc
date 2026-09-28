@@ -26,6 +26,7 @@ from measure.controller.charging.const import ChargingControllerType, ChargingDe
 from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.controller.media.const import MediaControllerType
+from measure.controller.switch.spec import HassMultiSwitchControllerSpec, HassSwitchControllerSpec
 from measure.home_assistant.client import HomeAssistantManager
 from measure.home_assistant.entities import (
     DeviceClass,
@@ -35,6 +36,8 @@ from measure.home_assistant.entities import (
     HomeAssistantEntityCatalog,
 )
 from measure.powermeter.const import PowerMeterType
+from measure.powermeter.spec import HassPowerMeterSpec
+from measure.request import SmartSwitchMeasurementRequest
 import pytest
 
 from tests.conftest import MockConfigFactory
@@ -74,6 +77,83 @@ def _catalog(*entities: EntityDescriptor) -> HomeAssistantEntityCatalog:
 
 def test_every_measure_type_has_an_explicit_cli_builder() -> None:
     assert set(CLI_QUESTION_BUILDERS) == set(MeasureType)
+
+
+def test_cli_smart_switch_questions_expose_relays_and_power_monitoring(mock_config_factory: MockConfigFactory) -> None:
+    catalog = _catalog(_entity("switch.one", EntityDomain.SWITCH, device_id="switch-device"))
+    questions = measurement_questions(MeasureType.SMART_SWITCH, mock_config_factory(), catalog)
+
+    assert [question.name for question in questions] == ["switch_entity_ids", "power_monitoring"]
+    assert isinstance(questions[1], inquirer.Confirm)
+
+
+@pytest.mark.parametrize(
+    "second_device, meter_device, accepted",
+    [
+        ("switch-device", "meter-device", True),
+        ("other-device", "meter-device", False),
+        ("switch-device", "switch-device", False),
+    ],
+)
+def test_cli_validates_smart_switch_relays_and_external_meter(
+    mock_config_factory: MockConfigFactory, second_device: str, meter_device: str, accepted: bool
+) -> None:
+    catalog = _catalog(
+        _entity("switch.one", EntityDomain.SWITCH, device_id="switch-device"),
+        _entity("switch.two", EntityDomain.SWITCH, device_id=second_device),
+        _entity("sensor.meter", EntityDomain.SENSOR, device_id=meter_device, state="0.5"),
+    )
+    measure = Measure(mock_config_factory())
+    measure._entity_catalog = catalog  # noqa: SLF001
+    request = SmartSwitchMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.meter"),
+        controller=HassMultiSwitchControllerSpec(entity_ids=["switch.one", "switch.two"]),
+        power_monitoring=False,
+    )
+
+    if accepted:
+        measure._validate_smart_switch_selection(request)  # noqa: SLF001
+    else:
+        with pytest.raises(ValueError, match=r"same Home Assistant device|external power meter"):
+            measure._validate_smart_switch_selection(request)  # noqa: SLF001
+
+
+def test_cli_rejects_an_unavailable_smart_switch_relay(mock_config_factory: MockConfigFactory) -> None:
+    catalog = _catalog(_entity("switch.one", EntityDomain.SWITCH, device_id="switch-device", state="unavailable"))
+    measure = Measure(mock_config_factory())
+    measure._entity_catalog = catalog  # noqa: SLF001
+    request = SmartSwitchMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.external_power"),
+        controller=HassSwitchControllerSpec(entity_id="switch.one"),
+        power_monitoring=False,
+    )
+
+    with pytest.raises(ValueError, match="report on or off"):
+        measure._validate_smart_switch_selection(request)  # noqa: SLF001
+
+
+def test_cli_validates_smart_switch_before_assembling(mock_config_factory: MockConfigFactory) -> None:
+    measure = Measure(mock_config_factory())
+    measure.measure_type = MeasureType.SMART_SWITCH
+    measure._entity_catalog = _catalog(_entity("switch.one", EntityDomain.SWITCH, device_id="switch-device"))  # noqa: SLF001
+    request = SmartSwitchMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.external_power"),
+        controller=HassSwitchControllerSpec(entity_id="switch.one"),
+        power_monitoring=False,
+    )
+
+    with (
+        patch.object(measure, "_select_measure_type"),
+        patch.object(measure, "ask_questions", return_value={}),
+        patch.object(measure, "_validate_smart_switch_selection", side_effect=ValueError("invalid relays")) as validate,
+        patch("measure.cli.main.request_from_answers", return_value=request),
+        patch("measure.cli.main.MeasurementAssembler") as assembler,
+        pytest.raises(ValueError, match="invalid relays"),
+    ):
+        measure.start()
+
+    validate.assert_called_once_with(request)
+    assembler.assert_not_called()
 
 
 @pytest.mark.parametrize(

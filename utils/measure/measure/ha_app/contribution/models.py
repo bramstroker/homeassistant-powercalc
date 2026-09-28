@@ -12,12 +12,14 @@ SUPPORTED_MEASURE_TYPES = {
     MeasureType.LIGHT,
     MeasureType.SPEAKER,
     MeasureType.FAN,
+    MeasureType.SMART_SWITCH,
     MeasureType.CHARGING,
     MeasureType.RECORDER,
 }
 
 AUTOMATIC_CONTRIBUTION_MESSAGE = (
-    "Automatic contribution is available for light, speaker, fan, charging, and analysed recorder profiles"
+    "Automatic contribution is available for light, speaker, fan, smart switch, charging, "
+    "and analysed recorder profiles"
 )
 
 

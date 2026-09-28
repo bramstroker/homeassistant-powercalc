@@ -17,6 +17,7 @@ export interface EntityDescriptor {
   domain?: string;
   device_class?: string | null;
   device_id?: string | null;
+  device_name?: string | null;
   related_device_ids?: string[];
   integration?: string | null;
   connectivity?: "zigbee" | "zwave" | null;
@@ -98,7 +99,7 @@ export interface Capabilities {
   fast_test_mode?: boolean;
 }
 
-export type MeasureType = "light" | "speaker" | "recorder" | "average" | "charging" | "fan";
+export type MeasureType = "light" | "speaker" | "recorder" | "average" | "charging" | "fan" | "smart_switch";
 
 /** A plain value as it travels between the app and the API: form field values, device info, metadata. */
 export type PrimitiveValue = string | number | boolean | null;
@@ -132,6 +133,10 @@ export interface FormField {
   maximum?: number | null;
   /** Whether several entities can be selected for this field at once. */
   multiple?: boolean;
+  /** Whether a separate toggle switches between one and several selected entities. */
+  multiple_toggle?: boolean;
+  /** Require a Home Assistant device choice before listing this field's entities. */
+  group_by_device?: boolean;
   /** Label to use while several entities are selected. */
   plural_label?: string;
   /** Entity field whose number of selected entities this count follows by default. */
@@ -166,6 +171,7 @@ export interface MeasureDefinition {
   parameters: MeasureParameter[];
   supports_profile: boolean;
   supports_resume: boolean;
+  supports_dummy_controller?: boolean;
   confirmation_action?: string | null;
   confirmation_is_warning?: boolean;
   confirmation_guidance?: string[];
@@ -222,6 +228,7 @@ export type LightControllerSpec =
 export type MediaControllerSpec = { type: "dummy" } | { type: "hass"; entity_id: string };
 export type ChargingControllerSpec = { type: "dummy" } | { type: "hass"; entity_id: string };
 export type FanControllerSpec = { type: "dummy" } | { type: "hass"; entity_id: string };
+export type SwitchControllerSpec = { type: "hass"; entity_id: string } | { type: "hass_multi"; entity_ids: string[] };
 
 export interface LightMeasurementRequest extends BaseMeasurementRequest {
   measure_type: "light";
@@ -248,6 +255,14 @@ export interface RecorderMeasurementRequest extends BaseMeasurementRequest {
 export interface SpeakerMeasurementRequest extends BaseMeasurementRequest { measure_type: "speaker"; controller: MediaControllerSpec; disable_streaming: boolean; }
 export interface ChargingMeasurementRequest extends BaseMeasurementRequest { measure_type: "charging"; controller: ChargingControllerSpec; charging_device_type: ChargingDeviceType; }
 export interface FanMeasurementRequest extends BaseMeasurementRequest { measure_type: "fan"; controller: FanControllerSpec; }
+export interface SmartSwitchMeasurementRequest extends BaseMeasurementRequest {
+  measure_type: "smart_switch";
+  controller: SwitchControllerSpec;
+  power_monitoring: boolean;
+  samples_per_state: number;
+  repeat_cycles: number;
+  settle_seconds: number;
+}
 
 export type MeasurementRequest =
   | LightMeasurementRequest
@@ -255,7 +270,8 @@ export type MeasurementRequest =
   | RecorderMeasurementRequest
   | SpeakerMeasurementRequest
   | ChargingMeasurementRequest
-  | FanMeasurementRequest;
+  | FanMeasurementRequest
+  | SmartSwitchMeasurementRequest;
 
 
 export interface CalibrationJob {

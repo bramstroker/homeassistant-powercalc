@@ -19,7 +19,6 @@ import { emit } from "../../utils/events";
 import { submittedForm } from "../../utils/form";
 import { sharedStyles } from "../../styles";
 import { defaultDummyLoadMode, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
-import { entityListStyles } from "./entity-list-field";
 import {
   renderPowerMeterRequired,
   renderPowerMeterSummary,
@@ -33,10 +32,12 @@ import {
   FREE_MEASUREMENT,
   routesForDevice,
   selectionFromRequest,
+  selectionFromType,
   type MeasurementRoute,
 } from "./device-routes";
 import { errorHelpLink } from "../shared/error-help-link";
 import type {
+  EntityDeviceChange,
   EntitySelectionChange,
   MultiSelectionChange,
   MultipleLightsChange,
@@ -118,6 +119,9 @@ export class SetupView extends LitElement {
   selectedEntities: Record<string, string[]> = {};
 
   @state()
+  selectedEntityDeviceIds: Record<string, string> = {};
+
+  @state()
   selectValues: Record<string, string> = {};
 
   @state()
@@ -141,13 +145,13 @@ export class SetupView extends LitElement {
   /** Deliberately not reactive: it exists so a typed count survives re-renders instead of being recomputed. */
   private derivedCountOverride?: string;
 
-  static readonly styles = [sharedStyles, dummyLoadStyles, entityListStyles, setupChromeStyles, css`
+  static readonly styles = [sharedStyles, dummyLoadStyles, setupChromeStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
     measure-setup-fields-section, measure-setup-developer-options { display: contents; }
     form { display: grid; gap: 1rem; }
     .profile-grid { align-items: start; }
     .device-section { display: grid; gap: 1rem; min-width: 0; }
-    .light-grid > measure-combobox, .light-grid > .entity-list, .light-grid > .field-block { grid-column: 1 / -1; }
+    .light-grid > measure-combobox, .light-grid > .field-block { grid-column: 1 / -1; }
     .checks { display: flex; flex-wrap: wrap; gap: 0.6rem; }
     .check { min-height: 42px; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 999px; }
     /* A checkbox pill has no caption above it, so pin it to the input line of its row. */
@@ -197,7 +201,7 @@ export class SetupView extends LitElement {
     // Restore a saved route without changing the request's stable measure_type.
     if ((changed.has("initialType") || changed.has("initialRequest")) && this.selectedType === undefined) {
       const restored = this.initialRequest ? selectionFromRequest(this.initialRequest) : this.initialType
-        ? this.selectionFromType(this.initialType) : undefined;
+        ? selectionFromType(this.initialType) : undefined;
       if (restored) {
         this.selectedDeviceId = restored.deviceId;
         this.selectedRouteId = restored.routeId;
@@ -301,6 +305,7 @@ export class SetupView extends LitElement {
           .deviceEntities=${this.deviceEntities}
           .deviceEntityErrors=${this.deviceEntityErrors}
           .selectedEntities=${this.selectedEntities}
+          .selectedEntityDeviceIds=${this.selectedEntityDeviceIds}
           .selectValues=${this.selectValues}
           .multiSelection=${this.multiSelection}
           .parameterValues=${this.parameterValues}
@@ -308,6 +313,7 @@ export class SetupView extends LitElement {
           .multipleLights=${this.multipleLights}
           .derivedCountOverride=${this.derivedCountOverride}
           @entity-selection-change=${this.entitySelectionChanged}
+          @entity-device-change=${this.entityDeviceChanged}
           @select-value-change=${this.selectValueChanged}
           @multi-selection-change=${this.multiSelectionChanged}
           @multiple-lights-change=${this.multipleLightsChanged}
@@ -319,7 +325,8 @@ export class SetupView extends LitElement {
         <measure-setup-developer-options
           .developerMode=${this.capabilities.developer_mode ?? false}
           .fastTestMode=${this.capabilities.fast_test_mode ?? false}
-          .hasController=${definition.fields.some((field) => field.role === "controller")}
+          .hasController=${definition.supports_dummy_controller !== false
+            && definition.fields.some((field) => field.role === "controller")}
           .dummyController=${this.dummyController}
           @dummy-controller-change=${this.dummyControllerChanged}
         ></measure-setup-developer-options>
@@ -386,6 +393,12 @@ export class SetupView extends LitElement {
     this.selectEntities(event.detail.name, event.detail.rows);
   }
 
+  private entityDeviceChanged(event: CustomEvent<EntityDeviceChange>): void {
+    const { name, deviceId } = event.detail;
+    this.selectedEntityDeviceIds = { ...this.selectedEntityDeviceIds, [name]: deviceId };
+    this.selectEntities(name, []);
+  }
+
   private selectValueChanged(event: CustomEvent<SelectValueChange>): void {
     this.selectValues = { ...this.selectValues, [event.detail.name]: event.detail.value };
     if (event.detail.name === "profile_device_type") {
@@ -438,6 +451,7 @@ export class SetupView extends LitElement {
     this.dummyController = false;
     this.multipleLights = false;
     this.selectedEntities = {};
+    this.selectedEntityDeviceIds = {};
     this.selectValues = {};
     this.multiSelection = {};
     this.parameterValues = {};
@@ -491,17 +505,6 @@ export class SetupView extends LitElement {
       id: this.selectedRouteId, measureType: "recorder", label: "Saved recording method",
       description: "Previously saved complex-profile recording.", preset,
     };
-  }
-
-  private selectionFromType(type: MeasureType): { deviceId: string; routeId: string } {
-    switch (type) {
-      case "light": return { deviceId: "light", routeId: "light" };
-      case "speaker": return { deviceId: "smart_speaker", routeId: "speaker" };
-      case "fan": return { deviceId: "fan", routeId: "fan" };
-      case "charging": return { deviceId: "vacuum_robot", routeId: "charging" };
-      case "average": return { deviceId: FREE_MEASUREMENT, routeId: "average" };
-      case "recorder": return { deviceId: FREE_MEASUREMENT, routeId: "playbook" };
-    }
   }
 
   private selectEntities(name: string, rows: string[]): void {

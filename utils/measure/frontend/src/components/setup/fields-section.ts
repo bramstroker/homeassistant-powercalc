@@ -18,13 +18,11 @@ import {
 } from "../../measurement/definition";
 import { emit } from "../../utils/events";
 import { entitySelect, fieldHint, optionSelect, textField } from "../shared/fields";
-import { renderEntityList } from "./entity-list-field";
 import {
   activeParameters,
   availableOptions,
   disabledVacuumEntityIds,
   entityChoices,
-  entityRows,
   selectedEntityId,
   selectedEntityIds,
   selectedOptions,
@@ -42,6 +40,11 @@ const HOME_ASSISTANT_GROUP_GUIDE_URL = "https://www.home-assistant.io/integratio
 export interface EntitySelectionChange {
   name: string;
   rows: string[];
+}
+
+export interface EntityDeviceChange {
+  name: string;
+  deviceId: string;
 }
 
 export interface SelectValueChange {
@@ -69,6 +72,7 @@ export class SetupFieldsSection extends LitElement {
   @property({ attribute: false }) deviceEntities: Record<string, EntityDescriptor[]> = {};
   @property({ attribute: false }) deviceEntityErrors: Record<string, string> = {};
   @property({ attribute: false }) selectedEntities: Record<string, string[]> = {};
+  @property({ attribute: false }) selectedEntityDeviceIds: Record<string, string> = {};
   @property({ attribute: false }) selectValues: Record<string, string> = {};
   @property({ attribute: false }) presetValues: Record<string, string> = {};
   @property({ attribute: false }) multiSelection: Record<string, string[]> = {};
@@ -112,7 +116,8 @@ export class SetupFieldsSection extends LitElement {
     return html`
       <div class="device-section">
         ${this.dummyController ? html`<p class="test-mode-status" role="status">Virtual device · test output only</p>` : nothing}
-        ${multipleController && !this.dummyController ? this.renderMultipleLightsToggle(multipleController) : nothing}
+        ${multipleController && definition.measure_type === "light" && !this.dummyController
+          ? this.renderMultipleLightsToggle(multipleController) : nothing}
         <div class="field-with-help">
           <div class="grid profile-grid ${definition.measure_type === "light" ? "light-grid" : ""}">
             ${fields.filter((field) => field.control !== "multi_select").map((field) => this.renderField(field))}
@@ -206,7 +211,10 @@ export class SetupFieldsSection extends LitElement {
     if (field.derived_from) return this.renderDerivedCount(field);
     const stored = this.request && requestFieldValue(this.request, field);
     if (field.control === "boolean") {
-      return html`<label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>`;
+      return html`<div class="field-block">
+        <label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>
+        ${field.hint ? fieldHint(field.hint) : nothing}
+      </div>`;
     }
     if (field.control === "entity") {
       const value = (stored ?? field.default ?? "").toString();
@@ -221,7 +229,7 @@ export class SetupFieldsSection extends LitElement {
         return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
       }
       const entities = entityChoices(field, this.fieldState, domains);
-      if (field.multiple && (field.role !== "controller" || this.multipleLights)) {
+      if (field.multiple && (!field.multiple_toggle || this.multipleLights)) {
         return this.renderMultiEntity(field, entities);
       }
       let selected = this.selectedEntities[name] !== undefined ? selectedEntityId(field, this.fieldState) : value;
@@ -294,22 +302,47 @@ export class SetupFieldsSection extends LitElement {
   }
 
   private renderMultiEntity(field: FormField, entities: EntityDescriptor[]) {
+    if (field.group_by_device) return this.renderDeviceEntities(field, entities);
     const vacuumAdditional = this.definition?.measure_type === "recorder" && field.name === "additional_entity_ids";
-    const genericAdditional = this.definition?.measure_type === "recorder" && field.name === "tracked_entity_ids";
-    const lightController = this.definition?.measure_type === "light" && field.role === "controller";
-    if (vacuumAdditional || genericAdditional || lightController) {
-      return html`<div class="field-block">
-        ${this.renderEntityCombobox(field, entities, lightController ? "Select lights" : "Select additional entities")}
-        ${vacuumAdditional ? this.renderVacuumRecordingHint(field) : nothing}
-        ${genericAdditional && field.hint ? fieldHint(field.hint) : nothing}
-      </div>`;
+    const placeholder = field.role === "controller"
+      ? `Select ${(field.plural_label || field.label).toLowerCase()}`
+      : "Select additional entities";
+    return html`<div class="field-block">
+      ${this.renderEntityCombobox(field, entities, placeholder)}
+      ${vacuumAdditional ? this.renderVacuumRecordingHint(field) : field.hint ? fieldHint(field.hint) : nothing}
+    </div>`;
+  }
+
+  private renderDeviceEntities(field: FormField, entities: EntityDescriptor[]) {
+    const devices = new Map<string, string>();
+    for (const entity of entities) {
+      if (entity.device_id && !devices.has(entity.device_id)) {
+        devices.set(entity.device_id, entity.device_name || entity.product_name || entity.name);
+      }
     }
-    return renderEntityList({
-      field,
-      entities,
-      rows: this.fieldState ? entityRows(field, this.fieldState) : [],
-      onChange: (rows) => this.changeEntities(field.name, rows),
-    });
+    const selected = this.fieldState ? selectedEntityIds(field, this.fieldState) : [];
+    const savedDeviceId = entities.find((entity) => selected.includes(entity.entity_id))?.device_id ?? "";
+    const deviceId = this.selectedEntityDeviceIds[field.name] ?? savedDeviceId;
+    const deviceOptions = [...devices].map(([value, label]) => ({ value, label }));
+    deviceOptions.sort((left, right) => left.label.localeCompare(right.label));
+    return html`<div class="field-block">
+      ${optionSelect(`device_${field.name}`, "Device", deviceOptions, {
+        selected: deviceId,
+        required: true,
+        placeholder: "Select a device",
+        onChange: (event) => this.changeEntityDevice(field.name, event),
+      })}
+      ${deviceId ? this.renderEntityCombobox(
+        field, entities.filter((entity) => entity.device_id === deviceId), `Select ${(field.plural_label || field.label).toLowerCase()}`,
+      ) : nothing}
+      ${field.hint ? fieldHint(field.hint) : nothing}
+      ${devices.size === 0 ? html`<p class="muted">No available switch entities are assigned to a Home Assistant device.</p>` : nothing}
+    </div>`;
+  }
+
+  private changeEntityDevice(name: string, event: Event): void {
+    const deviceId = (event.currentTarget as HTMLInputElement).value;
+    emit<EntityDeviceChange>(this, "entity-device-change", { name, deviceId });
   }
 
   private renderEntityCombobox(field: FormField, entities: EntityDescriptor[], placeholder: string) {

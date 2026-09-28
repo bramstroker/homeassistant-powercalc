@@ -41,7 +41,11 @@ def test_measure_definitions_and_average_request(app_client: TestClient) -> None
         "average": "Start averaging",
         "charging": "Start charging measurement",
         "fan": "Start fan measurement",
+        "smart_switch": "Start switch measurement",
     }
+    smart_switch = next(item for item in definitions.json() if item["measure_type"] == MeasureType.SMART_SWITCH)
+    relay = next(field for field in smart_switch["fields"] if field["name"] == "switch_entity_id")
+    assert relay["group_by_device"] is True
     guidance = {item["measure_type"]: item["confirmation_guidance"] for item in definitions.json()}
     assert "Disable automations" in guidance["light"][0]
     assert "Disable automations" in guidance["fan"][0]
@@ -72,6 +76,14 @@ def test_measure_definitions_and_average_request(app_client: TestClient) -> None
     assert recorder_fields["profile_recipe"]["visible_when"] == {"recorder_purpose": ["complex_profile"]}
     assert recorder_fields["tracked_entity_ids"]["all_entities"] is True
     assert recorder_fields["battery_entity_id"]["same_device_only"] is True
+    light = next(item for item in definitions.json() if item["measure_type"] == MeasureType.LIGHT)
+    light_fields = {field["name"]: field for field in light["fields"]}
+    assert light_fields["light_entity_id"]["multiple_toggle"] is True
+    smart_switch = next(item for item in definitions.json() if item["measure_type"] == MeasureType.SMART_SWITCH)
+    switch_fields = {field["name"]: field for field in smart_switch["fields"]}
+    assert smart_switch["supports_dummy_controller"] is False
+    assert switch_fields["switch_entity_id"]["multiple_toggle"] is False
+    assert switch_fields["power_monitoring"]["control"] == "boolean"
 
     payload = {
         "measure_type": MeasureType.AVERAGE,

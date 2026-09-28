@@ -63,6 +63,10 @@ class FormFieldDefinition:
     maximum: int | float | None = None
     #: Whether several entities can be selected for this field at once.
     multiple: bool = False
+    #: Whether a separate toggle switches this field between one and several entities.
+    multiple_toggle: bool = False
+    #: Ask for a Home Assistant device before offering its entities.
+    group_by_device: bool = False
     #: Label to use while several entities are selected.
     plural_label: str = ""
     #: Entity field whose number of selected entities this count follows by default.
@@ -112,6 +116,7 @@ class MeasurementDefinition:
     parameters: tuple[ParameterDefinition, ...] = ()
     supports_profile: bool = True
     supports_resume: bool = False
+    supports_dummy_controller: bool = True
 
     @property
     def label(self) -> str:
@@ -152,6 +157,8 @@ def _controller(
     *domains: str,
     narrowed_by: str | None = None,
     multiple: bool = False,
+    multiple_toggle: bool = False,
+    group_by_device: bool = False,
     plural_label: str = "",
 ) -> FormFieldDefinition:
     """Entity field that selects the device being measured, and becomes the request controller."""
@@ -163,6 +170,8 @@ def _controller(
         narrowed_by=narrowed_by,
         entity_domains=domains,
         multiple=multiple,
+        multiple_toggle=multiple_toggle,
+        group_by_device=group_by_device,
         plural_label=plural_label,
     )
 
@@ -307,7 +316,9 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         parameters=LIGHT_PARAMETERS,
         fields=(
             POWER_FIELD,
-            _controller("light_entity_id", "Light", "light", multiple=True, plural_label="Lights"),
+            _controller(
+                "light_entity_id", "Light", "light", multiple=True, multiple_toggle=True, plural_label="Lights"
+            ),
             MODES_FIELD,
             FormFieldDefinition(
                 name="multiple_light_count",
@@ -569,6 +580,56 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         product_name_example="Dyson Purifier Cool TP07",
         parameters=(READING_INTERVAL,),
         fields=(POWER_FIELD, _controller("fan_entity_id", "Fan", "fan")),
+    ),
+    MeasureType.SMART_SWITCH: MeasurementDefinition(
+        measure_type=MeasureType.SMART_SWITCH,
+        description="Measure a smart switch's own power use as relays turn off and on.",
+        icon="mdi:toggle-switch",
+        model_id_example="SHSW-25",
+        product_name_example="Shelly 2.5",
+        parameters=(READING_INTERVAL,),
+        supports_dummy_controller=False,
+        fields=(
+            POWER_FIELD,
+            _controller(
+                "switch_entity_id", "Relay", "switch", multiple=True, group_by_device=True, plural_label="Relays"
+            ),
+            FormFieldDefinition(
+                name="power_monitoring",
+                label="The smart switch has built-in power monitoring",
+                control=FieldControl.BOOLEAN,
+                default=False,
+                hint=(
+                    "Enable this when the switch reports its own load power. The generated profile will then "
+                    "set only_self_usage so it does not duplicate the built-in meter."
+                ),
+                review=True,
+            ),
+            FormFieldDefinition(
+                name="samples_per_state",
+                label="Readings per relay state",
+                control=FieldControl.NUMBER,
+                default=12,
+                minimum=5,
+                maximum=100,
+            ),
+            FormFieldDefinition(
+                name="repeat_cycles",
+                label="Measurement cycles",
+                control=FieldControl.NUMBER,
+                default=3,
+                minimum=2,
+                maximum=5,
+            ),
+            FormFieldDefinition(
+                name="settle_seconds",
+                label="Relay settle time (seconds)",
+                control=FieldControl.NUMBER,
+                default=5,
+                minimum=0,
+                maximum=120,
+            ),
+        ),
     ),
 }
 

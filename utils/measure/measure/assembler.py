@@ -27,6 +27,8 @@ from measure.controller.media.controller import MediaController
 from measure.controller.media.dummy import DummyMediaController
 from measure.controller.media.hass import HassMediaController
 from measure.controller.media.spec import DummyMediaControllerSpec, HassMediaControllerSpec, MediaControllerSpec
+from measure.controller.switch.hass import HassSwitchController
+from measure.controller.switch.spec import HassMultiSwitchControllerSpec
 from measure.execution import (
     DummyLoadCalibrationStore,
     DummyLoadPreparation,
@@ -67,6 +69,7 @@ from measure.request import (
     MeasurementRequest,
     RecorderMeasurementRequest,
     ResumePolicy,
+    SmartSwitchMeasurementRequest,
     SpeakerMeasurementRequest,
 )
 from measure.runner.average import AverageRunner
@@ -76,6 +79,7 @@ from measure.runner.interaction import RunInteraction
 from measure.runner.light.runner import LightRunner
 from measure.runner.recorder import EntityStateReader, RecorderEntityState, RecorderRunner
 from measure.runner.runner import MeasurementRunner
+from measure.runner.smart_switch import SmartSwitchRunner
 from measure.runner.speaker import SpeakerRunner
 from measure.tuning import MeasurementParameters
 from measure.utils.sampling import PowerSampler
@@ -225,6 +229,15 @@ class MeasurementAssembler:
         if isinstance(request, FanMeasurementRequest):
             fan_controller = self._create_fan_controller(request.controller)
             return FanRunner(sampler, parameters, fan_controller, interaction)
+        if isinstance(request, SmartSwitchMeasurementRequest):
+            controller = request.controller
+            entity_ids = (
+                controller.entity_ids
+                if isinstance(controller, HassMultiSwitchControllerSpec)
+                else [controller.entity_id]
+            )
+            switch_controller = HassSwitchController(self._require_home_assistant(), entity_ids)
+            return SmartSwitchRunner(sampler, switch_controller, interaction)
         assert_never(request)  # pragma: no cover - all MeasurementRequest variants handled
 
     def _create_recorder_state_reader(self) -> EntityStateReader:

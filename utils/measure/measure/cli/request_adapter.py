@@ -26,6 +26,7 @@ from measure.controller.light.const import LightControllerType
 from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec, HueLightControllerSpec
 from measure.controller.media.const import MediaControllerType
 from measure.controller.media.spec import DummyMediaControllerSpec, HassMediaControllerSpec
+from measure.controller.switch.spec import HassMultiSwitchControllerSpec, HassSwitchControllerSpec
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.spec import (
     DummyPowerMeterSpec,
@@ -48,6 +49,7 @@ from measure.request import (
     MeasurementRequest,
     RecorderMeasurementRequest,
     ResumePolicy,
+    SmartSwitchMeasurementRequest,
     SpeakerMeasurementRequest,
 )
 from measure.tuning import MeasurementParameters
@@ -101,6 +103,20 @@ def request_from_answers(
         return FanMeasurementRequest(
             **common,
             controller=_fan_controller_spec(environment, answers),
+        )
+    if measure_type == MeasureType.SMART_SWITCH:
+        entity_ids = list(answers.get("switch_entity_ids") or [])
+        if not entity_ids:
+            raise ValueError("Select at least one switch relay")
+        controller = (
+            HassMultiSwitchControllerSpec(entity_ids=entity_ids)
+            if len(entity_ids) > 1
+            else HassSwitchControllerSpec(entity_id=entity_ids[0])
+        )
+        return SmartSwitchMeasurementRequest(
+            **common,
+            controller=controller,
+            power_monitoring=answers["power_monitoring"],
         )
     assert_never(measure_type)  # pragma: no cover - all MeasureType members handled
 

@@ -9,6 +9,7 @@ Before starting, connect the power meter so it measures the device described in 
 | [Light](lights.md) | Automated light measurement | PowerCalc changes the selected brightness, color temperature, color, or effects. |
 | [Smart speaker](#smart-speaker) | Volume measurement | Playback power at different volume levels. |
 | [Fan](#fan) | Automated speed measurement or experimental state recording | Percentage speeds, or manually selected states. |
+| [Smart switch](#smart-switch) | Automated relay measurement | The switch's own power draw with every relay output disconnected. |
 | [Robot vacuum](#robot-vacuum) | Experimental vacuum and dock recording, or charging measurement | Dock activities and charging, or charging alone. |
 | [Air purifier](#air-purifier) | Experimental state recording | Off and manual fan speeds. |
 | [Camera](#camera) | Experimental state recording | Infrared off and on, when Home Assistant reports the difference. |
@@ -30,6 +31,10 @@ Select a `media_player` entity and disable automations that could change playbac
 ### Fan
 
 For **Measure fan speeds**, select a percentage-controllable `fan` entity. Use manual speed mode and disable automations. Keep oscillation, direction, lights, and other extra functions at the same settings throughout the run. PowerCalc changes the fan speed automatically and measures the resulting power curve. See [Fan measurement](modes.md#fan).
+
+### Smart switch
+
+Disconnect all loads from the selected relay outputs, disable automations, and use a precise external meter capable of resolving the switch's small power changes. A calibrated resistive dummy load may be connected in parallel with the switch, never to a relay output. Select one relay for a fixed profile or all relays on one device for `multi_switch`. The ready screen requires you to acknowledge the disconnected loads before PowerCalc switches the relays automatically. It repeats each state and restores the original relay states afterwards. Select whether the switch has built-in power monitoring; multi-relay profiles cover only the switch's own use, so model connected loads separately. See [Smart switch profiles](../../library/device-types/smart-switch.md#measure).
 
 ### Robot vacuum
 

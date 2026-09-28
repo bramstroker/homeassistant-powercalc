@@ -2,6 +2,7 @@ import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SessionState } from "../../types";
 import { emit } from "../../utils/events";
+import { isVacuumProfileRequest } from "../../measurement/definition";
 import { hasModelArtifact } from "../../utils/artifacts";
 import { fileSize } from "../../utils/format";
 import { diagnosticsDownload, sharedStyles } from "../../styles";
@@ -265,8 +266,7 @@ export class ResultView extends LitElement {
   }
 
   private isVacuumRecording(): boolean {
-    const request = this.snapshot.request;
-    return request?.measure_type === "recorder" && request.profile_recipe === "vacuum_robot";
+    return isVacuumProfileRequest(this.snapshot.request);
   }
 
   private hasMissingAwayEpisodes(reason?: string): boolean {

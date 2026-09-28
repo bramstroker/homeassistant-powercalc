@@ -1,4 +1,4 @@
-import { decodeEntities, decodePreflight, decodeSessionSnapshot, isMeasurementRequest } from "./api-decoders";
+import { decodeEntities, decodePreflight, decodeSessionSnapshot, decodeSessionSummaries, isMeasurementRequest } from "./api-decoders";
 import { capabilities } from "./components/testing/fixtures";
 
 const averageRequest = {
@@ -51,6 +51,18 @@ describe("measurement request boundary", () => {
 });
 
 describe("response boundary", () => {
+  it("accepts saved smart switch sessions in the session list", () => {
+    const sessions = [{
+      session_id: "8af8795c-7131-4e94-8eab-2ce4a7e7f2c1", state: "failed",
+      created_at: "2026-09-28T16:24:12Z", updated_at: "2026-09-28T16:26:39Z",
+      measure_type: "smart_switch", model_id: "SHPLG-S", product_name: "Vaatwasser",
+      measure_device: "Shelly 1PM Mini Gen3", completed: 2, total: 6, percent: 33.33,
+      can_resume: false, file_count: 0, size: 6614, active: false,
+    }];
+
+    expect(decodeSessionSummaries(sessions)).toBe(sessions);
+  });
+
   it("accepts optional connectivity and rejects malformed detection results", () => {
     const entity = { entity_id: "light.test", name: "Test light" };
     for (const connectivity of [undefined, null, "zigbee", "zwave"]) {

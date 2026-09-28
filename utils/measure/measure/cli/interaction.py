@@ -2,13 +2,19 @@ from collections.abc import Mapping
 import time
 
 from measure.runner.interaction import OperatingPoint, RunInteraction
+from measure.start import MeasurementStart
 
 
 class ConsoleInteraction(RunInteraction):
     """Interactive terminal implementation of the execution boundary."""
 
+    def __init__(self, start: MeasurementStart | None = None) -> None:
+        self.start = start
+
     def confirm(self, message: str, *, action: str | None = None) -> None:
-        del action
+        if self.start and action == self.start.action and self.start.guidance:
+            steps = "\n".join(f"{index}. {step}" for index, step in enumerate(self.start.guidance, start=1))
+            message = f"{message}\n\n{self.start.guidance_title}:\n{steps}"
         input(f"{message}\nPress enter to continue...")
 
     def notify(self, message: str) -> None:
