@@ -32,6 +32,7 @@ from custom_components.powercalc.flow_helper.common import (
     wrap_choose_selector,
 )
 from custom_components.powercalc.flow_helper.schema import SCHEMA_UTILITY_METER_TOGGLE
+from custom_components.powercalc.flow_helper.strategy_form import find_present_choice, order_choices_for_default
 from custom_components.powercalc.sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 
 if TYPE_CHECKING:
@@ -41,15 +42,16 @@ DAILY_ENERGY_VALUE_CHOICES: dict[str, list[str] | str] = {
     CONF_VALUE_TEMPLATE: CONF_VALUE_TEMPLATE,
     CONF_VALUE: CONF_VALUE,
 }
+DAILY_ENERGY_CHOICE_SELECTORS: dict[str, selector.ChooseSelectorChoiceConfig] = {
+    CONF_VALUE: {"selector": {"number": {"mode": "box", "step": "any"}}},
+    CONF_VALUE_TEMPLATE: {"selector": {"template": {}}},
+}
 
 SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
     {
         vol.Optional(CONF_DAILY_ENERGY_VALUE): selector.ChooseSelector(
             selector.ChooseSelectorConfig(
-                choices={
-                    CONF_VALUE: {"selector": {"number": {"mode": "box", "step": "any"}}},
-                    CONF_VALUE_TEMPLATE: {"selector": {"template": {}}},
-                },
+                choices=DAILY_ENERGY_CHOICE_SELECTORS,
                 translation_key=CONF_DAILY_ENERGY_VALUE,
             ),
         ),
@@ -152,11 +154,20 @@ class DailyEnergyOptionsFlow:
             dict(self.flow.sensor_config[CONF_DAILY_FIXED_ENERGY]),
             CONF_DAILY_ENERGY_VALUE,
             DAILY_ENERGY_VALUE_CHOICES,
+            raw_value=True,
         )
-        schema = fill_schema_defaults(
-            SCHEMA_DAILY_ENERGY_OPTIONS,
-            form_data,
+        default_choice = find_present_choice(form_data, DAILY_ENERGY_VALUE_CHOICES)
+        schema = SCHEMA_DAILY_ENERGY_OPTIONS.extend(
+            {
+                vol.Optional(CONF_DAILY_ENERGY_VALUE): selector.ChooseSelector(
+                    selector.ChooseSelectorConfig(
+                        choices=order_choices_for_default(DAILY_ENERGY_CHOICE_SELECTORS, default_choice),
+                        translation_key=CONF_DAILY_ENERGY_VALUE,
+                    ),
+                ),
+            },
         )
+        schema = fill_schema_defaults(schema, form_data)
         if user_input is not None:
             user_input = unwrap_choose_selector(
                 dict(user_input),
