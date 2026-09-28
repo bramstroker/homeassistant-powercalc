@@ -99,12 +99,11 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
       experimental: true,
     });
   }
-  if (["vacuum_robot", "lawn_mower_robot"].includes(deviceId) && available.has("charging")) routes.push({
+  if (deviceId === "vacuum_robot" && available.has("charging")) routes.push({
     id: "charging", measureType: "charging", label: "Measure charging power",
     description: "Calibrate power against battery level while charging.", preset: { charging_device_type: deviceId },
-    experimental: deviceId === "lawn_mower_robot",
   });
-  if (deviceId === "lawn_mower_robot" || !available.has("recorder")) return routes;
+  if (!available.has("recorder")) return routes;
   if (deviceId !== "vacuum_robot" && fieldOptions(definitions.find((item) => item.measure_type === "recorder"), "profile_device_type")
     .some((option) => option.value === deviceId)) {
     routes.push({

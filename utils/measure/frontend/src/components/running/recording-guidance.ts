@@ -30,10 +30,6 @@ const DEVICE_ACTIONS: Record<string, string[]> = {
     "Record the box switched on during normal viewing, then in standby. Keep its energy-saving or standby mode unchanged throughout both runs.",
     "Allow startup and standby transitions to finish so you capture stable power in each state. Check that the media player entity reports the on and standby states correctly.",
   ],
-  smart_switch: [
-    "Leave the switch output empty: no load should be connected. Switch the relay off and on several times to measure the switch's own consumption.",
-    "Use this recording for a switch with a single relay. Keep indicator lights and other settings unchanged; switches with multiple relays need a different profile recipe.",
-  ],
 };
 
 /** Give the operator a practical sequence before a complex-profile recording begins. */

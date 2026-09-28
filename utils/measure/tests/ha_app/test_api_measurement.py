@@ -65,7 +65,6 @@ def test_measure_definitions_and_average_request(app_client: TestClient) -> None
         for option in fields["charging_device_type"]["options"]
     ] == [
         ("vacuum_robot", "Vacuum robot", "vacuum"),
-        ("lawn_mower_robot", "Lawn mower robot", "lawn_mower"),
     ]
     recorder = next(item for item in definitions.json() if item["measure_type"] == MeasureType.RECORDER)
     recorder_fields = {field["name"]: field for field in recorder["fields"]}

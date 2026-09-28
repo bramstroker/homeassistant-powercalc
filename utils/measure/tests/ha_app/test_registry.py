@@ -25,12 +25,12 @@ def test_registry_form_fields_use_wire_request_names() -> None:
     assert all("entity_id" not in names and "powermeter_entity_id" not in names for names in fields.values())
 
 
-def test_charging_definition_discovers_both_supported_domains() -> None:
+def test_charging_definition_discovers_vacuum_domain() -> None:
     entity = next(
         field for field in MEASUREMENT_REGISTRY[MeasureType.CHARGING].fields if field.name == "charging_entity_id"
     )
 
-    assert entity.entity_domains == ("vacuum", "lawn_mower")
+    assert entity.entity_domains == ("vacuum",)
 
 
 def test_light_definition_allows_multiple_entities_and_explains_the_physical_count() -> None:
@@ -65,13 +65,11 @@ def test_recorder_definition_starts_with_purpose_and_declares_vacuum_relationshi
         "heating",
         "printer",
         "set_top_box",
-        "smart_switch",
     ]
     assert fields["profile_device_type"].default in profile_device_types
     assert fields["primary_entity_id"].narrowed_by == "profile_device_type"
     options = {option.value: option for option in fields["profile_device_type"].options}
     assert options["camera"].entity_domains == ("camera",)
-    assert options["smart_switch"].entity_domains == ("light", "switch")
     assert fields["tracked_entity_ids"].multiple is True
     assert fields["battery_entity_id"].related_to == "vacuum_entity_id"
     assert fields["battery_entity_id"].same_device_only is True

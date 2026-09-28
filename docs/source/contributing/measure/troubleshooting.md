@@ -52,7 +52,7 @@ The tool filters entities by domain or unit:
 - Voltage sensors must use unit `V`.
 - Fan mode lists `fan` entities.
 - Smart speaker mode lists `media_player` entities.
-- Charging mode lists `vacuum` or `lawn_mower` entities, depending on the selected device type.
+- Charging mode lists `vacuum` entities in the Home Assistant app. The CLI also supports `lawn_mower` entities.
 
 If an entity is missing, check its Home Assistant state and attributes first. Also verify `HASS_URL` points to the API endpoint and `HASS_TOKEN` is a valid long-lived access token.
 

@@ -140,7 +140,6 @@ describe("running view", () => {
     ["generic", "heating", "heating power level", "thermostat idle"],
     ["generic", "printer", "same representative print job", "printer status entity"],
     ["generic", "set_top_box", "normal viewing", "standby mode unchanged"],
-    ["generic", "smart_switch", "no load should be connected", "switch's own consumption"],
   ] as const)("guides a %s recording before it starts", async (recipe, deviceType, action, finish) => {
     const element = document.createElement("measure-running-view") as import("./view").RunningView;
     element.snapshot = { state: "awaiting_confirmation", request: recorderRequest(recipe, deviceType) };

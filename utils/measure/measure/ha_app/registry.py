@@ -420,7 +420,6 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                         ProfileDeviceType.HEATING,
                         ProfileDeviceType.PRINTER,
                         ProfileDeviceType.SET_TOP_BOX,
-                        ProfileDeviceType.SMART_SWITCH,
                     )
                 ),
                 default=ProfileDeviceType.AIR_PURIFIER,
@@ -552,17 +551,12 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                         label="Vacuum robot",
                         entity_domain=charging_entity_domain(ChargingDeviceType.VACUUM_ROBOT),
                     ),
-                    FieldOption(
-                        value=ChargingDeviceType.LAWN_MOWER_ROBOT,
-                        label="Lawn mower robot",
-                        entity_domain=charging_entity_domain(ChargingDeviceType.LAWN_MOWER_ROBOT),
-                    ),
                 ),
             ),
             _controller(
                 "charging_entity_id",
                 "Charging device",
-                *(charging_entity_domain(device_type) for device_type in ChargingDeviceType),
+                charging_entity_domain(ChargingDeviceType.VACUUM_ROBOT),
                 narrowed_by="charging_device_type",
             ),
         ),

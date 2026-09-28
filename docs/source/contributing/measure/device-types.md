@@ -10,13 +10,11 @@ Before starting, connect the power meter so it measures the device described in 
 | [Smart speaker](#smart-speaker) | Volume measurement | Playback power at different volume levels. |
 | [Fan](#fan) | Automated speed measurement or experimental state recording | Percentage speeds, or manually selected states. |
 | [Robot vacuum](#robot-vacuum) | Experimental vacuum and dock recording, or charging measurement | Dock activities and charging, or charging alone. |
-| [Lawn mower robot](#lawn-mower-robot) | Experimental charging measurement | Charging power against battery level. |
 | [Air purifier](#air-purifier) | Experimental state recording | Off and manual fan speeds. |
 | [Camera](#camera) | Experimental state recording | Infrared off and on, when Home Assistant reports the difference. |
 | [Heating](#heating) | Experimental state recording | Standby and observable heating levels. |
 | [Printer](#printer) | Experimental state recording | Ready, printing, sleep, and other observable activities. |
 | [Set-top box](#set-top-box) | Experimental state recording | Normal viewing and standby. |
-| [Smart switch](#smart-switch) | Experimental state recording | The switch's own consumption with no load connected. |
 | [Free measurement](#free-measurement) | Average or Playbook recording | One stable power value, or a complete power cycle to use manually. |
 
 ## Automated measurements
@@ -39,13 +37,9 @@ For **Measure charging power**, connect the complete dock at the wall outlet. St
 
 For **Record vacuum and dock activity**, use the [recording instructions](#robot-vacuum-and-dock-recording) below.
 
-### Lawn mower robot
-
-The app offers **Measure charging power**. Connect the complete charging dock at the wall outlet, start with the battery as close to empty as possible, and begin before the mower docks. Leave it docked through full charge and the following 30 minutes of trickle charging. Keep other dock functions off. This method measures dock power while charging, not battery use while mowing. See [Charging measurement](modes.md#charging-device).
-
 ## Experimental device-state recordings
 
-Select the primary Home Assistant entity that the generated profile should use. The recorder captures its state and scalar attributes. Add another signal only when its state explains a power change; the picker limits choices to the same device or its immediate parent or child device. The signal also needs a portable reference for a shared library profile. A camera requires a `camera` primary entity; a smart switch can use a `switch` or `light` entity. See [Complex-profile recordings](modes.md#complex-profile-recordings) for the other entity requirements and analyser limits.
+Select the primary Home Assistant entity that the generated profile should use. The recorder captures its state and scalar attributes. Add another signal only when its state explains a power change; the picker limits choices to the same device or its immediate parent or child device. The signal also needs a portable reference for a shared library profile. A camera requires a `camera` primary entity; a set-top box uses a `media_player` entity. See [Complex-profile recordings](modes.md#complex-profile-recordings) for the other entity requirements and analyser limits.
 
 Start with the device powered and stable. Record each distinct state long enough for at least five power samples **after it settles**, return to the starting state, then stop. Use **Record more** for a second independent run covering the same states, again with at least five samples for every state. The analyser uses the earlier run for training and the latest run for validation. Recording longer cannot compensate for a missing Home Assistant state or attribute: check that the selected entities actually change when the power changes.
 
@@ -74,10 +68,6 @@ Select the printer status entity that reports ready, printing, and sleep. Use th
 Record normal viewing and standby. Allow startup and standby transitions to finish before counting stable samples. Check that the `media_player` entity reports the on and standby states correctly. Keep the energy-saving or standby setting unchanged in both runs.
 
 If the box has energy-saving modes or a setting to enable or disable Wi-Fi that changes its power use, make a **separate measurement session for each configuration**. Keep that configuration fixed during both runs of its session; **Record more** within the same session is for validating the same settings. In your profile pull request, describe each setting and include the corresponding measurements. The app does not create subprofiles from these sessions yet, but the profile can be [assembled with subprofiles](../../library/sub-profiles.md) manually so users can select the configuration they use.
-
-### Smart switch
-
-Leave the switch output empty: **connect no load**. Toggle its single relay off and on several times to measure the switch's own consumption. Keep indicator lights and other settings unchanged. A switch with multiple relays needs a different profile recipe.
 
 ### Robot vacuum and dock recording
 

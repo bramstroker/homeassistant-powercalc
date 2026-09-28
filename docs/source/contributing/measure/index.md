@@ -15,7 +15,7 @@ Use this guide when you want to create a new power profile for the library or wh
 | Light bulb(s) | Lights with brightness, color temperature, color, white, or effects support | LUT CSV files and optional `model.json` |
 | Smart speaker | Media players where power changes with volume or playing state | Linear calibration and optional `model.json` |
 | Fan | Fans with percentage control | Linear calibration and optional `model.json` |
-| Charging device | Vacuum robots and lawn mower robots while charging | Linear calibration and optional `model.json` |
+| Charging device | Vacuum robots while charging; lawn mower robots through the CLI | Linear calibration and optional `model.json` |
 | Average | Any device where you only need an average power value | Average power reading |
 | Recorder | Playbook patterns or state-driven device profiles | Power-only CSV, or entity-state JSON Lines with experimental fixed and vacuum composite analysis |
 

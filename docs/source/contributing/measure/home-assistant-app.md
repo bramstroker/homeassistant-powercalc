@@ -28,7 +28,7 @@ No port, host networking, Home Assistant configuration mapping, or API credentia
 | Light | `light` | Brightness, color-temperature, HS, and effect LUT data with optional `model.json` |
 | Smart speaker | `media_player` | Linear volume calibration and optional `model.json` |
 | Fan | `fan` | Linear percentage calibration and optional `model.json` |
-| Charging device | `vacuum` or `lawn_mower` | Battery-level charging calibration and optional `model.json` |
+| Charging device | `vacuum` | Battery-level charging calibration and optional `model.json` |
 | Average | No controlled device required | Average power over a configured duration |
 | Recorder | Optional tracked entities; guided vacuum and dock selection | Playbook CSV or entity-state recordings with experimental profile analysis |
 

@@ -50,14 +50,11 @@ The generated model uses a `linear` strategy with percentage calibration points.
 
 ## Charging device
 
-Use `Charging device` for devices where charging power can be mapped to battery level. The current device types are:
-
-- `vacuum_robot`
-- `lawn_mower_robot`
+Use `Charging device` for devices where charging power can be mapped to battery level. The Home Assistant app currently offers this for `vacuum_robot`. The CLI also supports `lawn_mower_robot`.
 
 === "Home Assistant app"
 
-    Select the `vacuum` or `lawn_mower` entity when creating the measurement session.
+    Select the `vacuum` entity when creating the measurement session.
 
 === "CLI"
 
@@ -86,7 +83,7 @@ Examples:
 
 - Printer idle power.
 - Camera day mode or night mode.
-- Smart switch self-usage in `on` and `off` states.
+- Set-top box standby power.
 - Network device idle power.
 
 ## Recorder
@@ -110,7 +107,7 @@ This is useful for:
 Choose the device type, such as camera, printer, or heating, then **Record device states**. Select the primary entity the Powercalc profile will use. The analyser considers the primary entity's state and scalar attributes.
 Robot vacuums use **Record vacuum and dock activity**, which selects their dedicated recipe automatically.
 The primary entity list follows the domains Powercalc supports for the selected profile type: a camera profile
-uses a `camera` entity, while a smart switch may use a `switch` or `light` entity.
+uses a `camera` entity, while a set-top box uses a `media_player` entity.
 Optionally add secondary entities whose states explain power changes, such as a camera's day/night sensor or a
 printer's operation-state sensor. The picker shows entities on the primary entity's device or its immediate parent
 or children. These need an unambiguous portable reference;

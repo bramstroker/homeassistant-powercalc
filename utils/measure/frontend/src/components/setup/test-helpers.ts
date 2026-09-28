@@ -58,7 +58,6 @@ export const recorderDefinition: MeasureDefinition = {
         { value: "generic_iot", label: "Generic IoT", entity_domains: ["media_player", "sensor"] },
         { value: "heating", label: "Heating", entity_domains: ["climate"] },
         { value: "camera", label: "Camera", entity_domains: ["camera"] },
-        { value: "smart_switch", label: "Smart switch", entity_domains: ["light", "switch"] },
       ],
       visible_when: { recorder_purpose: ["complex_profile"], profile_recipe: ["generic"] }, review: true,
     },
