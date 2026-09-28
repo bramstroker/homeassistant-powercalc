@@ -109,6 +109,11 @@ const lightDefinition: MeasureDefinition = {
   icon: "💡",
   model_id_example: "LWA017",
   product_name_example: "Hue White Ambiance A60 E27",
+  confirmation_action: "Start light measurement",
+  confirmation_guidance: [
+    "Disable automations and other controls for the selected lights so they cannot change them during measurement.",
+    "PowerCalc will control the lights automatically and cycle through the settings selected for this run.",
+  ],
   parameters: [
     { name: "sleep_time", label: "Settle time (seconds)", step: "0.1", group: "Sampling" },
     { name: "bri_bri_steps", label: "Brightness mode step", group: "Profile resolution" },
@@ -129,6 +134,9 @@ const lightDefinition: MeasureDefinition = {
 
 const recorderDefinition: MeasureDefinition = {
   measure_type: "recorder",
+  confirmation_action: "Start recording",
+  confirmation_guidance_title: "What to record",
+  confirmation_guidance_label: "Recording guidance",
   label: "Recorder",
   description: "Record power and entity states.",
   icon: "⏺",
@@ -451,4 +459,4 @@ export async function mockApi(page: Page, options: MockApiOptions = {}): Promise
   });
 }
 
-export { completedSession, settings, startedSnapshot, parameters, contributionPreview };
+export { completedSession, settings, startedSnapshot, parameters, contributionPreview, lightRequest };

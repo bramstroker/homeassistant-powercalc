@@ -112,14 +112,15 @@ describe("setup type picker", () => {
     await openSettings;
   });
 
-  it("shows a card per measurement type before a type is chosen", async () => {
+  it("shows device types and a separate free-measurement entry", async () => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.definitions = definitions;
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.querySelectorAll(".type-card")).toHaveLength(2);
-    expect(element.shadowRoot.textContent).toContain("Measure average power for a fixed duration.");
+    expect(element.shadowRoot.querySelectorAll(".device-card")).toHaveLength(1);
+    expect(element.shadowRoot.textContent).toContain("Light");
+    expect(element.shadowRoot.textContent).toContain("Free measurement");
     expect(element.shadowRoot.querySelector("form")).toBeNull();
   });
 
@@ -288,7 +289,6 @@ describe("setup type picker", () => {
             required: true,
             options: [
               { value: "vacuum_robot", label: "Vacuum robot", entity_domain: "vacuum" },
-              { value: "lawn_mower_robot", label: "Lawn mower robot", entity_domain: "lawn_mower" },
             ],
           },
           {
@@ -298,7 +298,7 @@ describe("setup type picker", () => {
             label: "Charging device",
             control: "entity" as const,
             required: true,
-            entity_domains: ["vacuum", "lawn_mower"],
+            entity_domains: ["vacuum"],
             options: [],
           },
         ],
@@ -366,49 +366,4 @@ describe("setup type picker", () => {
     expect(element.shadowRoot.querySelector('[name="fan_entity_id"]')).toBeNull();
   });
 
-  it("filters charging entities by the selected device type", async () => {
-    const chargingDefinition: MeasureDefinition = {
-      measure_type: "charging",
-        icon: "🔋",
-        model_id_example: "WSP002",
-        product_name_example: "",
-        parameters: [{ name: "sleep_time", label: "Reading interval (seconds)", hint: "Delay between repeated power readings and retries.", step: "0.1", group: "Sampling" }, { name: "sample_count", label: "Samples per reading", hint: "More samples reduce noise but increase measurement time.", group: "Sampling" }, { name: "sleep_time_sample", label: "Time between samples (seconds)", hint: "Only used when taking more than one sample.", group: "Sampling", requires_multiple: "sample_count" }] satisfies MeasureParameter[], label: "Charging device", description: "Measure charging power.",
-      fields: [
-        {
-          name: "charging_device_type", role: "attribute", label: "Device type", control: "select", required: true,
-          options: [
-            { value: "vacuum_robot", label: "Vacuum", entity_domain: "vacuum" },
-            { value: "lawn_mower_robot", label: "Lawn mower", entity_domain: "lawn_mower" },
-          ],
-        },
-        {
-          name: "charging_entity_id", role: "controller", narrowed_by: "charging_device_type", label: "Charging device", control: "entity", required: true,
-          entity_domains: ["vacuum", "lawn_mower"], options: [],
-        },
-      ],
-      supports_profile: false, supports_resume: false,
-    };
-    const element = document.createElement("measure-setup-view") as SetupViewElement;
-    element.definitions = [chargingDefinition];
-    element.capabilities = capabilities;
-    element.meter = { type: "dummy" };
-    element.deviceEntities = {
-      vacuum: [{ entity_id: "vacuum.downstairs", name: "Downstairs vacuum" }],
-      lawn_mower: [{ entity_id: "lawn_mower.garden", name: "Garden mower" }],
-    };
-    element.selectedType = "charging";
-    document.body.append(element);
-    await element.updateComplete;
-
-    const entity = entityCombobox(element, "charging_entity_id");
-    expect(entity.options.map((option) => option.label)).toContain("Downstairs vacuum · vacuum.downstairs");
-    expect(entity.options.map((option) => option.label)).not.toContain("Garden mower · lawn_mower.garden");
-
-    selectEntity(entityCombobox(element, "charging_device_type"), "lawn_mower_robot");
-    await element.updateComplete;
-
-    const updated = entityCombobox(element, "charging_entity_id");
-    expect(updated.options.map((option) => option.label)).toContain("Garden mower · lawn_mower.garden");
-    expect(updated.options.map((option) => option.label)).not.toContain("Downstairs vacuum · vacuum.downstairs");
-  });
 });

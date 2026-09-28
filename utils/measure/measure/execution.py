@@ -18,6 +18,7 @@ from measure.request import (
 )
 from measure.runner.interaction import ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
+from measure.start import MEASUREMENT_STARTS
 from measure.utils.sampling import PowerSampler
 
 
@@ -74,7 +75,7 @@ class DummyLoadPreparation(MeasurementPreparation):
         interaction.confirm(
             f"{completion}Connect the {target} in parallel with the dummy load, and keep the dummy load connected "
             "during the measurement.",
-            action="Start measurement",
+            action="Continue",
         )
 
     def _load_restored_resistance(self) -> float | None:
@@ -164,6 +165,8 @@ class MeasurementExecution:
         try:
             for preparation in self.measurement.preparations:
                 preparation.run(self.measurement.interaction)
+            start = MEASUREMENT_STARTS[request.measure_type]
+            self.measurement.interaction.confirm(start.message, action=start.action)
             result = runner.run(request, str(output_directory or ""))
             if (
                 isinstance(request, RecorderMeasurementRequest)

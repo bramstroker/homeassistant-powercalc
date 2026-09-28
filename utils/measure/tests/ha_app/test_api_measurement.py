@@ -35,13 +35,28 @@ def test_measure_definitions_and_average_request(app_client: TestClient) -> None
     assert {item["measure_type"] for item in definitions.json()} == {item.value for item in MeasureType}
     actions = {item["measure_type"]: item["confirmation_action"] for item in definitions.json()}
     assert actions == {
-        "light": None,
+        "light": "Start light measurement",
         "speaker": "Start speaker measurement",
         "recorder": "Start recording",
         "average": "Start averaging",
         "charging": "Start charging measurement",
-        "fan": None,
+        "fan": "Start fan measurement",
     }
+    guidance = {item["measure_type"]: item["confirmation_guidance"] for item in definitions.json()}
+    assert "Disable automations" in guidance["light"][0]
+    assert "Disable automations" in guidance["fan"][0]
+    assert guidance["average"] == []
+    speaker = next(item for item in definitions.json() if item["measure_type"] == MeasureType.SPEAKER)
+    assert speaker["confirmation_is_warning"] is True
+    assert speaker["confirmation_eyebrow"] == "High volume warning"
+    assert speaker["confirmation_title"] == "Protect your hearing"
+    assert (
+        next(item for item in definitions.json() if item["measure_type"] == MeasureType.FAN)["confirmation_title"]
+        == "Everything is ready"
+    )
+    recorder_definition = next(item for item in definitions.json() if item["measure_type"] == MeasureType.RECORDER)
+    assert recorder_definition["confirmation_guidance_title"] == "What to record"
+    assert recorder_definition["confirmation_guidance_label"] == "Recording guidance"
     charging = next(item for item in definitions.json() if item["measure_type"] == MeasureType.CHARGING)
     fields = {field["name"]: field for field in charging["fields"]}
     assert "entity_domain" not in fields["charging_entity_id"]
@@ -50,7 +65,6 @@ def test_measure_definitions_and_average_request(app_client: TestClient) -> None
         for option in fields["charging_device_type"]["options"]
     ] == [
         ("vacuum_robot", "Vacuum robot", "vacuum"),
-        ("lawn_mower_robot", "Lawn mower robot", "lawn_mower"),
     ]
     recorder = next(item for item in definitions.json() if item["measure_type"] == MeasureType.RECORDER)
     recorder_fields = {field["name"]: field for field in recorder["fields"]}

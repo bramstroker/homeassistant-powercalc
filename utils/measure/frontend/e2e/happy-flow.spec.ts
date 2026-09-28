@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { completedSnapshot, contributionPreview, mockApi, parameters, startedSnapshot } from "./mock-api";
+import { completedSession, completedSnapshot, contributionPreview, lightRequest, mockApi, parameters, startedSnapshot } from "./mock-api";
 import type { SessionSnapshot, SessionSummary } from "../src/types";
 
 /**
@@ -13,12 +13,81 @@ import type { SessionSnapshot, SessionSummary } from "../src/types";
 
 async function startAverageSetup(page: Page): Promise<void> {
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: /Average/ }).click();
+  await page.getByRole("button", { name: /Free measurement/ }).click();
+  await page.getByRole("button", { name: "Measure average power" }).click();
 }
 
 test.beforeEach(async ({ page }) => {
   await mockApi(page);
   await page.goto("/");
+});
+
+test("keeps experimental device labels above the device names", async ({ page }) => {
+  await page.getByRole("button", { name: "New measurement" }).click();
+  const heating = page.getByRole("button", { name: /Heating Experimental/ });
+  const badge = heating.locator(".experimental-badge");
+  const name = heating.locator(".type-label");
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    const badgeBounds = await badge.boundingBox();
+    const nameBounds = await name.boundingBox();
+    expect(badgeBounds).not.toBeNull();
+    expect(nameBounds).not.toBeNull();
+    expect(badgeBounds!.y + badgeBounds!.height).toBeLessThan(nameBounds!.y);
+  }
+});
+
+test("shows vacuum recording steps before the start button on mobile", async ({ page }, testInfo) => {
+  const pending: SessionSnapshot = {
+    ...startedSnapshot,
+    state: "awaiting_confirmation",
+    mode: "Recording",
+    confirmation_message: "Ready to start recording. Stop the measurement when you are finished.",
+    confirmation_action: "Start recording",
+    request: {
+      measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+      model_id: "", product_name: "Robot vacuum", measure_device: "Dock", generate_model: true,
+      parameters, resume_policy: "new", power_meter: { type: "dummy" },
+    },
+  };
+  await mockApi(page, { sessions: [{
+    ...completedSession, session_id: "session-running", state: "awaiting_confirmation",
+    measure_type: "recorder", product_name: "Robot vacuum", active: true,
+  }] });
+  await page.route("**/api/sessions/session-running", (route) => route.fulfill({ json: pending }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+
+  const guidance = page.getByLabel("Recording guidance");
+  await expect(guidance).toContainText("before docking a low-battery vacuum");
+  await expect(guidance).toContainText("at least 20 battery percentage points");
+  await expect(page.getByRole("button", { name: "Start recording" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.screenshot({ path: testInfo.outputPath("vacuum-recording-guidance.png"), fullPage: true });
+});
+
+test("guides light measurement before allowing PowerCalc to control the lights", async ({ page }, testInfo) => {
+  const pending: SessionSnapshot = {
+    ...startedSnapshot,
+    state: "awaiting_confirmation",
+    confirmation_message: "Ready to measure the light. PowerCalc will control the selected light settings after you start.",
+    confirmation_action: "Start light measurement",
+    request: lightRequest,
+  };
+  await mockApi(page, { sessions: [{
+    ...completedSession, session_id: "session-running", state: "awaiting_confirmation",
+    measure_type: "light", active: true,
+  }] });
+  await page.route("**/api/sessions/session-running", (route) => route.fulfill({ json: pending }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+
+  const guidance = page.getByLabel("Measurement guidance");
+  await expect(guidance).toContainText("Disable automations");
+  await expect(guidance).toContainText("settings selected for this run");
+  await expect(page.getByRole("button", { name: "Start light measurement" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.screenshot({ path: testInfo.outputPath("light-measurement-guidance.png"), fullPage: true });
 });
 
 test("preserves unfinished setup through settings and resets it for a new measurement", async ({ page }) => {
@@ -159,7 +228,8 @@ test("configures a measurement and reaches the setup check", async ({ page }) =>
   await page.getByRole("button", { name: "New measurement" }).click();
   await expect(page.getByRole("heading", { name: "Configure the measurement" })).toBeVisible();
 
-  await page.getByRole("button", { name: /Average/ }).click();
+  await page.getByRole("button", { name: /Free measurement/ }).click();
+  await page.getByRole("button", { name: "Measure average power" }).click();
 
   // The power meter comes from settings rather than the form, and is restated here.
   await expect(page.getByText("Plug power · sensor.plug_power")).toBeVisible();
@@ -175,7 +245,7 @@ test("configures a measurement and reaches the setup check", async ({ page }) =>
 
 test("selects a Home Assistant light with the shared combobox", async ({ page }) => {
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: /Light bulb/ }).click();
+  await page.getByRole("button", { name: "Light", exact: true }).click();
 
   const light = page.getByRole("combobox", { name: "Light" });
   await light.click();
@@ -192,16 +262,13 @@ test("selects a Home Assistant light with the shared combobox", async ({ page })
   await expect(page.getByText("Desk lamp", { exact: true })).toBeVisible();
 });
 
-test("loads related recorder entities after choosing a primary device entity", async ({ page }) => {
+test("loads related recorder entities after choosing a device type", async ({ page }) => {
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: /Recorder/ }).click();
-
-  await page.getByRole("combobox", { name: "What do you want to create?" }).click();
-  await page.getByRole("option", { name: "Data for a complex power profile (experimental)" }).click();
-
-  await page.getByRole("combobox", { name: "Profile device type" }).click();
-  await page.getByRole("option", { name: "Heating" }).click();
-  await page.getByRole("combobox", { name: "Primary entity" }).click();
+  await page.getByRole("button", { name: /Heating Experimental/ }).click();
+  await expect(page.locator('input[name="recorder_purpose"]')).toHaveValue("complex_profile");
+  await expect(page.locator('input[name="profile_device_type"]')).toHaveValue("heating");
+  const primary = page.getByRole("combobox", { name: "Primary entity" });
+  await primary.click();
   await page.getByRole("option", { name: "Living room thermostat · climate.living_room" }).click();
 
   const tracked = page.getByRole("combobox", { name: "Tracked entities" });
@@ -215,7 +282,7 @@ for (const width of [1280, 390]) {
   test(`keeps light setup compact and reveals contextual help at ${width}px`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 900 });
     await page.getByRole("button", { name: "New measurement" }).click();
-    await page.getByRole("button", { name: /Light bulb/ }).click();
+    await page.getByRole("button", { name: "Light", exact: true }).click();
 
     const setup = page.locator("measure-setup-view");
     const light = setup.locator('measure-combobox[name="light_entity_id"]');
@@ -281,7 +348,7 @@ for (const width of [1280, 390]) {
 
 test("submits light tags as distinct controller entities", async ({ page }) => {
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: /Light bulb/ }).click();
+  await page.getByRole("button", { name: "Light", exact: true }).click();
   await page.getByLabel("Measure multiple lights", { exact: true }).check();
   const picker = page.getByRole("combobox", { name: "Lights", exact: true });
   await picker.click();
@@ -301,7 +368,7 @@ test("keeps developer controls collapsed but virtual measurement status visible"
   await mockApi(page, { capabilities: { developer_mode: true, fast_test_mode: true } });
   await page.reload();
   await page.getByRole("button", { name: "New measurement" }).click();
-  await page.getByRole("button", { name: /Light bulb/ }).click();
+  await page.getByRole("button", { name: "Light", exact: true }).click();
   const setup = page.locator("measure-setup-view");
   const virtual = setup.getByLabel("Use virtual device (developer)");
   await expect(virtual).toBeHidden();

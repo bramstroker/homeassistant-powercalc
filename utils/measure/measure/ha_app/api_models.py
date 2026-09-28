@@ -208,6 +208,11 @@ class MeasureDefinition(BaseModel):
     icon: str
     confirmation_action: str | None
     confirmation_is_warning: bool = False
+    confirmation_guidance: list[str] = Field(default_factory=list)
+    confirmation_eyebrow: str = "Preparation complete"
+    confirmation_title: str = "Everything is ready"
+    confirmation_guidance_title: str = "Before starting"
+    confirmation_guidance_label: str = "Measurement guidance"
     model_id_example: str = ""
     product_name_example: str = ""
     fields: list[FormField]

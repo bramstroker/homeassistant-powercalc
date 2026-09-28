@@ -50,14 +50,11 @@ The generated model uses a `linear` strategy with percentage calibration points.
 
 ## Charging device
 
-Use `Charging device` for devices where charging power can be mapped to battery level. The current device types are:
-
-- `vacuum_robot`
-- `lawn_mower_robot`
+Use `Charging device` for devices where charging power can be mapped to battery level. The Home Assistant app currently offers this for `vacuum_robot`. The CLI also supports `lawn_mower_robot`.
 
 === "Home Assistant app"
 
-    Select the `vacuum` or `lawn_mower` entity when creating the measurement session.
+    Select the `vacuum` entity when creating the measurement session.
 
 === "CLI"
 
@@ -86,12 +83,12 @@ Examples:
 
 - Printer idle power.
 - Camera day mode or night mode.
-- Smart switch self-usage in `on` and `off` states.
+- Set-top box standby power.
 - Network device idle power.
 
 ## Recorder
 
-Use `Recorder` to capture an open-ended power time series. In the Home Assistant app, first choose what the recording is for:
+Use recording to capture an open-ended power time series. In the Home Assistant app, choose a device type and **Record device states** to create complex-profile source data, or choose **Free measurement** and **Record a Playbook cycle** for a Playbook CSV:
 
 - **A Playbook CSV** writes the existing headerless `elapsed time,power` format used by the [Playbook strategy](../../strategies/playbook.md).
 - **Data for a complex power profile (experimental)** records power together with the state and attributes of selected Home Assistant entities. Vacuum recordings filter attributes as described below. Generic devices can produce fixed profiles from one state or scalar attribute. The vacuum recipe can produce activity-based composite profiles with battery charging calibration when repeated episodes provide sufficient evidence.
@@ -107,11 +104,10 @@ This is useful for:
 
 ### Complex-profile recordings
 
-Choose **Generic device**, select the primary entity the Powercalc profile will use, and choose the output device
-type, such as camera, printer, or heating. The analyser considers the primary entity's state and scalar attributes.
-Robot vacuums use the dedicated recipe, which sets their profile device type automatically.
+Choose the device type, such as camera, printer, or heating, then **Record device states**. Select the primary entity the Powercalc profile will use. The analyser considers the primary entity's state and scalar attributes.
+Robot vacuums use **Record vacuum and dock activity**, which selects their dedicated recipe automatically.
 The primary entity list follows the domains Powercalc supports for the selected profile type: a camera profile
-uses a `camera` entity, while a smart switch may use a `switch` or `light` entity.
+uses a `camera` entity, while a set-top box uses a `media_player` entity.
 Optionally add secondary entities whose states explain power changes, such as a camera's day/night sensor or a
 printer's operation-state sensor. The picker shows entities on the primary entity's device or its immediate parent
 or children. These need an unambiguous portable reference;
@@ -122,7 +118,7 @@ train the model; the latest recording validates it without changing the fitted p
 at least five samples in training and five in the latest run. A single recording is retained with guidance to
 record more. Older saved generic configurations still use their first selected entity as the primary entity.
 
-Choose **Robot vacuum** for guided entity selection and dock activity analysis. See [Recording a vacuum and dock](#recording-a-vacuum-and-dock) below for setup and analysis requirements.
+Choose **Robot vacuum** and **Record vacuum and dock activity** for guided entity selection and dock activity analysis. See [Recording a vacuum and dock](#recording-a-vacuum-and-dock) below for setup and analysis requirements.
 
 Complex recordings use JSON Lines (`.jsonl`). The first record describes the recording and selected entities; every following sample contains a power reading and entity map. This lets the recorder stream samples safely without holding the complete recording in memory:
 
@@ -149,7 +145,7 @@ For a Playbook recording, move the resulting CSV into the Home Assistant playboo
 
 ### Recording a vacuum and dock
 
-Choose **Recorder**, **Complex profile**, and **Robot vacuum**. Select the vacuum and its battery percentage
+Choose **Robot vacuum** and **Record vacuum and dock activity**. Select the vacuum and its battery percentage
 sensor. The battery sensor must belong to the same Home Assistant device; the app selects it automatically when
 exactly one usable sensor is available. The app preselects the other enabled entities with live states on that device. You can
 remove entities or add dock entities belonging to another device. Camera and image entities are not selected

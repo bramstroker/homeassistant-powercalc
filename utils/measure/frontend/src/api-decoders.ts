@@ -242,6 +242,11 @@ const isMeasureDefinition: Guard<MeasureDefinition> = objectOf({
   supports_resume: isBoolean,
   confirmation_action: optionalNullable(isString),
   confirmation_is_warning: optional(isBoolean),
+  confirmation_guidance: optional(arrayOf(isString)),
+  confirmation_eyebrow: optional(isString),
+  confirmation_title: optional(isString),
+  confirmation_guidance_title: optional(isString),
+  confirmation_guidance_label: optional(isString),
   model_id_example: isString,
   product_name_example: isString,
 });

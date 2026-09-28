@@ -66,7 +66,9 @@ export function entityChoices(
   if (state.definition.measure_type === "recorder" && field.name === "tracked_entity_ids") {
     if (!related?.device_id) return [];
     const allowedDevices = new Set([related.device_id, ...(related.related_device_ids ?? [])]);
-    entities = entities.filter((entity) => entity.entity_id !== related.entity_id && allowedDevices.has(entity.device_id ?? ""));
+    entities = entities.filter((entity) => entity.entity_id !== related.entity_id
+      && entity.integration !== "powercalc"
+      && allowedDevices.has(entity.device_id ?? ""));
   }
   if (state.definition.measure_type === "recorder" && field.name === "additional_entity_ids") {
     const batteryField = state.definition.fields.find((candidate) => candidate.name === "battery_entity_id");

@@ -247,11 +247,10 @@ describe("setup view defaults", () => {
       { entity_id: "camera.porch", name: "Porch", domain: "camera", state: "idle", device_id: "porch",
         related_device_ids: ["porch-child", "porch-parent"] },
       { entity_id: "sensor.mode", name: "Mode", domain: "sensor", state: "day", device_id: "porch" },
+      { entity_id: "sensor.calculated", name: "Calculated power", domain: "sensor", state: "4", device_id: "porch", integration: "powercalc" },
       { entity_id: "sensor.child", name: "Child", domain: "sensor", state: "on", device_id: "porch-child" },
       { entity_id: "sensor.parent", name: "Parent", domain: "sensor", state: "on", device_id: "porch-parent" },
       { entity_id: "sensor.other", name: "Other", domain: "sensor", state: "on", device_id: "unrelated" },
-      { entity_id: "switch.plug", name: "Plug", domain: "switch", state: "on" },
-      { entity_id: "light.plug", name: "Plug light", domain: "light", state: "on" },
     ] };
     element.selectedType = "recorder";
     element.meter = { type: "dummy" };
@@ -268,13 +267,6 @@ describe("setup view defaults", () => {
     expect(entityCombobox(element, "tracked_entity_ids").options.map((option) => option.value)).toEqual([
       "sensor.mode", "sensor.child", "sensor.parent",
     ]);
-
-    selectEntity(entityCombobox(element, "profile_device_type"), "smart_switch");
-    await element.updateComplete;
-    expect(entityCombobox(element, "primary_entity_id").options.map((option) => option.value)).toEqual([
-      "switch.plug", "light.plug",
-    ]);
-    expect(entityCombobox(element, "primary_entity_id").value).toBe("");
   });
 
   it("shows the configured power sensor as read-only measurement context", async () => {
@@ -286,8 +278,9 @@ describe("setup view defaults", () => {
     element.meter = { type: "hass", entity_id: "sensor.plug_power" };
     element.defaultMeasureDevice = "Shelly Plug S";
     element.definitions = [lightDefinition];
-    element.selectedType = "light";
     document.body.append(element);
+    await element.updateComplete;
+    (element.shadowRoot.querySelector(".device-card") as HTMLButtonElement).click();
     await element.updateComplete;
 
     expect(element.shadowRoot.querySelector('select[name="power_entity_id"]')).toBeNull();
@@ -351,8 +344,9 @@ describe("setup view defaults", () => {
     element.powers = [{ entity_id: "sensor.plug_power", name: "Plug power" }];
     element.voltages = [];
     element.definitions = [lightDefinition];
-    element.selectedType = "light";
     document.body.append(element);
+    await element.updateComplete;
+    (element.shadowRoot.querySelector(".device-card") as HTMLButtonElement).click();
     await element.updateComplete;
 
     const profileSection = element.shadowRoot.querySelector(".device-section");

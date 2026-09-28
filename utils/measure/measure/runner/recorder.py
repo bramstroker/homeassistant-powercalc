@@ -69,7 +69,6 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
     ) -> RunnerResult:
         self.filename = validate_export_filename(request.export_filename)
         self._missing_optional_entities.clear()
-        self.interaction.confirm("Ready to start recording. Stop the measurement when you are finished.")
         self.interaction.phase("Starting recording")
 
         entity_ids = request.recorded_entity_ids

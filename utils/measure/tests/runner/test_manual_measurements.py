@@ -24,7 +24,7 @@ def test_average_has_no_separate_standby_measurement() -> None:
     sampler.take_average_measurement.assert_not_called()
 
 
-def test_average_reports_start_phase_after_confirmation() -> None:
+def test_average_reports_start_phase() -> None:
     sampler = MagicMock(spec=PowerSampler)
     sampler.take_average_measurement.return_value = MeasurementResult(power=4.2, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
@@ -32,7 +32,7 @@ def test_average_reports_start_phase_after_confirmation() -> None:
 
     runner.run(AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), duration=10), "")
 
-    interaction.confirm.assert_called_once_with("Ready to start the average measurement.")
+    interaction.confirm.assert_not_called()
     interaction.phase.assert_called_once_with("Starting averaging")
     assert sampler.take_average_measurement.call_args.kwargs["finish_on_interrupt"] is True
 
@@ -70,7 +70,7 @@ def test_recorder_treats_app_stop_as_successful_completion(tmp_path: Path) -> No
     export_directory = str(tmp_path)
     result = runner.run(request, export_directory)
 
-    interaction.confirm.assert_called_once_with("Ready to start recording. Stop the measurement when you are finished.")
+    interaction.confirm.assert_not_called()
     interaction.phase.assert_called_once_with("Starting recording")
     assert result.summary is not None
     assert result.summary["Samples recorded"] == "1"

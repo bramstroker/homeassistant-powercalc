@@ -7,6 +7,7 @@ The app guides you through configuring, running, and reviewing measurements. It 
 ![Powercalc Measure result view](../../img/measure_app_result.png)
 
 - [App settings](home-assistant-app/settings.md): power meters, connection checks, and developer options.
+- [Measuring by device type](device-types.md): preparation and recording steps for each choice in the app.
 - [Results and sessions](home-assistant-app/sessions.md): GitHub contributions, resume, downloads, and backups.
 - [Measurement automations](home-assistant-app/automations.md): notifications and flashing the measured lights.
 - [App troubleshooting](home-assistant-app/troubleshooting.md): connection, calibration, and storage problems.
@@ -27,7 +28,7 @@ No port, host networking, Home Assistant configuration mapping, or API credentia
 | Light | `light` | Brightness, color-temperature, HS, and effect LUT data with optional `model.json` |
 | Smart speaker | `media_player` | Linear volume calibration and optional `model.json` |
 | Fan | `fan` | Linear percentage calibration and optional `model.json` |
-| Charging device | `vacuum` or `lawn_mower` | Battery-level charging calibration and optional `model.json` |
+| Charging device | `vacuum` | Battery-level charging calibration and optional `model.json` |
 | Average | No controlled device required | Average power over a configured duration |
 | Recorder | Optional tracked entities; guided vacuum and dock selection | Playbook CSV or entity-state recordings with experimental profile analysis |
 
@@ -47,10 +48,10 @@ Keep people, automations, adaptive-lighting systems, and other controllers from 
 
 1. Configure and test the measurement device in [Settings](home-assistant-app/settings.md).
 2. Open **All sessions** and select **New measurement**.
-3. Select a measurement type and the Home Assistant entity when that measurement controls a device.
-4. Enter the profile details and measurement-specific options. Light measurements also let you choose the modes advertised by the selected entity. For loads too low for the meter, see [Measuring low-power devices](low-power-measurements.md).
+3. Choose the type of device you want to measure. Search the list of PowerCalc device types if needed. Choose **Free measurement** for a single average reading or a Playbook CSV.
+4. If the device has several measurement methods, choose one. Lights go directly to the automated light measurement. Select the Home Assistant entity and enter measurement-specific options. Light measurements also let you choose the modes advertised by the selected entity. For loads too low for the meter, see [Measuring low-power devices](low-power-measurements.md).
 5. Run the setup check and review its estimates, warnings, meter diagnostics, and timing settings. For lights without a dummy load, this checks representative low-load settings and standby, then leaves the lights off. Use **Recheck setup** after changing the physical setup. See [Measuring low-power devices](low-power-measurements.md) for check details and readings of `0` W.
-6. Start the session. Complete the dummy-load calibration or reuse confirmation when enabled. Average, recorder, speaker, and charging measurements also pause for an explicit confirmation when the physical device must be prepared or the actual sampling period is about to begin.
+6. Start the session. Complete the dummy-load calibration or reuse confirmation when enabled. Review the ready screen's [device-specific instructions](device-types.md), then press **Start** when the device is prepared.
 7. Follow live progress, current operating values, recent power samples, and session logs. You can close or reload the browser; the app owns the job and restores its persisted status when you return.
 8. Review plots and download generated CSV, model, or recording files from the result view. For generated profiles, follow [Results and sessions](home-assistant-app/sessions.md) to contribute through GitHub or download files for manual submission.
 
