@@ -11,6 +11,7 @@ from measure.controller.light.spec import (
     HassMultiLightControllerSpec,
 )
 from measure.controller.media.spec import DummyMediaControllerSpec, HassMediaControllerSpec
+from measure.controller.switch.spec import HassMultiSwitchControllerSpec, HassSwitchControllerSpec
 from measure.ha_app.preflight import ActiveSessionError, EntityRecord, MeasurementPreflight, PreflightError
 from measure.home_assistant.entities import DeviceClass
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
@@ -22,6 +23,7 @@ from measure.request import (
     FanMeasurementRequest,
     LightMeasurementRequest,
     RecorderMeasurementRequest,
+    SmartSwitchMeasurementRequest,
     SpeakerMeasurementRequest,
 )
 from measure.tuning import MeasurementParameters
@@ -90,6 +92,69 @@ def base_entities() -> dict[tuple[str | None, str | None], list[Entity]]:
         ("lawn_mower", None): [Entity("lawn_mower.test", attribute_names=["battery_level"])],
         ("sensor", None): [Entity("sensor.battery", state="75")],
     }
+
+
+def test_smart_switch_preflight_accepts_external_meter_and_same_device_relays() -> None:
+    entities = base_entities()
+    entities[("switch", None)] = [
+        Entity("switch.one", state="on", device_id="switch-device"),
+        Entity("switch.two", state="off", device_id="switch-device"),
+    ]
+    power = Entity("sensor.external_power", state="0.5", device_id="meter-device")
+    entities[("sensor", None)].append(power)
+    entities[(None, "power")].append(power)
+    request = SmartSwitchMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.external_power"),
+        controller=HassMultiSwitchControllerSpec(entity_ids=["switch.one", "switch.two"]),
+        power_monitoring="yes",
+    )
+
+    result = preflight(entities).validate(request)
+
+    assert result.estimated_variations == 12
+
+
+@pytest.mark.parametrize(
+    "relay_state, second_device, meter_device, expected",
+    [
+        ("unavailable", "switch-device", "meter-device", "on or off state"),
+        ("idle", "switch-device", "meter-device", "on or off state"),
+        ("on", "other-device", "meter-device", "same Home Assistant device"),
+        ("on", "switch-device", "switch-device", "external power meter"),
+    ],
+)
+def test_smart_switch_preflight_rejects_invalid_selection(
+    relay_state: str, second_device: str, meter_device: str, expected: str
+) -> None:
+    entities = base_entities()
+    entities[("switch", None)] = [
+        Entity("switch.one", state="on", device_id="switch-device"),
+        Entity("switch.two", state=relay_state, device_id=second_device),
+    ]
+    power = Entity("sensor.external_power", state="0.5", device_id=meter_device)
+    entities[("sensor", None)].append(power)
+    entities[(None, "power")].append(power)
+    request = SmartSwitchMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.external_power"),
+        controller=HassMultiSwitchControllerSpec(entity_ids=["switch.one", "switch.two"]),
+        power_monitoring="yes",
+    )
+
+    with pytest.raises(PreflightError, match=expected):
+        preflight(entities).validate(request)
+
+
+def test_smart_switch_preflight_requires_registered_switch_device() -> None:
+    entities = base_entities()
+    entities[("switch", None)] = [Entity("switch.one", state="off")]
+    request = SmartSwitchMeasurementRequest(
+        power_meter=ShellyPowerMeterSpec(device_ip="192.0.2.1"),
+        controller=HassSwitchControllerSpec(entity_id="switch.one"),
+        power_monitoring="no",
+    )
+
+    with pytest.raises(PreflightError, match="same Home Assistant device"):
+        preflight(entities).validate(request)
 
 
 def test_preflight_accepts_request_without_meter_diagnostics() -> None:

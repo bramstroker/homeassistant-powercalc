@@ -309,10 +309,11 @@ export class AppShell extends LitElement implements MeasureAppState {
         .guidanceTitle=${startDefinition?.confirmation_guidance_title ?? "Before starting"}
         .guidanceLabel=${startDefinition?.confirmation_guidance_label ?? "Measurement guidance"}
         .guidance=${startDefinition?.confirmation_guidance ?? []}
+        .acknowledgment=${startDefinition?.confirmation_acknowledgment ?? ""}
         .connected=${this.connectedToEvents} .logs=${this.logs} .samples=${this.samples}
         .lastEventReceivedAt=${this.lastEventReceivedAt}
         .diagnosticsUrl=${this.api.diagnosticsUrl(snapshot.session_id ?? "")} .busy=${this.busy}
-        @cancel=${() => void this.controller.cancel()} @confirm=${() => void this.controller.confirm()}
+        @cancel=${() => void this.controller.cancel()} @confirm=${(event: CustomEvent<{ acknowledged: boolean }>) => void this.controller.confirm(event.detail.acknowledged)}
       ></measure-running-view>`;
   }
 

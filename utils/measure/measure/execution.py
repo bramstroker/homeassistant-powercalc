@@ -166,6 +166,8 @@ class MeasurementExecution:
             for preparation in self.measurement.preparations:
                 preparation.run(self.measurement.interaction)
             start = MEASUREMENT_STARTS[request.measure_type]
+            if start.acknowledgment:
+                self.measurement.interaction.acknowledge(start.acknowledgment)
             self.measurement.interaction.confirm(start.message, action=start.action)
             result = runner.run(request, str(output_directory or ""))
             if (

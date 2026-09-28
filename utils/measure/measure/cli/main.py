@@ -44,6 +44,8 @@ from measure.home_assistant.client import HomeAssistantManager
 from measure.home_assistant.entities import HomeAssistantEntityCatalog
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.errors import PowerMeterError
+from measure.powermeter.spec import HassPowerMeterSpec
+from measure.request import SmartSwitchMeasurementRequest
 from measure.runner.errors import RunnerError
 from measure.utils.version import measure_version
 
@@ -67,6 +69,7 @@ MODEL_ID_EXAMPLES = {
     MeasureType.LIGHT: "LED1837R5",
     MeasureType.SPEAKER: "One SL",
     MeasureType.FAN: "AM07",
+    MeasureType.SMART_SWITCH: "SHSW-25",
 }
 
 _LOGGER = logging.getLogger("measure")
@@ -102,6 +105,8 @@ class Measure:
             interaction = ConsoleInteraction()
             request = request_from_answers(self.measure_type, answers, self.config)
             request = apply_dummy_load_answers(request, answers, self._dummy_load_calibration_store)
+            if isinstance(request, SmartSwitchMeasurementRequest):
+                self._validate_smart_switch_selection(request)
             if self._uses_home_assistant():
                 self._home_assistant_manager()
             prepared = MeasurementAssembler(
@@ -260,6 +265,19 @@ class Measure:
         if not answers.get(QUESTION_MODEL_NAME):
             answers[QUESTION_MODEL_NAME] = entity.product_name or ""
 
+    def _validate_smart_switch_selection(self, request: SmartSwitchMeasurementRequest) -> None:
+        snapshot = self._home_assistant_entity_catalog().load_snapshot()
+        relays = [snapshot.get(entity_id) for entity_id in request.controller.entity_ids]
+        if any(relay is None or relay.state not in {"on", "off"} for relay in relays):
+            raise ValueError("Every selected switch relay must be available and report on or off")
+        device_ids = {relay.device_id for relay in relays if relay is not None}
+        if None in device_ids or len(device_ids) != 1:
+            raise ValueError("All selected relays must belong to the same Home Assistant device")
+        if isinstance(request.power_meter, HassPowerMeterSpec):
+            meter = snapshot.get(request.power_meter.entity_id)
+            if meter is None or meter.device_id in device_ids:
+                raise ValueError("Measure switch self consumption with an external power meter")
+
     def _home_assistant_manager(self) -> HomeAssistantManager:
         if self._home_assistant is None:
             self._home_assistant = HomeAssistantManager(self.config.hass_url, self.config.hass_token)
@@ -272,7 +290,8 @@ class Measure:
 
     def _uses_home_assistant(self) -> bool:
         return (
-            self.config.selected_power_meter == PowerMeterType.HASS
+            self.measure_type == MeasureType.SMART_SWITCH
+            or self.config.selected_power_meter == PowerMeterType.HASS
             or (
                 self.measure_type == MeasureType.LIGHT
                 and self.config.selected_light_controller == LightControllerType.HASS

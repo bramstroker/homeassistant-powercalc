@@ -13,6 +13,7 @@ from measure.controller.light.const import LutMode
 from measure.controller.light.spec import LightControllerSpec
 from measure.controller.media.spec import MediaControllerSpec
 from measure.controller.spec import BaseControllerSpec
+from measure.controller.switch.spec import SwitchControllerSpec
 from measure.powermeter.spec import DummyPowerMeterSpec, ManualPowerMeterSpec, PowerMeterSpec
 from measure.profile.device_type import PROFILE_DEVICE_DOMAINS, ProfileDeviceType
 from measure.recording.files import COMPLEX_PROFILE_EXPORT_FILENAME, DEFAULT_EXPORT_FILENAME
@@ -366,6 +367,24 @@ class FanMeasurementRequest(BaseMeasurementRequest):
     generate_model: bool = True
 
 
+class SmartSwitchMeasurementRequest(BaseMeasurementRequest):
+    """Measure relay self consumption with every output load disconnected."""
+
+    measure_type: Literal[MeasureType.SMART_SWITCH] = MeasureType.SMART_SWITCH
+    controller: SwitchControllerSpec
+    power_monitoring: Literal["yes", "no"]
+    samples_per_state: int = Field(default=12, ge=5, le=100)
+    repeat_cycles: int = Field(default=3, ge=2, le=5)
+    settle_seconds: float = Field(default=5, ge=0, le=120)
+    generate_model: bool = True
+
+    @model_validator(mode="after")
+    def validate_switch_meter(self) -> SmartSwitchMeasurementRequest:
+        if isinstance(self.power_meter, ManualPowerMeterSpec):
+            raise ValueError("Smart switch measurements require an automatic precise power meter")
+        return self
+
+
 type MeasurementRequest = (
     LightMeasurementRequest
     | AverageMeasurementRequest
@@ -373,6 +392,7 @@ type MeasurementRequest = (
     | SpeakerMeasurementRequest
     | ChargingMeasurementRequest
     | FanMeasurementRequest
+    | SmartSwitchMeasurementRequest
 )
 
 MeasurementRequestPayload = Annotated[MeasurementRequest, Field(discriminator="measure_type")]

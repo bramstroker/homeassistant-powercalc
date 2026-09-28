@@ -97,6 +97,31 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector("progress")).toBeNull();
   });
 
+  it("requires a fresh safety acknowledgment for each smart switch session", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = { session_id: "first", state: "awaiting_confirmation" };
+    element.acknowledgment = "I disconnected all loads.";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const confirm = vi.fn();
+    element.addEventListener("confirm", confirm);
+    const button = element.shadowRoot!.querySelector<HTMLButtonElement>("button.confirm")!;
+    expect(button.disabled).toBe(true);
+    const checkbox = element.shadowRoot!.querySelector<HTMLInputElement>("input[type=checkbox]")!;
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event("change"));
+    await element.updateComplete;
+    expect(button.disabled).toBe(false);
+    button.click();
+    expect(confirm).toHaveBeenCalledOnce();
+    expect((confirm.mock.calls[0]?.[0] as CustomEvent).detail).toEqual({ acknowledged: true });
+
+    element.snapshot = { session_id: "second", state: "awaiting_confirmation" };
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector<HTMLButtonElement>("button.confirm")?.disabled).toBe(true);
+  });
+
   it("guides the operator before PowerCalc starts controlling a light", async () => {
     const element = document.createElement("measure-running-view") as import("./view").RunningView;
     element.snapshot = {

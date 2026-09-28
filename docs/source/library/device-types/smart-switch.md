@@ -86,21 +86,10 @@ So assuming switch with 4 relays, and 2 are activated the following power values
 
 ## Measure
 
-Start by disconnecting the device from the smart switch, as we need to measure the power consumption of the smart switch itself, not the device it controls.
-Next, plug the smart switch into the power meter (smart plug) you will be using for the measurement.
+Select **Smart switch** in the [Measure app](../../contributing/measure/index.md). The automated runner measures the switch's own power use, not an appliance connected to its output. **Disconnect every load from every relay output** and disable automations that could switch a relay during the run. The ready screen asks you to confirm this before PowerCalc operates any relay.
 
-The ability to measure the smart switch's standby power depends on the smart plug you're using. Some plugs may not be able to measure very low values.
+Connect a precise external power meter upstream of the switch. Its resolution must be good enough to distinguish the switch's small off and on power draws. The switch's built-in power sensor cannot measure its own self consumption. When the external meter cannot resolve these low readings, a calibrated resistive dummy load may be connected **in parallel with the switch**, upstream of the relay outputs. Never connect the dummy load to a switched output. Follow the [low-power measurement guide](../../contributing/measure/low-power-measurements.md).
 
-The Zhurui PR10 smart plug is a good option, as it can measure power as low as 0.1W.
+Select one relay for a fixed profile, or all relays on the same Home Assistant device for a `multi_switch` profile. State whether the switch has built-in power monitoring; this sets `device_specs.power_monitoring`. PowerCalc repeats the off and on measurements, checks their consistency, saves the individual readings, and restores the original relay states when it finishes or is cancelled.
 
-Alternatively, you can try another smart plug, but you might need to add a dummy load to the smart switch to get an accurate measurement.
-When using a smart plug, you can use the [measure tool](../../contributing/measure/index.md) and select the `average` mode for 1 minute to get a reading.
-
-Now, you’re ready to measure the smart switch's power consumption in both the `ON` and `OFF` states.
-
-- Turn the switch ON in HA
-- Record the power reading
-- Turn the switch OFF in HA
-- Record the power reading
-
-Choose the appropriate example JSON for your situation and replace the values with the ones you've measured.
+For multiple relays, PowerCalc measures an all-off baseline, each relay on separately, and all relays on. The relays must have sufficiently similar self-consumption increments for the shared `multi_switch_config.power` value. Multi-relay profiles use `only_self_usage: true` whether or not the device has built-in power monitoring. Model the appliances connected to its outputs separately. For a single relay without built-in power monitoring, the fixed profile can ask the user for the connected appliance's power as described above.

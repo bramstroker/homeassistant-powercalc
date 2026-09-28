@@ -15,6 +15,7 @@ class MeasureType(StrEnum):
     AVERAGE = "average"
     CHARGING = "charging"
     FAN = "fan"
+    SMART_SWITCH = "smart_switch"
 
 
 MEASURE_TYPE_LABELS: dict[MeasureType, str] = {
@@ -24,6 +25,7 @@ MEASURE_TYPE_LABELS: dict[MeasureType, str] = {
     MeasureType.AVERAGE: "Average",
     MeasureType.CHARGING: "Charging device",
     MeasureType.FAN: "Fan",
+    MeasureType.SMART_SWITCH: "Smart switch",
 }
 
 LEGACY_MEASURE_TYPE_VALUES: dict[str, MeasureType] = {

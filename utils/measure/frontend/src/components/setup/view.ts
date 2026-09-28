@@ -319,7 +319,8 @@ export class SetupView extends LitElement {
         <measure-setup-developer-options
           .developerMode=${this.capabilities.developer_mode ?? false}
           .fastTestMode=${this.capabilities.fast_test_mode ?? false}
-          .hasController=${definition.fields.some((field) => field.role === "controller")}
+          .hasController=${definition.measure_type !== "smart_switch"
+            && definition.fields.some((field) => field.role === "controller")}
           .dummyController=${this.dummyController}
           @dummy-controller-change=${this.dummyControllerChanged}
         ></measure-setup-developer-options>
@@ -498,6 +499,7 @@ export class SetupView extends LitElement {
       case "light": return { deviceId: "light", routeId: "light" };
       case "speaker": return { deviceId: "smart_speaker", routeId: "speaker" };
       case "fan": return { deviceId: "fan", routeId: "fan" };
+      case "smart_switch": return { deviceId: "smart_switch", routeId: "smart_switch" };
       case "charging": return { deviceId: "vacuum_robot", routeId: "charging" };
       case "average": return { deviceId: FREE_MEASUREMENT, routeId: "average" };
       case "recorder": return { deviceId: FREE_MEASUREMENT, routeId: "playbook" };

@@ -5,6 +5,7 @@ import { deviceChoices, FREE_MEASUREMENT, routesForDevice, selectionFromRequest 
 
 const speaker: MeasureDefinition = { ...lightDefinition, measure_type: "speaker", label: "Smart speaker" };
 const fan: MeasureDefinition = { ...lightDefinition, measure_type: "fan", label: "Fan" };
+const smartSwitch: MeasureDefinition = { ...lightDefinition, measure_type: "smart_switch", label: "Smart switch" };
 const charging: MeasureDefinition = {
   ...lightDefinition,
   measure_type: "charging",
@@ -30,14 +31,14 @@ const recorder: MeasureDefinition = {
     ],
   } : field),
 };
-const definitions = [lightDefinition, speaker, fan, charging, recorder, average];
+const definitions = [lightDefinition, speaker, fan, smartSwitch, charging, recorder, average];
 
 describe("device-first measurement routes", () => {
   it("lists server-supported profile types and a dedicated vacuum, without duplicating specialist types", () => {
     const choices = deviceChoices(definitions);
     expect(choices.map((choice) => choice.id)).toEqual([
       "air_purifier", "camera", "fan", "heating", "light", "printer",
-      "vacuum_robot", "set_top_box", "smart_speaker",
+      "vacuum_robot", "set_top_box", "smart_speaker", "smart_switch",
     ]);
     expect(choices.filter((choice) => choice.id === "vacuum_robot")).toHaveLength(1);
     expect(choices.find((choice) => choice.id === "camera")?.experimental).toBe(true);
@@ -54,6 +55,12 @@ describe("device-first measurement routes", () => {
   it("offers only automated measurement for smart speakers", () => {
     expect(routesForDevice("smart_speaker", definitions).map((route) => route.id)).toEqual(["speaker"]);
     expect(routesForDevice("smart_speaker", definitions.filter((item) => item.measure_type !== "speaker"))).toEqual([]);
+  });
+
+  it("offers a dedicated smart switch runner", () => {
+    expect(routesForDevice("smart_switch", definitions).map((route) => route.id)).toEqual(["smart_switch"]);
+    expect(routesForDevice("smart_switch", definitions)[0]?.experimental).toBeUndefined();
+    expect(routesForDevice("smart_switch", definitions.filter((item) => item.measure_type !== "smart_switch"))).toEqual([]);
   });
 
   it("offers specialist and recorder routes where both exist", () => {
@@ -73,7 +80,7 @@ describe("device-first measurement routes", () => {
   it("offers no route for device types deferred by the server", () => {
     for (const deviceType of [
       "air_conditioner", "ups", "television", "network", "power_meter", "smart_dimmer",
-      "cover", "generic_iot", "humidifier", "water_heater", "smart_switch", "lawn_mower_robot",
+      "cover", "generic_iot", "humidifier", "water_heater", "lawn_mower_robot",
     ]) {
       expect(routesForDevice(deviceType, definitions)).toEqual([]);
     }
@@ -96,5 +103,6 @@ describe("device-first measurement routes", () => {
       .toEqual({ deviceId: "vacuum_robot", routeId: "vacuum_profile" });
     expect(restore({ measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "generic", profile_device_type: "camera" }))
       .toEqual({ deviceId: "camera", routeId: "complex_profile" });
+    expect(restore({ measure_type: "smart_switch" })).toEqual({ deviceId: "smart_switch", routeId: "smart_switch" });
   });
 });

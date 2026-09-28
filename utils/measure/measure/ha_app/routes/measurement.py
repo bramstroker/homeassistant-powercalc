@@ -244,6 +244,7 @@ def _measure_definitions() -> list[MeasureDefinition]:
             confirmation_title=definition.confirmation_title,
             confirmation_guidance_title=definition.confirmation_guidance_title,
             confirmation_guidance_label=definition.confirmation_guidance_label,
+            confirmation_acknowledgment=definition.confirmation_acknowledgment,
             model_id_example=definition.model_id_example,
             product_name_example=definition.product_name_example,
             parameters=[MeasureParameter(**vars(parameter)) for parameter in definition.parameters],

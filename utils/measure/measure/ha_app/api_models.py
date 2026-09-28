@@ -213,6 +213,7 @@ class MeasureDefinition(BaseModel):
     confirmation_title: str = "Everything is ready"
     confirmation_guidance_title: str = "Before starting"
     confirmation_guidance_label: str = "Measurement guidance"
+    confirmation_acknowledgment: str | None = None
     model_id_example: str = ""
     product_name_example: str = ""
     fields: list[FormField]

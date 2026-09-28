@@ -14,6 +14,7 @@ from measure.cli.questions import (
     hue_light_controller_questions,
     light_questions,
     recorder_questions,
+    smart_switch_questions,
     speaker_questions,
 )
 from measure.const import MeasureType
@@ -75,6 +76,10 @@ def _fan(environment: CliEnvironment, entity_catalog: HomeAssistantEntityCatalog
     return []
 
 
+def _smart_switch(_: CliEnvironment, entity_catalog: HomeAssistantEntityCatalog | None) -> list[Question]:
+    return smart_switch_questions(_require_entity_catalog(entity_catalog))
+
+
 CLI_QUESTION_BUILDERS: dict[MeasureType, CliQuestionBuilder] = {
     MeasureType.LIGHT: _light,
     MeasureType.SPEAKER: _speaker,
@@ -82,6 +87,7 @@ CLI_QUESTION_BUILDERS: dict[MeasureType, CliQuestionBuilder] = {
     MeasureType.AVERAGE: _average,
     MeasureType.CHARGING: _charging,
     MeasureType.FAN: _fan,
+    MeasureType.SMART_SWITCH: _smart_switch,
 }
 
 

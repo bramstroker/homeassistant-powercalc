@@ -3,6 +3,7 @@ from measure.cli.request_adapter import request_from_answers
 from measure.const import PARAMETER_LIMITS, MeasureType
 from measure.controller.light.const import LightControllerType, LutMode
 from measure.controller.light.spec import HassMultiLightControllerSpec
+from measure.controller.switch.spec import HassMultiSwitchControllerSpec
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import (
@@ -15,6 +16,7 @@ from measure.request import (
     RecorderMeasurementRequest,
     RecorderProfileRecipe,
     RecorderPurpose,
+    SmartSwitchMeasurementRequest,
     parse_measurement_request,
     validate_export_filename,
 )
@@ -32,6 +34,45 @@ def valid_request() -> dict[str, object]:
         "controller": {"type": "hass", "entity_id": "light.test"},
         "power_meter": {"type": "hass", "entity_id": "sensor.test_power"},
     }
+
+
+def test_smart_switch_request_round_trip_preserves_multi_relay_configuration() -> None:
+    request = SmartSwitchMeasurementRequest.model_validate(
+        {
+            "power_meter": {"type": "hass", "entity_id": "sensor.external_power"},
+            "controller": {"type": "hass_multi", "entity_ids": ["switch.one", "switch.two"]},
+            "power_monitoring": "yes",
+        }
+    )
+
+    restored = parse_measurement_request(request.model_dump(mode="json"))
+
+    assert restored == request
+    assert isinstance(restored.controller, HassMultiSwitchControllerSpec)
+    assert restored.controlled_entity_ids == ["switch.one", "switch.two"]
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"controller": {"type": "hass_multi", "entity_ids": ["switch.one", "switch.one"]}},
+        {"controller": {"type": "hass_multi", "entity_ids": ["switch.one", "light.two"]}},
+        {"controller": {"type": "hass_multi", "entity_ids": ["switch.one"]}},
+        {"power_meter": {"type": "manual"}},
+        {"power_monitoring": ""},
+        {"samples_per_state": 4},
+        {"repeat_cycles": 1},
+    ],
+)
+def test_smart_switch_request_rejects_unusable_input(changes: dict[str, object]) -> None:
+    payload = {
+        "power_meter": {"type": "hass", "entity_id": "sensor.external_power"},
+        "controller": {"type": "hass", "entity_id": "switch.one"},
+        "power_monitoring": "no",
+    }
+
+    with pytest.raises(ValidationError):
+        SmartSwitchMeasurementRequest.model_validate(payload | changes)
 
 
 def test_request_round_trip_preserves_typed_input() -> None:

@@ -254,10 +254,10 @@ export class MeasureAppController {
     });
   }
 
-  async confirm(): Promise<void> {
+  async confirm(acknowledged = false): Promise<void> {
     const sessionId = this.state.snapshot?.session_id;
     if (!sessionId) return;
-    await this.sessionCommand("Confirmation", () => this.api().confirm(sessionId));
+    await this.sessionCommand("Confirmation", () => this.api().confirm(sessionId, acknowledged));
   }
 
   async cancel(): Promise<void> {

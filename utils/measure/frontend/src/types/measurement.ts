@@ -98,7 +98,7 @@ export interface Capabilities {
   fast_test_mode?: boolean;
 }
 
-export type MeasureType = "light" | "speaker" | "recorder" | "average" | "charging" | "fan";
+export type MeasureType = "light" | "speaker" | "recorder" | "average" | "charging" | "fan" | "smart_switch";
 
 /** A plain value as it travels between the app and the API: form field values, device info, metadata. */
 export type PrimitiveValue = string | number | boolean | null;
@@ -173,6 +173,7 @@ export interface MeasureDefinition {
   confirmation_title?: string;
   confirmation_guidance_title?: string;
   confirmation_guidance_label?: string;
+  confirmation_acknowledgment?: string | null;
   /** Placeholders shown in the profile fields, to steer the naming this type expects. */
   model_id_example: string;
   product_name_example: string;
@@ -222,6 +223,7 @@ export type LightControllerSpec =
 export type MediaControllerSpec = { type: "dummy" } | { type: "hass"; entity_id: string };
 export type ChargingControllerSpec = { type: "dummy" } | { type: "hass"; entity_id: string };
 export type FanControllerSpec = { type: "dummy" } | { type: "hass"; entity_id: string };
+export type SwitchControllerSpec = { type: "hass"; entity_id: string } | { type: "hass_multi"; entity_ids: string[] };
 
 export interface LightMeasurementRequest extends BaseMeasurementRequest {
   measure_type: "light";
@@ -248,6 +250,14 @@ export interface RecorderMeasurementRequest extends BaseMeasurementRequest {
 export interface SpeakerMeasurementRequest extends BaseMeasurementRequest { measure_type: "speaker"; controller: MediaControllerSpec; disable_streaming: boolean; }
 export interface ChargingMeasurementRequest extends BaseMeasurementRequest { measure_type: "charging"; controller: ChargingControllerSpec; charging_device_type: ChargingDeviceType; }
 export interface FanMeasurementRequest extends BaseMeasurementRequest { measure_type: "fan"; controller: FanControllerSpec; }
+export interface SmartSwitchMeasurementRequest extends BaseMeasurementRequest {
+  measure_type: "smart_switch";
+  controller: SwitchControllerSpec;
+  power_monitoring: "yes" | "no";
+  samples_per_state: number;
+  repeat_cycles: number;
+  settle_seconds: number;
+}
 
 export type MeasurementRequest =
   | LightMeasurementRequest
@@ -255,7 +265,8 @@ export type MeasurementRequest =
   | RecorderMeasurementRequest
   | SpeakerMeasurementRequest
   | ChargingMeasurementRequest
-  | FanMeasurementRequest;
+  | FanMeasurementRequest
+  | SmartSwitchMeasurementRequest;
 
 
 export interface CalibrationJob {

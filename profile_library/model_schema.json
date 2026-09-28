@@ -145,6 +145,11 @@
           },
           "only_self_usage": {
             "const": true
+          },
+          "calculation_strategy": {
+            "not": {
+              "const": "multi_switch"
+            }
           }
         },
         "required": [

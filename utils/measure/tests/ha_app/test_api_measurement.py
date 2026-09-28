@@ -41,6 +41,7 @@ def test_measure_definitions_and_average_request(app_client: TestClient) -> None
         "average": "Start averaging",
         "charging": "Start charging measurement",
         "fan": "Start fan measurement",
+        "smart_switch": "Start switch measurement",
     }
     guidance = {item["measure_type"]: item["confirmation_guidance"] for item in definitions.json()}
     assert "Disable automations" in guidance["light"][0]

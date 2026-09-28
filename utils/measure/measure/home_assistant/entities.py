@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 
 
 class EntityDomain(StrEnum):
+    SWITCH = "switch"
     LIGHT = "light"
     MEDIA_PLAYER = "media_player"
     FAN = "fan"

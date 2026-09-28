@@ -138,6 +138,23 @@ def hass_fan_controller_questions(entity_catalog: HomeAssistantEntityCatalog) ->
     ]
 
 
+def smart_switch_questions(entity_catalog: HomeAssistantEntityCatalog) -> list[Question]:
+    """Select all relays of one device and describe its internal meter explicitly."""
+
+    return [
+        inquirer.Checkbox(
+            name="switch_entity_ids",
+            message="Select the switch relays to measure (all from one device)",
+            choices=_entity_choices(entity_catalog.load_snapshot().select(domain=EntityDomain.SWITCH)),
+        ),
+        inquirer.List(
+            name="power_monitoring",
+            message="Does the smart switch have built-in power monitoring?",
+            choices=[("Yes", "yes"), ("No", "no")],
+        ),
+    ]
+
+
 def hass_light_controller_questions(entity_catalog: HomeAssistantEntityCatalog) -> list[Question]:
     return [
         inquirer.List(

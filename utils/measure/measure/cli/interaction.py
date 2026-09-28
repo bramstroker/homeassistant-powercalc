@@ -11,6 +11,10 @@ class ConsoleInteraction(RunInteraction):
         del action
         input(f"{message}\nPress enter to continue...")
 
+    def acknowledge(self, message: str) -> None:
+        if not self.choose(message, default=False):
+            raise ValueError("Safety acknowledgment is required before switching relays")
+
     def notify(self, message: str) -> None:
         print(message)
 

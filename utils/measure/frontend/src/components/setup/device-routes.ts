@@ -27,6 +27,7 @@ const SPECIALIZED_DEVICES: Partial<Record<MeasureType, DeviceChoice>> = {
   light: { id: "light", label: "Light" },
   speaker: { id: "smart_speaker", label: "Smart speaker" },
   fan: { id: "fan", label: "Fan" },
+  smart_switch: { id: "smart_switch", label: "Smart switch" },
 };
 
 function fieldOptions(definition: MeasureDefinition | undefined, name: string) {
@@ -90,6 +91,13 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
     id: "fan", measureType: "fan", label: "Measure fan speeds",
     description: "Automatically calibrate power across percentage levels.", preset: {},
   });
+  if (deviceId === "smart_switch") {
+    return available.has("smart_switch") ? [{
+      id: "smart_switch", measureType: "smart_switch", label: "Measure switch self consumption",
+      description: "Automatically measure one or more relay states with all output loads disconnected.",
+      preset: {},
+    }] : [];
+  }
   if (deviceId === "vacuum_robot" && available.has("recorder")) {
     routes.push({
       id: "vacuum_profile", measureType: "recorder", label: "Record vacuum and dock activity",
@@ -122,6 +130,7 @@ export function selectionFromRequest(request: MeasurementRequest): RouteSelectio
     case "light": return { deviceId: "light", routeId: "light" };
     case "speaker": return { deviceId: "smart_speaker", routeId: "speaker" };
     case "fan": return { deviceId: "fan", routeId: "fan" };
+    case "smart_switch": return { deviceId: "smart_switch", routeId: "smart_switch" };
     case "charging": return { deviceId: request.charging_device_type, routeId: "charging" };
     case "average": return { deviceId: FREE_MEASUREMENT, routeId: "average" };
     case "recorder":

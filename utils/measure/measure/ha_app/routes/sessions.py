@@ -253,9 +253,17 @@ async def cancel_session(session_id: str, request: Request) -> SessionSnapshotRe
     return _cancel_session(get_app_context(request), session_id)
 
 
+class ConfirmSessionRequest(BaseModel):
+    acknowledged: bool = False
+
+
 @router.post("/sessions/{session_id}/confirm", responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE})
-async def confirm_session(session_id: str, request: Request) -> SessionSnapshotResponse:
-    return _confirm_session(get_app_context(request), session_id)
+async def confirm_session(
+    session_id: str, request: Request, payload: ConfirmSessionRequest | None = None
+) -> SessionSnapshotResponse:
+    return _confirm_session(
+        get_app_context(request), session_id, acknowledged=payload.acknowledged if payload else False
+    )
 
 
 @router.post("/sessions/{session_id}/resume", responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE, 422: ERROR_RESPONSE})
@@ -330,9 +338,13 @@ def _cancel_session(context: AppContext, session_id: str) -> SessionSnapshotResp
     return _snapshot_response(context, snapshot)
 
 
-def _confirm_session(context: AppContext, session_id: str) -> SessionSnapshotResponse:
+def _confirm_session(context: AppContext, session_id: str, *, acknowledged: bool = False) -> SessionSnapshotResponse:
     try:
-        snapshot = context.coordinator.confirm(session_id)
+        snapshot = (
+            context.coordinator.confirm(session_id, acknowledged=True)
+            if acknowledged
+            else context.coordinator.confirm(session_id)
+        )
     except SessionConflictError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
     return _snapshot_response(context, snapshot)

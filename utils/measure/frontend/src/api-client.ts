@@ -235,8 +235,10 @@ export class MeasureApiClient {
     return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/cancel`, decodeSessionSnapshot, { method: "POST" });
   }
 
-  confirm(sessionId: string): Promise<SessionSnapshot> {
-    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/confirm`, decodeSessionSnapshot, { method: "POST" });
+  confirm(sessionId: string, acknowledged = false): Promise<SessionSnapshot> {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/confirm`, decodeSessionSnapshot, {
+      method: "POST", body: JSON.stringify({ acknowledged }),
+    });
   }
 
   resume(sessionId: string): Promise<SessionSnapshot> {

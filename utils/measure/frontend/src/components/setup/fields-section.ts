@@ -112,7 +112,8 @@ export class SetupFieldsSection extends LitElement {
     return html`
       <div class="device-section">
         ${this.dummyController ? html`<p class="test-mode-status" role="status">Virtual device · test output only</p>` : nothing}
-        ${multipleController && !this.dummyController ? this.renderMultipleLightsToggle(multipleController) : nothing}
+        ${multipleController && definition.measure_type === "light" && !this.dummyController
+          ? this.renderMultipleLightsToggle(multipleController) : nothing}
         <div class="field-with-help">
           <div class="grid profile-grid ${definition.measure_type === "light" ? "light-grid" : ""}">
             ${fields.filter((field) => field.control !== "multi_select").map((field) => this.renderField(field))}
@@ -221,7 +222,7 @@ export class SetupFieldsSection extends LitElement {
         return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
       }
       const entities = entityChoices(field, this.fieldState, domains);
-      if (field.multiple && (field.role !== "controller" || this.multipleLights)) {
+      if (field.multiple && (field.role !== "controller" || this.multipleLights || definition.measure_type === "smart_switch")) {
         return this.renderMultiEntity(field, entities);
       }
       let selected = this.selectedEntities[name] !== undefined ? selectedEntityId(field, this.fieldState) : value;

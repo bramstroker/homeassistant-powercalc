@@ -15,6 +15,7 @@ const ICONS: Record<string, ReturnType<typeof svg>> = {
   set_top_box: svg`<rect x="3" y="7" width="18" height="11" rx="2"/><path d="M7 14h5m4 0h1M7 4h10"/>`,
   smart_dimmer: svg`<path d="M6 3v18m12-18v18M3 8h6v4H3zm12 5h6v4h-6z"/>`,
   smart_speaker: svg`<rect x="6" y="3" width="12" height="18" rx="3"/><circle cx="12" cy="14" r="4"/><path d="M10 7h4"/>`,
+  smart_switch: svg`<rect x="4" y="6" width="16" height="12" rx="6"/><circle cx="9" cy="12" r="3"/>`,
   television: svg`<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8m-4-3v3"/>`,
   ups: svg`<rect x="6" y="3" width="12" height="18" rx="2"/><path d="M10 7h4m-2 4-2 3h4l-2 3"/>`,
   vacuum_robot: svg`<circle cx="12" cy="12" r="9"/><path d="M7 9h10M9 15h6M12 3v3"/>`,

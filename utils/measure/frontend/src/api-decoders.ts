@@ -139,7 +139,7 @@ const isMeasurementParameters: Guard<Capabilities["defaults"]> = (value): value 
 
 export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is MeasurementRequest => {
   if (!isRecord(value)
-    || !oneOf("light", "speaker", "recorder", "average", "charging", "fan")(value.measure_type)
+    || !oneOf("light", "speaker", "recorder", "average", "charging", "fan", "smart_switch")(value.measure_type)
     || !isString(value.model_id)
     || !isString(value.product_name)
     || !isString(value.measure_device)
@@ -159,6 +159,11 @@ export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is
     case "speaker": return isHassOrDummyController(value.controller) && isBoolean(value.disable_streaming);
     case "charging": return isHassOrDummyController(value.controller) && oneOf("vacuum_robot", "lawn_mower_robot")(value.charging_device_type);
     case "fan": return isHassOrDummyController(value.controller);
+    case "smart_switch": return isRecord(value.controller)
+      && ((value.controller.type === "hass" && isString(value.controller.entity_id))
+        || (value.controller.type === "hass_multi" && isStringArray(value.controller.entity_ids) && value.controller.entity_ids.length >= 2))
+      && oneOf("yes", "no")(value.power_monitoring)
+      && isInteger(value.samples_per_state) && isInteger(value.repeat_cycles) && isNumber(value.settle_seconds);
     case "average": return (value.controller === null || value.controller === undefined) && isInteger(value.duration);
     case "recorder":
       return (value.controller === null || value.controller === undefined)
@@ -232,7 +237,7 @@ const isMeasureParameter = objectOf({
   group: optional(isString), requires_multiple: optionalNullable(oneOf(...parameterNames)),
 });
 const isMeasureDefinition: Guard<MeasureDefinition> = objectOf({
-  measure_type: oneOf("light", "speaker", "recorder", "average", "charging", "fan"),
+  measure_type: oneOf("light", "speaker", "recorder", "average", "charging", "fan", "smart_switch"),
   label: isString,
   description: isString,
   icon: isString,
@@ -247,6 +252,7 @@ const isMeasureDefinition: Guard<MeasureDefinition> = objectOf({
   confirmation_title: optional(isString),
   confirmation_guidance_title: optional(isString),
   confirmation_guidance_label: optional(isString),
+  confirmation_acknowledgment: optionalNullable(isString),
   model_id_example: isString,
   product_name_example: isString,
 });

@@ -5,6 +5,7 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 from measure.controller.light.spec import DummyLightControllerSpec
+from measure.controller.switch.spec import HassSwitchControllerSpec
 from measure.execution import MeasurementExecution, PreparedMeasurement
 from measure.ha_app.coordinator import (
     MeasurementCoordinator,
@@ -25,6 +26,7 @@ from measure.request import (
     RecorderProfileRecipe,
     RecorderPurpose,
     ResumePolicy,
+    SmartSwitchMeasurementRequest,
 )
 from measure.runner.average import AverageRunner
 from measure.runner.interaction import LightOperatingPoint
@@ -172,6 +174,41 @@ class CheckpointService(SessionMeasurementService):
         )
         self.continued.set()
         return RunnerResult(model_json_data={})
+
+
+class SwitchCheckpointService(SessionMeasurementService):
+    def __init__(self, continued: Event) -> None:
+        self.continued = continued
+
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        control.confirm("Ready to switch relays.", action="Start switch measurement")
+        self.continued.set()
+        return RunnerResult(model_json_data={})
+
+
+def test_smart_switch_requires_explicit_load_disconnection_acknowledgment(tmp_path: Path) -> None:
+    continued = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: SwitchCheckpointService(continued))
+    request = SmartSwitchMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        controller=HassSwitchControllerSpec(entity_id="switch.test"),
+        power_monitoring="no",
+    )
+    session = coordinator.start(request)
+    wait_for_state(coordinator, SessionState.AWAITING_CONFIRMATION)
+
+    with pytest.raises(SessionConflictError, match="safety acknowledgment"):
+        coordinator.confirm(session.id)
+    assert not continued.is_set()
+
+    coordinator.confirm(session.id, acknowledged=True)
+    assert continued.wait(1)
+    wait_for_state(coordinator, SessionState.COMPLETED)
 
 
 def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:

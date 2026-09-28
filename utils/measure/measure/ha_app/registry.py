@@ -145,6 +145,10 @@ class MeasurementDefinition:
     def confirmation_guidance_label(self) -> str:
         return MEASUREMENT_STARTS[self.measure_type].guidance_label
 
+    @property
+    def confirmation_acknowledgment(self) -> str | None:
+        return MEASUREMENT_STARTS[self.measure_type].acknowledgment
+
 
 def _controller(
     name: str,
@@ -569,6 +573,57 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         product_name_example="Dyson Purifier Cool TP07",
         parameters=(READING_INTERVAL,),
         fields=(POWER_FIELD, _controller("fan_entity_id", "Fan", "fan")),
+    ),
+    MeasureType.SMART_SWITCH: MeasurementDefinition(
+        measure_type=MeasureType.SMART_SWITCH,
+        description="Measure a smart switch's own power use as relays turn off and on.",
+        icon="mdi:toggle-switch",
+        model_id_example="SHSW-25",
+        product_name_example="Shelly 2.5",
+        parameters=(READING_INTERVAL,),
+        fields=(
+            POWER_FIELD,
+            _controller("switch_entity_id", "Relay", "switch", multiple=True, plural_label="Relays"),
+            FormFieldDefinition(
+                name="power_monitoring",
+                label="Does the smart switch have built-in power monitoring?",
+                control=FieldControl.SELECT,
+                options=(
+                    FieldOption(value="", label="Select yes or no"),
+                    FieldOption(value="yes", label="Yes"),
+                    FieldOption(value="no", label="No"),
+                ),
+                hint=(
+                    "Choose explicitly. This determines whether a single-relay profile models only "
+                    "the switch's self consumption."
+                ),
+                review=True,
+            ),
+            FormFieldDefinition(
+                name="samples_per_state",
+                label="Readings per relay state",
+                control=FieldControl.NUMBER,
+                default=12,
+                minimum=5,
+                maximum=100,
+            ),
+            FormFieldDefinition(
+                name="repeat_cycles",
+                label="Measurement cycles",
+                control=FieldControl.NUMBER,
+                default=3,
+                minimum=2,
+                maximum=5,
+            ),
+            FormFieldDefinition(
+                name="settle_seconds",
+                label="Relay settle time (seconds)",
+                control=FieldControl.NUMBER,
+                default=5,
+                minimum=0,
+                maximum=120,
+            ),
+        ),
     ),
 }
 
