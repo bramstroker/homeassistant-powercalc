@@ -65,6 +65,8 @@ class FormFieldDefinition:
     multiple: bool = False
     #: Whether a separate toggle switches this field between one and several entities.
     multiple_toggle: bool = False
+    #: Ask for a Home Assistant device before offering its entities.
+    group_by_device: bool = False
     #: Label to use while several entities are selected.
     plural_label: str = ""
     #: Entity field whose number of selected entities this count follows by default.
@@ -156,6 +158,7 @@ def _controller(
     narrowed_by: str | None = None,
     multiple: bool = False,
     multiple_toggle: bool = False,
+    group_by_device: bool = False,
     plural_label: str = "",
 ) -> FormFieldDefinition:
     """Entity field that selects the device being measured, and becomes the request controller."""
@@ -168,6 +171,7 @@ def _controller(
         entity_domains=domains,
         multiple=multiple,
         multiple_toggle=multiple_toggle,
+        group_by_device=group_by_device,
         plural_label=plural_label,
     )
 
@@ -587,7 +591,9 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         supports_dummy_controller=False,
         fields=(
             POWER_FIELD,
-            _controller("switch_entity_id", "Relay", "switch", multiple=True, plural_label="Relays"),
+            _controller(
+                "switch_entity_id", "Relay", "switch", multiple=True, group_by_device=True, plural_label="Relays"
+            ),
             FormFieldDefinition(
                 name="power_monitoring",
                 label="The smart switch has built-in power monitoring",

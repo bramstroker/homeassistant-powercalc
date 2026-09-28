@@ -262,6 +262,30 @@ test("selects a Home Assistant light with the shared combobox", async ({ page })
   await expect(page.getByText("Desk lamp", { exact: true })).toBeVisible();
 });
 
+test("selects multiple smart switch relays with the shared combobox", async ({ page }) => {
+  await page.getByRole("button", { name: "New measurement" }).click();
+  await page.getByRole("button", { name: "Smart switch", exact: true }).click();
+
+  const relays = page.locator('measure-combobox[name="switch_entity_id"]');
+  await expect(relays).toHaveCount(0);
+  await page.getByRole("combobox", { name: "Device" }).click();
+  await page.getByRole("option", { name: "Dual relay" }).click();
+  await expect(relays).toHaveCount(1);
+  await relays.getByRole("combobox", { name: "Relays" }).click();
+  await expect(page.getByRole("listbox", { name: "Relays options" })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Other relay · switch.other" })).toHaveCount(0);
+  await page.getByRole("option", { name: "Relay one · switch.relay_one" }).click();
+  await page.getByRole("option", { name: "Relay two · switch.relay_two" }).click();
+  await expect(relays.locator(".tag")).toHaveCount(2);
+  await expect(page.getByRole("button", { name: "Add another relay" })).toHaveCount(0);
+  await page.getByRole("combobox", { name: "Device" }).click();
+  await page.getByRole("option", { name: "Other switch" }).click();
+  await expect(relays.locator(".tag")).toHaveCount(0);
+  await relays.getByRole("combobox", { name: "Relays" }).click();
+  await expect(page.getByRole("option", { name: "Other relay · switch.other" })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Relay one · switch.relay_one" })).toHaveCount(0);
+});
+
 test("loads related recorder entities after choosing a device type", async ({ page }) => {
   await page.getByRole("button", { name: "New measurement" }).click();
   await page.getByRole("button", { name: /Heating Experimental/ }).click();

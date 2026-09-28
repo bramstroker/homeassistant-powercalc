@@ -182,6 +182,7 @@ class FormField(BaseModel):
     maximum: int | float | None = None
     multiple: bool = False
     multiple_toggle: bool = False
+    group_by_device: bool = False
     plural_label: str = ""
     derived_from: str | None = None
     hint: str = ""

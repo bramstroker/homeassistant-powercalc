@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 import logging
+import math
 from pathlib import Path
 from statistics import mean
 import time
@@ -15,6 +16,25 @@ from measure.utils.files import write_json_atomic
 from measure.utils.sampling import MeasurementResult, PowerSampler
 
 _LOGGER = logging.getLogger("measure")
+
+
+def estimate_smart_switch_remaining_seconds(
+    request: SmartSwitchMeasurementRequest, relay_count: int, completed_states: int = 0
+) -> int:
+    """Estimate remaining relay states from configured settling and sampling intervals."""
+
+    states_per_cycle = relay_count + (2 if relay_count > 1 else 1)
+    remaining_states = request.repeat_cycles * states_per_cycle - completed_states
+    if remaining_states <= 0:
+        return 0
+    parameters = request.parameters
+    sample_interval = parameters.sample_count * parameters.sleep_time_sample if parameters.sample_count > 1 else 0
+    per_state = (
+        request.settle_seconds
+        + (request.samples_per_state - 1) * parameters.sleep_time
+        + request.samples_per_state * (1 + sample_interval)
+    )
+    return math.ceil(remaining_states * per_state)
 
 
 class StateReading(TypedDict):
@@ -39,6 +59,12 @@ class SmartSwitchRunner(MeasurementRunner[SmartSwitchMeasurementRequest]):
         total = request.repeat_cycles * len(states)
         readings: list[StateReading] = []
         voltages: list[float] = []
+        self.interaction.progress(
+            0,
+            total,
+            phase="Measuring relay self consumption",
+            remaining_seconds=estimate_smart_switch_remaining_seconds(request, len(entity_ids)),
+        )
         self.controller.remember_states()
         try:
             for cycle in range(request.repeat_cycles):
@@ -62,6 +88,9 @@ class SmartSwitchRunner(MeasurementRunner[SmartSwitchMeasurementRequest]):
                         cycle * len(states) + states.index(state) + 1,
                         total,
                         phase="Measuring relay self consumption",
+                        remaining_seconds=estimate_smart_switch_remaining_seconds(
+                            request, len(entity_ids), cycle * len(states) + states.index(state) + 1
+                        ),
                     )
         finally:
             # Cleanup also runs after validation below; this immediately restores relays after sampling.

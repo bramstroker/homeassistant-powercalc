@@ -112,6 +112,7 @@ def test_smart_switch_preflight_accepts_external_meter_and_same_device_relays() 
     result = preflight(entities).validate(request)
 
     assert result.estimated_variations == 12
+    assert result.estimated_duration_seconds == 468
 
 
 @pytest.mark.parametrize(

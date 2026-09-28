@@ -41,6 +41,7 @@ from measure.request import (
     SpeakerMeasurementRequest,
 )
 from measure.runner.light.plan import build_light_plan, estimate_light_time_left
+from measure.runner.smart_switch import estimate_smart_switch_remaining_seconds
 
 
 class PreflightError(Exception):
@@ -439,6 +440,7 @@ class MeasurementPreflight:
                 raise PreflightError("Measure switch self consumption with an external power meter, not its own sensor")
         return PreflightResult(
             estimated_variations=request.repeat_cycles * (len(relays) + (2 if len(relays) > 1 else 1)),
+            estimated_duration_seconds=estimate_smart_switch_remaining_seconds(request, len(relays)),
         )
 
     def _validate_charging(self, request: ChargingMeasurementRequest) -> PreflightResult:

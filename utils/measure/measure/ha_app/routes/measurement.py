@@ -274,6 +274,7 @@ def _measure_definitions() -> list[MeasureDefinition]:
                     maximum=field.maximum,
                     multiple=field.multiple,
                     multiple_toggle=field.multiple_toggle,
+                    group_by_device=field.group_by_device,
                     plural_label=field.plural_label,
                     derived_from=field.derived_from,
                     hint=field.hint,

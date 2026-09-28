@@ -60,6 +60,7 @@ export type SetupViewElement = HTMLElement & {
   dummyLoadCalibration: DummyLoadCalibration | null;
   selectedType: string;
   selectedEntities: Record<string, string[]>;
+  selectedEntityDeviceIds: Record<string, string>;
   multipleLights: boolean;
   meter: PowerMeterSpec;
   powerMeterConfigured: boolean;

@@ -64,7 +64,13 @@ def test_single_switch_measures_both_states_and_restores_relay(tmp_path: Path, p
         call("switch.relay", all_on=False),
     ]
     controller.restore_states.assert_called_once()
-    assert interaction.progress.call_count == 4
+    assert interaction.progress.call_args_list == [
+        call(0, 4, phase="Measuring relay self consumption", remaining_seconds=52),
+        call(1, 4, phase="Measuring relay self consumption", remaining_seconds=39),
+        call(2, 4, phase="Measuring relay self consumption", remaining_seconds=26),
+        call(3, 4, phase="Measuring relay self consumption", remaining_seconds=13),
+        call(4, 4, phase="Measuring relay self consumption", remaining_seconds=0),
+    ]
     assert len(json.loads((tmp_path / "smart_switch_readings.json").read_text())["readings"]) == 4
 
 

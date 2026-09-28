@@ -43,6 +43,9 @@ def test_measure_definitions_and_average_request(app_client: TestClient) -> None
         "fan": "Start fan measurement",
         "smart_switch": "Start switch measurement",
     }
+    smart_switch = next(item for item in definitions.json() if item["measure_type"] == MeasureType.SMART_SWITCH)
+    relay = next(field for field in smart_switch["fields"] if field["name"] == "switch_entity_id")
+    assert relay["group_by_device"] is True
     guidance = {item["measure_type"]: item["confirmation_guidance"] for item in definitions.json()}
     assert "Disable automations" in guidance["light"][0]
     assert "Disable automations" in guidance["fan"][0]

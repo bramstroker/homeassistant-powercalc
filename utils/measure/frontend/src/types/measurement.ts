@@ -17,6 +17,7 @@ export interface EntityDescriptor {
   domain?: string;
   device_class?: string | null;
   device_id?: string | null;
+  device_name?: string | null;
   related_device_ids?: string[];
   integration?: string | null;
   connectivity?: "zigbee" | "zwave" | null;
@@ -134,6 +135,8 @@ export interface FormField {
   multiple?: boolean;
   /** Whether a separate toggle switches between one and several selected entities. */
   multiple_toggle?: boolean;
+  /** Require a Home Assistant device choice before listing this field's entities. */
+  group_by_device?: boolean;
   /** Label to use while several entities are selected. */
   plural_label?: string;
   /** Entity field whose number of selected entities this count follows by default. */

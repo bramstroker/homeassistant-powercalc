@@ -55,6 +55,7 @@ def test_smart_switch_definition_controls_multi_selection_and_virtual_device_ava
 
     assert fields["switch_entity_id"].multiple is True
     assert fields["switch_entity_id"].multiple_toggle is False
+    assert fields["switch_entity_id"].group_by_device is True
     assert fields["power_monitoring"].control.value == "boolean"
     assert definition.supports_dummy_controller is False
 

@@ -144,13 +144,16 @@ def _entity_data(*, power_state: str = "4.2") -> HomeAssistantEntityData:
 
 def test_catalog_applies_one_selection_policy_and_enriches_entities() -> None:
     home_assistant = MagicMock(spec=HomeAssistantManager)
-    home_assistant.get_entity_data.return_value = _entity_data()
+    data = _entity_data()
+    data.device_registry[0].update(name="Original device", name_by_user="Desk lamp device")
+    home_assistant.get_entity_data.return_value = data
 
     snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
 
     lights = snapshot.select(domain=EntityDomain.LIGHT)
     assert [entity.entity_id for entity in lights] == ["light.desk"]
     assert lights[0].model_id == "LWA017"
+    assert lights[0].device_name == "Desk lamp device"
     assert lights[0].product_name == "Hue White Ambiance"
     assert lights[0].manufacturer == "Signify"
     assert lights[0].integration == "hue"
