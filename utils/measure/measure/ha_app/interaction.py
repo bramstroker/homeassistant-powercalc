@@ -13,10 +13,6 @@ class SessionInteraction(RunInteraction):
     def confirm(self, message: str, *, action: str | None = None) -> None:
         self.control.confirm(message, action=action)
 
-    def acknowledge(self, message: str) -> None:
-        # The confirmation endpoint checks the acknowledgment before releasing the worker.
-        pass
-
     def notify(self, message: str) -> None:
         self.control.log(message)
 

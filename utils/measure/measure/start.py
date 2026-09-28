@@ -15,7 +15,6 @@ class MeasurementStart:
     title: str = "Everything is ready"
     guidance_title: str = "Before starting"
     guidance_label: str = "Measurement guidance"
-    acknowledgment: str | None = None
 
 
 MEASUREMENT_STARTS: dict[MeasureType, MeasurementStart] = {
@@ -98,6 +97,9 @@ MEASUREMENT_STARTS: dict[MeasureType, MeasurementStart] = {
         message=(
             "PowerCalc will switch the selected relays off and on several times to measure the switch's own power use."
         ),
+        is_warning=True,
+        eyebrow="Relay output warning",
+        title="Disconnect all loads",
         guidance=(
             (
                 "Disconnect every load from every selected relay output. "
@@ -113,6 +115,5 @@ MEASUREMENT_STARTS: dict[MeasureType, MeasurementStart] = {
                 "device. It restores their initial states afterwards."
             ),
         ),
-        acknowledgment="I disconnected all loads from the relay outputs and disabled automations for these relays.",
     ),
 }

@@ -23,7 +23,6 @@ from measure.ha_app.session_projection import apply_session_event
 from measure.ha_app.storage import SESSION_LOAD_ERRORS, SessionStorage
 from measure.request import MeasurementRequest, RecorderMeasurementRequest, ResumePolicy
 from measure.runner.runner import RunnerResult
-from measure.start import MEASUREMENT_STARTS
 from measure.utils.clock import utc_now
 
 _LOGGER = logging.getLogger("measure")
@@ -265,17 +264,13 @@ class MeasurementCoordinator:
         self._notify_listeners()
         return snapshot
 
-    def confirm(self, session_id: str, *, acknowledged: bool = False) -> SessionSnapshot:
+    def confirm(self, session_id: str) -> SessionSnapshot:
         """Release a worker paused at an operator checkpoint."""
 
         with self._lock:
             snapshot = self._require_active(session_id)
             if snapshot.state != SessionState.AWAITING_CONFIRMATION:
                 raise SessionConflictError("The requested session is not waiting for confirmation")
-            request = self.storage.load_request(snapshot.id)
-            start = MEASUREMENT_STARTS[request.measure_type]
-            if snapshot.confirmation_action == start.action and start.acknowledgment and not acknowledged:
-                raise SessionConflictError("Confirm the safety acknowledgment before starting this measurement")
             assert self._control is not None
             running: SessionSnapshot = replace(
                 snapshot,

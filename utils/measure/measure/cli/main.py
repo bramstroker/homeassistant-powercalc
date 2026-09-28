@@ -47,6 +47,7 @@ from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.spec import HassPowerMeterSpec
 from measure.request import SmartSwitchMeasurementRequest
 from measure.runner.errors import RunnerError
+from measure.start import MEASUREMENT_STARTS
 from measure.utils.version import measure_version
 
 config = CliEnvironment()
@@ -102,7 +103,7 @@ class Measure:
             specific_questions = measurement_questions(self.measure_type, self.config, entity_catalog)
             answers = self.ask_questions(self.get_questions(specific_questions))
             self._prefill_device_metadata(answers)
-            interaction = ConsoleInteraction()
+            interaction = ConsoleInteraction(MEASUREMENT_STARTS[self.measure_type])
             request = request_from_answers(self.measure_type, answers, self.config)
             request = apply_dummy_load_answers(request, answers, self._dummy_load_calibration_store)
             if isinstance(request, SmartSwitchMeasurementRequest):

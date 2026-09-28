@@ -147,10 +147,10 @@ def smart_switch_questions(entity_catalog: HomeAssistantEntityCatalog) -> list[Q
             message="Select the switch relays to measure (all from one device)",
             choices=_entity_choices(entity_catalog.load_snapshot().select(domain=EntityDomain.SWITCH)),
         ),
-        inquirer.List(
+        inquirer.Confirm(
             name="power_monitoring",
             message="Does the smart switch have built-in power monitoring?",
-            choices=[("Yes", "yes"), ("No", "no")],
+            default=False,
         ),
     ]
 

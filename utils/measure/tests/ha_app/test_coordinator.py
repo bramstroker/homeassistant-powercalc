@@ -191,22 +191,18 @@ class SwitchCheckpointService(SessionMeasurementService):
         return RunnerResult(model_json_data={})
 
 
-def test_smart_switch_requires_explicit_load_disconnection_acknowledgment(tmp_path: Path) -> None:
+def test_smart_switch_starts_after_explicit_confirmation(tmp_path: Path) -> None:
     continued = Event()
     coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: SwitchCheckpointService(continued))
     request = SmartSwitchMeasurementRequest(
         power_meter=DummyPowerMeterSpec(),
         controller=HassSwitchControllerSpec(entity_id="switch.test"),
-        power_monitoring="no",
+        power_monitoring=False,
     )
     session = coordinator.start(request)
     wait_for_state(coordinator, SessionState.AWAITING_CONFIRMATION)
 
-    with pytest.raises(SessionConflictError, match="safety acknowledgment"):
-        coordinator.confirm(session.id)
-    assert not continued.is_set()
-
-    coordinator.confirm(session.id, acknowledged=True)
+    coordinator.confirm(session.id)
     assert continued.wait(1)
     wait_for_state(coordinator, SessionState.COMPLETED)
 

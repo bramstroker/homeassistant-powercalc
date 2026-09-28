@@ -40,9 +40,6 @@ class RunInteraction(Protocol):
     def confirm(self, message: str, *, action: str | None = None) -> None:
         """Wait until the user confirms a physical preparation step."""
 
-    def acknowledge(self, message: str) -> None:
-        """Require an explicit safety acknowledgment before automatic device control."""
-
     def choose(self, message: str, *, default: bool) -> bool:
         """Request a binary runtime choice."""
 
@@ -81,9 +78,6 @@ class ImmediateInteraction(RunInteraction):
 
     def confirm(self, _: str, *, action: str | None = None) -> None:
         del action
-
-    def acknowledge(self, _: str) -> None:
-        return
 
     def notify(self, _: str) -> None:
         return  # pragma: no cover - unattended notification is intentionally a no-op

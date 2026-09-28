@@ -24,7 +24,7 @@ def make_runner(
     return SmartSwitchRunner(sampler, controller, interaction), sampler, controller, interaction
 
 
-def make_request(entity_ids: list[str], power_monitoring: str = "no") -> SmartSwitchMeasurementRequest:
+def make_request(entity_ids: list[str], power_monitoring: bool = False) -> SmartSwitchMeasurementRequest:
     controller = (
         HassSwitchControllerSpec(entity_id=entity_ids[0])
         if len(entity_ids) == 1
@@ -40,8 +40,8 @@ def make_request(entity_ids: list[str], power_monitoring: str = "no") -> SmartSw
     )
 
 
-@pytest.mark.parametrize("power_monitoring", ["no", "yes"])
-def test_single_switch_measures_both_states_and_restores_relay(tmp_path: Path, power_monitoring: str) -> None:
+@pytest.mark.parametrize("power_monitoring", [False, True])
+def test_single_switch_measures_both_states_and_restores_relay(tmp_path: Path, power_monitoring: bool) -> None:
     powers = [0.5] * 5 + [0.8] * 5 + [0.5] * 5 + [0.8] * 5
     runner, sampler, controller, interaction = make_runner(["switch.relay"], powers)
 
@@ -49,11 +49,11 @@ def test_single_switch_measures_both_states_and_restores_relay(tmp_path: Path, p
 
     assert result.model_json_data == {
         "device_type": "smart_switch",
-        "device_specs": {"power_monitoring": power_monitoring == "yes"},
+        "device_specs": {"power_monitoring": power_monitoring},
         "calculation_strategy": "fixed",
         "standby_power": 0.5,
         "standby_power_on": 0.8,
-        **({"only_self_usage": True} if power_monitoring == "yes" else {}),
+        **({"only_self_usage": True} if power_monitoring else {}),
     }
     assert sampler.take_measurement.call_count == 20
     assert result.voltages == [230.0] * 20

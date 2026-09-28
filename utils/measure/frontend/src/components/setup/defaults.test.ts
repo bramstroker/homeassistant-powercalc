@@ -1,10 +1,36 @@
-import type { MeasurementRequest } from "../../types";
+import type { MeasureDefinition, MeasurementRequest } from "../../types";
 import "./view";
 import { SetupViewElement, capabilities, lightDefinition, lights } from "../testing/fixtures";
 import type { TestCombobox } from "./test-helpers";
 import { entityCombobox, recorderDefinition, selectEntity } from "./test-helpers";
 
 describe("setup view defaults", () => {
+  it("uses definition flags for multi-relay selection and virtual controllers", async () => {
+    const definition: MeasureDefinition = {
+      ...lightDefinition,
+      measure_type: "smart_switch",
+      label: "Smart switch",
+      supports_dummy_controller: false,
+      fields: [
+        { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, options: [] },
+        { name: "switch_entity_id", role: "controller", label: "Relay", plural_label: "Relays", control: "entity", required: true, multiple: true, entity_domains: ["switch"], options: [] },
+        { name: "power_monitoring", role: "attribute", label: "Built-in power monitoring", control: "boolean", required: true, default: false, options: [] },
+      ],
+    };
+    const element = document.createElement("measure-setup-view") as SetupViewElement;
+    element.capabilities = { ...capabilities, developer_mode: true };
+    element.definitions = [definition];
+    element.selectedType = "smart_switch";
+    element.deviceEntities = { switch: [{ entity_id: "switch.one", name: "Relay", domain: "switch" }] };
+    element.meter = { type: "dummy" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector('.entity-list .add-entity')?.textContent).toContain("Add another relay");
+    expect(element.shadowRoot.querySelector('input[name="power_monitoring"]')).toBeTruthy();
+    expect(element.shadowRoot.querySelector('input[name="use_dummy_controller"]')).toBeNull();
+  });
+
   it.each([{ selection: [] }, { selection: ["sensor.manual"] }])("preserves saved vacuum selections $selection when suggestions exist", async ({ selection }) => {
     const element = document.createElement("measure-setup-view") as SetupViewElement;
     element.capabilities = capabilities;

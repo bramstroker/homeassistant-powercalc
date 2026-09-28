@@ -319,7 +319,7 @@ export class SetupView extends LitElement {
         <measure-setup-developer-options
           .developerMode=${this.capabilities.developer_mode ?? false}
           .fastTestMode=${this.capabilities.fast_test_mode ?? false}
-          .hasController=${definition.measure_type !== "smart_switch"
+          .hasController=${definition.supports_dummy_controller !== false
             && definition.fields.some((field) => field.role === "controller")}
           .dummyController=${this.dummyController}
           @dummy-controller-change=${this.dummyControllerChanged}

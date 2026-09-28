@@ -107,7 +107,7 @@ class SmartSwitchRunner(MeasurementRunner[SmartSwitchMeasurementRequest]):
 
         model: dict[str, object] = {
             "device_type": "smart_switch",
-            "device_specs": {"power_monitoring": request.power_monitoring == "yes"},
+            "device_specs": {"power_monitoring": request.power_monitoring},
             "standby_power": round(baseline, 3),
         }
         if multi:
@@ -120,7 +120,7 @@ class SmartSwitchRunner(MeasurementRunner[SmartSwitchMeasurementRequest]):
         else:
             model["calculation_strategy"] = "fixed"
             model["standby_power_on"] = round(baseline + increment, 3)
-            if request.power_monitoring == "yes":
+            if request.power_monitoring:
                 model["only_self_usage"] = True
         return model
 

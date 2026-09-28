@@ -162,7 +162,7 @@ export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is
     case "smart_switch": return isRecord(value.controller)
       && ((value.controller.type === "hass" && isString(value.controller.entity_id))
         || (value.controller.type === "hass_multi" && isStringArray(value.controller.entity_ids) && value.controller.entity_ids.length >= 2))
-      && oneOf("yes", "no")(value.power_monitoring)
+      && isBoolean(value.power_monitoring)
       && isInteger(value.samples_per_state) && isInteger(value.repeat_cycles) && isNumber(value.settle_seconds);
     case "average": return (value.controller === null || value.controller === undefined) && isInteger(value.duration);
     case "recorder":
@@ -222,6 +222,7 @@ const isFormField = objectOf({
   minimum: optionalNullable(isNumber),
   maximum: optionalNullable(isNumber),
   multiple: optional(isBoolean),
+  multiple_toggle: optional(isBoolean),
   plural_label: optional(isString),
   derived_from: optionalNullable(isString),
   hint: optional(isString),
@@ -245,6 +246,7 @@ const isMeasureDefinition: Guard<MeasureDefinition> = objectOf({
   parameters: arrayOf(isMeasureParameter),
   supports_profile: isBoolean,
   supports_resume: isBoolean,
+  supports_dummy_controller: optional(isBoolean),
   confirmation_action: optionalNullable(isString),
   confirmation_is_warning: optional(isBoolean),
   confirmation_guidance: optional(arrayOf(isString)),
@@ -252,7 +254,6 @@ const isMeasureDefinition: Guard<MeasureDefinition> = objectOf({
   confirmation_title: optional(isString),
   confirmation_guidance_title: optional(isString),
   confirmation_guidance_label: optional(isString),
-  confirmation_acknowledgment: optionalNullable(isString),
   model_id_example: isString,
   product_name_example: isString,
 });

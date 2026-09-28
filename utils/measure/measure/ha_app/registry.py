@@ -63,6 +63,8 @@ class FormFieldDefinition:
     maximum: int | float | None = None
     #: Whether several entities can be selected for this field at once.
     multiple: bool = False
+    #: Whether a separate toggle switches this field between one and several entities.
+    multiple_toggle: bool = False
     #: Label to use while several entities are selected.
     plural_label: str = ""
     #: Entity field whose number of selected entities this count follows by default.
@@ -112,6 +114,7 @@ class MeasurementDefinition:
     parameters: tuple[ParameterDefinition, ...] = ()
     supports_profile: bool = True
     supports_resume: bool = False
+    supports_dummy_controller: bool = True
 
     @property
     def label(self) -> str:
@@ -145,10 +148,6 @@ class MeasurementDefinition:
     def confirmation_guidance_label(self) -> str:
         return MEASUREMENT_STARTS[self.measure_type].guidance_label
 
-    @property
-    def confirmation_acknowledgment(self) -> str | None:
-        return MEASUREMENT_STARTS[self.measure_type].acknowledgment
-
 
 def _controller(
     name: str,
@@ -156,6 +155,7 @@ def _controller(
     *domains: str,
     narrowed_by: str | None = None,
     multiple: bool = False,
+    multiple_toggle: bool = False,
     plural_label: str = "",
 ) -> FormFieldDefinition:
     """Entity field that selects the device being measured, and becomes the request controller."""
@@ -167,6 +167,7 @@ def _controller(
         narrowed_by=narrowed_by,
         entity_domains=domains,
         multiple=multiple,
+        multiple_toggle=multiple_toggle,
         plural_label=plural_label,
     )
 
@@ -311,7 +312,9 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         parameters=LIGHT_PARAMETERS,
         fields=(
             POWER_FIELD,
-            _controller("light_entity_id", "Light", "light", multiple=True, plural_label="Lights"),
+            _controller(
+                "light_entity_id", "Light", "light", multiple=True, multiple_toggle=True, plural_label="Lights"
+            ),
             MODES_FIELD,
             FormFieldDefinition(
                 name="multiple_light_count",
@@ -581,21 +584,18 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
         model_id_example="SHSW-25",
         product_name_example="Shelly 2.5",
         parameters=(READING_INTERVAL,),
+        supports_dummy_controller=False,
         fields=(
             POWER_FIELD,
             _controller("switch_entity_id", "Relay", "switch", multiple=True, plural_label="Relays"),
             FormFieldDefinition(
                 name="power_monitoring",
-                label="Does the smart switch have built-in power monitoring?",
-                control=FieldControl.SELECT,
-                options=(
-                    FieldOption(value="", label="Select yes or no"),
-                    FieldOption(value="yes", label="Yes"),
-                    FieldOption(value="no", label="No"),
-                ),
+                label="The smart switch has built-in power monitoring",
+                control=FieldControl.BOOLEAN,
+                default=False,
                 hint=(
-                    "Choose explicitly. This determines whether a single-relay profile models only "
-                    "the switch's self consumption."
+                    "Enable this when the switch reports its own load power. The generated profile will then "
+                    "set only_self_usage so it does not duplicate the built-in meter."
                 ),
                 review=True,
             ),

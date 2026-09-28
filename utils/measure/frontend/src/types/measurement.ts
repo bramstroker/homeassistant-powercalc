@@ -132,6 +132,8 @@ export interface FormField {
   maximum?: number | null;
   /** Whether several entities can be selected for this field at once. */
   multiple?: boolean;
+  /** Whether a separate toggle switches between one and several selected entities. */
+  multiple_toggle?: boolean;
   /** Label to use while several entities are selected. */
   plural_label?: string;
   /** Entity field whose number of selected entities this count follows by default. */
@@ -166,6 +168,7 @@ export interface MeasureDefinition {
   parameters: MeasureParameter[];
   supports_profile: boolean;
   supports_resume: boolean;
+  supports_dummy_controller?: boolean;
   confirmation_action?: string | null;
   confirmation_is_warning?: boolean;
   confirmation_guidance?: string[];
@@ -173,7 +176,6 @@ export interface MeasureDefinition {
   confirmation_title?: string;
   confirmation_guidance_title?: string;
   confirmation_guidance_label?: string;
-  confirmation_acknowledgment?: string | null;
   /** Placeholders shown in the profile fields, to steer the naming this type expects. */
   model_id_example: string;
   product_name_example: string;
@@ -253,7 +255,7 @@ export interface FanMeasurementRequest extends BaseMeasurementRequest { measure_
 export interface SmartSwitchMeasurementRequest extends BaseMeasurementRequest {
   measure_type: "smart_switch";
   controller: SwitchControllerSpec;
-  power_monitoring: "yes" | "no";
+  power_monitoring: boolean;
   samples_per_state: number;
   repeat_cycles: number;
   settle_seconds: number;

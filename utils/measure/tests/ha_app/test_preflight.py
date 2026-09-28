@@ -106,7 +106,7 @@ def test_smart_switch_preflight_accepts_external_meter_and_same_device_relays() 
     request = SmartSwitchMeasurementRequest(
         power_meter=HassPowerMeterSpec(entity_id="sensor.external_power"),
         controller=HassMultiSwitchControllerSpec(entity_ids=["switch.one", "switch.two"]),
-        power_monitoring="yes",
+        power_monitoring=True,
     )
 
     result = preflight(entities).validate(request)
@@ -137,7 +137,7 @@ def test_smart_switch_preflight_rejects_invalid_selection(
     request = SmartSwitchMeasurementRequest(
         power_meter=HassPowerMeterSpec(entity_id="sensor.external_power"),
         controller=HassMultiSwitchControllerSpec(entity_ids=["switch.one", "switch.two"]),
-        power_monitoring="yes",
+        power_monitoring=True,
     )
 
     with pytest.raises(PreflightError, match=expected):
@@ -150,7 +150,7 @@ def test_smart_switch_preflight_requires_registered_switch_device() -> None:
     request = SmartSwitchMeasurementRequest(
         power_meter=ShellyPowerMeterSpec(device_ip="192.0.2.1"),
         controller=HassSwitchControllerSpec(entity_id="switch.one"),
-        power_monitoring="no",
+        power_monitoring=False,
     )
 
     with pytest.raises(PreflightError, match="same Home Assistant device"):

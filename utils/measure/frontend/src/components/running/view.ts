@@ -1,4 +1,4 @@
-import { LitElement, css, html, nothing, svg, type PropertyValues } from "lit";
+import { LitElement, css, html, nothing, svg } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { SessionProgress, SessionSnapshot } from "../../types";
 import { emit } from "../../utils/events";
@@ -34,19 +34,6 @@ export class RunningView extends LitElement {
 
   @property({ attribute: false })
   guidance: string[] = [];
-
-  @property({ type: String })
-  acknowledgment = "";
-
-  @property({ type: Boolean, state: true })
-  private acknowledged = false;
-
-  protected willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has("snapshot")) {
-      const previous = changed.get("snapshot") as SessionSnapshot | undefined;
-      if (previous?.session_id !== this.snapshot?.session_id) this.acknowledged = false;
-    }
-  }
 
   @property({ type: Boolean })
   connected = false;
@@ -181,9 +168,7 @@ export class RunningView extends LitElement {
             <h4>${this.guidanceTitle}</h4>
             <ol>${guidance.map((step) => html`<li>${step}</li>`)}</ol>
           </div>` : nothing}
-          ${this.acknowledgment ? html`<label class="check"><input type="checkbox" .checked=${this.acknowledged}
-            @change=${(event: Event) => { this.acknowledged = (event.target as HTMLInputElement).checked; }} />${this.acknowledgment}</label>` : nothing}
-          <button class="primary confirm" type="button" @click=${this.confirm} ?disabled=${this.busy || Boolean(this.acknowledgment && !this.acknowledged)}>${this.busy ? "Starting…" : this.confirmationAction || "Start measurement"}</button>
+          <button class="primary confirm" type="button" @click=${this.confirm} ?disabled=${this.busy}>${this.busy ? "Starting…" : this.confirmationAction || "Start measurement"}</button>
         </div>
         ${this.renderFooter(false)}
       </section>
@@ -309,7 +294,7 @@ export class RunningView extends LitElement {
   }
 
   private confirm(): void {
-    emit(this, "confirm", { acknowledged: this.acknowledged });
+    emit(this, "confirm");
   }
 
   private runningTitle(preparing = false): string {

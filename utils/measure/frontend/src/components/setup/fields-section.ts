@@ -207,7 +207,10 @@ export class SetupFieldsSection extends LitElement {
     if (field.derived_from) return this.renderDerivedCount(field);
     const stored = this.request && requestFieldValue(this.request, field);
     if (field.control === "boolean") {
-      return html`<label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>`;
+      return html`<div class="field-block">
+        <label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>
+        ${field.hint ? fieldHint(field.hint) : nothing}
+      </div>`;
     }
     if (field.control === "entity") {
       const value = (stored ?? field.default ?? "").toString();
@@ -222,7 +225,7 @@ export class SetupFieldsSection extends LitElement {
         return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
       }
       const entities = entityChoices(field, this.fieldState, domains);
-      if (field.multiple && (field.role !== "controller" || this.multipleLights || definition.measure_type === "smart_switch")) {
+      if (field.multiple && (!field.multiple_toggle || this.multipleLights)) {
         return this.renderMultiEntity(field, entities);
       }
       let selected = this.selectedEntities[name] !== undefined ? selectedEntityId(field, this.fieldState) : value;

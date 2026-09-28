@@ -372,7 +372,7 @@ class SmartSwitchMeasurementRequest(BaseMeasurementRequest):
 
     measure_type: Literal[MeasureType.SMART_SWITCH] = MeasureType.SMART_SWITCH
     controller: SwitchControllerSpec
-    power_monitoring: Literal["yes", "no"]
+    power_monitoring: bool
     samples_per_state: int = Field(default=12, ge=5, le=100)
     repeat_cycles: int = Field(default=3, ge=2, le=5)
     settle_seconds: float = Field(default=5, ge=0, le=120)

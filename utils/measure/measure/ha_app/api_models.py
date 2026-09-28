@@ -181,6 +181,7 @@ class FormField(BaseModel):
     minimum: int | float | None = None
     maximum: int | float | None = None
     multiple: bool = False
+    multiple_toggle: bool = False
     plural_label: str = ""
     derived_from: str | None = None
     hint: str = ""
@@ -213,10 +214,10 @@ class MeasureDefinition(BaseModel):
     confirmation_title: str = "Everything is ready"
     confirmation_guidance_title: str = "Before starting"
     confirmation_guidance_label: str = "Measurement guidance"
-    confirmation_acknowledgment: str | None = None
     model_id_example: str = ""
     product_name_example: str = ""
     fields: list[FormField]
     parameters: list[MeasureParameter] = Field(default_factory=list)
     supports_profile: bool
     supports_resume: bool
+    supports_dummy_controller: bool = True
