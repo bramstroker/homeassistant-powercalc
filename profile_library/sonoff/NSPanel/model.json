@@ -17,6 +17,22 @@
         }
       },
       {
+        "entity_id": "[[relay_1]]",
+        "fixed": {
+          "states_power": {
+            "on": "[[relay_1_load]]"
+          }
+        }
+      },
+      {
+        "entity_id": "[[relay_2]]",
+        "fixed": {
+          "states_power": {
+            "on": "[[relay_2_load]]"
+          }
+        }
+      },
+      {
         "fixed": {
           "states_power": {
             "off": 1.16
@@ -44,6 +60,20 @@
         }
       }
     },
+    "relay_1_load": {
+      "label": "Relay 1 connected load (W)",
+      "description": "Power drawn by whatever is connected to relay 1, e.g. a lamp, fan or other appliance. 0 = no load.",
+      "default": 0,
+      "selector": {
+        "number": {
+          "min": 0,
+          "max": 300,
+          "step": 0.1,
+          "mode": "box",
+          "unit_of_measurement": "W"
+        }
+      }
+    },
     "relay_2": {
       "label": "Relay 2",
       "description": "Switch entity of the second relay of the NSPanel",
@@ -52,10 +82,24 @@
           "domain": "switch"
         }
       }
+    },
+    "relay_2_load": {
+      "label": "Relay 2 connected load (W)",
+      "description": "Power drawn by whatever is connected to relay 2, e.g. a lamp, fan or other appliance. 0 = no load.",
+      "default": 0,
+      "selector": {
+        "number": {
+          "min": 0,
+          "max": 300,
+          "step": 0.1,
+          "mode": "box",
+          "unit_of_measurement": "W"
+        }
+      }
     }
   },
   "mains_voltage": 230,
-  "measure_description": "Measured with the utils/measure script. The display brightness LUT was recorded while both relays were off. Relay power was measured as the constant delta when switching each relay on, one at a time, at a fixed display brightness. The 1.16 W off-state value is the display's standby consumption.",
+  "measure_description": "Measured with the utils/measure script. The display brightness LUT was recorded while both relays were off. Relay power was measured as the constant delta when switching each relay on, one at a time, at a fixed display brightness. The 1.16 W off-state value is the display's standby consumption. The connected load of each relay is not part of the measurement and is asked for separately via the relay_1_load / relay_2_load fields.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
   "measure_settings": {
@@ -63,7 +107,7 @@
   },
   "min_version": "1.26.0",
   "name": "NSPanel",
-  "product_url": "https://sonoff.tech/products/sonoff-nspanel",
+  "product_url": "https://sonoff.tech/products/sonoff-nspanel-smart-scene-wall-switch86-eu-type-120-type",
   "standby_power": 1.16,
   "authors": [
     {
