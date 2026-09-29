@@ -111,6 +111,44 @@ async def test_manual_setup_from_library_skips_to_manufacturer_step(
     assert result["step_id"] == Step.MANUFACTURER
 
 
+async def test_manual_composite_profile_resolves_entities_before_validation(hass: HomeAssistant) -> None:
+    mock_devices(hass, {"vacuum-device": {"manufacturer": "Unknown", "model": "Unknown"}})
+    mock_entities_in_registry(
+        hass,
+        {
+            "vacuum.test": {"device_id": "vacuum-device", "platform": "test"},
+            "switch.test_mop_drying": {
+                "device_id": "vacuum-device",
+                "platform": "test",
+                "translation_key": "mop_drying",
+            },
+        },
+    )
+
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_ENTITY_ID: "vacuum.test"})
+    result = await select_manufacturer_and_model(hass, result, "test", "vacuum_dock")
+
+    assert result["step_id"] != Step.MODEL
+    assert not result.get("errors")
+
+
+async def test_manual_composite_profile_reports_missing_related_entity(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    mock_devices(hass, {"vacuum-device": {"manufacturer": "Unknown", "model": "Unknown"}})
+    mock_entities_in_registry(hass, {"vacuum.test": {"device_id": "vacuum-device", "platform": "test"}})
+
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_ENTITY_ID: "vacuum.test"})
+    result = await select_manufacturer_and_model(hass, result, "test", "vacuum_dock")
+
+    assert result["step_id"] == Step.MODEL
+    assert result["errors"] == {"base": "unknown"}
+    assert "Could not find related entity for translation key mop_drying" in caplog.text
+
+
 async def test_manufacturer_listing_is_filtered_for_light_entity(
     hass: HomeAssistant,
 ) -> None:

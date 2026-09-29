@@ -200,10 +200,15 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 return await getattr(handler, step_method)(user_input)  # type: ignore[no-any-return]
         raise SchemaFlowError("No handler defined")  # pragma: nocover
 
-    async def validate_strategy_config(self, user_input: dict[str, Any] | None = None) -> None:
+    async def validate_strategy_config(
+        self,
+        user_input: dict[str, Any] | None = None,
+        power_profile: PowerProfile | None = None,
+    ) -> None:
         """Validate the strategy config."""
+        profile = power_profile or self.selected_profile
         strategy_name = CalculationStrategy(
-            self.sensor_config.get(CONF_MODE) or self.selected_profile.calculation_strategy,  # type: ignore
+            self.sensor_config.get(CONF_MODE) or profile.calculation_strategy,  # type: ignore
         )
         factory = PowerCalculatorStrategyFactory(self.hass)
         assert self.source_entity is not None
@@ -211,7 +216,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             await factory.create(
                 user_input or self.sensor_config,
                 strategy_name,
-                self.selected_profile,
+                profile,
                 self.source_entity,
             )
         except StrategyConfigurationError as error:
