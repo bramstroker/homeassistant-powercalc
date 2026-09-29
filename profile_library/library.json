@@ -9471,6 +9471,48 @@
         },
         {
           "aliases": [
+            "VARMBLIXT colour and white"
+          ],
+          "authors": [
+            {
+              "github": "luuk58",
+              "name": "luuk58"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-09-05T21:35:24Z",
+          "device_type": "light",
+          "measure_description": "Measured with utils/measure script",
+          "measure_device": "Shelly Plus Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 4.0,
+            "VERSION": "v0.6.0:app"
+          },
+          "name": "VARMBLIXT LED table-wall lamp, dimmable smart-white glass colour and white spectrum, 30 cm",
+          "standby_power": 0.5,
+          "voltage_range": {
+            "max": 239.2,
+            "min": 231.5
+          },
+          "id": "E2499",
+          "manufacturer": "ikea",
+          "updated_at": "2026-09-29T15:15:25",
+          "max_power": 6.2,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-09-29T15:15:05",
+          "power_range": {
+            "min": 0.4,
+            "max": 6.2
+          },
+          "color_modes": [
+            "hs"
+          ],
+          "hash": "41f1ef356fc2a7d12273a25ed600cd6a"
+        },
+        {
+          "aliases": [
             "TRADFRI LED driver, 30 w",
             "ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2",
             "TRADFRI LED driver, 30 w (ICPSHC24-30EU-IL-1/ICPSHC24-10EU-IL-2"
@@ -12903,8 +12945,8 @@
         "smart_switch",
         "network",
         "fan",
-        "smart_dimmer",
-        "light"
+        "light",
+        "smart_dimmer"
       ]
     },
     {
