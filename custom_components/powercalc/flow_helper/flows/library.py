@@ -1,9 +1,11 @@
+import logging
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_DEVICE
 from homeassistant.helpers import selector, translation
 from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 import voluptuous as vol
 
 from custom_components.powercalc.const import (
@@ -38,6 +40,7 @@ from custom_components.powercalc.helpers import (
     iter_related_entity_placeholders,
     resolve_related_entity_placeholder,
 )
+from custom_components.powercalc.power_profile.error import LibraryError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.library_url import profile_url
 from custom_components.powercalc.power_profile.power_profile import (
@@ -52,6 +55,7 @@ if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
 
 CONF_CONFIRM_AUTODISCOVERED_MODEL = "confirm_autodisovered_model"
+_LOGGER = logging.getLogger(__name__)
 
 SCHEMA_POWER_AUTODISCOVERED = vol.Schema(
     {vol.Optional(CONF_CONFIRM_AUTODISCOVERED_MODEL, default=True): bool},
@@ -140,7 +144,15 @@ class LibraryFlow:
             )
             self.flow.selected_profile = profile
             if self.flow.selected_profile and not await self.flow.selected_profile.needs_user_configuration:
-                await self.flow.validate_strategy_config()
+                try:
+                    resolved_profile = await library.get_profile(
+                        ModelInfo(str(self.flow.sensor_config.get(CONF_MANUFACTURER)), str(user_input.get(CONF_MODEL))),
+                        self.flow.source_entity,
+                    )
+                except LibraryError as error:
+                    _LOGGER.error("Problem loading model: %s", error)
+                    raise SchemaFlowError("unknown") from error
+                await self.flow.validate_strategy_config(power_profile=resolved_profile)
             return user_input
 
         async def _create_schema() -> vol.Schema:
