@@ -49,7 +49,7 @@
       "wifi"
     ]
   },
-  "discovery_by": "device",
+  "discovery_by": "entity",
   "fields": {
     "relay_1": {
       "label": "Relay 1",
@@ -106,7 +106,7 @@
     "VERSION": "v1.26.0:docker"
   },
   "min_version": "1.26.0",
-  "name": "NSPanel",
+  "name": "NSPanel EU",
   "product_url": "https://sonoff.tech/products/sonoff-nspanel-smart-scene-wall-switch86-eu-type-120-type",
   "standby_power": 1.16,
   "authors": [
