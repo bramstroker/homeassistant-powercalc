@@ -97,6 +97,44 @@ After setup Powercalc will replace this with the value the user provided.
 !!! note
     Not all selectors are tested. Some might not be supported. `number` and `entity` are tested and should work.
 
+#### Separate translation keys
+
+An optional `translation_key` lets profiles use different labels and descriptions for the same variable name:
+
+```json
+{
+  "fields": {
+    "amount_entity": {
+      "translation_key": "perfume_amount_entity",
+      "label": "Perfume amount entity",
+      "description": "The entity which controls the amount of perfume",
+      "selector": {
+        "entity": {
+          "domain": "number"
+        }
+      }
+    }
+  }
+}
+```
+
+The translation generator uses `perfume_amount_entity` for both the label and description under
+`config.step.library_custom_fields`. The form uses that name too, but Powercalc maps submitted values
+back to `amount_entity`. Existing saved selections, YAML `variables`, and `[[amount_entity]]` templates
+keep their original keys. Editing an existing configuration also prefills the saved selection.
+
+Without `translation_key`, the field key is used for translations as before. Use lowercase letters,
+digits, and underscores for translation keys. Each form field name must be unique within a profile,
+including field keys that do not have a translation key. Across profiles, share a translation key
+only when both the label and description have the same meaning. This property is separate from
+`auto_select.translation_key`, which matches a Home Assistant entity registry entry.
+
+When adopting this feature in a published profile, set `min_version` to the first Powercalc release
+that supports it. Older versions cannot parse the new field property. Add the generated English
+translations and matching keys in every locale to the integration release as well; the library
+update workflow does not currently commit translation files. Existing published profiles can keep
+their current fields until the integration support and translations have shipped.
+
 #### Automatically selecting an entity
 
 From Powercalc v1.26.0, an entity field can use `auto_select` to prefill its selector:

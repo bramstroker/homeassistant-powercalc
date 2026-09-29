@@ -20,6 +20,25 @@ MODEL_SCHEMA = Path(__file__).parents[3] / "profile_library" / "model_schema.jso
 
 
 @pytest.mark.parametrize(
+    "translation_key,valid",
+    [("perfume_amount_entity", True), ("relay_1_load", True), ("", False), (None, False), (42, False), ("a.b", False)],
+)
+def test_field_translation_key_schema(tmp_path: Path, translation_key: object, valid: bool) -> None:
+    profile = complete_model(
+        "generic_iot",
+        fields={
+            "amount_entity": {
+                "label": "Amount entity",
+                "selector": {"entity": {"domain": "number"}},
+                "translation_key": translation_key,
+            }
+        },
+    )
+    path = write_json(tmp_path / "model.json", profile)
+    assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is valid
+
+
+@pytest.mark.parametrize(
     "auto_select,selector,valid",
     [
         ({"translation_key": "floodlight"}, {"entity": {"domain": "light"}}, True),

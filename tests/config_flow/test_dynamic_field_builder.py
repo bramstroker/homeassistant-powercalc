@@ -8,8 +8,43 @@ import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.flow_helper.dynamic_field_builder import build_dynamic_field_schema
+from custom_components.powercalc.power_profile.error import LibraryError
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from tests.common import mock_device, mock_entities_in_registry
+
+
+@pytest.mark.parametrize("default", [None, 0, 5])
+def test_translation_key_names_form_field(hass: HomeAssistant, default: int | None) -> None:
+    profile = create_power_profile(
+        hass,
+        {
+            "amount": {
+                "translation_key": "perfume_amount",
+                "label": "Perfume amount",
+                "selector": {"number": {"min": 0, "max": 10}},
+                "default": default,
+            },
+            "duration": {"label": "Duration", "selector": {"number": {}}},
+        },
+    )
+    schema = build_dynamic_field_schema(hass, profile, None)
+    assert schema({"perfume_amount": 3, "duration": 10}) == {"perfume_amount": 3, "duration": 10}
+    if default is not None:
+        assert schema({"duration": 10}) == {"perfume_amount": default, "duration": 10}
+    with pytest.raises(vol.MultipleInvalid):
+        schema({"amount": 3, "duration": 10})
+
+
+@pytest.mark.parametrize("second_field", ["other_amount", "perfume_amount"])
+def test_duplicate_form_keys_rejected(hass: HomeAssistant, second_field: str) -> None:
+    first = {"label": "Amount", "selector": {"number": {}}, "translation_key": "perfume_amount"}
+    second = {"label": "Other amount", "selector": {"number": {}}}
+    if second_field == "other_amount":
+        second["translation_key"] = "perfume_amount"
+    profile = create_power_profile(hass, {"amount": first, second_field: second})
+
+    with pytest.raises(LibraryError, match="Duplicate custom field form key 'perfume_amount'"):
+        build_dynamic_field_schema(hass, profile, None)
 
 
 @pytest.mark.parametrize(
