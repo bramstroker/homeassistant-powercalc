@@ -1,0 +1,61 @@
+{
+  "name": "Back-UPS ES BE1050G2",
+  "product_url": "https://www.se.com/nl/nl/product/BE1050G2-GR/apc-backups-1050va-600w-vloer-wandmontage-230v-8x-schuko-cee-7-3-uitgangen-usb-type-a+c-poort-door-de-gebruiker-te-vervangen-batterij/,
+  "aliases": [
+    "Back-UPS BE1050G2"
+  ],
+  "description": "Power profile for the APC Back-UPS ES BE1050G2 (1050VA/600W). Estimates real-time output power from NUT load percentage.",
+  "device_type": "ups",
+  "device_specs": {
+    "connectivity": [
+      "usb"
+    ]
+  },
+  "gtin": [
+    "731304285434"
+  ],
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "compatible_integrations": [
+    "nut"
+  ],
+  "created_at": "2026-04-28T00:00:00Z",
+  "measure_method": "manual",
+  "measure_device": "N/A",
+  "config_flow_discovery_remarks": "",
+  "fields": {
+    "nominal_va": {
+      "label": "Nominal Power (VA)",
+      "description": "The VA rating of your UPS. Default: 1050",
+      "default": 1050,
+      "selector": {
+        "number": {
+          "min": 100,
+          "max": 10000
+        }
+      }
+    },
+    "power_factor": {
+      "label": "Power Factor",
+      "description": "Ratio of real power to apparent power. Default: 0.6, matching this UPS's 600 W / 1050 VA rating.",
+      "default": 0.57,
+      "selector": {
+        "number": {
+          "min": 0.1,
+          "max": 1.0,
+          "step": 0.1
+        }
+      }
+    }
+  },
+  "fixed_config": {
+    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * [[nominal_va]] | float(650) * [[power_factor]] | float(0.6) }}"
+  },
+  "authors": [
+    {
+      "name": "RM Hogervorst",
+      "github": "rmhogervorst",
+      "email": "hogervorst.rm@gmail.com"
+    }
+  ]
+}
