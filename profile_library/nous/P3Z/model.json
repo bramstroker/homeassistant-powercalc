@@ -29,7 +29,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.7.0:app"
   },
-  "name": "P3Z",
+  "name": "NOUS P3Z Smart ZigBee Bulb RGB E27",
   "product_url": "https://nous.technology/product/p3z.html",
   "standby_power": 0.27,
   "voltage_range": {
