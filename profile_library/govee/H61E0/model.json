@@ -1,0 +1,40 @@
+{
+  "authors": [
+    {
+      "name": "Vincent",
+      "github": "vinceke44"
+    }
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-29T15:12:39Z",
+  "device_type": "light",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "bluetooth",
+      "matter"
+    ],
+    "lumens": 600,
+    "rated_power": 14,
+    "socket": "integrated"
+  },
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plug S gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 42.44,
+    "DUMMY_LOAD_RESISTANCE": 1240.33,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.10.0:cli"
+  },
+  "name": "LED Strip Light M1 (2m)",
+  "product_url": "https://eu.govee.com/products/govee-led-strip-light-m1-matter-compatible-2m",
+  "standby_power": 1.57,
+  "voltage_range": {
+    "max": 234.1,
+    "min": 221.3
+  }
+}

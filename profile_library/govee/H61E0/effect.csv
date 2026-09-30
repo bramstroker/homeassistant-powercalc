@@ -1,0 +1,1281 @@
+effect,bri,watt
+Action,5,1.51
+Action,45,2.04
+Action,85,2.67
+Action,125,3.8
+Action,165,4.52
+Action,205,5.7
+Action,245,6.73
+Action,255,6.87
+Adventure Game,5,1.47
+Adventure Game,45,2.16
+Adventure Game,85,3.06
+Adventure Game,125,4.23
+Adventure Game,165,5.42
+Adventure Game,205,6.63
+Adventure Game,245,8.07
+Adventure Game,255,7.04
+Afternoon,5,1.5
+Afternoon,45,2.6
+Afternoon,85,4.0
+Afternoon,125,5.89
+Afternoon,165,7.61
+Afternoon,205,9.77
+Afternoon,245,12.2
+Afternoon,255,12.66
+Aurora,5,1.41
+Aurora,45,2.17
+Aurora,85,3.19
+Aurora,125,4.74
+Aurora,165,6.07
+Aurora,205,7.53
+Aurora,245,9.18
+Aurora,255,9.85
+Awaken,5,1.62
+Awaken,45,2.36
+Awaken,85,3.19
+Awaken,125,4.28
+Awaken,165,4.94
+Awaken,205,5.7
+Awaken,245,7.17
+Awaken,255,7.27
+Awaken A,5,1.63
+Awaken A,45,2.69
+Awaken A,85,4.01
+Awaken A,125,5.56
+Awaken A,165,7.19
+Awaken A,205,9.0
+Awaken A,245,11.01
+Awaken A,255,11.65
+Awaken B,5,1.77
+Awaken B,45,3.12
+Awaken B,85,4.79
+Awaken B,125,6.87
+Awaken B,165,8.93
+Awaken B,205,11.21
+Awaken B,245,13.84
+Awaken B,255,14.61
+Awaken C,5,1.76
+Awaken C,45,2.93
+Awaken C,85,4.39
+Awaken C,125,6.05
+Awaken C,165,7.78
+Awaken C,205,9.67
+Awaken C,245,11.91
+Awaken C,255,12.67
+Ballet,5,1.95
+Ballet,45,3.09
+Ballet,85,4.85
+Ballet,125,6.84
+Ballet,165,9.16
+Ballet,205,11.53
+Ballet,245,14.35
+Ballet,255,15.25
+Birthday,5,1.84
+Birthday,45,2.94
+Birthday,85,4.14
+Birthday,125,5.7
+Birthday,165,7.6
+Birthday,205,8.63
+Birthday,245,11.01
+Birthday,255,10.91
+Breaking,5,1.67
+Breaking,45,1.8
+Breaking,85,2.01
+Breaking,125,2.23
+Breaking,165,2.41
+Breaking,205,2.57
+Breaking,245,2.88
+Breaking,255,3.07
+Breathe,5,2.6
+Breathe,45,2.59
+Breathe,85,2.79
+Breathe,125,3.38
+Breathe,165,4.04
+Breathe,205,5.46
+Breathe,245,6.6
+Breathe,255,6.25
+Business,5,1.92
+Business,45,3.67
+Business,85,5.78
+Business,125,8.57
+Business,165,11.13
+Business,205,14.44
+Business,245,17.95
+Business,255,18.92
+Candlelight,5,1.85
+Candlelight,45,2.35
+Candlelight,85,2.89
+Candlelight,125,3.58
+Candlelight,165,4.22
+Candlelight,205,4.88
+Candlelight,245,5.68
+Candlelight,255,5.76
+Cards Game,5,1.73
+Cards Game,45,3.23
+Cards Game,85,5.66
+Cards Game,125,8.44
+Cards Game,165,10.86
+Cards Game,205,14.16
+Cards Game,245,16.69
+Cards Game,255,17.96
+Care,5,1.63
+Care,45,1.82
+Care,85,2.16
+Care,125,2.64
+Care,165,3.09
+Care,205,3.47
+Care,245,4.13
+Care,255,4.42
+Carnival,5,1.72
+Carnival,45,2.28
+Carnival,85,2.99
+Carnival,125,3.7
+Carnival,165,4.64
+Carnival,205,5.55
+Carnival,245,6.61
+Carnival,255,6.91
+Cha-Cha,5,1.63
+Cha-Cha,45,2.48
+Cha-Cha,85,3.68
+Cha-Cha,125,5.02
+Cha-Cha,165,6.28
+Cha-Cha,205,7.8
+Cha-Cha,245,9.75
+Cha-Cha,255,10.35
+Cheerful,5,1.64
+Cheerful,45,2.72
+Cheerful,85,4.19
+Cheerful,125,5.58
+Cheerful,165,7.09
+Cheerful,205,8.92
+Cheerful,245,10.79
+Cheerful,255,11.11
+Christmas,5,1.72
+Christmas,45,2.13
+Christmas,85,2.78
+Christmas,125,3.45
+Christmas,165,3.99
+Christmas,205,4.69
+Christmas,245,5.55
+Christmas,255,6.0
+Christmas Gift,5,1.81
+Christmas Gift,45,2.35
+Christmas Gift,85,3.49
+Christmas Gift,125,4.1
+Christmas Gift,165,5.0
+Christmas Gift,205,5.69
+Christmas Gift,245,7.47
+Christmas Gift,255,6.71
+Christmas Tree,5,1.75
+Christmas Tree,45,2.15
+Christmas Tree,85,2.82
+Christmas Tree,125,3.77
+Christmas Tree,165,4.22
+Christmas Tree,205,5.25
+Christmas Tree,245,5.8
+Christmas Tree,255,5.73
+Comedies,5,1.72
+Comedies,45,2.82
+Comedies,85,4.34
+Comedies,125,5.99
+Comedies,165,7.69
+Comedies,205,9.64
+Comedies,245,11.93
+Comedies,255,12.52
+Cornfield,5,1.76
+Cornfield,45,2.42
+Cornfield,85,3.19
+Cornfield,125,4.38
+Cornfield,165,5.38
+Cornfield,205,6.53
+Cornfield,245,7.88
+Cornfield,255,8.17
+Cosplay,5,1.57
+Cosplay,45,1.81
+Cosplay,85,2.23
+Cosplay,125,2.62
+Cosplay,165,3.01
+Cosplay,205,3.27
+Cosplay,245,3.57
+Cosplay,255,3.92
+Crazy,5,1.66
+Crazy,45,2.5
+Crazy,85,3.49
+Crazy,125,3.29
+Crazy,165,5.61
+Crazy,205,7.19
+Crazy,245,8.59
+Crazy,255,5.75
+Crossing,5,2.09
+Crossing,45,4.45
+Crossing,85,7.15
+Crossing,125,10.5
+Crossing,165,14.17
+Crossing,205,17.75
+Crossing,245,22.03
+Crossing,255,22.22
+Dance Party,5,1.83
+Dance Party,45,2.81
+Dance Party,85,4.44
+Dance Party,125,5.69
+Dance Party,165,7.15
+Dance Party,205,10.3
+Dance Party,245,10.97
+Dance Party,255,13.07
+Dancing,5,1.69
+Dancing,45,2.82
+Dancing,85,4.21
+Dancing,125,5.84
+Dancing,165,7.66
+Dancing,205,7.55
+Dancing,245,11.53
+Dancing,255,12.35
+Dating,5,1.74
+Dating,45,2.68
+Dating,85,3.87
+Dating,125,5.11
+Dating,165,6.38
+Dating,205,7.94
+Dating,245,9.81
+Dating,255,10.38
+Daze,5,1.66
+Daze,45,2.96
+Daze,85,4.69
+Daze,125,6.5
+Daze,165,8.58
+Daze,205,10.68
+Daze,245,13.13
+Daze,255,13.74
+Deep sea,5,1.7
+Deep sea,45,2.73
+Deep sea,85,4.12
+Deep sea,125,5.82
+Deep sea,165,7.26
+Deep sea,205,9.06
+Deep sea,245,11.03
+Deep sea,255,11.57
+Deep Sea B,5,1.6
+Deep Sea B,45,2.59
+Deep Sea B,85,3.58
+Deep Sea B,125,5.33
+Deep Sea B,165,6.27
+Deep Sea B,205,7.54
+Deep Sea B,245,10.83
+Deep Sea B,255,11.71
+Desert,5,1.56
+Desert,45,2.14
+Desert,85,2.8
+Desert,125,3.64
+Desert,165,4.41
+Desert,205,5.53
+Desert,245,6.24
+Desert,255,6.23
+Desert B,5,1.63
+Desert B,45,1.95
+Desert B,85,2.33
+Desert B,125,2.93
+Desert B,165,3.45
+Desert B,205,4.15
+Desert B,245,4.84
+Desert B,255,5.07
+Disco,5,1.59
+Disco,45,2.75
+Disco,85,4.38
+Disco,125,5.38
+Disco,165,8.26
+Disco,205,9.89
+Disco,245,12.69
+Disco,255,12.74
+Documentaries,5,1.45
+Documentaries,45,2.01
+Documentaries,85,2.97
+Documentaries,125,3.98
+Documentaries,165,4.85
+Documentaries,205,5.74
+Documentaries,245,6.87
+Documentaries,255,7.3
+Downpour,5,1.63
+Downpour,45,1.75
+Downpour,85,1.83
+Downpour,125,1.97
+Downpour,165,2.19
+Downpour,205,2.7
+Downpour,245,2.8
+Downpour,255,3.33
+Dracarys,5,1.74
+Dracarys,45,2.14
+Dracarys,85,2.78
+Dracarys,125,3.61
+Dracarys,165,4.4
+Dracarys,205,5.33
+Dracarys,245,6.34
+Dracarys,255,6.7
+Dramas,5,1.71
+Dramas,45,2.89
+Dramas,85,4.52
+Dramas,125,6.1
+Dramas,165,8.09
+Dramas,205,9.63
+Dramas,245,11.94
+Dramas,255,12.43
+Dreamland,5,1.82
+Dreamland,45,3.66
+Dreamland,85,6.42
+Dreamland,125,8.52
+Dreamland,165,11.68
+Dreamland,205,14.39
+Dreamland,245,18.56
+Dreamland,255,19.6
+Dreamland-F,5,1.83
+Dreamland-F,45,3.17
+Dreamland-F,85,4.85
+Dreamland-F,125,6.78
+Dreamland-F,165,8.92
+Dreamland-F,205,11.29
+Dreamland-F,245,13.82
+Dreamland-F,255,14.55
+Dreamlike,5,1.88
+Dreamlike,45,2.75
+Dreamlike,85,3.86
+Dreamlike,125,5.42
+Dreamlike,165,6.84
+Dreamlike,205,8.25
+Dreamlike,245,11.61
+Dreamlike,255,11.08
+Easter,5,1.7
+Easter,45,2.48
+Easter,85,3.31
+Easter,125,4.7
+Easter,165,5.94
+Easter,205,6.75
+Easter,245,8.26
+Easter,255,8.35
+Electro Dance,5,1.69
+Electro Dance,45,2.11
+Electro Dance,85,2.73
+Electro Dance,125,3.46
+Electro Dance,165,4.28
+Electro Dance,205,5.08
+Electro Dance,245,5.89
+Electro Dance,255,6.13
+Energetic,5,1.85
+Energetic,45,3.26
+Energetic,85,4.92
+Energetic,125,6.65
+Energetic,165,9.28
+Energetic,205,11.42
+Energetic,245,13.85
+Energetic,255,14.57
+Enthusiastic,5,1.65
+Enthusiastic,45,2.28
+Enthusiastic,85,3.0
+Enthusiastic,125,3.94
+Enthusiastic,165,4.9
+Enthusiastic,205,6.21
+Enthusiastic,245,6.99
+Enthusiastic,255,7.73
+Excited,5,1.65
+Excited,45,2.13
+Excited,85,2.8
+Excited,125,3.35
+Excited,165,3.97
+Excited,205,4.73
+Excited,245,5.62
+Excited,255,5.97
+Fall,5,1.77
+Fall,45,2.81
+Fall,85,4.14
+Fall,125,5.71
+Fall,165,6.77
+Fall,205,8.51
+Fall,245,10.51
+Fall,255,12.6
+Fascination,5,1.61
+Fascination,45,2.42
+Fascination,85,3.14
+Fascination,125,3.79
+Fascination,165,4.89
+Fascination,205,5.08
+Fascination,245,7.71
+Fascination,255,6.44
+Father's Day,5,1.9
+Father's Day,45,3.25
+Father's Day,85,4.88
+Father's Day,125,6.8
+Father's Day,165,9.27
+Father's Day,205,11.23
+Father's Day,245,13.2
+Father's Day,255,14.26
+Fight,5,1.84
+Fight,45,2.33
+Fight,85,3.04
+Fight,125,3.7
+Fight,165,4.56
+Fight,205,5.44
+Fight,245,6.59
+Fight,255,6.78
+Fighting Game,5,1.91
+Fighting Game,45,2.89
+Fighting Game,85,4.15
+Fighting Game,125,5.84
+Fighting Game,165,7.72
+Fighting Game,205,9.7
+Fighting Game,245,11.62
+Fighting Game,255,12.17
+Fire,5,2.05
+Fire,45,2.49
+Fire,85,3.06
+Fire,125,3.8
+Fire,165,4.54
+Fire,205,5.43
+Fire,245,6.6
+Fire,255,6.56
+Fireworks,5,1.94
+Fireworks,45,2.13
+Fireworks,85,2.33
+Fireworks,125,2.67
+Fireworks,165,2.78
+Fireworks,205,3.06
+Fireworks,245,3.41
+Fireworks,255,3.44
+Fire & Blood,5,1.96
+Fire & Blood,45,2.39
+Fire & Blood,85,2.9
+Fire & Blood,125,3.54
+Fire & Blood,165,4.16
+Fire & Blood,205,4.84
+Fire & Blood,245,5.77
+Fire & Blood,255,5.9
+Flash,5,1.93
+Flash,45,2.25
+Flash,85,2.54
+Flash,125,3.05
+Flash,165,3.67
+Flash,205,4.12
+Flash,245,4.64
+Flash,255,4.46
+Flow,5,1.81
+Flow,45,2.0
+Flow,85,2.27
+Flow,125,2.63
+Flow,165,3.0
+Flow,205,3.42
+Flow,245,3.88
+Flow,255,3.98
+Flower Field,5,1.66
+Flower Field,45,2.39
+Flower Field,85,3.25
+Flower Field,125,4.54
+Flower Field,165,5.25
+Flower Field,205,6.84
+Flower Field,245,7.65
+Flower Field,255,9.17
+Forest,5,1.74
+Forest,45,2.37
+Forest,85,3.22
+Forest,125,4.12
+Forest,165,5.19
+Forest,205,6.4
+Forest,245,7.67
+Forest,255,7.8
+Game,5,1.7
+Game,45,3.06
+Game,85,5.09
+Game,125,6.96
+Game,165,9.44
+Game,205,11.93
+Game,245,14.17
+Game,255,15.55
+Gary,5,1.62
+Gary,45,2.33
+Gary,85,3.27
+Gary,125,4.39
+Gary,165,5.34
+Gary,205,6.66
+Gary,245,7.98
+Gary,255,8.35
+Ghost,5,1.48
+Ghost,45,2.35
+Ghost,85,3.49
+Ghost,125,4.71
+Ghost,165,6.15
+Ghost,205,7.59
+Ghost,245,9.33
+Ghost,255,9.8
+Glacier,5,1.66
+Glacier,45,2.29
+Glacier,85,3.08
+Glacier,125,4.71
+Glacier,165,6.87
+Glacier,205,7.3
+Glacier,245,8.97
+Glacier,255,9.01
+Gobi Desert,5,1.77
+Gobi Desert,45,2.11
+Gobi Desert,85,2.57
+Gobi Desert,125,3.17
+Gobi Desert,165,3.78
+Gobi Desert,205,4.34
+Gobi Desert,245,5.2
+Gobi Desert,255,5.01
+Green Reign,5,1.83
+Green Reign,45,2.01
+Green Reign,85,2.25
+Green Reign,125,2.58
+Green Reign,165,2.83
+Green Reign,205,3.2
+Green Reign,245,3.56
+Green Reign,255,3.69
+Halloween,5,1.8
+Halloween,45,2.23
+Halloween,85,2.9
+Halloween,125,3.66
+Halloween,165,4.51
+Halloween,205,5.18
+Halloween,245,6.43
+Halloween,255,6.66
+Halloween Night,5,1.65
+Halloween Night,45,2.0
+Halloween Night,85,2.59
+Halloween Night,125,3.35
+Halloween Night,165,3.94
+Halloween Night,205,4.85
+Halloween Night,245,5.7
+Halloween Night,255,6.2
+Happy,5,1.75
+Happy,45,2.17
+Happy,85,3.23
+Happy,125,3.08
+Happy,165,3.72
+Happy,205,4.69
+Happy,245,7.19
+Happy,255,5.97
+Heartbeat,5,1.61
+Heartbeat,45,1.75
+Heartbeat,85,2.13
+Heartbeat,125,2.41
+Heartbeat,165,2.81
+Heartbeat,205,3.09
+Heartbeat,245,3.58
+Heartbeat,255,3.53
+High,5,1.6
+High,45,1.95
+High,85,2.4
+High,125,2.95
+High,165,3.38
+High,205,3.94
+High,245,4.62
+High,255,5.09
+Jazz,5,1.79
+Jazz,45,3.6
+Jazz,85,5.93
+Jazz,125,8.65
+Jazz,165,11.46
+Jazz,205,14.7
+Jazz,245,18.29
+Jazz,255,19.26
+Judy,5,1.76
+Judy,45,2.59
+Judy,85,3.51
+Judy,125,4.99
+Judy,165,6.2
+Judy,205,7.68
+Judy,245,9.25
+Judy,255,9.46
+Karst Cave,5,1.78
+Karst Cave,45,2.96
+Karst Cave,85,4.58
+Karst Cave,125,6.6
+Karst Cave,165,8.15
+Karst Cave,205,10.36
+Karst Cave,245,13.07
+Karst Cave,255,13.78
+Latin Dance,5,1.75
+Latin Dance,45,3.0
+Latin Dance,85,4.9
+Latin Dance,125,5.24
+Latin Dance,165,8.53
+Latin Dance,205,7.51
+Latin Dance,245,8.46
+Latin Dance,255,11.2
+Leisure,5,1.53
+Leisure,45,2.19
+Leisure,85,3.09
+Leisure,125,4.29
+Leisure,165,5.54
+Leisure,205,6.78
+Leisure,245,8.26
+Leisure,255,8.51
+Lightning,5,1.64
+Lightning,45,1.93
+Lightning,85,2.36
+Lightning,125,2.65
+Lightning,165,3.48
+Lightning,205,4.39
+Lightning,245,4.85
+Lightning,255,5.23
+Longing,5,1.73
+Longing,45,2.38
+Longing,85,3.19
+Longing,125,4.19
+Longing,165,5.04
+Longing,205,6.05
+Longing,245,7.04
+Longing,255,7.5
+MDL,5,1.72
+MDL,45,3.1
+MDL,85,4.8
+MDL,125,6.93
+MDL,165,9.26
+MDL,205,11.82
+MDL,245,14.34
+MDL,255,15.49
+Meditation,5,1.67
+Meditation,45,2.09
+Meditation,85,2.78
+Meditation,125,3.64
+Meditation,165,4.31
+Meditation,205,4.97
+Meditation,245,5.41
+Meditation,255,5.56
+Meteor,5,1.57
+Meteor,45,1.87
+Meteor,85,2.23
+Meteor,125,2.68
+Meteor,165,3.0
+Meteor,205,3.46
+Meteor,245,3.96
+Meteor,255,4.12
+Meteor shower,5,1.41
+Meteor shower,45,2.31
+Meteor shower,85,3.52
+Meteor shower,125,4.89
+Meteor shower,165,6.27
+Meteor shower,205,7.9
+Meteor shower,245,9.84
+Meteor shower,255,10.19
+Moonlight,5,1.36
+Moonlight,45,1.73
+Moonlight,85,2.3
+Moonlight,125,2.78
+Moonlight,165,3.5
+Moonlight,205,4.01
+Moonlight,245,4.69
+Moonlight,255,5.14
+Morning,5,1.23
+Morning,45,2.12
+Morning,85,3.41
+Morning,125,4.91
+Morning,165,6.23
+Morning,205,7.88
+Morning,245,9.77
+Morning,255,10.39
+Mother's Day,5,1.34
+Mother's Day,45,2.95
+Mother's Day,85,4.82
+Mother's Day,125,7.09
+Mother's Day,165,9.37
+Mother's Day,205,12.46
+Mother's Day,245,14.78
+Mother's Day,255,15.9
+Mother's Hug,5,1.42
+Mother's Hug,45,1.91
+Mother's Hug,85,2.46
+Mother's Hug,125,3.22
+Mother's Hug,165,4.06
+Mother's Hug,205,4.9
+Mother's Hug,245,5.84
+Mother's Hug,255,6.1
+Movie,5,1.37
+Movie,45,2.49
+Movie,85,3.73
+Movie,125,5.24
+Movie,165,6.71
+Movie,205,8.38
+Movie,245,10.32
+Movie,255,10.84
+Music: DayAndNight,5,1.38
+Music: DayAndNight,45,1.5
+Music: DayAndNight,85,1.8
+Music: DayAndNight,125,2.05
+Music: DayAndNight,165,2.28
+Music: DayAndNight,205,2.85
+Music: DayAndNight,245,2.94
+Music: DayAndNight,255,2.94
+Music: Energic,5,1.62
+Music: Energic,45,2.06
+Music: Energic,85,2.61
+Music: Energic,125,3.36
+Music: Energic,165,4.13
+Music: Energic,205,4.88
+Music: Energic,245,5.6
+Music: Energic,255,5.86
+Music: Fountain,5,1.51
+Music: Fountain,45,2.0
+Music: Fountain,85,2.77
+Music: Fountain,125,3.59
+Music: Fountain,165,4.57
+Music: Fountain,205,5.67
+Music: Fountain,245,6.71
+Music: Fountain,255,2.31
+Music: Hopping,5,1.44
+Music: Hopping,45,1.63
+Music: Hopping,85,2.17
+Music: Hopping,125,2.77
+Music: Hopping,165,2.17
+Music: Hopping,205,3.33
+Music: Hopping,245,4.46
+Music: Hopping,255,3.39
+Music: PianoKeys,5,1.5
+Music: PianoKeys,45,2.54
+Music: PianoKeys,85,3.91
+Music: PianoKeys,125,5.19
+Music: PianoKeys,165,7.02
+Music: PianoKeys,205,8.46
+Music: PianoKeys,245,10.34
+Music: PianoKeys,255,11.12
+Music: Rhythm,5,1.63
+Music: Rhythm,45,2.04
+Music: Rhythm,85,2.65
+Music: Rhythm,125,3.8
+Music: Rhythm,165,4.26
+Music: Rhythm,205,5.47
+Music: Rhythm,245,6.07
+Music: Rhythm,255,6.6
+Music: Rolling,5,1.62
+Music: Rolling,45,1.57
+Music: Rolling,85,1.5
+Music: Rolling,125,1.52
+Music: Rolling,165,1.52
+Music: Rolling,205,1.43
+Music: Rolling,245,1.45
+Music: Rolling,255,1.48
+Music: Separation,5,1.55
+Music: Separation,45,2.64
+Music: Separation,85,3.54
+Music: Separation,125,5.45
+Music: Separation,165,8.39
+Music: Separation,205,10.23
+Music: Separation,245,10.32
+Music: Separation,255,11.64
+Music: Shiny,5,1.32
+Music: Shiny,45,1.52
+Music: Shiny,85,1.77
+Music: Shiny,125,1.75
+Music: Shiny,165,2.46
+Music: Shiny,205,2.96
+Music: Shiny,245,3.71
+Music: Shiny,255,3.63
+Music: Spectrum,5,1.39
+Music: Spectrum,45,1.41
+Music: Spectrum,85,1.43
+Music: Spectrum,125,1.51
+Music: Spectrum,165,1.55
+Music: Spectrum,205,1.62
+Music: Spectrum,245,1.68
+Music: Spectrum,255,1.65
+Music: Sprouting,5,1.36
+Music: Sprouting,45,2.44
+Music: Sprouting,85,3.77
+Music: Sprouting,125,5.53
+Music: Sprouting,165,6.81
+Music: Sprouting,205,8.78
+Music: Sprouting,245,10.92
+Music: Sprouting,255,10.18
+Mysterious,5,1.32
+Mysterious,45,2.06
+Mysterious,85,2.93
+Mysterious,125,4.31
+Mysterious,165,5.47
+Mysterious,205,6.89
+Mysterious,245,8.49
+Mysterious,255,9.14
+New Years,5,1.18
+New Years,45,2.07
+New Years,85,3.12
+New Years,125,4.32
+New Years,165,5.72
+New Years,205,7.05
+New Years,245,8.68
+New Years,255,9.0
+Nick,5,1.2
+Nick,45,2.1
+Nick,85,3.23
+Nick,125,4.65
+Nick,165,5.92
+Nick,205,7.29
+Nick,245,9.15
+Nick,255,9.87
+Night,5,1.21
+Night,45,1.56
+Night,85,1.82
+Night,125,2.51
+Night,165,2.8
+Night,205,3.04
+Night,245,3.88
+Night,255,3.83
+Party,5,1.32
+Party,45,2.41
+Party,85,3.14
+Party,125,4.38
+Party,165,6.81
+Party,205,7.14
+Party,245,13.94
+Party,255,13.03
+Pole dance,5,1.59
+Pole dance,45,2.34
+Pole dance,85,3.75
+Pole dance,125,4.88
+Pole dance,165,6.47
+Pole dance,205,8.77
+Pole dance,245,10.16
+Pole dance,255,10.69
+Poppin,5,1.64
+Poppin,45,1.8
+Poppin,85,2.07
+Poppin,125,2.16
+Poppin,165,1.87
+Poppin,205,3.37
+Poppin,245,2.58
+Poppin,255,4.17
+Profound,5,1.66
+Profound,45,2.37
+Profound,85,3.26
+Profound,125,4.38
+Profound,165,5.46
+Profound,205,6.69
+Profound,245,8.1
+Profound,255,8.41
+Puzzle Game,5,1.81
+Puzzle Game,45,2.37
+Puzzle Game,85,2.97
+Puzzle Game,125,3.79
+Puzzle Game,165,4.61
+Puzzle Game,205,5.32
+Puzzle Game,245,6.31
+Puzzle Game,255,6.62
+Quiet,5,1.6
+Quiet,45,2.06
+Quiet,85,2.63
+Quiet,125,3.38
+Quiet,165,4.17
+Quiet,205,4.96
+Quiet,245,5.81
+Quiet,255,6.08
+Racing Game,5,1.52
+Racing Game,45,1.77
+Racing Game,85,2.1
+Racing Game,125,2.47
+Racing Game,165,2.92
+Racing Game,205,3.3
+Racing Game,245,3.79
+Racing Game,255,4.04
+Rainbow,5,1.6
+Rainbow,45,2.67
+Rainbow,85,4.1
+Rainbow,125,5.18
+Rainbow,165,7.26
+Rainbow,205,8.78
+Rainbow,245,10.68
+Rainbow,255,11.79
+Reading,5,1.59
+Reading,45,2.75
+Reading,85,4.24
+Reading,125,6.05
+Reading,165,7.83
+Reading,205,9.95
+Reading,245,12.53
+Reading,255,13.27
+Release,5,1.54
+Release,45,2.04
+Release,85,2.74
+Release,125,3.5
+Release,165,4.37
+Release,205,5.22
+Release,245,6.21
+Release,255,6.54
+Ripple,5,1.49
+Ripple,45,1.93
+Ripple,85,2.37
+Ripple,125,3.07
+Ripple,165,3.54
+Ripple,205,4.25
+Ripple,245,4.98
+Ripple,255,5.18
+Romance,5,1.61
+Romance,45,3.29
+Romance,85,5.39
+Romance,125,7.8
+Romance,165,9.07
+Romance,205,13.36
+Romance,245,14.24
+Romance,255,17.07
+Romantic,5,1.49
+Romantic,45,2.39
+Romantic,85,3.6
+Romantic,125,5.1
+Romantic,165,5.99
+Romantic,205,7.91
+Romantic,245,9.2
+Romantic,255,10.2
+Rush,5,1.73
+Rush,45,3.6
+Rush,85,5.97
+Rush,125,8.58
+Rush,165,11.67
+Rush,205,15.23
+Rush,245,19.04
+Rush,255,16.97
+Rustling leaves,5,1.61
+Rustling leaves,45,2.72
+Rustling leaves,85,4.48
+Rustling leaves,125,5.96
+Rustling leaves,165,8.33
+Rustling leaves,205,10.16
+Rustling leaves,245,12.29
+Rustling leaves,255,13.13
+Sailboat,5,1.53
+Sailboat,45,2.32
+Sailboat,85,3.38
+Sailboat,125,4.83
+Sailboat,165,6.26
+Sailboat,205,7.57
+Sailboat,245,9.12
+Sailboat,255,9.7
+Sand Grains,5,1.49
+Sand Grains,45,2.15
+Sand Grains,85,2.98
+Sand Grains,125,4.09
+Sand Grains,165,5.12
+Sand Grains,205,6.25
+Sand Grains,245,7.51
+Sand Grains,255,7.95
+Science Fiction,5,1.43
+Science Fiction,45,1.73
+Science Fiction,85,2.02
+Science Fiction,125,2.39
+Science Fiction,165,2.8
+Science Fiction,205,3.23
+Science Fiction,245,3.8
+Science Fiction,255,3.84
+Shooting Game,5,1.27
+Shooting Game,45,1.52
+Shooting Game,85,1.85
+Shooting Game,125,2.23
+Shooting Game,165,2.66
+Shooting Game,205,3.07
+Shooting Game,245,3.54
+Shooting Game,255,3.67
+Siren,5,1.33
+Siren,45,3.25
+Siren,85,5.51
+Siren,125,8.75
+Siren,165,10.87
+Siren,205,14.89
+Siren,245,18.11
+Siren,255,19.17
+Sky,5,1.24
+Sky,45,2.07
+Sky,85,3.17
+Sky,125,4.47
+Sky,165,5.73
+Sky,205,7.18
+Sky,245,8.76
+Sky,255,9.35
+Sled,5,1.44
+Sled,45,2.61
+Sled,85,4.04
+Sled,125,5.92
+Sled,165,7.64
+Sled,205,9.53
+Sled,245,11.55
+Sled,255,12.55
+Sleep,5,1.37
+Sleep,45,1.56
+Sleep,85,1.74
+Sleep,125,1.97
+Sleep,165,2.23
+Sleep,205,2.5
+Sleep,245,2.92
+Sleep,255,3.05
+Snow flake,5,1.57
+Snow flake,45,2.05
+Snow flake,85,2.17
+Snow flake,125,2.69
+Snow flake,165,3.67
+Snow flake,205,3.84
+Snow flake,245,4.12
+Snow flake,255,5.33
+Soothing,5,1.42
+Soothing,45,1.85
+Soothing,85,2.53
+Soothing,125,4.81
+Soothing,165,3.53
+Soothing,205,6.68
+Soothing,245,6.64
+Soothing,255,5.53
+Sports,5,1.25
+Sports,45,1.58
+Sports,85,1.93
+Sports,125,2.38
+Sports,165,2.78
+Sports,205,3.3
+Sports,245,3.89
+Sports,255,4.1
+Spring,5,1.23
+Spring,45,2.5
+Spring,85,3.6
+Spring,125,6.07
+Spring,165,7.57
+Spring,205,8.35
+Spring,245,12.45
+Spring,255,12.67
+Stacking,5,1.26
+Stacking,45,1.6
+Stacking,85,2.11
+Stacking,125,2.59
+Stacking,165,3.09
+Stacking,205,3.7
+Stacking,245,4.34
+Stacking,255,4.51
+Star,5,1.31
+Star,45,1.86
+Star,85,2.65
+Star,125,4.19
+Star,165,5.22
+Star,205,4.81
+Star,245,7.68
+Star,255,8.69
+Starry Sky,5,1.49
+Starry Sky,45,2.59
+Starry Sky,85,4.07
+Starry Sky,125,5.71
+Starry Sky,165,7.51
+Starry Sky,205,8.98
+Starry Sky,245,11.32
+Starry Sky,255,11.85
+Street Dance,5,1.4
+Street Dance,45,1.6
+Street Dance,85,1.98
+Street Dance,125,2.48
+Street Dance,165,3.13
+Street Dance,205,3.54
+Street Dance,245,3.41
+Street Dance,255,6.34
+Study,5,1.42
+Study,45,4.33
+Study,85,8.01
+Study,125,12.47
+Study,165,17.14
+Study,205,22.34
+Study,245,28.04
+Study,255,29.71
+Summer,5,1.19
+Summer,45,2.56
+Summer,85,4.34
+Summer,125,6.28
+Summer,165,8.42
+Summer,205,10.93
+Summer,245,13.46
+Summer,255,14.31
+Sunny,5,1.15
+Sunny,45,3.23
+Sunny,85,5.01
+Sunny,125,8.36
+Sunny,165,10.27
+Sunny,205,15.25
+Sunny,245,16.55
+Sunny,255,16.33
+Sunrise,5,1.15
+Sunrise,45,1.17
+Sunrise,85,1.16
+Sunrise,125,1.12
+Sunrise,165,1.24
+Sunrise,205,1.21
+Sunrise,245,1.17
+Sunrise,255,1.16
+Sunset,5,1.17
+Sunset,45,2.08
+Sunset,85,3.37
+Sunset,125,4.82
+Sunset,165,2.22
+Sunset,205,6.32
+Sunset,245,7.82
+Sunset,255,8.27
+Suspense,5,1.17
+Suspense,45,2.28
+Suspense,85,3.75
+Suspense,125,5.35
+Suspense,165,7.09
+Suspense,205,8.7
+Suspense,245,10.96
+Suspense,255,11.71
+Sweet,5,2.12
+Sweet,45,2.08
+Sweet,85,3.01
+Sweet,125,4.25
+Sweet,165,5.46
+Sweet,205,6.9
+Sweet,245,8.57
+Sweet,255,9.11
+Swing,5,1.16
+Swing,45,1.24
+Swing,85,1.41
+Swing,125,1.65
+Swing,165,1.91
+Swing,205,2.14
+Swing,245,2.35
+Swing,255,2.38
+Tango,5,1.41
+Tango,45,1.95
+Tango,85,2.7
+Tango,125,3.52
+Tango,165,4.23
+Tango,205,5.1
+Tango,245,6.27
+Tango,255,6.13
+Tension,5,1.38
+Tension,45,1.53
+Tension,85,1.81
+Tension,125,2.17
+Tension,165,2.36
+Tension,205,2.66
+Tension,245,3.06
+Tension,255,3.17
+Thanksgiving,5,1.4
+Thanksgiving,45,2.1
+Thanksgiving,85,2.75
+Thanksgiving,125,3.95
+Thanksgiving,165,5.21
+Thanksgiving,205,6.54
+Thanksgiving,245,8.0
+Thanksgiving,255,7.9
+Thrillers,5,1.19
+Thrillers,45,1.24
+Thrillers,85,1.36
+Thrillers,125,1.49
+Thrillers,165,1.54
+Thrillers,205,1.81
+Thrillers,245,1.86
+Thrillers,255,1.84
+Twinkle,5,1.45
+Twinkle,45,2.66
+Twinkle,85,3.98
+Twinkle,125,5.97
+Twinkle,165,7.5
+Twinkle,205,9.56
+Twinkle,245,11.66
+Twinkle,255,12.48
+Undersea King,5,1.32
+Undersea King,45,1.95
+Undersea King,85,2.65
+Undersea King,125,3.65
+Undersea King,165,4.55
+Undersea King,205,5.44
+Undersea King,245,6.63
+Undersea King,255,6.98
+Universe,5,1.28
+Universe,45,1.68
+Universe,85,2.14
+Universe,125,2.67
+Universe,165,4.26
+Universe,205,5.74
+Universe,245,5.63
+Universe,255,5.5
+Valentine's Day,5,1.46
+Valentine's Day,45,2.62
+Valentine's Day,85,4.19
+Valentine's Day,125,6.17
+Valentine's Day,165,7.98
+Valentine's Day,205,10.76
+Valentine's Day,245,13.0
+Valentine's Day,255,12.53
+Volcano,5,1.38
+Volcano,45,1.77
+Volcano,85,2.21
+Volcano,125,2.71
+Volcano,165,3.16
+Volcano,205,3.92
+Volcano,245,4.63
+Volcano,255,1.91
+Waltz,5,1.52
+Waltz,45,2.83
+Waltz,85,4.66
+Waltz,125,6.52
+Waltz,165,6.96
+Waltz,205,11.39
+Waltz,245,13.71
+Waltz,255,15.08
+War Films,5,1.48
+War Films,45,1.73
+War Films,85,2.08
+War Films,125,2.53
+War Films,165,3.2
+War Films,205,3.68
+War Films,245,4.33
+War Films,255,4.43
+Warm,5,1.44
+Warm,45,2.29
+Warm,85,3.56
+Warm,125,4.94
+Warm,165,6.36
+Warm,205,8.06
+Warm,245,9.92
+Warm,255,10.47
+Watermelon,5,1.49
+Watermelon,45,2.29
+Watermelon,85,3.34
+Watermelon,125,4.69
+Watermelon,165,5.75
+Watermelon,205,7.32
+Watermelon,245,9.09
+Watermelon,255,9.49
+Wave,5,1.56
+Wave,45,2.74
+Wave,85,4.27
+Wave,125,5.8
+Wave,165,7.28
+Wave,205,9.42
+Wave,245,10.95
+Wave,255,11.95
+White Light,5,1.7
+White Light,45,3.96
+White Light,85,6.83
+White Light,125,10.15
+White Light,165,13.82
+White Light,205,17.76
+White Light,245,22.37
+White Light,255,23.75
+Winter,5,1.74
+Winter,45,3.39
+Winter,85,5.72
+Winter,125,8.52
+Winter,165,11.48
+Winter,205,14.14
+Winter,245,16.54
+Winter,255,17.42
+Work,5,1.71
+Work,45,3.63
+Work,85,6.17
+Work,125,9.09
+Work,165,12.14
+Work,205,15.63
+Work,245,19.44
+Work,255,20.57
+ZDP Duo,5,1.95
+ZDP Duo,45,2.49
+ZDP Duo,85,3.62
+ZDP Duo,125,5.0
+ZDP Duo,165,6.4
+ZDP Duo,205,8.01
+ZDP Duo,245,9.81
+ZDP Duo,255,10.4
+ZDP Trio,5,1.44
+ZDP Trio,45,2.39
+ZDP Trio,85,3.54
+ZDP Trio,125,4.95
+ZDP Trio,165,6.35
+ZDP Trio,205,8.05
+ZDP Trio,245,9.64
+ZDP Trio,255,10.25
