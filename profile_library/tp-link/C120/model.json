@@ -19,6 +19,10 @@
         "entity": {
           "domain": "switch"
         }
+      },
+      "auto_select": {
+        "integration": "tapo_control",
+        "unique_id_pattern": "-privacy$"
       }
     },
     "night_vision_entity": {
@@ -28,6 +32,10 @@
         "entity": {
           "domain": "select"
         }
+      },
+      "auto_select": {
+        "integration": "tapo_control",
+        "unique_id_pattern": "-nightvisionswitching$"
       }
     },
     "floodlight_entity": {
@@ -37,6 +45,10 @@
         "entity": {
           "domain": "light"
         }
+      },
+      "auto_select": {
+        "integration": "tapo_control",
+        "unique_id_pattern": "-floodlight\\(timed\\)$"
       }
     },
     "spotlight_intensity_entity": {
@@ -46,6 +58,10 @@
         "entity": {
           "domain": "number"
         }
+      },
+      "auto_select": {
+        "integration": "tapo_control",
+        "unique_id_pattern": "-spotlightintensity$"
       }
     }
   },
