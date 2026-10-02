@@ -35,7 +35,7 @@
         }
       }
     },
-    
+
   },
   "fixed_config": {
     "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * [[nominal_w]] | float(600)  }}"
