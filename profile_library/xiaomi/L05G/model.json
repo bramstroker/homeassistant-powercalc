@@ -45,7 +45,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.10.0:app"
   },
-  "name": "Xiaomi Smart Speaker IR Control",
+  "name": "Smart Speaker IR Control",
   "product_url": "https://www.mi.com/global/product/xiaomi-smart-speaker-ir-control/",
   "standby_power": 1.823,
   "voltage_range": {
