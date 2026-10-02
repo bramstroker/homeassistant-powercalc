@@ -150,6 +150,12 @@ class EntityCatalogSnapshot:
     def get(self, entity_id: str) -> EntityDescriptor | None:
         return self._by_id.get(entity_id)
 
+    def get_device_entity(self, device_id: str) -> EntityDescriptor | None:
+        """Return a stable entity of the device, for reading device-level metadata such as its model."""
+
+        device_entities = [entity for entity in self._entities if entity.device_id == device_id]
+        return min(device_entities, key=lambda entity: entity.entity_id, default=None)
+
     def find_related_entity_id(self, entity_id: str, device_class: DeviceClass) -> str | None:
         entity = self._by_id.get(entity_id)
         if entity is None:

@@ -1,4 +1,4 @@
-import { validateMetadata } from "./validation";
+import { isValidModelId, validateMetadata } from "./validation";
 
 const valid = {
   manufacturer_name: "Signify", model_id: "LCT010", product_name: "Hue lamp", contributor: "Tester",
@@ -43,5 +43,13 @@ describe("metadata validation", () => {
     for (const product_name of ["Ankora bulb", "Lamp compatible with Anko"]) {
       expect(validateMetadata({ ...valid, manufacturer_name: "Anko", product_name }).product_name).toBeUndefined();
     }
+  });
+
+  it("accepts model IDs that are safe library directory names", () => {
+    expect(isValidModelId("FRITZ!Box 5690 Pro")).toBe(true);
+    expect(isValidModelId("a".repeat(120))).toBe(true);
+    expect(isValidModelId("a".repeat(121))).toBe(false);
+    expect(isValidModelId("../model")).toBe(false);
+    expect(validateMetadata({ ...valid, model_id: "FRITZ!Box 5690 Pro" })).not.toHaveProperty("model_id");
   });
 });

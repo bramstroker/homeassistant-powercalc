@@ -1,6 +1,7 @@
 import logging
 from statistics import mean
 
+from measure.profile.fixed import create_fixed_profile_data
 from measure.request import AverageMeasurementRequest, FixedMeasurementRequest
 from measure.runner.interaction import ImmediateInteraction, RunInteraction
 from measure.utils.sampling import PowerSampler
@@ -47,25 +48,15 @@ class AverageRunner(MeasurementRunner[AverageMeasurementRequest | FixedMeasureme
 
         model_json_data: dict[str, object] = {}
         if isinstance(request, FixedMeasurementRequest):
-            power = round(result.power, 4)
-            if power <= 0:
-                raise ValueError("No positive self consumption was measured; check the meter and device")
-            if request.profile_device_type.value == "power_meter" and power < 0.05:
-                raise ValueError("Power meter self consumption must be at least 0.05 W for a valid profile")
-            model_json_data = {
-                "device_type": request.profile_device_type.value,
-                "calculation_strategy": "fixed",
-                "discovery_by": "device",
-            }
-            if request.profile_device_type.value == "power_meter":
-                model_json_data.update({"standby_power": power, "only_self_usage": True})
-            else:
-                model_json_data["fixed_config"] = {"power": power}
+            model_json_data = create_fixed_profile_data(request.profile_device_type, result.power)
 
         return RunnerResult(model_json_data=model_json_data, voltages=result.voltages, summary=summary)
 
     def measure_standby_power(self) -> None:
-        """Averaging measures one operating state, with no separate standby reading."""
+        """Skip the default zero standby reading, so fixed profiles don't get `standby_power: 0`.
+
+        Power meter profiles set their measured self consumption as standby power themselves.
+        """
 
     def _report_progress(self, elapsed: float, duration: float) -> None:
         self.elapsed = elapsed

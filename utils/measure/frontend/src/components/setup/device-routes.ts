@@ -62,7 +62,7 @@ export function deviceChoices(definitions: MeasureDefinition[]): DeviceChoice[] 
   }
   const fixed = definitions.find((item) => item.measure_type === "fixed");
   for (const option of fieldOptions(fixed, "profile_device_type")) {
-    choices.set(option.value, { id: option.value, label: option.label });
+    if (!choices.has(option.value)) choices.set(option.value, { id: option.value, label: option.label });
   }
   const charging = definitions.find((item) => item.measure_type === "charging");
   for (const option of fieldOptions(charging, "charging_device_type")) {

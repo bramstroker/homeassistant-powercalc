@@ -5,6 +5,9 @@ from pathlib import Path
 script_dir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()
 
+# Model IDs become library directory names, so only allow characters which are safe in a path.
+MODEL_ID_PATTERN = r"[A-Za-z0-9][A-Za-z0-9 ._()+!-]*"
+
 
 class MeasureType(StrEnum):
     """Stable machine identifiers for supported measurement workflows."""

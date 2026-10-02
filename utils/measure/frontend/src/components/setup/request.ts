@@ -7,6 +7,7 @@ import {
   narrowingField,
 } from "../../measurement/definition";
 import { meterFor } from "../../power-meter/registry";
+import { isValidModelId } from "../profile/validation";
 import type {
   Capabilities,
   DummyLoadCalibration,
@@ -84,9 +85,9 @@ function profileDefaults(options: RequestOptions): { model_id: string; product_n
     if (!entity) return empty;
     const modelId = entity.model_id ?? "";
     return {
-      model_id: modelId.length <= 120 && /^[A-Za-z0-9][A-Za-z0-9 ._()+!-]*$/.test(modelId) ? modelId : "",
+      model_id: isValidModelId(modelId) ? modelId : "",
       product_name: entity.product_name ?? "",
-      session_name: entity.device_name ?? entity.name,
+      session_name: entity.device_name || entity.name,
     };
   }
   const controller = options.definition.fields.find((field) => field.role === "controller");
@@ -100,7 +101,7 @@ function profileDefaults(options: RequestOptions): { model_id: string; product_n
   const modelId = shared("model_id");
   return {
     // An HA model ID can contain characters not allowed in an export path.
-    model_id: modelId.length <= 120 && /^[A-Za-z0-9][A-Za-z0-9 ._()+!-]*$/.test(modelId) ? modelId : "",
+    model_id: isValidModelId(modelId) ? modelId : "",
     product_name: shared("product_name"),
     session_name: selected.map((entity, index) => entity?.name || ids[index]).join(", ").slice(0, 200),
   };

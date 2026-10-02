@@ -4,6 +4,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from measure.const import MODEL_ID_PATTERN
+
 
 class ProfileAuthor(BaseModel):
     """Contributor attribution written to ``model.json``."""
@@ -88,7 +90,7 @@ class ProfileMetadata(BaseModel):
     @field_validator("model_id")
     @classmethod
     def validate_model_id(cls, value: str) -> str:
-        if value in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+!-]*", value):
+        if value in {".", ".."} or not re.fullmatch(MODEL_ID_PATTERN, value):
             raise ValueError("model_id contains unsafe characters")
         return value
 

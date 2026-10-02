@@ -6,7 +6,7 @@ from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.spec import charging_entity_domain
 from measure.controller.light.const import LutMode
 from measure.profile.device_type import PROFILE_DEVICE_DOMAINS, ProfileDeviceType
-from measure.request import RecorderProfileRecipe, RecorderPurpose
+from measure.request import FIXED_DEFAULT_DURATION, RecorderProfileRecipe, RecorderPurpose
 from measure.start import MEASUREMENT_STARTS
 
 
@@ -579,7 +579,8 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                 name="duration",
                 label="Duration (seconds)",
                 control=FieldControl.NUMBER,
-                default=60,
+                default=FIXED_DEFAULT_DURATION,
+                hint="Longer runs give a steadier average for devices using less than a watt.",
                 minimum=1,
                 maximum=86_400,
             ),

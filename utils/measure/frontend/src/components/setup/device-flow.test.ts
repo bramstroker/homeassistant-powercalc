@@ -32,7 +32,10 @@ function savedRecording(deviceType: string, primaryEntityId: string, trackedEnti
 afterEach(() => document.body.replaceChildren());
 
 describe("device-first setup", () => {
-  it("selects a Home Assistant device and uses its model for a fixed profile", async () => {
+  it.each([
+    { deviceName: "Living room router", sessionName: "Living room router" },
+    { deviceName: "", sessionName: "Router status" },
+  ])("selects a Home Assistant device and uses its model for a fixed profile (device name: '$deviceName')", async ({ deviceName, sessionName }) => {
     const fixedDefinition: MeasureDefinition = {
       ...lightDefinition,
       measure_type: "fixed", label: "Fixed power profile", supports_profile: true,
@@ -50,7 +53,7 @@ describe("device-first setup", () => {
     element.definitions = [fixedDefinition];
     element.deviceEntities = { "*": [{
       entity_id: "sensor.router_status", name: "Router status", domain: "sensor", state: "on",
-      device_id: "router-device", device_name: "Living room router", manufacturer: "AVM",
+      device_id: "router-device", device_name: deviceName, manufacturer: "AVM",
       model_id: "FRITZ!Repeater 1200", product_name: "FRITZ!Repeater 1200",
     }] };
     await element.updateComplete;
@@ -67,6 +70,7 @@ describe("device-first setup", () => {
     expect(await submitted).toMatchObject({
       measure_type: "fixed", profile_device_type: "network", device_id: "router-device",
       model_id: "FRITZ!Repeater 1200", product_name: "FRITZ!Repeater 1200", generate_model: true,
+      session_name: sessionName,
     });
   });
 

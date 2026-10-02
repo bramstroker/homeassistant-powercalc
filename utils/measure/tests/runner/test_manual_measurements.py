@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 from measure.cancellation import MeasurementCancelledError
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.profile.device_type import ProfileDeviceType
+from measure.profile.fixed import UnusableSelfConsumptionError
 from measure.recording.models import RecordedEntity, RecorderProfileRecipe, RecordingContext
 from measure.request import AverageMeasurementRequest, FixedMeasurementRequest, RecorderMeasurementRequest
 from measure.runner.average import AverageRunner
@@ -90,8 +91,8 @@ def test_fixed_profile_uses_average_power(device_type: ProfileDeviceType, expect
 @pytest.mark.parametrize(
     "device_type, power, message",
     [
-        (ProfileDeviceType.NETWORK, 0, "No positive self consumption"),
-        (ProfileDeviceType.POWER_METER, 0.04, "at least 0.05 W"),
+        (ProfileDeviceType.NETWORK, 0, r"Measured 0 W, but a fixed profile needs positive self consumption"),
+        (ProfileDeviceType.POWER_METER, 0.04, r"Measured 0\.04 W, .* at least 0\.05 W"),
     ],
 )
 def test_fixed_profile_rejects_unusable_power(device_type: ProfileDeviceType, power: float, message: str) -> None:
@@ -101,7 +102,7 @@ def test_fixed_profile_rejects_unusable_power(device_type: ProfileDeviceType, po
         power_meter=DummyPowerMeterSpec(), device_id="ha-device", profile_device_type=device_type
     )
 
-    with pytest.raises(ValueError, match=message):
+    with pytest.raises(UnusableSelfConsumptionError, match=message):
         AverageRunner(sampler).run(request, "")
 
 
