@@ -16,7 +16,6 @@ from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import HomeAssistant, State
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import TrackTemplate
-import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
@@ -30,6 +29,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.helpers import get_related_entity_by_device_class
+from custom_components.powercalc.validation import vol
 
 from .strategy_interface import PowerCalculationStrategyInterface
 

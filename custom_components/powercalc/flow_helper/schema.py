@@ -6,7 +6,6 @@ from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
 from homeassistant.helpers.selector import NumberSelector, NumberSelectorMode
 from homeassistant.util.unit_conversion import EnergyConverter
-import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_APPLY_TO_ALL,
@@ -34,6 +33,7 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
+from custom_components.powercalc.validation import vol
 
 SCHEMA_UTILITY_METER_TOGGLE = vol.Schema(
     {

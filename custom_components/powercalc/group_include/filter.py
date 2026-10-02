@@ -14,7 +14,6 @@ from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
-import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_ALL,
@@ -31,6 +30,7 @@ from custom_components.powercalc.const import (
     CONF_WILDCARD,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
+from custom_components.powercalc.validation import vol
 
 
 class FilterOperator(StrEnum):

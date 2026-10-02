@@ -8,7 +8,8 @@ from homeassistant.core import HomeAssistant, split_entity_id
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
-import voluptuous as vol
+
+from custom_components.powercalc.validation import vol
 
 from .const import (
     CONF_CREATE_COST_SENSOR,

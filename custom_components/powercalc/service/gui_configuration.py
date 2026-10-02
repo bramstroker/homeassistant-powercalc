@@ -1,7 +1,6 @@
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
 import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_CREATE_COST_SENSOR,
@@ -13,6 +12,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     ENERGY_INTEGRATION_METHODS,
 )
+from custom_components.powercalc.validation import vol
 
 ALLOWED_CONFIG_KEYS = [
     CONF_CREATE_ENERGY_SENSOR,

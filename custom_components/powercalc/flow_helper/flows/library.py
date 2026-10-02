@@ -6,7 +6,6 @@ from homeassistant.const import CONF_DEVICE
 from homeassistant.helpers import selector, translation
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
-import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
@@ -50,6 +49,7 @@ from custom_components.powercalc.power_profile.power_profile import (
     DiscoveryBy,
     PowerProfile,
 )
+from custom_components.powercalc.validation import vol
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow

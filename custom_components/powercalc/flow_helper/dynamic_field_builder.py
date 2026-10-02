@@ -5,11 +5,11 @@ from typing import cast
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.selector import EntitySelector, selector
-import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.power_profile.error import LibraryError
 from custom_components.powercalc.power_profile.power_profile import EntityAutoSelectConfig, PowerProfile
+from custom_components.powercalc.validation import vol
 
 
 def build_dynamic_field_schema(

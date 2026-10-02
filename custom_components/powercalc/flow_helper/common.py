@@ -5,7 +5,8 @@ from enum import StrEnum
 from typing import Any
 
 from homeassistant.data_entry_flow import section
-import voluptuous as vol
+
+from custom_components.powercalc.validation import vol
 
 
 class Step(StrEnum):

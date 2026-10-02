@@ -1,18 +1,22 @@
-from typing import Any
+from __future__ import annotations
 
-from homeassistant import data_entry_flow
+from typing import TYPE_CHECKING, Any
+
 from homeassistant.components.repairs import RepairsFlow
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, issue_registry as ir, selector
-import voluptuous as vol
 
 from custom_components.powercalc.common import create_source_entity, get_main_device_entry
 from custom_components.powercalc.const import CONF_MODEL, CONF_SUB_PROFILE, DOMAIN, ISSUE_COMPOSITE_DEVICE_ID
 from custom_components.powercalc.device_binding import is_composite_device_id
 from custom_components.powercalc.flow_helper.schema import build_sub_profile_schema
 from custom_components.powercalc.power_profile.factory import get_power_profile
+from custom_components.powercalc.validation import vol
+
+if TYPE_CHECKING:
+    from homeassistant.components.repairs import RepairsFlowResult
 
 
 class SubProfileRepairFlow(RepairsFlow):
@@ -22,12 +26,12 @@ class SubProfileRepairFlow(RepairsFlow):
         self._config_entry = config_entry
         self._hass = hass
 
-    async def async_step_init(self, _: dict[str, str] | None = None) -> data_entry_flow.FlowResult:
+    async def async_step_init(self, _: dict[str, str] | None = None) -> RepairsFlowResult:
         """Handle the first step of a fix flow."""
 
         return await self.async_step_sub_profile()
 
-    async def async_step_sub_profile(self, user_input: dict[str, str] | None = None) -> data_entry_flow.FlowResult:
+    async def async_step_sub_profile(self, user_input: dict[str, str] | None = None) -> RepairsFlowResult:
         if user_input is not None:
             new_data = self._config_entry.data.copy()
             new_data[CONF_MODEL] = f"{new_data[CONF_MODEL]}/{user_input[CONF_SUB_PROFILE]}"
@@ -63,11 +67,11 @@ class CompositeDeviceIdRepairFlow(RepairsFlow):
         self._entry_id = entry_id
         self._entry_title = entry_title
 
-    async def async_step_init(self, _: dict[str, Any] | None = None) -> data_entry_flow.FlowResult:
+    async def async_step_init(self, _: dict[str, Any] | None = None) -> RepairsFlowResult:
         """Handle the first step of the repair flow."""
         return await self.async_step_select_device()
 
-    async def async_step_select_device(self, user_input: dict[str, Any] | None = None) -> data_entry_flow.FlowResult:
+    async def async_step_select_device(self, user_input: dict[str, Any] | None = None) -> RepairsFlowResult:
         """Select a concrete split device, or unlink the Powercalc entities."""
         errors: dict[str, str] = {}
         if user_input is not None:

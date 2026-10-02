@@ -30,7 +30,8 @@ from homeassistant.helpers.event import async_call_later, async_track_time_inter
 from homeassistant.helpers.reload import async_integration_yaml_config
 from homeassistant.helpers.service import async_register_admin_service
 from homeassistant.helpers.typing import ConfigType
-import voluptuous as vol
+
+from custom_components.powercalc.validation import vol
 
 from .analytics.analytics import ANALYTICS_INTERVAL, Analytics
 from .common import validate_name_pattern

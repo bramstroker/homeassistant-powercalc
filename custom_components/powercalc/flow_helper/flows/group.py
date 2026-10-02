@@ -17,7 +17,6 @@ from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.selector import TextSelector
-import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_AREA,
@@ -55,6 +54,7 @@ from custom_components.powercalc.group_include.include import find_entities
 from custom_components.powercalc.sensors.group.config_entry_utils import get_group_entries
 from custom_components.powercalc.sensors.group.tracked_untracked import find_auto_tracked_power_entities
 from custom_components.powercalc.sensors.power import PowerSensor
+from custom_components.powercalc.validation import vol
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
