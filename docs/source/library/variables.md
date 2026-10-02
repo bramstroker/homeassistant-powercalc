@@ -106,8 +106,8 @@ original field key. Without `translation_key`, translations use the field key to
 Use lowercase letters, digits, and underscores. The key must be unique among the profile's form
 field names; share it across profiles only when the label and description have the same meaning.
 
-Set `min_version` to the first **Powercalc** release supporting this property: older Powercalc
-versions cannot parse it. Ship the corresponding translations in every locale with that release.
+Set `min_version` to `1.26.1` or higher: older Powercalc versions cannot parse this property.
+Ship the corresponding translations in every locale with the integration release.
 
 #### Automatically selecting an entity
 
