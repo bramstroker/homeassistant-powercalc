@@ -73,7 +73,7 @@ def test_recorder_definition_starts_with_purpose_and_declares_vacuum_relationshi
     complex_profile = fields["recorder_purpose"].options[1]
     assert "experimental" in complex_profile.label
     assert "activity-based composite profiles" in (complex_profile.description or "")
-    assert "two independent episodes" in (complex_profile.description or "")
+    assert "one complete cycle can be enough" in (complex_profile.description or "")
     assert "can create a fixed" in (complex_profile.description or "")
     assert "battery charging calibration" in (complex_profile.description or "")
     assert "at least five samples" in (complex_profile.description or "")

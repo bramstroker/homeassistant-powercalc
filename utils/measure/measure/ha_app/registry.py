@@ -382,7 +382,8 @@ MEASUREMENT_REGISTRY: dict[MeasureType, MeasurementDefinition] = {
                             "activity-based composite profiles with "
                             "battery charging calibration. For generic devices, record every relevant state for at "
                             "least five samples in each of two separate runs, using Record more after the first. "
-                            "For vacuums, repeat every activity in at least two independent episodes."
+                            "For vacuums, one complete cycle can be enough. Record charging from a low battery "
+                            "through to full with mop drying off, and let each dock activity finish."
                         ),
                     ),
                 ),

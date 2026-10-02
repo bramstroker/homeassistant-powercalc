@@ -41,11 +41,12 @@ class AnalysisStatus(StrEnum):
 class ValidationMethod(StrEnum):
     HELD_OUT_RECORDING = "held_out_recording"
     HELD_OUT_EPISODES = "held_out_episodes"
+    HELD_OUT_BLOCKS = "held_out_blocks"
 
 
 @dataclass(frozen=True)
 class TrainingValidationSplit:
-    """Samples used to fit a model and independently validate it.
+    """Separate samples used to fit a model and check its predictions.
 
     The signals travel with the split because they were discovered over every sample to
     establish its episode coverage. A strategy that rediscovered them from the training

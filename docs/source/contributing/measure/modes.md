@@ -153,8 +153,8 @@ automatically. Changing the selected vacuum resets these defaults; reopening a s
 selections.
 
 Measure the entire dock at the wall outlet. Start with a low battery and record charging through completion,
-idle, cleaning, mop washing, auto-emptying, and drying where supported. Repeat cycles to allow validation against
-independent runs rather than nearby samples from the same cycle.
+idle, cleaning, mop washing, auto-emptying, and drying where supported. One complete cycle can be enough to generate
+a profile. Additional cycles allow the analyser to check repeatability.
 
 The selected entity list is fixed for the run. `record.jsonl` includes entity roles, integration, translation keys,
 device classes, units, and device associations when available. Its device inventory also lists disabled entities
@@ -171,11 +171,12 @@ Automatic analysis is experimental. The vacuum recipe can generate a small `stop
 activities use a fixed power, their time-weighted average, and charging uses a battery-level calibration curve.
 The average keeps the energy of cycling loads, such as a drying heater that switches on and off.
 
-Repeat every observed activity in at least two independent episodes, with at least five samples per episode.
 Record washing, drying, auto-emptying, charging, sleep/standby, and operation away from the dock where supported.
-Capture continuous charging over at least 20 battery percentage points, and charge over the same battery range
-at least twice. Let every cycle finish, for example until drying ends. A single run is useful source data but does
-not provide independent evidence for automatic profile generation.
+Capture one continuous charge from a low battery through to full with mop drying switched off. Charging needs
+at least 20 battery percentage points of coverage and enough readings to fit and check the curve across that range.
+Let every activity finish, for example until drying ends. Charging that overlaps drying is classified as drying,
+so it cannot supply an isolated charging curve. You can add one charge with drying off to an existing session
+using **Record more**; the other activities do not need to be repeated just to supply that charge.
 
 The analyser uses recognised runtime status sensors or active activity flags, not settings such as an
 **auto drying enabled** switch. A dock action switch that is on while the dock works, such as Roborock's
@@ -196,10 +197,12 @@ To add runs to a session, choose **Record more** on its result page. The app kee
 the first run. Start a new session after updating the app, as the analysis uses the metadata of the session's first
 recording.
 
-Validation holds out whole episodes rather than nearby samples from the same episode. With several recordings, the
-analyser fits the model on the earlier runs and validates it on the latest, when that run covers at least 10% of
-every activity's recorded time. Otherwise it alternates whole episodes of each activity between fitting and
-validation. The analyser's Python API also accepts several compatible recording paths.
+With suitable repeated recordings, the analyser fits the model on the earlier runs and validates it on the latest,
+when that run covers at least 10% of every activity's recorded time and its charging range is covered by training.
+Otherwise it uses alternate whole episodes where possible. For activities without suitable repeated cycles, it
+holds out separate portions of the same cycle. Charging is split within battery ranges so both fitting and checking
+cover the curve. This is reported as `held_out_blocks`, with a note that repeatability across cycles has not been
+tested for those activities. The analyser's Python API also accepts several compatible recording paths.
 
 Every activity must estimate at least 90% of its validation samples. Charging is validated per sample: its mean
 error must be within 20% of its average power, or within 0.5 W. Fixed-power activities are validated on energy: their

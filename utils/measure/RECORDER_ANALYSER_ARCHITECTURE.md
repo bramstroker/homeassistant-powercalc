@@ -269,16 +269,26 @@ uses an explicit battery source and numeric/range guards matching candidate conv
 Branches model total outlet power, including overlapping consumption. Per-activity validation
 checks repeatability and requests better signals or isolated runs when errors are too large.
 
-## 9. Independent evidence and diagnostics
+## 9. Validation evidence and diagnostics
 
-Recorded states determine activity labels. Each identified activity needs two episodes with
-at least five samples each. Episodes change at activity or recording boundaries. Short and
-unexplained episodes remain in validation.
+Recorded states determine activity labels. Episodes change at activity or recording boundaries.
+Short episodes with fewer than five samples and unexplained episodes remain in validation.
 
 When compatible source files contain all activities on both sides, the last recording is
-held out in full if it covers at least 10% of every activity's eligible recorded time.
-Otherwise, alternate qualifying episodes of each activity are held out.
-Training and validation use separate episodes, providing a check on repeated-cycle behaviour.
+held out in full if it covers at least 10% of every activity's eligible recorded time and
+training can cover its charging range. Otherwise, alternate qualifying episodes of each
+activity are held out where suitable. Activities with only one qualifying episode, or
+charging without sufficient independent range coverage, use a within-cycle split: the
+middle third (at least two samples) is held out from each episode, separately within each
+5-percentage-point battery bucket for charging. Bucket edges remain available for fitting.
+All samples belong to only one side of the split. Existing minimum fitting support and
+per-activity validation thresholds still apply.
+
+The `held_out_blocks` method identifies this weaker evidence and includes a warning that
+repeatability across cycles has not been tested for those activities. It allows a useful
+profile from one complete cycle without claiming independent validation. An insufficient
+charging curve with a battery rise hidden by drying requests one isolated charge with
+drying off, which can be added to the existing session.
 
 [validation.py](measure/analyser/vacuum/validation.py) reports each activity's sample
 and episode counts, coverage, MAE, transition MAE, and energy. Each activity must have 90%
