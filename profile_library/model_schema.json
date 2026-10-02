@@ -377,6 +377,11 @@
             "type": "string",
             "description": "Label of the field"
           },
+          "translation_key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$",
+            "description": "Optional key for the form label and description translations. The field key remains the stored variable name. Must be unique among form field names in this profile."
+          },
           "auto_select": {
             "type": "object",
             "description": "Prefill a single entity field when exactly one enabled entity on the source device matches all supplied criteria.",
