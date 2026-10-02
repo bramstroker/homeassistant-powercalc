@@ -15,7 +15,7 @@
   "fields": {
     "rgb_light": {
       "label": "RGB LED light",
-      "description": "The AIR-1's RGB LED light entity (ESPHome names it '<device> RGB Light'). Its colour and brightness change the draw.",
+      "description": "The AIR-1's RGB LED light entity (ESPHome names it with the device name followed by 'RGB Light'). Its colour and brightness change the draw.",
       "selector": {
         "entity": {
           "domain": "light"

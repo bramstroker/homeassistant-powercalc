@@ -346,10 +346,22 @@
       "library_custom_fields": {
         "title": "Конфигурация профиля",
         "data": {
-          "power_factor": "Коэффициент мощности"
+          "amount_entity": "Perfume amount entity",
+          "night_vision_entity": "Night vision switching select",
+          "nominal_va": "Nominal Power (VA)",
+          "power_factor": "Коэффициент мощности",
+          "privacy_entity": "Privacy mode switch",
+          "rgb_light": "RGB LED light",
+          "switch_entity": "Switch entity"
         },
         "data_description": {
-          "power_factor": "Отношение реальной мощности к полной мощности. Используйте 0,6 для компьютеров/электроники, 0,7 для смешанных нагрузок, 1,0 для резистивных нагрузок, таких как обогреватели."
+          "amount_entity": "The entity which controls the amount of perfume",
+          "night_vision_entity": "The camera's Night Vision Switching select (tapo_control creates it as a night vision switching select with options auto/on/off). Forced on or off is honoured; on auto the sun is used as the proxy for IR.",
+          "nominal_va": "The VA rating of your UPS. Default: 650",
+          "power_factor": "Отношение реальной мощности к полной мощности. Используйте 0,6 для компьютеров/электроники, 0,7 для смешанных нагрузок, 1,0 для резистивных нагрузок, таких как обогреватели.",
+          "privacy_entity": "The camera's Privacy switch (tapo_control creates it as a privacy switch on the camera). While it is on, the lens is closed and the image sensor and IR LEDs are off.",
+          "rgb_light": "The AIR-1's RGB LED light entity (ESPHome names it with the device name followed by 'RGB Light'). Its colour and brightness change the draw.",
+          "switch_entity": "The entity which controls the on/off state of the diffuser"
         }
       },
       "library_multi_profile": {

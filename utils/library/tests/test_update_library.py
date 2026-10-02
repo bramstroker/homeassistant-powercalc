@@ -347,3 +347,30 @@ def write_brightness_lut(path: Path, *, rough: bool) -> None:
         writer = csv.writer(lut_file)
         writer.writerow(["bri", "watt"])
         writer.writerows(rows)
+
+
+def test_update_translations_reads_the_field_label(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Field labels live under "label", so the generated translations must read that key."""
+    translation_file = tmp_path / "custom_components" / "powercalc" / "translations" / "en.json"
+    translation_file.parent.mkdir(parents=True)
+    translation_file.write_text(
+        json.dumps({"config": {"step": {"library_custom_fields": {"data": {}, "data_description": {}}}}}),
+    )
+    monkeypatch.setattr(update_library, "PROJECT_ROOT", tmp_path)
+
+    model_listing = [
+        {
+            "fields": {
+                "relay_1_load": {
+                    "label": "Relay 1 connected load (W)",
+                    "description": "Power drawn by whatever is connected to relay 1.",
+                },
+            },
+        },
+    ]
+
+    asyncio.run(update_library.update_translations(model_listing))
+
+    written = json.loads(translation_file.read_text())["config"]["step"]["library_custom_fields"]
+    assert written["data"] == {"relay_1_load": "Relay 1 connected load (W)"}
+    assert written["data_description"] == {"relay_1_load": "Power drawn by whatever is connected to relay 1."}
