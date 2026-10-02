@@ -99,41 +99,15 @@ After setup Powercalc will replace this with the value the user provided.
 
 #### Separate translation keys
 
-An optional `translation_key` lets profiles use different labels and descriptions for the same variable name:
+Add `"translation_key": "perfume_amount_entity"` to an `amount_entity` field to give it a separate
+label and description translation. Saved values, YAML variables, and `[[amount_entity]]` keep the
+original field key. Without `translation_key`, translations use the field key too.
 
-```json
-{
-  "fields": {
-    "amount_entity": {
-      "translation_key": "perfume_amount_entity",
-      "label": "Perfume amount entity",
-      "description": "The entity which controls the amount of perfume",
-      "selector": {
-        "entity": {
-          "domain": "number"
-        }
-      }
-    }
-  }
-}
-```
+Use lowercase letters, digits, and underscores. The key must be unique among the profile's form
+field names; share it across profiles only when the label and description have the same meaning.
 
-The translation generator uses `perfume_amount_entity` for both the label and description under
-`config.step.library_custom_fields`. The form uses that name too, but Powercalc maps submitted values
-back to `amount_entity`. Existing saved selections, YAML `variables`, and `[[amount_entity]]` templates
-keep their original keys. Editing an existing configuration also prefills the saved selection.
-
-Without `translation_key`, the field key is used for translations as before. Use lowercase letters,
-digits, and underscores for translation keys. Each form field name must be unique within a profile,
-including field keys that do not have a translation key. Across profiles, share a translation key
-only when both the label and description have the same meaning. This property is separate from
-`auto_select.translation_key`, which matches a Home Assistant entity registry entry.
-
-When adopting this feature in a published profile, set `min_version` to the first Powercalc release
-that supports it. Older versions cannot parse the new field property. Add the generated English
-translations and matching keys in every locale to the integration release as well; the library
-update workflow does not currently commit translation files. Existing published profiles can keep
-their current fields until the integration support and translations have shipped.
+Set `min_version` to the first **Powercalc** release supporting this property: older Powercalc
+versions cannot parse it. Ship the corresponding translations in every locale with that release.
 
 #### Automatically selecting an entity
 
