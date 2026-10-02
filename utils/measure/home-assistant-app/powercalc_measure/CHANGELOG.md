@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 0.11.0 - 2026-10-02
+
+### 🚀 Features
+
+- #4884 Extend recorder complex profiles to more device types @bramstroker
+- #4885 Choose device type before measurement method @bramstroker
+- #4888 Add automated smart switch measurement @bramstroker
+- #4896 Measure fixed self consumption for device profiles @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4892 Fix speaker measurements when turn-off is unsupported @bramstroker
+- #4914 Allow vacuum profile analysis from a single cycle @bramstroker
+
 ## 0.10.0 - 2026-09-27
 
 - #4881 Centralize vacuum entity rules and expand integration mappings @bramstroker
