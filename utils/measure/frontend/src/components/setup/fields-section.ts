@@ -11,6 +11,7 @@ import type {
 } from "../../types";
 import {
   deviceFields,
+  deviceOptions,
   entityDomainsForOption,
   entityDomains,
   narrowingField,
@@ -213,6 +214,17 @@ export class SetupFieldsSection extends LitElement {
     if (field.control === "boolean") {
       return html`<div class="field-block">
         <label class="check"><input type="checkbox" name=${name} .checked=${Boolean(stored ?? field.default)} />${field.label}</label>
+        ${field.hint ? fieldHint(field.hint) : nothing}
+      </div>`;
+    }
+    if (field.control === "device") {
+      if (this.deviceEntityErrors["*"]) {
+        return html`<div class="notice error" role="alert">Could not load Home Assistant devices: ${this.deviceEntityErrors["*"]}</div>`;
+      }
+      const options = deviceOptions(this.deviceEntities["*"] ?? []);
+      const selected = String(stored ?? field.default ?? "");
+      return html`<div class="field-block">
+        ${optionSelect(name, field.label, options, { selected, required: field.required, placeholder: "Select a device" })}
         ${field.hint ? fieldHint(field.hint) : nothing}
       </div>`;
     }

@@ -288,7 +288,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     return html`
       <measure-preflight-view
         .metrics=${reviewMetrics(this.request, this.preflight, definition)}
-        .summary=${reviewSummary(this.request, this.preflight, definition)}
+        .summary=${reviewSummary(this.request, this.preflight, definition, this.deviceEntities["*"])}
         .warnings=${this.preflight?.warnings ?? []} .powerMeterDiagnostic=${this.preflight?.power_meter_diagnostic}
         .lightLoadProbe=${this.preflight?.light_load_probe}
         .confirmationAction=${this.confirmationAction()}

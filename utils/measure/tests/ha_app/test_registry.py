@@ -11,6 +11,7 @@ def test_registry_contains_every_stable_measurement_kind() -> None:
         "speaker",
         "recorder",
         "average",
+        "fixed",
         "charging",
         "fan",
         "smart_switch",

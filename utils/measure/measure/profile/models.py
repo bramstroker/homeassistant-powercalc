@@ -4,6 +4,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from measure.const import MODEL_ID_MAX_LENGTH, MODEL_ID_PATTERN
+
 
 class ProfileAuthor(BaseModel):
     """Contributor attribution written to ``model.json``."""
@@ -44,7 +46,7 @@ class ProfileMetadata(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     manufacturer: str = Field(min_length=1, max_length=200)
-    model_id: str = Field(min_length=1, max_length=120)
+    model_id: str = Field(min_length=1, max_length=MODEL_ID_MAX_LENGTH)
     product_name: str | None = Field(default=None, min_length=1, max_length=200)
     aliases: tuple[str, ...] | None = None
     gtins: tuple[str, ...] | None = None
@@ -88,7 +90,7 @@ class ProfileMetadata(BaseModel):
     @field_validator("model_id")
     @classmethod
     def validate_model_id(cls, value: str) -> str:
-        if value in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", value):
+        if value in {".", ".."} or not re.fullmatch(MODEL_ID_PATTERN, value):
             raise ValueError("model_id contains unsafe characters")
         return value
 

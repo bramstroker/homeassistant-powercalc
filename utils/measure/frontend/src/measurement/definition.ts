@@ -1,6 +1,7 @@
 import type {
   BaseMeasurementRequest,
   Capabilities,
+  EntityDescriptor,
   FormField,
   FormFieldOption,
   LutMode,
@@ -61,6 +62,22 @@ export function fieldOptions(field: FormField, supportedModes?: LutMode[]): Form
   const supported = field.narrowed_by ? supportedModes : undefined;
   if (!supported?.length) return field.options;
   return field.options.filter((option) => supported.some((mode) => mode === option.value));
+}
+
+/** Name of the Home Assistant device an entity belongs to, falling back to its model and then the entity. */
+export function deviceLabel(entity: EntityDescriptor): string {
+  return entity.device_name || entity.product_name || entity.name;
+}
+
+/** Home Assistant devices behind the given entities as select options, labelled by device name. */
+export function deviceOptions(entities: EntityDescriptor[]): FormFieldOption[] {
+  const devices = new Map<string, string>();
+  for (const entity of entities) {
+    if (entity.device_id && !devices.has(entity.device_id)) devices.set(entity.device_id, deviceLabel(entity));
+  }
+  return [...devices]
+    .map(([value, label]) => ({ value, label }))
+    .sort((left, right) => left.label.localeCompare(right.label));
 }
 
 /**
