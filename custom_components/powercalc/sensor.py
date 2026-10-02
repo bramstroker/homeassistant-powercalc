@@ -27,7 +27,8 @@ from homeassistant.helpers.entity_registry import (
 )
 from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-import voluptuous as vol
+
+from custom_components.powercalc.validation import vol
 
 from .analytics.analytics import collect_analytics
 from .common import (

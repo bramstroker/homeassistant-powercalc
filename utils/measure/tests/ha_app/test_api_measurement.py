@@ -39,10 +39,15 @@ def test_measure_definitions_and_average_request(app_client: TestClient) -> None
         "speaker": "Start speaker measurement",
         "recorder": "Start recording",
         "average": "Start averaging",
+        "fixed": "Start measuring self consumption",
         "charging": "Start charging measurement",
         "fan": "Start fan measurement",
         "smart_switch": "Start switch measurement",
     }
+    fixed = next(item for item in definitions.json() if item["measure_type"] == MeasureType.FIXED)
+    device_field = next(field for field in fixed["fields"] if field["name"] == "device_id")
+    assert device_field["control"] == "device"
+    assert device_field["all_entities"] is True
     smart_switch = next(item for item in definitions.json() if item["measure_type"] == MeasureType.SMART_SWITCH)
     relay = next(field for field in smart_switch["fields"] if field["name"] == "switch_entity_id")
     assert relay["group_by_device"] is True

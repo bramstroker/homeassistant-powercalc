@@ -302,7 +302,7 @@ describe("result view", () => {
     expect(analysis?.querySelector('[aria-label^="Model inputs:"]')?.getAttribute("title"))
       .toContain("Enabled settings do not indicate active washing or drying");
     expect(analysis?.querySelector('[aria-label^="Validation method:"]')?.getAttribute("title"))
-      .toContain("Whole activity episodes or a separate recording");
+      .toContain("With one cycle, separate portions are held out from fitting");
     const measurement = element.shadowRoot.querySelector('[aria-label="Measurement result"]');
     expect(measurement?.textContent).not.toContain("held_out_episodes");
   });

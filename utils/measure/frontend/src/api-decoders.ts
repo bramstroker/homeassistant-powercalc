@@ -92,7 +92,7 @@ function decoder<T>(description: string, guard: Guard<T>): Decoder<T> {
 
 const isStringArray = arrayOf(isString);
 const isStringRecord = recordOf(isString);
-const isMeasureType: Guard<MeasureType> = oneOf("light", "speaker", "recorder", "average", "charging", "fan", "smart_switch");
+const isMeasureType: Guard<MeasureType> = oneOf("light", "speaker", "recorder", "average", "fixed", "charging", "fan", "smart_switch");
 const isPrimitive = (value: unknown): value is string | number | boolean | null =>
   value === null || isString(value) || isNumber(value) || isBoolean(value);
 
@@ -167,6 +167,10 @@ export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is
       && isBoolean(value.power_monitoring)
       && isInteger(value.samples_per_state) && isInteger(value.repeat_cycles) && isNumber(value.settle_seconds);
     case "average": return (value.controller === null || value.controller === undefined) && isInteger(value.duration);
+    case "fixed": return (value.controller === null || value.controller === undefined)
+      && isString(value.device_id) && value.device_id.length > 0
+      && oneOf("network", "power_meter", "generic_iot")(value.profile_device_type)
+      && isInteger(value.duration);
     case "recorder":
       return (value.controller === null || value.controller === undefined)
         && oneOf("playbook", "complex_profile")(value.recorder_purpose)
@@ -215,7 +219,7 @@ const isFormFieldOption = objectOf({
 const isFormField = objectOf({
   name: isString,
   label: isString,
-  control: oneOf("entity", "number", "text", "boolean", "select", "multi_select"),
+  control: oneOf("entity", "device", "number", "text", "boolean", "select", "multi_select"),
   role: oneOf("attribute", "controller", "power_meter"),
   narrowed_by: optionalNullable(isString),
   required: isBoolean,

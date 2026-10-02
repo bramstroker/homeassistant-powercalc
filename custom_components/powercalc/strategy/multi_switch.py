@@ -6,9 +6,9 @@ from homeassistant.const import CONF_ENTITIES, STATE_CLOSING, STATE_ON, STATE_OP
 from homeassistant.core import HomeAssistant, State
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import TrackTemplate
-import voluptuous as vol
 
 from custom_components.powercalc.const import CONF_POWER, CONF_POWER_OFF, DUMMY_ENTITY_ID
+from custom_components.powercalc.validation import vol
 
 from .strategy_interface import PowerCalculationStrategyInterface
 

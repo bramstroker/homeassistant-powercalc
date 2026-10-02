@@ -67,6 +67,7 @@ export class ProfileMeasurementFields extends ProfileFormSection {
   }
 
   private renderStandby() {
+    if (hasFixedPowerOnly(this.measurementRequest)) return nothing;
     const isLight = profileDeviceType(this.draft) === "light";
     const value = this.fieldValue("standby_power", this.draft.standby_power);
     const estimated = this.fieldValue("standby_power_estimated", this.draft.standby_power_estimated ?? false) === "true";
@@ -202,4 +203,9 @@ export class ProfileMeasurementFields extends ProfileFormSection {
         required
       ></measure-combobox>`;
   }
+}
+
+/** Fixed network and IoT profiles store their measured power as `fixed_config`; a standby value would only repeat it. */
+function hasFixedPowerOnly(request?: MeasurementRequest): boolean {
+  return request?.measure_type === "fixed" && request.profile_device_type !== "power_meter";
 }

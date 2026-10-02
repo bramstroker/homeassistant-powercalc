@@ -3,6 +3,7 @@ import type { ProfileMeasurementFields } from "./measurement-fields";
 import type { Combobox } from "../shared/combobox";
 import type { StringListInput } from "../shared/string-list-input";
 import type { ContributionPreview, StandbyEstimate, StandbyMeasurementResult } from "../../types";
+import { capabilities } from "../testing/fixtures";
 
 const preview: ContributionPreview = {
   eligible: true, manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010",
@@ -195,6 +196,30 @@ describe("profile validation", () => {
     submit(element);
     expect(onPreview.mock.lastCall![0].detail).toMatchObject({ standby_power: 1.2, standby_power_estimated: true });
   });
+  it.each([
+    { profileDeviceType: "network", standbyShown: false },
+    { profileDeviceType: "power_meter", standbyShown: true },
+  ] as const)("shows standby for a fixed $profileDeviceType profile: $standbyShown", async ({ profileDeviceType, standbyShown }) => {
+    const element = await mount();
+    element.snapshot = {
+      state: "completed", session_id: "session-1",
+      request: {
+        measure_type: "fixed", model_id: "FRITZ!Repeater 1200", product_name: "FRITZ!Repeater 1200",
+        measure_device: "Test meter", generate_model: true, parameters: capabilities.defaults,
+        power_meter: { type: "hass", entity_id: "sensor.plug_power" }, resume_policy: "new",
+        device_id: "router-device", profile_device_type: profileDeviceType, duration: 300,
+      },
+    };
+    element.contributionDraft = { ...preview, device_type: profileDeviceType, standby_power: null };
+    const onPreview = vi.fn();
+    element.addEventListener("contribution-preview", onPreview);
+    await element.updateComplete;
+
+    expect(Boolean(input(element, "standby_power"))).toBe(standbyShown);
+    submit(element);
+    expect(onPreview.mock.lastCall![0].detail).not.toHaveProperty("standby_power");
+  });
+
   it("requires a correction for legacy zero standby and applies estimates only on request", async () => {
     const element = await mount();
     element.contributionDraft = { ...preview, standby_power: null };

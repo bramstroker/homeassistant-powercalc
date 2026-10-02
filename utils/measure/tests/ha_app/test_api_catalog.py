@@ -202,6 +202,22 @@ def test_entity_manufacturer_normalizes_a_library_alias(app_client: TestClient) 
         assert context.get_entity_manufacturers(["light.test"]) == {"light.test": "Signify"}
 
 
+def test_device_id_resolves_manufacturer_and_model_for_fixed_profile(app_client: TestClient) -> None:
+    context = app_client.app.state.context
+    context.home_assistant = FakeClient()
+    context.manufacturer_catalog = ManufacturerCatalog(
+        loader=lambda: {"manufacturers": [{"name": "Acme", "full_name": "Acme", "models": []}]},
+    )
+
+    with patch.object(
+        FakeClient,
+        "get_device_registry",
+        return_value=[{"id": "light-device", "manufacturer": "Acme", "model": "Router X"}],
+    ):
+        assert context.get_entity_manufacturers(["light-device"]) == {"light-device": "Acme"}
+        assert context.get_entity_model_ids(["light-device"]) == {"light-device": "Router X"}
+
+
 @pytest.mark.parametrize("manufacturer", [None, ""])
 def test_entity_without_manufacturer_skips_library_lookup(app_client: TestClient, manufacturer: str | None) -> None:
     context = app_client.app.state.context

@@ -377,10 +377,139 @@ def test_incomplete_last_recording_falls_back_to_independent_episode_validation(
     assert result.metrics.validation_count == len(split.validation)
 
 
-def test_single_cycle_is_not_independent_evidence(tmp_path: Path) -> None:
+def test_sparse_single_cycle_needs_more_charging_samples(tmp_path: Path) -> None:
     result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", cycle()), CONTEXT)
     assert not result.model_ready
-    assert "two independent episodes" in str(result.reason)
+    assert "three battery ranges" in str(result.reason)
+
+
+@pytest.mark.parametrize("include_sparse_charge", [False, True])
+def test_empty_training_split_requests_more_data(tmp_path: Path, include_sparse_charge: bool) -> None:
+    samples = []
+    for activity, power in [("sleeping", 3.5), ("washing", 22), ("drying", 7)]:
+        for _ in range(4):
+            samples.append(sample(activity, power, len(samples)))
+    if include_sparse_charge:
+        for level in range(20, 81, 10):
+            samples.append(sample("charging", 50 - level / 2, len(samples), level))
+
+    result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", samples), CONTEXT)
+
+    assert result.status == AnalysisStatus.INSUFFICIENT_DATA
+    assert result.sample_count == len(samples)
+    assert result.model_config_fragment is None
+    assert "record longer, complete vacuum/dock activities" in str(result.reason)
+
+
+def dense_cycle() -> list[RecordingSample]:
+    return [
+        replace(item, elapsed_seconds=float(index))
+        for index, item in enumerate(item for item in cycle() for _ in range(3))
+    ]
+
+
+def test_one_complete_cycle_can_create_a_profile(tmp_path: Path) -> None:
+    samples = dense_cycle()
+    result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", samples), CONTEXT)
+
+    assert result.model_ready
+    assert result.validation_method == ValidationMethod.HELD_OUT_BLOCKS
+    assert result.metrics is not None
+    assert result.metrics.coverage == 1
+    assert result.metrics.mae_w == 0
+    assert any("repeatability across cycles has not been tested" in warning for warning in result.warnings)
+    assert {report.activity for report in result.activity_reports} == {
+        Activity.SLEEPING,
+        Activity.WASHING,
+        Activity.AUTO_EMPTYING,
+        Activity.DRYING,
+        Activity.CHARGING,
+        Activity.AWAY,
+    }
+    assert all(report.validation_count > 0 for report in result.activity_reports)
+
+    split = split_vacuum_samples(samples, CONTEXT)
+    assert isinstance(split, TrainingValidationSplit)
+    training_ids = {id(item) for item in split.training}
+    validation_ids = {id(item) for item in split.validation}
+    assert training_ids.isdisjoint(validation_ids)
+    assert training_ids | validation_ids == {id(item) for item in samples}
+
+
+def test_single_continuous_charge_with_tapering_and_meter_noise(tmp_path: Path) -> None:
+    samples = [item for item in dense_cycle() if item.entities[STATE].state != "charging"]
+    for level in range(20, 101):
+        power = 30 if level < 75 else max(3, 30 - (level - 75) * 1.2)
+        for index in range(10):
+            samples.append(sample("charging", power + (0.1 if index % 2 else -0.1), len(samples), level))
+    result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", samples), CONTEXT)
+
+    assert result.model_ready
+    assert result.validation_method == ValidationMethod.HELD_OUT_BLOCKS
+    report = next(report for report in result.activity_reports if report.activity == Activity.CHARGING)
+    assert report.coverage == 1
+    assert report.mae_w is not None
+    assert report.mae_w < 1
+
+
+def test_repeated_charges_still_check_independent_power_differences(tmp_path: Path) -> None:
+    first = write_recording(tmp_path / "record-1.jsonl", dense_cycle())
+    different = [
+        replace(item, power=item.power * 2) if item.entities[STATE].state == "charging" else item
+        for item in dense_cycle()
+    ]
+    second = write_recording(tmp_path / "record-2.jsonl", different)
+    result = RecorderAnalyser().analyse([first, second], CONTEXT)
+
+    assert not result.model_ready
+    assert result.validation_method == ValidationMethod.HELD_OUT_RECORDING
+    assert "charging validation error" in str(result.reason)
+
+
+def test_single_cycle_still_rejects_a_bad_fit(tmp_path: Path) -> None:
+    samples = dense_cycle()
+    washing = [item for item in samples if item.entities[STATE].state == "washing"]
+    high_ids = {id(item) for item in washing[8:22]}
+    samples = [replace(item, power=100) if id(item) in high_ids else item for item in samples]
+    result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", samples), CONTEXT)
+
+    assert not result.model_ready
+    assert "washing validation" in str(result.reason)
+
+
+@pytest.mark.parametrize("isolated_first", [True, False])
+def test_one_isolated_charge_can_supplement_overlapping_recordings(tmp_path: Path, isolated_first: bool) -> None:
+    overlapping = [
+        replace(item, entities={**item.entities, DRYING: RecordedEntityState("on", {})}, power=7)
+        if item.entities[STATE].state == "charging"
+        else item
+        for item in dense_cycle()
+    ]
+    recordings = [overlapping, dense_cycle()]
+    if isolated_first:
+        recordings.reverse()
+    paths = [write_recording(tmp_path / f"record-{index}.jsonl", data) for index, data in enumerate(recordings)]
+
+    result = RecorderAnalyser().analyse(paths, CONTEXT)
+
+    assert result.model_ready
+    assert result.validation_method == ValidationMethod.HELD_OUT_BLOCKS
+    assert next(report for report in result.activity_reports if report.activity == Activity.CHARGING).coverage == 1
+
+
+def test_drying_overlap_requests_one_isolated_charge(tmp_path: Path) -> None:
+    samples = [
+        replace(item, entities={**item.entities, DRYING: RecordedEntityState("on", {})}, power=60)
+        if item.entities[STATE].state == "charging"
+        else item
+        for item in dense_cycle()
+    ]
+    samples.extend(sample("charging", 3, len(samples) + index, 100) for index in range(30))
+    result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", samples), CONTEXT)
+
+    assert not result.model_ready
+    assert "Drying overlaps the battery rise" in str(result.reason)
+    assert "one continuous charge with mop drying switched off" in str(result.reason)
 
 
 def test_short_mode_error_is_not_hidden_by_long_idle(tmp_path: Path) -> None:

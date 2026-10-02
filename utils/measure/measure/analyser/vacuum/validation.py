@@ -99,7 +99,7 @@ def _find_activity_failure(report: ActivityReport) -> str | None:
         # A charging curve cannot estimate battery levels its training charges never reached.
         return (
             f"The {activity} model covers only {report.coverage:.0%} of its validation samples; "
-            f"record at least two {activity} cycles over the same battery range"
+            "record one continuous charge from a low battery through to full with mop drying off"
         )
     if report.coverage < 0.9:
         return (

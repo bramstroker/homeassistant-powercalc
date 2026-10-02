@@ -97,6 +97,18 @@ After setup Powercalc will replace this with the value the user provided.
 !!! note
     Not all selectors are tested. Some might not be supported. `number` and `entity` are tested and should work.
 
+#### Separate translation keys
+
+Add `"translation_key": "perfume_amount_entity"` to an `amount_entity` field to give it a separate
+label and description translation. Saved values, YAML variables, and `[[amount_entity]]` keep the
+original field key. Without `translation_key`, translations use the field key too.
+
+Use lowercase letters, digits, and underscores. The key must be unique among the profile's form
+field names; share it across profiles only when the label and description have the same meaning.
+
+Set `min_version` to `1.26.1` or higher: older Powercalc versions cannot parse this property.
+Ship the corresponding translations in every locale with the integration release.
+
 #### Automatically selecting an entity
 
 From Powercalc v1.26.0, an entity field can use `auto_select` to prefill its selector:

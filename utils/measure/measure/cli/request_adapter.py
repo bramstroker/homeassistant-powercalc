@@ -61,6 +61,8 @@ def request_from_answers(
     environment: CliEnvironment,
 ) -> MeasurementRequest:
     """Adapt CLI/Inquirer answers once at the transport boundary."""
+    if measure_type == MeasureType.FIXED:
+        raise ValueError("Fixed profiles are currently available only in the Home Assistant measure app")
     common: dict[str, Any] = {
         "model_id": str(answers.get(QUESTION_MODEL_ID) or ""),
         "product_name": str(answers.get(QUESTION_MODEL_NAME) or ""),

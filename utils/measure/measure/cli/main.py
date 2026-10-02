@@ -33,7 +33,14 @@ from measure.cli.environment import CliEnvironment
 from measure.cli.interaction import ConsoleInteraction
 from measure.cli.measurements import measurement_questions
 from measure.cli.request_adapter import request_from_answers
-from measure.const import MEASURE_TYPE_LABELS, PROJECT_DIR, MeasureType, parse_measure_type
+from measure.const import (
+    MEASURE_TYPE_LABELS,
+    MODEL_ID_MAX_LENGTH,
+    MODEL_ID_PATTERN,
+    PROJECT_DIR,
+    MeasureType,
+    parse_measure_type,
+)
 from measure.controller.charging.const import ChargingControllerType
 from measure.controller.errors import ControllerError
 from measure.controller.fan.const import FanControllerType
@@ -163,11 +170,13 @@ class Measure:
     def _select_measure_type(self) -> None:
         if self.config.selected_measure_type:
             self.measure_type = parse_measure_type(self.config.selected_measure_type)
+            if self.measure_type == MeasureType.FIXED:
+                raise ValueError("Fixed profiles are currently available only in the Home Assistant measure app")
             return
 
         self.measure_type = inquirer.list_input(
             "What kind of measurement session do you want to run?",
-            choices=[(MEASURE_TYPE_LABELS[kind], kind) for kind in MeasureType],
+            choices=[(MEASURE_TYPE_LABELS[kind], kind) for kind in MeasureType if kind != MeasureType.FIXED],
             render=self.console_render,
         )
 
@@ -259,8 +268,8 @@ class Measure:
         model_id = entity.model_id or ""
         if (
             not answers.get(QUESTION_MODEL_ID)
-            and len(model_id) <= 120
-            and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", model_id)
+            and len(model_id) <= MODEL_ID_MAX_LENGTH
+            and re.fullmatch(MODEL_ID_PATTERN, model_id)
         ):
             answers[QUESTION_MODEL_ID] = model_id
         if not answers.get(QUESTION_MODEL_NAME):

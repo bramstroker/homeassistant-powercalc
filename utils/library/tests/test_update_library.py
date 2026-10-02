@@ -347,3 +347,50 @@ def write_brightness_lut(path: Path, *, rough: bool) -> None:
         writer = csv.writer(lut_file)
         writer.writerow(["bri", "watt"])
         writer.writerows(rows)
+
+
+def test_update_translations_uses_separate_field_keys(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    translation_file = tmp_path / "custom_components" / "powercalc" / "translations" / "en.json"
+    translation_file.parent.mkdir(parents=True)
+    translation_file.write_text(
+        json.dumps({"config": {"step": {"library_custom_fields": {"data": {}, "data_description": {}}}}}),
+    )
+    monkeypatch.setattr(update_library, "PROJECT_ROOT", tmp_path)
+    model_listing = [
+        {
+            "fields": {
+                "amount_entity": {
+                    "translation_key": "perfume_amount_entity",
+                    "label": "Perfume amount entity",
+                    "description": "Select the perfume amount entity.",
+                },
+                "switch_entity": {
+                    "label": "Switch entity",
+                    "description": "Select the switch entity.",
+                },
+            },
+        },
+        {
+            "fields": {
+                "amount_entity": {
+                    "translation_key": "water_amount_entity",
+                    "label": "Water amount entity",
+                    "description": "Select the water amount entity.",
+                },
+            },
+        },
+    ]
+
+    asyncio.run(update_library.update_translations(model_listing))
+
+    written = json.loads(translation_file.read_text())["config"]["step"]["library_custom_fields"]
+    assert written["data"] == {
+        "perfume_amount_entity": "Perfume amount entity",
+        "water_amount_entity": "Water amount entity",
+        "switch_entity": "Switch entity",
+    }
+    assert written["data_description"] == {
+        "perfume_amount_entity": "Select the perfume amount entity.",
+        "water_amount_entity": "Select the water amount entity.",
+        "switch_entity": "Select the switch entity.",
+    }

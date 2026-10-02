@@ -16,7 +16,10 @@ from custom_components.powercalc.power_profile.library import ProfileLibrary
 from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
 
 
-async def test_custom_field_variables_from_yaml_config(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+@pytest.mark.parametrize("model", ["custom_fields", "custom_fields_translation_key"])
+async def test_custom_field_variables_from_yaml_config(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture, model: str
+) -> None:
     """Test custom field variables can be passed from YAML configuration"""
     caplog.set_level(logging.ERROR)
 
@@ -27,7 +30,7 @@ async def test_custom_field_variables_from_yaml_config(hass: HomeAssistant, capl
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_NAME: "Test",
             CONF_MANUFACTURER: "test",
-            CONF_MODEL: "custom_fields",
+            CONF_MODEL: model,
             CONF_VARIABLES: {
                 "some_entity": "sensor.test",
             },

@@ -54,6 +54,11 @@ class RecorderAnalyser:
         split = _split_analysis_samples(samples, context)
         if isinstance(split, StrategyNotApplicable):
             return _build_insufficient_data_result(samples, loaded.warnings, split.reason)
+        if split.method == ValidationMethod.HELD_OUT_BLOCKS:
+            loaded.warnings.append(
+                "This analysis uses separate portions of the same cycle for some activities. "
+                "Their repeatability across cycles has not been tested."
+            )
         baseline = _calculate_baseline_metrics(split.training, split.validation)
         outcomes: list[EvaluatedCandidate | AnalysisFailure] = []
         for strategy in self._select_strategies(context):

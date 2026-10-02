@@ -9,7 +9,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
-import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_ENERGY_PRICE,
@@ -21,6 +20,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.flow_helper.common import PowercalcFormStep, Step, flatten_sections
 from custom_components.powercalc.flow_helper.schema import SECTION_COST_PRICING, build_cost_pricing_schema
+from custom_components.powercalc.validation import vol
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcConfigFlow, PowercalcOptionsFlow

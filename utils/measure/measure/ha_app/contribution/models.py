@@ -4,21 +4,22 @@ from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
-from measure.const import MeasureType
+from measure.const import MODEL_ID_MAX_LENGTH, MeasureType
 from measure.contribution.github import UPSTREAM_BRANCH, UPSTREAM_OWNER, UPSTREAM_REPO
-from measure.request import MeasurementRequest, RecorderMeasurementRequest, RecorderPurpose
+from measure.request import FixedMeasurementRequest, MeasurementRequest, RecorderMeasurementRequest, RecorderPurpose
 
 SUPPORTED_MEASURE_TYPES = {
     MeasureType.LIGHT,
     MeasureType.SPEAKER,
     MeasureType.FAN,
     MeasureType.SMART_SWITCH,
+    MeasureType.FIXED,
     MeasureType.CHARGING,
     MeasureType.RECORDER,
 }
 
 AUTOMATIC_CONTRIBUTION_MESSAGE = (
-    "Automatic contribution is available for light, speaker, fan, smart switch, charging, "
+    "Automatic contribution is available for light, speaker, fan, smart switch, fixed, charging, "
     "and analysed recorder profiles"
 )
 
@@ -43,6 +44,8 @@ def contribution_entity_ids(request: MeasurementRequest) -> list[str]:
 
     if isinstance(request, RecorderMeasurementRequest):
         return request.recorded_entity_ids[:1]
+    if isinstance(request, FixedMeasurementRequest):
+        return [request.device_id]
     return request.controlled_entity_ids
 
 
@@ -157,7 +160,7 @@ class ContributionPreviewRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     manufacturer_name: str = Field(min_length=1, max_length=200)
-    model_id: str = Field(min_length=1, max_length=120)
+    model_id: str = Field(min_length=1, max_length=MODEL_ID_MAX_LENGTH)
     product_name: str = Field(min_length=1, max_length=200)
     contributor: str = Field(min_length=1, max_length=200)
     contributor_github: str | None = Field(default=None, max_length=100)

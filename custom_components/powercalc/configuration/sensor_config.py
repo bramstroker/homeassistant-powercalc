@@ -7,7 +7,6 @@ from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
 
 from custom_components.powercalc.common import validate_name_pattern
 from custom_components.powercalc.const import (
@@ -85,6 +84,7 @@ from custom_components.powercalc.strategy.linear import CONFIG_SCHEMA as LINEAR_
 from custom_components.powercalc.strategy.multi_switch import CONFIG_SCHEMA as MULTI_SWITCH_SCHEMA
 from custom_components.powercalc.strategy.playbook import CONFIG_SCHEMA as PLAYBOOK_SCHEMA
 from custom_components.powercalc.strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
+from custom_components.powercalc.validation import vol
 
 MAX_GROUP_NESTING_LEVEL = 5
 
