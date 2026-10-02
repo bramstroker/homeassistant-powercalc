@@ -34,7 +34,7 @@ afterEach(() => document.body.replaceChildren());
 describe("device-first setup", () => {
   it.each([
     { deviceName: "Living room router", sessionName: "Living room router" },
-    { deviceName: "", sessionName: "Router status" },
+    { deviceName: "", sessionName: "FRITZ!Repeater 1200" },
   ])("selects a Home Assistant device and uses its model for a fixed profile (device name: '$deviceName')", async ({ deviceName, sessionName }) => {
     const fixedDefinition: MeasureDefinition = {
       ...lightDefinition,

@@ -2,6 +2,7 @@ import { isMeasurementRequest } from "../../api-decoders";
 import { formText } from "../../utils/form";
 import {
   buildMeasurementRequest,
+  deviceLabel,
   entityDomain,
   entityDomains,
   narrowingField,
@@ -87,7 +88,7 @@ function profileDefaults(options: RequestOptions): { model_id: string; product_n
     return {
       model_id: isValidModelId(modelId) ? modelId : "",
       product_name: entity.product_name ?? "",
-      session_name: entity.device_name || entity.name,
+      session_name: deviceLabel(entity),
     };
   }
   const controller = options.definition.fields.find((field) => field.role === "controller");

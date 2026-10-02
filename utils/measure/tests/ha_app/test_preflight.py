@@ -105,10 +105,10 @@ def test_fixed_profile_requires_selected_device_and_external_meter() -> None:
         power_meter=HassPowerMeterSpec(entity_id="sensor.power"),
         device_id="router-device",
         profile_device_type="network",
-        duration=45,
+        duration=90,
     )
 
-    assert preflight(entities).validate(request).estimated_duration_seconds == 45
+    assert preflight(entities).validate(request).estimated_duration_seconds == 90
     with pytest.raises(PreflightError, match="external power meter"):
         preflight(entities).validate(request.model_copy(update={"device_id": "meter-device"}))
     with pytest.raises(PreflightError, match="no longer exists"):

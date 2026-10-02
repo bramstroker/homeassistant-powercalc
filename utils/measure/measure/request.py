@@ -5,7 +5,13 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, field_validator, model_validator
 
-from measure.const import MANUAL_PARAMETER_LIMIT_OVERRIDES, MODEL_ID_PATTERN, PARAMETER_LIMITS, MeasureType
+from measure.const import (
+    MANUAL_PARAMETER_LIMIT_OVERRIDES,
+    MODEL_ID_MAX_LENGTH,
+    MODEL_ID_PATTERN,
+    PARAMETER_LIMITS,
+    MeasureType,
+)
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.spec import ChargingControllerSpec
 from measure.controller.fan.spec import FanControllerSpec
@@ -111,7 +117,7 @@ class BaseMeasurementRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     measure_type: MeasureType
-    model_id: str = Field(default="", max_length=120)
+    model_id: str = Field(default="", max_length=MODEL_ID_MAX_LENGTH)
     product_name: str = Field(default="", max_length=200)
     session_name: str = Field(default="", max_length=200)
     measure_device: str = Field(default="", max_length=200)
@@ -207,6 +213,7 @@ class AverageMeasurementRequest(BaseMeasurementRequest):
 
 # Sub-watt readings need a longer average to settle than the generic average measurement.
 FIXED_DEFAULT_DURATION = 300
+FIXED_MINIMUM_DURATION = 60
 
 
 class FixedMeasurementRequest(BaseMeasurementRequest):
@@ -221,7 +228,7 @@ class FixedMeasurementRequest(BaseMeasurementRequest):
         ProfileDeviceType.POWER_METER,
         ProfileDeviceType.GENERIC_IOT,
     ]
-    duration: int = Field(default=FIXED_DEFAULT_DURATION, ge=1, le=86_400)
+    duration: int = Field(default=FIXED_DEFAULT_DURATION, ge=FIXED_MINIMUM_DURATION, le=86_400)
 
 
 class RecorderMeasurementRequest(BaseMeasurementRequest):

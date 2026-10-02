@@ -4,7 +4,7 @@ from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
-from measure.const import MeasureType
+from measure.const import MODEL_ID_MAX_LENGTH, MeasureType
 from measure.contribution.github import UPSTREAM_BRANCH, UPSTREAM_OWNER, UPSTREAM_REPO
 from measure.request import FixedMeasurementRequest, MeasurementRequest, RecorderMeasurementRequest, RecorderPurpose
 
@@ -160,7 +160,7 @@ class ContributionPreviewRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     manufacturer_name: str = Field(min_length=1, max_length=200)
-    model_id: str = Field(min_length=1, max_length=120)
+    model_id: str = Field(min_length=1, max_length=MODEL_ID_MAX_LENGTH)
     product_name: str = Field(min_length=1, max_length=200)
     contributor: str = Field(min_length=1, max_length=200)
     contributor_github: str | None = Field(default=None, max_length=100)

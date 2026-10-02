@@ -73,7 +73,7 @@ def test_fixed_profile_uses_average_power(device_type: ProfileDeviceType, expect
     sampler = MagicMock(spec=PowerSampler)
     sampler.take_average_measurement.return_value = MeasurementResult(power=4.2, voltages=[230.0])
     request = FixedMeasurementRequest(
-        power_meter=DummyPowerMeterSpec(), device_id="ha-device", profile_device_type=device_type, duration=30
+        power_meter=DummyPowerMeterSpec(), device_id="ha-device", profile_device_type=device_type, duration=60
     )
 
     result = AverageRunner(sampler).run(request, "")
@@ -85,7 +85,7 @@ def test_fixed_profile_uses_average_power(device_type: ProfileDeviceType, expect
         **expected,
     }
     assert result.voltages == [230.0]
-    assert sampler.take_average_measurement.call_args.args == (30,)
+    assert sampler.take_average_measurement.call_args.args == (60,)
 
 
 @pytest.mark.parametrize(
