@@ -383,6 +383,24 @@ def test_sparse_single_cycle_needs_more_charging_samples(tmp_path: Path) -> None
     assert "three battery ranges" in str(result.reason)
 
 
+@pytest.mark.parametrize("include_sparse_charge", [False, True])
+def test_empty_training_split_requests_more_data(tmp_path: Path, include_sparse_charge: bool) -> None:
+    samples = []
+    for activity, power in [("sleeping", 3.5), ("washing", 22), ("drying", 7)]:
+        for _ in range(4):
+            samples.append(sample(activity, power, len(samples)))
+    if include_sparse_charge:
+        for level in range(20, 81, 10):
+            samples.append(sample("charging", 50 - level / 2, len(samples), level))
+
+    result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", samples), CONTEXT)
+
+    assert result.status == AnalysisStatus.INSUFFICIENT_DATA
+    assert result.sample_count == len(samples)
+    assert result.model_config_fragment is None
+    assert "record longer, complete vacuum/dock activities" in str(result.reason)
+
+
 def dense_cycle() -> list[RecordingSample]:
     return [
         replace(item, elapsed_seconds=float(index))

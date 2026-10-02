@@ -381,7 +381,13 @@ def split_vacuum_samples(
         fallback_activities.add(Activity.CHARGING)
     if not fallback_activities:
         return split
-    return _split_within_activities(samples, episodes, split, fallback_activities, context)
+    split = _split_within_activities(samples, episodes, split, fallback_activities, context)
+    if not split.training:
+        return StrategyNotApplicable(
+            "No samples remain for fitting after holding out validation data; "
+            "record longer, complete vacuum/dock activities with enough readings for both fitting and validation."
+        )
+    return split
 
 
 def _supports_charging_split(split: TrainingValidationSplit, context: RecordingContext) -> bool:
