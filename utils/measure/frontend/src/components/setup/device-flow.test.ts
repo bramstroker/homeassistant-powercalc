@@ -32,6 +32,48 @@ function savedRecording(deviceType: string, primaryEntityId: string, trackedEnti
 afterEach(() => document.body.replaceChildren());
 
 describe("device-first setup", () => {
+  it.each([
+    { deviceName: "Living room router", sessionName: "Living room router" },
+    { deviceName: "", sessionName: "FRITZ!Repeater 1200" },
+  ])("selects a Home Assistant device and uses its model for a fixed profile (device name: '$deviceName')", async ({ deviceName, sessionName }) => {
+    const fixedDefinition: MeasureDefinition = {
+      ...lightDefinition,
+      measure_type: "fixed", label: "Fixed power profile", supports_profile: true,
+      fields: [
+        { name: "profile_device_type", label: "Device type", control: "select", role: "attribute", required: true,
+          options: [{ value: "network", label: "Network" }, { value: "power_meter", label: "Power meter" },
+            { value: "generic_iot", label: "Generic IoT" }] },
+        { name: "device_id", label: "Home Assistant device", control: "device", role: "attribute", required: true,
+          all_entities: true, options: [] },
+        { name: "duration", label: "Duration", control: "number", role: "attribute", required: true,
+          default: 60, options: [] },
+      ],
+    };
+    const element = createSetup();
+    element.definitions = [fixedDefinition];
+    element.deviceEntities = { "*": [{
+      entity_id: "sensor.router_status", name: "Router status", domain: "sensor", state: "on",
+      device_id: "router-device", device_name: deviceName, manufacturer: "AVM",
+      model_id: "FRITZ!Repeater 1200", product_name: "FRITZ!Repeater 1200",
+    }] };
+    await element.updateComplete;
+    [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".device-card")]
+      .find((card) => card.querySelector(".type-label")?.textContent === "Network")!.click();
+    await element.updateComplete;
+    selectEntity(entityCombobox(element, "device_id"), "router-device");
+    await element.updateComplete;
+    const submitted = new Promise<MeasurementRequest>((resolve) => {
+      element.addEventListener("preflight", (event) => resolve((event as CustomEvent<MeasurementRequest>).detail));
+    });
+    element.shadowRoot.querySelector<HTMLFormElement>("form")!.requestSubmit();
+
+    expect(await submitted).toMatchObject({
+      measure_type: "fixed", profile_device_type: "network", device_id: "router-device",
+      model_id: "FRITZ!Repeater 1200", product_name: "FRITZ!Repeater 1200", generate_model: true,
+      session_name: sessionName,
+    });
+  });
+
   it("filters device types and opens the only light route directly", async () => {
     const element = createSetup();
     await element.updateComplete;

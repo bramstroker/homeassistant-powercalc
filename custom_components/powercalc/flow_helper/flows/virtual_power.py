@@ -16,7 +16,6 @@ from homeassistant.const import (
 )
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
-import voluptuous as vol
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
@@ -79,6 +78,7 @@ from custom_components.powercalc.flow_helper.strategy_form import (
 )
 from custom_components.powercalc.power_profile.power_profile import DeviceType
 from custom_components.powercalc.strategy.wled import CONFIG_SCHEMA as CONFIG_SCHEMA_WLED
+from custom_components.powercalc.validation import vol
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
@@ -232,7 +232,7 @@ class VirtualPowerFlow:
 
     async def create_schema_linear(self) -> vol.Schema:
         """Create the config schema for linear strategy."""
-        return SCHEMA_POWER_LINEAR.extend(  # type: ignore[no-any-return]
+        return SCHEMA_POWER_LINEAR.extend(
             {
                 vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(
                     selector.AttributeSelectorConfig(
@@ -432,7 +432,7 @@ class VirtualPowerConfigFlow(VirtualPowerFlow):
             options_schema,
             get_global_powercalc_config(self.flow),
         )
-        return schema.extend(power_options.schema)  # type: ignore[no-any-return]
+        return schema.extend(power_options.schema)
 
     async def async_step_virtual_power(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the flow for virtual power sensor."""

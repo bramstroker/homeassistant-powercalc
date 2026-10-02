@@ -8,7 +8,6 @@ from homeassistant.helpers import condition
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
-import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
@@ -34,6 +33,7 @@ from custom_components.powercalc.errors import (
     UnsupportedStrategyError,
 )
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
+from custom_components.powercalc.validation import vol
 
 from .composite import (
     COMPOUND_CONDITIONS,

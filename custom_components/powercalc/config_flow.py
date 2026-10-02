@@ -25,7 +25,8 @@ from homeassistant.data_entry_flow import section
 from homeassistant.helpers import entity_registry as er, selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-import voluptuous as vol
+
+from custom_components.powercalc.validation import vol
 
 from .common import SourceEntity, create_source_entity
 from .const import (
@@ -761,7 +762,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 {vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float)},
             )
 
-        return schema.extend(  # type: ignore[no-any-return]
+        return schema.extend(
             {
                 **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
                 **SCHEMA_STANDBY_ENERGY_SENSOR_TOGGLE.schema,

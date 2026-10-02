@@ -33,6 +33,7 @@ from measure.request import (
     ChargingMeasurementRequest,
     DummyLoadCalibrationRequest,
     FanMeasurementRequest,
+    FixedMeasurementRequest,
     LightMeasurementRequest,
     MeasurementRequest,
     RecorderMeasurementRequest,
@@ -336,6 +337,7 @@ class MeasurementPreflight:
         """Apply the check this request type declares; a type absent here drives nothing up front."""
 
         checks: dict[type[MeasurementRequest], Callable[[Any], PreflightResult]] = {
+            FixedMeasurementRequest: self._validate_fixed,
             SpeakerMeasurementRequest: self._validate_speaker,
             FanMeasurementRequest: self._validate_fan,
             ChargingMeasurementRequest: self._validate_charging,
@@ -344,6 +346,22 @@ class MeasurementPreflight:
         }
         check = checks.get(type(request))
         return PreflightResult() if check is None else check(request)
+
+    def _validate_fixed(self, request: FixedMeasurementRequest) -> PreflightResult:
+        if self._load_all_entities is None:
+            raise PreflightError("Home Assistant device metadata is unavailable")
+        entities = self._load_all_entities()
+        devices = {entity.device_id for entity in entities if entity.device_id}
+        if request.device_id not in devices:
+            raise PreflightError("Selected Home Assistant device no longer exists")
+        if isinstance(request.power_meter, HassPowerMeterSpec):
+            meter = next(
+                (entity for entity in entities if entity.entity_id == request.power_meter.entity_id),
+                None,
+            )
+            if meter is not None and meter.device_id == request.device_id:
+                raise PreflightError("Use an external power meter to measure the selected device's own consumption")
+        return PreflightResult(estimated_duration_seconds=request.duration)
 
     def _validate_recorder(self, request: RecorderMeasurementRequest) -> PreflightResult:
         if not request.recorded_entity_ids:

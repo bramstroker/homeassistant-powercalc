@@ -13,7 +13,6 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
-import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_AUTOSTART,
@@ -23,6 +22,7 @@ from custom_components.powercalc.const import (
     CONF_STATES_TRIGGER,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.validation import vol
 
 from .profile_data import open_profile_csv
 from .strategy_interface import PowerCalculationStrategyInterface

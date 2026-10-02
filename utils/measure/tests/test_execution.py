@@ -14,16 +14,19 @@ from measure.controller.light.spec import DummyLightControllerSpec
 from measure.dummy_load import DummyLoadCalibration
 from measure.execution import DummyLoadPreparation, MeasurementExecution, MeasurementPreparation, PreparedMeasurement
 from measure.powermeter.spec import DummyPowerMeterSpec, HassPowerMeterSpec
+from measure.profile.device_type import ProfileDeviceType
 from measure.request import (
     AverageMeasurementRequest,
     DummyLoadCalibrationRequest,
     DummyLoadRequest,
     DummyLoadReuseRequest,
     FanMeasurementRequest,
+    FixedMeasurementRequest,
     LightMeasurementRequest,
     MeasurementRequest,
     RecorderMeasurementRequest,
 )
+from measure.runner.average import AverageRunner
 from measure.runner.interaction import RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.utils.sampling import MeasurementResult, PowerSampler
@@ -142,6 +145,40 @@ def test_execution_saves_completed_light_profile_without_unavailable_standby(tmp
     assert "standby_power" not in model
     assert model["voltage_range"] == {"min": 229.9, "max": 231.2}
     runner.cleanup.assert_called_once_with()
+
+
+@pytest.mark.parametrize(
+    "device_type",
+    [ProfileDeviceType.NETWORK, ProfileDeviceType.POWER_METER, ProfileDeviceType.GENERIC_IOT],
+)
+def test_fixed_measurement_writes_valid_profile(tmp_path: Path, device_type: ProfileDeviceType) -> None:
+    request = FixedMeasurementRequest(
+        device_id="selected-device",
+        profile_device_type=device_type,
+        product_name="Test device",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+    )
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_average_measurement.return_value = MeasurementResult(power=0.8, voltages=[230.0])
+    runner = AverageRunner(sampler)
+
+    MeasurementExecution(
+        measurement=PreparedMeasurement(request=request, runner=runner), output_directory=tmp_path
+    ).run()
+
+    model = json.loads((tmp_path / "model.json").read_text(encoding="utf-8"))
+    schema_path = Path(__file__).parents[3] / "profile_library" / "model_schema.json"
+    validate(model, json.loads(schema_path.read_text(encoding="utf-8")))
+    assert model["device_type"] == device_type.value
+    assert model["discovery_by"] == "device"
+    if device_type == ProfileDeviceType.POWER_METER:
+        assert model["standby_power"] == pytest.approx(0.8)
+        assert model["only_self_usage"] is True
+        assert "fixed_config" not in model
+    else:
+        assert model["fixed_config"] == {"power": 0.8}
+        assert "standby_power" not in model
 
 
 def test_execution_records_enabled_dummy_load_in_measure_settings(tmp_path: Path) -> None:

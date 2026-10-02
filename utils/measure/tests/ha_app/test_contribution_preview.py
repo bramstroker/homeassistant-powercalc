@@ -1,15 +1,21 @@
 import json
 from pathlib import Path
 
-from measure.ha_app.contribution.models import ContributionApiError, ContributionAuthStatus
+from measure.ha_app.contribution.models import (
+    ContributionApiError,
+    ContributionAuthStatus,
+    contribution_entity_ids,
+    supports_automatic_contribution,
+)
 from measure.ha_app.contribution.preview import (
     _build_preview_file,
     _prepared_model,
     draft_from_request,
     metadata_from_request,
 )
+from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.profile.models import RenderedProfileFile
-from measure.request import MeasurementRequest, parse_measurement_request
+from measure.request import FixedMeasurementRequest, MeasurementRequest, parse_measurement_request
 import pytest
 
 
@@ -31,6 +37,15 @@ def test_metadata_defaults_to_request_and_authenticated_author(request_model: Me
     assert metadata.model_id == "test"
     assert metadata.author.github == "octo"
     assert metadata.measure_device == request_model.measure_device
+
+
+def test_fixed_profile_contribution_uses_selected_device() -> None:
+    request = FixedMeasurementRequest(
+        device_id="router-device", profile_device_type="network", power_meter=DummyPowerMeterSpec()
+    )
+
+    assert supports_automatic_contribution(request)
+    assert contribution_entity_ids(request) == ["router-device"]
 
 
 def test_metadata_requires_github_identity(request_model: MeasurementRequest) -> None:

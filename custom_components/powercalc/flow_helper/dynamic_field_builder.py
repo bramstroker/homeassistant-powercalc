@@ -5,10 +5,11 @@ from typing import cast
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.selector import EntitySelector, selector
-import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.power_profile.error import LibraryError
 from custom_components.powercalc.power_profile.power_profile import EntityAutoSelectConfig, PowerProfile
+from custom_components.powercalc.validation import vol
 
 
 def build_dynamic_field_schema(
@@ -21,7 +22,13 @@ def build_dynamic_field_schema(
     Prefill entity fields with a unique auto-selection match unless an explicit default is set.
     """
     schema = {}
+    form_keys: set[str] = set()
     for field in profile.custom_fields:
+        if field.form_key in form_keys:
+            raise LibraryError(
+                f"Duplicate custom field form key '{field.form_key}' in {profile.manufacturer}/{profile.model}"
+            )
+        form_keys.add(field.form_key)
         field_description = field.description or field.label
         field_selector = field.selector
         device_entities: list[er.RegistryEntry] = []
@@ -48,9 +55,9 @@ def build_dynamic_field_schema(
         if default is None and field.auto_select and isinstance(entity_selector, EntitySelector):
             default = find_auto_selected_entity(device_entities, entity_selector, field.auto_select)
 
-        key = vol.Required(field.key, description=field_description)
+        key = vol.Required(field.form_key, description=field_description)
         if default is not None:
-            key = vol.Required(field.key, description=field_description, default=default)
+            key = vol.Required(field.form_key, description=field_description, default=default)
         schema[key] = entity_selector
     return vol.Schema(schema)
 

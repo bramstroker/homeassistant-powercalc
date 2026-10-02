@@ -683,9 +683,15 @@ def test_library_discovery_filter(
     assert LibraryConfigFlow(flow)._get_library_discovery_by() == expected_discovery_by  # noqa: SLF001
 
 
+@pytest.mark.parametrize(
+    "model,form_key",
+    [("custom_fields", "some_entity"), ("custom_fields_translation_key", "profile_dependency")],
+)
 async def test_profile_with_custom_fields(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
+    model: str,
+    form_key: str,
 ) -> None:
     caplog.set_level(logging.ERROR)
 
@@ -693,7 +699,7 @@ async def test_profile_with_custom_fields(
         hass,
         ["sensor.test", "sensor.foobar"],
         "test",
-        "custom_fields",
+        model,
     )
 
     result = await select_menu_item(hass, Step.MENU_LIBRARY)
@@ -708,7 +714,7 @@ async def test_profile_with_custom_fields(
                 CONF_CONFIRM_AUTODISCOVERED_MODEL: True,
             },
             Step.LIBRARY_CUSTOM_FIELDS: {
-                "some_entity": "sensor.foobar",
+                form_key: "sensor.foobar",
             },
             Step.POWER_ADVANCED: {},
         },
@@ -724,7 +730,7 @@ async def test_profile_with_custom_fields(
         CONF_ENTITY_ID: "sensor.test",
         CONF_NAME: "test",
         CONF_MANUFACTURER: "test",
-        CONF_MODEL: "custom_fields",
+        CONF_MODEL: model,
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_VARIABLES: {
             "some_entity": "sensor.foobar",
@@ -950,7 +956,10 @@ async def test_options_flow_initializes_profile_with_custom_fields(
 
 
 @pytest.mark.parametrize("saved_entity", [None, "sensor.manual"])
-async def test_custom_fields_prefill_preserves_saved_selection(hass: HomeAssistant, saved_entity: str | None) -> None:
+@pytest.mark.parametrize("translation_key", [None, "profile_dependency"])
+async def test_custom_fields_prefill_preserves_saved_selection(
+    hass: HomeAssistant, saved_entity: str | None, translation_key: str | None
+) -> None:
     device = mock_device(hass, "test-device", "test", "device_custom_fields")
     mock_entities_in_registry(
         hass,
@@ -964,6 +973,8 @@ async def test_custom_fields_prefill_preserves_saved_selection(hass: HomeAssista
         hass, {CONF_VARIABLES: {"some_entity": "sensor.automatic"}}, source, ModelInfo("test", "device_custom_fields")
     )
     profile.json_data["fields"]["some_entity"]["auto_select"] = {"translation_key": "dependency"}
+    if translation_key:
+        profile.json_data["fields"]["some_entity"]["translation_key"] = translation_key
     flow = PowercalcConfigFlow()
     flow.hass = hass
     flow.source_entity = source
@@ -974,7 +985,39 @@ async def test_custom_fields_prefill_preserves_saved_selection(hass: HomeAssista
     result = await LibraryConfigFlow(flow).async_step_library_custom_fields()
 
     assert result["step_id"] == Step.LIBRARY_CUSTOM_FIELDS
-    assert result["data_schema"]({}) == {"some_entity": saved_entity or "sensor.automatic"}
+    assert result["data_schema"]({}) == {translation_key or "some_entity": saved_entity or "sensor.automatic"}
+
+
+async def test_edit_custom_field_with_translation_key(hass: HomeAssistant) -> None:
+    mock_device_with_entities(
+        hass, ["sensor.test", "sensor.saved", "sensor.replacement"], "test", "custom_fields_translation_key"
+    )
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "sensor.test",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "custom_fields_translation_key",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_VARIABLES: {"some_entity": "sensor.saved"},
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {})
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {CONF_MANUFACTURER: "test"})
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {CONF_MODEL: "custom_fields_translation_key"}
+    )
+
+    assert result["step_id"] == Step.LIBRARY_CUSTOM_FIELDS
+    assert result["data_schema"]({}) == {"profile_dependency": "sensor.saved"}
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"profile_dependency": "sensor.replacement"}
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_VARIABLES] == {"some_entity": "sensor.replacement"}
 
 
 async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
