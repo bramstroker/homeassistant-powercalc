@@ -38,7 +38,7 @@ const ANALYSIS_DETAILS: Readonly<Record<string, AnalysisDetailDefinition>> = {
     help: "The share of those measurement samples for which the profile could estimate power. 100% means every sample was covered.",
   },
   "Validation method": {
-    help: "Whole activity episodes or a separate recording were held out from fitting. Nearby samples in one episode are not independent validation evidence.",
+    help: "Checks use a separate recording or whole activity episodes when available. With one cycle, separate portions are held out from fitting; this checks the fit within that cycle, not repeatability across cycles.",
   },
   "Recorded activities": {
     help: "The measured vacuum and dock activities covered by this profile. Unmeasured modes do not get an assumed zero-power fallback.",
