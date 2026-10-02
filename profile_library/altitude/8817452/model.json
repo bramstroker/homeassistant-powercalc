@@ -1,0 +1,49 @@
+{
+  "authors": [
+    {
+      "github": "tpascaru",
+      "name": "tpascaru"
+    }
+  ],
+  "calculation_strategy": "linear",
+  "created_at": "2026-08-23T22:00:06Z",
+  "device_type": "fan",
+  "linear_config": {
+    "calibrate": [
+      "5 -> 6.07",
+      "10 -> 6.11",
+      "15 -> 6.22",
+      "20 -> 6.36",
+      "25 -> 8.75",
+      "30 -> 10.15",
+      "35 -> 10.19",
+      "40 -> 13.47",
+      "45 -> 13.97",
+      "50 -> 13.97",
+      "55 -> 17.86",
+      "60 -> 19.61",
+      "65 -> 24.42",
+      "70 -> 27.59",
+      "75 -> 27.59",
+      "80 -> 27.53",
+      "85 -> 34.02",
+      "90 -> 35.84",
+      "95 -> 36.62",
+      "100 -> 37.25"
+    ]
+  },
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "test",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 40.0,
+    "VERSION": "v0.4.1:app"
+  },
+  "name": "ALTITUDE SKYLARK 52-in Matte Black Covered Outdoor Propeller Ceiling Fan Without Light",
+  "standby_power": 3.45,
+  "voltage_range": {
+    "max": 121.3,
+    "min": 120.7
+  }
+}
