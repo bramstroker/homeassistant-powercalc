@@ -69,8 +69,8 @@
     "SLEEP_TIME": 3.0,
     "VERSION": "v0.7.1:app"
   },
-  "name": "Pure Cool Purifying Fan TP01",
-  "product_url": "https://www.dyson.com/outlet/refurbished-air-purifiers/pure-cool-tp01/white-silver",
+  "name": "Pure Cool Link Tower TP02",
+  "product_url": "https://www.dyson.com/air-treatment/air-purifiers/pure-cool-link-tower-tp02/white-silver",
   "standby_power": 3.34,
   "voltage_range": {
     "max": 124.13,
