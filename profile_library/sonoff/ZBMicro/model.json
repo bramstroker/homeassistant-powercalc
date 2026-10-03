@@ -14,7 +14,6 @@
   "measure_method": "manual",
   "measure_device": "Treedix TRX5-0814",
   "measure_description": "measured at a constant set voltage of 5V",
-  "mains_voltage": 5,
   "calculation_strategy": "fixed",
   "authors": [
     {
