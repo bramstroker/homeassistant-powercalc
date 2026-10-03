@@ -6,7 +6,6 @@
   "discovery_by": "device",
   "device_specs": {
     "form_factor": "plug",
-    "rated_power": 36.0,
     "power_monitoring": false,
     "connectivity": [
       "zigbee"
