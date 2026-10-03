@@ -1,0 +1,79 @@
+{
+  "aliases": [
+    "475"
+  ],
+  "authors": [
+    {
+      "github": "jimstrang",
+      "name": "Jim Strang"
+    }
+  ],
+  "calculation_strategy": "composite",
+  "composite_config": [
+    {
+      "condition": {
+        "attribute": "oscillating",
+        "condition": "state",
+        "entity_id": [
+          "[[entity]]"
+        ],
+        "state": true
+      },
+      "linear": {
+        "calibrate": [
+          "10 -> 5.49",
+          "20 -> 6.25",
+          "30 -> 7.74",
+          "40 -> 9.72",
+          "50 -> 12.77",
+          "60 -> 18.68",
+          "70 -> 22.93",
+          "80 -> 33.50",
+          "90 -> 44.61",
+          "100 -> 57.59"
+        ]
+      }
+    },
+    {
+      "linear": {
+        "calibrate": [
+          "10 -> 3.58",
+          "20 -> 4.33",
+          "30 -> 5.84",
+          "40 -> 7.78",
+          "50 -> 10.82",
+          "60 -> 16.92",
+          "70 -> 21.26",
+          "80 -> 31.68",
+          "90 -> 43.21",
+          "100 -> 55.62"
+        ]
+      }
+    }
+  ],
+  "created_at": "2026-09-22T01:58:21Z",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ],
+    "form_factor": "purifier_fan"
+  },
+  "device_type": "fan",
+  "mains_voltage": 120,
+  "measure_description": "Stationary fan-speed curve measured with utils/measure script; oscillating curve measured as 60-second averages at each supported speed. Continuous monitoring enabled; off-state with monitoring disabled not modeled.",
+  "measure_device": "KAUF PLF12",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.7.1:app"
+  },
+  "name": "Pure Cool Link Tower TP02",
+  "product_url": "https://www.dyson.com/air-treatment/air-purifiers/pure-cool-link-tower-tp02/white-silver",
+  "standby_power": 3.34,
+  "voltage_range": {
+    "max": 124.13,
+    "min": 122.52
+  }
+}
