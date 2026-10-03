@@ -1,5 +1,5 @@
-import { decodeEntities, decodePreflight, decodeSessionSnapshot, decodeSessionSummaries, isMeasurementRequest } from "./api-decoders";
-import { capabilities } from "./components/testing/fixtures";
+import { decodeEntities, decodeMeasureDefinitions, decodePreflight, decodeSessionSnapshot, decodeSessionSummaries, isMeasurementRequest } from "./api-decoders";
+import { capabilities, lightDefinition } from "./components/testing/fixtures";
 
 const averageRequest = {
   measure_type: "average",
@@ -51,6 +51,17 @@ describe("measurement request boundary", () => {
 });
 
 describe("response boundary", () => {
+  it("accepts the device selector in a fixed measurement definition", () => {
+    const definitions = [{
+      ...lightDefinition,
+      measure_type: "fixed",
+      fields: [{ name: "device_id", label: "Home Assistant device", control: "device",
+        role: "attribute", required: true, options: [], all_entities: true }],
+    }];
+
+    expect(decodeMeasureDefinitions(definitions)).toBe(definitions);
+  });
+
   it("accepts saved smart switch sessions in the session list", () => {
     const sessions = [{
       session_id: "8af8795c-7131-4e94-8eab-2ce4a7e7f2c1", state: "failed",

@@ -8,7 +8,6 @@ from homeassistant.data_entry_flow import UnknownFlow
 from homeassistant.exceptions import HomeAssistantError
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.typing import ConfigType
-import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CalculationStrategy
@@ -17,6 +16,7 @@ from custom_components.powercalc.flow_helper.strategy_form import unwrap_strateg
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.selector import detect_calculation_strategy
+from custom_components.powercalc.validation import vol
 
 PREVIEW_NAME = "powercalc"
 PREVIEW_FRIENDLY_NAME = "Preview power"

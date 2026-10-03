@@ -485,6 +485,19 @@ def test_catalog_snapshot_exposes_related_devices() -> None:
     assert snapshot.get("sensor.desk_power").related_device_ids == ["child"]
 
 
+def test_snapshot_returns_stable_entity_for_device() -> None:
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = _entity_data()
+
+    snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
+
+    device_entity = snapshot.get_device_entity("meter-device")
+    assert device_entity is not None
+    assert device_entity.entity_id == "sensor.desk_power"
+    assert device_entity.model_id == "PM-001"
+    assert snapshot.get_device_entity("unknown-device") is None
+
+
 @pytest.mark.parametrize("live", [True, False])
 def test_catalog_preserves_valetudo_identity(live: bool) -> None:
     data = _entity_data()

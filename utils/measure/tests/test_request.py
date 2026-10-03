@@ -12,6 +12,7 @@ from measure.request import (
     AverageMeasurementRequest,
     DummyLoadCalibrationRequest,
     DummyLoadReuseRequest,
+    FixedMeasurementRequest,
     LightMeasurementRequest,
     RecorderMeasurementRequest,
     RecorderProfileRecipe,
@@ -168,6 +169,24 @@ def test_request_rejects_blank_required_profile_metadata(field: str) -> None:
     payload = valid_request() | {field: "   "}
     with pytest.raises(ValidationError, match=field):
         LightMeasurementRequest.model_validate(payload)
+
+
+def fixed_request(duration: int) -> dict[str, object]:
+    return {
+        "power_meter": {"type": "dummy"},
+        "device_id": "router-device",
+        "profile_device_type": "network",
+        "duration": duration,
+    }
+
+
+def test_fixed_request_accepts_a_one_minute_average() -> None:
+    assert FixedMeasurementRequest.model_validate(fixed_request(60)).duration == 60
+
+
+def test_fixed_request_rejects_averages_shorter_than_a_minute() -> None:
+    with pytest.raises(ValidationError, match="duration"):
+        FixedMeasurementRequest.model_validate(fixed_request(59))
 
 
 def test_request_defers_unknown_product_details_until_preparation() -> None:

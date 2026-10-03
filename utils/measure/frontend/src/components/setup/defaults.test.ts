@@ -175,6 +175,7 @@ describe("setup view defaults", () => {
     element.definitions = [recorderDefinition];
     element.deviceEntities = { "*": [
       { entity_id: "vacuum.robot", name: "Robot", domain: "vacuum", device_id: "robot-device", state: "docked",
+        related_device_ids: ["dock-device"],
         suggested_recording_entity_ids: ["sensor.dock_state", "switch.dock_drying"],
         disabled_recording_entity_ids: ["switch.dock_washing"] },
       { entity_id: "switch.dock_drying", name: "Drying", domain: "switch", device_id: "dock-device", state: "off" },
@@ -206,8 +207,15 @@ describe("setup view defaults", () => {
     expect(element.shadowRoot.querySelectorAll('select[name="additional_entity_ids"]')).toHaveLength(0);
     const additional = entityCombobox(element, "additional_entity_ids");
     expect(additional.label).toBe("Additional entities (optional)");
+    expect(additional.options).toContainEqual({
+      value: "sensor.dock_state", label: "Dock state", description: "sensor.dock_state", badge: "idle",
+    });
+    expect(battery.options[0]).toMatchObject({ label: "Robot battery", description: "sensor.robot_battery" });
+    expect(battery.options[0]).not.toHaveProperty("badge", "42 %");
     expect(additional.options.map((option) => option.value)).not.toContain("vacuum.robot");
     expect(additional.options.map((option) => option.value)).not.toContain("sensor.robot_battery");
+    expect(additional.options.map((option) => option.value)).toContain("switch.dock_drying");
+    expect(additional.options.map((option) => option.value)).not.toContain("sensor.other_state");
     expect(additional.value).toEqual(["sensor.dock_state", "switch.dock_drying"]);
     expect(element.shadowRoot.textContent).toContain("Useful activity entities are disabled: switch.dock_washing");
     expect(element.shadowRoot.textContent).toContain("Known activity entities are selected automatically");
@@ -231,6 +239,7 @@ describe("setup view defaults", () => {
     selectEntity(entityCombobox(element, "vacuum_entity_id"), "vacuum.other");
     await element.updateComplete;
     expect(entityCombobox(element, "additional_entity_ids").value).toEqual([]);
+    expect(entityCombobox(element, "additional_entity_ids").options.map((option) => option.value)).toEqual(["sensor.other_state"]);
     expect(entityCombobox(element, "battery_entity_id").value).toBe("sensor.other_battery");
   });
 

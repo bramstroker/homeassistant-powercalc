@@ -4,7 +4,7 @@ import type { EntityDescriptor, MeasurementRequest } from "../../types";
 import { capabilities } from "../testing/fixtures";
 
 const entities: EntityDescriptor[] = [
-  { entity_id: "vacuum.robot", name: "Robot", domain: "vacuum", device_id: "robot", state: "docked" },
+  { entity_id: "vacuum.robot", name: "Robot", domain: "vacuum", device_id: "robot", related_device_ids: ["dock"], state: "docked" },
   { entity_id: "sensor.battery", name: "Battery", domain: "sensor", device_id: "robot", state: "100", unit: "%", device_class: "battery" },
   { entity_id: "sensor.state", name: "State", domain: "sensor", device_id: "robot", state: "idle" },
   { entity_id: "switch.drying", name: "Drying", domain: "switch", device_id: "robot", state: "on" },
@@ -14,6 +14,8 @@ const entities: EntityDescriptor[] = [
   { entity_id: "camera.map", name: "Map", domain: "camera", device_id: "robot", state: "idle" },
   { entity_id: "image.map", name: "Map", domain: "image", device_id: "robot", state: "idle" },
   { entity_id: "sensor.other", name: "Other", domain: "sensor", device_id: "other", state: "idle" },
+  { entity_id: "switch.dock_drying", name: "Dock drying", domain: "switch", device_id: "dock", state: "on" },
+  { entity_id: "sensor.unassigned", name: "Unassigned", domain: "sensor", state: "idle" },
 ];
 const additional = recorderDefinition.fields.find((field) => field.name === "additional_entity_ids")!;
 const state: FieldState = {
@@ -34,14 +36,44 @@ describe("vacuum recording selection", () => {
 
   it("preserves explicit removals and manual dock selections", () => {
     expect(entityRows(additional, { ...state, selectedEntities: { ...state.selectedEntities, additional_entity_ids: [] } })).toEqual([]);
-    expect(entityRows(additional, { ...state, selectedEntities: { ...state.selectedEntities, additional_entity_ids: ["sensor.other"] } })).toEqual(["sensor.other"]);
+    expect(entityRows(additional, { ...state, selectedEntities: { ...state.selectedEntities, additional_entity_ids: ["switch.dock_drying"] } })).toEqual(["switch.dock_drying"]);
   });
 
   it("never offers disabled or stateless registry entries as recording choices", () => {
     const choices = entityChoices(additional, state).map((entity) => entity.entity_id);
     expect(choices).not.toContain("sensor.disabled");
     expect(choices).not.toContain("sensor.pending");
-    expect(choices).toContain("sensor.other");
+    expect(choices).toContain("sensor.state");
+  });
+
+  it("only offers entities on the vacuum or its related devices", () => {
+    const choices = entityChoices(additional, state).map((entity) => entity.entity_id);
+    expect(choices).toContain("sensor.state");
+    expect(choices).toContain("switch.dock_drying");
+    expect(choices).not.toContain("sensor.other");
+    expect(choices).not.toContain("sensor.unassigned");
+  });
+
+  it("offers no additional entities without a selected vacuum device", () => {
+    expect(entityChoices(additional, { ...state, selectedEntities: {} })).toEqual([]);
+    expect(entityChoices(additional, {
+      ...state,
+      deviceEntities: { "*": entities.map((entity) => entity.entity_id === "vacuum.robot"
+        ? { ...entity, device_id: undefined }
+        : entity) },
+    })).toEqual([]);
+  });
+
+  it("only offers same-device entities when the vacuum has no related devices", () => {
+    const choices = entityChoices(additional, {
+      ...state,
+      deviceEntities: { "*": entities.map((entity) => entity.entity_id === "vacuum.robot"
+        ? { ...entity, related_device_ids: undefined }
+        : entity) },
+    }).map((entity) => entity.entity_id);
+    expect(choices).toContain("sensor.state");
+    expect(choices).not.toContain("switch.dock_drying");
+    expect(choices).not.toContain("sensor.other");
   });
 
   it("excludes the vacuum and its automatically selected battery from additional choices", () => {

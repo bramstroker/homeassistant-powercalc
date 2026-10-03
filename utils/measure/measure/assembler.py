@@ -65,6 +65,7 @@ from measure.request import (
     AverageMeasurementRequest,
     ChargingMeasurementRequest,
     FanMeasurementRequest,
+    FixedMeasurementRequest,
     LightMeasurementRequest,
     MeasurementRequest,
     RecorderMeasurementRequest,
@@ -216,7 +217,7 @@ class MeasurementAssembler:
                 snapshot = HomeAssistantEntityCatalog(self._require_home_assistant()).load_snapshot()
                 context = build_recording_context(request, snapshot.get_all(), snapshot.related_device_ids)
             return RecorderRunner(sampler, interaction, state_reader, context)
-        if isinstance(request, AverageMeasurementRequest):
+        if isinstance(request, AverageMeasurementRequest | FixedMeasurementRequest):
             return AverageRunner(sampler, interaction=interaction)
         if isinstance(request, ChargingMeasurementRequest):
             charging_controller = self._create_charging_controller(request.controller)

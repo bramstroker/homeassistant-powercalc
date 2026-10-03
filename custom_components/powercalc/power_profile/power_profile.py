@@ -97,6 +97,12 @@ class CustomField:
     description: str | None = None
     default: Any = None
     auto_select: EntityAutoSelectConfig | None = None
+    translation_key: str | None = None
+
+    @property
+    def form_key(self) -> str:
+        """Name used by Home Assistant to look up the field's label and description."""
+        return self.translation_key or self.key
 
 
 DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {

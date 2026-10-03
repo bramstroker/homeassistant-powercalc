@@ -4290,6 +4290,49 @@
       "description": "Singapore-headquartered technology company founded in Britain, known for vacuum cleaners and air-treatment appliances.",
       "models": [
         {
+          "aliases": [
+            "475"
+          ],
+          "authors": [
+            {
+              "github": "jimstrang",
+              "name": "Jim Strang"
+            }
+          ],
+          "calculation_strategy": "composite",
+          "created_at": "2026-09-22T01:58:21Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi"
+            ],
+            "form_factor": "purifier_fan"
+          },
+          "device_type": "fan",
+          "mains_voltage": 120,
+          "measure_description": "Stationary fan-speed curve measured with utils/measure script; oscillating curve measured as 60-second averages at each supported speed. Continuous monitoring enabled; off-state with monitoring disabled not modeled.",
+          "measure_device": "KAUF PLF12",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.7.1:app"
+          },
+          "name": "Pure Cool Link Tower TP02",
+          "product_url": "https://www.dyson.com/air-treatment/air-purifiers/pure-cool-link-tower-tp02/white-silver",
+          "standby_power": 3.34,
+          "voltage_range": {
+            "max": 124.13,
+            "min": 122.52
+          },
+          "id": "TP02",
+          "manufacturer": "dyson",
+          "updated_at": "2026-10-03T05:30:02",
+          "max_power": null,
+          "sub_profile_count": 0,
+          "hash": "05bb9da77ecd8d9dc561560b4b9ae9c4"
+        },
+        {
           "calculation_strategy": "composite",
           "created_at": "2026-07-20T21:56:29Z",
           "device_type": "fan",
@@ -36587,7 +36630,7 @@
           ],
           "id": "NSPanel-EU",
           "manufacturer": "sonoff",
-          "updated_at": "2026-09-29T15:29:33",
+          "updated_at": "2026-09-29T16:42:45",
           "max_power": null,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-29T15:29:33",
@@ -36598,7 +36641,7 @@
             "score": 97.8,
             "brightness": 97.8
           },
-          "hash": "072c73a707876ff6f65e3ccccc6352ef"
+          "hash": "99c73319ce6e438c1ec439dc6f97ef60"
         },
         {
           "calculation_strategy": "fixed",
@@ -38695,6 +38738,93 @@
       "country": "CN",
       "description": "Chinese networking manufacturer. Its smart home products are sold as Kasa and Tapo.",
       "models": [
+        {
+          "calculation_strategy": "fixed",
+          "compatible_integrations": [
+            "tapo_control"
+          ],
+          "created_at": "2026-09-23T21:30:00Z",
+          "device_type": "camera",
+          "device_specs": {
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "discovery_by": "device",
+          "fields": {
+            "privacy_entity": {
+              "label": "Privacy mode switch",
+              "description": "The camera's Privacy switch (tapo_control creates it as switch.<camera>_privacy). While it is on, the lens is closed and the image sensor and IR LEDs are off.",
+              "selector": {
+                "entity": {
+                  "domain": "switch"
+                }
+              },
+              "auto_select": {
+                "integration": "tapo_control",
+                "unique_id_pattern": "-privacy$"
+              }
+            },
+            "night_vision_entity": {
+              "label": "Night vision switching select",
+              "description": "The camera's Night Vision Switching select (tapo_control creates it as select.<camera>_night_vision_switching, options auto/on/off). Forced on or off is honoured; on auto the sun is used as the proxy for IR.",
+              "selector": {
+                "entity": {
+                  "domain": "select"
+                }
+              },
+              "auto_select": {
+                "integration": "tapo_control",
+                "unique_id_pattern": "-nightvisionswitching$"
+              }
+            },
+            "floodlight_entity": {
+              "label": "Spotlight light",
+              "description": "The camera's spotlight (tapo_control creates it as light.<camera>_floodlight_timed). It turns on when the spotlight is lit manually, in Full Color mode, or on motion in Smart mode; tapo_control polls it, so it can lag the real spotlight by about 30 s.",
+              "selector": {
+                "entity": {
+                  "domain": "light"
+                }
+              },
+              "auto_select": {
+                "integration": "tapo_control",
+                "unique_id_pattern": "-floodlight\\(timed\\)$"
+              }
+            },
+            "spotlight_intensity_entity": {
+              "label": "Spotlight intensity",
+              "description": "The camera's Spotlight Intensity number (number.<camera>_spotlight_intensity). The C120 accepts 1-5.",
+              "selector": {
+                "entity": {
+                  "domain": "number"
+                }
+              },
+              "auto_select": {
+                "integration": "tapo_control",
+                "unique_id_pattern": "-spotlightintensity$"
+              }
+            }
+          },
+          "measure_description": "Measured manually with a Shelly Plus Plug UK, polling its Switch.GetStatus apower every 2 s and averaging, with the camera on its own USB adapter (the adapter's draw is included). Privacy mode on: 2.1 W; watching by day (night vision forced off, colour image): 2.3 W; watching at night (night vision forced on, IR LEDs lit, black-and-white image): 3.2 W. 60-90 s per state after settling, repeated privacy readings agreed within 0.05 W. tapo_control has no day/night sensor, so the Night Vision Switching select decides: forced on uses the IR figure, forced off the day figure, and on auto the sun is the proxy for IR. Firmware 1.9.3 Build 260521. Spotlight: when it is lit it replaces the IR LEDs rather than adding to them. Total draw by spotlight intensity (mean of two sessions, Full Color at night): 1 = 2.54, 2 = 2.67, 3 = 3.07, 4 = 3.46, 5 = 3.89 W; a manual activation measured the same as Full Color at the same intensity (3.93 vs 3.88 W at 5). Privacy mode takes precedence: turning it on while the spotlight was lit dropped the draw to privacy level (1.99 W) and the light entity switched off within 2 s. In Smart mode a motion trigger lit the spotlight for about 50 s, then the camera returned to IR. tapo_control's intensity number advertises 1-50, but this camera only accepts 1-5 (JurajNyiri/HomeAssistant-Tapo-Control#1443); values outside 1-5 are clamped. The light entity is polled, so the estimate can lag the real spotlight by about 30 s.",
+          "measure_device": "Shelly Plus Plug UK",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "min_version": "1.20.3",
+          "name": "Tapo C120 Indoor/Outdoor Home Security Wi-Fi Camera",
+          "product_url": "https://www.tp-link.com/uk/home-networking/cloud-camera/tapo-c120/",
+          "authors": [
+            {
+              "name": "Laurens",
+              "github": "LaurensBot"
+            }
+          ],
+          "id": "C120",
+          "manufacturer": "tp-link",
+          "updated_at": "2026-10-01T13:07:45",
+          "max_power": 0.0,
+          "sub_profile_count": 0,
+          "hash": "244f3fded2b28d321df5360339630aaa"
+        },
         {
           "calculation_strategy": "fixed",
           "compatible_integrations": [
@@ -41421,7 +41551,9 @@
       ]
     },
     {
-      "aliases": [],
+      "aliases": [
+        "Xiaomi Communications Co Ltd"
+      ],
       "name": "xiaomi",
       "full_name": "Xiaomi",
       "dir_name": "xiaomi",
@@ -41526,6 +41658,100 @@
             "max": 34.0
           },
           "hash": "e5607c74e5b7ac5a9ec1be8047522190"
+        },
+        {
+          "aliases": [
+            "Mi Smart Speaker Lite"
+          ],
+          "authors": [
+            {
+              "github": "thewan056",
+              "name": "thewan"
+            }
+          ],
+          "calculation_strategy": "linear",
+          "created_at": "2026-09-29T06:27:51Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "infrared"
+            ],
+            "form_factor": "speaker"
+          },
+          "device_type": "smart_speaker",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "TP-Link Tapo P110M",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.10.0:app"
+          },
+          "name": "Smart Speaker IR Control",
+          "product_url": "https://www.mi.com/global/product/xiaomi-smart-speaker-ir-control/",
+          "standby_power": 1.823,
+          "voltage_range": {
+            "max": 242.0,
+            "min": 239.47
+          },
+          "id": "L05G",
+          "manufacturer": "xiaomi",
+          "updated_at": "2026-10-03T04:46:41",
+          "max_power": 4.11,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 2.14,
+            "max": 4.11
+          },
+          "hash": "cbdce50478967c5813dd6347677469e5"
+        },
+        {
+          "authors": [
+            {
+              "github": "thewan056",
+              "name": "thewan"
+            }
+          ],
+          "calculation_strategy": "linear",
+          "created_at": "2026-09-29T06:15:31Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "bluetooth"
+            ],
+            "form_factor": "speaker"
+          },
+          "device_type": "smart_speaker",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "TP-Link Tapo P110M",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.10.0:app"
+          },
+          "name": "Mi Smart Speaker",
+          "product_url": "https://www.mi.com/global/product/mi-smart-speaker/",
+          "standby_power": 1.648,
+          "voltage_range": {
+            "max": 243.31,
+            "min": 240.31
+          },
+          "id": "L09G",
+          "manufacturer": "xiaomi",
+          "updated_at": "2026-10-02T07:54:34",
+          "max_power": 4.37,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 1.83,
+            "max": 4.37
+          },
+          "hash": "12892d45c9c5f901ebe513d2631f0d30"
         },
         {
           "created_at": "2025-05-01T21:56:26Z",
@@ -41634,6 +41860,7 @@
       "device_types": [
         "light",
         "fan",
+        "smart_speaker",
         "network"
       ]
     },

@@ -212,8 +212,9 @@ async def update_translations(model_listing: list[dict[str, Any]]) -> None:
             continue
 
         for key, field_data in custom_fields.items():
-            data_translations[key] = field_data.get("name")
-            description_translations[key] = field_data.get("description")
+            translation_key = field_data.get("translation_key", key)
+            data_translations[translation_key] = field_data.get("label")
+            description_translations[translation_key] = field_data.get("description")
 
     if not data_translations:
         print("No translations found")

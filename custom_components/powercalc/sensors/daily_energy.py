@@ -26,7 +26,6 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 import homeassistant.util.dt as dt_util
 from homeassistant.util.unit_conversion import EnergyConverter
-import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -44,6 +43,7 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 from custom_components.powercalc.unit import ENERGY_UNIT_PREFIX_MAPPING, evaluate_to_decimal, parse_decimal
+from custom_components.powercalc.validation import vol
 
 from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 from .energy import EnergySensor

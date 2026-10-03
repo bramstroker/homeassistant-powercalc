@@ -1,6 +1,6 @@
-import { requestFieldValue } from "../../measurement/definition";
+import { deviceOptions, requestFieldValue } from "../../measurement/definition";
 import { summarize } from "../../power-meter/registry";
-import type { FormField, MeasureDefinition, MeasurementRequest, PreflightResponse } from "../../types";
+import type { EntityDescriptor, FormField, MeasureDefinition, MeasurementRequest, PreflightResponse } from "../../types";
 import { duration as formatDuration } from "../../utils/format";
 
 /** One labelled value on the review screen, as a headline metric or a summary row. */
@@ -42,6 +42,7 @@ export function reviewSummary(
   request: MeasurementRequest | undefined,
   preflight: PreflightResponse | undefined,
   definition: MeasureDefinition | undefined,
+  entities: EntityDescriptor[] = [],
 ): LabelledValue[] {
   if (!request) return [];
   const battery = batterySource(request, preflight);
@@ -49,7 +50,7 @@ export function reviewSummary(
     { label: "Type", value: definition?.label ?? request.measure_type },
     ...profileRows(request, definition),
     ...controllerRows(request, definition),
-    ...reviewFieldRows(request, definition),
+    ...reviewFieldRows(request, definition, entities),
     { label: "Power", value: summarize(request.power_meter) },
     ...multiSelectionRows(request, definition),
     ...(battery ? [{ label: "Battery", value: battery }] : []),
@@ -76,12 +77,18 @@ function controllerRows(request: MeasurementRequest, definition?: MeasureDefinit
   return [{ label: controller.label, value: typeof value === "string" && value ? value : "Virtual device" }];
 }
 
-function reviewFieldRows(request: MeasurementRequest, definition?: MeasureDefinition): LabelledValue[] {
+function reviewFieldRows(
+  request: MeasurementRequest,
+  definition: MeasureDefinition | undefined,
+  entities: EntityDescriptor[],
+): LabelledValue[] {
   return (definition?.fields.filter((field) => field.review) ?? []).flatMap((field) => {
     const value = requestFieldValue(request, field);
     if (value === undefined || value === "" || (Array.isArray(value) && value.length === 0)) return [];
     const values = Array.isArray(value) ? value : [String(value)];
-    const formatted = values.map((item) => field.options.find((option) => option.value === item)?.label ?? item);
+    // Device selectors carry no options of their own; name the device as the selector did.
+    const options = field.control === "device" ? deviceOptions(entities) : field.options;
+    const formatted = values.map((item) => options.find((option) => option.value === item)?.label ?? item);
     const label = field.plural_label && formatted.length > 1 ? field.plural_label : field.label;
     return [{ label, value: formatted.join(", ") }];
   });

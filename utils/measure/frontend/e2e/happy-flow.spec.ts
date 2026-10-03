@@ -250,10 +250,10 @@ test("selects a Home Assistant light with the shared combobox", async ({ page })
   const light = page.getByRole("combobox", { name: "Light" });
   await light.click();
   await expect(page.getByRole("listbox", { name: "Light options" })).toBeVisible();
-  await expect(page.getByRole("option", { name: "Desk lamp · light.desk" })).toBeVisible();
-  await page.getByRole("option", { name: "Desk lamp · light.desk" }).click();
+  await expect(page.getByRole("option", { name: "Desk lamp light.desk" })).toBeVisible();
+  await page.getByRole("option", { name: "Desk lamp light.desk" }).click();
 
-  await expect(light).toHaveValue("Desk lamp · light.desk");
+  await expect(light).toHaveValue("Desk lamp");
   await expect(page.getByRole("listbox", { name: "Light options" })).toBeHidden();
   await expect(page.locator('input[name="model_id"]')).toHaveCount(0);
   await expect(page.locator('input[name="product_name"]')).toHaveCount(0);
@@ -273,17 +273,17 @@ test("selects multiple smart switch relays with the shared combobox", async ({ p
   await expect(relays).toHaveCount(1);
   await relays.getByRole("combobox", { name: "Relays" }).click();
   await expect(page.getByRole("listbox", { name: "Relays options" })).toBeVisible();
-  await expect(page.getByRole("option", { name: "Other relay · switch.other" })).toHaveCount(0);
-  await page.getByRole("option", { name: "Relay one · switch.relay_one" }).click();
-  await page.getByRole("option", { name: "Relay two · switch.relay_two" }).click();
+  await expect(page.getByRole("option", { name: "Other relay switch.other" })).toHaveCount(0);
+  await page.getByRole("option", { name: "Relay one switch.relay_one" }).click();
+  await page.getByRole("option", { name: "Relay two switch.relay_two" }).click();
   await expect(relays.locator(".tag")).toHaveCount(2);
   await expect(page.getByRole("button", { name: "Add another relay" })).toHaveCount(0);
   await page.getByRole("combobox", { name: "Device" }).click();
   await page.getByRole("option", { name: "Other switch" }).click();
   await expect(relays.locator(".tag")).toHaveCount(0);
   await relays.getByRole("combobox", { name: "Relays" }).click();
-  await expect(page.getByRole("option", { name: "Other relay · switch.other" })).toBeVisible();
-  await expect(page.getByRole("option", { name: "Relay one · switch.relay_one" })).toHaveCount(0);
+  await expect(page.getByRole("option", { name: "Other relay switch.other" })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Relay one switch.relay_one" })).toHaveCount(0);
 });
 
 test("loads related recorder entities after choosing a device type", async ({ page }) => {
@@ -293,11 +293,11 @@ test("loads related recorder entities after choosing a device type", async ({ pa
   await expect(page.locator('input[name="profile_device_type"]')).toHaveValue("heating");
   const primary = page.getByRole("combobox", { name: "Primary entity" });
   await primary.click();
-  await page.getByRole("option", { name: "Living room thermostat · climate.living_room" }).click();
+  await page.getByRole("option", { name: "Living room thermostat climate.living_room" }).click();
 
   const tracked = page.getByRole("combobox", { name: "Tracked entities" });
   await tracked.click();
-  await expect(page.getByRole("option", { name: "Thermostat mode · sensor.thermostat_mode" })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Thermostat mode sensor.thermostat_mode" })).toBeVisible();
   await expect(page.locator('input[name="model_id"]')).toHaveCount(0);
   await expect(page.locator('input[name="product_name"]')).toHaveCount(0);
 });
@@ -347,8 +347,8 @@ for (const width of [1280, 390]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
     await multipleHelp.press("Escape");
     await setup.getByRole("combobox", { name: "Lights", exact: true }).click();
-    await setup.getByRole("option", { name: "Desk lamp · light.desk" }).click();
-    await setup.getByRole("option", { name: "Floor lamp · light.floor" }).click();
+    await setup.getByRole("option", { name: "Desk lamp light.desk" }).click();
+    await setup.getByRole("option", { name: "Floor lamp light.floor" }).click();
     await setup.getByRole("combobox", { name: "Lights", exact: true }).press("Escape");
     expect(await toggle.boundingBox()).toEqual(toggleBefore);
     await expect(setup.locator('measure-combobox[name="light_entity_id"]')).toHaveCount(1);
@@ -365,7 +365,7 @@ for (const width of [1280, 390]) {
     await expect(light.locator(".tag")).toHaveCount(1);
     await expect(setup.getByRole("spinbutton", { name: "Number of lights" })).toHaveValue("1");
     await toggle.uncheck();
-    await expect(setup.getByRole("combobox", { name: "Light", exact: true })).toHaveValue("Desk lamp · light.desk");
+    await expect(setup.getByRole("combobox", { name: "Light", exact: true })).toHaveValue("Desk lamp");
     await expect(setup.locator(".multiple-lights .help-content")).toBeHidden();
   });
 }
@@ -376,8 +376,8 @@ test("submits light tags as distinct controller entities", async ({ page }) => {
   await page.getByLabel("Measure multiple lights", { exact: true }).check();
   const picker = page.getByRole("combobox", { name: "Lights", exact: true });
   await picker.click();
-  await page.getByRole("option", { name: "Desk lamp · light.desk" }).click();
-  await page.getByRole("option", { name: "Floor lamp · light.floor" }).click();
+  await page.getByRole("option", { name: "Desk lamp light.desk" }).click();
+  await page.getByRole("option", { name: "Floor lamp light.floor" }).click();
   await picker.press("Escape");
   const request = page.waitForRequest("**/api/preflight");
   await page.getByRole("button", { name: "Check light and setup", exact: true }).click();
@@ -774,7 +774,7 @@ test("opens settings from setup with the configured power meter", async ({ page 
   await expect(page.getByRole("combobox", { name: "Power measurement device" })).toHaveValue("Shelly Plug S");
   await expect(page.getByLabel("Power measurement device firmware")).toHaveValue("1.2.3");
   await expect(page.getByRole("combobox", { name: "Type", exact: true })).toHaveValue("Home Assistant sensor");
-  await expect(page.getByRole("combobox", { name: "Power sensor" })).toHaveValue("Plug power · sensor.plug_power");
+  await expect(page.getByRole("combobox", { name: "Power sensor" })).toHaveValue("Plug power");
 
   const deviceName = page.getByRole("combobox", { name: "Power measurement device" });
   await deviceName.fill("plus");

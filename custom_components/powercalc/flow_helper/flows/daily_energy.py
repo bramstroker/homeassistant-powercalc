@@ -11,7 +11,6 @@ from homeassistant.const import (
 )
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
-import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
@@ -34,6 +33,7 @@ from custom_components.powercalc.flow_helper.common import (
 from custom_components.powercalc.flow_helper.schema import SCHEMA_UTILITY_METER_TOGGLE
 from custom_components.powercalc.flow_helper.strategy_form import find_present_choice, order_choices_for_default
 from custom_components.powercalc.sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
+from custom_components.powercalc.validation import vol
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcConfigFlow, PowercalcOptionsFlow

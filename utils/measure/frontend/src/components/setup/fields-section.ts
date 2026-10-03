@@ -11,13 +11,14 @@ import type {
 } from "../../types";
 import {
   deviceFields,
+  deviceOptions,
   entityDomainsForOption,
   entityDomains,
   narrowingField,
   requestFieldValue,
 } from "../../measurement/definition";
 import { emit } from "../../utils/events";
-import { entitySelect, fieldHint, optionSelect, textField } from "../shared/fields";
+import { entityOption, entitySelect, fieldHint, optionSelect, textField } from "../shared/fields";
 import {
   activeParameters,
   availableOptions,
@@ -216,6 +217,17 @@ export class SetupFieldsSection extends LitElement {
         ${field.hint ? fieldHint(field.hint) : nothing}
       </div>`;
     }
+    if (field.control === "device") {
+      if (this.deviceEntityErrors["*"]) {
+        return html`<div class="notice error" role="alert">Could not load Home Assistant devices: ${this.deviceEntityErrors["*"]}</div>`;
+      }
+      const options = deviceOptions(this.deviceEntities["*"] ?? []);
+      const selected = String(stored ?? field.default ?? "");
+      return html`<div class="field-block">
+        ${optionSelect(name, field.label, options, { selected, required: field.required, placeholder: "Select a device" })}
+        ${field.hint ? fieldHint(field.hint) : nothing}
+      </div>`;
+    }
     if (field.control === "entity") {
       const value = (stored ?? field.default ?? "").toString();
       const source = narrowingField(definition, field);
@@ -347,11 +359,12 @@ export class SetupFieldsSection extends LitElement {
 
   private renderEntityCombobox(field: FormField, entities: EntityDescriptor[], placeholder: string) {
     const selected = this.fieldState ? selectedEntityIds(field, this.fieldState) : [];
+    const showState = this.definition?.measure_type === "recorder" && field.name === "additional_entity_ids";
     return html`<measure-combobox
       name=${field.name}
       label=${field.plural_label || field.label}
       .value=${selected}
-      .options=${entities.map((entity) => ({ value: entity.entity_id, label: `${entity.name} · ${entity.entity_id}` }))}
+      .options=${entities.map((entity) => entityOption(entity, showState))}
       placeholder=${placeholder}
       ?required=${field.required}
       multiple

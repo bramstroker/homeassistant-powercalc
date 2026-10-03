@@ -58,6 +58,16 @@ MEASUREMENT_STARTS: dict[MeasureType, MeasurementStart] = {
         action="Start averaging",
         message="Ready to start the average measurement.",
     ),
+    MeasureType.FIXED: MeasurementStart(
+        action="Start measuring self consumption",
+        message="PowerCalc will measure the selected device's constant power use for the chosen duration.",
+        guidance=(
+            "Connect only the selected device to the external power meter and leave it in its normal idle state.",
+            "Disable automations and keep network activity and device settings stable during the measurement.",
+            "Use a sufficiently precise meter for low power readings. No device settings are changed automatically.",
+        ),
+        guidance_title="Before measuring",
+    ),
     MeasureType.CHARGING: MeasurementStart(
         action="Start charging measurement",
         message="Ready to start charging measurement.",

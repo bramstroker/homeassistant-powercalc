@@ -6,7 +6,6 @@ from homeassistant.const import CONF_DEVICE
 from homeassistant.helpers import selector, translation
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
-import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
@@ -50,6 +49,7 @@ from custom_components.powercalc.power_profile.power_profile import (
     DiscoveryBy,
     PowerProfile,
 )
+from custom_components.powercalc.validation import vol
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
@@ -308,9 +308,14 @@ class LibraryFlow:
 
     async def async_step_library_custom_fields(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the flow for custom fields."""
+        profile = self.flow.selected_profile
+        assert profile is not None
+        fields = profile.custom_fields
+        saved_variables = self.flow.sensor_config.get(CONF_VARIABLES, {})
+        form_data = {field.form_key: saved_variables[field.key] for field in fields if field.key in saved_variables}
 
         def _process_user_input(user_input: dict[str, Any]) -> dict[str, Any]:
-            return {CONF_VARIABLES: user_input}
+            return {CONF_VARIABLES: {field.key: user_input[field.form_key] for field in fields}}
 
         form_kwarg: dict[str, Any] | None = None
         if self.flow.selected_profile and self.flow.selected_profile.documentation_url:
@@ -325,13 +330,13 @@ class LibraryFlow:
                 step=Step.LIBRARY_CUSTOM_FIELDS,
                 schema=build_dynamic_field_schema(
                     self.flow.hass,
-                    self.flow.selected_profile,  # type: ignore
+                    profile,
                     self.flow.source_entity,
                 ),
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_process_user_input,
                 form_kwarg=form_kwarg,
-                form_data=self.flow.sensor_config.get(CONF_VARIABLES, {}),
+                form_data=form_data,
             ),
             user_input,
         )
