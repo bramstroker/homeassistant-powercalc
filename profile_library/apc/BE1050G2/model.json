@@ -22,9 +22,9 @@
   "created_at": "2026-04-28T00:00:00Z",
   "measure_method": "manual",
   "measure_device": "N/A",
-  "config_flow_discovery_remarks": "",
+  "config_flow_discovery_remarks": "This calculation uses the 'Nominal real power' diagnostic in the NUT integration. You need to enable that first.",
   "fixed_config": {
-    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_nominal_real_power]]') | float(600)  }}"
+    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_realpower_nominal]]') | float(600)  }}"
   },
   "authors": [
     {
