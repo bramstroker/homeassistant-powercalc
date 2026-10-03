@@ -1,0 +1,39 @@
+{
+  "authors": [
+    {
+      "github": "Philip6294",
+      "name": "Philip6294"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-17T14:28:58Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ],
+    "lumens": 810,
+    "rated_power": 9
+  },
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_device_firmware": "1.7.3",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 46.97,
+    "DUMMY_LOAD_RESISTANCE": 1264.84,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.7.0:app"
+  },
+  "name": "NOUS P3Z Smart ZigBee Bulb RGB E27",
+  "product_url": "https://nous.technology/product/p3z.html",
+  "standby_power": 0.27,
+  "voltage_range": {
+    "max": 247.6,
+    "min": 237.8
+  }
+}
