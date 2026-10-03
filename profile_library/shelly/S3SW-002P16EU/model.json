@@ -5,7 +5,13 @@
   ],
   "device_type": "smart_switch",
   "device_specs": {
-    "power_monitoring": true
+    "form_factor": "in_wall",
+    "power_monitoring": true,
+    "rated_power": 1.4,
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
   },
   "calculation_strategy": "multi_switch",
   "discovery_by": "device",
@@ -13,7 +19,7 @@
   "created_at": "2026-10-02T09:07:13Z",
   "measure_method": "script",
   "measure_device": "Shelly Plug S",
-  "measure_description": "Measured on 2026-10-02 with Shelly Plug S 1D3A67; 60-second means for relay states 00, 10, 01 and 11. WLAN + ECO uses a parallel dummy load: 9.1 W measured separately as a 60-second mean and subtracted from all four totals. Latest repeat used for WLAN + AP + ECO. Relay increment = (P11 - P00) / 2. See MEASUREMENTS.md and measurements.csv for data, limitations and discarded runs.",
+  "measure_description": "Measured on 2026-10-02 with Shelly Plug S 1D3A67; 60-second means for relay states 00, 10, 01 and 11. WLAN + ECO uses a parallel dummy load: 9.1 W measured separately as a 60-second mean and subtracted from all four totals. Latest repeat used for WLAN + AP + ECO. Relay increment = (P11 - P00) / 2.",
   "config_flow_sub_profile_remarks": "Select the measured WLAN / BT / ECO / AP combination matching your device settings. AP means access point, BT means Bluetooth. This profile covers self-consumption in two-relay switch mode. Select both output switch entities. Settings are not detected automatically; change the selected subprofile after changing device settings.",
   "standby_power": 0.62,
   "multi_switch_config": {
