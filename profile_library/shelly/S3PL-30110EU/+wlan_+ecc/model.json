@@ -1,0 +1,5 @@
+{
+  "name": "WLAN + ECC",
+  "standby_power": 0.28,
+  "standby_power_on": 0.79
+}
