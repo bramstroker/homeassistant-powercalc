@@ -4327,10 +4327,10 @@
           },
           "id": "TP02",
           "manufacturer": "dyson",
-          "updated_at": "2026-10-02T15:29:27",
+          "updated_at": "2026-10-03T05:30:02",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "005f687d8f906825487ff3e2ff41566f"
+          "hash": "05bb9da77ecd8d9dc561560b4b9ae9c4"
         },
         {
           "calculation_strategy": "composite",
@@ -41707,6 +41707,51 @@
             "max": 4.11
           },
           "hash": "cbdce50478967c5813dd6347677469e5"
+        },
+        {
+          "authors": [
+            {
+              "github": "thewan056",
+              "name": "thewan"
+            }
+          ],
+          "calculation_strategy": "linear",
+          "created_at": "2026-09-29T06:15:31Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "bluetooth"
+            ],
+            "form_factor": "speaker"
+          },
+          "device_type": "smart_speaker",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "TP-Link Tapo P110M",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.10.0:app"
+          },
+          "name": "Mi Smart Speaker",
+          "product_url": "https://www.mi.com/global/product/mi-smart-speaker/",
+          "standby_power": 1.648,
+          "voltage_range": {
+            "max": 243.31,
+            "min": 240.31
+          },
+          "id": "L09G",
+          "manufacturer": "xiaomi",
+          "updated_at": "2026-10-02T07:54:34",
+          "max_power": 4.37,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 1.83,
+            "max": 4.37
+          },
+          "hash": "12892d45c9c5f901ebe513d2631f0d30"
         },
         {
           "created_at": "2025-05-01T21:56:26Z",
