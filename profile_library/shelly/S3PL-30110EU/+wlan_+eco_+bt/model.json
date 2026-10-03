@@ -1,0 +1,5 @@
+{
+  "name": "WLAN + ECO + Bluetooth",
+  "standby_power": 0.44,
+  "standby_power_on": 1.02
+}
