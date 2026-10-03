@@ -5,7 +5,7 @@ import { DEFAULT_SHELLY_USERNAME, POWER_METER_LIST, meterFor } from "../../power
 import { emit } from "../../utils/events";
 import type { ComboboxOption } from "../shared/combobox";
 import "../shared/combobox";
-import { optionSelect } from "../shared/fields";
+import { entityOption, optionSelect } from "../shared/fields";
 import "../shared/power-meter-diagnostic";
 
 @customElement("measure-settings-power-meter-section")
@@ -118,10 +118,7 @@ export class SettingsPowerMeterSection extends LitElement {
   }
 
   private renderHassFields() {
-    const options = this.powers.map((entity) => ({
-      value: entity.entity_id,
-      label: `${entity.name} · ${entity.entity_id}`,
-    }));
+    const options = this.powers.map((entity) => entityOption(entity));
     return html`
       <measure-combobox
         name="default_power_entity_id"

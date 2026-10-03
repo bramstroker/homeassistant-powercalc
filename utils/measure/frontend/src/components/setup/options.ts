@@ -71,13 +71,17 @@ export function entityChoices(
       && allowedDevices.has(entity.device_id ?? ""));
   }
   if (state.definition.measure_type === "recorder" && field.name === "additional_entity_ids") {
+    if (!related?.device_id) return [];
+    const allowedDevices = new Set([related.device_id, ...(related.related_device_ids ?? [])]);
     const batteryField = state.definition.fields.find((candidate) => candidate.name === "battery_entity_id");
     let batteryId = batteryField ? selectedEntityId(batteryField, state) : "";
     if (batteryField && !batteryId) {
       const batteries = entityChoices(batteryField, state);
       if (batteries.length === 1) batteryId = batteries[0]!.entity_id;
     }
-    entities = entities.filter((entity) => entity.entity_id !== related?.entity_id && entity.entity_id !== batteryId);
+    entities = entities.filter((entity) => entity.entity_id !== related.entity_id
+      && entity.entity_id !== batteryId
+      && allowedDevices.has(entity.device_id ?? ""));
   }
   if (!related?.device_id) return field.same_device_only ? [] : entities;
   if (field.same_device_only) return entities.filter((entity) => entity.device_id === related.device_id);

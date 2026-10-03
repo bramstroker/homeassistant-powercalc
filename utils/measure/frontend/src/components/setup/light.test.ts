@@ -18,7 +18,8 @@ describe("setup view", () => {
 
     const light = entityCombobox(element, "light_entity_id");
     await light.updateComplete;
-    expect((light.shadowRoot.querySelector("input") as HTMLInputElement).value).toBe("Desk lamp · light.desk");
+    expect((light.shadowRoot.querySelector("input") as HTMLInputElement).value).toBe("Desk lamp");
+    expect(light.shadowRoot.querySelector(".selected-description")?.textContent).toBe("light.desk");
     expect(element.shadowRoot.querySelector(".discovery-help")?.textContent).toContain("If a light is missing, change its state once in Home Assistant, then reload this page.");
     expect(element.shadowRoot.textContent).toContain("Brightness");
     expect(element.shadowRoot.querySelector("details")?.open).toBe(false);

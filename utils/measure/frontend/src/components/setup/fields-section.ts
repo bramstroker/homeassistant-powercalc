@@ -18,7 +18,7 @@ import {
   requestFieldValue,
 } from "../../measurement/definition";
 import { emit } from "../../utils/events";
-import { entitySelect, fieldHint, optionSelect, textField } from "../shared/fields";
+import { entityOption, entitySelect, fieldHint, optionSelect, textField } from "../shared/fields";
 import {
   activeParameters,
   availableOptions,
@@ -359,11 +359,12 @@ export class SetupFieldsSection extends LitElement {
 
   private renderEntityCombobox(field: FormField, entities: EntityDescriptor[], placeholder: string) {
     const selected = this.fieldState ? selectedEntityIds(field, this.fieldState) : [];
+    const showState = this.definition?.measure_type === "recorder" && field.name === "additional_entity_ids";
     return html`<measure-combobox
       name=${field.name}
       label=${field.plural_label || field.label}
       .value=${selected}
-      .options=${entities.map((entity) => ({ value: entity.entity_id, label: `${entity.name} · ${entity.entity_id}` }))}
+      .options=${entities.map((entity) => entityOption(entity, showState))}
       placeholder=${placeholder}
       ?required=${field.required}
       multiple
