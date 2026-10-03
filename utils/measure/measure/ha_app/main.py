@@ -1,12 +1,25 @@
 import argparse
+from copy import deepcopy
 import json
 import logging
 from pathlib import Path
 
 import uvicorn
+from uvicorn.config import LOGGING_CONFIG
 
 from measure.ha_app.access import is_loopback_address, trusted_ingress_only_enabled
 from measure.ha_app.api import create_app
+
+
+class _HealthCheckAccessFilter(logging.Filter):
+    """Keep failed health checks visible without logging every successful probe."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        # Uvicorn access records contain client, method, path, HTTP version, and status.
+        if not isinstance(record.args, tuple) or len(record.args) != 5:
+            return True
+        _, method, path, _, status = record.args
+        return not (method == "GET" and path == "/health" and isinstance(status, int) and 200 <= status < 300)
 
 
 def main() -> None:
@@ -55,7 +68,17 @@ def main() -> None:
         workers=1,
         proxy_headers=False,
         log_level="debug" if debug else "info",
+        log_config=_create_uvicorn_log_config(),
     )
+
+
+def _create_uvicorn_log_config() -> dict[str, object]:
+    config = deepcopy(LOGGING_CONFIG)
+    for formatter in config["formatters"].values():
+        formatter["fmt"] = "%(asctime)s " + formatter["fmt"]
+    config["filters"] = {"health_check": {"()": _HealthCheckAccessFilter}}
+    config["handlers"]["access"]["filters"] = ["health_check"]
+    return config
 
 
 def _read_options(data_root: Path) -> dict[str, object]:
