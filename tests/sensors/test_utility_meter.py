@@ -1,11 +1,12 @@
 from datetime import timedelta
 import logging
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
 from freezegun import freeze_time
 from homeassistant.components import utility_meter
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.const import DAILY, HOURLY, QUARTER_HOURLY
+from homeassistant.components.utility_meter.select import TariffSelect
 from homeassistant.components.utility_meter.sensor import (
     ATTR_STATUS,
     ATTR_TARIFF,
@@ -13,7 +14,14 @@ from homeassistant.components.utility_meter.sensor import (
     CONF_UNIQUE_ID,
     PAUSED,
 )
-from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_ENTITY_ID, CONF_NAME, STATE_OFF, UnitOfEnergy
+from homeassistant.const import (
+    ATTR_UNIT_OF_MEASUREMENT,
+    CONF_ENTITY_ID,
+    CONF_NAME,
+    STATE_OFF,
+    UnitOfEnergy,
+    UnitOfPower,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.setup import async_setup_component
@@ -45,6 +53,34 @@ from tests.common import (
     run_powercalc_setup,
     set_states,
 )
+
+
+async def setup_existing_energy_tariff_meters(hass: HomeAssistant) -> None:
+    """Set up tariff meters backed by registered power and energy sensors."""
+    mock_entities_in_registry(
+        hass,
+        {
+            "sensor.existing_power": {"name": "Existing power", "device_class": SensorDeviceClass.POWER},
+            "sensor.existing_energy": {"name": "Existing energy", "device_class": SensorDeviceClass.ENERGY},
+        },
+    )
+    await set_states(
+        hass,
+        [
+            ("sensor.existing_power", 0, {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT}),
+            ("sensor.existing_energy", 10, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR}),
+        ],
+    )
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_POWER_SENSOR_ID: "sensor.existing_power",
+            CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
+        },
+    )
 
 
 async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
@@ -90,6 +126,81 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     assert_entity_state(hass, "sensor.test_energy_daily_peak", attributes={ATTR_STATUS: PAUSED})
 
     assert_entity_state(hass, "sensor.test_energy_daily_offpeak", attributes={ATTR_STATUS: COLLECTING})
+
+
+async def test_tariff_meter_tracks_existing_energy_sensor(hass: HomeAssistant) -> None:
+    await setup_existing_energy_tariff_meters(hass)
+
+    assert_entity_state(hass, "select.existing_energy_daily", "peak")
+    await set_states(
+        hass,
+        [("sensor.existing_energy", 12, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})],
+    )
+
+    assert_entity_state(
+        hass,
+        "sensor.existing_energy_daily_peak",
+        "2.0000",
+        attributes={ATTR_STATUS: COLLECTING},
+    )
+    assert_entity_state(
+        hass,
+        "sensor.existing_energy_daily_offpeak",
+        "0",
+        attributes={ATTR_STATUS: PAUSED},
+    )
+
+
+async def test_tariff_meter_recovers_when_select_becomes_available(hass: HomeAssistant) -> None:
+    with (
+        patch.object(TariffSelect, "current_option", new_callable=PropertyMock, return_value=None),
+        patch("homeassistant.components.utility_meter.sensor.async_at_started", return_value=lambda: None),
+    ):
+        await setup_existing_energy_tariff_meters(hass)
+
+    assert_entity_state(hass, "select.existing_energy_daily", "unknown")
+    await set_states(hass, [("select.existing_energy_daily", "peak")])
+    await set_states(
+        hass,
+        [("sensor.existing_energy", 12, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})],
+    )
+
+    assert_entity_state(
+        hass,
+        "sensor.existing_energy_daily_peak",
+        "2.0000",
+        attributes={ATTR_STATUS: COLLECTING},
+    )
+    assert_entity_state(
+        hass,
+        "sensor.existing_energy_daily_offpeak",
+        "0",
+        attributes={ATTR_STATUS: PAUSED},
+    )
+
+    await hass.services.async_call(
+        "select",
+        "select_option",
+        {"entity_id": "select.existing_energy_daily", "option": "offpeak"},
+        blocking=True,
+    )
+    await set_states(
+        hass,
+        [("sensor.existing_energy", 15, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})],
+    )
+
+    assert_entity_state(
+        hass,
+        "sensor.existing_energy_daily_peak",
+        "2.0000",
+        attributes={ATTR_STATUS: PAUSED},
+    )
+    assert_entity_state(
+        hass,
+        "sensor.existing_energy_daily_offpeak",
+        "3.0000",
+        attributes={ATTR_STATUS: COLLECTING},
+    )
 
 
 async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
