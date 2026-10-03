@@ -41508,7 +41508,9 @@
       ]
     },
     {
-      "aliases": [],
+      "aliases": [
+        "Xiaomi Communications Co Ltd"
+      ],
       "name": "xiaomi",
       "full_name": "Xiaomi",
       "dir_name": "xiaomi",
@@ -41613,6 +41615,55 @@
             "max": 34.0
           },
           "hash": "e5607c74e5b7ac5a9ec1be8047522190"
+        },
+        {
+          "aliases": [
+            "Mi Smart Speaker Lite"
+          ],
+          "authors": [
+            {
+              "github": "thewan056",
+              "name": "thewan"
+            }
+          ],
+          "calculation_strategy": "linear",
+          "created_at": "2026-09-29T06:27:51Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "infrared"
+            ],
+            "form_factor": "speaker"
+          },
+          "device_type": "smart_speaker",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "TP-Link Tapo P110M",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.10.0:app"
+          },
+          "name": "Smart Speaker IR Control",
+          "product_url": "https://www.mi.com/global/product/xiaomi-smart-speaker-ir-control/",
+          "standby_power": 1.823,
+          "voltage_range": {
+            "max": 242.0,
+            "min": 239.47
+          },
+          "id": "L05G",
+          "manufacturer": "xiaomi",
+          "updated_at": "2026-10-02T07:39:08",
+          "max_power": 4.11,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 2.14,
+            "max": 4.11
+          },
+          "hash": "ce8c98be52925a34655e738df1106972"
         },
         {
           "created_at": "2025-05-01T21:56:26Z",
@@ -41721,6 +41772,7 @@
       "device_types": [
         "light",
         "fan",
+        "smart_speaker",
         "network"
       ]
     },
