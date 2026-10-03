@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.12.0 - 2026-10-03
+
+### 🚀 Features
+
+- #4921 Improve measure app entity pickers and vacuum entity filtering @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4920 Improve Measure app log timestamps and health-check filtering @bramstroker
+
 ## 0.11.0 - 2026-10-02
 
 ### 🚀 Features
