@@ -1,0 +1,26 @@
+{
+  "name": "Zigbee USB Smart Adaptor",
+  "created_at": "2026-10-02T22:44:15Z",
+  "device_type": "smart_switch",
+  "product_url": "https://sonoff.tech/products/sonoff-micro-zigbee-usb-smart-adaptor",
+  "discovery_by": "device",
+  "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": false,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "measure_method": "manual",
+  "measure_device": "Treedix TRX5-0814",
+  "measure_description": "measured at a constant set voltage of 5V",
+  "calculation_strategy": "fixed",
+  "authors": [
+    {
+      "name": "ps1noob",
+      "github": "ps1noob"
+    }
+  ],
+  "standby_power": 0.048,
+  "standby_power_on": 0.058
+}
