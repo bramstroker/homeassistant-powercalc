@@ -23,7 +23,7 @@
     "3800238073602"
   ],
   "measure_description": "Measured with 33.7 W dummy load, averaged over 60 seconds. Multiple combinations of settings were tested. Firmware version 2.0.1.",
-  "measure_device": "Shelly Plug M Gen3",
+  "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "mains_voltage": 230,
   "measure_settings": {
