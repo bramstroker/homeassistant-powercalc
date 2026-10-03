@@ -1,6 +1,6 @@
 {
   "name": "Back-UPS ES BE1050G2",
-  "product_url": "https://www.se.com/nl/nl/product/BE1050G2-GR/apc-backups-1050va-600w-vloer-wandmontage-230v-8x-schuko-cee-7-3-uitgangen-usb-type-a+c-poort-door-de-gebruiker-te-vervangen-batterij/",
+  "product_url": "https://www.se.com/nl/en/product/BE1050G2-GR/apc-backups-1050va-600w-floor-wall-mount-230v-8x-schuko-cee-7-3-outlets-usb-type-a+c-port-user-replaceable-battery/",
   "aliases": [
     "Back-UPS BE1050G2"
   ],
@@ -12,7 +12,7 @@
     ]
   },
   "gtin": [
-    "731304285434"
+    "0731304738275"
   ],
   "calculation_strategy": "fixed",
   "discovery_by": "device",
@@ -23,22 +23,8 @@
   "measure_method": "manual",
   "measure_device": "N/A",
   "config_flow_discovery_remarks": "",
-  "fields": {
-    "nominal_w": {
-      "label": "Nominal Real Power (W)",
-      "description": "The power max of your UPS, normally 600W",
-      "default": 600,
-      "selector": {
-        "number": {
-          "min": 100,
-          "max": 10000
-        }
-      }
-    },
-
-  },
   "fixed_config": {
-    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * [[nominal_w]] | float(600)  }}"
+    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_nominal_real_power]]') | float(600)  }}"
   },
   "authors": [
     {
