@@ -81,8 +81,9 @@ test("keeps long selected entity names inside a multi-select field", async ({ pa
   await mockApi(page);
   await page.goto("/");
   await page.getByRole("heading", { name: "Your measurements" }).waitFor();
-  const label = "Pushcel Trigger Auto Empty Dock · button.valetudo_eurekaj15proultramax_trigger_auto_empty_dock";
-  await page.evaluate(async (selectedLabel) => {
+  const label = "Pushcel Trigger Auto Empty Dock";
+  const entityId = "button.valetudo_eurekaj15proultramax_trigger_auto_empty_dock";
+  await page.evaluate(async ({ selectedLabel, entityId }) => {
     const form = document.createElement("form");
     form.id = "long-entity-test";
     form.style.cssText = "display: grid; grid-template-columns: 280px 280px; gap: 20px; width: 580px";
@@ -90,14 +91,14 @@ test("keeps long selected entity names inside a multi-select field", async ({ pa
     picker.name = "entities";
     picker.label = "Additional entities";
     picker.multiple = true;
-    picker.options = [{ value: "button.valetudo", label: selectedLabel }];
-    picker.value = ["button.valetudo"];
+    picker.options = [{ value: entityId, label: selectedLabel, description: entityId, badge: "unavailable" }];
+    picker.value = [entityId];
     const nextField = document.createElement("input");
     nextField.id = "next-field";
     form.append(picker, nextField);
     document.body.append(form);
     await picker.updateComplete;
-  }, label);
+  }, { selectedLabel: label, entityId });
 
   const form = page.locator("#long-entity-test");
   const bounds = await form.evaluate((element) => {
@@ -115,5 +116,8 @@ test("keeps long selected entity names inside a multi-select field", async ({ pa
   expect(bounds.tagRight).toBeLessThanOrEqual(bounds.controlRight);
   expect(bounds.removeRight).toBeLessThanOrEqual(bounds.controlRight);
   expect(bounds.tagRight).toBeLessThan(bounds.nextLeft);
-  await expect(form.locator("measure-combobox").locator(".tag-label")).toHaveAttribute("title", label);
+  await expect(form.locator(".tag-label")).toHaveAttribute("title", entityId);
+  await expect(form.locator(".option-name")).toHaveText(label);
+  await expect(form.locator(".option-description")).toHaveText(entityId);
+  await expect(form.locator(".badge")).toHaveText("unavailable");
 });
