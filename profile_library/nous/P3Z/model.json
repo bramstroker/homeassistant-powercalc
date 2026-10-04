@@ -22,18 +22,18 @@
   "measure_method": "script",
   "measure_settings": {
     "DUMMY_LOAD": true,
-    "DUMMY_LOAD_POWER": 46.97,
-    "DUMMY_LOAD_RESISTANCE": 1264.84,
+    "DUMMY_LOAD_POWER": 47.18,
+    "DUMMY_LOAD_RESISTANCE": 1239.46,
     "NUM_LIGHTS": 1,
-    "SAMPLE_COUNT": 1,
-    "SLEEP_TIME": 2.0,
-    "VERSION": "v0.7.0:app"
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 2,
+    "VERSION": "v0.12.0:app"
   },
   "name": "NOUS P3Z Smart ZigBee Bulb RGB E27",
   "product_url": "https://nous.technology/product/p3z.html",
-  "standby_power": 0.27,
+  "standby_power": 0.64,
   "voltage_range": {
-    "max": 247.6,
-    "min": 237.8
+    "max": 245.4,
+    "min": 238.1
   }
 }
