@@ -46,7 +46,8 @@
   "device_specs": {
     "form_factor": "panel",
     "connectivity": [
-      "wifi"
+      "wifi",
+      "bluetooth"
     ]
   },
   "discovery_by": "entity",
