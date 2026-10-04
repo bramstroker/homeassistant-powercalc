@@ -91,12 +91,20 @@ export function optionSelect(
   `;
 }
 
+export function entityOption(entity: EntityDescriptor, showState = false): ComboboxOption {
+  const state = entity.state || "unknown";
+  const unit = entity.unit && !["unknown", "unavailable"].includes(state) ? ` ${entity.unit}` : "";
+  return {
+    value: entity.entity_id,
+    label: entity.name,
+    description: entity.entity_id,
+    badge: showState ? `${state}${unit}` : undefined,
+  };
+}
+
 export function entitySelect(name: string, label: string, entities: EntityDescriptor[], options: EntitySelectOptions = {}) {
   const { selected = "", required = false, hint = "", onChange = null } = options;
-  const comboboxOptions: ComboboxOption[] = entities.map((entity) => ({
-    value: entity.entity_id,
-    label: `${entity.name} · ${entity.entity_id}`,
-  }));
+  const comboboxOptions = entities.map((entity) => entityOption(entity));
   if (!required) comboboxOptions.unshift({ value: "", label: "None" });
   return optionSelect(name, label, comboboxOptions, {
     selected,

@@ -28,6 +28,37 @@ function createCombobox(allowCustom = false): { form: HTMLFormElement; picker: C
 describe("combobox", () => {
   afterEach(() => document.body.replaceChildren());
 
+  it("shows entity details and state while searching and selecting by entity ID", async () => {
+    const { form, picker } = createCombobox();
+    picker.options = [
+      { value: "sensor.dock_power", label: "Dock power", description: "sensor.dock_power", badge: "0 W" },
+      ...picker.options,
+    ];
+    await picker.updateComplete;
+    const input = picker.shadowRoot!.querySelector("input")!;
+    input.focus();
+    input.value = "sensor.dock_power";
+    input.dispatchEvent(new InputEvent("input", { bubbles: true }));
+    await picker.updateComplete;
+    const option = picker.shadowRoot!.querySelector<HTMLElement>('[role="option"]')!;
+    expect(option.querySelector(".option-name")?.textContent).toBe("Dock power");
+    expect(option.querySelector(".option-description")?.textContent).toBe("sensor.dock_power");
+    expect(option.querySelector(".badge")?.textContent).toBe("0 W");
+    option.click();
+    await picker.updateComplete;
+    expect(input.value).toBe("Dock power");
+    expect(picker.shadowRoot!.querySelector(".selected-description")?.textContent).toBe("sensor.dock_power");
+    expect(new FormData(form).get("device")).toBe("sensor.dock_power");
+
+    picker.multiple = true;
+    picker.value = ["sensor.dock_power"];
+    await picker.updateComplete;
+    const tag = picker.shadowRoot!.querySelector(".tag")!;
+    expect(tag.querySelector(".option-description")?.textContent).toBe("sensor.dock_power");
+    expect(tag.querySelector(".badge")?.textContent).toBe("0 W");
+    expect(tag.querySelector("button")?.getAttribute("aria-label")).toBe("Remove Dock power · sensor.dock_power");
+  });
+
   it("settles external value and option changes in one update", async () => {
     const { picker } = createCombobox();
     await picker.updateComplete;

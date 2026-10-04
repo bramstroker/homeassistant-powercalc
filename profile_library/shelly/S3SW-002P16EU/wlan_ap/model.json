@@ -1,0 +1,7 @@
+{
+  "name": "WLAN + AP",
+  "standby_power": 0.675,
+  "multi_switch_config": {
+    "power": 0.2925
+  }
+}

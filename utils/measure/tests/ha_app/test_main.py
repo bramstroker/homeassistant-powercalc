@@ -1,9 +1,12 @@
 import json
 import logging
 from pathlib import Path
-from unittest.mock import patch
+import re
+import subprocess
+import sys
+from unittest.mock import ANY, patch
 
-from measure.ha_app.main import _configure_logging, _read_options, main
+from measure.ha_app.main import _configure_logging, _HealthCheckAccessFilter, _read_options, main
 import pytest
 
 
@@ -44,7 +47,9 @@ def test_main_access_policy(
         workers=1,
         proxy_headers=False,
         log_level="info",
+        log_config=ANY,
     )
+    assert run.call_args.kwargs["log_config"] is not None
 
 
 @pytest.mark.parametrize("host", ["0.0.0.0", "::", "192.0.2.1", "localhost", "example.com"])  # noqa: S104
@@ -103,3 +108,96 @@ def test_configure_logging_sets_measure_level() -> None:
         assert logger.level == logging.INFO
     finally:
         logger.setLevel(original)
+
+
+@pytest.mark.parametrize("debug", [False, True])
+def test_server_log_output(debug: bool) -> None:
+    # Run logging configuration in isolation: dictConfig closes existing handlers,
+    # including pytest's capture handlers if called in the test process.
+    result = subprocess.run(  # noqa: S603 - fixed script executed with the test interpreter
+        [
+            sys.executable,
+            "-c",
+            """
+import logging
+import sys
+from unittest.mock import patch
+
+import uvicorn
+from measure.ha_app.main import main
+
+debug = sys.argv[1] == "True"
+sys.argv = ["measure-app"]
+
+def run(app, **kwargs):
+    uvicorn.Config(app, **kwargs)
+    logging.getLogger("measure").info("Measurement ready")
+    server = logging.getLogger("uvicorn.error")
+    server.info("Application startup complete")
+    server.error("Server error")
+    server.debug("Server debug details")
+    access = logging.getLogger("uvicorn.access")
+    for path, status in [("/health", 200), ("/health", 503), ("/api/sessions", 200)]:
+        access.info('%s - "%s %s HTTP/%s" %d', "127.0.0.1:1234", "GET", path, "1.1", status)
+    server.info("Application shutdown complete")
+
+with (
+    patch("measure.ha_app.main._read_options", return_value={"debug_logging": debug}),
+    patch("measure.ha_app.main.create_app"),
+    patch("measure.ha_app.main.uvicorn.run", side_effect=run),
+):
+    main()
+""",
+            str(debug),
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    output = result.stdout + result.stderr
+    assert '"GET /health HTTP/1.1" 200' not in output
+    assert '"GET /health HTTP/1.1" 503' in output
+    assert '"GET /api/sessions HTTP/1.1" 200' in output
+    assert "Measurement ready" in output
+    assert "Application startup complete" in output
+    assert "Application shutdown complete" in output
+    assert "Server error" in output
+    assert ("Server debug details" in output) is debug
+    for line in output.splitlines():
+        assert re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} ", line)
+
+
+@pytest.mark.parametrize(
+    "method,path,status,visible",
+    [
+        ("GET", "/health", 200, False),
+        ("GET", "/health", 204, False),
+        ("GET", "/health", 299, False),
+        ("GET", "/health", 199, True),
+        ("GET", "/health", 301, True),
+        ("GET", "/health", 403, True),
+        ("GET", "/health", 500, True),
+        ("POST", "/health", 200, True),
+        ("GET", "/api/sessions", 200, True),
+        ("GET", "/health/details", 200, True),
+        ("GET", "/health", "unknown", True),
+    ],
+)
+def test_health_check_access_filter(method: str, path: str, status: int | str, visible: bool) -> None:
+    record = logging.LogRecord(
+        "uvicorn.access",
+        logging.INFO,
+        __file__,
+        0,
+        "%s %s %s %s %s",
+        ("127.0.0.1:1234", method, path, "1.1", status),
+        None,
+    )
+    assert _HealthCheckAccessFilter().filter(record) is visible
+
+
+@pytest.mark.parametrize("args", [(), ("detail",), {"detail": "value"}])
+def test_health_check_access_filter_keeps_other_records(args: tuple[object, ...] | dict[str, object]) -> None:
+    record = logging.makeLogRecord({"msg": "Other access message", "args": args})
+    assert _HealthCheckAccessFilter().filter(record) is True

@@ -221,7 +221,9 @@ describe("setup type picker", () => {
 
     const fanSelect = entityCombobox(element, "fan_entity_id");
     expect(fanSelect).toBeTruthy();
-    expect(fanSelect.options.map((option) => option.label)).toContain("Bedroom fan · fan.bedroom");
+    expect(fanSelect.options).toContainEqual({
+      value: "fan.bedroom", label: "Bedroom fan", description: "fan.bedroom", badge: undefined,
+    });
   });
 
   it.each([
