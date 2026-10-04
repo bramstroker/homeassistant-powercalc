@@ -13,7 +13,7 @@
   },
   "measure_method": "manual",
   "measure_device": "Treedix TRX5-0814",
-  "measure_description": "measured at a constant set voltage of 5V",
+  "measure_description": "Measured at 5V, unloaded. Values varied between 0.045–0.050 W (off) and 0.055–0.060 W (on) - mostly showing the higher end, rounded to 0.05 W and 0.06 W.",
   "calculation_strategy": "fixed",
   "authors": [
     {
@@ -21,6 +21,6 @@
       "github": "ps1noob"
     }
   ],
-  "standby_power": 0.048,
-  "standby_power_on": 0.058
+  "standby_power": 0.05,
+  "standby_power_on": 0.06
 }
