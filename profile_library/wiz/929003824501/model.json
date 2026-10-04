@@ -1,6 +1,6 @@
 {
   "aliases": [
-    "Philips Wiz Neo Smart WiFi LED Downlight  15W (Round) (Tuneable White)"
+    "SHTWC"
   ],
   "authors": [
     {
@@ -27,7 +27,7 @@
     "SLEEP_TIME": 2.0,
     "VERSION": "v0.10.0:app"
   },
-  "name": "SHTWC",
+  "name": "Philips Wiz Neo Smart WiFi LED Downlight  15W (Round) (Tuneable White)",
   "product_url": "https://in.shop.lighting.philips.com/products/philips-smart-wifi-neo-led-downlight?variant=45967297872062",
   "standby_power": 0.83,
   "voltage_range": {
