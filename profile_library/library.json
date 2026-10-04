@@ -41386,6 +41386,62 @@
           "hash": "14d7feb5203fee810a4ad117d1277607"
         },
         {
+          "aliases": [
+            "SHTWC"
+          ],
+          "authors": [
+            {
+              "github": "haideralipunjabi",
+              "name": "Haider Ali Punjabi"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-02T17:20:39Z",
+          "device_type": "light",
+          "gtin": [
+            "8720169347083"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Sonoff DualR3",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 100.12,
+            "DUMMY_LOAD_RESISTANCE": 535.51,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.10.0:app"
+          },
+          "name": "Philips Wiz Neo Smart WiFi LED Downlight  15W (Round) (Tuneable White)",
+          "product_url": "https://in.shop.lighting.philips.com/products/philips-smart-wifi-neo-led-downlight?variant=45967297872062",
+          "standby_power": 0.83,
+          "voltage_range": {
+            "max": 234.96,
+            "min": 217.22
+          },
+          "id": "929003824501",
+          "manufacturer": "wiz",
+          "updated_at": "2026-10-04T12:46:59",
+          "max_power": 16.28,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-04T12:46:59",
+          "power_range": {
+            "min": 0.78,
+            "max": 16.28
+          },
+          "color_modes": [
+            "color_temp",
+            "effect"
+          ],
+          "lut_quality": {
+            "score": 95.6,
+            "color_temp": 95.6
+          },
+          "hash": "faef70ee52813940fba7a0b0699a5d20"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2023-08-10T08:41:48Z",
           "device_type": "light",
@@ -41744,14 +41800,14 @@
           },
           "id": "L09G",
           "manufacturer": "xiaomi",
-          "updated_at": "2026-10-02T07:54:34",
+          "updated_at": "2026-10-03T10:01:01",
           "max_power": 4.37,
           "sub_profile_count": 0,
           "power_range": {
             "min": 1.83,
             "max": 4.37
           },
-          "hash": "12892d45c9c5f901ebe513d2631f0d30"
+          "hash": "0a033dbf250aa94be391b86557047466"
         },
         {
           "created_at": "2025-05-01T21:56:26Z",
