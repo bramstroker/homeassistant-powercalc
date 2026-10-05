@@ -1,6 +1,7 @@
 {
   "aliases": [
-    "dreame.vacuum.r2427a"
+    "dreame.vacuum.r2427a",
+    "MOVA E30 Ultra"
   ],
   "authors": [
     {
@@ -144,14 +145,17 @@
     "e30-ultra"
   ],
   "mains_voltage": 230,
-  "measure_description": "Preliminary values measured with the Powercalc Measure app (record.jsonl, 2026-10-04) on a Shelly Plug S Gen3 feeding the base station. Auto-empty 322 W (single partial cycle; the automated validator flagged ~22% deviation against its prediction, so this value is provisional), charging curve recorded from 10% to 100% (33-36 W, dropping to 15.8 W above ~95%), washing 17.1 W, drying 12.0 W, standby/idle/docked 3.16 W. While the robot vacuums it runs on battery, so the station only draws 0.75 W. All values are real measurements, the auto-empty branch should be re-measured with a complete emptying cycle.",
+  "measure_description": "Preliminary values measured with the Powercalc Measure app (record.jsonl, 2026-10-04) on a Shelly Plug S Gen3 feeding the base station. The device is sold under the MOVA brand, a sister brand of Dreame, and is integrated through the Dreame Vacuum integration, which is why it is listed under the Dreame manufacturer here. Auto-empty 322 W (single partial cycle; the automated validator flagged ~22% deviation against its prediction, so this value is provisional), charging curve recorded from 10% to 100% (33-36 W, dropping to 15.8 W above ~95%), washing 17.1 W, drying 12.0 W, standby/idle/docked 3.16 W. While the robot vacuums it runs on battery, so the station only draws 0.75 W. All values are real measurements; the auto-empty branch should be re-measured with a complete emptying cycle.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "name": "E30 Ultra Robot Vacuum Cleaner",
-  "product_url": "https://global.dreametech.com/products/dreame-e30-ultra",
+  "product_url": "https://de.mova.tech/products/mova-e30-ultra-robot-vacuum",
   "standby_power": 3.16,
   "voltage_range": {
     "min": 225,
     "max": 235
-  }
+  },
+  "gtin": [
+    "6976233679983"
+  ]
 }
