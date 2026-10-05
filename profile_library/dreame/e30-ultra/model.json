@@ -149,7 +149,7 @@
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "name": "E30 Ultra Robot Vacuum Cleaner",
-  "product_url": "https://de.mova.tech/products/mova-e30-ultra-robot-vacuum",
+  "product_url": "https://mova.tech/products/mova-e30-ultra-robot-vacuum",
   "standby_power": 3.16,
   "voltage_range": {
     "min": 225,
