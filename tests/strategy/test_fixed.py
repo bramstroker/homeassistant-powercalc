@@ -54,6 +54,30 @@ async def test_template_power(hass: HomeAssistant) -> None:
     assert track_entity.template.template == template
 
 
+@pytest.mark.parametrize("power_key", [CONF_POWER, CONF_STATES_POWER])
+@pytest.mark.parametrize(
+    "template",
+    [
+        "{{ states('input_number.test') }}",
+        "\n  {{ states('input_number.test') }}",
+        "{% if is_state('input_number.test', '42') %}42{% else %}60{% endif %}",
+        "{# Power consumption #}{{ states('input_number.test') }}",
+    ],
+)
+async def test_raw_template_power(hass: HomeAssistant, power_key: str, template: str) -> None:
+    await set_states(hass, [("input_number.test", "42")])
+    source_entity = create_source_entity("switch.test", hass)
+    config = {power_key: {STATE_ON: template} if power_key == CONF_STATES_POWER else template}
+    strategy = await _create_strategy(hass, config, source_entity)
+
+    assert await strategy.calculate(State(source_entity.entity_id, STATE_ON)) == 42
+    track_entity = strategy.get_entities_to_track()[0]
+    assert isinstance(track_entity, TrackTemplate)
+
+    await set_states(hass, [("input_number.test", "60")])
+    assert await strategy.calculate(State(source_entity.entity_id, STATE_ON)) == 60
+
+
 async def test_states_power(hass: HomeAssistant) -> None:
     source_entity = create_source_entity("media_player.test", hass)
     strategy = await _create_strategy(
