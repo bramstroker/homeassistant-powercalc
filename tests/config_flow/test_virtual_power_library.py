@@ -588,6 +588,63 @@ async def test_change_sub_profile_options_flow(hass: HomeAssistant) -> None:
     assert entry.data[CONF_MODEL] == "YLDD04YL/extension_5x1meter"
 
 
+@pytest.mark.parametrize(
+    "manufacturer,model,sub_profile,entity_id",
+    [
+        ("shelly", "S3PL-30110EU", "+wlan", "switch.test"),
+        ("yeelight", "YLDD04YL", "standard_length", "light.test"),
+    ],
+)
+async def test_sub_profile_options_flow_accepts_unchanged_defaults(
+    hass: HomeAssistant,
+    manufacturer: str,
+    model: str,
+    sub_profile: str,
+    entity_id: str,
+) -> None:
+    configured_model = f"{model}/{sub_profile}"
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: entity_id,
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: manufacturer,
+            CONF_MODEL: configured_model,
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], user_input={})
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MANUFACTURER: manufacturer},
+    )
+
+    assert result["step_id"] == Step.MODEL
+    model_schema = result["data_schema"]
+    model_key = next(iter(model_schema.schema))
+    assert model_key.description == {"suggested_value": model}
+    assert model_key.default() == model
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=model_schema({CONF_MODEL: model_key.description["suggested_value"]}),
+    )
+
+    assert result["step_id"] == Step.SUB_PROFILE
+    sub_profile_schema = result["data_schema"]
+    sub_profile_key = next(iter(sub_profile_schema.schema))
+    assert sub_profile_key.description == {"suggested_value": sub_profile}
+    assert sub_profile_key.default() == sub_profile
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=sub_profile_schema({CONF_SUB_PROFILE: sub_profile_key.description["suggested_value"]}),
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_MANUFACTURER] == manufacturer
+    assert entry.data[CONF_MODEL] == configured_model
+
+
 async def test_configured_model_populated_in_options_flow(hass: HomeAssistant) -> None:
     entry = await create_mock_config_entry(
         hass,

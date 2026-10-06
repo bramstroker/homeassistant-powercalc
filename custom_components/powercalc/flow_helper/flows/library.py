@@ -155,6 +155,10 @@ class LibraryFlow:
                 await self.flow.validate_strategy_config(power_profile=resolved_profile)
             return user_input
 
+        model = (
+            self.flow.selected_profile.model if self.flow.selected_profile else self.flow.sensor_config.get(CONF_MODEL)
+        )
+
         async def _create_schema() -> vol.Schema:
             """Create model schema."""
             manufacturer = str(self.flow.sensor_config.get(CONF_MANUFACTURER))
@@ -167,11 +171,6 @@ class LibraryFlow:
                     self._get_library_discovery_by(),
                 )
             ]
-            model = (
-                self.flow.selected_profile.model
-                if self.flow.selected_profile
-                else self.flow.sensor_config.get(CONF_MODEL)
-            )
             return vol.Schema(
                 {
                     vol.Required(
@@ -194,6 +193,8 @@ class LibraryFlow:
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_validate,
                 form_kwarg={"description_placeholders": {"supported_models_link": LIBRARY_URL}},
+                # The saved model may include a subprofile suffix, which the model selector cannot accept.
+                form_data={CONF_MODEL: model},
             ),
             user_input,
         )
