@@ -1,0 +1,281 @@
+effect,bri,watt
+Alarm,5,5.4
+Alarm,45,4.26
+Alarm,85,4.62
+Alarm,125,4.63
+Alarm,165,4.84
+Alarm,205,4.92
+Alarm,245,4.83
+Alarm,255,4.69
+Bedtime,5,1.14
+Bedtime,45,1.25
+Bedtime,85,1.72
+Bedtime,125,2.38
+Bedtime,165,3.18
+Bedtime,205,3.84
+Bedtime,245,4.84
+Bedtime,255,5.18
+Candlelight,5,2.0
+Candlelight,45,2.11
+Candlelight,85,2.54
+Candlelight,125,3.2
+Candlelight,165,3.32
+Candlelight,205,3.72
+Candlelight,245,4.15
+Candlelight,255,4.87
+Christmas,5,1.54
+Christmas,45,1.77
+Christmas,85,2.1
+Christmas,125,2.58
+Christmas,165,3.04
+Christmas,205,3.68
+Christmas,245,3.93
+Christmas,255,3.8
+Cozy,5,1.65
+Cozy,45,1.89
+Cozy,85,2.4
+Cozy,125,2.71
+Cozy,165,3.37
+Cozy,205,4.0
+Cozy,245,4.55
+Cozy,255,4.55
+Cool white,5,1.1
+Cool white,45,1.61
+Cool white,85,2.66
+Cool white,125,4.13
+Cool white,165,5.86
+Cool white,205,7.2
+Cool white,245,8.26
+Cool white,255,8.4
+Daylight,5,1.24
+Daylight,45,1.71
+Daylight,85,2.69
+Daylight,125,4.13
+Daylight,165,5.85
+Daylight,205,7.33
+Daylight,245,8.91
+Daylight,255,9.33
+Diwali,5,2.08
+Diwali,45,2.19
+Diwali,85,2.73
+Diwali,125,2.75
+Diwali,165,3.04
+Diwali,205,3.71
+Diwali,245,3.92
+Diwali,255,4.21
+Deep dive,5,1.14
+Deep dive,45,1.47
+Deep dive,85,1.67
+Deep dive,125,1.95
+Deep dive,165,2.34
+Deep dive,205,2.68
+Deep dive,245,2.91
+Deep dive,255,2.95
+Fall,5,1.4
+Fall,45,1.44
+Fall,85,2.01
+Fall,125,2.58
+Fall,165,3.36
+Fall,205,3.92
+Fall,245,4.53
+Fall,255,4.62
+Fireplace,5,2.22
+Fireplace,45,2.5
+Fireplace,85,2.85
+Fireplace,125,2.55
+Fireplace,165,3.48
+Fireplace,205,4.19
+Fireplace,245,4.53
+Fireplace,255,4.49
+Forest,5,1.74
+Forest,45,1.98
+Forest,85,2.49
+Forest,125,3.04
+Forest,165,3.54
+Forest,205,5.26
+Forest,245,5.97
+Forest,255,5.98
+Focus,5,2.97
+Focus,45,3.07
+Focus,85,3.61
+Focus,125,4.27
+Focus,165,5.53
+Focus,205,6.17
+Focus,245,6.39
+Focus,255,6.39
+Golden white,5,3.17
+Golden white,45,3.64
+Golden white,85,4.53
+Golden white,125,5.8
+Golden white,165,7.5
+Golden white,205,8.64
+Golden white,245,9.54
+Golden white,255,9.73
+Halloween,5,3.0
+Halloween,45,3.21
+Halloween,85,3.57
+Halloween,125,4.01
+Halloween,165,4.68
+Halloween,205,5.23
+Halloween,245,5.66
+Halloween,255,5.56
+Jungle,5,2.84
+Jungle,45,3.09
+Jungle,85,3.38
+Jungle,125,3.79
+Jungle,165,3.95
+Jungle,205,4.21
+Jungle,245,3.96
+Jungle,255,4.16
+Mojito,5,2.63
+Mojito,45,2.79
+Mojito,85,3.32
+Mojito,125,3.49
+Mojito,165,4.56
+Mojito,205,4.88
+Mojito,245,5.11
+Mojito,255,5.3
+Night light,5,2.85
+Night light,45,2.88
+Night light,85,2.83
+Night light,125,2.9
+Night light,165,2.88
+Night light,205,2.91
+Night light,245,2.81
+Night light,255,2.85
+Ocean,5,2.75
+Ocean,45,2.94
+Ocean,85,2.94
+Ocean,125,3.38
+Ocean,165,4.04
+Ocean,205,4.58
+Ocean,245,4.95
+Ocean,255,4.4
+Party,5,2.6
+Party,45,2.35
+Party,85,2.73
+Party,125,3.99
+Party,165,4.91
+Party,205,5.36
+Party,245,5.52
+Party,255,5.35
+Pulse,5,3.22
+Pulse,45,3.47
+Pulse,85,3.93
+Pulse,125,4.99
+Pulse,165,6.4
+Pulse,205,7.2
+Pulse,245,8.06
+Pulse,255,8.24
+Pastel colors,5,3.05
+Pastel colors,45,3.26
+Pastel colors,85,3.62
+Pastel colors,125,4.27
+Pastel colors,165,5.23
+Pastel colors,205,5.71
+Pastel colors,245,6.03
+Pastel colors,255,5.27
+Plantgrowth,5,2.15
+Plantgrowth,45,2.4
+Plantgrowth,85,2.73
+Plantgrowth,125,3.25
+Plantgrowth,165,3.79
+Plantgrowth,205,4.53
+Plantgrowth,245,4.74
+Plantgrowth,255,4.84
+Romance,5,2.27
+Romance,45,2.4
+Romance,85,2.87
+Romance,125,3.59
+Romance,165,4.35
+Romance,205,5.05
+Romance,245,5.35
+Romance,255,5.31
+Relax,5,2.63
+Relax,45,2.8
+Relax,85,3.2
+Relax,125,3.78
+Relax,165,4.56
+Relax,205,5.49
+Relax,245,6.0
+Relax,255,6.05
+Sunset,5,2.91
+Sunset,45,3.05
+Sunset,85,3.46
+Sunset,125,4.0
+Sunset,165,4.58
+Sunset,205,5.44
+Sunset,245,5.9
+Sunset,255,5.89
+Spring,5,2.91
+Spring,45,3.02
+Spring,85,3.34
+Spring,125,3.9
+Spring,165,4.15
+Spring,205,4.69
+Spring,245,4.97
+Spring,255,4.99
+Summer,5,2.51
+Summer,45,2.72
+Summer,85,3.07
+Summer,125,3.67
+Summer,165,4.43
+Summer,205,5.44
+Summer,245,6.12
+Summer,255,5.42
+Steampunk,5,2.25
+Steampunk,45,2.81
+Steampunk,85,3.07
+Steampunk,125,3.95
+Steampunk,165,5.1
+Steampunk,205,5.68
+Steampunk,245,6.56
+Steampunk,255,6.38
+True colors,5,2.34
+True colors,45,2.49
+True colors,85,3.17
+True colors,125,3.86
+True colors,165,4.68
+True colors,205,5.35
+True colors,245,5.85
+True colors,255,5.89
+TV time,5,2.41
+TV time,45,2.44
+TV time,85,2.62
+TV time,125,3.05
+TV time,165,3.42
+TV time,205,3.66
+TV time,245,4.01
+TV time,255,3.99
+White,5,2.4
+White,45,2.87
+White,85,4.07
+White,125,5.49
+White,165,7.2
+White,205,8.49
+White,245,9.33
+White,255,9.54
+Wake-up,5,3.62
+Wake-up,45,3.43
+Wake-up,85,3.56
+Wake-up,125,3.46
+Wake-up,165,3.35
+Wake-up,205,3.42
+Wake-up,245,3.55
+Wake-up,255,3.46
+Warm white,5,2.13
+Warm white,45,2.67
+Warm white,85,3.74
+Warm white,125,5.1
+Warm white,165,7.01
+Warm white,205,8.29
+Warm white,245,9.41
+Warm white,255,9.41
+Rhythm,5,9.46
+Rhythm,45,9.54
+Rhythm,85,9.49
+Rhythm,125,9.43
+Rhythm,165,9.52
+Rhythm,205,9.41
+Rhythm,245,9.52
+Rhythm,255,9.49
