@@ -1092,6 +1092,44 @@
       "description": "American power-protection brand of Schneider Electric, best known for uninterruptible power supplies.",
       "models": [
         {
+          "name": "Back-UPS ES BE1050G2",
+          "product_url": "https://www.se.com/nl/en/product/BE1050G2-GR/apc-backups-1050va-600w-floor-wall-mount-230v-8x-schuko-cee-7-3-outlets-usb-type-a+c-port-user-replaceable-battery/",
+          "aliases": [
+            "Back-UPS BE1050G2"
+          ],
+          "description": "Power profile for the APC Back-UPS ES BE1050G2 (1050VA/600W). Estimates real-time output power from NUT load percentage.",
+          "device_type": "ups",
+          "device_specs": {
+            "connectivity": [
+              "usb"
+            ]
+          },
+          "gtin": [
+            "0731304738275"
+          ],
+          "calculation_strategy": "fixed",
+          "discovery_by": "device",
+          "compatible_integrations": [
+            "nut"
+          ],
+          "created_at": "2026-04-28T00:00:00Z",
+          "measure_method": "manual",
+          "measure_device": "N/A",
+          "authors": [
+            {
+              "name": "RM Hogervorst",
+              "github": "rmhogervorst",
+              "email": "hogervorst.rm@gmail.com"
+            }
+          ],
+          "id": "BE1050G2",
+          "manufacturer": "apc",
+          "updated_at": "2026-10-03T19:28:00",
+          "max_power": 0.0,
+          "sub_profile_count": 0,
+          "hash": "878e25278f5f37de7f712e7f05b3affd"
+        },
+        {
           "name": "Back-UPS ES 650G1",
           "product_url": "https://www.se.com/us/en/product/BE650G1/apc-backups-650va-120v-8-nema-outlets-4-surge/",
           "aliases": [
