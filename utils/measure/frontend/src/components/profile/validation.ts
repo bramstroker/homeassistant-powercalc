@@ -5,9 +5,18 @@ export const metadataLabels: Record<string, string> = {
   contributor: "Contributor name", contributor_github: "GitHub username", contributor_email: "Email",
   product_url: "Manufacturer product URL", aliases: "Model aliases", gtins: "GTIN / barcodes",
   mains_voltage: "Nominal mains voltage",
+  standby_power: "Standby power", standby_power_estimated: "Estimated standby",
   measure_device: "Measurement device", measure_device_firmware: "Device firmware",
   measure_description: "Measurement description", notes: "Notes", device_specs: "Device specifications",
 };
+
+// Model IDs become library directory names, so only allow characters which are safe in a path.
+const MODEL_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9 ._()+!-]*$/;
+const MODEL_ID_MAX_LENGTH = 120;
+
+export function isValidModelId(value: string): boolean {
+  return value.length <= MODEL_ID_MAX_LENGTH && MODEL_ID_PATTERN.test(value);
+}
 
 // Fast feedback for editable metadata. The server remains authoritative and also
 // validates the complete generated model against the library's current schema.
@@ -15,8 +24,11 @@ export function validateMetadata(values: ContributionPreviewRequest): Record<str
   const errors: Record<string, string> = {};
   validateRequiredMetadata(values, errors);
   validateMainsVoltage(values, errors);
+  if (values.standby_power !== undefined && (values.standby_power === null || !Number.isFinite(values.standby_power) || values.standby_power < 0.05)) {
+    errors.standby_power = "Enter standby power of at least 0.05 W, or use an estimate.";
+  }
   const limits: Partial<Record<keyof ContributionPreviewRequest, number>> = {
-    manufacturer_name: 200, model_id: 120, product_name: 200, contributor: 200,
+    manufacturer_name: 200, model_id: MODEL_ID_MAX_LENGTH, product_name: 200, contributor: 200,
     contributor_github: 100, contributor_email: 200, product_url: 2000,
     measure_device: 200, measure_device_firmware: 200, measure_description: 2000, notes: 2000,
   };
@@ -24,8 +36,8 @@ export function validateMetadata(values: ContributionPreviewRequest): Record<str
     const value = values[name as keyof ContributionPreviewRequest];
     if (typeof value === "string" && value.length > limit) errors[name] = `Use ${limit} characters or fewer.`;
   }
-  if (values.model_id && !/^[A-Za-z0-9][A-Za-z0-9 ._()+-]*$/.test(values.model_id)) {
-    errors.model_id = "Start with a letter or number. Use only letters, numbers, spaces, dots, underscores, parentheses, + or -.";
+  if (values.model_id && !MODEL_ID_PATTERN.test(values.model_id)) {
+    errors.model_id = "Start with a letter or number. Use only letters, numbers, spaces, dots, underscores, parentheses, +, ! or -.";
   }
   if (values.product_url && !values.product_url.startsWith("https://")) errors.product_url = "Enter a URL starting with https://.";
   if (values.gtins?.some((value) => !/^(?:\d{8}|\d{12,14})$/.test(value))) {

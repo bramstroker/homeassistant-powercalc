@@ -1,5 +1,5 @@
-from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass, field
 import math
 from typing import Any, Protocol
 
@@ -18,7 +18,8 @@ from measure.controller.light.spec import (
     HueLightControllerSpec,
 )
 from measure.controller.media.spec import HassMediaControllerSpec
-from measure.home_assistant_entities import DeviceClass, EntityDomain
+from measure.controller.switch.spec import HassMultiSwitchControllerSpec, HassSwitchControllerSpec
+from measure.home_assistant.entities import DeviceClass, EntityDomain
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostic
 from measure.powermeter.spec import (
     DummyPowerMeterSpec,
@@ -27,17 +28,21 @@ from measure.powermeter.spec import (
     PowerMeterSpec,
     ShellyPowerMeterSpec,
 )
+from measure.profile.device_type import ProfileDeviceType
 from measure.request import (
     ChargingMeasurementRequest,
     DummyLoadCalibrationRequest,
     FanMeasurementRequest,
+    FixedMeasurementRequest,
     LightMeasurementRequest,
     MeasurementRequest,
     RecorderMeasurementRequest,
     RecorderProfileRecipe,
+    SmartSwitchMeasurementRequest,
     SpeakerMeasurementRequest,
 )
-from measure.runner.light_plan import build_light_plan, estimate_light_time_left
+from measure.runner.light.plan import build_light_plan, estimate_light_time_left
+from measure.runner.smart_switch import estimate_smart_switch_remaining_seconds
 
 
 class PreflightError(Exception):
@@ -51,8 +56,10 @@ class ActiveSessionError(PreflightError):
 class EntityRecord(Protocol):
     entity_id: str
     domain: str
-    device_class: DeviceClass | None
+    device_class: str | None
+    unit: str | None
     device_id: str | None
+    related_device_ids: list[str]
     state: str
     attribute_names: list[str]
     supported_modes: list[LutMode] | None
@@ -61,6 +68,8 @@ class EntityRecord(Protocol):
     max_mired: int | None
     model_id: str | None
     member_entity_ids: list[str]
+    disabled_by: str | None
+    has_live_state: bool
 
 
 EntityLoader = Callable[[EntityDomain | None, DeviceClass | None], Sequence[EntityRecord]]
@@ -69,10 +78,10 @@ AllEntityLoader = Callable[[], Sequence[EntityRecord]]
 
 @dataclass(frozen=True)
 class PreflightResult:
-    warnings: tuple[str, ...] = ()
+    warnings: list[str] = field(default_factory=list)
     estimated_variations: int | None = None
     estimated_duration_seconds: int | None = None
-    supported_modes: tuple[LutMode, ...] | None = None
+    supported_modes: list[LutMode] | None = None
     power_meter_diagnostic: PowerMeterDiagnostic | None = None
     battery_level_entity_id: str | None = None
     battery_level_attribute: str | None = None
@@ -87,71 +96,84 @@ MODEL_UNCONFIRMED_WARNING = (
 class LightSelection:
     """The lights one request drives, reduced to the capabilities they all share."""
 
-    lights: tuple[EntityRecord, ...]
+    lights: list[EntityRecord]
     supported_modes: set[LutMode]
     light_info: LightInfo
     effects: list[str]
 
 
-def _no_group_member_overlap(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_no_group_member_overlap(selection: LightSelection, _: LightMeasurementRequest) -> list[str]:
     """A group already drives its members, so selecting both would measure them twice."""
 
     members = {member for light in selection.lights for member in light.member_entity_ids}
     if members & {light.entity_id for light in selection.lights}:
         raise PreflightError("A light group and one of its members cannot both be selected")
-    return ()
+    return []
 
 
-def _count_covers_selection(selection: LightSelection, request: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_light_count(selection: LightSelection, request: LightMeasurementRequest) -> list[str]:
     """Measured power is divided by the count, so it cannot describe fewer lights than are driven."""
 
     if request.multiple_light_count < len(selection.lights):
         raise PreflightError("Number of lights cannot be lower than the number of selected lights")
-    return ()
+    return []
 
 
-def _models_agree(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_matching_models(selection: LightSelection, _: LightMeasurementRequest) -> list[str]:
     """One profile is produced for all lights, so they must be the same model."""
 
     models = {light.model_id for light in selection.lights}
     if len(models - {None}) > 1:
         raise PreflightError("Selected lights must have the same model ID")
     if len(selection.lights) > 1 and None in models:
-        return (MODEL_UNCONFIRMED_WARNING,)
-    return ()
+        return [MODEL_UNCONFIRMED_WARNING]
+    return []
 
 
-def _modes_supported(selection: LightSelection, request: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_supported_modes(selection: LightSelection, request: LightMeasurementRequest) -> list[str]:
     if not set(request.modes).issubset(selection.supported_modes):
         raise PreflightError("Selected light does not advertise every requested mode")
-    return ()
+    return []
 
 
-def _color_temp_range_overlaps(selection: LightSelection, _: LightMeasurementRequest) -> tuple[str, ...]:
+def _validate_color_temp_range(selection: LightSelection, _: LightMeasurementRequest) -> list[str]:
     if selection.light_info.min_mired > selection.light_info.max_mired:
         raise PreflightError("Selected lights do not share a color temperature range")
-    return ()
+    return []
 
 
-LightRule = Callable[[LightSelection, LightMeasurementRequest], tuple[str, ...]]
+LightRule = Callable[[LightSelection, LightMeasurementRequest], list[str]]
 
 #: Checks applied to a light selection, in order. Each returns warnings or raises a PreflightError,
 #: so a new condition is added here rather than by growing the caller.
 LIGHT_RULES: tuple[LightRule, ...] = (
-    _no_group_member_overlap,
-    _count_covers_selection,
-    _models_agree,
-    _modes_supported,
-    _color_temp_range_overlaps,
+    _validate_no_group_member_overlap,
+    _validate_light_count,
+    _validate_matching_models,
+    _validate_supported_modes,
+    _validate_color_temp_range,
 )
 
 
-def _light_info(light: EntityRecord) -> LightInfo:
+def _build_light_info(light: EntityRecord) -> LightInfo:
     return LightInfo(
         "unknown",
         min_mired=light.min_mired if light.min_mired is not None else MIN_MIRED,
         max_mired=light.max_mired if light.max_mired is not None else MAX_MIRED,
     )
+
+
+def _recorder_entity_problem(entity_id: str, all_entities: Mapping[str, EntityRecord]) -> str | None:
+    """Describe why an entity cannot be recorded, or None when it is usable."""
+
+    entity = all_entities.get(entity_id)
+    if entity is None:
+        return f"Selected recorder entity does not exist: {entity_id}"
+    if entity.disabled_by:
+        return f"Selected recorder entity is disabled: {entity_id}"
+    if not entity.has_live_state:
+        return f"Selected recorder entity has no live state: {entity_id}"
+    return None
 
 
 class MeasurementPreflight:
@@ -174,10 +196,19 @@ class MeasurementPreflight:
         self._diagnose_power_meter = diagnose_power_meter
         self._developer_mode = developer_mode
 
+    def validate_standby(self, request: MeasurementRequest) -> None:
+        """Check retry entities without LUT validation or switching any devices."""
+        self._validate_adapters(request)
+        self._validate_power_meter(request)
+        if isinstance(request.controller, HassLightControllerSpec | HassMultiLightControllerSpec):
+            self._resolve_lights(request.controller.entity_ids)
+
     def validate(self, request: MeasurementRequest) -> PreflightResult:
         """Return warnings and estimates, or raise a typed preflight error."""
 
         self._validate_adapters(request)
+        if request.parameters.allow_zero_power and not self._developer_mode:
+            raise PreflightError("Accepting 0 W readings requires developer mode")
         if self._has_active_session():
             raise ActiveSessionError("A measurement session is already active")
         try:
@@ -204,7 +235,7 @@ class MeasurementPreflight:
         diagnostic = self._collect_power_meter_diagnostic(request, diagnostic, warnings)
 
         return PreflightResult(
-            warnings=tuple(warnings),
+            warnings=warnings,
             estimated_variations=result.estimated_variations,
             estimated_duration_seconds=duration,
             supported_modes=result.supported_modes,
@@ -262,12 +293,17 @@ class MeasurementPreflight:
             | HassMultiLightControllerSpec
             | HassMediaControllerSpec
             | HassChargingControllerSpec
-            | HassFanControllerSpec,
+            | HassFanControllerSpec
+            | HassSwitchControllerSpec
+            | HassMultiSwitchControllerSpec,
         ):
             return
         if isinstance(controller, HueLightControllerSpec):
             raise PreflightError("Hue light controllers are not supported by the Home Assistant app")
-        raise PreflightError(f"{type(controller).__name__} is not supported by the Home Assistant app")
+        # Validated controller unions are exhausted above; retain a guard for future adapter types.
+        raise PreflightError(  # pragma: no cover
+            f"{type(controller).__name__} is not supported by the Home Assistant app"
+        )
 
     def _validate_power_meter(self, request: MeasurementRequest) -> None:
         power_meter = request.power_meter
@@ -301,13 +337,31 @@ class MeasurementPreflight:
         """Apply the check this request type declares; a type absent here drives nothing up front."""
 
         checks: dict[type[MeasurementRequest], Callable[[Any], PreflightResult]] = {
+            FixedMeasurementRequest: self._validate_fixed,
             SpeakerMeasurementRequest: self._validate_speaker,
             FanMeasurementRequest: self._validate_fan,
             ChargingMeasurementRequest: self._validate_charging,
             RecorderMeasurementRequest: self._validate_recorder,
+            SmartSwitchMeasurementRequest: self._validate_smart_switch,
         }
         check = checks.get(type(request))
         return PreflightResult() if check is None else check(request)
+
+    def _validate_fixed(self, request: FixedMeasurementRequest) -> PreflightResult:
+        if self._load_all_entities is None:
+            raise PreflightError("Home Assistant device metadata is unavailable")
+        entities = self._load_all_entities()
+        devices = {entity.device_id for entity in entities if entity.device_id}
+        if request.device_id not in devices:
+            raise PreflightError("Selected Home Assistant device no longer exists")
+        if isinstance(request.power_meter, HassPowerMeterSpec):
+            meter = next(
+                (entity for entity in entities if entity.entity_id == request.power_meter.entity_id),
+                None,
+            )
+            if meter is not None and meter.device_id == request.device_id:
+                raise PreflightError("Use an external power meter to measure the selected device's own consumption")
+        return PreflightResult(estimated_duration_seconds=request.duration)
 
     def _validate_recorder(self, request: RecorderMeasurementRequest) -> PreflightResult:
         if not request.recorded_entity_ids:
@@ -316,11 +370,23 @@ class MeasurementPreflight:
             raise PreflightError("Home Assistant entity metadata is unavailable")
 
         all_entities = {entity.entity_id: entity for entity in self._load_all_entities()}
-        if missing := [entity_id for entity_id in request.recorded_entity_ids if entity_id not in all_entities]:
-            raise PreflightError(f"Selected recorder entity does not exist: {missing[0]}")
+        required_ids = set(request.required_entity_ids)
+        warnings: list[str] = []
+        for entity_id in request.recorded_entity_ids:
+            problem = _recorder_entity_problem(entity_id, all_entities)
+            if problem is None:
+                continue
+            if entity_id in required_ids:
+                raise PreflightError(problem)
+            # The runner records a vanished optional entity as "unavailable" rather than ending
+            # the run, so this must not block record-more or resume on a stored request.
+            warnings.append(f"{problem}. It will be recorded as unavailable.")
+
+        self._validate_printer_primary(request, all_entities)
+        self._validate_generic_signals(request, all_entities)
 
         if request.profile_recipe != RecorderProfileRecipe.VACUUM_ROBOT:
-            return PreflightResult()
+            return PreflightResult(warnings=warnings)
 
         vacuums = {entity.entity_id: entity for entity in self._load_entities(EntityDomain.VACUUM, None)}
         vacuum = vacuums.get(request.vacuum_entity_id or "")
@@ -333,7 +399,30 @@ class MeasurementPreflight:
             raise PreflightError("Selected battery sensor is unavailable or not a numeric percentage")
         if vacuum.device_id is None or battery.device_id != vacuum.device_id:
             raise PreflightError("Battery sensor must belong to the same Home Assistant device as the vacuum")
-        return PreflightResult()
+        return PreflightResult(warnings=warnings)
+
+    @staticmethod
+    def _validate_printer_primary(request: RecorderMeasurementRequest, entities: dict[str, EntityRecord]) -> None:
+        if request.profile_device_type != ProfileDeviceType.PRINTER:
+            return
+        primary = entities.get(request.primary_entity_id or "")
+        if primary is not None and primary.unit:
+            raise PreflightError("A printer profile needs a sensor without a unit of measurement")
+
+    @staticmethod
+    def _validate_generic_signals(request: RecorderMeasurementRequest, entities: dict[str, EntityRecord]) -> None:
+        if request.profile_recipe != RecorderProfileRecipe.GENERIC or not request.tracked_entity_ids:
+            return
+        primary = entities.get(request.primary_entity_id or "")
+        if primary is None or primary.device_id is None:
+            raise PreflightError("Additional power signals require a primary entity with a Home Assistant device")
+        allowed_devices = {primary.device_id, *primary.related_device_ids}
+        for entity_id in request.tracked_entity_ids:
+            signal = entities.get(entity_id)
+            if signal is not None and signal.device_id not in allowed_devices:
+                raise PreflightError(
+                    f"Additional power signal {entity_id} must belong to the primary device or its parent or child"
+                )
 
     def _validate_speaker(self, request: SpeakerMeasurementRequest) -> PreflightResult:
         if isinstance(request.controller, HassMediaControllerSpec):
@@ -348,6 +437,29 @@ class MeasurementPreflight:
         if isinstance(request.controller, HassFanControllerSpec):
             self._require_entity(request.controller.entity_id, EntityDomain.FAN, "Selected fan is unavailable")
         return PreflightResult()
+
+    def _validate_smart_switch(self, request: SmartSwitchMeasurementRequest) -> PreflightResult:
+        """Require live relays on one device and an external measurement source."""
+
+        relays = [
+            self._require_entity(entity_id, EntityDomain.SWITCH, "Selected switch is unavailable")
+            for entity_id in request.controller.entity_ids
+        ]
+        device_id = relays[0].device_id
+        if device_id is None or any(relay.device_id != device_id for relay in relays):
+            raise PreflightError("All selected relays must belong to the same Home Assistant device")
+        if any(relay.state not in {"on", "off"} for relay in relays):
+            raise PreflightError("Every selected relay must have an on or off state")
+        if isinstance(request.power_meter, HassPowerMeterSpec):
+            meter = self._require_entity(
+                request.power_meter.entity_id, EntityDomain.SENSOR, "Power sensor is unavailable"
+            )
+            if meter.device_id == device_id:
+                raise PreflightError("Measure switch self consumption with an external power meter, not its own sensor")
+        return PreflightResult(
+            estimated_variations=request.repeat_cycles * (len(relays) + (2 if len(relays) > 1 else 1)),
+            estimated_duration_seconds=estimate_smart_switch_remaining_seconds(request, len(relays)),
+        )
 
     def _validate_charging(self, request: ChargingMeasurementRequest) -> PreflightResult:
         if not isinstance(request.controller, HassChargingControllerSpec):
@@ -399,17 +511,19 @@ class MeasurementPreflight:
     def _validate_light(self, request: LightMeasurementRequest) -> PreflightResult:
         if isinstance(request.controller, DummyLightControllerSpec):
             return self._estimate_dummy_light(request)
-        if not isinstance(request.controller, HassLightControllerSpec | HassMultiLightControllerSpec):
+        if not isinstance(  # pragma: no cover - other light adapters are rejected by _validate_adapters
+            request.controller, HassLightControllerSpec | HassMultiLightControllerSpec
+        ):
             raise PreflightError("Selected light entity is unavailable")
 
         selection = self._resolve_lights(request.controller.entity_ids)
-        warnings = tuple(warning for rule in LIGHT_RULES for warning in rule(selection, request))
+        warnings = [warning for rule in LIGHT_RULES for warning in rule(selection, request)]
         plan = build_light_plan(request.modes, request.parameters, selection.light_info, selection.effects)
         return PreflightResult(
             warnings=warnings,
             estimated_variations=plan.variation_count,
             estimated_duration_seconds=round(estimate_light_time_left(plan, request.parameters)),
-            supported_modes=tuple(sorted(selection.supported_modes, key=str)),
+            supported_modes=sorted(selection.supported_modes, key=str),
         )
 
     def _resolve_lights(self, entity_ids: Sequence[str]) -> LightSelection:
@@ -420,9 +534,9 @@ class MeasurementPreflight:
         if len(selected) != len(entity_ids):
             raise PreflightError("Selected light entity is unavailable")
         return LightSelection(
-            lights=tuple(selected),
+            lights=selected,
             supported_modes=set.intersection(*(set(light.supported_modes or []) for light in selected)),
-            light_info=merge_light_infos([_light_info(light) for light in selected]),
+            light_info=merge_light_infos([_build_light_info(light) for light in selected]),
             effects=common_effects([light.effect_list or [] for light in selected]),
         )
 
@@ -438,7 +552,7 @@ class MeasurementPreflight:
         return PreflightResult(
             estimated_variations=plan.variation_count,
             estimated_duration_seconds=round(estimate_light_time_left(plan, request.parameters)),
-            supported_modes=tuple(sorted(request.modes, key=str)),
+            supported_modes=sorted(request.modes, key=str),
         )
 
     def _require_entity(self, entity_id: str | None, domain: EntityDomain, message: str) -> EntityRecord:

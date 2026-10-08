@@ -20,6 +20,7 @@ export const measurementDefaults = { sleep_time: 1, sample_count: 5, sleep_time_
 export const defaultSettings: AppSettings = {
   default_power_entity_id: null, default_measure_device: null, power_meter: "hass", shelly_ip: null, kasa_ip: null,
   fast_test_mode: false,
+  allow_zero_power: false,
   measurement_defaults: measurementDefaults,
 };
 export const capabilities: Capabilities = {
@@ -59,6 +60,7 @@ export type SetupViewElement = HTMLElement & {
   dummyLoadCalibration: DummyLoadCalibration | null;
   selectedType: string;
   selectedEntities: Record<string, string[]>;
+  selectedEntityDeviceIds: Record<string, string>;
   multipleLights: boolean;
   meter: PowerMeterSpec;
   powerMeterConfigured: boolean;
@@ -102,7 +104,7 @@ export const lightDefinition: MeasureDefinition = {
   ],
   fields: [
     { name: "power_entity_id", role: "power_meter", label: "Power sensor", control: "entity", required: true, entity_domains: ["sensor"], options: [] },
-    { name: "light_entity_id", role: "controller", label: "Light", plural_label: "Lights", control: "entity", required: true, multiple: true, entity_domains: ["light"], options: [] },
+    { name: "light_entity_id", role: "controller", label: "Light", plural_label: "Lights", control: "entity", required: true, multiple: true, multiple_toggle: true, entity_domains: ["light"], options: [] },
     {
       name: "modes",
       role: "attribute",

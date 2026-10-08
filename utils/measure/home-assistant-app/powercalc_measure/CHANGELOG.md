@@ -2,6 +2,83 @@
 
 ## Unreleased
 
+## 0.12.0 - 2026-10-03
+
+### 🚀 Features
+
+- #4921 Improve measure app entity pickers and vacuum entity filtering @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4920 Improve Measure app log timestamps and health-check filtering @bramstroker
+
+## 0.11.0 - 2026-10-02
+
+### 🚀 Features
+
+- #4884 Extend recorder complex profiles to more device types @bramstroker
+- #4885 Choose device type before measurement method @bramstroker
+- #4888 Add automated smart switch measurement @bramstroker
+- #4896 Measure fixed self consumption for device profiles @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4892 Fix speaker measurements when turn-off is unsupported @bramstroker
+- #4914 Allow vacuum profile analysis from a single cycle @bramstroker
+
+## 0.10.0 - 2026-09-27
+
+- #4881 Centralize vacuum entity rules and expand integration mappings @bramstroker
+
+### 🚀 Features
+
+- #4880 Automatically select vacuum recording entities @bramstroker
+- #4882 Support portable Valetudo dock entity references @bramstroker
+
+## 0.9.0 - 2026-09-26
+
+- #4875 Improve analyser validation and simplify domain models @bramstroker
+
+### 🚀 Features
+
+- #4867 Add developer setting to accept 0 W readings @bramstroker
+- #4874 Analyse vacuum dock activities in the measure recorder @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4860 Call media_player.volume_mute for the muted speaker baseline @LaurensBot
+
+## 0.8.0 - 2026-09-26
+
+### 🚀 Features
+
+- #4826 Autofill device connectivity in PowerCalc Measure @bramstroker
+- #4827 Allow changing the setup when remeasuring standby @bramstroker
+- #4839 Exclude transient effect commands from Measure recordings @bramstroker
+- #4858 Store profile LUTs as plain CSV and compress on installation @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4818 Clarify measurement description and setup guidance @bramstroker
+- #4824 Warn when standby estimate metadata changes @bramstroker
+- #4828 Make standby calibration recoverable and tighten setup validation @bramstroker
+- #4850 Clarify vacuum measurement results and profile preparation @bramstroker
+
+## 0.7.1 - 2026-09-20
+
+- #4751 Tapo smart support @TheLexus
+- #4760 Rename profile EAN field to GTIN @bramstroker
+- #4790 Improve vacuum recording entity capture @bramstroker
+- #4796 Simplify measurement package layout and app routes @bramstroker
+- #4801 Extend measurement backend behavior coverage @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4780 Wait for Home Assistant entities after restart @bramstroker
+- #4781 Retry transient Shelly rate limits @bramstroker
+- #4806 Recover unavailable light standby measurements @bramstroker
+- #4813 Keep standby failures from discarding a finished session @bramstroker
+
 ## 0.7.0 - 2026-09-13
 
 - #4724 Clean up measure frontend components @bramstroker

@@ -37,7 +37,7 @@ ocr = [
 ]
 dev = [
     "httpx2>=0.1",
-    "mypy==2.3.1",
+    "mypy==2.4.0",
     "ruff>=0.2",
     "pytest>=8.3.3",
     "pytest-cov>=6.0"
@@ -65,3 +65,11 @@ include = ["measure*"]
 
 [tool.pytest.ini_options]
 pythonpath = "."
+filterwarnings = [
+    # Remove when Starlette's test client imports BlockingPortal from anyio.from_thread.
+    "ignore:The anyio\\.abc\\.BlockingPortal alias is deprecated, use anyio\\.from_thread\\.BlockingPortal instead\\.:DeprecationWarning:starlette.testclient",
+]
+
+[tool.coverage.run]
+# Temporary: restore coverage when the OCR implementation is replaced.
+omit = ["measure/ocr/*", "measure/powermeter/ocr.py"]

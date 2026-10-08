@@ -55,6 +55,49 @@ async def test_calculate_sum_without_off_power(hass: HomeAssistant) -> None:
     assert await strategy.calculate(State(switch2, STATE_OFF)) == Decimal("0.00")
 
 
+async def test_refreshes_switch_states_when_calculated_for_another_entity(hass: HomeAssistant) -> None:
+    """Switch state changes are picked up when multi-switch is used in a composite strategy."""
+    switch1 = "switch.test1"
+    switch2 = "switch.test2"
+    display = State("light.display", STATE_ON)
+    strategy = MultiSwitchStrategy(
+        hass,
+        [switch1, switch2],
+        on_power=Decimal("0.5"),
+        off_power=Decimal(0),
+    )
+
+    await set_states(hass, [(switch1, STATE_OFF), (switch2, STATE_OFF)])
+    assert await strategy.calculate(display) == Decimal("0.0")
+
+    await set_states(hass, [(switch1, STATE_ON)])
+    assert await strategy.calculate(display) == Decimal("0.5")
+
+    await set_states(hass, [(switch2, STATE_ON)])
+    assert await strategy.calculate(display) == Decimal("1.0")
+
+
+async def test_factory_preserves_zero_off_power(hass: HomeAssistant) -> None:
+    factory = PowerCalculatorStrategyFactory(hass)
+    source_entity = create_source_entity("switch.test1", hass)
+
+    strategy = await factory.create(
+        {
+            CONF_MULTI_SWITCH: {
+                CONF_POWER: 0.5,
+                CONF_POWER_OFF: 0,
+                CONF_ENTITIES: ["switch.test1"],
+            },
+        },
+        CalculationStrategy.MULTI_SWITCH,
+        None,
+        source_entity,
+    )
+
+    assert strategy.can_calculate_standby()
+    assert await strategy.calculate(State("switch.test1", STATE_OFF)) == Decimal(0)
+
+
 async def test_cover_entities(hass: HomeAssistant) -> None:
     cover1 = "cover.test1"
     cover2 = "cover.test2"

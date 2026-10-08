@@ -58,6 +58,8 @@ export interface ContributionDraft {
   voltage_range?: { min: number; max: number } | null;
   device_specs?: Record<string, unknown> | null;
   device_type?: string;
+  standby_power?: number | null;
+  standby_power_estimated?: boolean;
   measure_device?: string;
   measure_device_firmware?: string;
   measure_description?: string;
@@ -88,6 +90,8 @@ export interface ContributionPreviewRequest {
   product_url?: string;
   mains_voltage?: number | null;
   device_specs?: Record<string, unknown> | null;
+  standby_power?: number | null;
+  standby_power_estimated?: boolean;
   measure_device?: string;
   measure_device_firmware?: string;
   measure_description?: string;
@@ -95,6 +99,11 @@ export interface ContributionPreviewRequest {
 }
 
 export interface ContributionPreview extends ContributionDraft { warnings: string[]; }
+export interface StandbyEstimate {
+  power_w: number;
+  basis: "manufacturer" | "connectivity" | "fallback";
+  profile_count: number;
+}
 export interface ContributionSubmitRequest extends ContributionPreviewRequest { confirmed: true; }
 
 export interface ContributionResult {

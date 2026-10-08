@@ -1,7 +1,7 @@
 from homeassistant_api import State
 
 from measure.controller.errors import ApiConnectionError, ControllerError
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 
 
 class HassControllerBase:

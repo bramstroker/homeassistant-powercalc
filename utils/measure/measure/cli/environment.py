@@ -280,6 +280,11 @@ class CliEnvironment:
         return False
 
     @property
+    def allow_zero_power(self) -> bool:
+        """Accepting 0 W readings is controlled by the developer-only app setting."""
+        return False
+
+    @property
     def sample_count(self) -> int:
         if self.selected_power_meter == PowerMeterType.MANUAL:
             return 1

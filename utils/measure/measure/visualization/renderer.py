@@ -2,8 +2,8 @@ from pathlib import Path
 import textwrap
 from typing import Any
 
-from measure.visualization.core import PlotKind, PlotSeries, PlotSpec
 from measure.visualization.diagram import CompositeDiagramSpec, CompositeMode
+from measure.visualization.models import PlotKind, PlotSeries, PlotSpec
 
 _DEFAULT_COLOR = "#5488e8"
 

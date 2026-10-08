@@ -28,6 +28,7 @@
     "GLD130P3HA"
   ],
   "standby_power": 0.7,
+  "standby_power_estimated": true,
   "authors": [
     {
       "name": "Daniel O'Connor",

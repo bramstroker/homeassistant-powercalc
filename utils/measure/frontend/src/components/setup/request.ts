@@ -2,11 +2,13 @@ import { isMeasurementRequest } from "../../api-decoders";
 import { formText } from "../../utils/form";
 import {
   buildMeasurementRequest,
+  deviceLabel,
   entityDomain,
   entityDomains,
   narrowingField,
 } from "../../measurement/definition";
 import { meterFor } from "../../power-meter/registry";
+import { isValidModelId } from "../profile/validation";
 import type {
   Capabilities,
   DummyLoadCalibration,
@@ -77,6 +79,18 @@ export function prepareRequest(options: RequestOptions): RequestResult {
 function profileDefaults(options: RequestOptions): { model_id: string; product_name: string; session_name: string } {
   const empty = { model_id: "", product_name: "", session_name: "" };
   if (options.dummyController) return empty;
+  const deviceField = options.definition.fields.find((field) => field.control === "device");
+  if (deviceField) {
+    const deviceId = formText(options.form, deviceField.name);
+    const entity = options.entities.find((candidate) => candidate.device_id === deviceId);
+    if (!entity) return empty;
+    const modelId = entity.model_id ?? "";
+    return {
+      model_id: isValidModelId(modelId) ? modelId : "",
+      product_name: entity.product_name ?? "",
+      session_name: deviceLabel(entity),
+    };
+  }
   const controller = options.definition.fields.find((field) => field.role === "controller");
   if (!controller) return empty;
   const ids = options.form.getAll(controller.name).map(String).filter(Boolean);
@@ -88,7 +102,7 @@ function profileDefaults(options: RequestOptions): { model_id: string; product_n
   const modelId = shared("model_id");
   return {
     // An HA model ID can contain characters not allowed in an export path.
-    model_id: modelId.length <= 120 && /^[A-Za-z0-9][A-Za-z0-9 ._()+-]*$/.test(modelId) ? modelId : "",
+    model_id: isValidModelId(modelId) ? modelId : "",
     product_name: shared("product_name"),
     session_name: selected.map((entity, index) => entity?.name || ids[index]).join(", ").slice(0, 200),
   };
@@ -101,6 +115,8 @@ function previousRequest(
 ): MeasurementRequest | undefined {
   if (initial?.measure_type !== definition.measure_type) return undefined;
   if (JSON.stringify(initial.controller) !== JSON.stringify(request.controller)) return undefined;
+  if (initial.measure_type === "fixed" && request.measure_type === "fixed"
+    && initial.device_id !== request.device_id) return undefined;
   return initial;
 }
 

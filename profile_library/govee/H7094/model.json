@@ -1,0 +1,38 @@
+{
+  "authors": [
+    {
+      "name": "Vincent",
+      "github": "vinceke44"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-09-12T21:58:31Z",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "bluetooth",
+      "matter"
+    ],
+    "form_factor": "fixture",
+    "lumens": 2800,
+    "rated_power": 48,
+    "socket": "integrated"
+  },
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.6.0:cli"
+  },
+  "name": "Outdoor Spotlights 2 (4-pack)",
+  "product_url": "https://eu.govee.com/products/govee-outdoor-spotlights-2",
+  "standby_power": 0.7,
+  "voltage_range": {
+    "max": 234.3,
+    "min": 221.4
+  }
+}

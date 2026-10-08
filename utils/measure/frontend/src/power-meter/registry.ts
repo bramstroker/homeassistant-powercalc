@@ -114,7 +114,7 @@ export const POWER_METERS: { [T in PowerMeterType]: PowerMeterDescriptor<T> } = 
 
   kasa: {
     type: "kasa",
-    label: "Kasa smart plug",
+    label: "TP-Link Kasa / Tapo plug",
     validatable: true,
     discoverable: false,
     supportsDummyLoad: true,
@@ -123,7 +123,7 @@ export const POWER_METERS: { [T in PowerMeterType]: PowerMeterDescriptor<T> } = 
     settingsFromForm: (form) => ({ kasa_ip: formTextOrNull(form, "kasa_ip") }),
     isAddressed: (spec) => Boolean(spec.device_ip),
     hasVoltageReading: () => true,
-    describe: (spec) => ({ source: "Kasa power meter", detail: spec.device_ip }),
+    describe: (spec) => ({ source: "TP-Link Kasa / Tapo power meter", detail: spec.device_ip }),
   },
 
   dummy: {

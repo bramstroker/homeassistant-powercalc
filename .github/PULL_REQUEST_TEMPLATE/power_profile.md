@@ -22,7 +22,7 @@
 - [ ] The model name does not repeat the manufacturer name.
 - [ ] I have checked existing profiles for this manufacturer for consistent naming and metadata.
 - [ ] I have reused the existing `measure_device` value when my measurement device is already in the library.
-- [ ] For lights - I have only included the gzipped files (*.gz), not the raw CSV files.
+- [ ] For lights - I have included plain CSV files, not gzipped files (*.gz).
 - [ ] For lights - I have provided a CSV file per supported color mode. Look that up in Developer Tools -> States
 
 ## Additional info

@@ -8,6 +8,7 @@ from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITY_ID,
     CONF_NAME,
+    CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
     EntityCategory,
     UnitOfEnergy,
@@ -15,6 +16,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.exceptions import TemplateError
+from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.typing import ConfigType
 import pytest
 from pytest_homeassistant_custom_component.common import (
@@ -563,6 +565,25 @@ async def test_entity_category(hass: HomeAssistant) -> None:
     )
 
     assert hass.states.get("sensor.test_energy")
+
+
+async def test_entity_category_from_yaml(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:
+    """A category set on a YAML sensor is a plain string, which should still be accepted."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_UNIQUE_ID: "daily_test",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 12,
+            },
+            CONF_ENERGY_SENSOR_CATEGORY: "diagnostic",
+        },
+    )
+
+    energy_entry = entity_registry.async_get("sensor.test_energy")
+    assert energy_entry
+    assert energy_entry.entity_category == EntityCategory.DIAGNOSTIC
 
 
 async def _trigger_periodic_update(

@@ -1,6 +1,8 @@
 import asyncio
 from collections.abc import Callable, Coroutine
+from dataclasses import dataclass
 from functools import partial
+import gzip
 import json
 from json import JSONDecodeError
 import logging
@@ -28,6 +30,7 @@ from custom_components.powercalc.helpers import async_cache, clear_async_cache
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.profile_cache import (
     InstalledProfile,
+    compress_installed_profile_csv_files,
     create_staging_directory,
     install_profile,
     read_installed_profile,
@@ -56,6 +59,15 @@ MAX_LIBRARY_SIZE = 10 * 1024 * 1024
 MAX_PROFILE_RESOURCES = 256
 MAX_PROFILE_DOWNLOAD_SIZE = 25 * 1024 * 1024
 DOWNLOAD_CHUNK_SIZE = 64 * 1024
+
+
+@dataclass(frozen=True)
+class RemoteResource:
+    """A validated remote resource and its normalized local destination."""
+
+    url: str
+    destination: Path
+    compress: bool
 
 
 def _is_library_repository_url(parsed_url: SplitResult) -> bool:
@@ -173,7 +185,7 @@ def _resolve_resource_path(storage_path: str, resource_path: object) -> Path:
     return destination
 
 
-def _validate_resources(resources: object, storage_path: str) -> list[tuple[str, Path]]:
+def _validate_resources(resources: object, storage_path: str) -> list[RemoteResource]:
     """Validate all resources in a remote profile response."""
     if not isinstance(resources, list) or not all(isinstance(resource, dict) for resource in resources):
         raise ProfileDownloadError("Remote profile response contains invalid resources")
@@ -182,16 +194,35 @@ def _validate_resources(resources: object, storage_path: str) -> list[tuple[str,
             f"Remote profile contains more than the maximum of {MAX_PROFILE_RESOURCES} resources",
         )
 
-    return [
-        (_validate_resource_url(resource.get("url")), _resolve_resource_path(storage_path, resource.get("path")))
-        for resource in resources
-    ]
+    resources_by_destination: dict[Path, RemoteResource] = {}
+    for resource in resources:
+        destination = _resolve_resource_path(storage_path, resource.get("path"))
+        compress = destination.suffix == ".csv"
+        if compress:
+            destination = destination.with_name(f"{destination.name}.gz")
+
+        validated_resource = RemoteResource(
+            url=_validate_resource_url(resource.get("url")),
+            destination=destination,
+            compress=compress,
+        )
+        existing_resource = resources_by_destination.get(destination)
+        if existing_resource is not None and existing_resource.compress == compress:
+            raise ProfileDownloadError(f"Remote profile contains duplicate resource path: {destination.name}")
+        if existing_resource is None or existing_resource.compress:
+            resources_by_destination[destination] = validated_resource
+
+    return list(resources_by_destination.values())
 
 
-def _save_resources(resources: list[tuple[bytes, Path]]) -> None:
+def _save_resources(resources: list[tuple[bytes, RemoteResource]]) -> None:
     """Save all downloaded resources after every response has completed successfully."""
-    for data, path in resources:
-        save_resource(data, path)
+    prepared_resources = [
+        (gzip.compress(data, mtime=0) if resource.compress else data, resource.destination)
+        for data, resource in resources
+    ]
+    for data, destination in prepared_resources:
+        save_resource(data, destination)
 
 
 class LibraryModel(TypedDict):
@@ -269,7 +300,7 @@ class RemoteLoader(Loader):
             if (manufacturer, model) not in models:
                 continue
             key = f"{manufacturer}/{model}"
-            profile = read_installed_profile(
+            profile = self._read_and_compress_installed_profile(
                 Path(self.get_storage_path(manufacturer, model)),
                 model,
                 self.profile_hashes.get(key),
@@ -277,6 +308,23 @@ class RemoteLoader(Loader):
             )
             if profile is not None:
                 installed[key] = profile
+        return installed
+
+    @staticmethod
+    def _read_and_compress_installed_profile(
+        storage: Path,
+        model_id: str,
+        legacy_hash: str | None,
+        version: AwesomeVersion,
+    ) -> InstalledProfile | None:
+        """Read an installed profile and migrate its plain CSV resources to gzip."""
+        installed = read_installed_profile(storage, model_id, legacy_hash, version)
+        if installed is None:
+            return None
+        try:
+            compress_installed_profile_csv_files(installed)
+        except (OSError, ValueError, KeyError, TypeError, JSONDecodeError) as err:
+            _LOGGER.warning("Could not compress cached CSV files for %s: %s", storage, err)
         return installed
 
     def get_discovery_low_priority_domains(self) -> set[str]:
@@ -566,7 +614,7 @@ class RemoteLoader(Loader):
             raise LibraryLoadingError(f"Profile {key} requires Powercalc {model_info['min_version']}")
         storage_path = self.get_storage_path(manufacturer, model)
         installed = await self.hass.async_add_executor_job(
-            read_installed_profile,
+            self._read_and_compress_installed_profile,
             Path(storage_path),
             model,
             self.profile_hashes.get(key),
@@ -713,12 +761,12 @@ class RemoteLoader(Loader):
                 await self.hass.async_add_executor_job(lambda: os.makedirs(storage_path, exist_ok=True))
 
                 # Download the files
-                downloaded_resources: list[tuple[bytes, Path]] = []
+                downloaded_resources: list[tuple[bytes, RemoteResource]] = []
                 downloaded_size = 0
-                for url, destination in validated_resources:
-                    async with session.get(url, allow_redirects=False) as resp:
+                for resource in validated_resources:
+                    async with session.get(resource.url, allow_redirects=False) as resp:
                         if resp.status != 200:
-                            raise ProfileDownloadError(f"Failed to download github URL: {url}")
+                            raise ProfileDownloadError(f"Failed to download github URL: {resource.url}")
 
                         remaining_size = MAX_PROFILE_DOWNLOAD_SIZE - downloaded_size
                         if remaining_size <= 0:
@@ -729,7 +777,7 @@ class RemoteLoader(Loader):
                             contents = await _read_capped(
                                 resp,
                                 min(MAX_RESOURCE_SIZE, remaining_size),
-                                f"Remote profile resource {url}",
+                                f"Remote profile resource {resource.url}",
                             )
                         except ProfileDownloadError as err:
                             if remaining_size < MAX_RESOURCE_SIZE:
@@ -738,7 +786,7 @@ class RemoteLoader(Loader):
                                 ) from err
                             raise
                         downloaded_size += len(contents)
-                        downloaded_resources.append((contents, destination))
+                        downloaded_resources.append((contents, resource))
 
                 await self.hass.async_add_executor_job(_save_resources, downloaded_resources)
         except (TimeoutError, aiohttp.ClientError) as e:

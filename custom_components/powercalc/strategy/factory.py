@@ -6,9 +6,8 @@ from homeassistant.const import CONF_CONDITION, CONF_CONDITIONS, CONF_ENTITIES, 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import condition
 from homeassistant.helpers.singleton import singleton
-from homeassistant.helpers.template import Template
+from homeassistant.helpers.template import Template, is_template_string
 from homeassistant.helpers.typing import ConfigType
-import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.const import (
@@ -34,6 +33,7 @@ from custom_components.powercalc.errors import (
     UnsupportedStrategyError,
 )
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
+from custom_components.powercalc.validation import vol
 
 from .composite import (
     COMPOUND_CONDITIONS,
@@ -300,7 +300,11 @@ class PowerCalculatorStrategyFactory:
     def _create_multi_switch(self, config: ConfigType, power_profile: PowerProfile | None) -> MultiSwitchStrategy:
         """Create instance of multi switch strategy."""
         multi_switch_config: ConfigType = {}
-        if power_profile and power_profile.multi_switch_config:
+        if (
+            power_profile
+            and power_profile.is_strategy_supported(CalculationStrategy.MULTI_SWITCH)
+            and power_profile.multi_switch_config
+        ):
             # Copy to avoid mutating the (potentially cached) profile config with the user's config below.
             multi_switch_config = dict(power_profile.multi_switch_config)
         multi_switch_config.update(config.get(CONF_MULTI_SWITCH, {}))
@@ -319,7 +323,7 @@ class PowerCalculatorStrategyFactory:
             self._hass,
             entities,
             on_power=Decimal(on_power),
-            off_power=Decimal(off_power) if off_power else None,
+            off_power=Decimal(off_power) if off_power is not None else None,
         )
 
     def _resolve_template(self, value: Any) -> Any:  # noqa: ANN401
@@ -327,7 +331,7 @@ class PowerCalculatorStrategyFactory:
         Process the input to ensure it is a Template if applicable.
         Otherwise, return the original value.
         """
-        if isinstance(value, str) and value.startswith("{{"):
+        if isinstance(value, str) and is_template_string(value):
             return Template(value, self._hass)
         if isinstance(value, Template):
             value.hass = self._hass

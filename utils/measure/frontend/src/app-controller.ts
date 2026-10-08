@@ -3,6 +3,7 @@ import type { MeasureApiClient } from "./api-client";
 import { AuthController } from "./contribution/auth";
 import { entityDomains, requestFormData } from "./measurement/definition";
 import { meterFor } from "./power-meter/registry";
+import { hasModelArtifact } from "./utils/artifacts";
 import { emptyPlots } from "./types";
 import type {
   AppSettings,
@@ -18,6 +19,8 @@ import type {
   ContributionStatus,
   ContributionSubmitRequest,
   DummyLoadCalibration,
+  CalibrationJob,
+  LightMeasurementRequest,
   DeviceSpecificationField,
   EntityDescriptor,
   ErrorHelp,
@@ -46,6 +49,10 @@ export interface MeasureAppState {
   errorMessage: string;
   errorHelp?: ErrorHelp;
   busy: boolean;
+  /** A setup recheck shares the busy flag but must not read as starting a session. */
+  rechecking?: boolean;
+  /** The shown preflight result predates a failed recheck, so it may no longer hold. */
+  preflightStale?: boolean;
   lastAnalysedSessionId?: string;
   connectedToEvents: boolean;
   snapshot?: SessionSnapshot;
@@ -114,6 +121,10 @@ interface EventCallbacks {
 }
 
 type EventConnectionFactory = (sessionId: string, callbacks: EventCallbacks) => EventConnection;
+type Wait = (delayMs: number) => Promise<void>;
+
+const ENTITY_CATALOG_RETRY_DELAY_MS = 1_000;
+const wait: Wait = (delayMs) => new Promise((resolve) => setTimeout(resolve, delayMs));
 
 /** Framework-neutral application controller. Lit only observes the state mutations. */
 export class MeasureAppController {
@@ -129,6 +140,7 @@ export class MeasureAppController {
     private readonly api: () => MeasureAppApi,
     private readonly createEventConnection: EventConnectionFactory,
     private readonly changed: () => void,
+    private readonly waitForRetry: Wait = wait,
   ) {
     this.contributionAuthController = new AuthController(state, api, changed);
   }
@@ -158,7 +170,7 @@ export class MeasureAppController {
       const calibrationPromise = this.refreshDummyLoadCalibration();
       const [capabilities, entities, settings, auth, sessions, definitions] = await Promise.all([
         api.getCapabilities(),
-        api.getEntityCatalog(),
+        this.loadEntityCatalogWhenReady(api),
         api.getSettings(),
         api.getContributionAuth().catch(() => ({ connected: false }) satisfies ContributionAuthState),
         api.getSessions(),
@@ -184,6 +196,15 @@ export class MeasureAppController {
     this.changed();
   }
 
+  private async loadEntityCatalogWhenReady(api: MeasureAppApi) {
+    let catalog = await api.getEntityCatalog();
+    while (!catalog.home_assistant_ready) {
+      await this.waitForRetry(ENTITY_CATALOG_RETRY_DELAY_MS);
+      catalog = await api.getEntityCatalog();
+    }
+    return catalog;
+  }
+
   selectMeasureType(type: MeasureType): void {
     this.state.selectedMeasureType = type;
     this.changed();
@@ -198,8 +219,22 @@ export class MeasureAppController {
     this.state.request = request;
     await this.run(async () => {
       this.state.preflight = await this.api().preflight(request);
+      this.state.preflightStale = false;
       this.state.view = "review";
     });
+  }
+
+  async recheckSetup(): Promise<void> {
+    const request = this.state.request;
+    if (!request) return;
+    this.state.rechecking = true;
+    this.state.preflightStale = true;
+    await this.run(async () => {
+      this.state.preflight = await this.api().preflight(request, true);
+      this.state.preflightStale = false;
+    });
+    this.state.rechecking = false;
+    this.changed();
   }
 
   backToSetup(): void {
@@ -253,6 +288,18 @@ export class MeasureAppController {
     });
   }
 
+  async recordMore(): Promise<void> {
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) return;
+    await this.run(async () => {
+      this.state.snapshot = await this.api().recordMore(sessionId);
+      this.state.samples = [];
+      this.state.plotCollection = emptyPlots();
+      this.state.lastAnalysedSessionId = undefined;
+      await this.enterRunning();
+    });
+  }
+
   newMeasurement(): void {
     this.resetDraft();
     this.state.view = "setup";
@@ -260,7 +307,7 @@ export class MeasureAppController {
   }
 
   openProfile(): void {
-    if (this.state.snapshot?.state !== "completed" || this.isAverageMeasurement()) return;
+    if (this.state.busy || this.state.snapshot?.state !== "completed" || this.isAverageMeasurement() || !hasModelArtifact(this.state.files)) return;
     this.clearError();
     this.state.view = "profile";
     this.changed();
@@ -517,6 +564,19 @@ export class MeasureAppController {
     });
   }
 
+  async calibrateStandby(sessionId: string, setup: LightMeasurementRequest): Promise<CalibrationJob> {
+    return this.api().calibrateStandby(sessionId, setup);
+  }
+
+  async getStandbyCalibration(sessionId: string): Promise<CalibrationJob | null> {
+    const job = await this.api().getStandbyCalibration(sessionId);
+    if (job?.status === "completed") {
+      await this.refreshDummyLoadCalibration();
+      this.changed();
+    }
+    return job;
+  }
+
   async retryDummyLoadCalibration(): Promise<void> {
     await this.refreshDummyLoadCalibration();
     this.changed();
@@ -614,6 +674,7 @@ export class MeasureAppController {
     this.state.connectedToEvents = false;
     if (this.state.view === "settings") this.settingsReturnView = "result";
     else this.state.view = "result";
+    this.state.files = [];
     await this.loadResultArtifacts();
     await this.refreshSessions();
     this.changed();

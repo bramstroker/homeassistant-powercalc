@@ -4,30 +4,29 @@ from typing import Any
 import inquirer
 from inquirer.questions import Question
 
-from measure.const import QUESTION_DUMMY_LOAD, QUESTION_ENTITY_ID, QUESTION_GENERATE_MODEL_JSON
+from measure.cli.const import (
+    QUESTION_CHARGING_DEVICE_TYPE,
+    QUESTION_DISABLE_STREAMING,
+    QUESTION_DUMMY_LOAD,
+    QUESTION_DURATION,
+    QUESTION_ENTITY_ID,
+    QUESTION_GENERATE_MODEL_JSON,
+    QUESTION_GZIP,
+    QUESTION_MODE,
+    QUESTION_MULTIPLE_LIGHTS,
+    QUESTION_NUM_LIGHTS,
+    QUESTION_POWERMETER_ENTITY_ID,
+    QUESTION_VOLTAGEMETER_ENTITY_ID,
+)
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.spec import charging_entity_domain
 from measure.controller.light.const import LutMode
-from measure.home_assistant_entities import (
+from measure.home_assistant.entities import (
     DeviceClass,
     EntityDescriptor,
     EntityDomain,
     HomeAssistantEntityCatalog,
 )
-from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID
-from measure.runner.const import (
-    QUESTION_CHARGING_DEVICE_TYPE,
-    QUESTION_DISABLE_STREAMING,
-    QUESTION_DURATION,
-    QUESTION_GZIP,
-    QUESTION_MODE,
-    QUESTION_MULTIPLE_LIGHTS,
-    QUESTION_NUM_LIGHTS,
-)
-
-
-def _not_empty(_: Any, current: str) -> bool:  # noqa: ANN401
-    return bool(current.strip())
 
 
 def _positive_number(_: Any, current: str) -> bool:  # noqa: ANN401
@@ -139,6 +138,23 @@ def hass_fan_controller_questions(entity_catalog: HomeAssistantEntityCatalog) ->
     ]
 
 
+def smart_switch_questions(entity_catalog: HomeAssistantEntityCatalog) -> list[Question]:
+    """Select all relays of one device and describe its internal meter explicitly."""
+
+    return [
+        inquirer.Checkbox(
+            name="switch_entity_ids",
+            message="Select the switch relays to measure (all from one device)",
+            choices=_entity_choices(entity_catalog.load_snapshot().select(domain=EntityDomain.SWITCH)),
+        ),
+        inquirer.Confirm(
+            name="power_monitoring",
+            message="Does the smart switch have built-in power monitoring?",
+            default=False,
+        ),
+    ]
+
+
 def hass_light_controller_questions(entity_catalog: HomeAssistantEntityCatalog) -> list[Question]:
     return [
         inquirer.List(
@@ -185,7 +201,7 @@ def hass_power_meter_questions(entity_catalog: HomeAssistantEntityCatalog) -> li
         if not power_entity:
             return None
         if power_entity not in related_voltage:
-            related_voltage[power_entity] = entity_catalog.load_snapshot().related_entity_id(
+            related_voltage[power_entity] = entity_catalog.load_snapshot().find_related_entity_id(
                 power_entity,
                 DeviceClass.VOLTAGE,
             )

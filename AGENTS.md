@@ -18,6 +18,39 @@ messages, for example: `refactor: simplify discovery flow`.
 Write PR titles as concise, human-readable titles without Conventional Commit
 prefixes such as `feat:` or `fix:`.
 
+## Python conventions
+
+- Write for human contributors: prefer readability over cleverness. Use
+  straightforward loops, named intermediate values, and explicit conditions;
+  comprehensions are fine when easy to read.
+- Use verbs in function names when they clarify intent: `create_runner`,
+  `filter_attributes`, or `calculate_metrics`. Use `is_`, `has_`, or `can_` for
+  boolean checks, such as `is_recordable` and `has_average_converged`. Keep
+  properties as nouns, and name side-effecting functions to reflect their actions.
+- Prefer lists over tuples for collections and return values. Use tuples only
+  when immutability is required; prefer a dataclass for structured results with
+  named fields over positional tuples.
+- Prefer enums for named states and choices, and dataclasses for structured data
+  when they make intent clearer and improve type safety.
+- Add a short docstring when it clarifies a function's intent. Skip docstrings
+  for tiny, self-explanatory functions. Keep descriptions to one or two sentences;
+  if explaining a function takes a long story, consider splitting it up.
+- Keep control flow simple with early returns for invalid or exceptional cases.
+  Keep functions focused without scattering simple logic across tiny helpers.
+- Separate calculations and validation from external I/O and UI handling. Pass
+  dependencies explicitly; use small protocols where interchangeable
+  implementations benefit from them, not for speculative abstraction.
+- Annotate function inputs and outputs with specific types rather than `Any`
+  where practical. Reuse existing domain models and constants.
+- Catch specific exceptions where they can be handled meaningfully. Include
+  useful context and preserve the original exception when translating errors;
+  avoid silently hiding failures.
+- Test observable behaviour with realistic inputs, edge cases, and failure paths.
+  Assert results and effects rather than private implementation details or
+  package structure.
+
+These conventions should clarify simple code, not make it more elaborate.
+
 ## Change-specific rules
 
 ### Translations

@@ -15,9 +15,15 @@ export interface EntityDescriptor {
   entity_id: string;
   name: string;
   domain?: string;
-  device_class?: DeviceClass | null;
+  device_class?: string | null;
   device_id?: string | null;
+  device_name?: string | null;
+  related_device_ids?: string[];
   integration?: string | null;
+  connectivity?: "zigbee" | "zwave" | null;
+  translation_key?: string | null;
+  disabled_by?: string | null;
+  has_live_state?: boolean;
   manufacturer?: string | null;
   model_id?: string | null;
   product_name?: string | null;
@@ -30,9 +36,12 @@ export interface EntityDescriptor {
   max_mired?: number | null;
   related_voltage_entity_id?: string | null;
   member_entity_ids?: string[];
+  suggested_recording_entity_ids?: string[];
+  disabled_recording_entity_ids?: string[];
 }
 
 export interface EntityCatalog {
+  home_assistant_ready: boolean;
   lights: EntityDescriptor[];
   powers: EntityDescriptor[];
   voltages: EntityDescriptor[];
@@ -90,7 +99,7 @@ export interface Capabilities {
   fast_test_mode?: boolean;
 }
 
-export type MeasureType = "light" | "speaker" | "recorder" | "average" | "charging" | "fan";
+export type MeasureType = "light" | "speaker" | "recorder" | "average" | "fixed" | "charging" | "fan" | "smart_switch";
 
 /** A plain value as it travels between the app and the API: form field values, device info, metadata. */
 export type PrimitiveValue = string | number | boolean | null;
@@ -102,6 +111,7 @@ export interface FormFieldOption {
   value: string;
   label: string;
   entity_domain?: string | null;
+  entity_domains?: string[];
   /** Measurement parameters that only apply while this option is selected. */
   enables?: string[];
   description?: string;
@@ -111,7 +121,7 @@ export interface FormFieldOption {
 export interface FormField {
   name: string;
   label: string;
-  control: "entity" | "number" | "text" | "boolean" | "select" | "multi_select";
+  control: "entity" | "device" | "number" | "text" | "boolean" | "select" | "multi_select";
   role: FieldRole;
   /** Controller field whose selected entity limits this field's options to what it supports. */
   narrowed_by?: string | null;
@@ -123,6 +133,10 @@ export interface FormField {
   maximum?: number | null;
   /** Whether several entities can be selected for this field at once. */
   multiple?: boolean;
+  /** Whether a separate toggle switches between one and several selected entities. */
+  multiple_toggle?: boolean;
+  /** Require a Home Assistant device choice before listing this field's entities. */
+  group_by_device?: boolean;
   /** Label to use while several entities are selected. */
   plural_label?: string;
   /** Entity field whose number of selected entities this count follows by default. */
@@ -157,8 +171,14 @@ export interface MeasureDefinition {
   parameters: MeasureParameter[];
   supports_profile: boolean;
   supports_resume: boolean;
+  supports_dummy_controller?: boolean;
   confirmation_action?: string | null;
   confirmation_is_warning?: boolean;
+  confirmation_guidance?: string[];
+  confirmation_eyebrow?: string;
+  confirmation_title?: string;
+  confirmation_guidance_title?: string;
+  confirmation_guidance_label?: string;
   /** Placeholders shown in the profile fields, to steer the naming this type expects. */
   model_id_example: string;
   product_name_example: string;
@@ -208,6 +228,7 @@ export type LightControllerSpec =
 export type MediaControllerSpec = { type: "dummy" } | { type: "hass"; entity_id: string };
 export type ChargingControllerSpec = { type: "dummy" } | { type: "hass"; entity_id: string };
 export type FanControllerSpec = { type: "dummy" } | { type: "hass"; entity_id: string };
+export type SwitchControllerSpec = { type: "hass"; entity_id: string } | { type: "hass_multi"; entity_ids: string[] };
 
 export interface LightMeasurementRequest extends BaseMeasurementRequest {
   measure_type: "light";
@@ -218,11 +239,20 @@ export interface LightMeasurementRequest extends BaseMeasurementRequest {
 }
 
 export interface AverageMeasurementRequest extends BaseMeasurementRequest { measure_type: "average"; controller?: null; duration: number; }
+export interface FixedMeasurementRequest extends BaseMeasurementRequest {
+  measure_type: "fixed";
+  controller?: null;
+  device_id: string;
+  profile_device_type: "network" | "power_meter" | "generic_iot";
+  duration: number;
+}
 export interface RecorderMeasurementRequest extends BaseMeasurementRequest {
   measure_type: "recorder";
   controller?: null;
   recorder_purpose: "playbook" | "complex_profile";
   profile_recipe?: "generic" | "vacuum_robot" | null;
+  primary_entity_id?: string | null;
+  profile_device_type?: string | null;
   tracked_entity_ids?: string[];
   vacuum_entity_id?: string | null;
   battery_entity_id?: string | null;
@@ -232,11 +262,38 @@ export interface RecorderMeasurementRequest extends BaseMeasurementRequest {
 export interface SpeakerMeasurementRequest extends BaseMeasurementRequest { measure_type: "speaker"; controller: MediaControllerSpec; disable_streaming: boolean; }
 export interface ChargingMeasurementRequest extends BaseMeasurementRequest { measure_type: "charging"; controller: ChargingControllerSpec; charging_device_type: ChargingDeviceType; }
 export interface FanMeasurementRequest extends BaseMeasurementRequest { measure_type: "fan"; controller: FanControllerSpec; }
+export interface SmartSwitchMeasurementRequest extends BaseMeasurementRequest {
+  measure_type: "smart_switch";
+  controller: SwitchControllerSpec;
+  power_monitoring: boolean;
+  samples_per_state: number;
+  repeat_cycles: number;
+  settle_seconds: number;
+}
 
 export type MeasurementRequest =
   | LightMeasurementRequest
   | AverageMeasurementRequest
+  | FixedMeasurementRequest
   | RecorderMeasurementRequest
   | SpeakerMeasurementRequest
   | ChargingMeasurementRequest
-  | FanMeasurementRequest;
+  | FanMeasurementRequest
+  | SmartSwitchMeasurementRequest;
+
+
+export interface CalibrationJob {
+  id: string;
+  session_id: string;
+  started_at: string;
+  status: "running" | "cancelling" | "completed" | "cancelled" | "failed";
+  calibration: DummyLoadCalibration | null;
+  error: string | null;
+}
+
+export interface StandbyCalibrationActions {
+  start(sessionId: string, setup: LightMeasurementRequest): Promise<CalibrationJob>;
+  status(sessionId: string): Promise<CalibrationJob | null>;
+  cancel(sessionId: string, jobId: string): Promise<CalibrationJob>;
+  loadSaved(meter: PowerMeterSpec): Promise<DummyLoadCalibration | null>;
+}

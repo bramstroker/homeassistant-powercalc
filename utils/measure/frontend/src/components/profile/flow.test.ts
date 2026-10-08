@@ -26,6 +26,7 @@ describe("profile flow components", () => {
         device_type?: string;
         measure_device?: string;
         mains_voltage?: number;
+        standby_power?: number;
         voltage_range?: { min: number; max: number };
         device_info: Record<string, string>;
         home_assistant: Record<string, string>;
@@ -73,6 +74,7 @@ describe("profile flow components", () => {
       contributor_github: "octocat",
       device_specs: { rated_power: 9.5, connectivity: ["zigbee"] },
       device_type: "light",
+      standby_power: 0.3,
       measure_device: "Shelly PM Mini Gen3",
       mains_voltage: 230,
       voltage_range: { min: 229.9, max: 231.2 },

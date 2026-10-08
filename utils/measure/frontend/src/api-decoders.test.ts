@@ -1,5 +1,5 @@
-import { decodePreflight, decodeSessionSnapshot, isMeasurementRequest } from "./api-decoders";
-import { capabilities } from "./components/testing/fixtures";
+import { decodeEntities, decodeMeasureDefinitions, decodePreflight, decodeSessionSnapshot, decodeSessionSummaries, isMeasurementRequest } from "./api-decoders";
+import { capabilities, lightDefinition } from "./components/testing/fixtures";
 
 const averageRequest = {
   measure_type: "average",
@@ -51,6 +51,48 @@ describe("measurement request boundary", () => {
 });
 
 describe("response boundary", () => {
+  it("accepts the device selector in a fixed measurement definition", () => {
+    const definitions = [{
+      ...lightDefinition,
+      measure_type: "fixed",
+      fields: [{ name: "device_id", label: "Home Assistant device", control: "device",
+        role: "attribute", required: true, options: [], all_entities: true }],
+    }];
+
+    expect(decodeMeasureDefinitions(definitions)).toBe(definitions);
+  });
+
+  it("accepts saved smart switch sessions in the session list", () => {
+    const sessions = [{
+      session_id: "8af8795c-7131-4e94-8eab-2ce4a7e7f2c1", state: "failed",
+      created_at: "2026-09-28T16:24:12Z", updated_at: "2026-09-28T16:26:39Z",
+      measure_type: "smart_switch", model_id: "SHPLG-S", product_name: "Vaatwasser",
+      measure_device: "Shelly 1PM Mini Gen3", completed: 2, total: 6, percent: 33.33,
+      can_resume: false, file_count: 0, size: 6614, active: false,
+    }];
+
+    expect(decodeSessionSummaries(sessions)).toBe(sessions);
+  });
+
+  it("accepts optional connectivity and rejects malformed detection results", () => {
+    const entity = { entity_id: "light.test", name: "Test light" };
+    for (const connectivity of [undefined, null, "zigbee", "zwave"]) {
+      expect(decodeEntities([{ ...entity, connectivity }])).toHaveLength(1);
+    }
+    expect(() => decodeEntities([{ ...entity, connectivity: ["zigbee"] }])).toThrow();
+  });
+
+  it("accepts recording metadata and arbitrary Home Assistant device classes", () => {
+    const entities = [{
+      entity_id: "binary_sensor.robot_problem", name: "Robot problem", domain: "binary_sensor",
+      device_class: "problem", translation_key: "problem", disabled_by: "integration", has_live_state: false,
+    }];
+    expect(decodeEntities(entities)).toBe(entities);
+    expect(decodeEntities([{ entity_id: "sensor.legacy", name: "Legacy" }])).toHaveLength(1);
+    expect(() => decodeEntities([{ ...entities[0], has_live_state: "false" }])).toThrow();
+    expect(() => decodeEntities([{ ...entities[0], device_class: 42 }])).toThrow();
+  });
+
   it("accepts nullable estimates emitted by an incomplete preflight", () => {
     const response = {
       valid: true,

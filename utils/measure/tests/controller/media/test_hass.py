@@ -1,28 +1,114 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
+from homeassistant_api.errors import InternalServerError, ResponseError, WebsocketError
 from measure.controller.media.hass import HassMediaController
-from measure.home_assistant import HomeAssistantManager
+import pytest
 
 
-def test_mute_volume_is_not_replayed_after_disconnect() -> None:
-    client = _mock_client()
+@pytest.mark.parametrize("volume,expected", [(0, 0.0), (1, 0.01), (35, 0.35), (100, 1.0)])
+def test_set_volume_converts_percentage_to_home_assistant_level(
+    hass_client: MagicMock, volume: int, expected: float
+) -> None:
+    _get_instance(hass_client).set_volume(volume)
 
-    _get_instance(client).mute_volume()
-
-    client.trigger_service.assert_called_once_with(
+    hass_client.trigger_service.assert_called_once_with(
         "media_player",
-        "mute_volume",
-        retry_on_disconnect=False,
+        "volume_set",
         entity_id="media_player.test",
+        volume_level=expected,
     )
 
 
-def test_play_audio_is_not_replayed_after_disconnect() -> None:
-    client = _mock_client()
+def test_turn_off_uses_device_power_service(hass_client: MagicMock) -> None:
+    _get_instance(hass_client).turn_off()
 
-    _get_instance(client).play_audio("https://example.com/audio.mp3")
+    hass_client.trigger_service.assert_called_once_with("media_player", "turn_off", entity_id="media_player.test")
 
-    client.trigger_service.assert_called_once_with(
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        InternalServerError(500, "Not supported"),
+        ResponseError(
+            "[service_validation_error] Validation error: "
+            "Entity media_player.test does not support action media_player.turn_off"
+        ),
+        ResponseError("[unauthorized] User is not authorized"),
+        ResponseError("[service_validation_error] Validation error: Entity media_player.test is unavailable"),
+        ResponseError("[unknown_error] Unexpected failure"),
+    ],
+)
+def test_turn_off_stops_playback_when_power_service_fails(hass_client: MagicMock, error: Exception) -> None:
+    hass_client.trigger_service.side_effect = [error, None]
+
+    _get_instance(hass_client).turn_off()
+
+    assert hass_client.trigger_service.call_args_list == [
+        call("media_player", "turn_off", entity_id="media_player.test"),
+        call("media_player", "media_stop", entity_id="media_player.test"),
+    ]
+
+
+def test_turn_off_propagates_connection_failure_without_fallback(hass_client: MagicMock) -> None:
+    hass_client.trigger_service.side_effect = WebsocketError("Disconnected")
+
+    with pytest.raises(WebsocketError, match="Disconnected"):
+        _get_instance(hass_client).turn_off()
+
+    hass_client.trigger_service.assert_called_once_with("media_player", "turn_off", entity_id="media_player.test")
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        InternalServerError(500, "Cannot stop"),
+        ResponseError("[unknown_error] Cannot stop"),
+    ],
+)
+def test_turn_off_propagates_stop_playback_failure(hass_client: MagicMock, error: Exception) -> None:
+    hass_client.trigger_service.side_effect = [
+        InternalServerError(500, "Not supported"),
+        error,
+    ]
+
+    with pytest.raises(type(error), match="Cannot stop") as exc_info:
+        _get_instance(hass_client).turn_off()
+
+    assert exc_info.value is error
+    assert hass_client.trigger_service.call_args_list == [
+        call("media_player", "turn_off", entity_id="media_player.test"),
+        call("media_player", "media_stop", entity_id="media_player.test"),
+    ]
+
+
+def test_mute_volume_is_not_replayed_after_disconnect(hass_client: MagicMock) -> None:
+    _get_instance(hass_client).mute_volume()
+
+    hass_client.trigger_service.assert_called_once_with(
+        "media_player",
+        "volume_mute",
+        retry_on_disconnect=False,
+        entity_id="media_player.test",
+        is_volume_muted=True,
+    )
+
+
+def test_unmute_volume_is_not_replayed_after_disconnect(hass_client: MagicMock) -> None:
+    _get_instance(hass_client).unmute_volume()
+
+    hass_client.trigger_service.assert_called_once_with(
+        "media_player",
+        "volume_mute",
+        retry_on_disconnect=False,
+        entity_id="media_player.test",
+        is_volume_muted=False,
+    )
+
+
+def test_play_audio_is_not_replayed_after_disconnect(hass_client: MagicMock) -> None:
+    _get_instance(hass_client).play_audio("https://example.com/audio.mp3")
+
+    hass_client.trigger_service.assert_called_once_with(
         "media_player",
         "play_media",
         retry_on_disconnect=False,
@@ -34,9 +120,3 @@ def test_play_audio_is_not_replayed_after_disconnect() -> None:
 
 def _get_instance(client: MagicMock) -> HassMediaController:
     return HassMediaController(client, entity_id="media_player.test")
-
-
-def _mock_client() -> MagicMock:
-    client = MagicMock(spec=HomeAssistantManager)
-    client.get_config.return_value = {}
-    return client

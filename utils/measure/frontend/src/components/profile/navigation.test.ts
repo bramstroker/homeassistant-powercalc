@@ -9,6 +9,7 @@ const draft: ContributionPreview = {
   eligible: true, manufacturer_name: "Signify", manufacturer_directory: "signify", model_id: "LCT010",
   product_name: "Hue lamp", contributor: "", contributor_github: "tester", measure_device: "Test meter",
   mains_voltage: 230, notes: "", device_info: {}, home_assistant: {}, device_type: "light", files: [], warnings: [],
+  standby_power: 0.3, standby_power_estimated: false,
   repository: "bramstroker/homeassistant-powercalc", base_branch: "master", commit_message: "Add profile",
   pr_title: "Add profile", pr_body: "Measured profile", branch_name: "measure/test",
 };
@@ -34,13 +35,14 @@ async function rendered(app: AppShell): Promise<void> {
   await current?.updateComplete;
 }
 
-async function mount(preview?: ContributionPreview) {
+async function mount(preview?: ContributionPreview, initialDraft = draft) {
   vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
   const app = new AppShell();
   app.snapshot = { state: "completed", session_id: "session-1" };
+  app.files = [{ name: "model.json", size: 2, media_type: "application/json" }];
   app.view = "profile";
   app.settings = defaultSettings;
-  app.contributionDraft = { ...draft };
+  app.contributionDraft = { ...initialDraft };
   app.contributionPreview = preview;
   app.deviceSpecificationFields = { light: [{
     name: "connectivity", label: "Connectivity", description: "", value_type: "string",
@@ -48,11 +50,13 @@ async function mount(preview?: ContributionPreview) {
   }] };
   const api = {
     diagnosticsUrl: () => "/diagnostics",
+    fileUrl: (_sessionId: string, name: string) => `/files/${name}`,
     getMeasureDevices: vi.fn(async () => ({ devices: [] })),
+    getStandbyEstimate: vi.fn(async () => ({ power_w: 0.4, basis: "fallback", profile_count: 0 })),
     saveSettings: vi.fn(async (settings: AppSettings) => settings),
     getCapabilities: vi.fn(async () => capabilities),
     getDummyLoadCalibration: vi.fn(async () => null),
-    getContributionDraft: vi.fn(async () => ({ ...draft })),
+    getContributionDraft: vi.fn(async () => ({ ...initialDraft })),
     previewContribution: vi.fn(async () => ({ ...draft, contributor: "Tester" })),
   };
   (app as unknown as { api: unknown }).api = api;
@@ -78,9 +82,33 @@ async function backAndForward(app: AppShell): Promise<void> {
 afterEach(() => document.body.replaceChildren());
 
 describe("profile draft navigation", () => {
+  it.each([{ selected: ["wifi"] }, { selected: [] }])("preserves a connectivity override $selected after using the detected default", async ({ selected }) => {
+    const { app, api } = await mount(undefined, { ...draft, device_specs: { connectivity: ["zigbee"] } });
+    expect(api.getStandbyEstimate).toHaveBeenCalledExactlyOnceWith("Signify", ["zigbee"]);
+    const connectivity = field(app, "device_specs.connectivity") as unknown as Combobox;
+    expect(connectivity.value).toEqual(["zigbee"]);
+    connectivity.value = selected;
+    connectivity.dispatchEvent(new CustomEvent("combobox-change", { bubbles: true, composed: true }));
+    await rendered(app);
+    await backAndForward(app);
+    expect((field(app, "device_specs.connectivity") as unknown as Combobox).value).toEqual(selected);
+    if (selected.length) expect(api.getStandbyEstimate).toHaveBeenLastCalledWith("Signify", selected);
+    else expect(api.getStandbyEstimate).toHaveBeenCalledTimes(1);
+    await edit(app, "contributor", "Tester");
+    view(app).shadowRoot!.querySelector<HTMLFormElement>("form")!.requestSubmit();
+    await vi.waitFor(() => expect(api.previewContribution).toHaveBeenCalled());
+    expect(api.previewContribution.mock.lastCall).toEqual([
+      "session-1", expect.objectContaining({ device_specs: selected.length ? { connectivity: selected } : {} }),
+    ]);
+  });
+
   it("keeps unfinished text, list rows and multiselect tags when returning from Result", async () => {
     const { app } = await mount();
     await edit(app, "product_name", "Edited product ");
+    await edit(app, "standby_power", "0.45");
+    const estimated = field(app, "standby_power_estimated");
+    estimated.checked = true;
+    estimated.dispatchEvent(new Event("change", { bubbles: true }));
     const aliases = listField(app, "aliases");
     aliases.value = ["First alias ", ""];
     aliases.dispatchEvent(new CustomEvent("list-input-change", { bubbles: true, composed: true }));
@@ -93,6 +121,8 @@ describe("profile draft navigation", () => {
     await backAndForward(app);
 
     expect(field(app, "product_name").value).toBe("Edited product ");
+    expect(field(app, "standby_power").value).toBe("0.45");
+    expect(field(app, "standby_power_estimated").checked).toBe(true);
     expect(listField(app, "aliases").value).toEqual(["First alias ", ""]);
     expect(field(app, "contributor_github").value).toBe("");
     expect(field(app, "device_specs.connectivity").value).toEqual(["zigbee", "wifi"]);

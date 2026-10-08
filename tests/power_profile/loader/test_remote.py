@@ -2,6 +2,7 @@ import asyncio
 from collections.abc import AsyncIterator
 import contextlib
 from functools import partial
+import gzip
 import json
 import logging
 import os
@@ -40,6 +41,7 @@ pytestmark = pytest.mark.skip_remote_loader_mocking
 LIBRARY_URL_PREFIX = "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library"
 LIBRARY_RESOURCE_URL = f"{LIBRARY_URL_PREFIX}/test/model/model.json"
 LIBRARY_CSV_RESOURCE_URL = f"{LIBRARY_URL_PREFIX}/test/model/data.csv.gz"
+LIBRARY_RAW_CSV_RESOURCE_URL = f"{LIBRARY_URL_PREFIX}/test/model/data.csv"
 
 
 @pytest.fixture
@@ -121,6 +123,128 @@ async def test_download(
             os.path.exists,
             os.path.join(storage_dir, remote_file["path"]),
         )
+
+
+async def test_download_compresses_plain_csv_resources(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    csv_contents = b"bri,watt\n1,2.5\n"
+    resources = [
+        {"path": "nested/data.csv", "url": LIBRARY_RAW_CSV_RESOURCE_URL},
+        {"path": "model.json", "url": LIBRARY_RESOURCE_URL},
+    ]
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=resources,
+    )
+    mock_aioresponse.get(LIBRARY_RAW_CSV_RESOURCE_URL, status=200, body=csv_contents)
+    mock_aioresponse.get(LIBRARY_RESOURCE_URL, status=200, body=b"{}")
+    storage_path = tmp_path / "profiles"
+
+    await remote_loader.download_profile("test", "model", str(storage_path), "test_download")
+
+    assert not (storage_path / "nested" / "data.csv").exists()
+    with gzip.open(storage_path / "nested" / "data.csv.gz", "rb") as csv_file:
+        assert csv_file.read() == csv_contents
+    assert (storage_path / "model.json").read_bytes() == b"{}"
+
+
+async def test_download_preserves_gzipped_csv_resources(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    compressed_contents = gzip.compress(b"bri,watt\n1,2.5\n", mtime=123)
+    resources = [{"path": "data.csv.gz", "url": LIBRARY_CSV_RESOURCE_URL}]
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=resources,
+    )
+    mock_aioresponse.get(LIBRARY_CSV_RESOURCE_URL, status=200, body=compressed_contents)
+    storage_path = tmp_path / "profiles"
+
+    await remote_loader.download_profile("test", "model", str(storage_path), "test_download")
+
+    assert (storage_path / "data.csv.gz").read_bytes() == compressed_contents
+
+
+@pytest.mark.parametrize(
+    "resources",
+    [
+        [
+            {"path": "data.csv", "url": LIBRARY_RAW_CSV_RESOURCE_URL},
+            {"path": "data.csv.gz", "url": LIBRARY_CSV_RESOURCE_URL},
+        ],
+        [
+            {"path": "data.csv.gz", "url": LIBRARY_CSV_RESOURCE_URL},
+            {"path": "data.csv", "url": LIBRARY_RAW_CSV_RESOURCE_URL},
+        ],
+    ],
+)
+async def test_download_prefers_gzipped_csv_when_both_formats_are_available(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+    resources: list[dict[str, str]],
+) -> None:
+    compressed_contents = gzip.compress(b"bri,watt\n1,2.5\n", mtime=123)
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=resources,
+    )
+    mock_aioresponse.get(LIBRARY_CSV_RESOURCE_URL, status=200, body=compressed_contents)
+
+    storage_path = tmp_path / "profiles"
+    await remote_loader.download_profile("test", "model", str(storage_path), "test_download")
+
+    assert (storage_path / "data.csv.gz").read_bytes() == compressed_contents
+
+
+async def test_download_rejects_duplicate_resource_paths(
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    tmp_path: Path,
+) -> None:
+    resources = [
+        {"path": "data.csv", "url": LIBRARY_RAW_CSV_RESOURCE_URL},
+        {"path": "data.csv", "url": LIBRARY_RAW_CSV_RESOURCE_URL},
+    ]
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/test/model?hash=test_download",
+        status=200,
+        payload=resources,
+    )
+
+    with pytest.raises(ProfileDownloadError, match="duplicate resource path"):
+        await remote_loader.download_profile("test", "model", str(tmp_path / "profiles"), "test_download")
+
+
+def test_cached_csv_migration_failure_keeps_installed_profile(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    (tmp_path / "model.json").write_text("{}")
+    (tmp_path / "data.csv").write_text("bri,watt\n1,2.5\n")
+
+    with patch(
+        "custom_components.powercalc.power_profile.loader.remote.compress_installed_profile_csv_files",
+        side_effect=OSError("read-only cache"),
+    ):
+        installed = RemoteLoader._read_and_compress_installed_profile(  # noqa: SLF001
+            tmp_path,
+            "model",
+            "hash",
+            AwesomeVersion("1.0.0"),
+        )
+
+    assert installed is not None
+    assert installed.metadata["hash"] == "hash"
+    assert "Could not compress cached CSV files" in caplog.text
 
 
 async def test_download_keeps_existing_resources_when_a_later_download_fails(

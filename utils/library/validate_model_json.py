@@ -3,7 +3,7 @@ import json
 import os
 from typing import Any, cast
 
-from jsonschema import ValidationError, validate
+from jsonschema import FormatChecker, ValidationError, validate
 
 from utils.library.common import PROFILE_DIRECTORY
 
@@ -51,7 +51,7 @@ def validate_file(file_path: str, schema: dict[str, Any]) -> bool:
     """Validate a JSON file against the schema, returning whether it passed."""
     try:
         instance = load_json(file_path)
-        validate(instance=instance, schema=schema)
+        validate(instance=instance, schema=schema, format_checker=FormatChecker(formats=["regex"]))
         print(f"VALID: {file_path}")  # noqa: T201
     except ValidationError as e:
         print(f"INVALID: {file_path}\nError: {e.message}")  # noqa: T201

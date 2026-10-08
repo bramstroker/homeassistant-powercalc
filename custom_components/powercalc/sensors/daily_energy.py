@@ -14,6 +14,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
+    EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
 )
@@ -25,7 +26,6 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 import homeassistant.util.dt as dt_util
 from homeassistant.util.unit_conversion import EnergyConverter
-import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -43,6 +43,7 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 from custom_components.powercalc.unit import ENERGY_UNIT_PREFIX_MAPPING, evaluate_to_decimal, parse_decimal
+from custom_components.powercalc.validation import vol
 
 from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 from .energy import EnergySensor
@@ -181,7 +182,9 @@ class DailyEnergySensor(EnergySensor, RestoreEntity, SensorEntity):
         self._hass = hass
         self._attr_name = name
         self._state: Decimal = Decimal(0)
-        self._attr_entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
+        entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
+        if entity_category:
+            self._attr_entity_category = EntityCategory(entity_category)
         self._value = value
         self._user_unit_of_measurement = user_unit_of_measurement
         self._update_frequency = update_frequency

@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 from uuid import uuid4
 
-from measure.clock import utc_now
 from measure.contribution.credentials import CredentialStore
 from measure.contribution.github import GitHubApiError, GitHubClient, missing_required_scopes
 from measure.contribution.models import (
@@ -14,14 +13,15 @@ from measure.contribution.models import (
     ContributionMetadata,
     ContributionSubmission,
 )
-from measure.contribution.prepare import ProfilePreparer
 from measure.contribution.pull_request import (
     conventional_commit_message,
     deterministic_branch_name,
     pull_request_body,
     pull_request_title,
 )
-from measure.files import write_json_atomic
+from measure.profile.prepare import ProfilePreparer
+from measure.utils.clock import utc_now
+from measure.utils.files import write_json_atomic
 
 
 class ContributionJobExpiredError(LookupError):
@@ -162,10 +162,10 @@ class ContributionJobCoordinator:
         base_tree_sha = str(parent_commit["tree"]["sha"])
 
         tree_entries = []
-        for path, content in self.preparer.render_contents(artifact_directory, job.metadata, job.preview):
-            blob_sha = client.create_blob(fork_owner, fork_repo, base64.b64encode(content).decode("ascii"))
-            tree_entries.append({"path": path, "mode": "100644", "type": "blob", "sha": blob_sha})
-        tree_sha = client.create_tree(fork_owner, fork_repo, base_tree_sha, tuple(tree_entries))
+        for file in self.preparer.render_contents(artifact_directory, job.metadata, job.preview):
+            blob_sha = client.create_blob(fork_owner, fork_repo, base64.b64encode(file.content).decode("ascii"))
+            tree_entries.append({"path": file.path, "mode": "100644", "type": "blob", "sha": blob_sha})
+        tree_sha = client.create_tree(fork_owner, fork_repo, base_tree_sha, tree_entries)
         commit_sha = client.create_commit(
             fork_owner,
             fork_repo,

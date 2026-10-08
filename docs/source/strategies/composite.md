@@ -140,7 +140,7 @@ For a library profile, replace the fixed light contribution with this entry in `
 }
 ```
 
-Keep the light's `hs.csv.gz` alongside `model.json`. The LUT uses the same profile directory as the composite and reads
+Keep the light's `hs.csv` alongside `model.json`. The LUT uses the same profile directory as the composite and reads
 brightness and colour attributes from the selected light entity. Its measurements must contain only the additional
 light consumption; subtract any motor consumption already included by another strategy.
 

@@ -26,6 +26,7 @@
   "name": "STOFTMOLN LED Ceiling/Wall Lamp (24 cm)",
   "product_url": "https://www.ikea.com/fi/fi/p/stoftmoln-led-katto-seinaevalaisin-aelylaite-langaton-himmennettaevae-laemmin-valkoinen-valkoinen-30497490/",
   "standby_power": 0.25,
+  "standby_power_estimated": true,
   "authors": [
     {
       "name": "vyruz1986",

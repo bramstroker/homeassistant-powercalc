@@ -27,8 +27,10 @@ Try:
 Some devices consume less standby power than a consumer meter can resolve. Follow
 [Measuring low-power devices](low-power-measurements.md) to choose between measuring identical devices together,
 adding a calibrated resistive dummy load, or using a more precise meter. If none of these produces repeatable nonzero
-readings, the tool cannot determine a reliable standby value; clearly document any manual fallback estimate in the
-pull request.
+readings, the tool cannot determine a reliable standby value. Completed light measurements can still be prepared:
+enter a separately measured value or apply **Use estimated standby** in **Prepare profile**, keep **Estimated**
+checked for estimates, and validate before submitting. The value is per light and must be at least `0.05` W.
+Existing completed sessions with zero or missing standby can be corrected without repeating their LUT measurements.
 
 ## Readings are stale or repeated
 
@@ -50,7 +52,7 @@ The tool filters entities by domain or unit:
 - Voltage sensors must use unit `V`.
 - Fan mode lists `fan` entities.
 - Smart speaker mode lists `media_player` entities.
-- Charging mode lists `vacuum` or `lawn_mower` entities, depending on the selected device type.
+- Charging mode lists `vacuum` entities in the Home Assistant app. The CLI also supports `lawn_mower` entities.
 
 If an entity is missing, check its Home Assistant state and attributes first. Also verify `HASS_URL` points to the API endpoint and `HASS_TOKEN` is a valid long-lived access token.
 

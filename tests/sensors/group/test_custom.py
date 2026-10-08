@@ -24,6 +24,7 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
+    EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
 )
@@ -51,6 +52,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
+    CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
@@ -71,6 +73,7 @@ from custom_components.powercalc.const import (
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_MODE,
     CONF_POWER,
+    CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
@@ -993,6 +996,39 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert ATTR_ENTITIES not in energy_state.attributes
     assert ATTR_IS_GROUP not in energy_state.attributes
+
+
+@pytest.mark.parametrize("force_calculate_energy", [False, True])
+async def test_global_entity_category_applied_to_group(
+    hass: HomeAssistant,
+    entity_registry: EntityRegistry,
+    force_calculate_energy: bool,
+) -> None:
+    """Group sensors created from the GUI should follow the global sensor categories."""
+    await run_powercalc_setup(
+        hass,
+        {},
+        {
+            CONF_POWER_SENSOR_CATEGORY: EntityCategory.DIAGNOSTIC,
+            CONF_ENERGY_SENSOR_CATEGORY: EntityCategory.DIAGNOSTIC,
+        },
+    )
+
+    await create_mock_group_entry(
+        hass,
+        "GroupA",
+        {
+            CONF_GROUP_POWER_ENTITIES: ["sensor.a_power"],
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.a_energy"],
+            CONF_FORCE_CALCULATE_GROUP_ENERGY: force_calculate_energy,
+        },
+    )
+
+    power_entry = entity_registry.async_get("sensor.groupa_power")
+    assert power_entry.entity_category == EntityCategory.DIAGNOSTIC
+
+    energy_entry = entity_registry.async_get("sensor.groupa_energy")
+    assert energy_entry.entity_category == EntityCategory.DIAGNOSTIC
 
 
 async def test_associate_entry_to_existing_group(hass: HomeAssistant) -> None:

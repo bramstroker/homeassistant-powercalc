@@ -108,7 +108,11 @@
               "power_sensor_naming": "Navnemønster for effektsensor",
               "power_sensor_friendly_naming": "Navnemønster for effektsensorens visningsnavn",
               "power_sensor_category": "Effektsensorkategori",
-              "power_sensor_precision": "Effektsensorens præcision"
+              "power_sensor_precision": "Effektsensorens præcision",
+              "follow_device_name": "Følg enhedens navn"
+            },
+            "data_description": {
+              "follow_device_name": "Brug navnet på den tilknyttede enhed til genererede entiteter for understøttede virtuelle effektsensorer konfigureret i brugergrænsefladen. Entitets-id’er og brugerdefinerede entitetsnavne ændres ikke. De konfigurerede navne gendannes, når indstillingen slås fra. Brugerdefinerede mønstre for visningsnavne, herunder globale mønstre, har forrang: berørte poster beholder deres konfigurerede navne."
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Effekt"
+      },
+      "energy": {
+        "name": "Energi"
+      },
+      "standby_energy": {
+        "name": "Standbyenergi"
+      },
+      "cost": {
+        "name": "Omkostninger"
+      },
+      "utility_meter_cycle": {
+        "name": "Energi {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Energi {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Energi {period} omkostninger"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Energi {period} {tariff} omkostninger"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Energi {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "Navnemønster for effektsensor",
               "power_sensor_friendly_naming": "Navnemønster for effektsensorens visningsnavn",
               "power_sensor_category": "Effektsensorkategori",
-              "power_sensor_precision": "Effektsensorens præcision"
+              "power_sensor_precision": "Effektsensorens præcision",
+              "follow_device_name": "Følg enhedens navn"
+            },
+            "data_description": {
+              "follow_device_name": "Brug navnet på den tilknyttede enhed til genererede entiteter for understøttede virtuelle effektsensorer konfigureret i brugergrænsefladen. Entitets-id’er og brugerdefinerede entitetsnavne ændres ikke. De konfigurerede navne gendannes, når indstillingen slås fra. Brugerdefinerede mønstre for visningsnavne, herunder globale mønstre, har forrang: berørte poster beholder deres konfigurerede navne."
             }
           },
           "features": {

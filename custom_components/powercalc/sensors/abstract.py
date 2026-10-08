@@ -25,6 +25,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
 )
 from custom_components.powercalc.device_binding import bind_entity_to_registry_metadata
+from custom_components.powercalc.device_naming import DeviceName
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -32,6 +33,17 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class BaseEntity(Entity):
+    device_name: DeviceName | None = None
+
+    def enable_device_naming(self) -> None:
+        """Use a translated relative name after legacy names and IDs have been consumed."""
+        if self.device_name is None:
+            return
+        self._attr_has_entity_name = True
+        self._attr_translation_key = self.device_name.translation_key
+        self._attr_translation_placeholders = self.device_name.placeholders or {}
+        del self._attr_name
+
     async def async_added_to_hass(self) -> None:
         """Bind configured registry metadata."""
         await super().async_added_to_hass()

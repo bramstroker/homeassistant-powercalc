@@ -84,4 +84,36 @@ describe("review summary", () => {
       { label: "Additional entity", value: "sensor.dock_state" },
     ]));
   });
+
+  it("names the selected Home Assistant device instead of its registry ID", () => {
+    const fixed: MeasurementRequest = {
+      measure_type: "fixed",
+      model_id: "FRITZ!Repeater 1200",
+      product_name: "FRITZ!Repeater 1200",
+      measure_device: "Wall plug",
+      generate_model: true,
+      parameters: capabilities.defaults,
+      power_meter: { type: "hass", entity_id: "sensor.plug_power" },
+      resume_policy: "new",
+      device_id: "8d2c1f0e9a7b",
+      profile_device_type: "network",
+      duration: 300,
+    };
+    const definition: MeasureDefinition = {
+      measure_type: "fixed", label: "Fixed power profile", description: "Measure self consumption.", icon: "mdi:devices",
+      model_id_example: "", product_name_example: "", parameters: [], supports_profile: true, supports_resume: false,
+      fields: [
+        { name: "device_id", label: "Home Assistant device", role: "attribute", control: "device", required: true, review: true, all_entities: true, options: [] },
+      ],
+    };
+    const entities = [{
+      entity_id: "sensor.router_status", name: "Router status", domain: "sensor", state: "on",
+      device_id: "8d2c1f0e9a7b", device_name: "Living room router",
+    }];
+
+    expect(reviewSummary(fixed, { valid: true, warnings: [] }, definition, entities))
+      .toContainEqual({ label: "Home Assistant device", value: "Living room router" });
+    expect(reviewSummary(fixed, { valid: true, warnings: [] }, definition))
+      .toContainEqual({ label: "Home Assistant device", value: "8d2c1f0e9a7b" });
+  });
 });

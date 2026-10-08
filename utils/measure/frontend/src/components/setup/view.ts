@@ -13,21 +13,31 @@ import type {
   PowerMeterSpec,
 } from "../../types";
 import { hasVoltageReading, meterFor } from "../../power-meter/registry";
+import { entityDomains } from "../../measurement/definition";
 import type { MeterContext } from "../../power-meter/registry";
 import { emit } from "../../utils/events";
 import { submittedForm } from "../../utils/form";
 import { sharedStyles } from "../../styles";
 import { defaultDummyLoadMode, dummyLoadStyles, renderDummyLoad } from "./dummy-load-field";
-import { entityListStyles } from "./entity-list-field";
 import {
   renderPowerMeterRequired,
   renderPowerMeterSummary,
-  renderTypeChip,
-  renderTypePicker,
+  renderDevicePicker,
+  renderRoutePicker,
+  renderSelectionChip,
   setupChromeStyles,
 } from "./chrome";
+import {
+  deviceChoices,
+  FREE_MEASUREMENT,
+  routesForDevice,
+  selectionFromRequest,
+  selectionFromType,
+  type MeasurementRoute,
+} from "./device-routes";
 import { errorHelpLink } from "../shared/error-help-link";
 import type {
+  EntityDeviceChange,
   EntitySelectionChange,
   MultiSelectionChange,
   MultipleLightsChange,
@@ -94,10 +104,22 @@ export class SetupView extends LitElement {
   @state()
   selectedType?: MeasureType;
 
+  @state()
+  selectedDeviceId?: string;
+
+  @state()
+  selectedRouteId?: string;
+
+  @state()
+  deviceSearch = "";
+
   /** Entities picked per field. A single-entity field simply holds a one-entry list. */
 
   @state()
   selectedEntities: Record<string, string[]> = {};
+
+  @state()
+  selectedEntityDeviceIds: Record<string, string> = {};
 
   @state()
   selectValues: Record<string, string> = {};
@@ -123,13 +145,13 @@ export class SetupView extends LitElement {
   /** Deliberately not reactive: it exists so a typed count survives re-renders instead of being recomputed. */
   private derivedCountOverride?: string;
 
-  static readonly styles = [sharedStyles, dummyLoadStyles, entityListStyles, setupChromeStyles, css`
+  static readonly styles = [sharedStyles, dummyLoadStyles, setupChromeStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
     measure-setup-fields-section, measure-setup-developer-options { display: contents; }
     form { display: grid; gap: 1rem; }
     .profile-grid { align-items: start; }
     .device-section { display: grid; gap: 1rem; min-width: 0; }
-    .light-grid > measure-combobox, .light-grid > .entity-list, .light-grid > .field-block { grid-column: 1 / -1; }
+    .light-grid > measure-combobox, .light-grid > .field-block { grid-column: 1 / -1; }
     .checks { display: flex; flex-wrap: wrap; gap: 0.6rem; }
     .check { min-height: 42px; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 999px; }
     /* A checkbox pill has no caption above it, so pin it to the input line of its row. */
@@ -176,9 +198,15 @@ export class SetupView extends LitElement {
   `];
 
   willUpdate(changed: PropertyValues<this>): void {
-    // Restore the previously chosen type when returning from the review step.
-    if (changed.has("initialType") && this.initialType && this.selectedType === undefined) {
-      this.selectedType = this.initialType;
+    // Restore a saved route without changing the request's stable measure_type.
+    if ((changed.has("initialType") || changed.has("initialRequest")) && this.selectedType === undefined) {
+      const restored = this.initialRequest ? selectionFromRequest(this.initialRequest) : this.initialType
+        ? selectionFromType(this.initialType) : undefined;
+      if (restored) {
+        this.selectedDeviceId = restored.deviceId;
+        this.selectedRouteId = restored.routeId;
+        this.selectedType = this.initialRequest?.measure_type ?? this.initialType;
+      }
     }
     if (changed.has("initialRequest")) {
       const controller = this.initialRequest && "controller" in this.initialRequest
@@ -224,10 +252,24 @@ export class SetupView extends LitElement {
   }
 
   private renderSetupContent() {
+    const devices = deviceChoices(this.definitions).filter((device) => routesForDevice(device.id, this.definitions).length);
+    const freeRoutes = routesForDevice(FREE_MEASUREMENT, this.definitions);
+    const selectedDevice = this.selectedDeviceId === FREE_MEASUREMENT
+      ? { id: FREE_MEASUREMENT, label: "Free measurement" }
+      : devices.find((device) => device.id === this.selectedDeviceId)
+        ?? (this.selectedDeviceId && this.currentRun
+          ? { id: this.selectedDeviceId, label: this.selectedDeviceId.replaceAll("_", " ") }
+          : undefined);
+    const routes = selectedDevice ? routesForDevice(selectedDevice.id, this.definitions) : [];
+    const selectedRoute = routes.find((route) => route.id === this.selectedRouteId) ?? this.restoredRoute();
+    // Older callers may still set selectedType directly without choosing a route.
+    const hasForm = Boolean(this.selectedType && (selectedRoute || !this.selectedDeviceId));
     return html`
-      ${this.selectedType
+      ${hasForm
         ? html`<div class="setup-summary">
-            ${renderTypeChip(this.selectedType, this.definition(this.selectedType), this.changeType)}
+            ${selectedDevice && selectedRoute ? renderSelectionChip(
+              selectedDevice, selectedRoute, this.changeDevice, this.changeRoute, routes.length > 1,
+            ) : nothing}
             ${renderPowerMeterSummary({
               meter: this.meter,
               measureDevice: this.defaultMeasureDevice,
@@ -235,8 +277,10 @@ export class SetupView extends LitElement {
               onOpenSettings: this.openSettings,
             })}
           </div>`
-        : renderTypePicker(this.definitions, this.selectType)}
-      ${this.selectedType ? this.renderMeasurementForm(this.selectedType) : nothing}
+        : selectedDevice
+          ? renderRoutePicker(selectedDevice, routes, this.selectRoute, this.changeDevice)
+          : renderDevicePicker(devices, this.deviceSearch, this.searchDevices, this.selectDevice, freeRoutes.length > 0)}
+      ${hasForm && this.selectedType ? this.renderMeasurementForm(this.selectedType, selectedRoute) : nothing}
     `;
   }
 
@@ -244,10 +288,10 @@ export class SetupView extends LitElement {
     emit(this, "use-current-settings");
   }
 
-  private renderMeasurementForm(type: MeasureType) {
+  private renderMeasurementForm(type: MeasureType, route?: MeasurementRoute) {
     const definition = this.definition(type);
     if (!definition || !this.capabilities) return html`<p class="muted">Loading measurement capabilities…</p>`;
-    const run = this.initialRequest?.measure_type === type ? this.initialRequest : undefined;
+    const run = this.currentRun;
     const activeLightCheck = type === "light" && !this.dummyController && !this.dummyLoadEnabled;
     return html`
       <form @submit=${this.submitMeasurement}>
@@ -256,10 +300,12 @@ export class SetupView extends LitElement {
           .definition=${definition}
           .definitions=${this.definitions}
           .request=${run}
+          .presetValues=${route?.preset ?? {}}
           .lights=${this.lights}
           .deviceEntities=${this.deviceEntities}
           .deviceEntityErrors=${this.deviceEntityErrors}
           .selectedEntities=${this.selectedEntities}
+          .selectedEntityDeviceIds=${this.selectedEntityDeviceIds}
           .selectValues=${this.selectValues}
           .multiSelection=${this.multiSelection}
           .parameterValues=${this.parameterValues}
@@ -267,6 +313,7 @@ export class SetupView extends LitElement {
           .multipleLights=${this.multipleLights}
           .derivedCountOverride=${this.derivedCountOverride}
           @entity-selection-change=${this.entitySelectionChanged}
+          @entity-device-change=${this.entityDeviceChanged}
           @select-value-change=${this.selectValueChanged}
           @multi-selection-change=${this.multiSelectionChanged}
           @multiple-lights-change=${this.multipleLightsChanged}
@@ -278,7 +325,8 @@ export class SetupView extends LitElement {
         <measure-setup-developer-options
           .developerMode=${this.capabilities.developer_mode ?? false}
           .fastTestMode=${this.capabilities.fast_test_mode ?? false}
-          .hasController=${definition.fields.some((field) => field.role === "controller")}
+          .hasController=${definition.supports_dummy_controller !== false
+            && definition.fields.some((field) => field.role === "controller")}
           .dummyController=${this.dummyController}
           @dummy-controller-change=${this.dummyControllerChanged}
         ></measure-setup-developer-options>
@@ -345,8 +393,18 @@ export class SetupView extends LitElement {
     this.selectEntities(event.detail.name, event.detail.rows);
   }
 
+  private entityDeviceChanged(event: CustomEvent<EntityDeviceChange>): void {
+    const { name, deviceId } = event.detail;
+    this.selectedEntityDeviceIds = { ...this.selectedEntityDeviceIds, [name]: deviceId };
+    this.selectEntities(name, []);
+  }
+
   private selectValueChanged(event: CustomEvent<SelectValueChange>): void {
     this.selectValues = { ...this.selectValues, [event.detail.name]: event.detail.value };
+    if (event.detail.name === "profile_device_type") {
+      this.selectEntities("primary_entity_id", []);
+      this.selectEntities("tracked_entity_ids", []);
+    }
   }
 
   private multiSelectionChanged(event: CustomEvent<MultiSelectionChange>): void {
@@ -357,17 +415,62 @@ export class SetupView extends LitElement {
     this.derivedCountOverride = event.detail;
   }
 
-  private readonly selectType = (type: MeasureType): void => {
-    this.errorMessage = "";
-    this.selectedType = type;
-    this.dummyController = false;
-    this.multipleLights = false;
-    emit<MeasureType>(this, "measure-type-selected", type);
+  private readonly searchDevices = (value: string): void => {
+    this.deviceSearch = value;
   };
 
-  private readonly changeType = (): void => {
+  private readonly selectDevice = (deviceId: string): void => {
+    this.errorMessage = "";
+    this.selectedDeviceId = deviceId;
+    this.selectedRouteId = undefined;
+    this.selectedType = undefined;
+    this.clearRouteValues();
+    const routes = routesForDevice(deviceId, this.definitions);
+    if (routes.length === 1) this.selectRoute(routes[0]!.id);
+  };
+
+  private readonly selectRoute = (routeId: string): void => {
+    const route = routesForDevice(this.selectedDeviceId ?? "", this.definitions)
+      .find((candidate) => candidate.id === routeId);
+    if (!route) return;
+    this.errorMessage = "";
+    this.clearRouteValues();
+    this.selectedRouteId = routeId;
+    this.selectedType = route.measureType;
+    this.selectValues = { ...route.preset };
+    emit<MeasureType>(this, "measure-type-selected", route.measureType);
+    const definition = this.definition(route.measureType);
+    if (definition) {
+      const values = new FormData();
+      for (const [name, value] of Object.entries(route.preset)) values.set(name, value);
+      emit<string[]>(this, "entity-domains-requested", entityDomains(definition, values));
+    }
+  };
+
+  private clearRouteValues(): void {
+    this.dummyController = false;
+    this.multipleLights = false;
+    this.selectedEntities = {};
+    this.selectedEntityDeviceIds = {};
+    this.selectValues = {};
+    this.multiSelection = {};
+    this.parameterValues = {};
+    this.derivedCountOverride = undefined;
+  }
+
+  private readonly changeDevice = (): void => {
     this.errorMessage = "";
     this.selectedType = undefined;
+    this.selectedDeviceId = undefined;
+    this.selectedRouteId = undefined;
+    this.clearRouteValues();
+  };
+
+  private readonly changeRoute = (): void => {
+    this.errorMessage = "";
+    this.selectedType = undefined;
+    this.selectedRouteId = undefined;
+    this.clearRouteValues();
   };
   /** Rows as the form currently shows them, so an edit starts from what the user can see. */
   private currentRows(name: string): string[] {
@@ -379,7 +482,29 @@ export class SetupView extends LitElement {
 
   /** The previous run, when it belongs to the type now being configured. */
   private get currentRun(): MeasurementRequest | undefined {
-    return this.initialRequest?.measure_type === this.selectedType ? this.initialRequest : undefined;
+    const request = this.initialRequest;
+    if (!request || request.measure_type !== this.selectedType) return undefined;
+    if (!this.selectedRouteId) return request;
+    const selection = selectionFromRequest(request);
+    return selection.deviceId === this.selectedDeviceId && selection.routeId === this.selectedRouteId
+      ? request : undefined;
+  }
+
+  /** Keep old saved recordings editable even when their route is no longer offered for new sessions. */
+  private restoredRoute(): MeasurementRoute | undefined {
+    const request = this.currentRun;
+    if (!request || !this.selectedRouteId) return undefined;
+    if (request.measure_type !== "recorder" || request.recorder_purpose !== "complex_profile") return undefined;
+    const preset: Record<string, string> = request.profile_recipe === "vacuum_robot"
+      ? { recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot" }
+      : {
+          recorder_purpose: "complex_profile", profile_recipe: "generic",
+          profile_device_type: request.profile_device_type ?? "generic_iot",
+        };
+    return {
+      id: this.selectedRouteId, measureType: "recorder", label: "Saved recording method",
+      description: "Previously saved complex-profile recording.", preset,
+    };
   }
 
   private selectEntities(name: string, rows: string[]): void {
@@ -407,7 +532,7 @@ export class SetupView extends LitElement {
       measureDevice: this.defaultMeasureDevice,
       dummyController: this.dummyController,
       calibration: this.dummyLoadCalibration,
-      initialRequest: this.initialRequest,
+      initialRequest: this.currentRun,
       entities: [...this.lights, ...Object.values(this.deviceEntities).flat()],
       entityErrors: this.deviceEntityErrors,
     });

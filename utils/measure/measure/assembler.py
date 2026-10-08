@@ -1,5 +1,5 @@
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any
+from typing import Any, assert_never
 
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.dummy import DummyChargingController
@@ -27,14 +27,17 @@ from measure.controller.media.controller import MediaController
 from measure.controller.media.dummy import DummyMediaController
 from measure.controller.media.hass import HassMediaController
 from measure.controller.media.spec import DummyMediaControllerSpec, HassMediaControllerSpec, MediaControllerSpec
+from measure.controller.switch.hass import HassSwitchController
+from measure.controller.switch.spec import HassMultiSwitchControllerSpec
 from measure.execution import (
     DummyLoadCalibrationStore,
     DummyLoadPreparation,
     MeasurementPreparation,
     PreparedMeasurement,
-    RunInteraction,
 )
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
+from measure.home_assistant.entities import HomeAssistantEntityCatalog
+from measure.powermeter.credentials import TapoCredentials
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.hass import HassPowerMeter
@@ -57,25 +60,30 @@ from measure.powermeter.spec import (
     TuyaPowerMeterSpec,
 )
 from measure.powermeter.tasmota import TasmotaPowerMeter
+from measure.recording.context import build_recording_context
 from measure.request import (
     AverageMeasurementRequest,
     ChargingMeasurementRequest,
     FanMeasurementRequest,
+    FixedMeasurementRequest,
     LightMeasurementRequest,
     MeasurementRequest,
     RecorderMeasurementRequest,
     ResumePolicy,
+    SmartSwitchMeasurementRequest,
     SpeakerMeasurementRequest,
 )
 from measure.runner.average import AverageRunner
 from measure.runner.charging import ChargingRunner
 from measure.runner.fan import FanRunner
-from measure.runner.light import LightRunner
+from measure.runner.interaction import RunInteraction
+from measure.runner.light.runner import LightRunner
 from measure.runner.recorder import EntityStateReader, RecorderEntityState, RecorderRunner
 from measure.runner.runner import MeasurementRunner
+from measure.runner.smart_switch import SmartSwitchRunner
 from measure.runner.speaker import SpeakerRunner
 from measure.tuning import MeasurementParameters
-from measure.util.measure_util import MeasureUtil
+from measure.utils.sampling import PowerSampler
 
 
 class MeasurementAssembler:
@@ -88,6 +96,7 @@ class MeasurementAssembler:
         home_assistant: HomeAssistantManager | None = None,
         tuya_device_key: str | None = None,
         shelly_password: str | None = None,
+        kasa_credentials: TapoCredentials | None = None,
         on_sample: Callable[[float], None] | None = None,
         on_calibration_sample: Callable[[float, float, float], None] | None = None,
         dummy_load_calibration_store: DummyLoadCalibrationStore | None = None,
@@ -96,6 +105,7 @@ class MeasurementAssembler:
         self._home_assistant_manager = home_assistant
         self._tuya_device_key = tuya_device_key
         self._shelly_password = shelly_password
+        self._kasa_credentials = kasa_credentials
         self._on_sample = on_sample
         self._on_calibration_sample = on_calibration_sample
         self._dummy_load_calibration_store = dummy_load_calibration_store
@@ -103,10 +113,10 @@ class MeasurementAssembler:
     def assemble(self, request: MeasurementRequest) -> PreparedMeasurement:
         """Resolve a request once into a transport-independent runner graph."""
 
-        power_meter = self.build_power_meter(request.power_meter)
+        power_meter = self.create_power_meter(request.power_meter)
         voltage_enabled = power_meter.has_voltage_support()
         parameters = request.parameters
-        measure_util = MeasureUtil(
+        sampler = PowerSampler(
             power_meter,
             parameters,
             include_voltage=lambda: voltage_enabled,
@@ -114,13 +124,13 @@ class MeasurementAssembler:
             on_sample=self._on_sample,
             on_calibration_sample=self._on_calibration_sample,
         )
-        runner = self._runner(request, parameters, measure_util)
+        runner = self.create_runner(request, parameters, sampler)
         preparations: list[MeasurementPreparation] = (
             [
                 DummyLoadPreparation(
                     request=request,
                     spec=request.dummy_load,
-                    measure_util=measure_util,
+                    sampler=sampler,
                     calibration_store=self._dummy_load_calibration_store,
                 ),
             ]
@@ -134,13 +144,13 @@ class MeasurementAssembler:
             interaction=self._interaction,
         )
 
-    def build_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:  # noqa: C901
+    def create_power_meter(self, spec: PowerMeterSpec) -> PowerMeter:  # noqa: C901
         """Build the configured meter for execution or preflight diagnostics."""
 
         if isinstance(spec, DummyPowerMeterSpec):
             return DummyPowerMeter()
         if isinstance(spec, HassPowerMeterSpec):
-            hass = self._home_assistant()
+            hass = self._require_home_assistant()
             return HassPowerMeter(
                 hass,
                 spec.call_update_entity,
@@ -151,7 +161,7 @@ class MeasurementAssembler:
         if isinstance(spec, KasaPowerMeterSpec):
             from measure.powermeter.kasa import KasaPowerMeter
 
-            return KasaPowerMeter(spec.device_ip)
+            return KasaPowerMeter(spec.device_ip, credentials=self._kasa_credentials)
         if isinstance(spec, ManualPowerMeterSpec):
             return ManualPowerMeter()
         if isinstance(spec, MyStromPowerMeterSpec):
@@ -177,70 +187,82 @@ class MeasurementAssembler:
             from measure.powermeter.serial_scpi import OwonOwh98xxPowerMeter
 
             return OwonOwh98xxPowerMeter(spec.port, spec.baudrate, spec.timeout, spec.channel)
-        raise PowerMeterError(f"Unsupported power meter specification: {type(spec).__name__}")
+        assert_never(spec)  # pragma: no cover - all PowerMeterSpec variants handled
 
-    def _runner(
+    def create_runner(
         self,
         request: MeasurementRequest,
         parameters: MeasurementParameters,
-        measure_util: MeasureUtil,
+        sampler: PowerSampler,
     ) -> MeasurementRunner[Any]:
         interaction = self._interaction
         if isinstance(request, LightMeasurementRequest):
-            light_controller = self.build_light_controller(request.controller)
-            return LightRunner(
-                measure_util,
+            light_controller = self.create_light_controller(request.controller)
+            runner = LightRunner(
+                sampler,
                 parameters,
                 light_controller,
                 interaction,
                 resume=request.resume_policy == ResumePolicy.RESUME,
             )
+            runner.num_lights = request.multiple_light_count
+            return runner
         if isinstance(request, SpeakerMeasurementRequest):
-            media_controller = self._media_controller(request.controller)
-            return SpeakerRunner(measure_util, parameters, media_controller, interaction)
+            media_controller = self._create_media_controller(request.controller)
+            return SpeakerRunner(sampler, parameters, media_controller, interaction)
         if isinstance(request, RecorderMeasurementRequest):
-            state_reader = self._recorder_state_reader() if request.recorded_entity_ids else None
-            return RecorderRunner(measure_util, interaction, state_reader)
-        if isinstance(request, AverageMeasurementRequest):
-            return AverageRunner(measure_util, interaction=interaction)
+            state_reader = self._create_recorder_state_reader() if request.recorded_entity_ids else None
+            context = None
+            if request.recorded_entity_ids:
+                snapshot = HomeAssistantEntityCatalog(self._require_home_assistant()).load_snapshot()
+                context = build_recording_context(request, snapshot.get_all(), snapshot.related_device_ids)
+            return RecorderRunner(sampler, interaction, state_reader, context)
+        if isinstance(request, AverageMeasurementRequest | FixedMeasurementRequest):
+            return AverageRunner(sampler, interaction=interaction)
         if isinstance(request, ChargingMeasurementRequest):
-            charging_controller = self._charging_controller(request.controller)
+            charging_controller = self._create_charging_controller(request.controller)
             return ChargingRunner(
-                measure_util,
+                sampler,
                 parameters,
                 charging_controller,
                 interaction,
             )
         if isinstance(request, FanMeasurementRequest):
-            fan_controller = self._fan_controller(request.controller)
-            return FanRunner(measure_util, parameters, fan_controller, interaction)
-        raise ValueError(f"Unsupported measurement request: {type(request).__name__}")
+            fan_controller = self._create_fan_controller(request.controller)
+            return FanRunner(sampler, parameters, fan_controller, interaction)
+        if isinstance(request, SmartSwitchMeasurementRequest):
+            controller = request.controller
+            entity_ids = (
+                controller.entity_ids
+                if isinstance(controller, HassMultiSwitchControllerSpec)
+                else [controller.entity_id]
+            )
+            switch_controller = HassSwitchController(self._require_home_assistant(), entity_ids)
+            return SmartSwitchRunner(sampler, switch_controller, interaction)
+        assert_never(request)  # pragma: no cover - all MeasurementRequest variants handled
 
-    def _recorder_state_reader(self) -> EntityStateReader:
-        home_assistant = self._home_assistant()
+    def _create_recorder_state_reader(self) -> EntityStateReader:
+        home_assistant = self._require_home_assistant()
 
         def read(entity_ids: Sequence[str]) -> Mapping[str, RecorderEntityState]:
             # One dump per sample. `get_state` has no single-entity WebSocket command
             # behind it, so asking per entity refetches every state in Home Assistant.
             wanted = set(entity_ids)
-            states = {
+            return {
                 state.entity_id: RecorderEntityState(state=str(state.state), attributes=state.attributes)
                 for state in home_assistant.get_states()
                 if state.entity_id in wanted
             }
-            if missing := sorted(wanted - states.keys()):
-                raise ValueError(f"Entities not found in Home Assistant: {', '.join(missing)}")
-            return states
 
         return read
 
-    def build_light_controller(self, spec: LightControllerSpec) -> LightController:
+    def create_light_controller(self, spec: LightControllerSpec) -> LightController:
         """Build a configured light controller for execution or active preflight checks."""
 
         if isinstance(spec, DummyLightControllerSpec):
             return DummyLightController()
         if isinstance(spec, HassLightControllerSpec | HassMultiLightControllerSpec):
-            hass = self._home_assistant()
+            hass = self._require_home_assistant()
             return HassLightController(
                 hass,
                 spec.transition_time,
@@ -251,36 +273,36 @@ class MeasurementAssembler:
             from measure.controller.light.hue import HueLightController
 
             return HueLightController(spec.bridge_ip, light=spec.light)
-        raise ValueError(f"Expected a light controller specification, got {type(spec).__name__}")
+        assert_never(spec)  # pragma: no cover - all LightControllerSpec variants handled
 
-    def _media_controller(self, spec: MediaControllerSpec) -> MediaController:
+    def _create_media_controller(self, spec: MediaControllerSpec) -> MediaController:
         if isinstance(spec, DummyMediaControllerSpec):
             return DummyMediaController()
         if isinstance(spec, HassMediaControllerSpec):
-            hass = self._home_assistant()
+            hass = self._require_home_assistant()
             return HassMediaController(hass, entity_id=spec.entity_id)
-        raise ValueError(f"Expected a media controller specification, got {type(spec).__name__}")
+        assert_never(spec)  # pragma: no cover - all MediaControllerSpec variants handled
 
-    def _charging_controller(self, spec: ChargingControllerSpec) -> ChargingController:
+    def _create_charging_controller(self, spec: ChargingControllerSpec) -> ChargingController:
         if isinstance(spec, DummyChargingControllerSpec):
             return DummyChargingController()
         if isinstance(spec, HassChargingControllerSpec):
-            hass = self._home_assistant()
+            hass = self._require_home_assistant()
             return HassChargingController(
                 hass,
                 entity_id=spec.entity_id,
             )
-        raise ValueError(f"Expected a charging controller specification, got {type(spec).__name__}")
+        assert_never(spec)  # pragma: no cover - all ChargingControllerSpec variants handled
 
-    def _fan_controller(self, spec: FanControllerSpec) -> FanController:
+    def _create_fan_controller(self, spec: FanControllerSpec) -> FanController:
         if isinstance(spec, DummyFanControllerSpec):
             return DummyFanController()
         if isinstance(spec, HassFanControllerSpec):
-            hass = self._home_assistant()
+            hass = self._require_home_assistant()
             return HassFanController(hass, entity_id=spec.entity_id)
-        raise ValueError(f"Expected a fan controller specification, got {type(spec).__name__}")
+        assert_never(spec)  # pragma: no cover - all FanControllerSpec variants handled
 
-    def _home_assistant(self) -> HomeAssistantManager:
+    def _require_home_assistant(self) -> HomeAssistantManager:
         if self._home_assistant_manager is None:
             raise ValueError("Home Assistant runtime connection is required")
         return self._home_assistant_manager

@@ -34,6 +34,7 @@ describe("measure app controller: contribution", () => {
       }),
     }), () => connection(), () => undefined);
     appState.snapshot = { state: "completed", session_id: "session-1" };
+    appState.files = [{ name: "model.json", size: 2, media_type: "application/json" }];
 
     await controller.startContributionDeviceAuth();
     expect(appState.contributionDeviceFlow?.flow_id).toBe("flow-1");

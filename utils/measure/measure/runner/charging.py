@@ -4,12 +4,12 @@ import time
 from measure.controller.charging.const import ChargingDeviceType
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import ChargingControllerError
-from measure.execution import ChargingOperatingPoint, ImmediateInteraction, RunInteraction
 from measure.request import ChargingMeasurementRequest
 from measure.runner.errors import RunnerError
+from measure.runner.interaction import ChargingOperatingPoint, ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.tuning import MeasurementParameters
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.utils.sampling import PowerSampler
 
 _LOGGER = logging.getLogger("measure")
 
@@ -20,15 +20,14 @@ TRICKLE_CHARGING_TIME = 1800
 class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
     def __init__(
         self,
-        measure_util: MeasureUtil,
+        sampler: PowerSampler,
         parameters: MeasurementParameters,
         controller: ChargingController,
         interaction: RunInteraction | None = None,
     ) -> None:
         self.config = parameters
-        self.measure_util = measure_util
+        self.sampler = sampler
         self.controller = controller
-        self.charging_device_type: ChargingDeviceType | None = None
         self.interaction = interaction or ImmediateInteraction()
 
     def run(
@@ -36,12 +35,6 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         request: ChargingMeasurementRequest,
         export_directory: str,
     ) -> RunnerResult:
-        self.charging_device_type = request.charging_device_type
-
-        self.interaction.notify(
-            "Make sure the device is as close to 0% charged as possible before starting the test.",
-        )
-        self.interaction.confirm("Ready to start charging measurement.")
         self.interaction.phase("Starting charging measurement")
 
         self.interaction.phase("Checking battery and charging state")
@@ -76,9 +69,9 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         self.interaction.phase("Measuring trickle charging power")
 
         trickle_result = (
-            self.measure_util.take_measurement(time.time())
+            self.sampler.take_measurement(time.time())
             if self.config.fast_test_mode
-            else self.measure_util.take_average_measurement(
+            else self.sampler.take_average_measurement(
                 TRICKLE_CHARGING_TIME,
                 on_progress=self._report_trickle_progress,
             )
@@ -86,7 +79,9 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         measurements[100] = [trickle_result.power]
         voltages.extend(trickle_result.voltages)
 
-        return RunnerResult(model_json_data=self._build_model_json_data(measurements), voltages=voltages)
+        return RunnerResult(
+            model_json_data=self._build_model_json_data(measurements, request.charging_device_type), voltages=voltages
+        )
 
     def _measure_charging_step(
         self,
@@ -109,7 +104,7 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         self.interaction.progress(battery_level, 100, phase="Charging")
         _LOGGER.info("Battery level: %d%%", battery_level)
         self.interaction.phase(f"Measuring charging power at {battery_level}% battery")
-        result = self.measure_util.take_measurement(time.time())
+        result = self.sampler.take_measurement(time.time())
         _LOGGER.info("Measured power: %.2f W", result.power)
         measurements.setdefault(battery_level, []).append(result.power)
         voltages.extend(result.voltages)
@@ -146,10 +141,10 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
         if wait_message_printed:
             self.interaction.notify("Charging device started charging, starting measurements")
 
-    def _build_model_json_data(self, measurements: dict[int, list[float]]) -> dict[str, object]:
+    def _build_model_json_data(
+        self, measurements: dict[int, list[float]], device_type: ChargingDeviceType
+    ) -> dict[str, object]:
         """Build the model JSON data from the measurements"""
-        if self.charging_device_type is None:
-            raise RuntimeError("Charging runner is not configured")
         calibrate_list = []
         for battery_level, powers in measurements.items():
             average_power = round(sum(powers) / len(powers), 2)
@@ -162,11 +157,8 @@ class ChargingRunner(MeasurementRunner[ChargingMeasurementRequest]):
             linear_config["attribute"] = self.controller.battery_level_attribute
 
         return {
-            "device_type": self.charging_device_type.value,
+            "device_type": device_type.value,
             "calculation_strategy": "linear",
             "calculation_enabled_condition": calculation_enabled_condition,
             "linear_config": linear_config,
         }
-
-    def measure_standby_power(self) -> MeasurementResult:
-        return MeasurementResult(power=0, voltages=[])

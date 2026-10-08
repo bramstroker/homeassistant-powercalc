@@ -88,6 +88,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     PowerProfileSource,
 )
+from custom_components.powercalc.device_naming import DeviceName
 from custom_components.powercalc.discovery import get_discovery_manager
 from custom_components.powercalc.errors import (
     ModelNotSupportedError,
@@ -372,6 +373,8 @@ class PowerSensor(BaseEntity):
 class VirtualPowerSensor(PowerSensor, SensorEntity):
     """Virtual power sensor."""
 
+    device_name = DeviceName("power")
+
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfPower.WATT
@@ -406,7 +409,9 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         self._attr_force_update = True
         self._attr_unique_id = unique_id
         multiply_factor = sensor_config.get(CONF_MULTIPLY_FACTOR)
-        self._multiply_factor: Decimal | None = Decimal(multiply_factor) if multiply_factor else None
+        self._multiply_factor: Decimal | None = Decimal(multiply_factor) if multiply_factor is not None else None
+        if multiply_factor is None and power_profile:
+            self._multiply_factor = power_profile.multiply_factor
         self._multiply_factor_standby = bool(sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY, False))
         self._ignore_unavailable_state = bool(sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE, False))
         self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
@@ -722,7 +727,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
 
     def _apply_multiply_factor(self, power: Decimal) -> Decimal:
         """Apply the configured multiply factor to a power value."""
-        return power * self._multiply_factor if self._multiply_factor else power
+        return power * self._multiply_factor if self._multiply_factor is not None else power
 
     def _apply_standby_multiply_factor(self, power: Decimal) -> Decimal:
         """Apply the multiply factor to a standby power value, only when enabled for standby."""

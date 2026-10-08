@@ -21,6 +21,7 @@ const settings: AppSettings = {
   shelly_username: "operator",
   kasa_ip: "192.0.2.30",
   fast_test_mode: false,
+  allow_zero_power: false,
   measurement_defaults: { sleep_time: 1, sample_count: 1, sleep_time_sample: 1, max_retries: 5, max_nudges: 0 },
 };
 

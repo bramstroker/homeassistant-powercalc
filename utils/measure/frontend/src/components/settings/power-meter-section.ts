@@ -5,7 +5,7 @@ import { DEFAULT_SHELLY_USERNAME, POWER_METER_LIST, meterFor } from "../../power
 import { emit } from "../../utils/events";
 import type { ComboboxOption } from "../shared/combobox";
 import "../shared/combobox";
-import { optionSelect } from "../shared/fields";
+import { entityOption, optionSelect } from "../shared/fields";
 import "../shared/power-meter-diagnostic";
 
 @customElement("measure-settings-power-meter-section")
@@ -32,6 +32,9 @@ export class SettingsPowerMeterSection extends LitElement {
   @state() private shellyPassword = "";
   @state() private clearShellyPassword = false;
   @state() private kasaIp?: string;
+  @state() private tapoUsername = "";
+  @state() private tapoPassword = "";
+  @state() private clearTapoCredentials = false;
 
   protected createRenderRoot(): HTMLElement | DocumentFragment {
     return this;
@@ -115,10 +118,7 @@ export class SettingsPowerMeterSection extends LitElement {
   }
 
   private renderHassFields() {
-    const options = this.powers.map((entity) => ({
-      value: entity.entity_id,
-      label: `${entity.name} · ${entity.entity_id}`,
-    }));
+    const options = this.powers.map((entity) => entityOption(entity));
     return html`
       <measure-combobox
         name="default_power_entity_id"
@@ -207,9 +207,30 @@ export class SettingsPowerMeterSection extends LitElement {
     const address = this.kasaIp ?? this.settings?.kasa_ip ?? "";
     return html`
       <label>
-        <span>Kasa IP address</span>
+        <span>TP-Link Kasa / Tapo IP address</span>
         <input name="kasa_ip" .value=${address} required autocomplete="off" placeholder="192.168.1.50" @input=${this.kasaIpChanged} />
-        <small class="field-hint">Enter the IP address of a Kasa plug with energy monitoring, such as a KP115 or HS110. Give it a static lease in your router so it stays reachable.</small>
+        <small class="field-hint">Enter the IP address of an energy-monitoring Kasa or Tapo plug. Give it a static lease in your router so it stays reachable.</small>
+      </label>
+      <div class="grid">
+        <label>
+          <span>TP-Link account email</span>
+          <input name="tapo_username" type="email" .value=${this.tapoUsername} autocomplete="username" maxlength="255" @input=${this.tapoUsernameChanged} />
+        </label>
+        <label>
+          <span>TP-Link account password</span>
+          <input name="tapo_password" type="password" .value=${this.tapoPassword} autocomplete="new-password" maxlength="255" placeholder=${this.settings?.tapo_credentials_configured ? "Saved credentials (enter both to replace)" : "Required"} @input=${this.tapoPasswordChanged} />
+          <small class="field-hint">Stored privately in the app and used only to authenticate local Tapo connections.</small>
+        </label>
+      </div>
+      ${this.renderClearTapoCredentials()}`;
+  }
+
+  private renderClearTapoCredentials() {
+    if (!this.settings?.tapo_credentials_configured) return nothing;
+    return html`
+      <label class="check">
+        <input name="clear_tapo_credentials" type="checkbox" .checked=${this.clearTapoCredentials} @change=${this.clearTapoCredentialsChanged} />
+        <span>Remove saved Tapo credentials</span>
       </label>`;
   }
 
@@ -261,6 +282,27 @@ export class SettingsPowerMeterSection extends LitElement {
 
   private readonly kasaIpChanged = (event: Event): void => {
     this.kasaIp = (event.currentTarget as HTMLInputElement).value;
+    this.powerMeterSettingsChanged();
+  };
+
+  private readonly tapoUsernameChanged = (event: Event): void => {
+    this.tapoUsername = (event.currentTarget as HTMLInputElement).value;
+    this.clearTapoCredentials = false;
+    this.powerMeterSettingsChanged();
+  };
+
+  private readonly tapoPasswordChanged = (event: Event): void => {
+    this.tapoPassword = (event.currentTarget as HTMLInputElement).value;
+    this.clearTapoCredentials = false;
+    this.powerMeterSettingsChanged();
+  };
+
+  private readonly clearTapoCredentialsChanged = (event: Event): void => {
+    this.clearTapoCredentials = (event.currentTarget as HTMLInputElement).checked;
+    if (this.clearTapoCredentials) {
+      this.tapoUsername = "";
+      this.tapoPassword = "";
+    }
     this.powerMeterSettingsChanged();
   };
 

@@ -15,9 +15,9 @@ Use this guide when you want to create a new power profile for the library or wh
 | Light bulb(s) | Lights with brightness, color temperature, color, white, or effects support | LUT CSV files and optional `model.json` |
 | Smart speaker | Media players where power changes with volume or playing state | Linear calibration and optional `model.json` |
 | Fan | Fans with percentage control | Linear calibration and optional `model.json` |
-| Charging device | Vacuum robots and lawn mower robots while charging | Linear calibration and optional `model.json` |
+| Charging device | Vacuum robots while charging; lawn mower robots through the CLI | Linear calibration and optional `model.json` |
 | Average | Any device where you only need an average power value | Average power reading |
-| Recorder | Playbook patterns or state-driven device profiles | Power-only CSV, or entity-state JSON Lines with experimental fixed-profile analysis |
+| Recorder | Playbook patterns or state-driven device profiles | Power-only CSV, or entity-state JSON Lines with experimental fixed and vacuum composite analysis |
 
 The light mode is the most common contribution path. Other modes are useful when a device has a predictable relation between an entity attribute and power consumption.
 
@@ -31,11 +31,12 @@ There are two ways to run a measurement. Both share the same measurement core an
 ## Then continue with
 
 1. [Light profiles](lights.md) - create LUT profiles for lights, the most common contribution path.
-2. [Other measure modes](modes.md) - measure speakers, fans, charging devices, average readings, or recorder sessions.
-3. [Output and pull requests](output.md) - inspect the generated files and submit them to the library.
-4. [Measuring low-power devices](low-power-measurements.md) - handle sub-watt loads with multiple devices, a dummy
+2. [Measuring by device type](device-types.md) - prepare each supported device and follow its measurement steps in the app.
+3. [Other measure modes](modes.md) - measure speakers, fans, charging devices, average readings, or recorder sessions.
+4. [Output and pull requests](output.md) - inspect the generated files and submit them to the library.
+5. [Measuring low-power devices](low-power-measurements.md) - handle sub-watt loads with multiple devices, a dummy
    load, or a more precise meter.
-5. [Troubleshooting](troubleshooting.md) - fix common measurement problems.
+6. [Troubleshooting](troubleshooting.md) - fix common measurement problems.
 
 Developers can read [Architecture](architecture.md) to understand how the CLI and app share the same measurement pipeline.
 

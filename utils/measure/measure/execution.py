@@ -1,16 +1,13 @@
-from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from statistics import mean
-import time
-from typing import Any, Literal, NotRequired, Protocol, TypedDict
+from typing import Any, Protocol
 
-from measure.analyser import RecorderAnalyser
 from measure.analyser.execution import RecorderAnalysisExecution
-from measure.cancellation import MeasurementCancelledError as MeasurementCancelledError
+from measure.analyser.service import RecorderAnalyser
 from measure.const import DUMMY_LOAD_MEASUREMENT_COUNT, DUMMY_LOAD_MEASUREMENTS_DURATION, Trend
 from measure.dummy_load import DummyLoadCalibration
-from measure.model import write_model_json
+from measure.profile.model_json import write_model_json
 from measure.request import (
     DummyLoadRequest,
     DummyLoadReuseRequest,
@@ -19,117 +16,10 @@ from measure.request import (
     RecorderMeasurementRequest,
     RecorderPurpose,
 )
+from measure.runner.interaction import ImmediateInteraction, RunInteraction
 from measure.runner.runner import MeasurementRunner, RunnerResult
-from measure.util.measure_util import DummyLoadMeasurementError, MeasureUtil
-
-
-class LightOperatingPoint(TypedDict):
-    type: Literal["light"]
-    on: bool
-    brightness: NotRequired[int]
-    color_temp_mired: NotRequired[int]
-    hue: NotRequired[int]
-    saturation: NotRequired[int]
-    effect: NotRequired[str]
-
-
-class SpeakerOperatingPoint(TypedDict):
-    type: Literal["speaker"]
-    volume: int
-    muted: bool
-
-
-class FanOperatingPoint(TypedDict):
-    type: Literal["fan"]
-    percentage: int
-    on: bool
-
-
-class ChargingOperatingPoint(TypedDict):
-    type: Literal["charging"]
-    battery_level: int
-    charging: bool
-
-
-type OperatingPoint = LightOperatingPoint | SpeakerOperatingPoint | FanOperatingPoint | ChargingOperatingPoint
-
-
-class RunInteraction(Protocol):
-    """Full interaction boundary used while a measurement is running."""
-
-    def confirm(self, message: str, *, action: str | None = None) -> None:
-        """Wait until the user confirms a physical preparation step."""
-
-    def choose(self, message: str, *, default: bool) -> bool:
-        """Request a binary runtime choice."""
-
-    def notify(self, message: str) -> None:
-        """Report information which does not represent a measurement phase."""
-
-    def phase(self, message: str) -> None:
-        """Report the current activity when numeric progress is unavailable."""
-
-    def progress(
-        self,
-        completed: int,
-        total: int,
-        *,
-        phase: str,
-        remaining_seconds: float | None = None,
-        skipped: int = 0,
-    ) -> None:
-        """Report measurement progress. ``total`` of 0 means the run is open-ended."""
-
-    def wait(self, seconds: float) -> None:
-        """Wait for a duration, raising if the run is cancelled."""
-
-    def checkpoint(self) -> None:
-        """Raise when the active run has been cancelled."""
-
-    def operating_point(self, point: OperatingPoint) -> None:
-        """Report the device state currently being measured."""
-
-    def entity_states(self, states: Mapping[str, str]) -> None:
-        """Report the latest states captured by a recorder session."""
-
-
-class ImmediateInteraction(RunInteraction):
-    """Non-interactive execution adapter used by tests and unattended runs."""
-
-    def confirm(self, _: str, *, action: str | None = None) -> None:
-        del action
-
-    def notify(self, _: str) -> None:
-        return
-
-    def choose(self, _: str, *, default: bool) -> bool:
-        return default
-
-    def phase(self, message: str) -> None:
-        return
-
-    def progress(
-        self,
-        completed: int,
-        total: int,
-        *,
-        phase: str,
-        remaining_seconds: float | None = None,
-        skipped: int = 0,
-    ) -> None:
-        return
-
-    def wait(self, seconds: float) -> None:
-        time.sleep(seconds)
-
-    def checkpoint(self) -> None:
-        return
-
-    def operating_point(self, point: OperatingPoint) -> None:
-        return
-
-    def entity_states(self, states: Mapping[str, str]) -> None:
-        return
+from measure.start import MEASUREMENT_STARTS
+from measure.utils.sampling import PowerSampler
 
 
 class MeasurementPreparation(Protocol):
@@ -154,13 +44,13 @@ class DummyLoadPreparation(MeasurementPreparation):
 
     request: MeasurementRequest
     spec: DummyLoadRequest
-    measure_util: MeasureUtil
+    sampler: PowerSampler
     calibration_store: DummyLoadCalibrationStore | None = None
 
     def run(self, interaction: RunInteraction) -> None:
-        self.measure_util.validate_dummy_load_support()
+        self.sampler.validate_dummy_load_support()
         calibrated = False
-        resistance = self._restored_resistance()
+        resistance = self._load_restored_resistance()
         target = "light" if self.request.measure_type == "light" else "target device"
 
         if resistance is None:
@@ -170,7 +60,7 @@ class DummyLoadPreparation(MeasurementPreparation):
                 f"({self.spec.description}) before starting calibration.",
                 action="Start dummy-load calibration",
             )
-            resistance = self._calibrate(interaction)
+            resistance = self.calibrate(interaction)
             calibrated = True
         else:
             interaction.phase("Preparing resistive dummy load")
@@ -178,17 +68,17 @@ class DummyLoadPreparation(MeasurementPreparation):
                 f"Connect the same preheated resistive dummy load ({self.spec.description}) to the power meter.",
             )
 
-        self.measure_util.set_dummy_load_resistance(resistance)
+        self.sampler.set_dummy_load_resistance(resistance)
         if calibrated and self.calibration_store is not None:
             self.calibration_store.save(self.request, resistance)
         completion = "Dummy-load calibration is complete. " if calibrated else ""
         interaction.confirm(
             f"{completion}Connect the {target} in parallel with the dummy load, and keep the dummy load connected "
             "during the measurement.",
-            action="Start measurement",
+            action="Continue",
         )
 
-    def _restored_resistance(self) -> float | None:
+    def _load_restored_resistance(self) -> float | None:
         if isinstance(self.spec, DummyLoadReuseRequest):
             return self.spec.resistance
         if self.calibration_store is None:
@@ -196,11 +86,9 @@ class DummyLoadPreparation(MeasurementPreparation):
         calibration = self.calibration_store.load(self.request)
         if calibration is None:
             return None
-        if calibration.resistance <= 0:
-            raise DummyLoadMeasurementError("Restored dummy-load resistance must be positive")
         return calibration.resistance
 
-    def _calibrate(self, interaction: RunInteraction) -> float:
+    def calibrate(self, interaction: RunInteraction) -> float:
         while True:
             averages: list[float] = []
             for index in range(DUMMY_LOAD_MEASUREMENT_COUNT):
@@ -211,7 +99,7 @@ class DummyLoadPreparation(MeasurementPreparation):
                     phase="Calibrating resistive dummy load",
                     remaining_seconds=(DUMMY_LOAD_MEASUREMENT_COUNT - index) * DUMMY_LOAD_MEASUREMENTS_DURATION,
                 )
-                average = self.measure_util.take_average_measurement(
+                average = self.sampler.take_average_measurement(
                     DUMMY_LOAD_MEASUREMENTS_DURATION,
                     measure_resistance=True,
                 )
@@ -226,9 +114,8 @@ class DummyLoadPreparation(MeasurementPreparation):
                 phase="Checking dummy-load stability",
                 remaining_seconds=0,
             )
-            trend = self.measure_util.dummy_load_trend(averages)
-            if trend is None:
-                raise DummyLoadMeasurementError("No dummy-load resistance trend could be calculated")
+            trend = self.sampler.classify_dummy_load_trend(averages)
+            assert trend is not None  # Calibration always collects the required 20 samples.
             if trend == Trend.STEADY:
                 resistance = round(mean(averages), 2)
                 interaction.phase(f"Dummy-load calibration completed at {resistance:.2f} Ω")
@@ -278,6 +165,8 @@ class MeasurementExecution:
         try:
             for preparation in self.measurement.preparations:
                 preparation.run(self.measurement.interaction)
+            start = MEASUREMENT_STARTS[request.measure_type]
+            self.measurement.interaction.confirm(start.message, action=start.action)
             result = runner.run(request, str(output_directory or ""))
             if (
                 isinstance(request, RecorderMeasurementRequest)
@@ -296,28 +185,37 @@ class MeasurementExecution:
                     ),
                 )
             if request.generate_model_json and output_directory is not None:
-                standby = runner.measure_standby_power()
-                voltages = list(result.voltages or []) + standby.voltages
-                write_model_json(
-                    output_directory,
-                    standby_power=standby.power,
-                    name=request.model_name,
-                    measure_device=request.measure_device,
-                    parameters=request.parameters,
-                    extra_json_data=result.model_json_data,
-                    voltages=voltages,
-                    num_lights=request.multiple_light_count if isinstance(request, LightMeasurementRequest) else None,
-                    dummy_load=request.dummy_load is not None,
-                    dummy_load_resistance=self._dummy_load_resistance(),
-                )
+                self._write_model(output_directory, runner, request, result)
             return result
         finally:
             runner.cleanup()
 
-    def _dummy_load_resistance(self) -> float | None:
+    def _write_model(
+        self,
+        output_directory: Path,
+        runner: MeasurementRunner[Any],
+        request: MeasurementRequest,
+        result: RunnerResult,
+    ) -> None:
+        standby = runner.measure_standby_power()
+        voltages = list(result.voltages or []) + (standby.voltages if standby is not None else [])
+        write_model_json(
+            output_directory,
+            standby_power=standby.power if standby is not None else None,
+            name=request.model_name,
+            measure_device=request.measure_device,
+            parameters=request.parameters,
+            extra_json_data=result.model_json_data,
+            voltages=voltages,
+            num_lights=request.multiple_light_count if isinstance(request, LightMeasurementRequest) else None,
+            dummy_load=request.dummy_load is not None,
+            dummy_load_resistance=self._get_dummy_load_resistance(),
+        )
+
+    def _get_dummy_load_resistance(self) -> float | None:
         if isinstance(self.measurement.request.dummy_load, DummyLoadReuseRequest):
             return self.measurement.request.dummy_load.resistance
         for preparation in self.measurement.preparations:
-            if isinstance(preparation, DummyLoadPreparation):
-                return preparation.measure_util.dummy_load_value
+            if isinstance(preparation, DummyLoadPreparation):  # pragma: no branch - only concrete preparation type
+                return preparation.sampler.dummy_load_value
         return None

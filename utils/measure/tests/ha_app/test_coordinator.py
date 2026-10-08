@@ -1,0 +1,905 @@
+from pathlib import Path
+from threading import Event, Thread
+import time
+from typing import Any
+from unittest.mock import MagicMock, patch
+
+from measure.controller.light.spec import DummyLightControllerSpec
+from measure.controller.switch.spec import HassSwitchControllerSpec
+from measure.execution import MeasurementExecution, PreparedMeasurement
+from measure.ha_app.coordinator import (
+    MeasurementCoordinator,
+    SessionConflictError,
+    SessionExecutionContext,
+    SessionMeasurementService,
+)
+from measure.ha_app.interaction import SessionInteraction
+from measure.ha_app.session import SessionControl, SessionEventType, SessionSnapshot, SessionState
+from measure.ha_app.storage import SessionStorage
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
+from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.request import (
+    AverageMeasurementRequest,
+    LightMeasurementRequest,
+    MeasurementRequest,
+    RecorderMeasurementRequest,
+    RecorderProfileRecipe,
+    RecorderPurpose,
+    ResumePolicy,
+    SmartSwitchMeasurementRequest,
+)
+from measure.runner.average import AverageRunner
+from measure.runner.interaction import LightOperatingPoint
+from measure.runner.recorder import RecorderRunner
+from measure.runner.runner import RunnerResult
+from measure.tuning import MeasurementParameters
+from measure.utils.sampling import MeasurementResult, PowerSampler
+import pytest
+
+
+def light_request() -> LightMeasurementRequest:
+    return LightMeasurementRequest(
+        model_id="LCT010",
+        product_name="Test light",
+        measure_device="Test meter",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyLightControllerSpec(),
+    )
+
+
+def wait_for_state(coordinator: MeasurementCoordinator, state: SessionState) -> None:
+    deadline = time.monotonic() + 2
+    while time.monotonic() < deadline:
+        if coordinator.current and coordinator.current.state == state:
+            return
+        time.sleep(0.01)
+    raise AssertionError(f"Session did not reach {state}")
+
+
+class CompletingService(SessionMeasurementService):
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        directory = context.artifact_directory
+        directory.mkdir(parents=True)
+        (directory / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
+        control.progress(completed=1, total=1, mode="brightness", estimated_remaining="0s")
+        return RunnerResult(model_json_data={})
+
+
+class BlockingService(SessionMeasurementService):
+    def __init__(self, started: Event) -> None:
+        self.started = started
+
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        self.started.set()
+        control.wait(60)
+        raise AssertionError("Cancelled wait returned")
+
+
+class RecorderService(SessionMeasurementService):
+    def __init__(self, sample_recorded: Event) -> None:
+        self.sample_recorded = sample_recorded
+
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        assert isinstance(request, RecorderMeasurementRequest)
+        context.artifact_directory.mkdir(parents=True)
+        sampler = MagicMock(spec=PowerSampler)
+
+        def take_measurement(_: float) -> MeasurementResult:
+            self.sample_recorded.set()
+            return MeasurementResult(power=4.2, voltages=[])
+
+        sampler.take_measurement.side_effect = take_measurement
+        interaction = SessionInteraction(control)
+        measurement = PreparedMeasurement(
+            request=request, runner=RecorderRunner(sampler, interaction), interaction=interaction
+        )
+        execution = MeasurementExecution(measurement=measurement, output_directory=context.artifact_directory)
+        return execution.run()
+
+
+class SamplingService(SessionMeasurementService):
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        control.sample(4.2)
+        return RunnerResult(model_json_data={})
+
+
+class WarningService(SessionMeasurementService):
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        control.log("Repeated warning", warning=True)
+        return RunnerResult(model_json_data={})
+
+
+class EntityStateService(SessionMeasurementService):
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        control.entity_states({"vacuum.robot": "cleaning", "sensor.robot_battery": "42"})
+        return RunnerResult(model_json_data={})
+
+
+class OperatingPointService(SessionMeasurementService):
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        control.operating_point(LightOperatingPoint(type="light", on=True, brightness=128))
+        control.wait(60)
+        raise AssertionError("Cancelled wait returned")
+
+
+class CheckpointService(SessionMeasurementService):
+    def __init__(self, continued: Event) -> None:
+        self.continued = continued
+
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        control.phase("Preparing operator checkpoint")
+        control.confirm(
+            "Place the device on its charger, then start the measurement.",
+            action="Start charging measurement",
+        )
+        self.continued.set()
+        return RunnerResult(model_json_data={})
+
+
+class SwitchCheckpointService(SessionMeasurementService):
+    def __init__(self, continued: Event) -> None:
+        self.continued = continued
+
+    def run(
+        self,
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        control.confirm("Ready to switch relays.", action="Start switch measurement")
+        self.continued.set()
+        return RunnerResult(model_json_data={})
+
+
+def test_smart_switch_starts_after_explicit_confirmation(tmp_path: Path) -> None:
+    continued = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: SwitchCheckpointService(continued))
+    request = SmartSwitchMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        controller=HassSwitchControllerSpec(entity_id="switch.test"),
+        power_monitoring=False,
+    )
+    session = coordinator.start(request)
+    wait_for_state(coordinator, SessionState.AWAITING_CONFIRMATION)
+
+    coordinator.confirm(session.id)
+    assert continued.wait(1)
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+
+def test_coordinator_completes_and_persists_files(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    assert coordinator.current is not None
+    assert coordinator.current.progress == 100
+    assert coordinator.current.files == ("LCT010/brightness.csv",)
+    assert [(event.sequence, event.data["state"]) for event in coordinator.events_since(1, session.id)] == [
+        (2, SessionState.COMPLETED),
+    ]
+
+
+def test_returned_session_collections_do_not_modify_coordinator_state(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    coordinator = MeasurementCoordinator(storage, CompletingService)
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+    expected_events = coordinator.events_since(0, session.id)
+
+    coordinator.sessions().clear()
+    coordinator.events_since(0, session.id).clear()
+    storage.list_files(session.id).clear()
+    storage.load_events(session.id).clear()
+
+    assert [snapshot.id for snapshot in coordinator.sessions()] == [session.id]
+    assert coordinator.events_since(0, session.id) == expected_events
+    assert storage.load_events(session.id) == expected_events
+    assert storage.list_files(session.id) == ["LCT010/brightness.csv"]
+
+
+def test_coordinator_projects_latest_recorder_entity_states(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), EntityStateService)
+
+    coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    assert coordinator.current is not None
+    assert coordinator.current.entity_states == {
+        "vacuum.robot": "cleaning",
+        "sensor.robot_battery": "42",
+    }
+
+
+def test_coordinator_notifies_session_state_listeners(tmp_path: Path) -> None:
+    started = Event()
+    terminal_notification = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
+    notifications: list[SessionState | None] = []
+
+    def record_notification() -> None:
+        state = coordinator.current.state if coordinator.current is not None else None
+        notifications.append(state)
+        if state == SessionState.CANCELLED:
+            terminal_notification.set()
+
+    unsubscribe = coordinator.subscribe(record_notification)
+
+    session = coordinator.start(light_request())
+    assert started.wait(1)
+    coordinator.cancel(session.id)
+    wait_for_state(coordinator, SessionState.CANCELLED)
+    assert terminal_notification.wait(1)
+    unsubscribe()
+    unsubscribe()
+    coordinator.delete(session.id)
+
+    assert notifications == [SessionState.RUNNING, SessionState.CANCELLING, SessionState.CANCELLED]
+
+
+def test_stopping_recorder_marks_session_completed(tmp_path: Path) -> None:
+    sample_recorded = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: RecorderService(sample_recorded))
+
+    session = coordinator.start(RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec()))
+    wait_for_state(coordinator, SessionState.AWAITING_CONFIRMATION)
+    coordinator.confirm(session.id)
+    assert sample_recorded.wait(1)
+
+    coordinator.cancel(session.id)
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    assert coordinator.current is not None
+    assert coordinator.current.summary is not None
+    assert coordinator.current.summary["Samples recorded"] == "1"
+    assert coordinator.current.files == ("measurement/record.csv",)
+
+
+@pytest.mark.parametrize("stop_before_confirmation", [False, True])
+def test_stopping_average_keeps_result_after_sampling(tmp_path: Path, stop_before_confirmation: bool) -> None:
+    sample_recorded = Event()
+
+    class AverageService(SessionMeasurementService):
+        def run(
+            self,
+            request: MeasurementRequest,
+            control: SessionControl,
+            context: SessionExecutionContext,
+        ) -> RunnerResult:
+            assert isinstance(request, AverageMeasurementRequest)
+            meter = MagicMock(PowerMeter)
+            meter.get_power.return_value = PowerMeasurementResult(power=4.2, voltage=230.0, updated=time.time())
+            util = PowerSampler(
+                meter,
+                MeasurementParameters(),
+                include_voltage=lambda: True,
+                wait=control.wait,
+                on_sample=lambda _: sample_recorded.set(),
+            )
+            interaction = SessionInteraction(control)
+            measurement = PreparedMeasurement(
+                request=request, runner=AverageRunner(util, interaction), interaction=interaction
+            )
+            return MeasurementExecution(measurement=measurement, output_directory=None).run()
+
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), AverageService)
+    session = coordinator.start(AverageMeasurementRequest(power_meter=DummyPowerMeterSpec(), duration=60))
+    wait_for_state(coordinator, SessionState.AWAITING_CONFIRMATION)
+    if not stop_before_confirmation:
+        coordinator.confirm(session.id)
+        assert sample_recorded.wait(1)
+    coordinator.cancel(session.id)
+    wait_for_state(coordinator, SessionState.CANCELLED if stop_before_confirmation else SessionState.COMPLETED)
+    assert coordinator.current is not None
+    if not stop_before_confirmation:
+        assert coordinator.current.summary is not None
+        assert coordinator.current.summary["Average power"] == "4.2 W"
+        assert coordinator.current.summary["Average voltage"] == "230.0 V"
+        assert float(coordinator.current.summary["Duration"].split()[0]) < 60
+
+
+def test_coordinator_isolates_session_state_listener_failures(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+
+    def fail_notification() -> None:
+        raise RuntimeError("Observer failed")
+
+    coordinator.subscribe(fail_notification)
+
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    assert session.id
+    assert "Measurement session state listener failed" in caplog.text
+
+
+def test_coordinator_rejects_concurrent_start_and_cancels(tmp_path: Path) -> None:
+    started = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
+    session = coordinator.start(light_request())
+    assert started.wait(1)
+
+    duplicate = light_request()
+    with pytest.raises(SessionConflictError):
+        coordinator.start(duplicate)
+    with pytest.raises(SessionConflictError, match="measurement session is already active"):
+        coordinator.analyse(session.id)
+    with pytest.raises(SessionConflictError, match="measurement session is already active"):
+        coordinator.record_more(session.id)
+
+    coordinator.cancel(session.id)
+    wait_for_state(coordinator, SessionState.CANCELLED)
+    assert coordinator.cancel(session.id).state == SessionState.CANCELLED
+
+
+def test_coordinator_serializes_recording_analysis_with_other_session_actions(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    request = RecorderMeasurementRequest(
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
+        tracked_entity_ids=("switch.device",),
+        power_meter=DummyPowerMeterSpec(),
+    )
+    completed = SessionSnapshot(
+        id="recording",
+        state=SessionState.COMPLETED,
+        created_at="2026-09-04T08:00:00Z",
+        updated_at="2026-09-04T08:00:00Z",
+        warnings=(
+            "Power meter briefly stopped reporting",
+            "Profile was not created: the previous analysis rejected the recording",
+            "Recording analysis: skipped one malformed line",
+        ),
+    )
+    storage.create(completed, request)
+    output = storage.artifact_directory(completed.id, request.model_id)
+    output.mkdir()
+    (output / "record.jsonl").write_text("recording", encoding="utf-8")
+    coordinator = MeasurementCoordinator(storage, CompletingService)
+    analysis_started = Event()
+    finish_analysis = Event()
+
+    def analyse_recording(*_args: object, **_kwargs: object) -> dict[str, str]:
+        analysis_started.set()
+        assert finish_analysis.wait(1)
+        return {"Recording analysis": "Profile created"}
+
+    with patch("measure.ha_app.coordinator.RecorderAnalysisExecution") as execution_class:
+        execution_class.return_value.run.side_effect = analyse_recording
+        thread = Thread(target=coordinator.analyse, args=(completed.id,))
+        thread.start()
+        assert analysis_started.wait(1)
+
+        with pytest.raises(SessionConflictError, match="Recording analysis is already active"):
+            coordinator.start(light_request())
+        with pytest.raises(SessionConflictError, match="Recording analysis is already active"):
+            coordinator.resume(completed.id)
+        with pytest.raises(SessionConflictError, match="Recording analysis is already active"):
+            coordinator.record_more(completed.id)
+        with pytest.raises(SessionConflictError, match="already being analysed"):
+            coordinator.analyse(completed.id)
+        with pytest.raises(SessionConflictError, match="while its recording is being analysed"):
+            coordinator.delete(completed.id)
+
+        finish_analysis.set()
+        thread.join(1)
+
+    assert not thread.is_alive()
+    assert coordinator.get(completed.id).summary == {"Recording analysis": "Profile created"}
+    assert coordinator.get(completed.id).warnings == ("Power meter briefly stopped reporting",)
+
+
+def test_coordinator_rejects_analysis_for_unknown_session(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+
+    with pytest.raises(SessionConflictError, match="requested session does not exist"):
+        coordinator.analyse("missing-session")
+
+
+def test_coordinator_rejects_resume_without_compatible_output(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    current = SessionSnapshot(
+        id="failed",
+        state=SessionState.FAILED,
+        created_at="2026-07-12T12:00:00Z",
+        updated_at="2026-07-12T12:00:00Z",
+    )
+    storage.create(current, light_request())
+    coordinator = MeasurementCoordinator(storage, CompletingService)
+
+    with pytest.raises(SessionConflictError, match="no compatible complete row"):
+        coordinator.resume(current.id)
+
+
+def test_resume_policy_cannot_start_a_new_session(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    service = MagicMock(spec=SessionMeasurementService)
+    coordinator = MeasurementCoordinator(storage, lambda: service)
+    request = light_request().model_copy(update={"resume_policy": ResumePolicy.RESUME})
+
+    with pytest.raises(SessionConflictError, match="Use the resume action"):
+        coordinator.start(request)
+
+    assert coordinator.sessions() == []
+    service.run.assert_not_called()
+
+
+def test_missing_session_cannot_be_resumed(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+
+    with pytest.raises(SessionConflictError, match="does not exist"):
+        coordinator.resume("missing")
+
+    assert coordinator.current is None
+
+
+def test_completed_session_cannot_be_resumed(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    with pytest.raises(SessionConflictError, match="cannot be resumed"):
+        coordinator.resume(session.id)
+
+    assert coordinator.get(session.id).state == SessionState.COMPLETED
+
+
+def test_cancelling_a_completed_session_preserves_its_result(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+    completed = coordinator.get(session.id)
+    events = coordinator.events_since(0, session.id)
+
+    with pytest.raises(SessionConflictError, match="No running measurement session"):
+        coordinator.cancel(session.id)
+
+    assert coordinator.current == completed
+    assert coordinator.storage.load_snapshot(session.id) == completed
+    assert coordinator.events_since(0, session.id) == events
+
+
+@pytest.mark.parametrize("action", ["cancel", "confirm"])
+def test_stale_session_actions_do_not_affect_the_running_session(tmp_path: Path, action: str) -> None:
+    storage = SessionStorage(tmp_path)
+    completed_coordinator = MeasurementCoordinator(storage, CompletingService)
+    previous = completed_coordinator.start(light_request())
+    wait_for_state(completed_coordinator, SessionState.COMPLETED)
+    started = Event()
+    coordinator = MeasurementCoordinator(storage, lambda: BlockingService(started))
+    current = coordinator.start(light_request())
+
+    try:
+        assert started.wait(1)
+        with pytest.raises(SessionConflictError, match="The requested session is not active"):
+            getattr(coordinator, action)(previous.id)
+
+        assert coordinator.get(current.id).state == SessionState.RUNNING
+        assert coordinator.get(previous.id).state == SessionState.COMPLETED
+    finally:
+        coordinator.cancel(current.id)
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_repeated_cancellation_preserves_cancellation_intent_while_the_worker_stops(tmp_path: Path) -> None:
+    started = Event()
+    release = Event()
+
+    class SlowStoppingService(SessionMeasurementService):
+        def run(
+            self, request: MeasurementRequest, control: SessionControl, context: SessionExecutionContext
+        ) -> RunnerResult:
+            started.set()
+            assert release.wait(2)
+            control.checkpoint()
+            return RunnerResult(model_json_data={})
+
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), SlowStoppingService)
+    session = coordinator.start(light_request())
+    try:
+        assert started.wait(1)
+        cancelling = coordinator.cancel(session.id)
+        repeated = coordinator.cancel(session.id)
+
+        assert cancelling.state == SessionState.CANCELLING
+        assert repeated == cancelling
+        assert coordinator.storage.load_snapshot(session.id) == cancelling
+    finally:
+        release.set()
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+    assert coordinator.cancel(session.id).state == SessionState.CANCELLED
+
+
+def test_running_session_cannot_be_resumed_or_confirmed(tmp_path: Path) -> None:
+    started = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
+    session = coordinator.start(light_request())
+    try:
+        assert started.wait(1)
+        with pytest.raises(SessionConflictError, match="already active"):
+            coordinator.resume(session.id)
+        with pytest.raises(SessionConflictError, match="not waiting for confirmation"):
+            coordinator.confirm(session.id)
+        assert coordinator.get(session.id).state == SessionState.RUNNING
+    finally:
+        coordinator.cancel(session.id)
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_analysis_failure_releases_slot_and_preserves_recording_for_retry(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    request = RecorderMeasurementRequest(
+        recorder_purpose=RecorderPurpose.COMPLEX_PROFILE,
+        profile_recipe=RecorderProfileRecipe.GENERIC,
+        tracked_entity_ids=["switch.device"],
+        power_meter=DummyPowerMeterSpec(),
+    )
+    completed = SessionSnapshot(
+        id="recording",
+        state=SessionState.COMPLETED,
+        created_at="2026-09-04T08:00:00Z",
+        updated_at="2026-09-04T08:00:00Z",
+        summary={"Recording": "Complete"},
+    )
+    storage.create(completed, request)
+    output = storage.artifact_directory(completed.id, request.model_id)
+    output.mkdir()
+    recording = output / "record.jsonl"
+    recording.write_text("original recording", encoding="utf-8")
+    coordinator = MeasurementCoordinator(storage, CompletingService)
+
+    with patch("measure.ha_app.coordinator.RecorderAnalysisExecution") as execution:
+        execution.return_value.run.side_effect = [
+            ValueError("Analysis failed"),
+            {"Recording analysis": "Profile created"},
+        ]
+        with pytest.raises(ValueError, match="Analysis failed"):
+            coordinator.analyse(completed.id)
+        assert storage.load_snapshot(completed.id) == completed
+        assert recording.read_text(encoding="utf-8") == "original recording"
+
+        retried = coordinator.analyse(completed.id)
+
+    assert retried.summary == {"Recording analysis": "Profile created"}
+    assert execution.return_value.run.call_count == 2
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+    assert session.id != completed.id
+
+
+def test_long_session_bounds_live_events_and_replays_retained_session(tmp_path: Path) -> None:
+    emitted = Event()
+    finish = Event()
+
+    def emit_events(
+        request: MeasurementRequest,
+        control: SessionControl,
+        context: SessionExecutionContext,
+    ) -> RunnerResult:
+        for index in range(1005):
+            control.log(f"Reading {index}")
+        emitted.set()
+        assert finish.wait(5)
+        return RunnerResult(model_json_data={})
+
+    service = MagicMock(spec=SessionMeasurementService)
+    service.run.side_effect = emit_events
+    storage = SessionStorage(tmp_path)
+    coordinator = MeasurementCoordinator(storage, lambda: service)
+    session = coordinator.start(light_request())
+    try:
+        assert emitted.wait(5)
+        events = coordinator.events_since(0, session.id)
+        assert len(events) == 1000
+        assert events[0].sequence == 6
+        assert events[-1].sequence == 1005
+        assert len(storage.load_events(session.id, limit=None)) == 1005
+    finally:
+        finish.set()
+        wait_for_state(coordinator, SessionState.COMPLETED)
+
+    service.run.side_effect = None
+    service.run.return_value = RunnerResult(model_json_data={})
+    coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    retained = coordinator.events_since(1003, session.id)
+    assert [event.sequence for event in retained] == [1004, 1005, 1006]
+    assert retained[-1].type == SessionEventType.STATE
+    assert retained[-1].data["state"] == SessionState.COMPLETED
+
+
+def test_starting_a_session_retains_the_previous_one(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+    first = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+    old_directory = coordinator.storage.session_directory(first.id)
+
+    second = coordinator.start(light_request())
+
+    assert old_directory.exists()
+    assert {session.id for session in coordinator.sessions()} == {first.id, second.id}
+
+
+def test_coordinator_resumes_a_retained_historical_session(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    old = SessionSnapshot(
+        id="old-session",
+        state=SessionState.CANCELLED,
+        created_at="2026-07-12T12:00:00Z",
+        updated_at="2026-07-12T12:05:00Z",
+    )
+    storage.create(old, light_request())
+    output = storage.artifact_directory(old.id, "LCT010")
+    output.mkdir()
+    (output / "brightness.csv").write_text("bri,watt\n2,1.0\n", encoding="utf-8")
+    current = SessionSnapshot(
+        id="new-session",
+        state=SessionState.COMPLETED,
+        created_at="2026-07-13T12:00:00Z",
+        updated_at="2026-07-13T12:05:00Z",
+    )
+    storage.create(current, light_request())
+    started = Event()
+    coordinator = MeasurementCoordinator(storage, lambda: BlockingService(started))
+
+    resumed = coordinator.resume(old.id)
+
+    assert started.wait(1)
+    assert resumed.id == old.id
+    assert resumed.state == SessionState.RUNNING
+    assert "old-session" in (tmp_path / "current.json").read_text(encoding="utf-8")
+    coordinator.cancel(old.id)
+    wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_coordinator_deduplicates_warnings_when_resuming(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    snapshot = SessionSnapshot(
+        id="resumable-session",
+        state=SessionState.CANCELLED,
+        created_at="2026-07-12T12:00:00Z",
+        updated_at="2026-07-12T12:05:00Z",
+        warnings=("Repeated warning", "Repeated warning", "Repeated warning"),
+    )
+    storage.create(snapshot, light_request())
+    output = storage.artifact_directory(snapshot.id, "LCT010")
+    output.mkdir()
+    (output / "brightness.csv").write_text("bri,watt\n1,1.0\n", encoding="utf-8")
+    coordinator = MeasurementCoordinator(storage, WarningService)
+
+    coordinator.resume(snapshot.id)
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    assert coordinator.get(snapshot.id).warnings == ("Repeated warning",)
+    warning_events = [
+        event for event in coordinator.events_since(0, snapshot.id) if event.type == SessionEventType.WARNING
+    ]
+    assert [event.data["message"] for event in warning_events] == ["Repeated warning"]
+
+
+def test_coordinator_deletes_only_terminal_sessions(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+    completed = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    coordinator.delete(completed.id)
+
+    assert coordinator.sessions() == []
+    assert coordinator.current is None
+
+
+def test_deleting_an_unknown_session_preserves_the_current_session(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), CompletingService)
+    completed = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+    snapshot = coordinator.current
+
+    with pytest.raises(SessionConflictError, match="The requested session does not exist"):
+        coordinator.delete("missing-session")
+
+    assert coordinator.current == snapshot
+    assert coordinator.get(completed.id) == snapshot
+    assert len(coordinator.sessions()) == 1
+
+
+def test_deleting_history_preserves_a_running_session_and_its_events(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    previous_coordinator = MeasurementCoordinator(storage, CompletingService)
+    completed = previous_coordinator.start(light_request())
+    wait_for_state(previous_coordinator, SessionState.COMPLETED)
+    started = Event()
+    coordinator = MeasurementCoordinator(storage, lambda: BlockingService(started))
+    current = coordinator.start(light_request())
+
+    try:
+        assert started.wait(1)
+        running_snapshot = coordinator.current
+        running_events = coordinator.events_since(0, current.id)
+
+        coordinator.delete(completed.id)
+
+        assert coordinator.current == running_snapshot
+        assert coordinator.events_since(0, current.id) == running_events
+        assert storage.load_snapshot(current.id) == running_snapshot
+        assert [session.id for session in coordinator.sessions()] == [current.id]
+        assert not storage.session_directory(completed.id).exists()
+    finally:
+        coordinator.cancel(current.id)
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+    assert storage.load_current() == coordinator.current
+
+
+def test_deleting_an_active_session_does_not_stop_the_worker(tmp_path: Path) -> None:
+    started = Event()
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), lambda: BlockingService(started))
+    session = coordinator.start(light_request())
+    assert started.wait(1)
+
+    try:
+        with pytest.raises(SessionConflictError, match="An active measurement session cannot be deleted"):
+            coordinator.delete(session.id)
+
+        assert coordinator.current is not None
+        assert coordinator.current.state == SessionState.RUNNING
+        assert coordinator.get(session.id).id == session.id
+    finally:
+        coordinator.cancel(session.id)
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_transient_sample_does_not_reuse_terminal_event_sequence(tmp_path: Path) -> None:
+    coordinator = MeasurementCoordinator(SessionStorage(tmp_path), SamplingService)
+
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    events = coordinator.events_since(0, session.id)
+    assert [event.sequence for event in events] == [1, 2]
+    assert len({event.sequence for event in events}) == len(events)
+
+
+@pytest.mark.parametrize(
+    "event_type,data",
+    [
+        (SessionEventType.SAMPLE, {"power": 4.2}),
+        (SessionEventType.CALIBRATION_SAMPLE, {"power": 4.2, "resistance": 100.0, "voltage": 230.0}),
+        (SessionEventType.ENTITY_STATES, {"states": {"vacuum.robot": "cleaning"}}),
+    ],
+)
+def test_transient_events_update_live_session_without_persisting(
+    tmp_path: Path, event_type: SessionEventType, data: dict[str, Any]
+) -> None:
+    emitted = Event()
+
+    def emit_live_reading(
+        request: MeasurementRequest, control: SessionControl, context: SessionExecutionContext
+    ) -> RunnerResult:
+        control.emit(event_type, data)
+        emitted.set()
+        control.wait(60)
+        raise AssertionError("Cancelled wait returned")
+
+    service = MagicMock(spec=SessionMeasurementService)
+    service.run.side_effect = emit_live_reading
+    storage = SessionStorage(tmp_path)
+    coordinator = MeasurementCoordinator(storage, lambda: service)
+    session = coordinator.start(light_request())
+
+    try:
+        assert emitted.wait(1)
+        current = coordinator.get(session.id)
+        assert current.event_sequence == 1
+        assert coordinator.events_since(0, session.id)[0].data == data
+        assert storage.load_events(session.id) == []
+        assert storage.load_snapshot(session.id).event_sequence == 0
+        if event_type == SessionEventType.CALIBRATION_SAMPLE:
+            assert current.calibration_sample == data
+            assert storage.load_snapshot(session.id).calibration_sample is None
+        elif event_type == SessionEventType.ENTITY_STATES:
+            assert current.entity_states == data["states"]
+    finally:
+        coordinator.cancel(session.id)
+        wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_coordinator_reloads_persisted_events_for_reconnect(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    coordinator = MeasurementCoordinator(storage, CompletingService)
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.COMPLETED)
+
+    reloaded = MeasurementCoordinator(storage, CompletingService)
+
+    assert [event.sequence for event in reloaded.events_since(0, session.id)] == [1, 2]
+
+
+def test_coordinator_projects_and_persists_operating_point(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    coordinator = MeasurementCoordinator(storage, OperatingPointService)
+    session = coordinator.start(light_request())
+
+    deadline = time.monotonic() + 1
+    while coordinator.current and coordinator.current.operating_point is None and time.monotonic() < deadline:
+        time.sleep(0.01)
+
+    assert coordinator.current is not None
+    assert coordinator.current.operating_point == {"type": "light", "on": True, "brightness": 128}
+    persisted = storage.load_current()
+    assert persisted is not None
+    assert persisted.operating_point == coordinator.current.operating_point
+
+    coordinator.cancel(session.id)
+    wait_for_state(coordinator, SessionState.CANCELLED)
+
+
+def test_coordinator_projects_phase_and_confirmation_message(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    continued = Event()
+    coordinator = MeasurementCoordinator(storage, lambda: CheckpointService(continued))
+
+    session = coordinator.start(light_request())
+    wait_for_state(coordinator, SessionState.AWAITING_CONFIRMATION)
+
+    assert coordinator.current is not None
+    assert coordinator.current.phase == "Waiting for confirmation"
+    assert coordinator.current.confirmation_message == "Place the device on its charger, then start the measurement."
+    assert coordinator.current.confirmation_action == "Start charging measurement"
+    persisted = storage.load_current()
+    assert persisted is not None
+    assert persisted.confirmation_message == coordinator.current.confirmation_message
+    assert persisted.confirmation_action == coordinator.current.confirmation_action
+
+    confirmed = coordinator.confirm(session.id)
+    assert confirmed.state == SessionState.RUNNING
+    assert confirmed.phase == "Starting measurement"
+    assert confirmed.confirmation_message is None
+    assert confirmed.confirmation_action is None
+    assert continued.wait(1)
+    wait_for_state(coordinator, SessionState.COMPLETED)

@@ -37,5 +37,6 @@ class MeasurementParameters:
     max_retries: int = 5
     max_nudges: int = 0
     fast_test_mode: bool = False
+    allow_zero_power: bool = False
     prompt_resume: bool = False
     csv_add_datetime_column: bool = False

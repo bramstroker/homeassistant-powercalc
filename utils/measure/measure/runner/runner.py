@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from measure.request import BaseMeasurementRequest
-from measure.util.measure_util import MeasurementResult
+from measure.utils.sampling import MeasurementResult
 
 
 class MeasurementRunner[TRequest: BaseMeasurementRequest](ABC):
@@ -24,8 +24,8 @@ class MeasurementRunner[TRequest: BaseMeasurementRequest](ABC):
     def cleanup(self) -> None:  # noqa: B027 - optional lifecycle hook
         """Release runner-owned resources after execution."""
 
-    def measure_standby_power(self) -> MeasurementResult:
-        """Measure idle power after cleanup when the strategy supports it."""
+    def measure_standby_power(self) -> MeasurementResult | None:
+        """Default to zero when the strategy has no separate standby measurement."""
 
         return MeasurementResult(power=0, voltages=[])
 

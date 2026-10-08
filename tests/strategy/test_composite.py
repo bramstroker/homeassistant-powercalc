@@ -83,6 +83,37 @@ async def test_composite(hass: HomeAssistant) -> None:
     assert_entity_state(hass, "sensor.test_power", "17.84")
 
 
+async def test_recorded_secondary_states_track_power_including_off(hass: HomeAssistant) -> None:
+    """Recorder branches describe total power even when a mode flag is off."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.device",
+            CONF_COMPOSITE: {
+                "mode": "stop_at_first",
+                "strategies": [
+                    {
+                        "condition": {"condition": "state", "entity_id": "binary_sensor.mode", "state": state},
+                        "fixed": {"power": power, "states_power": {"off": power}},
+                    }
+                    for state, power in [("off", 2), ("on", 5)]
+                ],
+            },
+        },
+        {},
+    )
+    await set_states(hass, [("switch.device", STATE_ON), ("binary_sensor.mode", STATE_OFF)])
+    assert_entity_state(hass, "sensor.device_power", "2.00")
+    await set_states(hass, [("binary_sensor.mode", STATE_ON)])
+    assert_entity_state(hass, "sensor.device_power", "5.00")
+    await set_states(hass, [("switch.device", STATE_OFF)])
+    assert_entity_state(hass, "sensor.device_power", "5.00")
+    await set_states(hass, [("binary_sensor.mode", STATE_OFF)])
+    assert_entity_state(hass, "sensor.device_power", "2.00")
+    await set_states(hass, [("switch.device", STATE_ON), ("binary_sensor.mode", STATE_UNAVAILABLE)])
+    assert_entity_state(hass, "sensor.device_power", STATE_UNAVAILABLE)
+
+
 async def test_template_condition(hass: HomeAssistant) -> None:
     sensor_config = {
         CONF_ENTITY_ID: "light.test",

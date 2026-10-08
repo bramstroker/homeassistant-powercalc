@@ -1,0 +1,51 @@
+{
+  "calculation_strategy": "composite",
+  "composite_config": {
+    "mode": "sum_all",
+    "strategies": [
+      {
+        "lut": {}
+      },
+      {
+        "multi_switch": {
+          "entities": [
+            "[[relay_1]]",
+            "[[relay_2]]"
+          ],
+          "power": 0.3,
+          "power_off": 0
+        }
+      },
+      {
+        "fixed": {
+          "states_power": {
+            "off": 1.16
+          }
+        }
+      }
+    ]
+  },
+  "device_type": "light",
+  "fields": {
+    "relay_1": {
+      "label": "Relay 1",
+      "selector": {
+        "entity": {
+          "domain": "switch"
+        }
+      }
+    },
+    "relay_2": {
+      "label": "Relay 2",
+      "selector": {
+        "entity": {
+          "domain": "switch"
+        }
+      }
+    }
+  },
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "name": "NSPanel",
+  "standby_power": 1.16
+}

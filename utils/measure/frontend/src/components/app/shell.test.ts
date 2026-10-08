@@ -29,7 +29,7 @@ describe("app shell device entities", () => {
     const element = new AppShell();
     (element as unknown as { api: unknown }).api = {
       getCapabilities: async () => capabilities,
-      getEntityCatalog: async () => ({ lights: [], powers: [], voltages: [] }),
+      getEntityCatalog: async () => ({ home_assistant_ready: true, lights: [], powers: [], voltages: [] }),
       getEntitiesByDeviceClass: async () => [],
       getSettings: async () => defaultSettings,
       getContributionAuth: async () => ({ connected: false }),
@@ -58,7 +58,7 @@ describe("app shell device entities", () => {
     const element = new AppShell();
     (element as unknown as { api: unknown }).api = {
       getCapabilities: async () => capabilities,
-      getEntityCatalog: async () => ({ lights: [], powers: [], voltages: [] }),
+      getEntityCatalog: async () => ({ home_assistant_ready: true, lights: [], powers: [], voltages: [] }),
       getEntitiesByDeviceClass: async () => [],
       getSettings: async () => defaultSettings,
       getContributionAuth: async () => ({ connected: false }),
@@ -302,6 +302,8 @@ describe("app shell", () => {
       supports_resume: false,
       confirmation_action: "Start speaker measurement",
       confirmation_is_warning: true,
+      confirmation_eyebrow: "High volume warning",
+      confirmation_title: "Protect your hearing",
     }];
     element.request = {
       measure_type: "speaker",
@@ -315,7 +317,7 @@ describe("app shell", () => {
       disable_streaming: false,
       resume_policy: "new",
     };
-    element.snapshot = { state: "awaiting_confirmation", request: element.request };
+    element.snapshot = { state: "awaiting_confirmation", request: element.request, confirmation_action: "Start speaker measurement" };
     element.view = "running";
     document.body.append(element);
     await element.updateComplete;
@@ -324,6 +326,18 @@ describe("app shell", () => {
       warningConfirmation: boolean; updateComplete: Promise<boolean>;
     };
     expect(running.warningConfirmation).toBe(true);
+    expect(running.shadowRoot?.textContent).toContain("Protect your hearing");
+
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      request: element.request,
+      confirmation_action: "Start dummy-load calibration",
+    };
+    element.requestUpdate();
+    await element.updateComplete;
+    await running.updateComplete;
+    expect(running.warningConfirmation).toBe(false);
+    expect(running.shadowRoot?.textContent).toContain("Everything is ready");
   });
 
   it("loads the Powercalc SVG logo", async () => {
@@ -507,5 +521,26 @@ describe("app shell", () => {
       expect(result.shadowRoot?.querySelector(".contribution")).toBeNull();
       expect(steps.at(-1)?.getAttribute("aria-current")).toBe("step");
     }
+  });
+
+  it("does not suggest profile preparation for a recorder playbook", async () => {
+    vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+    const element = document.createElement("powercalc-measure-app") as AppShell;
+    element.view = "result";
+    element.snapshot = {
+      state: "completed",
+      request: {
+        measure_type: "recorder", recorder_purpose: "playbook", model_id: "", product_name: "",
+        measure_device: "Test meter", generate_model: false, parameters: capabilities.defaults,
+        resume_policy: "new", power_meter: { type: "dummy" },
+      },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const result = element.shadowRoot!.querySelector("measure-result-view") as HTMLElement & { updateComplete: Promise<boolean>; shadowRoot: ShadowRoot };
+    await result.updateComplete;
+    expect(result.shadowRoot.querySelector(".contribution")).toBeNull();
+    expect(result.shadowRoot.textContent).not.toContain("No model.json is available yet");
   });
 });

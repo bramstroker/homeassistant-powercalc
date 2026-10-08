@@ -1,0 +1,2184 @@
+effect,bri,watt
+none,5,3.85
+none,15,4.72
+none,25,5.55
+none,35,6.2
+none,45,7.07
+none,55,7.97
+none,65,8.85
+none,75,9.45
+none,85,10.3
+none,95,10.9
+none,105,11.75
+none,115,12.4
+none,125,13.22
+none,135,13.9
+none,145,14.65
+none,155,15.28
+none,165,16.1
+none,175,16.73
+none,185,17.35
+none,195,18.25
+none,205,19.08
+none,215,19.95
+none,225,20.58
+none,235,21.4
+none,245,22.27
+none,255,23.15
+Afternoon,5,2.2
+Afternoon,15,2.85
+Afternoon,25,3.08
+Afternoon,35,3.52
+Afternoon,45,4.5
+Afternoon,55,4.42
+Afternoon,65,5.1
+Afternoon,75,5.58
+Afternoon,85,5.97
+Afternoon,95,7.28
+Afternoon,105,7.12
+Afternoon,115,6.92
+Afternoon,125,7.92
+Afternoon,135,8.8
+Afternoon,145,9.43
+Afternoon,155,8.4
+Afternoon,165,9.97
+Afternoon,175,9.6
+Afternoon,185,9.75
+Afternoon,195,9.95
+Afternoon,205,10.07
+Afternoon,215,10.78
+Afternoon,225,10.55
+Afternoon,235,10.8
+Afternoon,245,10.8
+Afternoon,255,10.72
+Aurora,5,1.92
+Aurora,15,2.12
+Aurora,25,2.38
+Aurora,35,2.48
+Aurora,45,2.83
+Aurora,55,2.98
+Aurora,65,3.05
+Aurora,75,3.17
+Aurora,85,3.33
+Aurora,95,3.6
+Aurora,105,3.8
+Aurora,115,3.92
+Aurora,125,4.15
+Aurora,135,4.4
+Aurora,145,4.5
+Aurora,155,4.85
+Aurora,165,4.92
+Aurora,175,5.07
+Aurora,185,5.28
+Aurora,195,5.3
+Aurora,205,5.7
+Aurora,215,5.72
+Aurora,225,5.85
+Aurora,235,6.05
+Aurora,245,6.2
+Aurora,255,6.6
+Birthday,5,1.92
+Birthday,15,2.25
+Birthday,25,2.33
+Birthday,35,2.55
+Birthday,45,2.88
+Birthday,55,3.33
+Birthday,65,2.72
+Birthday,75,3.1
+Birthday,85,3.3
+Birthday,95,3.92
+Birthday,105,3.85
+Birthday,115,3.57
+Birthday,125,3.2
+Birthday,135,5.6
+Birthday,145,5.22
+Birthday,155,4.5
+Birthday,165,3.6
+Birthday,175,4.92
+Birthday,185,5.5
+Birthday,195,5.25
+Birthday,205,5.17
+Birthday,215,5.78
+Birthday,225,5.83
+Birthday,235,6.03
+Birthday,245,6.75
+Birthday,255,7.3
+Blossom,5,2
+Blossom,15,2.27
+Blossom,25,2.35
+Blossom,35,2.58
+Blossom,45,2.9
+Blossom,55,3.2
+Blossom,65,3.25
+Blossom,75,3.73
+Blossom,85,3.65
+Blossom,95,3.82
+Blossom,105,4.3
+Blossom,115,4.2
+Blossom,125,4.47
+Blossom,135,5.08
+Blossom,145,4.78
+Blossom,155,5.47
+Blossom,165,5.4
+Blossom,175,5.12
+Blossom,185,5.88
+Blossom,195,6.45
+Blossom,205,6.4
+Blossom,215,6.75
+Blossom,225,7.15
+Blossom,235,6.1
+Blossom,245,7.28
+Blossom,255,6.83
+breathe,5,3.8
+breathe,15,4.75
+breathe,25,5.6
+breathe,35,6.25
+breathe,45,7.07
+breathe,55,7.95
+breathe,65,8.85
+breathe,75,9.45
+breathe,85,10.35
+breathe,95,10.95
+breathe,105,11.7
+breathe,115,12.38
+breathe,125,13.32
+breathe,135,13.88
+breathe,145,14.7
+breathe,155,15.3
+breathe,165,16.12
+breathe,175,16.8
+breathe,185,17.43
+breathe,195,18.23
+breathe,205,19.12
+breathe,215,19.98
+breathe,225,20.62
+breathe,235,21.5
+breathe,245,22.27
+breathe,255,23.12
+candlelight,5,3.85
+candlelight,15,4.75
+candlelight,25,5.6
+candlelight,35,6.28
+candlelight,45,7.1
+candlelight,55,7.93
+candlelight,65,8.8
+candlelight,75,9.5
+candlelight,85,10.32
+candlelight,95,10.9
+candlelight,105,11.7
+candlelight,115,12.4
+candlelight,125,13.25
+candlelight,135,13.93
+candlelight,145,14.7
+candlelight,155,15.32
+candlelight,165,16.08
+candlelight,175,16.73
+candlelight,185,17.35
+candlelight,195,18.27
+candlelight,205,19.07
+candlelight,215,19.97
+candlelight,225,20.65
+candlelight,235,21.45
+candlelight,245,22.32
+candlelight,255,23.12
+Candlelight,5,9.12
+Candlelight,15,4.5
+Candlelight,25,5.33
+Candlelight,35,6.1
+Candlelight,45,6.8
+Candlelight,55,7.67
+Candlelight,65,8.32
+Candlelight,75,8.93
+Candlelight,85,9.75
+Candlelight,95,10.7
+Candlelight,105,11.45
+Candlelight,115,12.1
+Candlelight,125,12.05
+Candlelight,135,12.15
+Candlelight,145,12.12
+Candlelight,155,12.18
+Candlelight,165,16.12
+Candlelight,175,16.9
+Candlelight,185,17.52
+Candlelight,195,18.2
+Candlelight,205,19.15
+Candlelight,215,19.95
+Candlelight,225,20.52
+Candlelight,235,21.38
+Candlelight,245,22.3
+Candlelight,255,23.1
+Candy,5,2.05
+Candy,15,2.55
+Candy,25,2.92
+Candy,35,3.3
+Candy,45,3.75
+Candy,55,4.08
+Candy,65,4.33
+Candy,75,4.75
+Candy,85,5.12
+Candy,95,5.47
+Candy,105,5.83
+Candy,115,6.17
+Candy,125,6.53
+Candy,135,6.85
+Candy,145,7.22
+Candy,155,7.62
+Candy,165,8
+Candy,175,8.25
+Candy,185,8.57
+Candy,195,8.72
+Candy,205,9
+Candy,215,9.28
+Candy,225,9.57
+Candy,235,9.8
+Candy,245,10
+Candy,255,10.18
+Cheerful,5,1.85
+Cheerful,15,2.05
+Cheerful,25,2.15
+Cheerful,35,2.35
+Cheerful,45,2.47
+Cheerful,55,2.48
+Cheerful,65,2.78
+Cheerful,75,2.83
+Cheerful,85,2.93
+Cheerful,95,3.25
+Cheerful,105,3.15
+Cheerful,115,3.3
+Cheerful,125,3.48
+Cheerful,135,3.45
+Cheerful,145,3.67
+Cheerful,155,3.92
+Cheerful,165,3.83
+Cheerful,175,4.22
+Cheerful,185,4.53
+Cheerful,195,4.27
+Cheerful,205,4.6
+Cheerful,215,4.5
+Cheerful,225,4.53
+Cheerful,235,5
+Cheerful,245,5.17
+Cheerful,255,4.83
+Cherry blossoms,5,1.92
+Cherry blossoms,15,2.25
+Cherry blossoms,25,2.58
+Cherry blossoms,35,2.7
+Cherry blossoms,45,2.85
+Cherry blossoms,55,3.1
+Cherry blossoms,65,3.38
+Cherry blossoms,75,3.58
+Cherry blossoms,85,3.9
+Cherry blossoms,95,4.08
+Cherry blossoms,105,4.28
+Cherry blossoms,115,4.4
+Cherry blossoms,125,4.4
+Cherry blossoms,135,4.98
+Cherry blossoms,145,5.53
+Cherry blossoms,155,5.45
+Cherry blossoms,165,5.8
+Cherry blossoms,175,5.67
+Cherry blossoms,185,6.2
+Cherry blossoms,195,6.3
+Cherry blossoms,205,6.1
+Cherry blossoms,215,6.85
+Cherry blossoms,225,6.72
+Cherry blossoms,235,7.2
+Cherry blossoms,245,7.75
+Cherry blossoms,255,7.3
+Christmas,5,1.88
+Christmas,15,2.17
+Christmas,25,2.33
+Christmas,35,2.58
+Christmas,45,2.73
+Christmas,55,3.02
+Christmas,65,3.08
+Christmas,75,3.33
+Christmas,85,3.48
+Christmas,95,3.83
+Christmas,105,3.73
+Christmas,115,4.3
+Christmas,125,4.2
+Christmas,135,4.45
+Christmas,145,4.8
+Christmas,155,4.75
+Christmas,165,4.83
+Christmas,175,5
+Christmas,185,5.12
+Christmas,195,5.33
+Christmas,205,5.72
+Christmas,215,5.7
+Christmas,225,5.88
+Christmas,235,6.1
+Christmas,245,6.17
+Christmas,255,6.45
+Colorful,5,2
+Colorful,15,2.35
+Colorful,25,2.75
+Colorful,35,3
+Colorful,45,3.25
+Colorful,55,3.5
+Colorful,65,3.65
+Colorful,75,4
+Colorful,85,4.33
+Colorful,95,4.53
+Colorful,105,4.9
+Colorful,115,5.15
+Colorful,125,5.4
+Colorful,135,5.72
+Colorful,145,6.08
+Colorful,155,6.47
+Colorful,165,6.57
+Colorful,175,6.88
+Colorful,185,7.08
+Colorful,195,7.47
+Colorful,205,7.43
+Colorful,215,7.67
+Colorful,225,7.92
+Colorful,235,8.3
+Colorful,245,8.45
+Colorful,255,9
+crossing,5,3.8
+crossing,15,4.7
+crossing,25,5.55
+crossing,35,6.2
+crossing,45,7.1
+crossing,55,8
+crossing,65,8.85
+crossing,75,9.53
+crossing,85,10.28
+crossing,95,10.95
+crossing,105,11.75
+crossing,115,12.38
+crossing,125,13.28
+crossing,135,13.82
+crossing,145,14.62
+crossing,155,15.25
+crossing,165,16.12
+crossing,175,16.75
+crossing,185,17.35
+crossing,195,18.23
+crossing,205,19.15
+crossing,215,20.02
+crossing,225,20.6
+crossing,235,21.48
+crossing,245,22.35
+crossing,255,23.12
+Dance Party,5,1.98
+Dance Party,15,1.98
+Dance Party,25,2.32
+Dance Party,35,3.08
+Dance Party,45,3
+Dance Party,55,2.92
+Dance Party,65,2.98
+Dance Party,75,2.95
+Dance Party,85,2.95
+Dance Party,95,3.08
+Dance Party,105,3
+Dance Party,115,3.05
+Dance Party,125,3.05
+Dance Party,135,3.08
+Dance Party,145,2.95
+Dance Party,155,3.12
+Dance Party,165,3
+Dance Party,175,2.92
+Dance Party,185,2.98
+Dance Party,195,2.95
+Dance Party,205,3.02
+Dance Party,215,3
+Dance Party,225,3.02
+Dance Party,235,3
+Dance Party,245,3.05
+Dance Party,255,3.08
+dating,5,3.85
+dating,15,4.75
+dating,25,5.6
+dating,35,6.28
+dating,45,7.12
+dating,55,8
+dating,65,8.88
+dating,75,9.43
+dating,85,10.3
+dating,95,10.9
+dating,105,11.72
+dating,115,12.33
+dating,125,13.25
+dating,135,13.88
+dating,145,14.7
+dating,155,15.25
+dating,165,16.15
+dating,175,16.82
+dating,185,17.45
+dating,195,18.32
+dating,205,19.08
+dating,215,20
+dating,225,20.6
+dating,235,21.45
+dating,245,22.35
+dating,255,23.18
+Deep sea,5,3.05
+Deep sea,15,2.98
+Deep sea,25,3.1
+Deep sea,35,3.08
+Deep sea,45,2.98
+Deep sea,55,3
+Deep sea,65,2.9
+Deep sea,75,3
+Deep sea,85,3.02
+Deep sea,95,2.92
+Deep sea,105,3.05
+Deep sea,115,2.95
+Deep sea,125,3.1
+Deep sea,135,3.02
+Deep sea,145,3.02
+Deep sea,155,3
+Deep sea,165,3.05
+Deep sea,175,3
+Deep sea,185,2.95
+Deep sea,195,2.98
+Deep sea,205,2.9
+Deep sea,215,2.95
+Deep sea,225,2.88
+Deep sea,235,3.05
+Deep sea,245,3.05
+Deep sea,255,2.92
+Disco,5,2.92
+Disco,15,3.08
+Disco,25,3.08
+Disco,35,3.02
+Disco,45,3.05
+Disco,55,2.95
+Disco,65,2.95
+Disco,75,2.95
+Disco,85,2.95
+Disco,95,3.05
+Disco,105,2.95
+Disco,115,3.02
+Disco,125,2.98
+Disco,135,3
+Disco,145,2.98
+Disco,155,3.02
+Disco,165,3
+Disco,175,2.92
+Disco,185,3.05
+Disco,195,2.9
+Disco,205,2.98
+Disco,215,2.95
+Disco,225,2.9
+Disco,235,2.98
+Disco,245,2.9
+Disco,255,2.95
+Downpour,5,2.9
+Downpour,15,3.02
+Downpour,25,2.92
+Downpour,35,3.1
+Downpour,45,2.95
+Downpour,55,2.98
+Downpour,65,3.05
+Downpour,75,3.02
+Downpour,85,3.05
+Downpour,95,3.02
+Downpour,105,3.05
+Downpour,115,3.08
+Downpour,125,3.12
+Downpour,135,3.17
+Downpour,145,3.1
+Downpour,155,3.15
+Downpour,165,3.12
+Downpour,175,3.23
+Downpour,185,3.1
+Downpour,195,3.27
+Downpour,205,3.25
+Downpour,215,3.12
+Downpour,225,3.2
+Downpour,235,3.05
+Downpour,245,3.12
+Downpour,255,3.12
+Dreamland,5,3.25
+Dreamland,15,3.08
+Dreamland,25,3.23
+Dreamland,35,3.12
+Dreamland,45,3.23
+Dreamland,55,3.1
+Dreamland,65,3.25
+Dreamland,75,3.22
+Dreamland,85,3.15
+Dreamland,95,3.2
+Dreamland,105,3.2
+Dreamland,115,3.2
+Dreamland,125,3.15
+Dreamland,135,3.17
+Dreamland,145,3.12
+Dreamland,155,3.1
+Dreamland,165,3.12
+Dreamland,175,3.12
+Dreamland,185,3.23
+Dreamland,195,3.12
+Dreamland,205,3.17
+Dreamland,215,3.17
+Dreamland,225,3.15
+Dreamland,235,3.27
+Dreamland,245,3.12
+Dreamland,255,3.27
+Dreamlike,5,3.25
+Dreamlike,15,3.15
+Dreamlike,25,3.15
+Dreamlike,35,3.25
+Dreamlike,45,3.15
+Dreamlike,55,3.15
+Dreamlike,65,3.17
+Dreamlike,75,3.12
+Dreamlike,85,3.23
+Dreamlike,95,3.17
+Dreamlike,105,3.17
+Dreamlike,115,3.2
+Dreamlike,125,3.17
+Dreamlike,135,3.23
+Dreamlike,145,3.17
+Dreamlike,155,3.27
+Dreamlike,165,3.17
+Dreamlike,175,3.23
+Dreamlike,185,3.12
+Dreamlike,195,3.2
+Dreamlike,205,3.17
+Dreamlike,215,3.12
+Dreamlike,225,3.15
+Dreamlike,235,3.15
+Dreamlike,245,3.12
+Dreamlike,255,3.15
+energetic,5,3.82
+energetic,15,4.75
+energetic,25,5.6
+energetic,35,6.25
+energetic,45,7.12
+energetic,55,8.05
+energetic,65,8.88
+energetic,75,9.45
+energetic,85,10.25
+energetic,95,10.93
+energetic,105,11.72
+energetic,115,12.35
+energetic,125,13.25
+energetic,135,13.88
+energetic,145,14.68
+energetic,155,15.25
+energetic,165,16.15
+energetic,175,16.75
+energetic,185,17.4
+energetic,195,18.32
+energetic,205,19.18
+energetic,215,19.9
+energetic,225,20.52
+energetic,235,21.4
+energetic,245,22.35
+energetic,255,23.12
+Energetic,5,3.17
+Energetic,15,3.17
+Energetic,25,3.12
+Energetic,35,3.05
+Energetic,45,3.1
+Energetic,55,3
+Energetic,65,3.02
+Energetic,75,2.98
+Energetic,85,3.08
+Energetic,95,2.85
+Energetic,105,3
+Energetic,115,2.88
+Energetic,125,2.9
+Energetic,135,2.8
+Energetic,145,2.77
+Energetic,155,2.9
+Energetic,165,2.75
+Energetic,175,2.75
+Energetic,185,2.68
+Energetic,195,2.7
+Energetic,205,2.75
+Energetic,215,2.7
+Energetic,225,2.7
+Energetic,235,2.65
+Energetic,245,2.62
+Energetic,255,2.73
+Fall,5,2.7
+Fall,15,2.65
+Fall,25,2.67
+Fall,35,2.7
+Fall,45,2.55
+Fall,55,2.67
+Fall,65,2.58
+Fall,75,2.6
+Fall,85,2.6
+Fall,95,2.52
+Fall,105,2.58
+Fall,115,2.58
+Fall,125,2.65
+Fall,135,2.65
+Fall,145,2.58
+Fall,155,2.68
+Fall,165,2.55
+Fall,175,2.67
+Fall,185,2.7
+Fall,195,2.55
+Fall,205,2.65
+Fall,215,2.5
+Fall,225,2.6
+Fall,235,2.62
+Fall,245,2.52
+Fall,255,2.52
+Father's Day,5,2.6
+Father's Day,15,2.55
+Father's Day,25,2.5
+Father's Day,35,2.6
+Father's Day,45,2.52
+Father's Day,55,2.62
+Father's Day,65,2.6
+Father's Day,75,2.55
+Father's Day,85,2.58
+Father's Day,95,2.52
+Father's Day,105,2.6
+Father's Day,115,2.55
+Father's Day,125,2.55
+Father's Day,135,2.58
+Father's Day,145,2.52
+Father's Day,155,2.52
+Father's Day,165,2.48
+Father's Day,175,2.5
+Father's Day,185,2.48
+Father's Day,195,2.45
+Father's Day,205,2.58
+Father's Day,215,2.45
+Father's Day,225,2.52
+Father's Day,235,2.52
+Father's Day,245,2.58
+Father's Day,255,2.42
+Fight,5,2.48
+Fight,15,2.45
+Fight,25,2.55
+Fight,35,2.42
+Fight,45,2.52
+Fight,55,2.48
+Fight,65,2.58
+Fight,75,2.52
+Fight,85,2.62
+Fight,95,2.62
+Fight,105,2.65
+Fight,115,2.7
+Fight,125,2.65
+Fight,135,2.77
+Fight,145,2.77
+Fight,155,2.8
+Fight,165,2.77
+Fight,175,2.85
+Fight,185,2.8
+Fight,195,2.85
+Fight,205,2.8
+Fight,215,2.75
+Fight,225,2.77
+Fight,235,2.77
+Fight,245,2.9
+Fight,255,2.92
+Fire,5,2.98
+Fire,15,3
+Fire,25,2.98
+Fire,35,3
+Fire,45,3
+Fire,55,2.98
+Fire,65,3.02
+Fire,75,2.95
+Fire,85,2.98
+Fire,95,3.02
+Fire,105,2.98
+Fire,115,2.95
+Fire,125,3
+Fire,135,2.92
+Fire,145,3.02
+Fire,155,3.02
+Fire,165,2.95
+Fire,175,3.08
+Fire,185,3.08
+Fire,195,3.1
+Fire,205,2.98
+Fire,215,3.1
+Fire,225,2.95
+Fire,235,3.1
+Fire,245,3.05
+Fire,255,2.92
+Fireworks,5,2.95
+Fireworks,15,3.05
+Fireworks,25,2.95
+Fireworks,35,2.95
+Fireworks,45,3.1
+Fireworks,55,2.92
+Fireworks,65,3.08
+Fireworks,75,3.05
+Fireworks,85,3
+Fireworks,95,3.1
+Fireworks,105,2.98
+Fireworks,115,3.35
+Fireworks,125,3
+Fireworks,135,2.98
+Fireworks,145,3.17
+Fireworks,155,2.98
+Fireworks,165,3.08
+Fireworks,175,2.98
+Fireworks,185,3.02
+Fireworks,195,3.05
+Fireworks,205,3.02
+Fireworks,215,3.08
+Fireworks,225,2.95
+Fireworks,235,3.05
+Fireworks,245,3.1
+Fireworks,255,3.02
+Flash,5,3.05
+Flash,15,3.08
+Flash,25,3.05
+Flash,35,3.08
+Flash,45,3.08
+Flash,55,3
+Flash,65,3.05
+Flash,75,3
+Flash,85,3
+Flash,95,2.92
+Flash,105,3
+Flash,115,3.02
+Flash,125,2.88
+Flash,135,2.95
+Flash,145,2.88
+Flash,155,2.95
+Flash,165,2.95
+Flash,175,2.88
+Flash,185,2.95
+Flash,195,2.77
+Flash,205,2.85
+Flash,215,2.82
+Flash,225,2.68
+Flash,235,2.77
+Flash,245,2.62
+Flash,255,2.73
+Flow,5,2.65
+Flow,15,2.7
+Flow,25,2.6
+Flow,35,2.62
+Flow,45,2.62
+Flow,55,2.6
+Flow,65,2.62
+Flow,75,2.55
+Flow,85,2.5
+Flow,95,2.5
+Flow,105,2.5
+Flow,115,2.45
+Flow,125,2.4
+Flow,135,2.42
+Flow,145,2.42
+Flow,155,2.52
+Flow,165,2.45
+Flow,175,2.4
+Flow,185,2.45
+Flow,195,2.45
+Flow,205,2.48
+Flow,215,2.45
+Flow,225,2.45
+Flow,235,2.42
+Flow,245,2.5
+Flow,255,2.38
+Flower Field,5,2.42
+Flower Field,15,2.4
+Flower Field,25,2.4
+Flower Field,35,2.4
+Flower Field,45,2.4
+Flower Field,55,2.48
+Flower Field,65,2.45
+Flower Field,75,2.42
+Flower Field,85,2.4
+Flower Field,95,2.45
+Flower Field,105,2.4
+Flower Field,115,2.42
+Flower Field,125,2.42
+Flower Field,135,2.38
+Flower Field,145,2.45
+Flower Field,155,2.38
+Flower Field,165,2.38
+Flower Field,175,2.38
+Flower Field,185,2.32
+Flower Field,195,2.4
+Flower Field,205,2.32
+Flower Field,215,2.42
+Flower Field,225,2.35
+Flower Field,235,2.3
+Flower Field,245,2.4
+Flower Field,255,2.32
+Forest,5,2.32
+Forest,15,2.35
+Forest,25,2.45
+Forest,35,2.32
+Forest,45,2.42
+Forest,55,2.4
+Forest,65,2.42
+Forest,75,2.45
+Forest,85,2.45
+Forest,95,2.5
+Forest,105,2.52
+Forest,115,2.58
+Forest,125,2.58
+Forest,135,2.55
+Forest,145,2.7
+Forest,155,2.6
+Forest,165,2.67
+Forest,175,2.65
+Forest,185,2.75
+Forest,195,2.73
+Forest,205,2.73
+Forest,215,2.8
+Forest,225,2.75
+Forest,235,2.75
+Forest,245,2.82
+Forest,255,2.77
+Game,5,2.85
+Game,15,2.9
+Game,25,2.95
+Game,35,2.88
+Game,45,3
+Game,55,2.92
+Game,65,3.02
+Game,75,2.95
+Game,85,2.95
+Game,95,3.17
+Game,105,3
+Game,115,3.12
+Game,125,3.1
+Game,135,2.95
+Game,145,3.1
+Game,155,3
+Game,165,3.12
+Game,175,3.12
+Game,185,3.1
+Game,195,3.23
+Game,205,3.08
+Game,215,3.23
+Game,225,3.28
+Game,235,3.08
+Game,245,3.23
+Game,255,3.15
+Glacier,5,3.15
+Glacier,15,3.25
+Glacier,25,3.17
+Glacier,35,3.1
+Glacier,45,3.2
+Glacier,55,3.18
+Glacier,65,3.12
+Glacier,75,3.17
+Glacier,85,3.23
+Glacier,95,3.15
+Glacier,105,3.2
+Glacier,115,3.2
+Glacier,125,3.23
+Glacier,135,3.17
+Glacier,145,3.22
+Glacier,155,3.23
+Glacier,165,3.3
+Glacier,175,3.25
+Glacier,185,3.27
+Glacier,195,3.15
+Glacier,205,3.17
+Glacier,215,3.25
+Glacier,225,3.17
+Glacier,235,3.2
+Glacier,245,3.2
+Glacier,255,3.2
+Gobi Desert,5,3.27
+Gobi Desert,15,3.23
+Gobi Desert,25,2.95
+Gobi Desert,35,2.82
+Gobi Desert,45,2.92
+Gobi Desert,55,2.88
+Gobi Desert,65,2.92
+Gobi Desert,75,2.82
+Gobi Desert,85,2.83
+Gobi Desert,95,2.85
+Gobi Desert,105,2.77
+Gobi Desert,115,2.77
+Gobi Desert,125,2.75
+Gobi Desert,135,2.7
+Gobi Desert,145,2.8
+Gobi Desert,155,2.65
+Gobi Desert,165,2.8
+Gobi Desert,175,2.73
+Gobi Desert,185,2.67
+Gobi Desert,195,2.7
+Gobi Desert,205,2.62
+Gobi Desert,215,2.67
+Gobi Desert,225,2.67
+Gobi Desert,235,2.62
+Gobi Desert,245,2.6
+Gobi Desert,255,2.62
+Halloween,5,2.58
+Halloween,15,2.55
+Halloween,25,2.5
+Halloween,35,2.52
+Halloween,45,2.48
+Halloween,55,2.55
+Halloween,65,2.45
+Halloween,75,2.5
+Halloween,85,2.48
+Halloween,95,2.42
+Halloween,105,2.42
+Halloween,115,2.42
+Halloween,125,2.35
+Halloween,135,2.38
+Halloween,145,2.32
+Halloween,155,2.35
+Halloween,165,2.35
+Halloween,175,2.3
+Halloween,185,2.3
+Halloween,195,2.27
+Halloween,205,2.27
+Halloween,215,2.25
+Halloween,225,2.23
+Halloween,235,2.23
+Halloween,245,2.15
+Halloween,255,2.18
+Happy,5,2.12
+Happy,15,2.1
+Happy,25,2.1
+Happy,35,2.12
+Happy,45,2.12
+Happy,55,2.12
+Happy,65,2.1
+Happy,75,2.15
+Happy,85,2.12
+Happy,95,2.15
+Happy,105,2.17
+Happy,115,2.15
+Happy,125,2.15
+Happy,135,2.12
+Happy,145,2.15
+Happy,155,2.18
+Happy,165,2.18
+Happy,175,2.15
+Happy,185,2.12
+Happy,195,2.18
+Happy,205,2.15
+Happy,215,2.2
+Happy,225,2.18
+Happy,235,2.25
+Happy,245,2.25
+Happy,255,2.23
+Heartbeat,5,2.18
+Heartbeat,15,2.25
+Heartbeat,25,2.23
+Heartbeat,35,2.25
+Heartbeat,45,2.27
+Heartbeat,55,2.27
+Heartbeat,65,2.35
+Heartbeat,75,2.32
+Heartbeat,85,2.3
+Heartbeat,95,2.35
+Heartbeat,105,2.32
+Heartbeat,115,2.48
+Heartbeat,125,2.4
+Heartbeat,135,2.45
+Heartbeat,145,2.52
+Heartbeat,155,2.5
+Heartbeat,165,2.55
+Heartbeat,175,2.52
+Heartbeat,185,2.55
+Heartbeat,195,2.58
+Heartbeat,205,2.58
+Heartbeat,215,2.65
+Heartbeat,225,2.58
+Heartbeat,235,2.62
+Heartbeat,245,2.7
+Heartbeat,255,2.65
+Karst Cave,5,2.68
+Karst Cave,15,2.73
+Karst Cave,25,2.77
+Karst Cave,35,2.8
+Karst Cave,45,2.85
+Karst Cave,55,2.75
+Karst Cave,65,2.92
+Karst Cave,75,2.77
+Karst Cave,85,2.9
+Karst Cave,95,2.82
+Karst Cave,105,2.88
+Karst Cave,115,2.9
+Karst Cave,125,2.88
+Karst Cave,135,2.88
+Karst Cave,145,2.9
+Karst Cave,155,2.92
+Karst Cave,165,2.98
+Karst Cave,175,2.85
+Karst Cave,185,3.02
+Karst Cave,195,2.92
+Karst Cave,205,3
+Karst Cave,215,3.15
+Karst Cave,225,3.08
+Karst Cave,235,2.98
+Karst Cave,245,3.15
+Karst Cave,255,3.15
+Leisure,5,3.17
+Leisure,15,3.08
+Leisure,25,3.05
+Leisure,35,3.12
+Leisure,45,3.02
+Leisure,55,3.12
+Leisure,65,3.05
+Leisure,75,3.25
+Leisure,85,3.12
+Leisure,95,3.35
+Leisure,105,3.12
+Leisure,115,3.25
+Leisure,125,3.3
+Leisure,135,3.23
+Leisure,145,3.2
+Leisure,155,3.17
+Leisure,165,3.3
+Leisure,175,3.15
+Leisure,185,3.17
+Leisure,195,3.12
+Leisure,205,3.08
+Leisure,215,3.1
+Leisure,225,3.05
+Leisure,235,3.23
+Leisure,245,3.17
+Leisure,255,3.12
+Lightning,5,3.08
+Lightning,15,3.17
+Lightning,25,3
+Lightning,35,3.1
+Lightning,45,3.08
+Lightning,55,3.08
+Lightning,65,3.1
+Lightning,75,3
+Lightning,85,3.08
+Lightning,95,3
+Lightning,105,2.95
+Lightning,115,2.95
+Lightning,125,2.88
+Lightning,135,2.95
+Lightning,145,2.88
+Lightning,155,2.82
+Lightning,165,2.9
+Lightning,175,2.85
+Lightning,185,2.88
+Lightning,195,2.85
+Lightning,205,2.95
+Lightning,215,2.77
+Lightning,225,2.88
+Lightning,235,2.8
+Lightning,245,2.77
+Lightning,255,2.77
+Longing,5,2.8
+Longing,15,2.7
+Longing,25,2.7
+Longing,35,2.73
+Longing,45,2.73
+Longing,55,2.65
+Longing,65,2.68
+Longing,75,2.65
+Longing,85,2.65
+Longing,95,2.65
+Longing,105,2.65
+Longing,115,2.67
+Longing,125,2.6
+Longing,135,2.6
+Longing,145,2.5
+Longing,155,2.58
+Longing,165,2.5
+Longing,175,2.55
+Longing,185,2.48
+Longing,195,2.4
+Longing,205,2.42
+Longing,215,2.42
+Longing,225,2.42
+Longing,235,2.38
+Longing,245,2.35
+Longing,255,2.38
+Meditation,5,2.35
+Meditation,15,2.32
+Meditation,25,2.25
+Meditation,35,2.25
+Meditation,45,2.25
+Meditation,55,2.25
+Meditation,65,2.25
+Meditation,75,2.18
+Meditation,85,2.12
+Meditation,95,2.18
+Meditation,105,2.12
+Meditation,115,2.1
+Meditation,125,2.1
+Meditation,135,2.02
+Meditation,145,2.05
+Meditation,155,2
+Meditation,165,2
+Meditation,175,2.05
+Meditation,185,2
+Meditation,195,1.98
+Meditation,205,1.95
+Meditation,215,1.9
+Meditation,225,1.98
+Meditation,235,1.95
+Meditation,245,1.98
+Meditation,255,1.98
+Meteor shower,5,2.02
+Meteor shower,15,1.98
+Meteor shower,25,2.02
+Meteor shower,35,2.02
+Meteor shower,45,2.02
+Meteor shower,55,2.05
+Meteor shower,65,2.05
+Meteor shower,75,2.1
+Meteor shower,85,2.1
+Meteor shower,95,2.1
+Meteor shower,105,2.18
+Meteor shower,115,2.1
+Meteor shower,125,2.18
+Meteor shower,135,2.18
+Meteor shower,145,2.23
+Meteor shower,155,2.25
+Meteor shower,165,2.23
+Meteor shower,175,2.32
+Meteor shower,185,2.25
+Meteor shower,195,2.27
+Meteor shower,205,2.32
+Meteor shower,215,2.32
+Meteor shower,225,2.35
+Meteor shower,235,2.38
+Meteor shower,245,2.38
+Meteor shower,255,2.45
+Moonlight,5,2.48
+Moonlight,15,2.42
+Moonlight,25,2.45
+Moonlight,35,2.52
+Moonlight,45,2.52
+Moonlight,55,2.55
+Moonlight,65,2.55
+Moonlight,75,2.6
+Moonlight,85,2.58
+Moonlight,95,2.62
+Moonlight,105,2.65
+Moonlight,115,2.58
+Moonlight,125,2.65
+Moonlight,135,2.65
+Moonlight,145,2.65
+Moonlight,155,2.65
+Moonlight,165,2.68
+Moonlight,175,2.73
+Moonlight,185,2.67
+Moonlight,195,2.75
+Moonlight,205,2.78
+Moonlight,215,2.73
+Moonlight,225,2.85
+Moonlight,235,2.77
+Moonlight,245,2.83
+Moonlight,255,2.8
+Morning,5,2.92
+Morning,15,2.77
+Morning,25,2.83
+Morning,35,2.88
+Morning,45,2.85
+Morning,55,2.88
+Morning,65,2.82
+Morning,75,2.95
+Morning,85,2.9
+Morning,95,2.95
+Morning,105,3.08
+Morning,115,2.95
+Morning,125,3.05
+Morning,135,2.87
+Morning,145,3
+Morning,155,3.1
+Morning,165,2.98
+Morning,175,3.15
+Morning,185,3.05
+Morning,195,3.02
+Morning,205,3.05
+Morning,215,3.02
+Morning,225,3.1
+Morning,235,3
+Morning,245,3.05
+Morning,255,3.17
+Mother's Day,5,3.27
+Mother's Day,15,3.05
+Mother's Day,25,3
+Mother's Day,35,3.08
+Mother's Day,45,3.02
+Mother's Day,55,3.02
+Mother's Day,65,2.9
+Mother's Day,75,3.02
+Mother's Day,85,2.92
+Mother's Day,95,2.92
+Mother's Day,105,2.88
+Mother's Day,115,2.85
+Mother's Day,125,2.85
+Mother's Day,135,2.9
+Mother's Day,145,2.88
+Mother's Day,155,2.88
+Mother's Day,165,2.88
+Mother's Day,175,2.9
+Mother's Day,185,2.82
+Mother's Day,195,2.9
+Mother's Day,205,2.83
+Mother's Day,215,2.85
+Mother's Day,225,2.85
+Mother's Day,235,2.73
+Mother's Day,245,2.85
+Mother's Day,255,2.75
+movie,5,3.85
+movie,15,4.75
+movie,25,5.58
+movie,35,6.25
+movie,45,7.1
+movie,55,7.95
+movie,65,8.85
+movie,75,9.47
+movie,85,10.3
+movie,95,10.97
+movie,105,11.75
+movie,115,12.33
+movie,125,13.2
+movie,135,13.83
+movie,145,14.7
+movie,155,15.3
+movie,165,16.1
+movie,175,16.82
+movie,185,17.4
+movie,195,18.35
+movie,205,19.08
+movie,215,20.02
+movie,225,20.62
+movie,235,21.45
+movie,245,22.27
+movie,255,23.15
+Movie,5,2.73
+Movie,15,2.65
+Movie,25,2.68
+Movie,35,2.62
+Movie,45,2.7
+Movie,55,2.62
+Movie,65,2.58
+Movie,75,2.7
+Movie,85,2.62
+Movie,95,2.65
+Movie,105,2.65
+Movie,115,2.55
+Movie,125,2.62
+Movie,135,2.55
+Movie,145,2.58
+Movie,155,2.52
+Movie,165,2.5
+Movie,175,2.52
+Movie,185,2.45
+Movie,195,2.45
+Movie,205,2.45
+Movie,215,2.4
+Movie,225,2.5
+Movie,235,2.4
+Movie,245,2.4
+Movie,255,2.4
+Mysterious,5,2.42
+Mysterious,15,2.35
+Mysterious,25,2.32
+Mysterious,35,2.33
+Mysterious,45,2.33
+Mysterious,55,2.3
+Mysterious,65,2.32
+Mysterious,75,2.25
+Mysterious,85,2.23
+Mysterious,95,2.27
+Mysterious,105,2.23
+Mysterious,115,2.23
+Mysterious,125,2.2
+Mysterious,135,2.2
+Mysterious,145,2.2
+Mysterious,155,2.18
+Mysterious,165,2.15
+Mysterious,175,2.18
+Mysterious,185,2.1
+Mysterious,195,2.15
+Mysterious,205,2.1
+Mysterious,215,2.08
+Mysterious,225,2.02
+Mysterious,235,2.08
+Mysterious,245,2.02
+Mysterious,255,1.98
+Night,5,1.98
+Night,15,2.02
+Night,25,1.95
+Night,35,1.95
+Night,45,1.95
+Night,55,1.92
+Night,65,1.95
+Night,75,1.98
+Night,85,1.95
+Night,95,1.92
+Night,105,1.85
+Night,115,1.82
+Night,125,1.88
+Night,135,1.88
+Night,145,1.9
+Night,155,1.88
+Night,165,1.9
+Night,175,1.9
+Night,185,1.9
+Night,195,1.95
+Night,205,1.9
+Night,215,1.98
+Night,225,1.95
+Night,235,1.98
+Night,245,1.9
+Night,255,1.95
+Night Light,5,1.98
+Night Light,15,2.02
+Night Light,25,1.98
+Night Light,35,2
+Night Light,45,2.02
+Night Light,55,2.05
+Night Light,65,2.05
+Night Light,75,2.05
+Night Light,85,2.02
+Night Light,95,2.08
+Night Light,105,2.05
+Night Light,115,2.1
+Night Light,125,2.1
+Night Light,135,2.1
+Night Light,145,2.15
+Night Light,155,2.18
+Night Light,165,2.1
+Night Light,175,2.15
+Night Light,185,2.15
+Night Light,195,2.2
+Night Light,205,2.15
+Night Light,215,2.18
+Night Light,225,2.2
+Night Light,235,2.17
+Night Light,245,2.18
+Night Light,255,2.15
+Optimistic,5,2.2
+Optimistic,15,2.2
+Optimistic,25,2.23
+Optimistic,35,2.2
+Optimistic,45,2.23
+Optimistic,55,2.25
+Optimistic,65,2.25
+Optimistic,75,2.25
+Optimistic,85,2.27
+Optimistic,95,2.27
+Optimistic,105,2.27
+Optimistic,115,2.27
+Optimistic,125,2.27
+Optimistic,135,2.3
+Optimistic,145,2.27
+Optimistic,155,2.3
+Optimistic,165,2.32
+Optimistic,175,2.3
+Optimistic,185,2.35
+Optimistic,195,2.3
+Optimistic,205,2.32
+Optimistic,215,2.32
+Optimistic,225,2.38
+Optimistic,235,2.27
+Optimistic,245,2.35
+Optimistic,255,2.38
+Party,5,2.38
+Party,15,2.55
+Party,25,2.85
+Party,35,3.12
+Party,45,2.88
+Party,55,3.08
+Party,65,3
+Party,75,2.95
+Party,85,3.05
+Party,95,2.85
+Party,105,2.97
+Party,115,2.95
+Party,125,2.85
+Party,135,2.95
+Party,145,2.82
+Party,155,3
+Party,165,2.98
+Party,175,2.88
+Party,185,2.95
+Party,195,2.85
+Party,205,2.88
+Party,215,2.95
+Party,225,2.92
+Party,235,2.88
+Party,245,2.85
+Party,255,2.88
+Profound,5,2.85
+Profound,15,2.83
+Profound,25,2.73
+Profound,35,2.68
+Profound,45,2.75
+Profound,55,2.75
+Profound,65,2.77
+Profound,75,2.75
+Profound,85,2.75
+Profound,95,2.65
+Profound,105,2.73
+Profound,115,2.62
+Profound,125,2.67
+Profound,135,2.73
+Profound,145,2.62
+Profound,155,2.65
+Profound,165,2.58
+Profound,175,2.6
+Profound,185,2.58
+Profound,195,2.55
+Profound,205,2.55
+Profound,215,2.52
+Profound,225,2.55
+Profound,235,2.52
+Profound,245,2.55
+Profound,255,2.5
+Quiet,5,2.5
+Quiet,15,2.45
+Quiet,25,2.45
+Quiet,35,2.42
+Quiet,45,2.45
+Quiet,55,2.4
+Quiet,65,2.38
+Quiet,75,2.35
+Quiet,85,2.35
+Quiet,95,2.32
+Quiet,105,2.25
+Quiet,115,2.32
+Quiet,125,2.32
+Quiet,135,2.25
+Quiet,145,2.3
+Quiet,155,2.25
+Quiet,165,2.23
+Quiet,175,2.25
+Quiet,185,2.23
+Quiet,195,2.2
+Quiet,205,2.12
+Quiet,215,2.15
+Quiet,225,2.12
+Quiet,235,2.1
+Quiet,245,2.18
+Quiet,255,2.05
+Rainbow,5,2.08
+Rainbow,15,2.02
+Rainbow,25,2.05
+Rainbow,35,2.05
+Rainbow,45,2.02
+Rainbow,55,2.08
+Rainbow,65,2.08
+Rainbow,75,2.08
+Rainbow,85,2.08
+Rainbow,95,2.1
+Rainbow,105,2.1
+Rainbow,115,2.12
+Rainbow,125,2.12
+Rainbow,135,2.18
+Rainbow,145,2.1
+Rainbow,155,2.1
+Rainbow,165,2.12
+Rainbow,175,2.08
+Rainbow,185,2.1
+Rainbow,195,2.15
+Rainbow,205,2.1
+Rainbow,215,2.15
+Rainbow,225,2.12
+Rainbow,235,2.12
+Rainbow,245,2.15
+Rainbow,255,2.12
+Release,5,2.1
+Release,15,2.15
+Release,25,2.17
+Release,35,2.25
+Release,45,2.23
+Release,55,2.2
+Release,65,2.33
+Release,75,2.27
+Release,85,2.3
+Release,95,2.35
+Release,105,2.32
+Release,115,2.32
+Release,125,2.35
+Release,135,2.48
+Release,145,2.5
+Release,155,2.52
+Release,165,2.58
+Release,175,2.45
+Release,185,2.67
+Release,195,2.47
+Release,205,2.58
+Release,215,2.7
+Release,225,2.65
+Release,235,2.62
+Release,245,2.67
+Release,255,2.6
+Rhythm,5,2.73
+Rhythm,15,2.7
+Rhythm,25,2.8
+Rhythm,35,2.73
+Rhythm,45,2.85
+Rhythm,55,2.85
+Rhythm,65,2.8
+Rhythm,75,2.88
+Rhythm,85,2.8
+Rhythm,95,2.95
+Rhythm,105,2.88
+Rhythm,115,3
+Rhythm,125,2.92
+Rhythm,135,2.85
+Rhythm,145,2.92
+Rhythm,155,2.9
+Rhythm,165,2.92
+Rhythm,175,2.9
+Rhythm,185,2.98
+Rhythm,195,3.02
+Rhythm,205,2.9
+Rhythm,215,2.98
+Rhythm,225,3.02
+Rhythm,235,3.08
+Rhythm,245,3.1
+Rhythm,255,3.02
+Ripple,5,3.05
+Ripple,15,3.35
+Ripple,25,3.35
+Ripple,35,3.48
+Ripple,45,3.42
+Ripple,55,3.35
+Ripple,65,3.48
+Ripple,75,3.38
+Ripple,85,3.48
+Ripple,95,3.42
+Ripple,105,3.4
+Ripple,115,3.48
+Ripple,125,3.38
+Ripple,135,3.48
+Ripple,145,3.4
+Ripple,155,3.42
+Ripple,165,3.5
+Ripple,175,3.38
+Ripple,185,3.48
+Ripple,195,3.4
+Ripple,205,3.32
+Ripple,215,3.42
+Ripple,225,3.35
+Ripple,235,3.45
+Ripple,245,3.35
+Ripple,255,3.35
+romantic,5,3.88
+romantic,15,4.65
+romantic,25,5.6
+romantic,35,6.22
+romantic,45,7.07
+romantic,55,7.9
+romantic,65,8.82
+romantic,75,9.47
+romantic,85,10.43
+romantic,95,10.95
+romantic,105,11.75
+romantic,115,12.4
+romantic,125,13.32
+romantic,135,13.93
+romantic,145,14.68
+romantic,155,15.25
+romantic,165,16.1
+romantic,175,16.73
+romantic,185,17.32
+romantic,195,18.23
+romantic,205,19.17
+romantic,215,20
+romantic,225,20.65
+romantic,235,21.45
+romantic,245,22.3
+romantic,255,23.12
+Romantic,5,3.32
+Romantic,15,3.42
+Romantic,25,3.38
+Romantic,35,3.45
+Romantic,45,3.38
+Romantic,55,3.48
+Romantic,65,3.4
+Romantic,75,3.42
+Romantic,85,3.45
+Romantic,95,3.38
+Romantic,105,3.42
+Romantic,115,3.35
+Romantic,125,3.35
+Romantic,135,3.42
+Romantic,145,3.25
+Romantic,155,3.35
+Romantic,165,3.25
+Romantic,175,3.3
+Romantic,185,3.35
+Romantic,195,3.15
+Romantic,205,3.35
+Romantic,215,3.18
+Romantic,225,3.3
+Romantic,235,3.2
+Romantic,245,3.17
+Romantic,255,3.27
+Siren,5,3.25
+Siren,15,3.1
+Siren,25,3.05
+Siren,35,3.15
+Siren,45,3.05
+Siren,55,3.08
+Siren,65,2.95
+Siren,75,3.02
+Siren,85,2.98
+Siren,95,2.88
+Siren,105,3
+Siren,115,2.85
+Siren,125,2.98
+Siren,135,2.92
+Siren,145,2.83
+Siren,155,2.9
+Siren,165,2.77
+Siren,175,2.88
+Siren,185,2.8
+Siren,195,2.75
+Siren,205,2.77
+Siren,215,2.62
+Siren,225,2.65
+Siren,235,2.6
+Siren,245,2.6
+Siren,255,2.62
+Sleep,5,2.58
+Sleep,15,2.48
+Sleep,25,2.5
+Sleep,35,2.55
+Sleep,45,2.5
+Sleep,55,2.62
+Sleep,65,2.5
+Sleep,75,2.62
+Sleep,85,2.52
+Sleep,95,2.52
+Sleep,105,2.6
+Sleep,115,2.52
+Sleep,125,2.55
+Sleep,135,2.55
+Sleep,145,2.52
+Sleep,155,2.55
+Sleep,165,2.52
+Sleep,175,2.6
+Sleep,185,2.48
+Sleep,195,2.6
+Sleep,205,2.6
+Sleep,215,2.55
+Sleep,225,2.58
+Sleep,235,2.62
+Sleep,245,2.6
+Sleep,255,2.52
+snowflake,5,3.82
+snowflake,15,4.75
+snowflake,25,5.57
+snowflake,35,6.22
+snowflake,45,7.08
+snowflake,55,8
+snowflake,65,8.82
+snowflake,75,9.47
+snowflake,85,10.32
+snowflake,95,10.97
+snowflake,105,11.7
+snowflake,115,12.4
+snowflake,125,13.2
+snowflake,135,13.83
+snowflake,145,14.65
+snowflake,155,15.3
+snowflake,165,16.12
+snowflake,175,16.75
+snowflake,185,17.4
+snowflake,195,18.32
+snowflake,205,19.18
+snowflake,215,20
+snowflake,225,20.62
+snowflake,235,21.48
+snowflake,245,22.32
+snowflake,255,23.15
+Spring,5,2.6
+Spring,15,2.58
+Spring,25,2.55
+Spring,35,2.52
+Spring,45,2.55
+Spring,55,2.52
+Spring,65,2.6
+Spring,75,2.62
+Spring,85,2.58
+Spring,95,2.6
+Spring,105,2.65
+Spring,115,2.6
+Spring,125,2.6
+Spring,135,2.6
+Spring,145,2.65
+Spring,155,2.55
+Spring,165,2.58
+Spring,175,2.58
+Spring,185,2.52
+Spring,195,2.6
+Spring,205,2.5
+Spring,215,2.62
+Spring,225,2.65
+Spring,235,2.55
+Spring,245,2.67
+Spring,255,2.52
+Stacking,5,2.65
+Stacking,15,2.65
+Stacking,25,2.73
+Stacking,35,2.67
+Stacking,45,2.83
+Stacking,55,2.65
+Stacking,65,2.65
+Stacking,75,2.75
+Stacking,85,2.7
+Stacking,95,2.8
+Stacking,105,2.73
+Stacking,115,2.73
+Stacking,125,2.85
+Stacking,135,2.8
+Stacking,145,2.98
+Stacking,155,2.82
+Stacking,165,2.85
+Stacking,175,2.92
+Stacking,185,3
+Stacking,195,2.92
+Stacking,205,2.98
+Stacking,215,3
+Stacking,225,2.92
+Stacking,235,2.98
+Stacking,245,2.98
+Stacking,255,2.95
+Starry Sky,5,3.05
+Starry Sky,15,3.12
+Starry Sky,25,2.98
+Starry Sky,35,3.12
+Starry Sky,45,3.08
+Starry Sky,55,2.98
+Starry Sky,65,3.05
+Starry Sky,75,2.9
+Starry Sky,85,2.98
+Starry Sky,95,2.88
+Starry Sky,105,2.88
+Starry Sky,115,2.92
+Starry Sky,125,2.85
+Starry Sky,135,2.98
+Starry Sky,145,2.88
+Starry Sky,155,2.82
+Starry Sky,165,2.9
+Starry Sky,175,2.85
+Starry Sky,185,3
+Starry Sky,195,2.8
+Starry Sky,205,2.88
+Starry Sky,215,2.88
+Starry Sky,225,2.83
+Starry Sky,235,2.8
+Starry Sky,245,2.83
+Starry Sky,255,2.85
+Summer,5,2.75
+Summer,15,2.77
+Summer,25,2.67
+Summer,35,2.75
+Summer,45,2.77
+Summer,55,2.68
+Summer,65,2.75
+Summer,75,2.7
+Summer,85,2.7
+Summer,95,2.68
+Summer,105,2.67
+Summer,115,2.65
+Summer,125,2.62
+Summer,135,2.62
+Summer,145,2.58
+Summer,155,2.6
+Summer,165,2.55
+Summer,175,2.6
+Summer,185,2.55
+Summer,195,2.58
+Summer,205,2.52
+Summer,215,2.55
+Summer,225,2.5
+Summer,235,2.52
+Summer,245,2.5
+Summer,255,2.5
+Sunny,5,2.48
+Sunny,15,2.45
+Sunny,25,2.45
+Sunny,35,2.45
+Sunny,45,2.4
+Sunny,55,2.4
+Sunny,65,2.38
+Sunny,75,2.35
+Sunny,85,2.35
+Sunny,95,2.32
+Sunny,105,2.32
+Sunny,115,2.27
+Sunny,125,2.32
+Sunny,135,2.3
+Sunny,145,2.23
+Sunny,155,2.27
+Sunny,165,2.2
+Sunny,175,2.25
+Sunny,185,2.2
+Sunny,195,2.18
+Sunny,205,2.17
+Sunny,215,2.18
+Sunny,225,2.15
+Sunny,235,2.15
+Sunny,245,2.1
+Sunny,255,2.1
+sunrise,15,4.78
+sunrise,25,5.62
+sunrise,35,6.22
+sunrise,45,7.03
+sunrise,55,7.97
+sunrise,65,8.83
+sunrise,75,9.45
+sunrise,85,10.25
+sunrise,95,10.97
+sunrise,105,11.75
+sunrise,115,12.35
+sunrise,125,13.28
+sunrise,135,13.85
+sunrise,145,14.68
+sunrise,155,15.32
+sunrise,165,16.12
+sunrise,175,16.77
+sunrise,185,17.4
+sunrise,195,18.23
+sunrise,205,19.15
+sunrise,215,19.95
+sunrise,225,20.62
+sunrise,235,21.38
+sunrise,245,22.35
+sunrise,255,23.15
+Sunrise,5,2.05
+Sunrise,15,2.02
+Sunrise,25,2.08
+Sunrise,35,2.08
+Sunrise,45,2.1
+Sunrise,55,2.1
+Sunrise,65,2.05
+Sunrise,75,2.15
+Sunrise,85,2.12
+Sunrise,95,2.15
+Sunrise,105,2.12
+Sunrise,115,2.18
+Sunrise,125,2.2
+Sunrise,135,2.17
+Sunrise,145,2.2
+Sunrise,155,2.2
+Sunrise,165,2.18
+Sunrise,175,2.25
+Sunrise,185,2.23
+Sunrise,195,2.27
+Sunrise,205,2.27
+Sunrise,215,2.27
+Sunrise,225,2.35
+Sunrise,235,2.27
+Sunrise,245,2.3
+Sunrise,255,2.35
+sunset,5,3.82
+sunset,15,4.67
+sunset,25,5.58
+sunset,35,6.2
+sunset,45,7.07
+sunset,55,7.97
+sunset,65,8.83
+sunset,75,9.45
+sunset,85,10.32
+sunset,95,10.97
+sunset,105,11.75
+sunset,115,12.38
+sunset,125,13.22
+sunset,135,13.8
+sunset,145,14.65
+sunset,155,15.25
+sunset,165,16.18
+sunset,175,16.7
+sunset,185,17.35
+sunset,195,18.35
+sunset,205,19.23
+sunset,215,19.97
+sunset,225,20.62
+sunset,235,21.45
+sunset,245,22.32
+sunset,255,23.15
+Sunset,5,2.35
+Sunset,15,2.35
+Sunset,25,2.4
+Sunset,35,2.35
+Sunset,45,2.38
+Sunset,55,2.42
+Sunset,65,2.4
+Sunset,75,2.38
+Sunset,85,2.42
+Sunset,95,2.42
+Sunset,105,2.52
+Sunset,115,2.42
+Sunset,125,2.48
+Sunset,135,2.52
+Sunset,145,2.52
+Sunset,155,2.5
+Sunset,165,2.58
+Sunset,175,2.52
+Sunset,185,2.5
+Sunset,195,2.6
+Sunset,205,2.52
+Sunset,215,2.6
+Sunset,225,2.6
+Sunset,235,2.58
+Sunset,245,2.58
+Sunset,255,2.6
+Technology,5,2.6
+Technology,15,2.67
+Technology,25,2.65
+Technology,35,2.73
+Technology,45,2.7
+Technology,55,2.67
+Technology,65,2.82
+Technology,75,2.68
+Technology,85,2.75
+Technology,95,2.8
+Technology,105,2.73
+Technology,115,2.8
+Technology,125,2.75
+Technology,135,2.9
+Technology,145,2.8
+Technology,155,2.85
+Technology,165,2.95
+Technology,175,2.82
+Technology,185,2.97
+Technology,195,2.88
+Technology,205,2.95
+Technology,215,3.02
+Technology,225,3.02
+Technology,235,3.1
+Technology,245,3.05
+Technology,255,3
+The Piano,5,3.12
+The Piano,15,2.62
+The Piano,25,2.2
+The Piano,35,2.2
+The Piano,45,2.15
+The Piano,55,2.15
+The Piano,65,2.18
+The Piano,75,2.15
+The Piano,85,2.18
+The Piano,95,2.25
+The Piano,105,2.18
+The Piano,115,2.2
+The Piano,125,2.15
+The Piano,135,2.2
+The Piano,145,2.2
+The Piano,155,2.17
+The Piano,165,2.25
+The Piano,175,2.27
+The Piano,185,2.23
+The Piano,195,2.25
+The Piano,205,2.27
+The Piano,215,2.25
+The Piano,225,2.27
+The Piano,235,2.25
+The Piano,245,2.23
+The Piano,255,2.25
+Tree shadow,5,2.25
+Tree shadow,15,2.27
+Tree shadow,25,2.33
+Tree shadow,35,2.25
+Tree shadow,45,2.3
+Tree shadow,55,2.33
+Tree shadow,65,2.38
+Tree shadow,75,2.25
+Tree shadow,85,2.35
+Tree shadow,95,2.33
+Tree shadow,105,2.35
+Tree shadow,115,2.3
+Tree shadow,125,2.3
+Tree shadow,135,2.35
+Tree shadow,145,2.3
+Tree shadow,155,2.32
+Tree shadow,165,2.35
+Tree shadow,175,2.35
+Tree shadow,185,2.4
+Tree shadow,195,2.35
+Tree shadow,205,2.38
+Tree shadow,215,2.35
+Tree shadow,225,2.4
+Tree shadow,235,2.4
+Tree shadow,245,2.3
+Tree shadow,255,2.48
+twinkle,5,3.82
+twinkle,15,4.72
+twinkle,25,5.6
+twinkle,35,6.2
+twinkle,45,7.15
+twinkle,55,7.95
+twinkle,65,8.83
+twinkle,75,9.5
+twinkle,85,10.3
+twinkle,95,10.97
+twinkle,105,11.77
+twinkle,115,12.38
+twinkle,125,13.28
+twinkle,135,13.9
+twinkle,145,14.62
+twinkle,155,15.25
+twinkle,165,16.12
+twinkle,175,16.73
+twinkle,185,17.4
+twinkle,195,18.3
+twinkle,205,19.12
+twinkle,215,19.97
+twinkle,225,20.65
+twinkle,235,21.45
+twinkle,245,22.23
+twinkle,255,23.18
+Volcano,5,2.42
+Volcano,15,2.45
+Volcano,25,2.35
+Volcano,35,2.42
+Volcano,45,2.4
+Volcano,55,2.38
+Volcano,65,2.48
+Volcano,75,2.35
+Volcano,85,2.45
+Volcano,95,2.38
+Volcano,105,2.5
+Volcano,115,2.52
+Volcano,125,2.35
+Volcano,135,2.58
+Volcano,145,2.38
+Volcano,155,2.55
+Volcano,165,2.58
+Volcano,175,2.48
+Volcano,185,2.55
+Volcano,195,2.4
+Volcano,205,2.52
+Volcano,215,2.45
+Volcano,225,2.35
+Volcano,235,2.45
+Volcano,245,2.4
+Volcano,255,2.45
+Warm,5,2.38
+Warm,15,2.4
+Warm,25,2.33
+Warm,35,2.45
+Warm,45,2.38
+Warm,55,2.42
+Warm,65,2.45
+Warm,75,2.4
+Warm,85,2.35
+Warm,95,2.48
+Warm,105,2.42
+Warm,115,2.35
+Warm,125,2.32
+Warm,135,2.38
+Warm,145,2.33
+Warm,155,2.38
+Warm,165,2.38
+Warm,175,2.3
+Warm,185,2.35
+Warm,195,2.33
+Warm,205,2.35
+Warm,215,2.33
+Warm,225,2.4
+Warm,235,2.35
+Warm,245,2.35
+Warm,255,2.27
+Wave,5,2.33
+Wave,15,2.27
+Wave,25,2.33
+Wave,35,2.3
+Wave,45,2.27
+Wave,55,2.25
+Wave,65,2.2
+Wave,75,2.38
+Wave,85,2.25
+Wave,95,2.3
+Wave,105,2.3
+Wave,115,2.25
+Wave,125,2.25
+Wave,135,2.3
+Wave,145,2.27
+Wave,155,2.23
+Wave,165,2.23
+Wave,175,2.25
+Wave,185,2.25
+Wave,195,2.2
+Wave,205,2.17
+Wave,215,2.23
+Wave,225,2.2
+Wave,235,2.18
+Wave,245,2.23
+Wave,255,2.2
+White Light,5,2.15
+White Light,15,2.18
+White Light,25,2.18
+White Light,35,2.2
+White Light,45,2.2
+White Light,55,2.15
+White Light,65,2.1
+White Light,75,2.18
+White Light,85,2.12
+White Light,95,2.15
+White Light,105,2.15
+White Light,115,2.15
+White Light,125,2.15
+White Light,135,2.1
+White Light,145,2.15
+White Light,155,2.12
+White Light,165,2.1
+White Light,175,2.15
+White Light,185,2.1
+White Light,195,2.12
+White Light,205,2.12
+White Light,215,2.12
+White Light,225,2.1
+White Light,235,2.1
+White Light,245,2.12
+White Light,255,2.08
+Winter,5,2.08
+Winter,15,2.6
+Winter,25,2.92
+Winter,35,2.8
+Winter,45,2.88
+Winter,55,2.88
+Winter,65,2.85
+Winter,75,2.92
+Winter,85,2.8
+Winter,95,2.9
+Winter,105,2.75
+Winter,115,2.85
+Winter,125,2.85
+Winter,135,2.83
+Winter,145,2.83
+Winter,155,2.83
+Winter,165,2.83
+Winter,175,2.73
+Winter,185,2.7
+Winter,195,2.7
+Winter,205,2.67
+Winter,215,2.75
+Winter,225,2.65
+Winter,235,2.75
+Winter,245,2.7
+Winter,255,2.7
+Work,5,2.67
+Work,15,2.67
+Work,25,2.62
+Work,35,2.67
+Work,45,2.55
+Work,55,2.75
+Work,65,2.58
+Work,75,2.6
+Work,85,2.6
+Work,95,2.52
+Work,105,2.55
+Work,115,2.48
+Work,125,2.58
+Work,135,2.5
+Work,145,2.55
+Work,155,2.5
+Work,165,2.55
+Work,175,2.52
+Work,185,2.48
+Work,195,2.55
+Work,205,2.42
+Work,215,2.5
+Work,225,2.48
+Work,235,2.38
+Work,245,2.45
+Work,255,2.38

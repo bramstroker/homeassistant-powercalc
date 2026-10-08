@@ -6,6 +6,8 @@ import { emit } from "../../utils/events";
 export interface ComboboxOption {
   value: string;
   label: string;
+  description?: string;
+  badge?: string;
   disabled?: boolean;
 }
 
@@ -39,6 +41,11 @@ export class Combobox extends LitElement {
     :host { display: grid; gap: 0.4rem; min-width: 0; }
     .control { position: relative; min-width: 0; }
     input { padding-right: 2.75rem; }
+    .control.with-description input { padding-bottom: 1.7rem; }
+    .selected-description {
+      position: absolute; left: 0.7rem; right: 2.75rem; bottom: 0.55rem; pointer-events: none;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
     .control.multiple {
       display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; min-height: 44px;
       padding: 0.35rem 2.75rem 0.35rem 0.45rem; border: 1px solid var(--line); border-radius: 9px;
@@ -54,10 +61,24 @@ export class Combobox extends LitElement {
     input[readonly] { cursor: pointer; }
     .tag {
       display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.35rem 0.5rem;
+      max-width: 100%; min-width: 0;
       border-radius: 999px; background: color-mix(in srgb, var(--signal) 18%, var(--surface-raised));
       font-size: 0.78rem; white-space: nowrap;
     }
-    .tag button { min-height: 0; padding: 0; border: 0; background: transparent; color: var(--muted); font: inherit; line-height: 1; }
+    .tag-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .option-content { display: flex; align-items: center; gap: 0.65rem; min-width: 0; }
+    .option-text { display: grid; gap: 0.25rem; min-width: 0; flex: 1; }
+    .option-name { font-weight: 600; overflow-wrap: anywhere; }
+    .option-description, .selected-description {
+      color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.72rem;
+    }
+    .option-description { overflow-wrap: anywhere; white-space: normal; }
+    .tag .option-name { overflow: hidden; text-overflow: ellipsis; }
+    .badge {
+      max-width: 45%; padding: 0.2rem 0.45rem; border: 1px solid var(--line); border-radius: 6px;
+      background: var(--field); color: var(--ink); font-size: 0.72rem; overflow-wrap: anywhere; white-space: normal;
+    }
+    .tag button { flex: none; min-height: 0; padding: 0; border: 0; background: transparent; color: var(--muted); font: inherit; line-height: 1; }
     .tag button:hover:not(:disabled) { border: 0; background: transparent; color: var(--ink); transform: none; }
     .toggle {
       position: absolute; inset: 1px 1px 1px auto; width: 2.65rem; min-height: 0; padding: 0; border: 0;
@@ -105,7 +126,8 @@ export class Combobox extends LitElement {
   private renderControl() {
     const options = this.open ? this.filteredOptions() : [];
     const activeOption = options[this.active];
-    const describedBy = [this.hint ? "combobox-hint" : "", this.error ? "combobox-error" : ""]
+    const description = this.selectedDescription();
+    const describedBy = [description ? "selected-description" : "", this.hint ? "combobox-hint" : "", this.error ? "combobox-error" : ""]
       .filter(Boolean)
       .join(" ");
     return html`
@@ -133,6 +155,7 @@ export class Combobox extends LitElement {
           @input=${this.inputChanged}
           @keydown=${this.keydown}
         />
+        ${description ? html`<span id="selected-description" class="selected-description" title=${description}>${description}</span>` : nothing}
         <button class="toggle" type="button" aria-label=${`Show ${this.label.toLowerCase()} options`} ?disabled=${this.disabled} @click=${this.toggle}>
           ${this.open ? "▲" : "▼"}
         </button>
@@ -150,12 +173,16 @@ export class Combobox extends LitElement {
 
   private renderSelectedValues() {
     if (!this.multiple) return nothing;
-    return this.values().map((value) => html`
-      <span class="tag">
-        ${this.displayValue(value)}
-        <button type="button" ?disabled=${this.disabled} aria-label=${`Remove ${this.displayValue(value)}`} @click=${() => this.removeValue(value)}>×</button>
-      </span>
-    `);
+    return this.values().map((value) => {
+      const label = this.displayValue(value);
+      const option = this.options.find((candidate) => candidate.value === value);
+      return html`
+        <span class="tag">
+          <span class="tag-label" title=${option?.description ?? label}>${option ? this.renderOptionContent(option) : label}</span>
+          <button type="button" ?disabled=${this.disabled} aria-label=${`Remove ${label}${option?.description ? ` · ${option.description}` : ""}`} @click=${() => this.removeValue(value)}>×</button>
+        </span>
+      `;
+    });
   }
 
   private inputPlaceholder(): string {
@@ -179,7 +206,24 @@ export class Combobox extends LitElement {
       @mousedown=${this.preventOptionBlur}
       @mousemove=${() => this.activateOption(option, index)}
       @click=${() => this.select(option)}
-    >${option.label}</div>`;
+    >${this.renderOptionContent(option)}</div>`;
+  }
+
+  private renderOptionContent(option: ComboboxOption) {
+    if (!option.description && !option.badge) return option.label;
+    return html`<span class="option-content">
+      <span class="option-text">
+        <span class="option-name">${option.label}</span>
+        ${option.description ? html`<span class="option-description">${option.description}</span>` : nothing}
+      </span>
+      ${option.badge ? html`<span class="badge" title="Current state">${option.badge}</span>` : nothing}
+    </span>`;
+  }
+
+  private selectedDescription(): string | undefined {
+    if (this.multiple) return undefined;
+    const option = this.options.find((candidate) => candidate.value === this.singleValue());
+    return option?.label === this.query ? option.description : undefined;
   }
 
   private emptyMessage(): string {
@@ -194,7 +238,7 @@ export class Combobox extends LitElement {
     return this.options.filter((option) => {
       if (selected.has(option.value)) return false;
       if (!terms.length) return true;
-      const text = `${option.label} ${option.value}`.toLocaleLowerCase();
+      const text = `${option.label} ${option.value} ${option.description ?? ""} ${option.badge ?? ""}`.toLocaleLowerCase();
       return terms.every((term) => text.includes(term));
     });
   }
@@ -410,7 +454,7 @@ export class Combobox extends LitElement {
   }
 
   private controlClass(): string {
-    return ["control", this.multiple ? "multiple" : "", this.error ? "invalid" : ""].filter(Boolean).join(" ");
+    return ["control", this.multiple ? "multiple" : "", this.selectedDescription() ? "with-description" : "", this.error ? "invalid" : ""].filter(Boolean).join(" ");
   }
 
   private get searchable(): boolean {

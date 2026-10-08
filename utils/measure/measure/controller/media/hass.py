@@ -1,10 +1,10 @@
 import logging
 
-from homeassistant_api.errors import InternalServerError
+from homeassistant_api.errors import InternalServerError, ResponseError
 
 from measure.controller.hass_controller import HassControllerBase
 from measure.controller.media.controller import MediaController
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 
 _LOGGER = logging.getLogger("measure")
 
@@ -29,9 +29,19 @@ class HassMediaController(HassControllerBase, MediaController):
     def mute_volume(self) -> None:
         self.client.trigger_service(
             "media_player",
-            "mute_volume",
+            "volume_mute",
             retry_on_disconnect=False,
             entity_id=self.entity_id,
+            is_volume_muted=True,
+        )
+
+    def unmute_volume(self) -> None:
+        self.client.trigger_service(
+            "media_player",
+            "volume_mute",
+            retry_on_disconnect=False,
+            entity_id=self.entity_id,
+            is_volume_muted=False,
         )
 
     def play_audio(self, stream_url: str) -> None:
@@ -51,10 +61,10 @@ class HassMediaController(HassControllerBase, MediaController):
                 "turn_off",
                 entity_id=self.entity_id,
             )
-        except InternalServerError:
+        except (InternalServerError, ResponseError) as error:
             _LOGGER.debug(
-                "Internal server error on media_player.turn_off service, probably because not "
-                "supported by device, Trying media_player.media_stop",
+                "Could not turn off speaker (%s), trying media_player.media_stop",
+                error,
             )
             self.client.trigger_service(
                 "media_player",

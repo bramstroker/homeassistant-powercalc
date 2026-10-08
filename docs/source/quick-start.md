@@ -58,6 +58,10 @@ If devices are found, you will see prompts as shown below. Click `ADD` to create
 
 ![Discovery](img/discovery.png)
 
+The power and energy sensors are added to the device of the source entity, so you'll find them on its device page.
+
+![Powercalc sensors on the device page](img/device_page_sensors.png)
+
 If no sensors appear:
 
 - Check the Home Assistant logs for Powercalc-related errors
@@ -84,6 +88,12 @@ To use virtual power sensors in the Energy Dashboard, you need energy sensors.
 Powercalc automatically creates a corresponding [**energy sensor**](sensor-types/energy-sensor.md) for each virtual power sensor, no configuration required.
 
 You can add these energy sensors to the energy dashboard under **Settings → Energy → Individual devices**.
+
+![Individual devices in the energy dashboard](img/energy_dashboard_individual_devices.png)
+
+When your devices are assigned to areas and floors, the **Energy flow** card shows how consumption is distributed across your home.
+
+![Energy flow in the energy dashboard](img/energy_dashboard_energy_flow.png)
 
 If you prefer to manage energy sensors yourself, you can disable automatic creation using:
 

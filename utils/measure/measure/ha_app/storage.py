@@ -1,5 +1,4 @@
 from collections import deque
-import csv
 from dataclasses import replace
 import json
 import logging
@@ -11,11 +10,9 @@ from uuid import uuid4
 
 from pydantic import BaseModel
 
-from measure.clock import utc_now
 from measure.controller.light.const import MAX_MIRED, MIN_MIRED, LutMode
 from measure.controller.light.controller import LightInfo
 from measure.dummy_load import DummyLoadCalibration
-from measure.files import write_json_atomic
 from measure.ha_app.contribution.models import ContributionStatus
 from measure.ha_app.preferences import AppPreferences
 from measure.ha_app.session import (
@@ -26,6 +23,9 @@ from measure.ha_app.session import (
     SessionState,
 )
 from measure.ha_app.shelly_credentials import ShellyCredentials, ShellyCredentialStore
+from measure.ha_app.tapo_credentials import TapoCredentialStore
+from measure.powermeter.credentials import TapoCredentials
+from measure.recording.files import find_recording_paths
 from measure.request import (
     LightMeasurementRequest,
     MeasurementRequest,
@@ -33,14 +33,15 @@ from measure.request import (
     RecorderPurpose,
     parse_measurement_request,
 )
-from measure.runner.light_plan import (
-    CSV_HEADERS,
+from measure.runner.light.csv import inspect_light_csv
+from measure.runner.light.plan import (
     ColorTempVariation,
     EffectVariation,
     Variation,
     build_light_plan,
-    variation_from_csv_row,
 )
+from measure.utils.clock import utc_now
+from measure.utils.files import write_json_atomic
 
 _LOGGER = logging.getLogger("measure")
 
@@ -48,6 +49,7 @@ _CURRENT_SESSION_FILENAME = "current.json"
 _DUMMY_LOAD_CALIBRATION_FILENAME = "dummy_load_calibration.json"
 _CONTRIBUTION_STATUS_FILENAME = "contribution_status.json"
 _SHELLY_CREDENTIALS_FILENAME = "shelly_credentials.json"
+_TAPO_CREDENTIALS_FILENAME = "tapo_credentials.json"
 
 #: Everything reading a persisted session document can raise: the directory is gone or
 #: unreadable, or the JSON no longer matches the model that wrote it. Callers treat all of
@@ -68,6 +70,7 @@ class SessionStorage:
         # do not re-read and re-validate the JSON document from disk.
         self._request_cache: dict[str, MeasurementRequest] = {}
         self._shelly_credentials = ShellyCredentialStore(self.data_root / _SHELLY_CREDENTIALS_FILENAME)
+        self._tapo_credentials = TapoCredentialStore(self.data_root / _TAPO_CREDENTIALS_FILENAME)
 
     def session_directory(self, session_id: str) -> Path:
         if not session_id or not session_id.replace("-", "").isalnum():
@@ -127,11 +130,11 @@ class SessionStorage:
             if durable:
                 os.fsync(file.fileno())
 
-    def load_events(self, session_id: str, *, limit: int | None = 1000) -> tuple[SessionEvent, ...]:
+    def load_events(self, session_id: str, *, limit: int | None = 1000) -> list[SessionEvent]:
         """Load persisted events, optionally retaining only the newest entries."""
         path = self.session_directory(session_id) / "events.jsonl"
         if not path.exists():
-            return ()
+            return []
         events: deque[SessionEvent] = deque(maxlen=limit)
         pending_line: str | None = None
         with path.open(encoding="utf-8") as file:
@@ -148,7 +151,7 @@ class SessionStorage:
                 # The session id is caller-supplied, so keep it out of the log and report the
                 # recovered count instead — it says as much about where the file was cut off.
                 _LOGGER.warning("Ignoring a truncated final session event after %d recovered events", len(events))
-        return tuple(events)
+        return list(events)
 
     @staticmethod
     def _decode_event(line: str) -> SessionEvent:
@@ -219,7 +222,7 @@ class SessionStorage:
             raise ValueError("Session state id does not match its directory")
         return snapshot
 
-    def list_sessions(self) -> tuple[SessionSnapshot, ...]:
+    def list_sessions(self) -> list[SessionSnapshot]:
         """Return valid persisted sessions, newest activity first."""
         sessions: list[SessionSnapshot] = []
         for path in self.sessions_root.iterdir():
@@ -229,7 +232,7 @@ class SessionStorage:
                 sessions.append(self.load_snapshot(path.name))
             except SESSION_LOAD_ERRORS as error:
                 _LOGGER.warning("Ignoring incompatible measurement session %s: %s", path.name, error)
-        return tuple(sorted(sessions, key=lambda item: item.updated_at, reverse=True))
+        return sorted(sessions, key=lambda item: item.updated_at, reverse=True)
 
     def session_size(self, session_id: str) -> int:
         """Return the total size of regular files stored for one session."""
@@ -276,6 +279,19 @@ class SessionStorage:
 
     def clear_shelly_credentials(self) -> None:
         self._shelly_credentials.clear()
+
+    def load_tapo_credentials(self) -> TapoCredentials | None:
+        try:
+            return self._tapo_credentials.load()
+        except (OSError, ValueError) as error:
+            _LOGGER.warning("Could not load persisted Tapo credentials: %s", error)
+            return None
+
+    def save_tapo_credentials(self, credentials: TapoCredentials) -> None:
+        self._tapo_credentials.save(credentials)
+
+    def clear_tapo_credentials(self) -> None:
+        self._tapo_credentials.clear()
 
     def load_dummy_load_calibration(self) -> DummyLoadCalibration | None:
         return self._load_model(
@@ -343,8 +359,24 @@ class SessionStorage:
             return False
         if request.recorder_purpose != RecorderPurpose.COMPLEX_PROFILE:
             return False
-        path = self.artifact_directory(session_id, request.model_id) / request.export_filename
-        return path.is_file() and not path.is_symlink()
+        return bool(
+            find_recording_paths(self.artifact_directory(session_id, request.model_id), request.export_filename)
+        )
+
+    def archive_recording(self, session_id: str, request: RecorderMeasurementRequest) -> None:
+        """Keep the previous run before the recorder opens its fixed output filename."""
+        directory = self.artifact_directory(session_id, request.model_id)
+        current = directory / request.export_filename
+        if current.is_symlink():
+            raise ValueError("A recording cannot be a symbolic link")
+        if not current.exists():
+            return
+        index = 1
+        archived = current.with_stem(f"{current.stem}-{index}")
+        while archived.exists() or archived.is_symlink():
+            index += 1
+            archived = current.with_stem(f"{current.stem}-{index}")
+        current.rename(archived)
 
     def verify_writable(self) -> None:
         """Exercise the same create/fsync/remove operations used by session persistence."""
@@ -357,14 +389,12 @@ class SessionStorage:
         finally:
             probe.unlink(missing_ok=True)
 
-    def list_files(self, session_id: str) -> tuple[str, ...]:
+    def list_files(self, session_id: str) -> list[str]:
         output = self.output_directory(session_id)
         if not output.exists():
-            return ()
-        return tuple(
-            sorted(
-                str(path.relative_to(output)) for path in output.rglob("*") if path.is_file() and not path.is_symlink()
-            ),
+            return []
+        return sorted(
+            str(path.relative_to(output)) for path in output.rglob("*") if path.is_file() and not path.is_symlink()
         )
 
     def file_path(self, session_id: str, relative_name: str) -> Path:
@@ -376,7 +406,7 @@ class SessionStorage:
             raise ValueError("Path escapes session output directory")
         if relative_name not in self.list_files(session_id):
             raise FileNotFoundError(relative_name)
-        if not path.is_file() or path.is_symlink():
+        if not path.is_file() or path.is_symlink():  # pragma: no cover - file changes after list_files validated it
             raise FileNotFoundError(relative_name)
         return path
 
@@ -395,13 +425,8 @@ class SessionStorage:
         if not path.is_file() or path.is_symlink():
             return False
         try:
-            raw = path.read_bytes()
-            if not raw.endswith((b"\n", b"\r")):
-                return False
-            rows = list(csv.reader(raw.decode("utf-8").splitlines()))
-            if len(rows) < 2 or rows[0] != CSV_HEADERS[mode]:
-                return False
-            variation = variation_from_csv_row(rows[-1], mode)
+            inspection = inspect_light_csv(path, mode, include_datetime=request.parameters.csv_add_datetime_column)
+            variation = inspection.last_complete_variation
             if variation is None:
                 return False
             return SessionStorage._variation_matches_request(variation, mode, request)

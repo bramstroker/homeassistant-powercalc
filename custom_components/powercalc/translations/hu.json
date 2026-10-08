@@ -108,7 +108,11 @@
               "power_sensor_naming": "Teljesítményérzékelő névmintája",
               "power_sensor_friendly_naming": "Teljesítményérzékelő megjelenítési névmintája",
               "power_sensor_category": "Teljesítményérzékelő kategóriája",
-              "power_sensor_precision": "Teljesítményérzékelő pontossága"
+              "power_sensor_precision": "Teljesítményérzékelő pontossága",
+              "follow_device_name": "Eszköznév követése"
+            },
+            "data_description": {
+              "follow_device_name": "A hozzárendelt eszköz nevének használata a felületen beállított, támogatott virtuális teljesítményérzékelők létrehozott entitásaihoz. Az entitásazonosítók és az egyéni entitásnevek változatlanok maradnak. Kikapcsoláskor visszaállnak a beállított nevek. Az egyéni megjelenítési névminták, beleértve a globális mintákat is, elsőbbséget élveznek: az érintett bejegyzések megtartják a beállított neveiket."
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Teljesítmény"
+      },
+      "energy": {
+        "name": "Energia"
+      },
+      "standby_energy": {
+        "name": "Készenléti energia"
+      },
+      "cost": {
+        "name": "Költség"
+      },
+      "utility_meter_cycle": {
+        "name": "Energia {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Energia {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Energia {period} költség"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Energia {period} {tariff} költség"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Energia {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "A teljesítményérzékelő névmintája",
               "power_sensor_friendly_naming": "Teljesítményérzékelő megjelenítési nevének mintája",
               "power_sensor_category": "Teljesítményérzékelő kategória",
-              "power_sensor_precision": "Teljesítményérzékelő pontossága"
+              "power_sensor_precision": "Teljesítményérzékelő pontossága",
+              "follow_device_name": "Eszköznév követése"
+            },
+            "data_description": {
+              "follow_device_name": "A hozzárendelt eszköz nevének használata a felületen beállított, támogatott virtuális teljesítményérzékelők létrehozott entitásaihoz. Az entitásazonosítók és az egyéni entitásnevek változatlanok maradnak. Kikapcsoláskor visszaállnak a beállított nevek. Az egyéni megjelenítési névminták, beleértve a globális mintákat is, elsőbbséget élveznek: az érintett bejegyzések megtartják a beállított neveiket."
             }
           },
           "features": {

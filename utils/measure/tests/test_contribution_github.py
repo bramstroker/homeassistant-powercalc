@@ -1,6 +1,7 @@
 import base64
 from dataclasses import dataclass, field
 from typing import Any
+from unittest.mock import call, patch
 
 from measure.contribution.github import GitHubApiError, GitHubClient, GitHubRepository
 import pytest
@@ -24,6 +25,212 @@ class FakeTransport:
     def request(self, method: str, url: str, **kwargs: object) -> Response:
         self.calls.append({"method": method, "url": url, **kwargs})
         return self.responses.pop(0)
+
+
+def test_github_writes_commit_tree_and_branch_references() -> None:
+    parent = {"sha": "parent-sha", "tree": {"sha": "base-tree-sha"}}
+    reference = {"ref": "refs/heads/profile", "object": {"sha": "commit-sha"}}
+    transport = FakeTransport(
+        [
+            Response(200, parent),
+            Response(201, {"sha": "blob-sha"}),
+            Response(201, {"sha": "tree-sha"}),
+            Response(201, {"sha": "commit-sha"}),
+            Response(201, reference),
+            Response(200, reference),
+        ]
+    )
+    client = GitHubClient("test-token", transport=transport)
+    tree = [{"path": "profile_library/acme/lamp/model.json", "mode": "100644", "type": "blob", "sha": "blob-sha"}]
+
+    assert client.get_commit("octo", "repo", "parent-sha") == parent
+    assert client.create_blob("octo", "repo", "e30=") == "blob-sha"
+    assert client.create_tree("octo", "repo", "base-tree-sha", tree) == "tree-sha"
+    assert client.create_commit("octo", "repo", "Add lamp profile", "tree-sha", "parent-sha") == "commit-sha"
+    assert client.create_ref("octo", "repo", "profile", "commit-sha") == reference
+    assert client.update_ref("octo", "repo", "profile", "commit-sha") == reference
+
+    base_url = "https://api.github.com/repos/octo/repo/git"
+    assert [request["url"] for request in transport.calls] == [
+        f"{base_url}/commits/parent-sha",
+        f"{base_url}/blobs",
+        f"{base_url}/trees",
+        f"{base_url}/commits",
+        f"{base_url}/refs",
+        f"{base_url}/refs/heads/profile",
+    ]
+    assert [request["method"] for request in transport.calls] == ["GET", "POST", "POST", "POST", "POST", "PATCH"]
+    assert [request["json"] for request in transport.calls] == [
+        None,
+        {"content": "e30=", "encoding": "base64"},
+        {"base_tree": "base-tree-sha", "tree": tree},
+        {"message": "Add lamp profile", "tree": "tree-sha", "parents": ["parent-sha"]},
+        {"ref": "refs/heads/profile", "sha": "commit-sha"},
+        {"sha": "commit-sha", "force": False},
+    ]
+    assert all(request["headers"]["Authorization"] == "Bearer test-token" for request in transport.calls)
+    assert all(request["timeout"] == 30 for request in transport.calls)
+
+
+def test_github_honors_explicit_encoding_and_force_update() -> None:
+    transport = FakeTransport([Response(201, {"sha": "blob-sha"}), Response(200, {})])
+    client = GitHubClient("test-token", transport=transport)
+
+    assert client.create_blob("octo", "repo", "{}", encoding="utf-8") == "blob-sha"
+    client.update_ref("octo", "repo", "profile", "commit-sha", force=True)
+
+    assert transport.calls[0]["json"] == {"content": "{}", "encoding": "utf-8"}
+    assert transport.calls[1]["json"] == {"sha": "commit-sha", "force": True}
+
+
+def test_fork_polling_waits_until_default_branch_is_available() -> None:
+    fork = {
+        "fork": True,
+        "name": "homeassistant-powercalc",
+        "owner": {"login": "octo"},
+        "parent": {"full_name": "bramstroker/homeassistant-powercalc"},
+    }
+    transport = FakeTransport(
+        [
+            Response(202, {}),
+            Response(200, {"login": "octo"}),
+            Response(404, {}),
+            Response(200, fork),
+            Response(404, {}),
+            Response(200, fork),
+            Response(200, {"object": {"sha": "ready"}}),
+        ]
+    )
+    client = GitHubClient("token", transport=transport)
+
+    with patch("measure.contribution.github.time.sleep") as sleep:
+        assert client.create_fork(poll_attempts=3, poll_interval=2) == fork
+
+    assert sleep.call_args_list == [call(2), call(2)]
+    assert transport.responses == []
+
+
+def test_fork_polling_times_out_without_creating_another_fork() -> None:
+    transport = FakeTransport(
+        [
+            Response(202, {}),
+            Response(200, {"login": "octo"}),
+            Response(404, {}),
+            Response(404, {}),
+        ]
+    )
+    client = GitHubClient("token", transport=transport)
+
+    with patch("measure.contribution.github.time.sleep") as sleep, pytest.raises(GitHubApiError, match="after polling"):
+        client.create_fork(poll_attempts=2, poll_interval=1)
+
+    assert sleep.call_count == 2
+    assert [request["method"] for request in transport.calls] == ["POST", "GET", "GET", "GET"]
+
+
+def test_authenticated_request_requires_token_before_sending() -> None:
+    transport = FakeTransport([])
+
+    with pytest.raises(GitHubApiError, match="token is required"):
+        GitHubClient(transport=transport).fetch_authenticated_user()
+
+    assert transport.calls == []
+
+
+def test_github_rejects_invalid_json_with_response_status() -> None:
+    response = Response(502, None)
+    error = ValueError("Invalid JSON")
+    client = GitHubClient("token", transport=FakeTransport([response]))
+
+    with (
+        patch.object(response, "json", side_effect=error),
+        pytest.raises(GitHubApiError, match="invalid JSON with status 502") as raised,
+    ):
+        client.fetch_authenticated_user()
+
+    assert raised.value.__cause__ is error
+
+
+@pytest.mark.parametrize("payload", [[], None, "unexpected"])
+def test_github_rejects_non_object_user_response(payload: object) -> None:
+    client = GitHubClient("token", transport=FakeTransport([Response(200, payload)]))
+
+    with pytest.raises(GitHubApiError, match="must be an object"):
+        client.fetch_authenticated_user()
+
+
+@pytest.mark.parametrize("payload", [{}, None, "unexpected"])
+def test_github_rejects_non_list_pull_request_response(payload: object) -> None:
+    client = GitHubClient("token", transport=FakeTransport([Response(200, payload)]))
+
+    with pytest.raises(GitHubApiError, match="must be a list"):
+        client.find_pull_request("owner", "repo", head="octo:profile", base="master")
+
+
+@pytest.mark.parametrize(
+    "payload,expected",
+    [([], None), ([None, "unexpected"], None), ([None, {"number": 123}, {"number": 456}], {"number": 123})],
+)
+def test_github_finds_first_pull_request_object(payload: list[object], expected: dict[str, int] | None) -> None:
+    transport = FakeTransport([Response(200, payload)])
+    client = GitHubClient("token", transport=transport)
+
+    result = client.find_pull_request("owner", "repo", head="octo:profile", base="master")
+
+    assert result == expected
+    assert transport.calls[0]["params"] == {"state": "open", "head": "octo:profile", "base": "master"}
+
+
+@pytest.mark.parametrize("payload", [{}, [], None])
+def test_github_error_without_message_includes_http_status(payload: object) -> None:
+    client = GitHubClient("token", transport=FakeTransport([Response(503, payload)]))
+
+    with pytest.raises(GitHubApiError, match="failed with status 503"):
+        client.fetch_authenticated_user()
+
+
+@pytest.mark.parametrize("payload", [{"message": "Unexpected conflict"}, []])
+def test_fork_sync_does_not_swallow_unrelated_conflicts(payload: object) -> None:
+    client = GitHubClient("token", transport=FakeTransport([Response(409, payload)]))
+
+    with pytest.raises(GitHubApiError, match="could not fetch upstream into contribution branch profile") as raised:
+        client.sync_fork_branch("octo", "repo", "profile")
+
+    assert isinstance(raised.value.__cause__, GitHubApiError)
+
+
+def test_fork_sync_reports_invalid_conflict_response() -> None:
+    response = Response(409, None)
+    client = GitHubClient("token", transport=FakeTransport([response]))
+
+    with (
+        patch.object(response, "json", side_effect=ValueError("Invalid JSON")),
+        pytest.raises(GitHubApiError, match="invalid JSON while fetching"),
+    ):
+        client.sync_fork_branch("octo", "repo", "profile")
+
+
+@pytest.mark.parametrize("content", ["a", "not-ascii-\u2603"])
+def test_file_download_reports_invalid_base64(content: str) -> None:
+    client = GitHubClient(transport=FakeTransport([Response(200, {"encoding": "base64", "content": content})]))
+
+    with pytest.raises(GitHubApiError, match=r"invalid base64 content for model\.json"):
+        client.get_file("owner", "repo", "model.json", "master")
+
+
+@pytest.mark.parametrize("blob", [{"encoding": "none", "content": "abc"}, {"encoding": "base64", "content": None}])
+def test_large_file_download_requires_base64_blob(blob: dict[str, object]) -> None:
+    client = GitHubClient(
+        transport=FakeTransport(
+            [
+                Response(200, {"encoding": "none", "sha": "blob-sha"}),
+                Response(200, blob),
+            ]
+        )
+    )
+
+    with pytest.raises(GitHubApiError, match=r"did not return base64 content for model\.json"):
+        client.get_file("owner", "repo", "model.json", "master")
 
 
 def test_github_client_starts_and_polls_oauth_device_flow_without_auth_header() -> None:

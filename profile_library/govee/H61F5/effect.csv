@@ -1,0 +1,1015 @@
+effect,bri,watt
+none,5,5.45
+none,55,9.3
+none,105,13.05
+none,155,16.6
+none,205,21.45
+none,255,25.8
+Afternoon,5,4.95
+Afternoon,55,8.15
+Afternoon,105,12.45
+Afternoon,155,15.95
+Afternoon,205,19.0
+Afternoon,255,22.65
+April Fool's Day,5,4.95
+April Fool's Day,55,6.25
+April Fool's Day,105,7.4
+April Fool's Day,155,8.35
+April Fool's Day,205,9.4
+April Fool's Day,255,10.1
+Aurora,5,5.0
+Aurora,55,10.0
+Aurora,105,14.4
+Aurora,155,18.65
+Aurora,205,23.25
+Aurora,255,27.1
+Beach,5,5.2
+Beach,55,11.7
+Beach,105,17.8
+Beach,155,23.5
+Beach,205,29.5
+Beach,255,35.5
+Berry,5,5.0
+Berry,55,9.35
+Berry,105,13.15
+Berry,155,17.4
+Berry,205,20.95
+Berry,255,24.95
+Birthday,5,5.0
+Birthday,55,7.55
+Birthday,105,10.3
+Birthday,155,13.45
+Birthday,205,16.0
+Birthday,255,17.4
+Blessing,5,5.1
+Blessing,55,10.25
+Blessing,105,14.7
+Blessing,155,19.5
+Blessing,205,23.9
+Blessing,255,28.6
+Blue,5,5.05
+Blue,55,10.1
+Blue,105,14.7
+Blue,155,19.5
+Blue,205,23.8
+Blue,255,28.4
+Bonfire,5,4.95
+Bonfire,55,6.4
+Bonfire,105,8.4
+Bonfire,155,9.95
+Bonfire,205,11.2
+Bonfire,255,13.2
+Breeze,5,4.95
+Breeze,55,6.1
+Breeze,105,7.2
+Breeze,155,8.25
+Breeze,205,9.7
+Breeze,255,10.7
+Candlelight,5,5.05
+Candlelight,55,9.05
+Candlelight,105,12.75
+Candlelight,155,16.5
+Candlelight,205,20.0
+Candlelight,255,23.7
+Care,5,5.0
+Care,55,7.75
+Care,105,11.1
+Care,155,14.05
+Care,205,16.5
+Care,255,19.55
+Carnival,5,5.1
+Carnival,55,8.05
+Carnival,105,10.8
+Carnival,155,13.55
+Carnival,205,16.35
+Carnival,255,19.25
+Cheerful,5,4.95
+Cheerful,55,8.1
+Cheerful,105,9.9
+Cheerful,155,13.35
+Cheerful,205,14.6
+Cheerful,255,18.45
+Cherry blossoms,5,4.9
+Cherry blossoms,55,6.4
+Cherry blossoms,105,8.55
+Cherry blossoms,155,10.0
+Cherry blossoms,205,11.15
+Cherry blossoms,255,13.1
+Christmas,5,4.95
+Christmas,55,6.85
+Christmas,105,8.5
+Christmas,155,10.5
+Christmas,205,12.35
+Christmas,255,14.05
+Christmas Gift,5,4.85
+Christmas Gift,55,6.1
+Christmas Gift,105,7.4
+Christmas Gift,155,8.75
+Christmas Gift,205,10.0
+Christmas Gift,255,10.9
+Christmas Tree,5,4.9
+Christmas Tree,55,6.3
+Christmas Tree,105,7.9
+Christmas Tree,155,9.15
+Christmas Tree,205,10.65
+Christmas Tree,255,12.5
+Clear Sky,5,5.05
+Clear Sky,55,10.55
+Clear Sky,105,15.35
+Clear Sky,155,20.25
+Clear Sky,205,24.8
+Clear Sky,255,29.85
+Cloudy,5,5.05
+Cloudy,55,8.75
+Cloudy,105,13.15
+Cloudy,155,17.1
+Cloudy,205,20.55
+Cloudy,255,24.65
+Cornfield,5,4.95
+Cornfield,55,7.55
+Cornfield,105,10.65
+Cornfield,155,13.45
+Cornfield,205,16.25
+Cornfield,255,19.1
+Crazy,5,4.9
+Crazy,55,7.15
+Crazy,105,9.75
+Crazy,155,11.05
+Crazy,205,13.3
+Crazy,255,13.7
+Dance Party,5,5.0
+Dance Party,55,7.35
+Dance Party,105,9.6
+Dance Party,155,11.4
+Dance Party,205,14.75
+Dance Party,255,16.1
+Daybreak,5,5.1
+Daybreak,55,10.4
+Daybreak,105,15.0
+Daybreak,155,19.75
+Daybreak,205,24.25
+Daybreak,255,29.3
+Daze,5,4.9
+Daze,55,5.8
+Daze,105,7.1
+Daze,155,8.15
+Daze,205,8.65
+Daze,255,10.45
+Deep sea,5,4.9
+Deep sea,55,6.55
+Deep sea,105,8.75
+Deep sea,155,10.45
+Deep sea,205,12.75
+Deep sea,255,14.55
+Desert,5,5.0
+Desert,55,7.2
+Desert,105,8.85
+Desert,155,11.3
+Desert,205,13.1
+Desert,255,15.1
+Downpour,5,4.85
+Downpour,55,4.95
+Downpour,105,5.1
+Downpour,155,7.0
+Downpour,205,7.15
+Downpour,255,8.0
+Dreamland,5,5.0
+Dreamland,55,9.05
+Dreamland,105,13.2
+Dreamland,155,16.95
+Dreamland,205,20.3
+Dreamland,255,24.75
+Drizzle,5,4.9
+Drizzle,55,5.3
+Drizzle,105,5.65
+Drizzle,155,6.15
+Drizzle,205,6.5
+Drizzle,255,7.05
+Dunhuang Colors,5,4.9
+Dunhuang Colors,55,6.25
+Dunhuang Colors,105,7.7
+Dunhuang Colors,155,9.15
+Dunhuang Colors,205,10.4
+Dunhuang Colors,255,12.0
+Dusk,5,5.05
+Dusk,55,10.85
+Dusk,105,16.1
+Dusk,155,20.3
+Dusk,205,26.0
+Dusk,255,30.35
+Earth,5,4.9
+Earth,55,5.9
+Earth,105,7.1
+Earth,155,8.65
+Earth,205,9.55
+Earth,255,10.95
+Easter,5,5.05
+Easter,55,8.1
+Easter,105,10.55
+Easter,155,13.8
+Easter,205,16.35
+Easter,255,19.15
+Energetic,5,4.9
+Energetic,55,5.4
+Energetic,105,6.0
+Energetic,155,6.7
+Energetic,205,7.5
+Energetic,255,8.15
+Enthusiastic,5,5.1
+Enthusiastic,55,9.75
+Enthusiastic,105,13.75
+Enthusiastic,155,17.95
+Enthusiastic,205,22.6
+Enthusiastic,255,26.8
+Excited,5,4.9
+Excited,55,6.3
+Excited,105,6.8
+Excited,155,8.2
+Excited,205,9.3
+Excited,255,10.5
+Fall,5,5.15
+Fall,55,9.75
+Fall,105,14.6
+Fall,155,18.9
+Fall,205,23.8
+Fall,255,28.3
+Fascination,5,5.05
+Fascination,55,8.9
+Fascination,105,11.5
+Fascination,155,15.3
+Fascination,205,18.55
+Fascination,255,21.7
+Father's Day,5,5.1
+Father's Day,55,10.35
+Father's Day,105,12.65
+Father's Day,155,16.15
+Father's Day,205,20.7
+Father's Day,255,23.9
+Fight,5,5.1
+Fight,55,9.55
+Fight,105,14.35
+Fight,155,18.65
+Fight,205,22.6
+Fight,255,27.35
+Fire,5,5.0
+Fire,55,7.7
+Fire,105,11.65
+Fire,155,15.1
+Fire,205,18.1
+Fire,255,21.2
+Firefly,5,4.9
+Firefly,55,6.15
+Firefly,105,7.4
+Firefly,155,8.5
+Firefly,205,9.45
+Firefly,255,11.25
+Fireworks,5,4.9
+Fireworks,55,6.45
+Fireworks,105,8.15
+Fireworks,155,9.75
+Fireworks,205,11.3
+Fireworks,255,11.85
+Flower Field,5,5.0
+Flower Field,55,9.9
+Flower Field,105,14.15
+Flower Field,155,19.15
+Flower Field,205,23.3
+Flower Field,255,27.65
+Forest,5,4.95
+Forest,55,6.85
+Forest,105,8.2
+Forest,155,9.4
+Forest,205,11.4
+Forest,255,13.9
+Fright,5,4.8
+Fright,55,5.45
+Fright,105,6.45
+Fright,155,6.05
+Fright,205,6.7
+Fright,255,7.35
+Game,5,4.95
+Game,55,7.45
+Game,105,10.65
+Game,155,15.1
+Game,205,14.6
+Game,255,15.3
+Glacier,5,5.05
+Glacier,55,8.65
+Glacier,105,12.65
+Glacier,155,15.95
+Glacier,205,19.8
+Glacier,255,22.45
+Gleam,5,5.0
+Gleam,55,8.1
+Gleam,105,11.0
+Gleam,155,13.95
+Gleam,205,16.85
+Gleam,255,19.55
+Gobi Desert,5,4.85
+Gobi Desert,55,6.15
+Gobi Desert,105,7.45
+Gobi Desert,155,8.8
+Gobi Desert,205,10.25
+Gobi Desert,255,11.35
+Gradient,5,5.1
+Gradient,55,10.8
+Gradient,105,12.15
+Gradient,155,16.5
+Gradient,205,20.5
+Gradient,255,24.2
+Grassland,5,4.95
+Grassland,55,6.5
+Grassland,105,8.15
+Grassland,155,9.75
+Grassland,205,11.05
+Grassland,255,12.95
+Green Wheat Field,5,4.95
+Green Wheat Field,55,7.35
+Green Wheat Field,105,11.15
+Green Wheat Field,155,13.95
+Green Wheat Field,205,16.2
+Green Wheat Field,255,20.15
+Halloween,5,4.9
+Halloween,55,6.2
+Halloween,105,7.45
+Halloween,155,8.9
+Halloween,205,9.9
+Halloween,255,11.1
+Happy,5,5.05
+Happy,55,9.0
+Happy,105,12.9
+Happy,155,16.65
+Happy,205,20.65
+Happy,255,24.9
+Haystack,5,4.95
+Haystack,55,6.8
+Haystack,105,8.45
+Haystack,155,10.0
+Haystack,205,11.75
+Haystack,255,13.4
+Heartbeat,5,4.9
+Heartbeat,55,6.05
+Heartbeat,105,6.55
+Heartbeat,155,7.45
+Heartbeat,205,8.3
+Heartbeat,255,9.8
+Herbal,5,5.05
+Herbal,55,10.35
+Herbal,105,14.9
+Herbal,155,19.45
+Herbal,205,24.55
+Herbal,255,29.4
+Illumination,5,5.0
+Illumination,55,9.55
+Illumination,105,13.45
+Illumination,155,17.1
+Illumination,205,21.55
+Illumination,255,25.8
+Jupiter,5,4.95
+Jupiter,55,8.6
+Jupiter,105,12.05
+Jupiter,155,15.7
+Jupiter,205,18.75
+Jupiter,255,21.8
+Karst Cave,5,4.95
+Karst Cave,55,7.35
+Karst Cave,105,10.1
+Karst Cave,155,14.15
+Karst Cave,205,17.3
+Karst Cave,255,19.65
+Labor Day,5,4.9
+Labor Day,55,6.15
+Labor Day,105,8.55
+Labor Day,155,10.85
+Labor Day,205,12.2
+Labor Day,255,14.55
+Lake,5,4.95
+Lake,55,8.8
+Lake,105,12.0
+Lake,155,15.7
+Lake,205,18.7
+Lake,255,22.2
+Leisure,5,5.05
+Leisure,55,11.15
+Leisure,105,16.35
+Leisure,155,22.2
+Leisure,205,27.5
+Leisure,255,32.3
+Light,5,5.15
+Light,55,10.0
+Light,105,15.4
+Light,155,19.9
+Light,205,25.6
+Light,255,30.95
+Macaron Colors,5,4.95
+Macaron Colors,55,8.9
+Macaron Colors,105,12.55
+Macaron Colors,155,16.15
+Macaron Colors,205,19.3
+Macaron Colors,255,23.05
+Maiden,5,5.0
+Maiden,55,7.75
+Maiden,105,9.55
+Maiden,155,12.45
+Maiden,205,14.05
+Maiden,255,16.95
+Maillard Style,5,5.0
+Maillard Style,55,7.8
+Maillard Style,105,10.35
+Maillard Style,155,12.95
+Maillard Style,205,15.55
+Maillard Style,255,18.7
+Mars,5,5.0
+Mars,55,8.0
+Mars,105,10.5
+Mars,155,13.05
+Mars,205,16.15
+Mars,255,18.05
+Matisse's Colors,5,4.9
+Matisse's Colors,55,6.8
+Matisse's Colors,105,8.9
+Matisse's Colors,155,10.9
+Matisse's Colors,205,12.55
+Matisse's Colors,255,14.55
+Meadow Breeze,5,5.05
+Meadow Breeze,55,8.1
+Meadow Breeze,105,11.0
+Meadow Breeze,155,14.1
+Meadow Breeze,205,17.2
+Meadow Breeze,255,20.3
+Meditation,5,4.9
+Meditation,55,6.1
+Meditation,105,7.3
+Meditation,155,8.35
+Meditation,205,9.7
+Meditation,255,10.9
+Memphis Style,5,4.95
+Memphis Style,55,6.7
+Memphis Style,105,8.1
+Memphis Style,155,10.4
+Memphis Style,205,11.6
+Memphis Style,255,13.4
+Mercury,5,5.0
+Mercury,55,6.55
+Mercury,105,8.35
+Mercury,155,10.15
+Mercury,205,11.5
+Mercury,255,13.05
+Meteor,5,4.85
+Meteor,55,5.9
+Meteor,105,6.6
+Meteor,155,7.85
+Meteor,205,8.55
+Meteor,255,9.25
+Mild,5,4.95
+Mild,55,7.2
+Mild,105,8.8
+Mild,155,11.3
+Mild,205,13.25
+Mild,255,15.1
+Milky Way,5,4.85
+Milky Way,55,5.65
+Milky Way,105,6.3
+Milky Way,155,7.4
+Milky Way,205,8.2
+Milky Way,255,8.9
+Mondrian's Colors,5,5.1
+Mondrian's Colors,55,9.4
+Mondrian's Colors,105,13.25
+Mondrian's Colors,155,16.7
+Mondrian's Colors,205,21.35
+Mondrian's Colors,255,24.75
+Moonlight,5,4.9
+Moonlight,55,5.8
+Moonlight,105,6.75
+Moonlight,155,7.6
+Moonlight,205,8.55
+Moonlight,255,9.45
+Moonlit Night,5,4.95
+Moonlit Night,55,8.35
+Moonlit Night,105,11.2
+Moonlit Night,155,14.55
+Moonlit Night,205,17.5
+Moonlit Night,255,20.45
+Morandi Colors,5,4.95
+Morandi Colors,55,7.15
+Morandi Colors,105,9.9
+Morandi Colors,155,12.25
+Morandi Colors,205,14.3
+Morandi Colors,255,17.1
+Morning,5,5.1
+Morning,55,10.15
+Morning,105,15.05
+Morning,155,19.85
+Morning,205,24.1
+Morning,255,28.85
+Mother's Day,5,17.05
+Mother's Day,55,10.0
+Mother's Day,105,14.1
+Mother's Day,155,18.1
+Mother's Day,205,23.25
+Mother's Day,255,27.45
+Mountain Forest,5,4.9
+Mountain Forest,55,8.1
+Mountain Forest,105,10.85
+Mountain Forest,155,13.5
+Mountain Forest,205,16.2
+Mountain Forest,255,18.75
+Mountains,5,5.0
+Mountains,55,7.3
+Mountains,105,9.9
+Mountains,155,12.2
+Mountains,205,14.3
+Mountains,255,17.1
+Movie,5,4.8
+Movie,55,5.5
+Movie,105,6.2
+Movie,155,6.85
+Movie,205,7.3
+Movie,255,8.05
+Mucha Style,5,4.95
+Mucha Style,55,7.05
+Mucha Style,105,9.1
+Mucha Style,155,11.15
+Mucha Style,205,13.0
+Mucha Style,255,15.0
+Music: DayAndNight,5,5.1
+Music: DayAndNight,55,9.6
+Music: DayAndNight,105,13.3
+Music: DayAndNight,155,17.6
+Music: DayAndNight,205,21.2
+Music: DayAndNight,255,25.35
+Music: Energic,5,4.95
+Music: Energic,55,6.2
+Music: Energic,105,8.6
+Music: Energic,155,10.05
+Music: Energic,205,10.9
+Music: Energic,255,12.35
+Music: Fountain,5,4.95
+Music: Fountain,55,6.1
+Music: Fountain,105,6.7
+Music: Fountain,155,8.2
+Music: Fountain,205,10.35
+Music: Fountain,255,9.15
+Music: Hopping,5,4.8
+Music: Hopping,55,4.9
+Music: Hopping,105,4.95
+Music: Hopping,155,4.95
+Music: Hopping,205,4.85
+Music: Hopping,255,4.95
+Music: Luminous,5,4.8
+Music: Luminous,55,5.1
+Music: Luminous,105,5.25
+Music: Luminous,155,7.0
+Music: Luminous,205,5.55
+Music: Luminous,255,6.55
+Music: Orbit,5,4.85
+Music: Orbit,55,5.0
+Music: Orbit,105,5.15
+Music: Orbit,155,5.35
+Music: Orbit,205,5.3
+Music: Orbit,255,5.5
+Music: PianoKeys,5,5.0
+Music: PianoKeys,55,9.4
+Music: PianoKeys,105,11.95
+Music: PianoKeys,155,15.75
+Music: PianoKeys,205,20.1
+Music: PianoKeys,255,20.45
+Music: Rhythm,5,4.85
+Music: Rhythm,55,6.0
+Music: Rhythm,105,6.7
+Music: Rhythm,155,7.5
+Music: Rhythm,205,9.45
+Music: Rhythm,255,10.55
+Music: Rolling,5,4.9
+Music: Rolling,55,6.25
+Music: Rolling,105,8.05
+Music: Rolling,155,7.85
+Music: Rolling,205,6.6
+Music: Rolling,255,9.3
+Music: Separation,5,5.05
+Music: Separation,55,10.6
+Music: Separation,105,14.7
+Music: Separation,155,16.25
+Music: Separation,205,22.55
+Music: Separation,255,29.85
+Music: Shiny,5,4.9
+Music: Shiny,55,6.5
+Music: Shiny,105,9.4
+Music: Shiny,155,8.3
+Music: Shiny,205,13.0
+Music: Shiny,255,11.9
+Music: Spectrum,5,4.9
+Music: Spectrum,55,5.0
+Music: Spectrum,105,5.05
+Music: Spectrum,155,5.2
+Music: Spectrum,205,5.15
+Music: Spectrum,255,5.9
+Music: Splash,5,4.85
+Music: Splash,55,5.65
+Music: Splash,105,6.65
+Music: Splash,155,7.25
+Music: Splash,205,8.9
+Music: Splash,255,9.25
+Music: Spring,5,4.95
+Music: Spring,55,6.7
+Music: Spring,105,8.35
+Music: Spring,155,9.85
+Music: Spring,205,11.8
+Music: Spring,255,13.45
+Music: Sprouting,5,5.1
+Music: Sprouting,55,10.65
+Music: Sprouting,105,15.4
+Music: Sprouting,155,20.2
+Music: Sprouting,205,23.8
+Music: Sprouting,255,29.65
+Music: UFO,5,4.75
+Music: UFO,55,5.2
+Music: UFO,105,5.3
+Music: UFO,155,5.8
+Music: UFO,205,6.0
+Music: UFO,255,6.5
+Neptune,5,5.1
+Neptune,55,9.4
+Neptune,105,13.3
+Neptune,155,17.05
+Neptune,205,21.65
+Neptune,255,25.5
+New Years,5,4.9
+New Years,55,6.3
+New Years,105,7.65
+New Years,155,9.15
+New Years,205,9.9
+New Years,255,11.6
+Night,5,4.95
+Night,55,6.1
+Night,105,7.35
+Night,155,9.15
+Night,205,10.3
+Night,255,11.3
+Oasis,5,5.0
+Oasis,55,8.95
+Oasis,105,12.45
+Oasis,155,15.75
+Oasis,205,19.6
+Oasis,255,22.8
+Party,5,4.9
+Party,55,7.5
+Party,105,9.2
+Party,155,9.05
+Party,205,12.2
+Party,255,14.05
+Passion,5,4.9
+Passion,55,8.0
+Passion,105,10.55
+Passion,155,12.9
+Passion,205,15.5
+Passion,255,18.0
+Peach,5,5.1
+Peach,55,10.2
+Peach,105,14.6
+Peach,155,19.2
+Peach,205,23.55
+Peach,255,28.0
+Quiet,5,5.0
+Quiet,55,9.3
+Quiet,105,12.25
+Quiet,155,17.75
+Quiet,205,21.6
+Quiet,255,25.2
+Radiance,5,5.1
+Radiance,55,10.5
+Radiance,105,15.25
+Radiance,155,20.0
+Radiance,205,24.95
+Radiance,255,29.8
+Rainbow,5,5.15
+Rainbow,55,10.35
+Rainbow,105,13.7
+Rainbow,155,17.65
+Rainbow,205,19.5
+Rainbow,255,24.8
+Reading,5,5.05
+Reading,55,9.7
+Reading,105,13.7
+Reading,155,18.1
+Reading,205,21.95
+Reading,255,26.0
+Refreshing,5,5.15
+Refreshing,55,10.0
+Refreshing,105,16.0
+Refreshing,155,21.4
+Refreshing,205,26.45
+Refreshing,255,32.1
+Release,5,5.05
+Release,55,10.1
+Release,105,15.95
+Release,155,20.85
+Release,205,25.05
+Release,255,30.9
+Ripple,5,4.95
+Ripple,55,6.25
+Ripple,105,8.65
+Ripple,155,11.85
+Ripple,205,9.6
+Ripple,255,14.15
+River,5,4.95
+River,55,6.25
+River,105,8.5
+River,155,10.5
+River,205,12.5
+River,255,13.95
+Riverside,5,5.0
+Riverside,55,8.5
+Riverside,105,13.05
+Riverside,155,17.1
+Riverside,205,20.75
+Riverside,255,23.8
+Rococo Style,5,4.95
+Rococo Style,55,6.65
+Rococo Style,105,9.05
+Rococo Style,155,10.95
+Rococo Style,205,13.1
+Rococo Style,255,15.75
+Romantic,5,5.05
+Romantic,55,9.4
+Romantic,105,13.35
+Romantic,155,17.95
+Romantic,205,21.75
+Romantic,255,25.85
+Rush,5,5.0
+Rush,55,10.45
+Rush,105,15.05
+Rush,155,15.1
+Rush,205,20.45
+Rush,255,31.8
+Rustling leaves,5,5.0
+Rustling leaves,55,8.6
+Rustling leaves,105,12.35
+Rustling leaves,155,15.45
+Rustling leaves,205,18.25
+Rustling leaves,255,23.1
+Sailboat,5,5.0
+Sailboat,55,7.45
+Sailboat,105,9.55
+Sailboat,155,12.3
+Sailboat,205,14.45
+Sailboat,255,16.7
+Saint Patrick's Day,5,4.8
+Saint Patrick's Day,55,5.85
+Saint Patrick's Day,105,6.55
+Saint Patrick's Day,155,7.65
+Saint Patrick's Day,205,8.35
+Saint Patrick's Day,255,9.15
+Saturn,5,5.05
+Saturn,55,7.7
+Saturn,105,10.7
+Saturn,155,13.45
+Saturn,205,15.9
+Saturn,255,19.05
+Seaside,5,5.0
+Seaside,55,8.55
+Seaside,105,13.2
+Seaside,155,16.5
+Seaside,205,20.05
+Seaside,255,24.15
+Siren,5,5.0
+Siren,55,9.6
+Siren,105,13.7
+Siren,155,17.65
+Siren,205,21.45
+Siren,255,25.65
+Sky,5,4.95
+Sky,55,8.45
+Sky,105,11.25
+Sky,155,15.1
+Sky,205,18.25
+Sky,255,21.0
+Sky B,5,5.0
+Sky B,55,7.8
+Sky B,105,10.55
+Sky B,155,13.55
+Sky B,205,16.15
+Sky B,255,18.65
+Sled,5,5.1
+Sled,55,9.25
+Sled,105,13.25
+Sled,155,17.95
+Sled,205,21.6
+Sled,255,25.65
+Sleep,5,4.8
+Sleep,55,5.15
+Sleep,105,5.5
+Sleep,155,5.85
+Sleep,205,6.0
+Sleep,255,6.3
+Snow flake,5,4.85
+Snow flake,55,5.75
+Snow flake,105,8.25
+Snow flake,155,8.5
+Snow flake,205,11.15
+Snow flake,255,11.25
+Soothing,5,5.0
+Soothing,55,7.4
+Soothing,105,9.55
+Soothing,155,11.9
+Soothing,205,14.1
+Soothing,255,16.35
+Sports,5,4.95
+Sports,55,10.1
+Sports,105,13.7
+Sports,155,17.75
+Sports,205,21.95
+Sports,255,26.3
+Spring,5,5.0
+Spring,55,8.05
+Spring,105,10.5
+Spring,155,14.15
+Spring,205,16.55
+Spring,255,19.35
+Spring Tour,5,5.0
+Spring Tour,55,6.85
+Spring Tour,105,9.15
+Spring Tour,155,11.05
+Spring Tour,205,13.1
+Spring Tour,255,15.2
+Starry Night,5,4.9
+Starry Night,55,6.95
+Starry Night,105,8.65
+Starry Night,155,10.6
+Starry Night,205,12.55
+Starry Night,255,14.4
+Starry Sky,5,4.9
+Starry Sky,55,6.2
+Starry Sky,105,7.95
+Starry Sky,155,9.4
+Starry Sky,205,10.2
+Starry Sky,255,11.8
+Street Dance,5,5.1
+Street Dance,55,10.15
+Street Dance,105,14.4
+Street Dance,155,20.25
+Street Dance,205,24.85
+Street Dance,255,28.8
+Summer,5,5.1
+Summer,55,9.65
+Summer,105,14.6
+Summer,155,19.15
+Summer,205,24.0
+Summer,255,28.7
+Sunflower,5,5.0
+Sunflower,55,8.5
+Sunflower,105,11.35
+Sunflower,155,14.6
+Sunflower,205,17.4
+Sunflower,255,20.5
+Sunny,5,5.0
+Sunny,55,8.5
+Sunny,105,11.5
+Sunny,155,15.55
+Sunny,205,18.75
+Sunny,255,21.6
+Sunrise,5,4.8
+Sunrise,55,4.9
+Sunrise,105,4.85
+Sunrise,155,4.85
+Sunrise,205,4.95
+Sunrise,255,5.0
+Sunrise at Sea,5,4.95
+Sunrise at Sea,55,7.75
+Sunrise at Sea,105,10.25
+Sunrise at Sea,155,13.6
+Sunrise at Sea,205,15.85
+Sunrise at Sea,255,18.85
+Sunset,5,5.1
+Sunset,55,10.0
+Sunset,105,15.5
+Sunset,155,20.45
+Sunset,205,25.1
+Sunset,255,30.65
+Sunshine,5,5.1
+Sunshine,55,10.9
+Sunshine,105,17.2
+Sunshine,155,22.95
+Sunshine,205,28.0
+Sunshine,255,33.75
+Sweet,5,5.1
+Sweet,55,10.55
+Sweet,105,15.95
+Sweet,155,20.4
+Sweet,205,26.0
+Sweet,255,31.0
+Tenderness,5,5.05
+Tenderness,55,8.7
+Tenderness,105,11.95
+Tenderness,155,15.5
+Tenderness,205,19.0
+Tenderness,255,22.3
+Tension,5,5.0
+Tension,55,6.4
+Tension,105,7.7
+Tension,155,8.9
+Tension,205,10.35
+Tension,255,11.55
+Thanksgiving,5,4.95
+Thanksgiving,55,8.75
+Thanksgiving,105,11.4
+Thanksgiving,155,16.2
+Thanksgiving,205,19.7
+Thanksgiving,255,20.45
+Thunderstorm,5,4.85
+Thunderstorm,55,6.2
+Thunderstorm,105,7.4
+Thunderstorm,155,8.25
+Thunderstorm,205,10.7
+Thunderstorm,255,11.6
+Tree Planting Day,5,5.0
+Tree Planting Day,55,9.55
+Tree Planting Day,105,14.25
+Tree Planting Day,155,18.15
+Tree Planting Day,205,22.1
+Tree Planting Day,255,25.3
+Tree shadow,5,4.9
+Tree shadow,55,6.85
+Tree shadow,105,8.0
+Tree shadow,155,10.0
+Tree shadow,205,11.6
+Tree shadow,255,13.15
+Twilight,5,4.95
+Twilight,55,6.2
+Twilight,105,7.25
+Twilight,155,8.4
+Twilight,205,9.55
+Twilight,255,10.6
+Ukiyo-e Colors,5,4.95
+Ukiyo-e Colors,55,7.7
+Ukiyo-e Colors,105,9.9
+Ukiyo-e Colors,155,12.55
+Ukiyo-e Colors,205,14.85
+Ukiyo-e Colors,255,17.35
+Universe,5,5.05
+Universe,55,10.15
+Universe,105,14.55
+Universe,155,19.45
+Universe,205,23.9
+Universe,255,28.4
+Unspoken Love,5,5.0
+Unspoken Love,55,10.1
+Unspoken Love,105,14.45
+Unspoken Love,155,18.35
+Unspoken Love,205,22.6
+Unspoken Love,255,27.6
+Uranus,5,5.1
+Uranus,55,10.4
+Uranus,105,15.2
+Uranus,155,19.9
+Uranus,205,24.45
+Uranus,255,29.2
+Valentine's Day,5,5.05
+Valentine's Day,55,9.0
+Valentine's Day,105,12.1
+Valentine's Day,155,16.35
+Valentine's Day,205,19.85
+Valentine's Day,255,23.4
+Venus,5,5.05
+Venus,55,8.0
+Venus,105,12.75
+Venus,155,17.25
+Venus,205,21.3
+Venus,255,24.3
+Warm,5,5.05
+Warm,55,7.4
+Warm,105,11.8
+Warm,155,16.5
+Warm,205,19.2
+Warm,255,22.6
+Water Lilies,5,4.9
+Water Lilies,55,6.3
+Water Lilies,105,7.85
+Water Lilies,155,9.25
+Water Lilies,205,10.5
+Water Lilies,255,12.5
+Wave,5,4.95
+Wave,55,6.55
+Wave,105,8.95
+Wave,155,10.25
+Wave,205,12.75
+Wave,255,13.8
+White Light,5,5.05
+White Light,55,9.35
+White Light,105,13.55
+White Light,155,17.8
+White Light,205,21.5
+White Light,255,25.6
+Winter,5,4.9
+Winter,55,7.25
+Winter,105,9.4
+Winter,155,11.25
+Winter,205,13.8
+Winter,255,16.05
+Work,5,5.05
+Work,55,9.95
+Work,105,14.2
+Work,155,18.55
+Work,205,22.7
+Work,255,27.05

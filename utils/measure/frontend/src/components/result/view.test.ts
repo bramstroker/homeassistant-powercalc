@@ -1,7 +1,29 @@
 import type { SessionSnapshot } from "../../types";
+import { capabilities } from "../../testing/controller";
+import type { ResultView } from "./view";
 import "./view";
 
 describe("result view", () => {
+  it("offers another recording only for retained profile recordings", async () => {
+    const element = document.createElement("measure-result-view") as ResultView;
+    element.snapshot = { state: "completed" };
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).not.toContain("Record more");
+
+    element.canAnalyse = true;
+    const recordMore = vi.fn();
+    element.addEventListener("record-more", recordMore);
+    await element.updateComplete;
+    const button = [...element.shadowRoot!.querySelectorAll("button")].find((item) => item.textContent === "Record more")!;
+    expect(element.shadowRoot?.textContent).toContain("all runs are analysed together");
+    button.click();
+    expect(recordMore).toHaveBeenCalledOnce();
+
+    element.busy = true;
+    await element.updateComplete;
+    expect(button.disabled).toBe(true);
+  });
   // jsdom does not implement native modal behavior; keyboard/inert behavior is covered in e2e.
   beforeAll(() => {
     HTMLDialogElement.prototype.showModal = function () { this.open = true; };
@@ -86,6 +108,7 @@ describe("result view", () => {
       files: { name: string; size: number; media_type: string }[];
       fileUrl: (name: string) => string;
       downloadAll: () => void;
+      busy: boolean;
       updateComplete: Promise<boolean>;
       shadowRoot: ShadowRoot;
     };
@@ -108,6 +131,9 @@ describe("result view", () => {
     const contribution = element.shadowRoot.querySelector(".contribution");
     expect(contribution?.textContent).toContain("Prepare the profile");
     expect(element.shadowRoot.querySelector(".contribution-next")).toBeNull();
+    element.busy = true;
+    await element.updateComplete;
+    expect(element.shadowRoot.querySelector<HTMLButtonElement>(".contribution button")?.disabled).toBe(true);
   });
 
 
@@ -119,7 +145,7 @@ describe("result view", () => {
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot.querySelector(".contribution-next")).toBeNull();
+    expect(element.shadowRoot.querySelector(".contribution")).toBeNull();
   });
 
   it("renders a summary readout for a file-less measurement", async () => {
@@ -138,7 +164,59 @@ describe("result view", () => {
     expect(element.shadowRoot.querySelector(".readout")?.textContent).toContain("42.3 W");
     expect(element.shadowRoot.querySelector("#result-title")?.textContent).toContain("Measurement complete");
     expect(element.shadowRoot.textContent).not.toContain("No downloadable files");
-    expect(element.shadowRoot.querySelector(".contribution")?.textContent).toContain("Prepare the profile");
+    expect(element.shadowRoot.querySelector(".contribution")).toBeNull();
+  });
+
+  it("explains a vacuum zero reading without treating it as actual zero power", async () => {
+    const element = document.createElement("measure-result-view") as ResultView;
+    element.snapshot = {
+      state: "failed",
+      error: "0 watt was read from the power meter",
+      request: {
+        measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+        model_id: "Eureka", product_name: "Vacuum", measure_device: "Dock", generate_model: true,
+        parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+      },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const notice = element.shadowRoot!.querySelector(".notice.error")!;
+    expect(notice.textContent).toContain("does not prove the dock uses no power");
+    expect(notice.textContent).toContain("calibrated resistive dummy load");
+    expect(notice.textContent).not.toContain("identical lights");
+    expect(notice.querySelector("a")?.getAttribute("href")).toBe("https://docs.powercalc.nl/contributing/measure/low-power-measurements/");
+  });
+
+  it("explains missing vacuum episodes and withholds Prepare profile until a model exists", async () => {
+    const element = document.createElement("measure-result-view") as ResultView;
+    element.snapshot = {
+      state: "completed",
+      request: {
+        measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+        model_id: "Eureka", product_name: "Vacuum", measure_device: "Dock", generate_model: true,
+        parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+      },
+      summary: {
+        "Recording analysis": "More data needed",
+        "Recording analysis reason": "Record at least two independent episodes of at least five samples for: away",
+      },
+    };
+    element.canAnalyse = true;
+    element.files = [{ name: "analyser.json", size: 100, media_type: "application/json" }];
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot!.textContent).toContain("No model.json is available yet");
+    expect(element.shadowRoot!.querySelector(".contribution")).toBeNull();
+    expect(element.shadowRoot!.querySelector(".analysis-panel")?.textContent).toMatch(/another run with the\s+same setup will not fix that/);
+    expect(element.shadowRoot!.querySelector(".analysis-panel a")?.getAttribute("href"))
+      .toBe("https://docs.powercalc.nl/contributing/measure/low-power-measurements/");
+    expect(element.shadowRoot!.querySelectorAll(".analysis-retry")[1]?.textContent).toContain("Once the meter can reliably read");
+
+    element.files = [...element.files, { name: "profile/model.json", size: 200, media_type: "application/json" }];
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector(".contribution")?.textContent).toContain("Prepare the profile");
   });
 
   it("separates recording analysis from measurement results", async () => {
@@ -170,7 +248,63 @@ describe("result view", () => {
     expect(details?.textContent).toContain("Typical difference");
     expect(details?.textContent).toContain("Data coverage");
     expect(details?.querySelectorAll(".analysis-help")).toHaveLength(3);
+    expect(details?.querySelector('[aria-label^="Typical difference:"]')?.getAttribute("title"))
+      .toContain("typical difference in watts; lower is better");
     expect(element.shadowRoot.querySelector('.notice[role="status"]')?.textContent).toContain("warning");
+  });
+
+  it("shows the analysis reason once while keeping other session warnings", async () => {
+    const reason = "No state or scalar attribute had enough usable values.";
+    const element = document.createElement("measure-result-view") as ResultView;
+    element.snapshot = {
+      state: "completed",
+      summary: {
+        "Recording analysis": "More data needed",
+        "Recording analysis reason": reason,
+      },
+      warnings: [`Profile was not created: ${reason}`, "One recording line was skipped"],
+    };
+    element.canPrepareProfile = false;
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot?.querySelector(".analysis-reason")?.textContent).toContain(reason);
+    expect([...element.shadowRoot!.querySelectorAll('.notice[role="status"]')].map((notice) => notice.textContent))
+      .toEqual(["One recording line was skipped"]);
+  });
+
+  it("explains multi-input vacuum profiles and independent validation", async () => {
+    const element = document.createElement("measure-result-view") as HTMLElement & {
+      snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.snapshot = {
+      state: "completed",
+      summary: {
+        "Samples recorded": "142",
+        "Recording analysis": "Composite vacuum profile created",
+        "Analysed inputs": "sensor.activity.state, sensor.battery.state",
+        "Validation MAE": "0.20 W",
+        "Validation coverage": "100%",
+        "Validation method": "held_out_episodes",
+        "Recorded activities": "washing, drying, charging, sleeping",
+      },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+    const analysis = element.shadowRoot.querySelector(".analysis-panel");
+    expect(analysis?.textContent).toContain("A composite vacuum profile was created.");
+    expect(analysis?.textContent).toContain("whole episodes");
+    expect(analysis?.textContent).toContain("analyser.json");
+    expect(analysis?.textContent).toContain("Model inputs");
+    expect(analysis?.textContent).toContain("held_out_episodes");
+    expect(analysis?.textContent).toContain("washing, drying, charging, sleeping");
+    expect(analysis?.querySelectorAll(".analysis-help")).toHaveLength(5);
+    expect(analysis?.querySelector('[aria-label^="Model inputs:"]')?.getAttribute("title"))
+      .toContain("Enabled settings do not indicate active washing or drying");
+    expect(analysis?.querySelector('[aria-label^="Validation method:"]')?.getAttribute("title"))
+      .toContain("With one cycle, separate portions are held out from fitting");
+    const measurement = element.shadowRoot.querySelector('[aria-label="Measurement result"]');
+    expect(measurement?.textContent).not.toContain("held_out_episodes");
   });
 
   it("can run the analyser again without starting a new measurement", async () => {

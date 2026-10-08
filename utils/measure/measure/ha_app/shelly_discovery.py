@@ -8,15 +8,14 @@ from homeassistant_api.errors import HomeassistantAPIError
 from pydantic import BaseModel, Field
 import requests
 
-from measure.const import (
-    SHELLY_DISCOVERY_COLLECTION_WINDOW_SECONDS,
-    SHELLY_DISCOVERY_MAX_CONCURRENT_PROBES,
-    SHELLY_DISCOVERY_PROBE_TIMEOUT_SECONDS,
-    ZEROCONF_HTTP_SERVICE_TYPE,
-    ZEROCONF_SHELLY_SERVICE_TYPE,
-)
-from measure.home_assistant import HomeAssistantDiscoveryError, HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantDiscoveryError, HomeAssistantManager
 from measure.powermeter.shelly_client import ShellyClient, ShellyDeviceInfo, ShellyProbeError
+
+ZEROCONF_HTTP_SERVICE_TYPE = "_http._tcp.local."
+ZEROCONF_SHELLY_SERVICE_TYPE = "_shelly._tcp.local."
+SHELLY_DISCOVERY_COLLECTION_WINDOW_SECONDS = 2.0
+SHELLY_DISCOVERY_PROBE_TIMEOUT_SECONDS = 2
+SHELLY_DISCOVERY_MAX_CONCURRENT_PROBES = 8
 
 _LOGGER = logging.getLogger("measure")
 

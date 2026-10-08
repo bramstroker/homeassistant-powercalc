@@ -2,22 +2,58 @@ import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SessionState } from "../../types";
 import { emit } from "../../utils/events";
+import { isVacuumProfileRequest } from "../../measurement/definition";
+import { hasModelArtifact } from "../../utils/artifacts";
 import { fileSize } from "../../utils/format";
 import { diagnosticsDownload, sharedStyles } from "../../styles";
 import { errorHelpLink } from "../shared/error-help-link";
 import "./plot";
 
 const TROUBLESHOOTING_URL = "https://docs.powercalc.nl/contributing/measure/troubleshooting/";
+const LOW_POWER_URL = "https://docs.powercalc.nl/contributing/measure/low-power-measurements/";
 const ZERO_READING_ERROR_PREFIX = "Aborting measurement session after repeated 0 W readings.";
+const ZERO_READING_METER_ERROR = "0 watt was read from the power meter";
+const MISSING_EPISODES_PREFIX = "Record at least two independent episodes of at least five samples for:";
+
+interface AnalysisDetailDefinition {
+  label?: string;
+  help: string;
+}
+
+const ANALYSIS_DETAILS: Readonly<Record<string, AnalysisDetailDefinition>> = {
+  "Analysed feature": {
+    label: "Model input",
+    help: "The Home Assistant entity data that best explained the measured power changes. The generated profile will use this as its input.",
+  },
+  "Analysed inputs": {
+    label: "Model inputs",
+    help: "Runtime activity and battery inputs used by the composite profile. Enabled settings do not indicate active washing or drying.",
+  },
+  "Validation MAE": {
+    label: "Typical difference",
+    help: "How closely the profile matched measurement samples it had not used to learn. This is the typical difference in watts; lower is better.",
+  },
+  "Validation coverage": {
+    label: "Data coverage",
+    help: "The share of those measurement samples for which the profile could estimate power. 100% means every sample was covered.",
+  },
+  "Validation method": {
+    help: "Checks use a separate recording or whole activity episodes when available. With one cycle, separate portions are held out from fitting; this checks the fit within that cycle, not repeatability across cycles.",
+  },
+  "Recorded activities": {
+    help: "The measured vacuum and dock activities covered by this profile. Unmeasured modes do not get an assumed zero-power fallback.",
+  },
+};
+
 const ANALYSIS_SUMMARY_LABELS = new Set([
   "Recording analysis",
   "Recording analysis reason",
   // Older sessions used these labels in their persisted summary.
   "Profile analysis",
   "Profile analysis reason",
-  "Analysed feature",
-  "Validation MAE",
-  "Validation coverage",
+  ...Object.keys(ANALYSIS_DETAILS),
+  "Recordings analysed",
+  "Samples analysed",
 ]);
 const INSPECTABLE_JSON_FILES = new Set(["analyser.json", "analysis.json", "model.json"]);
 
@@ -178,7 +214,9 @@ export class ResultView extends LitElement {
         ${showArtifacts ? this.renderPlots() : nothing}
         ${showArtifacts ? this.renderFiles() : nothing}
         ${this.renderJsonInspector()}
-        ${showArtifacts && state === "completed" && this.canPrepareProfile ? this.renderPrepareAction() : nothing}
+        ${showArtifacts && state === "completed" && this.canPrepareProfile
+          ? hasModelArtifact(this.files) ? this.renderPrepareAction() : this.renderMissingModelNotice()
+          : nothing}
         ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${diagnosticsDownload(this.diagnosticsUrl)}
         <div class="actions">
@@ -196,11 +234,27 @@ export class ResultView extends LitElement {
         <p class="eyebrow">What's next?</p>
         <h3 id="prepare-profile-title">Prepare the profile</h3>
         <p class="muted">Add product and measurement metadata, validate the result, and then download it or open a pull request.</p>
-        <div class="actions"><button class="primary" type="button" @click=${() => this.emit("prepare")}>Prepare profile</button></div>
+        <div class="actions"><button class="primary" type="button" ?disabled=${this.busy} @click=${() => this.emit("prepare")}>Prepare profile</button></div>
       </section>`;
   }
 
+  private renderMissingModelNotice() {
+    return html`<p class="notice" role="status">
+      No <code>model.json</code> is available yet, so there is no profile to prepare.
+      ${this.canAnalyse ? "Review the analysis above before recording again." : "Review the saved output for details."}
+    </p>`;
+  }
+
   private renderError(error: string) {
+    if (error.includes(ZERO_READING_METER_ERROR) && this.isVacuumRecording()) {
+      return html`
+        The power meter reported 0 W during the vacuum recording. This may mean the dock's draw is below the meter's
+        useful range; it does not prove the dock uses no power. Check the meter and setup with a known small load.
+        Use a safely installed, calibrated resistive dummy load or a meter that reliably measures low loads before
+        recording again. See the
+        <a href=${LOW_POWER_URL} target="_blank" rel="noopener noreferrer">low-power measurement guide</a>.
+      `;
+    }
     if (!error.startsWith(ZERO_READING_ERROR_PREFIX)) return error;
     return html`
       Aborting measurement session after repeated 0 W readings. The power meter may not resolve this low load.
@@ -209,6 +263,15 @@ export class ResultView extends LitElement {
       <a href=${TROUBLESHOOTING_URL} target="_blank" rel="noopener noreferrer">Troubleshooting guide</a>
       for troubleshooting guidance.
     `;
+  }
+
+  private isVacuumRecording(): boolean {
+    return isVacuumProfileRequest(this.snapshot.request);
+  }
+
+  private hasMissingAwayEpisodes(reason?: string): boolean {
+    return Boolean(reason?.startsWith(MISSING_EPISODES_PREFIX)
+      && reason.slice(MISSING_EPISODES_PREFIX.length).split(",").some((activity) => activity.trim() === "away"));
   }
 
   private renderFiles() {
@@ -319,21 +382,29 @@ export class ResultView extends LitElement {
     const reason = entries.find(([label]) => label === "Recording analysis reason")?.[1]
       ?? entries.find(([label]) => label === "Profile analysis reason")?.[1];
     const feature = entries.find(([label]) => label === "Analysed feature")?.[1];
+    const composite = entries.some(([label]) => label === "Analysed inputs");
     const details = entries.filter(([label]) => !label.endsWith("analysis") && !label.endsWith("analysis reason"));
     return html`
       <section class="analysis-panel" aria-labelledby="recording-analysis-title">
         <h3 id="recording-analysis-title">Recording analysis</h3>
         <p class="analysis-explanation">
-          ${feature
-            ? html`PowerCalc analysed how the measured power changed for each value of <code>${this.analysisFeature(feature)}</code>. This creates a profile that can estimate power from that entity data.`
-            : "PowerCalc compared the measured power with changes in the recorded entity states to create a suitable power profile."}
+          ${this.analysisExplanation(composite, feature)}
         </p>
         ${result ? html`<p class="analysis-outcome"><span>Result</span><strong>${this.analysisResult(result)}</strong></p>` : nothing}
         ${reason ? html`<p class="analysis-reason"><strong>Why:</strong> ${reason}</p>` : nothing}
+        ${this.isVacuumRecording() && this.hasMissingAwayEpisodes(reason) ? html`
+          <p class="analysis-reason">
+            The analyser needs two separate periods of each listed activity with at least five usable samples each.
+            If the meter reports 0 W while the robot is away, those readings are discarded; another run with the
+            same setup will not fix that. First check the dock's low-power draw with a known load, a calibrated
+            resistive dummy load, or a more sensitive meter. See the
+            <a href=${LOW_POWER_URL} target="_blank" rel="noopener noreferrer">low-power measurement guide</a>.
+          </p>` : nothing}
         ${details.length ? html`<dl class="analysis-details" aria-label="Recording analysis details">
           ${details.map(([label, value]) => {
-            const displayLabel = this.analysisDetailLabel(label);
-            const help = this.analysisDetailHelp(label);
+            const definition = ANALYSIS_DETAILS[label];
+            const displayLabel = definition?.label ?? label;
+            const help = definition?.help;
             return html`
               <div>
                 <dt>
@@ -352,42 +423,39 @@ export class ResultView extends LitElement {
                 ? "Analysing the saved recording and refreshing the result…"
                 : this.analysisComplete
                   ? "✓ Recording analysed again. The result and generated files are now up to date."
-                  : html`Run the saved <code>record.jsonl</code> through the current analyser again. No new measurement is needed.`}
+                  : "Run all saved recordings through the current analyser again. No new measurement is needed."}
             </p>
             <button type="button" @click=${() => this.emit("analyse")} ?disabled=${this.busy}>
               ${this.busy ? "Analysing…" : "Analyse recording again"}
             </button>
+          </div>
+          <div class="analysis-retry">
+            <p>${this.isVacuumRecording() && this.hasMissingAwayEpisodes(reason)
+              ? "Once the meter can reliably read the lowest-load activity, record enough separate activity periods. Previous recordings are kept and all runs are analysed together."
+              : "Record another run using the same entities and settings. Previous recordings are kept and all runs are analysed together."}</p>
+            <button type="button" @click=${() => this.emit("record-more")} ?disabled=${this.busy}>Record more</button>
           </div>
         ` : nothing}
       </section>
     `;
   }
 
+  private analysisExplanation(composite: boolean, feature?: string) {
+    if (composite) {
+      return "PowerCalc combined recorded runtime activity signals with battery-level charging data. It checked the profile against whole episodes or a recording not used for fitting. Per-activity errors and energy estimates are available in analyser.json.";
+    }
+    if (feature) {
+      return html`PowerCalc analysed how the measured power changed for each value of <code>${this.analysisFeature(feature)}</code>. This creates a profile that can estimate power from that entity data.`;
+    }
+    return "PowerCalc compared the measured power with changes in the recorded entity states to create a suitable power profile.";
+  }
+
   private analysisResult(result: string): string {
+    if (result === "Composite vacuum profile created") return "A composite vacuum profile was created.";
     if (result === "Fixed power profile created") return "A fixed power profile was created.";
     return result === "Fixed states_power model created" || result === "Fixed states_power profile created"
       ? "A state-based power profile was created."
       : result;
-  }
-
-  private analysisDetailLabel(label: string): string {
-    if (label === "Analysed feature") return "Model input";
-    if (label === "Validation MAE") return "Typical difference";
-    if (label === "Validation coverage") return "Data coverage";
-    return label;
-  }
-
-  private analysisDetailHelp(label: string): string | undefined {
-    if (label === "Analysed feature") {
-      return "The Home Assistant entity data that best explained the measured power changes. The generated profile will use this as its input.";
-    }
-    if (label === "Validation MAE") {
-      return "How closely the profile matched measurement samples it had not used to learn. This is the typical difference in watts; lower is better.";
-    }
-    if (label === "Validation coverage") {
-      return "The share of those measurement samples for which the profile could estimate power. 100% means every sample was covered.";
-    }
-    return undefined;
   }
 
   private analysisFeature(feature: string): string {
@@ -395,7 +463,14 @@ export class ResultView extends LitElement {
   }
 
   private renderWarnings() {
-    return (this.snapshot.warnings ?? []).map((warning) => html`<p class="notice" role="status">${warning}</p>`);
+    const reason = this.snapshot.summary?.["Recording analysis reason"]
+      ?? this.snapshot.summary?.["Profile analysis reason"];
+    const repeatedMessages = reason
+      ? new Set([`Profile was not created: ${reason}`, `Profile model was not created: ${reason}`])
+      : new Set<string>();
+    return (this.snapshot.warnings ?? [])
+      .filter((warning) => !repeatedMessages.has(warning))
+      .map((warning) => html`<p class="notice" role="status">${warning}</p>`);
   }
 
   private renderResume(state: SessionState) {
@@ -406,10 +481,10 @@ export class ResultView extends LitElement {
   /** How this outcome is announced. A completed run reads differently with and without a readout. */
   private outcome(state: SessionState): ResultOutcome {
     if (state !== "completed") return OUTCOMES[state] ?? CANCELLED;
-    return this.summaryEntries().length ? COMPLETED_WITH_READOUT : COMPLETED;
+    return this.summaryEntries().length || !hasModelArtifact(this.files) ? COMPLETED_WITH_READOUT : COMPLETED;
   }
 
-  private emit(name: "sessions" | "new" | "resume" | "analyse" | "prepare"): void {
+  private emit(name: "sessions" | "new" | "resume" | "analyse" | "record-more" | "prepare"): void {
     emit(this, name);
   }
 }

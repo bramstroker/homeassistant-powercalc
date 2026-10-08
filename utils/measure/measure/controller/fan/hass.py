@@ -3,7 +3,7 @@ from homeassistant_api.errors import HomeassistantAPIError
 from measure.controller.errors import ControllerError
 from measure.controller.fan.controller import FanController
 from measure.controller.hass_controller import HassControllerBase
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 
 
 class HassFanController(HassControllerBase, FanController):

@@ -2,16 +2,61 @@ from unittest.mock import MagicMock, call
 
 from measure.controller.media.controller import MediaController
 from measure.controller.media.spec import DummyMediaControllerSpec
-from measure.execution import RunInteraction
+from measure.powermeter.errors import ZeroReadingError
 from measure.powermeter.spec import DummyPowerMeterSpec
 from measure.request import SpeakerMeasurementRequest
+from measure.runner.interaction import RunInteraction
 from measure.runner.speaker import SpeakerRunner
 from measure.tuning import MeasurementParameters
-from measure.util.measure_util import MeasurementResult, MeasureUtil
+from measure.utils.sampling import MeasurementResult, PowerSampler
+import pytest
+
+
+@pytest.mark.parametrize("fast_test_mode", [False, True])
+def test_zero_standby_reading_is_preserved(fast_test_mode: bool) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.side_effect = ZeroReadingError
+    controller = MagicMock(spec=MediaController)
+    interaction = MagicMock(spec=RunInteraction)
+    runner = SpeakerRunner(
+        sampler, MeasurementParameters(fast_test_mode=fast_test_mode, sleep_standby=30), controller, interaction
+    )
+
+    assert runner.measure_standby_power() == MeasurementResult(power=0, voltages=[])
+    controller.turn_off.assert_called_once_with()
+    interaction.operating_point.assert_called_once_with({"type": "speaker", "volume": 0, "muted": True})
+    sampler.take_measurement.assert_called_once()
+    if fast_test_mode:
+        interaction.wait.assert_not_called()
+    else:
+        interaction.wait.assert_called_once_with(30)
+
+
+def test_disabled_streaming_leaves_existing_audio_untouched() -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=10.5, voltages=[230.0])
+    controller = MagicMock(spec=MediaController)
+    runner = SpeakerRunner(sampler, MeasurementParameters(fast_test_mode=True), controller)
+    request = SpeakerMeasurementRequest(
+        model_id="measurement",
+        product_name="Measurement",
+        power_meter=DummyPowerMeterSpec(),
+        controller=DummyMediaControllerSpec(),
+        disable_streaming=True,
+        fast_test_mode=True,
+    )
+
+    result = runner.run(request, "")
+
+    controller.play_audio.assert_not_called()
+    controller.mute_volume.assert_called_once_with()
+    assert controller.set_volume.call_args_list == [call(10), call(100), call(10)]
+    assert result.voltages == [230.0, 230.0, 230.0]
+    assert result.model_json_data["linear_config"]["calibrate"] == ["10 -> 10.5", "100 -> 10.5", "0 -> 10.5"]
 
 
 def _run(media_controller: MagicMock) -> dict:
-    measure_util_mock = MagicMock(MeasureUtil)
+    measure_util_mock = MagicMock(PowerSampler)
     measure_util_mock.take_average_measurement.return_value = MeasurementResult(power=10.50, voltages=[])
     runner = SpeakerRunner(measure_util_mock, MeasurementParameters(), media_controller)
     request = SpeakerMeasurementRequest(
@@ -42,6 +87,30 @@ def test_run_measures_every_volume_level_and_the_muted_baseline() -> None:
     media_controller.mute_volume.assert_called_once()
 
 
+def test_run_unmutes_before_measuring_and_after_the_muted_baseline() -> None:
+    media_controller = MagicMock(MediaController)
+
+    _run(media_controller)
+
+    calls = [name for name, _args, _kwargs in media_controller.mock_calls]
+    # A speaker left muted by an earlier run must be unmuted before the first volume step,
+    # and the muted baseline must not leave it muted for the next run.
+    assert calls.index("unmute_volume") < calls.index("set_volume")
+    assert calls.count("unmute_volume") == 2
+    assert calls.index("mute_volume") < len(calls) - 1 - calls[::-1].index("unmute_volume")
+
+
+def test_run_continues_when_the_speaker_cannot_be_unmuted() -> None:
+    media_controller = MagicMock(MediaController)
+    # First unmute rejected (no VOLUME_MUTE feature); the final one is not reached with an error.
+    media_controller.unmute_volume.side_effect = [RuntimeError("ServiceNotSupported"), None]
+
+    model_data = _run(media_controller)
+
+    assert media_controller.set_volume.call_count == 11
+    assert model_data["linear_config"]["calibrate"][0] == "10 -> 10.5"
+
+
 def test_streaming_is_started_for_every_volume_level() -> None:
     media_controller = MagicMock(MediaController)
 
@@ -52,10 +121,10 @@ def test_streaming_is_started_for_every_volume_level() -> None:
 
 def test_run_reports_volume_and_muted_operating_points() -> None:
     media_controller = MagicMock(MediaController)
-    measure_util = MagicMock(MeasureUtil)
-    measure_util.take_average_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
+    sampler = MagicMock(PowerSampler)
+    sampler.take_average_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
-    runner = SpeakerRunner(measure_util, MeasurementParameters(), media_controller, interaction)
+    runner = SpeakerRunner(sampler, MeasurementParameters(), media_controller, interaction)
     request = SpeakerMeasurementRequest(
         model_id="measurement",
         product_name="Measurement",
@@ -65,10 +134,7 @@ def test_run_reports_volume_and_muted_operating_points() -> None:
 
     runner.run(request, "")
 
-    interaction.confirm.assert_called_once_with(
-        "Speaker measurements can become very loud at higher volume levels. "
-        "Wear hearing protection or move to another room before starting.",
-    )
+    interaction.confirm.assert_not_called()
     interaction.phase.assert_any_call("Starting speaker measurement")
     interaction.phase.assert_any_call("Measuring speaker at 10% volume")
     # Progress must be reported before the first volume level so the UI leaves the preparing state.
@@ -85,10 +151,10 @@ def test_run_reports_volume_and_muted_operating_points() -> None:
 
 def test_fast_test_mode_measures_only_volume_endpoints_without_waiting() -> None:
     media_controller = MagicMock(MediaController)
-    measure_util = MagicMock(MeasureUtil)
-    measure_util.take_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
+    sampler = MagicMock(PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=10.5, voltages=[])
     interaction = MagicMock(spec=RunInteraction)
-    runner = SpeakerRunner(measure_util, MeasurementParameters(fast_test_mode=True), media_controller, interaction)
+    runner = SpeakerRunner(sampler, MeasurementParameters(fast_test_mode=True), media_controller, interaction)
     request = SpeakerMeasurementRequest(
         model_id="measurement",
         product_name="Measurement",
@@ -101,8 +167,8 @@ def test_fast_test_mode_measures_only_volume_endpoints_without_waiting() -> None
 
     # Only the two volume endpoints plus the muted baseline are measured.
     assert result.model_json_data["linear_config"]["calibrate"] == ["10 -> 10.5", "100 -> 10.5", "0 -> 10.5"]
-    assert measure_util.take_measurement.call_count == 3
-    measure_util.take_average_measurement.assert_not_called()
+    assert sampler.take_measurement.call_count == 3
+    sampler.take_average_measurement.assert_not_called()
     interaction.wait.assert_not_called()
     assert interaction.progress.call_args_list[0] == call(
         0,
@@ -120,7 +186,7 @@ def test_fast_test_mode_measures_only_volume_endpoints_without_waiting() -> None
 
 def test_cleanup_turns_off_speaker() -> None:
     media_controller = MagicMock(MediaController)
-    runner = SpeakerRunner(MagicMock(MeasureUtil), MeasurementParameters(), media_controller)
+    runner = SpeakerRunner(MagicMock(PowerSampler), MeasurementParameters(), media_controller)
 
     runner.cleanup()
 
@@ -130,6 +196,6 @@ def test_cleanup_turns_off_speaker() -> None:
 def test_cleanup_does_not_surface_speaker_shutdown_failure() -> None:
     media_controller = MagicMock(MediaController)
     media_controller.turn_off.side_effect = RuntimeError("offline")
-    runner = SpeakerRunner(MagicMock(MeasureUtil), MeasurementParameters(), media_controller)
+    runner = SpeakerRunner(MagicMock(PowerSampler), MeasurementParameters(), media_controller)
 
     runner.cleanup()

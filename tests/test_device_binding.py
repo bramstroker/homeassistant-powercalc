@@ -1,4 +1,6 @@
 import logging
+from types import SimpleNamespace
+from unittest.mock import MagicMock
 
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
@@ -27,6 +29,7 @@ from custom_components.powercalc.device_binding import (
     get_config_entry_ids,
     get_first_device_for_config_entry,
     get_non_composite_devices,
+    get_profile_related_devices,
     get_related_device_ids,
     is_composite_device_id,
     resolve_source_device,
@@ -73,6 +76,65 @@ def test_get_related_device_ids_for_unknown_device(hass: HomeAssistant) -> None:
     mock_device_registry(hass)
 
     assert get_related_device_ids(hass, "missing-device") == {"missing-device"}
+
+
+def test_get_profile_related_devices_for_unknown_device(hass: HomeAssistant) -> None:
+    assert get_profile_related_devices(hass, "missing-device") == []
+
+
+def test_profile_related_devices_skips_missing_parent(
+    hass: HomeAssistant,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    child = SimpleNamespace(id="child", parent_device_id="missing-parent", identifiers=set())
+    registry = MagicMock()
+    registry.async_get.side_effect = lambda device_id: child if device_id == "child" else None
+    monkeypatch.setattr(device_binding.device_registry, "async_get", lambda _: registry)
+    monkeypatch.setattr(device_binding, "_HAS_CHILD_DEVICES", False)
+
+    assert get_profile_related_devices(hass, "child") == []
+
+
+def test_roborock_dock_lookup_without_child_device_api(
+    hass: HomeAssistant,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    devices = mock_devices(
+        hass,
+        {
+            "robot": {"identifiers": {("roborock", "robot")}},
+            "dock": {"identifiers": {("roborock", "robot_dock")}},
+        },
+    )
+    monkeypatch.setattr(device_binding, "_HAS_CHILD_DEVICES", False)
+
+    assert get_profile_related_devices(hass, "robot") == [devices["dock"]]
+
+
+@requires_child_devices
+def test_profile_related_devices_deduplicate_roborock_child_dock(
+    hass: HomeAssistant,
+    device_registry: DeviceRegistry,
+) -> None:
+    config_entry = MockConfigEntry(domain="roborock")
+    config_entry.add_to_hass(hass)
+    robot = device_registry.async_get_or_create(
+        config_entry_id=config_entry.entry_id,
+        identifiers={("roborock", "robot")},
+    )
+    dock = device_registry.async_get_or_create_child(
+        config_entry_id=config_entry.entry_id,
+        parent_device_id=robot.id,
+        identifiers={("roborock", "robot_dock")},
+    )
+    other_child = device_registry.async_get_or_create_child(
+        config_entry_id=config_entry.entry_id,
+        parent_device_id=robot.id,
+        identifiers={("roborock", "other_child")},
+    )
+
+    assert get_profile_related_devices(hass, robot.id) == [dock, other_child]
+    assert get_profile_related_devices(hass, dock.id) == [robot]
 
 
 def test_get_first_device_for_config_entry(hass: HomeAssistant) -> None:

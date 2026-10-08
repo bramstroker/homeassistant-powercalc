@@ -8,6 +8,8 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
+import pytest
+import voluptuous as vol
 
 from custom_components.powercalc import SensorType
 from custom_components.powercalc.config_flow import Step
@@ -18,17 +20,20 @@ from custom_components.powercalc.const import (
     CONF_GROUP,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_TYPE,
+    CONF_HIDE_MEMBERS,
     CONF_ON_TIME,
     CONF_SENSOR_TYPE,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
+    CONF_VALUE_TEMPLATE,
     GroupType,
 )
 from tests.common import create_mock_config_entry
 from tests.config_flow.common import (
     handle_options_flow_update,
+    initialize_options_flow,
     process_config_flow,
     select_menu_item,
 )
@@ -77,25 +82,67 @@ async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.my_daily_energy_sensor_energy")
 
 
-async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
+@pytest.mark.parametrize(
+    "choice,value,updated_choice,updated_value",
+    [
+        (CONF_VALUE, 50, CONF_VALUE, 75),
+        (CONF_VALUE, 0, CONF_VALUE, 0.5),
+        (CONF_VALUE_TEMPLATE, "{{ 50 }}", CONF_VALUE_TEMPLATE, "{{ 75 }}"),
+        (CONF_VALUE, 50, CONF_VALUE_TEMPLATE, "{{ 75 }}"),
+        (CONF_VALUE_TEMPLATE, "{{ 50 }}", CONF_VALUE, 75),
+    ],
+)
+async def test_daily_energy_options_flow(
+    hass: HomeAssistant,
+    choice: str,
+    value: float | str,
+    updated_choice: str,
+    updated_value: float | str,
+) -> None:
     entry = await create_mock_config_entry(
         hass,
         {
             CONF_NAME: "My daily energy sensor",
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
-            CONF_DAILY_FIXED_ENERGY: {CONF_VALUE: 50},
+            CONF_DAILY_FIXED_ENERGY: {choice: value},
         },
     )
 
-    await handle_options_flow_update(
-        hass,
-        entry,
-        Step.DAILY_ENERGY,
-        {**_daily_energy_value_choice(CONF_VALUE, 75), CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT},
-    )
+    result = await initialize_options_flow(hass, entry, Step.DAILY_ENERGY)
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema)
+    assert schema_keys[schema_keys.index(CONF_DAILY_ENERGY_VALUE)].description == {"suggested_value": value}
+    choices = result["data_schema"].schema[CONF_DAILY_ENERGY_VALUE].serialize()["selector"]["choose"]["choices"]
+    assert next(iter(choices)) == choice
 
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {**_daily_energy_value_choice(updated_choice, updated_value), CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT},
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_UNIT_OF_MEASUREMENT] == UnitOfPower.WATT
-    assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 75
+    assert entry.data[CONF_DAILY_FIXED_ENERGY][updated_choice] == updated_value
+    other_choice = CONF_VALUE_TEMPLATE if updated_choice == CONF_VALUE else CONF_VALUE
+    assert other_choice not in entry.data[CONF_DAILY_FIXED_ENERGY]
+
+    result = await initialize_options_flow(hass, entry, Step.DAILY_ENERGY)
+    schema_keys = list(result["data_schema"].schema)
+    assert schema_keys[schema_keys.index(CONF_DAILY_ENERGY_VALUE)].description == {"suggested_value": updated_value}
+    choices = result["data_schema"].schema[CONF_DAILY_ENERGY_VALUE].serialize()["selector"]["choose"]["choices"]
+    assert next(iter(choices)) == updated_choice
+
+    # HA wraps the suggested value using the first choice when submitting an unchanged form.
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {
+            **_daily_energy_value_choice(next(iter(choices)), updated_value),
+            CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
+        },
+    )
+    await hass.async_block_till_done()
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_DAILY_FIXED_ENERGY][updated_choice] == updated_value
 
 
 async def test_on_time_option(hass: HomeAssistant) -> None:
@@ -191,6 +238,21 @@ async def test_add_to_group(hass: HomeAssistant) -> None:
 
     group_entry = hass.config_entries.async_get_entry(group_entry.entry_id)
     assert config_entry.entry_id in group_entry.data[CONF_GROUP_MEMBER_SENSORS]
+
+    # Daily energy entries assigned to a group must also be accepted by its editor (#4791).
+    for hide_members in (False, True):
+        result = await handle_options_flow_update(
+            hass,
+            group_entry,
+            Step.GROUP_CUSTOM,
+            {
+                CONF_GROUP_MEMBER_SENSORS: [config_entry.entry_id],
+                CONF_HIDE_MEMBERS: hide_members,
+            },
+        )
+        assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+        assert group_entry.data[CONF_GROUP_MEMBER_SENSORS] == [config_entry.entry_id]
+        assert group_entry.data[CONF_HIDE_MEMBERS] is hide_members
 
 
 async def test_can_set_basic_options(hass: HomeAssistant) -> None:

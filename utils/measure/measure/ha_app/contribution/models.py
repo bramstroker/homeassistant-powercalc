@@ -4,20 +4,23 @@ from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
-from measure.const import MeasureType
+from measure.const import MODEL_ID_MAX_LENGTH, MeasureType
 from measure.contribution.github import UPSTREAM_BRANCH, UPSTREAM_OWNER, UPSTREAM_REPO
-from measure.request import MeasurementRequest, RecorderMeasurementRequest, RecorderPurpose
+from measure.request import FixedMeasurementRequest, MeasurementRequest, RecorderMeasurementRequest, RecorderPurpose
 
 SUPPORTED_MEASURE_TYPES = {
     MeasureType.LIGHT,
     MeasureType.SPEAKER,
     MeasureType.FAN,
+    MeasureType.SMART_SWITCH,
+    MeasureType.FIXED,
     MeasureType.CHARGING,
     MeasureType.RECORDER,
 }
 
 AUTOMATIC_CONTRIBUTION_MESSAGE = (
-    "Automatic contribution is available for light, speaker, fan, charging, and analysed recorder profiles"
+    "Automatic contribution is available for light, speaker, fan, smart switch, fixed, charging, "
+    "and analysed recorder profiles"
 )
 
 
@@ -31,7 +34,7 @@ def supports_automatic_contribution(request: MeasurementRequest) -> bool:
     )
 
 
-def contribution_entity_ids(request: MeasurementRequest) -> tuple[str, ...]:
+def contribution_entity_ids(request: MeasurementRequest) -> list[str]:
     """Return the entities which identify the contributed device.
 
     Recorder analysis intentionally models the first recorded entity. Other recorded
@@ -41,7 +44,9 @@ def contribution_entity_ids(request: MeasurementRequest) -> tuple[str, ...]:
 
     if isinstance(request, RecorderMeasurementRequest):
         return request.recorded_entity_ids[:1]
-    return tuple(request.controlled_entity_ids)
+    if isinstance(request, FixedMeasurementRequest):
+        return [request.device_id]
+    return request.controlled_entity_ids
 
 
 class ContributionAuthMethod(StrEnum):
@@ -128,7 +133,12 @@ class DeviceFlowStartResponse(DeviceFlowStart):
     flow_id: str
 
 
-DeviceFlowPollStatus = Literal["pending", "slow_down", "authorized", "expired", "denied"]
+class DeviceFlowPollStatus(StrEnum):
+    PENDING = "pending"
+    SLOW_DOWN = "slow_down"
+    AUTHORIZED = "authorized"
+    EXPIRED = "expired"
+    DENIED = "denied"
 
 
 class DeviceFlowPollResponse(BaseModel):
@@ -150,7 +160,7 @@ class ContributionPreviewRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     manufacturer_name: str = Field(min_length=1, max_length=200)
-    model_id: str = Field(min_length=1, max_length=120)
+    model_id: str = Field(min_length=1, max_length=MODEL_ID_MAX_LENGTH)
     product_name: str = Field(min_length=1, max_length=200)
     contributor: str = Field(min_length=1, max_length=200)
     contributor_github: str | None = Field(default=None, max_length=100)
@@ -160,6 +170,8 @@ class ContributionPreviewRequest(BaseModel):
     product_url: str | None = Field(default=None, max_length=2_000)
     mains_voltage: Literal[120, 230] | None = None
     device_specs: dict[str, Any] | None = None
+    standby_power: float | None = Field(default=None, ge=0.05, allow_inf_nan=False, strict=True)
+    standby_power_estimated: bool | None = None
     measure_device: str | None = Field(default=None, max_length=200)
     measure_device_firmware: str | None = Field(default=None, max_length=200)
     measure_description: str | None = Field(default=None, max_length=2_000)
@@ -193,6 +205,8 @@ class ContributionPreviewResponse(BaseModel):
     voltage_range: dict[str, float] | None = None
     device_specs: dict[str, Any] | None = None
     device_type: str = ""
+    standby_power: float | None = None
+    standby_power_estimated: bool = False
     measure_device: str = ""
     measure_device_firmware: str = ""
     measure_description: str = ""

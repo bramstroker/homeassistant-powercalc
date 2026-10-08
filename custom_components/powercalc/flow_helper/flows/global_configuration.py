@@ -7,7 +7,6 @@ from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.typing import ConfigType
-import voluptuous as vol
 
 from custom_components.powercalc.const import (
     CONF_APPLY_TO_ALL,
@@ -29,6 +28,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_UPDATE_INTERVAL,
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
+    CONF_FOLLOW_DEVICE_NAME,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_GROUP_POWER_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -62,6 +62,7 @@ from custom_components.powercalc.flow_helper.schema import (
 )
 from custom_components.powercalc.power_profile.power_profile import DeviceType
 from custom_components.powercalc.service.gui_configuration import apply_field_to_config_entries
+from custom_components.powercalc.validation import vol
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
@@ -72,6 +73,7 @@ SECTION_GLOBAL_ADVANCED = "advanced"
 
 SCHEMA_GLOBAL_CONFIGURATION_POWER = vol.Schema(
     {
+        vol.Optional(CONF_FOLLOW_DEVICE_NAME, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_POWER_SENSOR_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.SelectSelector(

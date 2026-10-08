@@ -2,8 +2,8 @@ from measure.controller.charging.const import ATTR_BATTERY_LEVEL
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import BatteryLevelRetrievalError
 from measure.controller.hass_controller import HassControllerBase
-from measure.home_assistant import HomeAssistantManager
-from measure.home_assistant_entities import DeviceClass, HomeAssistantEntityCatalog
+from measure.home_assistant.client import HomeAssistantManager
+from measure.home_assistant.entities import DeviceClass, HomeAssistantEntityCatalog
 
 
 class HassChargingController(HassControllerBase, ChargingController):
@@ -45,10 +45,10 @@ class HassChargingController(HassControllerBase, ChargingController):
     def _discover_battery_sensor(self) -> str | None:
         """Find a battery sensor belonging to the same device as the charging entity."""
 
-        if not self.entity_id:
+        if not self.entity_id:  # pragma: no cover - validated charging requests always supply an entity ID
             return None
         snapshot = HomeAssistantEntityCatalog(self.client).load_snapshot()
-        return snapshot.related_entity_id(self.entity_id, DeviceClass.BATTERY)
+        return snapshot.find_related_entity_id(self.entity_id, DeviceClass.BATTERY)
 
     def _resolve_battery_sensor(self) -> str | None:
         """Resolve and cache the battery source for the lifetime of this controller."""

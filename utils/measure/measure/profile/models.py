@@ -1,7 +1,10 @@
+from dataclasses import dataclass
 import re
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from measure.const import MODEL_ID_MAX_LENGTH, MODEL_ID_PATTERN
 
 
 class ProfileAuthor(BaseModel):
@@ -43,13 +46,15 @@ class ProfileMetadata(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     manufacturer: str = Field(min_length=1, max_length=200)
-    model_id: str = Field(min_length=1, max_length=120)
+    model_id: str = Field(min_length=1, max_length=MODEL_ID_MAX_LENGTH)
     product_name: str | None = Field(default=None, min_length=1, max_length=200)
     aliases: tuple[str, ...] | None = None
     gtins: tuple[str, ...] | None = None
     product_url: str | None = Field(default=None, max_length=2_000)
     mains_voltage: Literal[120, 230] | None = None
     device_specs: dict[str, Any] | None = None
+    standby_power: float | None = Field(default=None, ge=0.05, allow_inf_nan=False, strict=True)
+    standby_power_estimated: bool | None = None
     measure_device: str | None = Field(default=None, max_length=200)
     measure_device_firmware: str | None = Field(default=None, max_length=200)
     measure_description: str | None = Field(default=None, max_length=2_000)
@@ -85,7 +90,7 @@ class ProfileMetadata(BaseModel):
     @field_validator("model_id")
     @classmethod
     def validate_model_id(cls, value: str) -> str:
-        if value in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._()+-]*", value):
+        if value in {".", ".."} or not re.fullmatch(MODEL_ID_PATTERN, value):
             raise ValueError("model_id contains unsafe characters")
         return value
 
@@ -121,3 +126,29 @@ def _valid_email(value: str) -> bool:
     local, domain = value.split("@")
     host, separator, suffix = domain.rpartition(".")
     return bool(local and host and separator and suffix)
+
+
+@dataclass(frozen=True)
+class RenderedProfileFile:
+    path: str
+    content: bytes
+
+
+class PreparedProfileFile(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    path: str = Field(min_length=1)
+    size: int = Field(ge=0)
+    sha: str | None = None
+
+
+class ProfilePreview(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    manufacturer_directory: str
+    manufacturer_library_url: str | None = None
+    model_directory: str
+    files: tuple[PreparedProfileFile, ...]
+    warnings: tuple[str, ...] = ()
+    standby_power: float | None = None
+    standby_power_estimated: bool = False

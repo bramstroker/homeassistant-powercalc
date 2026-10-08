@@ -2,6 +2,7 @@ import type {
   ApiErrorBody,
   AppSettings,
   Capabilities,
+  CalibrationJob,
   ContributionAuthDeviceStatus,
   ContributionAuthState,
   ContributionDeviceFlow,
@@ -16,6 +17,7 @@ import type {
   ManufacturerCatalog,
   MeasureDefinition,
   MeasureDeviceCatalog,
+  MeasureType,
   MeasurementRequest,
   OperatingPoint,
   PlotCollection,
@@ -27,6 +29,8 @@ import type {
   SessionSnapshot,
   SessionSummary,
   ShellyDiscoveryResponse,
+  StandbyEstimate,
+  StandbyMeasurementResult,
 } from "./types";
 
 export type Decoder<T> = (value: unknown) => T;
@@ -88,6 +92,7 @@ function decoder<T>(description: string, guard: Guard<T>): Decoder<T> {
 
 const isStringArray = arrayOf(isString);
 const isStringRecord = recordOf(isString);
+const isMeasureType: Guard<MeasureType> = oneOf("light", "speaker", "recorder", "average", "fixed", "charging", "fan", "smart_switch");
 const isPrimitive = (value: unknown): value is string | number | boolean | null =>
   value === null || isString(value) || isNumber(value) || isBoolean(value);
 
@@ -136,7 +141,7 @@ const isMeasurementParameters: Guard<Capabilities["defaults"]> = (value): value 
 
 export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is MeasurementRequest => {
   if (!isRecord(value)
-    || !oneOf("light", "speaker", "recorder", "average", "charging", "fan")(value.measure_type)
+    || !isMeasureType(value.measure_type)
     || !isString(value.model_id)
     || !isString(value.product_name)
     || !isString(value.measure_device)
@@ -156,11 +161,22 @@ export const isMeasurementRequest: Guard<MeasurementRequest> = (value): value is
     case "speaker": return isHassOrDummyController(value.controller) && isBoolean(value.disable_streaming);
     case "charging": return isHassOrDummyController(value.controller) && oneOf("vacuum_robot", "lawn_mower_robot")(value.charging_device_type);
     case "fan": return isHassOrDummyController(value.controller);
+    case "smart_switch": return isRecord(value.controller)
+      && ((value.controller.type === "hass" && isString(value.controller.entity_id))
+        || (value.controller.type === "hass_multi" && isStringArray(value.controller.entity_ids) && value.controller.entity_ids.length >= 2))
+      && isBoolean(value.power_monitoring)
+      && isInteger(value.samples_per_state) && isInteger(value.repeat_cycles) && isNumber(value.settle_seconds);
     case "average": return (value.controller === null || value.controller === undefined) && isInteger(value.duration);
+    case "fixed": return (value.controller === null || value.controller === undefined)
+      && isString(value.device_id) && value.device_id.length > 0
+      && oneOf("network", "power_meter", "generic_iot")(value.profile_device_type)
+      && isInteger(value.duration);
     case "recorder":
       return (value.controller === null || value.controller === undefined)
         && oneOf("playbook", "complex_profile")(value.recorder_purpose)
         && optionalNullable(oneOf("generic", "vacuum_robot"))(value.profile_recipe)
+        && optionalNullable(isString)(value.primary_entity_id)
+        && optionalNullable(isString)(value.profile_device_type)
         && optional(isStringArray)(value.tracked_entity_ids)
         && optionalNullable(isString)(value.vacuum_entity_id)
         && optionalNullable(isString)(value.battery_entity_id)
@@ -173,9 +189,15 @@ const isEntityDescriptor: Guard<EntityDescriptor> = objectOf({
   entity_id: isString,
   name: isString,
   domain: optional(isString),
-  device_class: optionalNullable(oneOf("power", "voltage", "battery")),
+  device_class: optionalNullable(isString),
   device_id: optionalNullable(isString),
+  device_name: optionalNullable(isString),
+  related_device_ids: optional(isStringArray),
   integration: optionalNullable(isString),
+  connectivity: optionalNullable(oneOf("zigbee", "zwave")),
+  translation_key: optionalNullable(isString),
+  disabled_by: optionalNullable(isString),
+  has_live_state: optional(isBoolean),
   manufacturer: optionalNullable(isString),
   model_id: optionalNullable(isString),
   product_name: optionalNullable(isString),
@@ -191,13 +213,13 @@ const isEntityDescriptor: Guard<EntityDescriptor> = objectOf({
 });
 
 const isFormFieldOption = objectOf({
-  value: isString, label: isString, entity_domain: optionalNullable(isString), enables: optional(isStringArray),
+  value: isString, label: isString, entity_domain: optionalNullable(isString), entity_domains: optional(isStringArray),
   description: optional(isString), guidance: optional(isStringArray),
 });
 const isFormField = objectOf({
   name: isString,
   label: isString,
-  control: oneOf("entity", "number", "text", "boolean", "select", "multi_select"),
+  control: oneOf("entity", "device", "number", "text", "boolean", "select", "multi_select"),
   role: oneOf("attribute", "controller", "power_meter"),
   narrowed_by: optionalNullable(isString),
   required: isBoolean,
@@ -207,6 +229,8 @@ const isFormField = objectOf({
   minimum: optionalNullable(isNumber),
   maximum: optionalNullable(isNumber),
   multiple: optional(isBoolean),
+  multiple_toggle: optional(isBoolean),
+  group_by_device: optional(isBoolean),
   plural_label: optional(isString),
   derived_from: optionalNullable(isString),
   hint: optional(isString),
@@ -222,7 +246,7 @@ const isMeasureParameter = objectOf({
   group: optional(isString), requires_multiple: optionalNullable(oneOf(...parameterNames)),
 });
 const isMeasureDefinition: Guard<MeasureDefinition> = objectOf({
-  measure_type: oneOf("light", "speaker", "recorder", "average", "charging", "fan"),
+  measure_type: isMeasureType,
   label: isString,
   description: isString,
   icon: isString,
@@ -230,8 +254,14 @@ const isMeasureDefinition: Guard<MeasureDefinition> = objectOf({
   parameters: arrayOf(isMeasureParameter),
   supports_profile: isBoolean,
   supports_resume: isBoolean,
+  supports_dummy_controller: optional(isBoolean),
   confirmation_action: optionalNullable(isString),
   confirmation_is_warning: optional(isBoolean),
+  confirmation_guidance: optional(arrayOf(isString)),
+  confirmation_eyebrow: optional(isString),
+  confirmation_title: optional(isString),
+  confirmation_guidance_title: optional(isString),
+  confirmation_guidance_label: optional(isString),
   model_id_example: isString,
   product_name_example: isString,
 });
@@ -251,7 +281,9 @@ const isAppSettings: Guard<AppSettings> = objectOf({
   shelly_username: optional(isString),
   shelly_password_configured: optional(isBoolean),
   kasa_ip: nullable(isString),
+  tapo_credentials_configured: optional(isBoolean),
   fast_test_mode: isBoolean,
+  allow_zero_power: isBoolean,
   measurement_defaults: isAppMeasurementDefaults,
 });
 
@@ -277,6 +309,7 @@ const isContributionFile = objectOf({
 });
 const isPrimitiveRecord = recordOf(isPrimitive);
 const isContributionPreview: Guard<ContributionPreview> = objectOf({
+  standby_power: optionalNullable(isNumber), standby_power_estimated: optional(isBoolean),
   eligible: isBoolean,
   reason: optionalNullable(isString),
   repository: isString,
@@ -339,6 +372,7 @@ const isPreflight: Guard<PreflightResponse> = objectOf({
   battery_level_attribute: optionalNullable(isString),
   light_load_probe: optionalNullable(objectOf({
     checked_variations: isNumber, minimum_aggregate_power_w: isNumber,
+    standby: optional(objectOf({ status: oneOf("measured", "unavailable", "skipped"), power_w: nullable(isNumber) })),
     points: arrayOf(objectOf({ label: isString, mode: oneOf("brightness", "color_temp", "hs", "effect"), power_w: isNumber })),
   })),
 });
@@ -378,7 +412,7 @@ const isSessionSummary: Guard<SessionSummary> = objectOf({
   session_id: isString,
   state: isSessionState,
   created_at: isString, updated_at: isString,
-  measure_type: oneOf("light", "speaker", "recorder", "average", "charging", "fan"),
+  measure_type: isMeasureType,
   model_id: isString, product_name: isString, measure_device: isString, completed: isNumber, total: isNumber,
   percent: isNumber, can_resume: isBoolean, file_count: isNumber, size: isNumber, active: isBoolean,
 });
@@ -417,18 +451,33 @@ export const decodeShellyDiscovery: Decoder<ShellyDiscoveryResponse> = decoder("
   available: isBoolean, message: nullable(isString),
 }));
 export const decodeEntityCatalog: Decoder<EntityCatalog> = decoder("entity catalog", objectOf({
+  home_assistant_ready: isBoolean,
   lights: arrayOf(isEntityDescriptor), powers: arrayOf(isEntityDescriptor), voltages: arrayOf(isEntityDescriptor),
 }));
 export const decodeEntities = decoder("entity list", arrayOf(isEntityDescriptor));
 export const decodeDummyLoadCalibration: Decoder<DummyLoadCalibration | null> = decoder("dummy-load calibration", nullable(objectOf({
   description: isString, resistance: isNumber, calibrated_at: isString, power_meter_fingerprint: optional(isString),
 })));
+const isCalibrationJob = objectOf({
+  id: isString, session_id: isString, started_at: isString,
+  status: oneOf("running", "cancelling", "completed", "cancelled", "failed"),
+  calibration: nullable(objectOf({ description: isString, resistance: isNumber, calibrated_at: isString, power_meter_fingerprint: optional(isString) })),
+  error: nullable(isString),
+});
+export const decodeCalibrationJob: Decoder<CalibrationJob> = decoder("calibration operation", isCalibrationJob);
+export const decodeOptionalCalibrationJob: Decoder<CalibrationJob | null> = decoder("calibration operation", nullable(isCalibrationJob));
 export const decodePreflight = decoder("preflight", isPreflight);
 export const decodeSessionSnapshot = decoder("session snapshot", isSessionSnapshot);
 export const decodeSessionSummaries = decoder("session list", arrayOf(isSessionSummary));
 export const decodeSessionFiles: Decoder<SessionFile[]> = decoder("session files", arrayOf(objectOf({ name: isString, size: isNumber, media_type: isString })));
 export const decodePlots = decoder("plots", isPlotCollection);
 export const decodeContributionPreview = decoder("contribution preview", isContributionPreview);
+export const decodeStandbyEstimate: Decoder<StandbyEstimate> = decoder("standby estimate", objectOf({
+  power_w: isNumber, basis: oneOf("manufacturer", "connectivity", "fallback"), profile_count: isNumber,
+}));
+export const decodeStandbyMeasurement: Decoder<StandbyMeasurementResult> = decoder("standby measurement", objectOf({
+  status: oneOf("measured", "unavailable", "skipped"), power_w: nullable(isNumber),
+}));
 export const decodeContributionResult = decoder("contribution result", isContributionResult);
 
 export function decodeApiError(value: unknown): Partial<ApiErrorBody> & { detail?: unknown } {

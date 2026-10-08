@@ -1,6 +1,7 @@
 """Persist complete installed profiles independently of the remote library index."""
 
 from dataclasses import dataclass
+import gzip
 import json
 import logging
 import os
@@ -63,6 +64,36 @@ class InstalledProfile:
 
     metadata: dict[str, Any]
     directory: Path
+
+
+def compress_installed_profile_csv_files(installed: InstalledProfile) -> None:
+    """Replace plain CSV resources in an installed profile with gzip files.
+
+    Gzip files are written before the installation manifest is switched to their
+    paths. The raw files are only removed afterwards, so an interrupted migration
+    always leaves either the old or the new resource set usable.
+    """
+    csv_paths = sorted(installed.directory.rglob("*.csv"))
+    if not csv_paths:
+        return
+
+    for csv_path in csv_paths:
+        compressed_path = csv_path.with_name(f"{csv_path.name}.gz")
+        save_resource(gzip.compress(csv_path.read_bytes(), mtime=0), compressed_path)
+
+    metadata_path = installed.directory / METADATA_FILE
+    if metadata_path.exists():
+        manifest = json.loads(metadata_path.read_bytes())
+        resources: list[str] = []
+        for resource in manifest["resources"]:
+            normalized_resource = f"{resource}.gz" if str(resource).endswith(".csv") else resource
+            if normalized_resource not in resources:
+                resources.append(normalized_resource)
+        manifest["resources"] = resources
+        save_resource(json.dumps(manifest).encode(), metadata_path)
+
+    for csv_path in csv_paths:
+        csv_path.unlink()
 
 
 def validate_profile(directory: Path, version: AwesomeVersion) -> dict[str, Any]:

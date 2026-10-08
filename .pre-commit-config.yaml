@@ -30,7 +30,7 @@ repos:
         exclude: \.svg$
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.7
+    rev: v0.16.10
     hooks:
       - id: ruff
         args: [--fix]
@@ -78,7 +78,7 @@ repos:
       - id: codespell
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.38.0
+    rev: 0.38.2
     hooks:
       - id: check-github-workflows
         args: [ "--verbose" ]

@@ -1,15 +1,23 @@
 import dataclasses
-from typing import Any
+from typing import Any, assert_never
 
-from measure.cli.environment import CliEnvironment
-from measure.const import (
+from measure.cli.const import (
+    QUESTION_CHARGING_DEVICE_TYPE,
+    QUESTION_DISABLE_STREAMING,
+    QUESTION_DURATION,
     QUESTION_ENTITY_ID,
     QUESTION_GENERATE_MODEL_JSON,
+    QUESTION_GZIP,
     QUESTION_MEASURE_DEVICE,
+    QUESTION_MODE,
     QUESTION_MODEL_ID,
     QUESTION_MODEL_NAME,
-    MeasureType,
+    QUESTION_NUM_LIGHTS,
+    QUESTION_POWERMETER_ENTITY_ID,
+    QUESTION_VOLTAGEMETER_ENTITY_ID,
 )
+from measure.cli.environment import CliEnvironment
+from measure.const import MeasureType
 from measure.controller.charging.const import ChargingControllerType, ChargingDeviceType
 from measure.controller.charging.spec import DummyChargingControllerSpec, HassChargingControllerSpec
 from measure.controller.fan.const import FanControllerType
@@ -18,7 +26,8 @@ from measure.controller.light.const import LightControllerType
 from measure.controller.light.spec import DummyLightControllerSpec, HassLightControllerSpec, HueLightControllerSpec
 from measure.controller.media.const import MediaControllerType
 from measure.controller.media.spec import DummyMediaControllerSpec, HassMediaControllerSpec
-from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID, PowerMeterType
+from measure.controller.switch.spec import HassMultiSwitchControllerSpec, HassSwitchControllerSpec
+from measure.powermeter.const import PowerMeterType
 from measure.powermeter.spec import (
     DummyPowerMeterSpec,
     HassPowerMeterSpec,
@@ -40,15 +49,8 @@ from measure.request import (
     MeasurementRequest,
     RecorderMeasurementRequest,
     ResumePolicy,
+    SmartSwitchMeasurementRequest,
     SpeakerMeasurementRequest,
-)
-from measure.runner.const import (
-    QUESTION_CHARGING_DEVICE_TYPE,
-    QUESTION_DISABLE_STREAMING,
-    QUESTION_DURATION,
-    QUESTION_GZIP,
-    QUESTION_MODE,
-    QUESTION_NUM_LIGHTS,
 )
 from measure.tuning import MeasurementParameters
 
@@ -59,6 +61,8 @@ def request_from_answers(
     environment: CliEnvironment,
 ) -> MeasurementRequest:
     """Adapt CLI/Inquirer answers once at the transport boundary."""
+    if measure_type == MeasureType.FIXED:
+        raise ValueError("Fixed profiles are currently available only in the Home Assistant measure app")
     common: dict[str, Any] = {
         "model_id": str(answers.get(QUESTION_MODEL_ID) or ""),
         "product_name": str(answers.get(QUESTION_MODEL_NAME) or ""),
@@ -97,10 +101,26 @@ def request_from_answers(
             controller=_charging_controller_spec(environment, answers),
             charging_device_type=ChargingDeviceType(answers[QUESTION_CHARGING_DEVICE_TYPE]),
         )
-    return FanMeasurementRequest(
-        **common,
-        controller=_fan_controller_spec(environment, answers),
-    )
+    if measure_type == MeasureType.FAN:
+        return FanMeasurementRequest(
+            **common,
+            controller=_fan_controller_spec(environment, answers),
+        )
+    if measure_type == MeasureType.SMART_SWITCH:
+        entity_ids = list(answers.get("switch_entity_ids") or [])
+        if not entity_ids:
+            raise ValueError("Select at least one switch relay")
+        controller = (
+            HassMultiSwitchControllerSpec(entity_ids=entity_ids)
+            if len(entity_ids) > 1
+            else HassSwitchControllerSpec(entity_id=entity_ids[0])
+        )
+        return SmartSwitchMeasurementRequest(
+            **common,
+            controller=controller,
+            power_monitoring=answers["power_monitoring"],
+        )
+    assert_never(measure_type)  # pragma: no cover - all MeasureType members handled
 
 
 def _parameters_from_environment(environment: CliEnvironment) -> MeasurementParameters:
@@ -147,7 +167,7 @@ def _power_meter_spec(environment: CliEnvironment, answers: dict[str, Any]) -> P
         return OwonOwh98xxPowerMeterSpec(
             port=environment.serial_port, baudrate=environment.serial_baudrate, channel=environment.owon_owh98xx_channel
         )
-    raise ValueError(f"Unsupported CLI power meter: {selected}")
+    assert_never(selected)  # pragma: no cover - all PowerMeterType members handled
 
 
 def _light_controller_spec(
@@ -167,7 +187,7 @@ def _light_controller_spec(
             bridge_ip=environment.hue_bridge_ip,
             light=_required_answer(answers, "light"),
         )
-    raise ValueError(f"Unsupported CLI light controller: {selected}")
+    assert_never(selected)  # pragma: no cover - all LightControllerType members handled
 
 
 def _media_controller_spec(
@@ -179,7 +199,7 @@ def _media_controller_spec(
         return DummyMediaControllerSpec()
     if selected == MediaControllerType.HASS:
         return HassMediaControllerSpec(entity_id=_required_answer(answers, QUESTION_ENTITY_ID))
-    raise ValueError(f"Unsupported CLI media controller: {selected}")
+    assert_never(selected)  # pragma: no cover - all MediaControllerType members handled
 
 
 def _charging_controller_spec(
@@ -193,7 +213,7 @@ def _charging_controller_spec(
         return HassChargingControllerSpec(
             entity_id=_required_answer(answers, QUESTION_ENTITY_ID),
         )
-    raise ValueError(f"Unsupported CLI charging controller: {selected}")
+    assert_never(selected)  # pragma: no cover - all ChargingControllerType members handled
 
 
 def _fan_controller_spec(
@@ -205,7 +225,7 @@ def _fan_controller_spec(
         return DummyFanControllerSpec()
     if selected == FanControllerType.HASS:
         return HassFanControllerSpec(entity_id=_required_answer(answers, QUESTION_ENTITY_ID))
-    raise ValueError(f"Unsupported CLI fan controller: {selected}")
+    assert_never(selected)  # pragma: no cover - all FanControllerType members handled
 
 
 def _required_answer(answers: dict[str, Any], key: str) -> str:

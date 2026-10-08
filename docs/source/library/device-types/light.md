@@ -27,16 +27,17 @@ This will fully automate the process and generate the required CSV files and mod
 Depending on the supported color modes of the light the integration expects one or more CSV files.
 You can check the supported modes in HA Developer Tools.
 
-> - hs.csv.gz (hue/saturation, colored lamps)
-> - color_temp.csv.gz (color temperature)
-> - brightness.csv.gz (brightness only lights)
-> - effect.csv.gz (lights with predefined effect)
+> - hs.csv (hue/saturation, colored lamps)
+> - color_temp.csv (color temperature)
+> - brightness.csv (brightness only lights)
+> - effect.csv (lights with predefined effect)
 
 Some lights support two color modes (both `hs` and `color_temp`), so there must be two CSV files.
 When your light supports `xy` color mode, you just need to provide the `hs` CSV file. When your light supports
 predefined `effect` mode, you should also include the `effect` CSV file.
 
-The files must be gzipped to keep the repository footprint small.
+The repository stores these files as plain CSV so changes can be reviewed as text. Powercalc compresses downloaded
+CSV files when installing a profile locally.
 
 Example directory structure:
 
@@ -44,9 +45,9 @@ Example directory structure:
 - signify
   - LCT010
     - model.json
-    - hs.csv.gz
-    - color_temp.csv.gz
-    - effect.csv.gz
+    - hs.csv
+    - color_temp.csv
+    - effect.csv
 ```
 
 ### Expected file structure

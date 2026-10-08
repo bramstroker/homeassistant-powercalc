@@ -83,10 +83,9 @@ class OwonOwh98xxPowerMeter(SerialScpiPowerMeter):
             # If the device's local controls are not locked, it will not return the value
             raise PowerMeterError("Cannot retrieve power, is local locked?")
 
-    def _retrieve_float(self, request: bytes) -> float:
-        # It has a special case for zero, hence the override
-        response = self._retrieve_data(request).strip()
-        return 0 if response == b"----" else self._bytes_to_float(response)
+    def _bytes_to_float(self, data: bytes) -> float:
+        # OWON represents zero as four dashes.
+        return 0 if data.strip() == b"----" else super()._bytes_to_float(data)
 
     def power_request(self) -> bytes:
         return f":MEAS:POW:REAL:ELEMENT{self.channel}?\n".encode()

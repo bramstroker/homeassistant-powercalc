@@ -6,10 +6,18 @@ from enum import StrEnum
 import json
 from pathlib import Path
 
+from measure.visualization.labels import format_entity_label, format_value_label
+
 
 class CompositeMode(StrEnum):
     STOP_AT_FIRST = "stop_at_first"
     SUM_ALL = "sum_all"
+
+
+@dataclass(frozen=True, slots=True)
+class CompositeConfig:
+    mode: CompositeMode
+    strategies: list[object]
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,7 +33,7 @@ class CompositeDiagramSpec:
     title: str
     mode: CompositeMode
     source: str
-    branches: tuple[CompositeBranch, ...]
+    branches: list[CompositeBranch]
 
 
 class CompositeDiagramError(ValueError):
@@ -40,18 +48,18 @@ def build_composite_diagram_from_file(path: str | Path) -> CompositeDiagramSpec:
     if not isinstance(data, dict) or data.get("calculation_strategy") != "composite":
         raise CompositeDiagramError("model does not contain a composite calculation strategy")
 
-    mode, strategies = _composite_config(data.get("composite_config"))
-    branches = tuple(
+    config = _composite_config(data.get("composite_config"))
+    branches = [
         branch
-        for index, strategy in enumerate(strategies, start=1)
+        for index, strategy in enumerate(config.strategies, start=1)
         if (branch := _composite_branch(index, strategy)) is not None
-    )
+    ]
     if not branches:
         raise CompositeDiagramError("model does not contain composite branches")
 
     return CompositeDiagramSpec(
         title="Composite strategy branches",
-        mode=mode,
+        mode=config.mode,
         source=file_path.name,
         branches=branches,
     )
@@ -62,15 +70,17 @@ def model_has_composite_branches(data: object) -> bool:
 
     if not isinstance(data, dict) or data.get("calculation_strategy") != "composite":
         return False
-    _, strategies = _composite_config(data.get("composite_config"))
-    return any(_composite_branch(index, strategy) is not None for index, strategy in enumerate(strategies, start=1))
+    config = _composite_config(data.get("composite_config"))
+    return any(
+        _composite_branch(index, strategy) is not None for index, strategy in enumerate(config.strategies, start=1)
+    )
 
 
-def _composite_config(config: object) -> tuple[CompositeMode, list[object]]:
+def _composite_config(config: object) -> CompositeConfig:
     if isinstance(config, list):
-        return CompositeMode.STOP_AT_FIRST, config
+        return CompositeConfig(mode=CompositeMode.STOP_AT_FIRST, strategies=config)
     if not isinstance(config, dict):
-        return CompositeMode.STOP_AT_FIRST, []
+        return CompositeConfig(mode=CompositeMode.STOP_AT_FIRST, strategies=[])
 
     mode_value = config.get("mode", CompositeMode.STOP_AT_FIRST)
     try:
@@ -78,7 +88,7 @@ def _composite_config(config: object) -> tuple[CompositeMode, list[object]]:
     except ValueError:
         mode = CompositeMode.STOP_AT_FIRST
     strategies = config.get("strategies")
-    return mode, strategies if isinstance(strategies, list) else []
+    return CompositeConfig(mode=mode, strategies=strategies if isinstance(strategies, list) else [])
 
 
 def _composite_branch(index: int, config: object) -> CompositeBranch | None:
@@ -177,15 +187,15 @@ def _compound_condition_label(condition_type: str, conditions: object) -> str:
 
 
 def _state_condition_label(condition: Mapping[str, object]) -> str:
-    subject = condition.get("attribute") or _entity_label(condition.get("entity_id"))
+    subject = condition.get("attribute") or format_entity_label(condition.get("entity_id"))
     state = condition.get("state")
     if subject and state is not None:
-        return f"{str(subject).replace('_', ' ')} = {_value_label(state)}"
+        return f"{str(subject).replace('_', ' ')} = {format_value_label(state)}"
     return "State condition"
 
 
 def _numeric_condition_label(condition: Mapping[str, object]) -> str:
-    subject = condition.get("attribute") or _entity_label(condition.get("entity_id"))
+    subject = condition.get("attribute") or format_entity_label(condition.get("entity_id"))
     bounds = []
     if "above" in condition:
         bounds.append(f"> {condition['above']}")
@@ -194,24 +204,3 @@ def _numeric_condition_label(condition: Mapping[str, object]) -> str:
     if subject and bounds:
         return f"{str(subject).replace('_', ' ')} {' and '.join(bounds)}"
     return "Numeric state condition"
-
-
-def _entity_label(entity_id: object) -> str | None:
-    if isinstance(entity_id, list):
-        entity_id = entity_id[0] if entity_id else None
-    if not isinstance(entity_id, str):
-        return None
-    if entity_id == "[[entity]]":
-        return "state"
-    if entity_id.startswith("[[") and entity_id.endswith("]]"):
-        entity_id = entity_id[2:-2]
-    _, separator, value = entity_id.partition(":")
-    return (value if separator else entity_id).replace("_", " ")
-
-
-def _value_label(value: object) -> str:
-    if isinstance(value, list):
-        return ", ".join(str(item) for item in value)
-    if isinstance(value, bool):
-        return str(value).lower()
-    return str(value)

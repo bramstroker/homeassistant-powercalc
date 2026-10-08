@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-from measure.home_assistant import HomeAssistantManager
+from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostics
 from measure.powermeter.hass import HassPowerMeter
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter, PowerMeterDiagnosticSample
@@ -269,3 +269,79 @@ def test_non_finite_readings_are_reported_as_connection_failures(raw_value: str)
 
     assert result.success is False
     assert result.message == "Power meter returned a non-finite reading"
+
+
+@pytest.mark.parametrize(
+    "duration, interval, message",
+    [
+        (-1, 1, "duration cannot be negative"),
+        (1, 0, "poll interval must be positive"),
+        (1, -1, "poll interval must be positive"),
+    ],
+)
+def test_diagnostics_reject_invalid_sampling_settings(duration: float, interval: float, message: str) -> None:
+    builder = MagicMock()
+
+    with pytest.raises(ValueError, match=message):
+        PowerMeterDiagnostics(builder, duration=duration, poll_interval=interval)
+
+    builder.assert_not_called()
+
+
+@pytest.mark.parametrize("power", [float("nan"), float("inf"), float("-inf")])
+def test_direct_diagnostics_reject_non_finite_power(power: float) -> None:
+    meter = SampledPowerMeter(lambda _: PowerMeterDiagnosticSample(power=power, raw_value=str(power), reported_at=100))
+
+    result = PowerMeterDiagnostics(lambda _: meter).evaluate(ShellyPowerMeterSpec(device_ip="192.0.2.1"))
+
+    assert result.success is False
+    assert result.message == "Power meter returned a non-finite reading"
+
+
+def test_diagnostics_treat_unparseable_precision_as_poor() -> None:
+    diagnostics, _, spec = diagnose(
+        lambda call: PowerMeterDiagnosticSample(power=1.2, raw_value="unavailable", reported_at=float(call)),
+        duration=2,
+    )
+
+    result = diagnostics.evaluate(spec)
+
+    assert result.success is True
+    assert result.precision_decimals == 0
+    assert result.precision_status is DiagnosticStatus.POOR
+    assert result.update_interval_status is DiagnosticStatus.GOOD
+
+
+def test_diagnostics_refresh_expired_cache_and_keep_meters_separate() -> None:
+    clock = FakeClock()
+    meter = SampledPowerMeter(lambda _: PowerMeterDiagnosticSample(power=4.2, raw_value="4.2", reported_at=100))
+    builder = MagicMock(return_value=meter)
+    diagnostics = PowerMeterDiagnostics(builder, duration=0, cache_ttl=60, monotonic=clock.monotonic)
+    spec = ShellyPowerMeterSpec(device_ip="192.0.2.1")
+
+    first = diagnostics.evaluate(spec)
+    clock.current += 60
+    assert diagnostics.evaluate(spec) is first
+    clock.current += 0.1
+    assert diagnostics.evaluate(spec) is not first
+    diagnostics.evaluate(ShellyPowerMeterSpec(device_ip="192.0.2.2"))
+
+    assert builder.call_count == 3
+
+
+def test_failed_diagnostics_are_retried_and_can_use_an_override_builder() -> None:
+    default_builder = MagicMock()
+    meter = SampledPowerMeter(lambda _: PowerMeterDiagnosticSample(power=4.2, raw_value="4.2", reported_at=100))
+    override = MagicMock(side_effect=[OSError(), meter])
+    diagnostics = PowerMeterDiagnostics(default_builder, duration=0)
+    spec = ShellyPowerMeterSpec(device_ip="192.0.2.1")
+
+    failure = diagnostics.evaluate(spec, create_power_meter=override)
+    success = diagnostics.evaluate(spec, create_power_meter=override)
+
+    assert failure.success is False
+    assert failure.message == "Could not read from the power meter"
+    assert success.success is True
+    assert diagnostics.evaluate(spec) is success
+    default_builder.assert_not_called()
+    assert override.call_count == 2

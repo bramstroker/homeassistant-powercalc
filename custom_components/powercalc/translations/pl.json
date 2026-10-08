@@ -108,7 +108,11 @@
               "power_sensor_naming": "Wzorzec nazwy sensora mocy",
               "power_sensor_friendly_naming": "Wzorzec przyjaznej nazwy sensora mocy",
               "power_sensor_category": "Kategoria sensorów mocy",
-              "power_sensor_precision": "Dokładność czujnika mocy"
+              "power_sensor_precision": "Dokładność czujnika mocy",
+              "follow_device_name": "Używaj nazwy urządzenia"
+            },
+            "data_description": {
+              "follow_device_name": "Używaj nazwy przypisanego urządzenia dla generowanych encji obsługiwanych wirtualnych czujników mocy skonfigurowanych w interfejsie. Identyfikatory encji i własne nazwy encji pozostają bez zmian. Wyłączenie przywraca skonfigurowane nazwy. Własne wzorce nazw wyświetlanych, w tym wzorce globalne, mają pierwszeństwo: wpisy, których to dotyczy, zachowują skonfigurowane nazwy."
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Moc"
+      },
+      "energy": {
+        "name": "Energia"
+      },
+      "standby_energy": {
+        "name": "Energia w trybie czuwania"
+      },
+      "cost": {
+        "name": "Koszt"
+      },
+      "utility_meter_cycle": {
+        "name": "Energia {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Energia {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Energia {period} koszt"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Energia {period} {tariff} koszt"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Energia {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "Wzorzec nazwy sensora mocy",
               "power_sensor_friendly_naming": "Wzorzec przyjaznej nazwy sensora mocy",
               "power_sensor_category": "Kategoria czujników mocy",
-              "power_sensor_precision": "Dokładność czujnika mocy"
+              "power_sensor_precision": "Dokładność czujnika mocy",
+              "follow_device_name": "Używaj nazwy urządzenia"
+            },
+            "data_description": {
+              "follow_device_name": "Używaj nazwy przypisanego urządzenia dla generowanych encji obsługiwanych wirtualnych czujników mocy skonfigurowanych w interfejsie. Identyfikatory encji i własne nazwy encji pozostają bez zmian. Wyłączenie przywraca skonfigurowane nazwy. Własne wzorce nazw wyświetlanych, w tym wzorce globalne, mają pierwszeństwo: wpisy, których to dotyczy, zachowują skonfigurowane nazwy."
             }
           },
           "features": {

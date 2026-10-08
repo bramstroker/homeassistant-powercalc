@@ -14,6 +14,7 @@ from measure.cli.questions import (
     hue_light_controller_questions,
     light_questions,
     recorder_questions,
+    smart_switch_questions,
     speaker_questions,
 )
 from measure.const import MeasureType
@@ -21,7 +22,7 @@ from measure.controller.charging.const import ChargingControllerType
 from measure.controller.fan.const import FanControllerType
 from measure.controller.light.const import LightControllerType
 from measure.controller.media.const import MediaControllerType
-from measure.home_assistant_entities import HomeAssistantEntityCatalog
+from measure.home_assistant.entities import HomeAssistantEntityCatalog
 from measure.powermeter.const import PowerMeterType
 
 type CliQuestionBuilder = Callable[[CliEnvironment, HomeAssistantEntityCatalog | None], list[Question]]
@@ -75,6 +76,10 @@ def _fan(environment: CliEnvironment, entity_catalog: HomeAssistantEntityCatalog
     return []
 
 
+def _smart_switch(_: CliEnvironment, entity_catalog: HomeAssistantEntityCatalog | None) -> list[Question]:
+    return smart_switch_questions(_require_entity_catalog(entity_catalog))
+
+
 CLI_QUESTION_BUILDERS: dict[MeasureType, CliQuestionBuilder] = {
     MeasureType.LIGHT: _light,
     MeasureType.SPEAKER: _speaker,
@@ -82,6 +87,7 @@ CLI_QUESTION_BUILDERS: dict[MeasureType, CliQuestionBuilder] = {
     MeasureType.AVERAGE: _average,
     MeasureType.CHARGING: _charging,
     MeasureType.FAN: _fan,
+    MeasureType.SMART_SWITCH: _smart_switch,
 }
 
 
@@ -90,10 +96,7 @@ def measurement_questions(
     environment: CliEnvironment,
     entity_catalog: HomeAssistantEntityCatalog | None = None,
 ) -> list[Question]:
-    try:
-        questions = CLI_QUESTION_BUILDERS[measure_type](environment, entity_catalog)
-    except KeyError as error:
-        raise ValueError(f"No CLI question builder registered for {measure_type}") from error
+    questions = CLI_QUESTION_BUILDERS[measure_type](environment, entity_catalog)
     if environment.selected_power_meter == PowerMeterType.HASS:
         questions.extend(hass_power_meter_questions(_require_entity_catalog(entity_catalog)))
     return questions

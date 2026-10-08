@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Any
 from unittest.mock import patch
 
@@ -26,6 +27,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import (
     ModelNotSupportedError,
+    StrategyConfigurationError,
     UnsupportedStrategyError,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
@@ -35,6 +37,22 @@ from custom_components.powercalc.power_profile.power_profile import (
     is_device_type_supported_for_entity,
 )
 from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [(None, None), (3, Decimal(3)), (0.1, Decimal("0.1")), ("4.5", Decimal("4.5")), (0, Decimal(0))],
+)
+def test_profile_multiply_factor(hass: HomeAssistant, value: float | str | None, expected: Decimal | None) -> None:
+    profile = PowerProfile(hass, "test", "panels", "", {"multiply_factor": value})
+    assert profile.multiply_factor == expected
+
+
+@pytest.mark.parametrize("value", ["not a number", "[[panel_count]]", "NaN", "Infinity", "-Infinity", True, []])
+def test_invalid_profile_multiply_factor(hass: HomeAssistant, value: object) -> None:
+    profile = PowerProfile(hass, "test", "panels", "", {"multiply_factor": value})
+    with pytest.raises(StrategyConfigurationError, match=r"Invalid multiply_factor .* for test/panels"):
+        _ = profile.multiply_factor
 
 
 async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> None:

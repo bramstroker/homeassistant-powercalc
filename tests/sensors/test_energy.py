@@ -1,8 +1,11 @@
 from datetime import timedelta
+from decimal import Decimal
+import json
 import logging
 from unittest.mock import patch
 
 from freezegun.api import FrozenDateTimeFactory
+from homeassistant.components.integration.sensor import IntegrationSensorExtraStoredData
 from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
@@ -46,7 +49,7 @@ from custom_components.powercalc.const import (
     SERVICE_CALIBRATE_ENERGY,
     UnitPrefix,
 )
-from custom_components.powercalc.sensors.energy import VirtualEnergySensor
+from custom_components.powercalc.sensors.energy import VirtualEnergyExtraStoredData, VirtualEnergySensor
 from tests.common import (
     assert_entity_state,
     async_advance_time,
@@ -309,6 +312,22 @@ def test_set_entity_category(hass: HomeAssistant) -> None:
         sensor_config={},
     )
     assert energy_sensor.entity_category == EntityCategory.DIAGNOSTIC
+
+
+@pytest.mark.parametrize("value", [None, Decimal(0), Decimal("123.456789")])
+def test_energy_restore_data_round_trip(value: Decimal | None) -> None:
+    stored = VirtualEnergyExtraStoredData(value, UnitOfEnergy.KILO_WATT_HOUR, "sensor.test_power", value)
+    serialized = stored.as_dict()
+    assert serialized["last_valid_state"] == (str(value) if value is not None else None)
+    assert serialized["source_entity"] == "sensor.test_power"
+    restored = IntegrationSensorExtraStoredData.from_dict(json.loads(json.dumps(serialized)))
+    if value is None:
+        assert restored is None
+    else:
+        assert restored is not None
+        assert restored.native_value == value
+        assert restored.last_valid_state == value
+        assert restored.native_unit_of_measurement == UnitOfEnergy.KILO_WATT_HOUR
 
 
 async def test_calibrate_service(hass: HomeAssistant) -> None:

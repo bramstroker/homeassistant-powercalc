@@ -54,6 +54,30 @@ async def test_template_power(hass: HomeAssistant) -> None:
     assert track_entity.template.template == template
 
 
+@pytest.mark.parametrize("power_key", [CONF_POWER, CONF_STATES_POWER])
+@pytest.mark.parametrize(
+    "template",
+    [
+        "{{ states('input_number.test') }}",
+        "\n  {{ states('input_number.test') }}",
+        "{% if is_state('input_number.test', '42') %}42{% else %}60{% endif %}",
+        "{# Power consumption #}{{ states('input_number.test') }}",
+    ],
+)
+async def test_raw_template_power(hass: HomeAssistant, power_key: str, template: str) -> None:
+    await set_states(hass, [("input_number.test", "42")])
+    source_entity = create_source_entity("switch.test", hass)
+    config = {power_key: {STATE_ON: template} if power_key == CONF_STATES_POWER else template}
+    strategy = await _create_strategy(hass, config, source_entity)
+
+    assert await strategy.calculate(State(source_entity.entity_id, STATE_ON)) == 42
+    track_entity = strategy.get_entities_to_track()[0]
+    assert isinstance(track_entity, TrackTemplate)
+
+    await set_states(hass, [("input_number.test", "60")])
+    assert await strategy.calculate(State(source_entity.entity_id, STATE_ON)) == 60
+
+
 async def test_states_power(hass: HomeAssistant) -> None:
     source_entity = create_source_entity("media_player.test", hass)
     strategy = await _create_strategy(
@@ -68,6 +92,20 @@ async def test_states_power(hass: HomeAssistant) -> None:
     assert await strategy.calculate(State(source_entity.entity_id, "paused")) == 2.25
     assert await strategy.calculate(State(source_entity.entity_id, "idle")) == 1.5
     assert await strategy.calculate(State(source_entity.entity_id, "whatever")) == 20
+
+
+async def test_off_state_power_can_calculate_standby(hass: HomeAssistant) -> None:
+    source_entity = create_source_entity("light.test", hass)
+    strategy = await _create_strategy(
+        hass,
+        {
+            CONF_POWER: 20,
+            CONF_STATES_POWER: {STATE_OFF: 1.5},
+        },
+        source_entity,
+    )
+
+    assert strategy.can_calculate_standby()
 
 
 async def test_states_power_with_template(hass: HomeAssistant) -> None:

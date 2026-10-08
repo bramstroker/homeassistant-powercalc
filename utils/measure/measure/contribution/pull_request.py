@@ -2,24 +2,28 @@
 
 from collections.abc import Sequence
 
-from measure.contribution.models import ContributionJob, ContributionPreview, DeviceInfo
+from measure.contribution.models import ContributionJob, DeviceInfo
+from measure.profile.models import ProfilePreview
 
 
-def deterministic_branch_name(preview: ContributionPreview) -> str:
+def deterministic_branch_name(preview: ProfilePreview) -> str:
     manufacturer = _branch_part(preview.manufacturer_directory)
     model = _branch_part(preview.model_directory)
     return f"powercalc-profile-{manufacturer}-{model}"
 
 
-def conventional_commit_message(preview: ContributionPreview) -> str:
+def conventional_commit_message(preview: ProfilePreview) -> str:
     return f"feat(profile): add {preview.manufacturer_directory} {preview.model_directory}"
 
 
-def pull_request_title(preview: ContributionPreview) -> str:
+def pull_request_title(preview: ProfilePreview) -> str:
     return f"Add {preview.manufacturer_directory} {preview.model_directory} power profile"
 
 
 def pull_request_body(job: ContributionJob) -> str:
+    notes = [job.metadata.notes] if job.metadata.notes else []
+    if job.preview.standby_power_estimated and job.preview.standby_power is not None:
+        notes.append(f"Standby power is estimated: {job.preview.standby_power:g} W.")
     return profile_pull_request_body(
         DeviceInfo(
             manufacturer=job.metadata.manufacturer,
@@ -29,7 +33,7 @@ def pull_request_body(job: ContributionJob) -> str:
         ),
         measure_device=job.metadata.measure_device,
         measure_type=job.metadata.measure_type,
-        notes=job.metadata.notes,
+        notes="\n\n".join(notes),
         file_paths=[file.path for file in job.preview.files],
         warnings=job.preview.warnings,
     )
@@ -71,7 +75,7 @@ def profile_pull_request_body(
         f"{home_assistant}\n"
         "## Checklist\n\n"
         "- [x] I have created a single PR per device.\n"
-        "- [x] For lights, only generated gzipped lookup tables are included.\n"
+        "- [x] For lights, only generated lookup tables are included.\n"
         "- [x] I reviewed the generated files and JSON in Powercalc Measure.\n\n"
         "## Additional info\n\n"
         f"{additional_info}\n\n"

@@ -14,11 +14,16 @@ export interface AppSettings {
   shelly_username?: string;
   shelly_password_configured?: boolean;
   kasa_ip: string | null;
+  tapo_credentials_configured?: boolean;
   fast_test_mode: boolean;
+  allow_zero_power: boolean;
   measurement_defaults: AppMeasurementDefaults;
 }
 
 export interface AppSettingsUpdate extends AppSettings {
   shelly_password?: string | null;
   clear_shelly_password?: boolean;
+  tapo_username?: string | null;
+  tapo_password?: string | null;
+  clear_tapo_credentials?: boolean;
 }

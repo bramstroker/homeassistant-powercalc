@@ -17,6 +17,11 @@ Just click the button to directly add a powercalc sensor:
 
 Select `Virtual power (library)` and follow the instructions.
 
+After you select the source entity, Powercalc looks up the manufacturer and model of the device and asks you to confirm the matching profile.
+Uncheck `Confirm model` to pick a different manufacturer and model yourself.
+
+![Library model detection](../img/library_autodetect.png)
+
 To change the profile of an existing sensor, go to the sensor's settings and click on `Library options`.
 
 ## YAML

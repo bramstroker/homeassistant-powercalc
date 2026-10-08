@@ -7,8 +7,11 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import TemplateError
+from homeassistant.helpers.device_registry import DeviceRegistry
+from homeassistant.helpers.entity_registry import RegistryEntryDisabler
 from homeassistant.helpers.template import Template
 import pytest
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import DUMMY_ENTITY_ID, PLACEHOLDER_ENTITY_BY_DEVICE_CLASS, CalculationStrategy
@@ -23,7 +26,13 @@ from custom_components.powercalc.helpers import (
     resolve_related_entity_placeholder,
 )
 from custom_components.powercalc.unit import evaluate_to_decimal
-from tests.common import build_device_entry, get_test_profile_dir, mock_entities_in_registry
+from tests.common import (
+    build_device_entry,
+    get_test_profile_dir,
+    mock_devices,
+    mock_entities_in_registry,
+    requires_child_devices,
+)
 
 
 @pytest.mark.parametrize(
@@ -119,6 +128,176 @@ def test_get_related_entity_by_translation_key(hass: HomeAssistant) -> None:
     result = get_related_entity_by_translation_key(hass, source_entity, "power")
 
     assert result == "sensor.test_power"
+
+
+@pytest.fixture(params=["entity_by_translation_key:power", "entity_by_device_class:power"])
+def related_placeholder(request: pytest.FixtureRequest) -> str:
+    return str(request.param)
+
+
+@pytest.mark.parametrize("own_matches", [0, 1, 2])
+def test_related_entity_prefers_source_device(
+    hass: HomeAssistant,
+    related_placeholder: str,
+    own_matches: int,
+) -> None:
+    devices = mock_devices(
+        hass,
+        {
+            "robot": {"identifiers": {("roborock", "robot")}},
+            "dock": {"identifiers": {("roborock", "robot_dock")}},
+        },
+    )
+    matching_attributes = {"translation_key": "power", "original_device_class": SensorDeviceClass.POWER}
+    entities = {"sensor.dock_power": {"device_id": "dock", **matching_attributes}}
+    for index in range(own_matches):
+        entities[f"sensor.robot_power_{index}"] = {"device_id": "robot", **matching_attributes}
+    mock_entities_in_registry(hass, entities)
+    source = SourceEntity("robot", "vacuum.robot", "vacuum", device_entry=devices["robot"])
+
+    result = resolve_related_entity_placeholder(hass, related_placeholder, source)
+
+    assert result == ("sensor.robot_power_0" if own_matches else "sensor.dock_power")
+
+
+@pytest.mark.parametrize("disabled", [False, True])
+def test_related_entity_only_searches_the_matching_roborock_dock(
+    hass: HomeAssistant,
+    related_placeholder: str,
+    disabled: bool,
+) -> None:
+    devices = mock_devices(
+        hass,
+        {
+            "robot": {"identifiers": {("roborock", "robot")}},
+            "other_robot": {"identifiers": {("roborock", "other_robot")}},
+            "other_dock": {"identifiers": {("roborock", "other_robot_dock")}},
+            "wrong_namespace": {"identifiers": {("other", "robot_dock")}},
+            "wrong_entry": {"identifiers": {("roborock", "robot_dock")}, "config_entry_id": "other"},
+            "unrelated": {},
+            "via_device": {"via_device_id": "robot"},
+            "dock": {"identifiers": {("roborock", "robot_dock")}},
+        },
+    )
+    entities = {}
+    for device_id in devices:
+        if device_id == "robot":
+            continue
+        entities[f"sensor.{device_id}_power"] = {
+            "device_id": device_id,
+            "translation_key": "power",
+            "original_device_class": SensorDeviceClass.POWER,
+            "disabled_by": RegistryEntryDisabler.USER if disabled and device_id == "dock" else None,
+        }
+    mock_entities_in_registry(hass, entities)
+    source = SourceEntity("robot", "vacuum.robot", "vacuum", device_entry=devices["robot"])
+
+    result = resolve_related_entity_placeholder(hass, related_placeholder, source)
+
+    assert result == (None if disabled else "sensor.dock_power")
+    other_source = SourceEntity("other_robot", "vacuum.other_robot", "vacuum", device_entry=devices["other_robot"])
+    assert resolve_related_entity_placeholder(hass, related_placeholder, other_source) == "sensor.other_robot_power"
+
+
+def test_related_entity_skips_disabled_source_match(
+    hass: HomeAssistant,
+    related_placeholder: str,
+) -> None:
+    devices = mock_devices(
+        hass,
+        {
+            "robot": {"identifiers": {("roborock", "robot")}},
+            "dock": {"identifiers": {("roborock", "robot_dock")}},
+        },
+    )
+    mock_entities_in_registry(
+        hass,
+        {
+            "sensor.robot_power": {
+                "device_id": "robot",
+                "translation_key": "power",
+                "original_device_class": SensorDeviceClass.POWER,
+                "disabled_by": RegistryEntryDisabler.USER,
+            },
+            "sensor.dock_power": {
+                "device_id": "dock",
+                "translation_key": "power",
+                "original_device_class": SensorDeviceClass.POWER,
+            },
+            "sensor.dock_temperature": {"device_id": "dock", "translation_key": "temperature"},
+        },
+    )
+    source = SourceEntity("robot", "vacuum.robot", "vacuum", device_entry=devices["robot"])
+
+    assert resolve_related_entity_placeholder(hass, related_placeholder, source) == "sensor.dock_power"
+
+
+@requires_child_devices
+@pytest.mark.parametrize("matching_children", [0, 1, 2])
+def test_related_entity_resolves_native_children_without_ambiguity(
+    hass: HomeAssistant,
+    device_registry: DeviceRegistry,
+    related_placeholder: str,
+    matching_children: int,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    config_entry = MockConfigEntry(domain="test")
+    config_entry.add_to_hass(hass)
+    parent = device_registry.async_get_or_create(
+        config_entry_id=config_entry.entry_id,
+        identifiers={("test", "parent")},
+    )
+    entities = {}
+    for index in range(matching_children):
+        child = device_registry.async_get_or_create_child(
+            config_entry_id=config_entry.entry_id,
+            parent_device_id=parent.id,
+            identifiers={("test", f"child_{index}")},
+        )
+        entities[f"sensor.child_{index}_power"] = {
+            "device_id": child.id,
+            "translation_key": "power",
+            "original_device_class": SensorDeviceClass.POWER,
+        }
+    mock_entities_in_registry(hass, entities)
+    source = SourceEntity("parent", "switch.parent", "switch", device_entry=parent)
+
+    result = resolve_related_entity_placeholder(hass, related_placeholder, source)
+
+    assert result == ("sensor.child_0_power" if matching_children == 1 else None)
+    if matching_children == 2:
+        assert "Ambiguous related entities for switch.parent" in caplog.text
+        assert "power" in caplog.text
+        assert "sensor.child_0_power, sensor.child_1_power" in caplog.text
+
+
+def test_related_entity_rejects_multiple_matches_on_one_dock(
+    hass: HomeAssistant,
+    related_placeholder: str,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    devices = mock_devices(
+        hass,
+        {
+            "robot": {"identifiers": {("roborock", "robot")}},
+            "dock": {"identifiers": {("roborock", "robot_dock")}},
+        },
+    )
+    mock_entities_in_registry(
+        hass,
+        {
+            f"sensor.dock_power_{index}": {
+                "device_id": "dock",
+                "translation_key": "power",
+                "original_device_class": SensorDeviceClass.POWER,
+            }
+            for index in range(2)
+        },
+    )
+    source = SourceEntity("robot", "vacuum.robot", "vacuum", device_entry=devices["robot"])
+
+    assert resolve_related_entity_placeholder(hass, related_placeholder, source) is None
+    assert "sensor.dock_power_0, sensor.dock_power_1" in caplog.text
 
 
 @pytest.mark.parametrize(

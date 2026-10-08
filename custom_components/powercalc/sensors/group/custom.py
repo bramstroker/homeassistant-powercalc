@@ -24,6 +24,7 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STOP,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
+    EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
 )
@@ -59,6 +60,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
+    CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_EXCLUDE_ENTITIES,
@@ -75,6 +77,7 @@ from custom_components.powercalc.const import (
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
+    CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_PRECISION,
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
@@ -428,6 +431,7 @@ def create_grouped_energy_sensor(
             name=name,
             unique_id=energy_unique_id,
             sensor_config=sensor_config,
+            entity_category=sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY),
             unit_prefix=sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX, UnitPrefix.NONE),
         )
 
@@ -484,6 +488,10 @@ class GroupedSensor(BaseEntity, SensorEntity):
                 sensor_config.get(CONF_GROUP_POWER_UPDATE_INTERVAL, DEFAULT_GROUP_POWER_UPDATE_INTERVAL),
             )
         self._attr_suggested_display_precision = self._rounding_digits
+        category_key = CONF_ENERGY_SENSOR_CATEGORY if self._is_energy_sensor else CONF_POWER_SENSOR_CATEGORY
+        entity_category = sensor_config.get(category_key)
+        if entity_category:
+            self._attr_entity_category = EntityCategory(entity_category)
         if unique_id:
             self._attr_unique_id = unique_id
         self._native_value_exact = Decimal(0)

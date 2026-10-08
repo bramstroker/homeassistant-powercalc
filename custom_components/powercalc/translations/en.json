@@ -108,7 +108,11 @@
               "power_sensor_naming": "Power sensor name pattern",
               "power_sensor_friendly_naming": "Power sensor friendly name pattern",
               "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_precision": "Power sensor precision",
+              "follow_device_name": "Follow device name"
+            },
+            "data_description": {
+              "follow_device_name": "Use the assigned device name for generated entities of supported virtual power sensors configured in the UI. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names. Custom display-name patterns, including global patterns, take precedence: affected entries keep their configured names."
             }
           },
           "features": {
@@ -623,6 +627,35 @@
           "failed": "Failed",
           "resumable": "Resumable"
         }
+      },
+      "power": {
+        "name": "Power"
+      },
+      "energy": {
+        "name": "Energy"
+      },
+      "standby_energy": {
+        "name": "Standby energy"
+      },
+      "cost": {
+        "name": "Cost"
+      },
+      "utility_meter_cycle": {
+        "name": "Energy {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Energy {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Energy {period} cost"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Energy {period} {tariff} cost"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Energy {period}"
       }
     }
   },
@@ -774,7 +807,11 @@
               "power_sensor_naming": "Power sensor name pattern",
               "power_sensor_friendly_naming": "Power sensor friendly name pattern",
               "power_sensor_category": "Power sensor category",
-              "power_sensor_precision": "Power sensor precision"
+              "power_sensor_precision": "Power sensor precision",
+              "follow_device_name": "Follow device name"
+            },
+            "data_description": {
+              "follow_device_name": "Use the assigned device name for generated entities of supported virtual power sensors configured in the UI. Entity IDs and custom entity names stay unchanged. Turning this off restores the configured names. Custom display-name patterns, including global patterns, take precedence: affected entries keep their configured names."
             }
           },
           "features": {

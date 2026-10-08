@@ -102,16 +102,16 @@ def _has_composite_branches(path: Path) -> bool:
     return model_has_composite_branches(data)
 
 
-def _directory_output_paths(input_path: Path) -> tuple[Path, ...]:
+def _directory_output_paths(input_path: Path) -> list[Path]:
     if input_path.name == "model.json":
         name = "calibration"
     else:
         name = input_path.name.removesuffix(".gz").removesuffix(".csv")
-    return tuple(input_path.with_name(f"{name}.{extension}") for extension in ("png", "svg"))
+    return [input_path.with_name(f"{name}.{extension}") for extension in ("png", "svg")]
 
 
-def _composite_output_paths(input_path: Path) -> tuple[Path, ...]:
-    return tuple(input_path.with_name(f"composite.{extension}") for extension in ("png", "svg"))
+def _composite_output_paths(input_path: Path) -> list[Path]:
+    return [input_path.with_name(f"composite.{extension}") for extension in ("png", "svg")]
 
 
 def _plot_for_output(plot: PlotSpec, output: Path) -> PlotSpec:

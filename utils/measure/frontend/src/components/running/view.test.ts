@@ -1,5 +1,14 @@
-import type { SessionSnapshot } from "../../types";
+import type { RecorderMeasurementRequest, SessionSnapshot } from "../../types";
+import { capabilities } from "../../testing/controller";
 import "./view";
+
+function recorderRequest(profileRecipe: "generic" | "vacuum_robot", deviceType?: string): RecorderMeasurementRequest {
+  return {
+    measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: profileRecipe,
+    profile_device_type: deviceType, model_id: "", product_name: "", measure_device: "",
+    generate_model: true, parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+  };
+}
 
 describe("running view", () => {
   it("explains a disconnected stream and labels the last received update", async () => {
@@ -82,8 +91,99 @@ describe("running view", () => {
     expect(announcement?.getAttribute("aria-live")).toBe("polite");
     expect(ready?.textContent).toContain("Switch on the test signal, then start recording.");
     expect(ready?.querySelector("button.confirm")?.textContent).toBe("Start recording");
+    expect(element.shadowRoot.querySelector("measure-session-log")).toBeNull();
+    expect(element.shadowRoot.querySelector(".connection")).toBeNull();
     expect(element.shadowRoot.querySelector(".instrument")).toBeNull();
     expect(element.shadowRoot.querySelector("progress")).toBeNull();
+  });
+
+  it("starts a smart switch measurement from the ready view", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = { session_id: "first", state: "awaiting_confirmation" };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const confirm = vi.fn();
+    element.addEventListener("confirm", confirm);
+    const button = element.shadowRoot!.querySelector<HTMLButtonElement>("button.confirm")!;
+    expect(button.disabled).toBe(false);
+    button.click();
+    expect(confirm).toHaveBeenCalledOnce();
+  });
+
+  it("guides the operator before PowerCalc starts controlling a light", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      request: { measure_type: "light" } as SessionSnapshot["request"],
+    };
+    element.confirmationAction = "Start light measurement";
+    element.guidance = [
+      "Disable automations for the selected lights.",
+      "PowerCalc will cycle through the settings selected for this run.",
+    ];
+    document.body.append(element);
+    await element.updateComplete;
+
+    const guidance = element.shadowRoot!.querySelector('[aria-label="Measurement guidance"]');
+    expect(guidance?.textContent).toContain("Disable automations");
+    expect(guidance?.textContent).toContain("cycle through the settings selected for this run");
+    expect(element.shadowRoot!.querySelector("button.confirm")?.textContent).toBe("Start light measurement");
+  });
+
+  it("shows optional fan guidance on the same ready screen", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      request: { measure_type: "fan" } as SessionSnapshot["request"],
+    };
+    element.confirmationAction = "Start fan measurement";
+    element.guidance = ["Disable automations for the fan before PowerCalc cycles through its speeds."];
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot!.querySelector('[aria-label="Measurement guidance"]')?.textContent).toContain("Disable automations");
+    expect(element.shadowRoot!.querySelector("button.confirm")?.textContent).toBe("Start fan measurement");
+  });
+
+  it.each([
+    ["vacuum_robot", "vacuum_robot", "low-battery", "Record more"],
+    ["generic", "camera", "infrared off from on", "recorded signal"],
+    ["generic", "air_purifier", "manual fan speed", "same settings"],
+    ["generic", "fan", "manual speed", "oscillation"],
+    ["generic", "heating", "heating power level", "thermostat idle"],
+    ["generic", "printer", "same representative print job", "printer status entity"],
+    ["generic", "set_top_box", "normal viewing", "standby mode unchanged"],
+  ] as const)("guides a %s recording before it starts", async (recipe, deviceType, action, finish) => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = { state: "awaiting_confirmation", request: recorderRequest(recipe, deviceType) };
+    element.confirmationAction = "Start recording";
+    document.body.append(element);
+    await element.updateComplete;
+
+    const guidance = element.shadowRoot!.querySelector(".measurement-guidance");
+    expect(guidance?.textContent).toContain(action);
+    expect(guidance?.textContent).toContain(finish);
+    if (recipe === "generic") {
+      expect(guidance?.textContent).toContain("Repeat every state");
+      expect(guidance?.textContent).toContain("at least five samples per state in both runs");
+    }
+    if (deviceType === "camera") {
+      expect(guidance?.textContent).not.toContain("live viewing");
+    }
+    expect(guidance?.querySelectorAll("li").length).toBeGreaterThanOrEqual(3);
+    expect(element.shadowRoot!.querySelector("button.confirm")?.textContent).toBe("Start recording");
+  });
+
+  it("omits complex-profile instructions for a Playbook recording", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = {
+      state: "awaiting_confirmation",
+      request: { ...recorderRequest("generic", "camera"), recorder_purpose: "playbook" },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector(".measurement-guidance")).toBeNull();
   });
 
   it("renders speaker confirmation as a high-volume warning", async () => {
@@ -97,6 +197,8 @@ describe("running view", () => {
     };
     element.confirmationAction = "Start speaker measurement";
     element.warningConfirmation = true;
+    (element as unknown as import("./view").RunningView).confirmationEyebrow = "High volume warning";
+    (element as unknown as import("./view").RunningView).confirmationTitle = "Protect your hearing";
     document.body.append(element);
     await element.updateComplete;
 
@@ -106,6 +208,20 @@ describe("running view", () => {
     expect(warning?.textContent).toContain("High volume warning");
     expect(warning?.textContent).toContain("Protect your hearing");
     expect(warning?.querySelector(".ready-icon svg")).toBeTruthy();
+  });
+
+  it("uses configured headings for another warning", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = { state: "awaiting_confirmation", confirmation_message: "Keep clear of moving parts." };
+    element.warningConfirmation = true;
+    element.confirmationEyebrow = "Moving parts warning";
+    element.confirmationTitle = "Keep your distance";
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.shadowRoot!.querySelector(".ready-eyebrow")?.textContent).toBe("Moving parts warning");
+    expect(element.shadowRoot!.querySelector(".ready-announcement h3")?.textContent).toBe("Keep your distance");
+    expect(element.shadowRoot!.textContent).not.toContain("Protect your hearing");
   });
 
   it("shows progress, phase, connection state, and cancellation", async () => {
@@ -255,5 +371,24 @@ describe("running view", () => {
     const notice = element.shadowRoot.querySelector(".notice.warning");
     expect(notice?.getAttribute("role")).toBe("alert");
     expect(notice?.textContent).toContain(warning);
+  });
+
+  it("adds low-power guidance to a vacuum recording's zero-reading warning", async () => {
+    const warning = "Discarding measurement: 0 watt was read from the power meter";
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.snapshot = {
+      state: "running", warnings: [warning],
+      request: {
+        measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+        model_id: "Eureka", product_name: "Vacuum", measure_device: "Dock", generate_model: true,
+        parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+      },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    const notice = element.shadowRoot!.querySelector(".notice.warning")!;
+    expect(notice.textContent).toContain("not assumed to be the dock's actual use");
+    expect(notice.querySelector("a")?.getAttribute("href")).toBe("https://docs.powercalc.nl/contributing/measure/low-power-measurements/");
   });
 });

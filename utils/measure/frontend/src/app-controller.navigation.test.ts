@@ -3,6 +3,41 @@ import { MeasureAppController } from "./app-controller";
 import { api, capabilities, connection, state } from "./testing/controller";
 
 describe("measure app controller: navigation", () => {
+  it("forces a fresh setup check for the unchanged request", async () => {
+    const appState = state();
+    const preflight = vi.fn(api().preflight);
+    const controller = new MeasureAppController(appState, () => api({ preflight }), () => connection(), () => undefined);
+    await controller.preflight({
+      measure_type: "average", duration: 60, model_id: "", product_name: "", measure_device: "Test meter",
+      generate_model: false, parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+    });
+    await controller.recheckSetup();
+    expect(preflight).toHaveBeenLastCalledWith(appState.request, true);
+    expect(appState.view).toBe("review");
+    expect(appState.busy).toBe(false);
+    expect(appState.rechecking).toBe(false);
+    expect(appState.preflightStale).toBe(false);
+  });
+
+  it("marks the shown setup check stale when a recheck fails", async () => {
+    const appState = state();
+    const preflight = vi.fn(api().preflight);
+    const controller = new MeasureAppController(appState, () => api({ preflight }), () => connection(), () => undefined);
+    await controller.preflight({
+      measure_type: "average", duration: 60, model_id: "", product_name: "", measure_device: "Test meter",
+      generate_model: false, parameters: capabilities.defaults, resume_policy: "new", power_meter: { type: "dummy" },
+    });
+    const shown = appState.preflight;
+    preflight.mockRejectedValueOnce(new Error("meter offline"));
+
+    await controller.recheckSetup();
+
+    expect(appState.preflight).toBe(shown);
+    expect(appState.preflightStale).toBe(true);
+    expect(appState.rechecking).toBe(false);
+    expect(appState.errorMessage).toContain("meter offline");
+  });
+
   it.each(["snapshot", "request"] as const)("prevents profile navigation for average measurements from %s", (source) => {
     const appState = state();
     const request = {
@@ -19,6 +54,25 @@ describe("measure app controller: navigation", () => {
     expect(appState.view).toBe("result");
     controller.backToProfile();
     expect(appState.view).toBe("result");
+  });
+
+  it("prevents profile navigation when analysis produced no model", () => {
+    const appState = state();
+    appState.view = "result";
+    appState.snapshot = { state: "completed", session_id: "session-1" };
+    appState.files = [{ name: "analyser.json", size: 100, media_type: "application/json" }];
+    const controller = new MeasureAppController(appState, () => api(), () => connection(), () => undefined);
+
+    controller.openProfile();
+    expect(appState.view).toBe("result");
+
+    appState.files.push({ name: "profile/model.json", size: 200, media_type: "application/json" });
+    appState.busy = true;
+    controller.openProfile();
+    expect(appState.view).toBe("result");
+    appState.busy = false;
+    controller.openProfile();
+    expect(appState.view).toBe("profile");
   });
 
   it("preserves structured help from API errors", async () => {

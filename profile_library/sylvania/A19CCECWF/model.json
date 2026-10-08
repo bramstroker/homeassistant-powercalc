@@ -27,7 +27,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.10.0:docker"
   },
-  "name": "SMART+ Wi-Fi Full Color A19 LED Bulb (9W, 2700–6500K)",
+  "name": "SMART+ WiFi Full Color A19 LED Bulb (9W, 2700–6500K)",
   "standby_power": 0.43,
   "authors": [
     {

@@ -1,7 +1,10 @@
+import type { LightMeasurementRequest } from "./types";
 import { SESSION_EVENT_TYPES } from "./types";
 import {
   decodeApiError,
   decodeCapabilities,
+  decodeCalibrationJob,
+  decodeOptionalCalibrationJob,
   decodeContributionAuth,
   decodeContributionAuthDeviceStatus,
   decodeContributionDeviceFlow,
@@ -24,6 +27,8 @@ import {
   decodeSessionSummaries,
   decodeSettings,
   decodeShellyDiscovery,
+  decodeStandbyEstimate,
+  decodeStandbyMeasurement,
 } from "./api-decoders";
 import type { Decoder } from "./api-decoders";
 import type {
@@ -42,6 +47,7 @@ import type {
   ContributionTokenRequest,
   DeviceClass,
   DummyLoadCalibration,
+  PowerMeterSpec,
   DeviceSpecificationCatalog,
   EntityCatalog,
   EntityDescriptor,
@@ -175,8 +181,38 @@ export class MeasureApiClient {
     return this.requestJson("api/dummy-load/calibration", decodeDummyLoadCalibration);
   }
 
-  preflight(request: MeasurementRequest): Promise<PreflightResponse> {
-    return this.requestJson("api/preflight", decodePreflight, { method: "POST", body: JSON.stringify(request) });
+  preflight(request: MeasurementRequest, refresh = false): Promise<PreflightResponse> {
+    return this.requestJson(`api/preflight${refresh ? "?refresh=true" : ""}`, decodePreflight, { method: "POST", body: JSON.stringify(request) });
+  }
+
+  getStandbyEstimate(manufacturer: string, connectivity: string[]) {
+    const query = new URLSearchParams({ manufacturer });
+    for (const value of connectivity) query.append("connectivity", value);
+    return this.requestJson(`api/library/standby-estimate?${query}`, decodeStandbyEstimate);
+  }
+
+  measureStandby(sessionId: string, setup?: LightMeasurementRequest) {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby`, decodeStandbyMeasurement, {
+      method: "POST", body: JSON.stringify({ confirmed: true, setup }),
+    });
+  }
+
+  calibrateStandby(sessionId: string, setup: LightMeasurementRequest) {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby/calibrate`, decodeCalibrationJob, {
+      method: "POST", body: JSON.stringify({ confirmed: true, setup }),
+    });
+  }
+
+  getStandbyCalibration(sessionId: string) {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby/calibrate`, decodeOptionalCalibrationJob);
+  }
+
+  cancelStandbyCalibration(sessionId: string, jobId: string) {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/standby/calibrate/${encodeURIComponent(jobId)}/cancel`, decodeCalibrationJob, { method: "POST" });
+  }
+
+  getCompatibleCalibration(meter: PowerMeterSpec) {
+    return this.requestJson("api/dummy-load/calibration/match", decodeDummyLoadCalibration, { method: "POST", body: JSON.stringify(meter) });
   }
 
   start(request: MeasurementRequest): Promise<SessionSnapshot> {
@@ -200,7 +236,9 @@ export class MeasureApiClient {
   }
 
   confirm(sessionId: string): Promise<SessionSnapshot> {
-    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/confirm`, decodeSessionSnapshot, { method: "POST" });
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/confirm`, decodeSessionSnapshot, {
+      method: "POST",
+    });
   }
 
   resume(sessionId: string): Promise<SessionSnapshot> {
@@ -209,6 +247,10 @@ export class MeasureApiClient {
 
   analyse(sessionId: string): Promise<SessionSnapshot> {
     return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/analyse`, decodeSessionSnapshot, { method: "POST" });
+  }
+
+  recordMore(sessionId: string): Promise<SessionSnapshot> {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/record-more`, decodeSessionSnapshot, { method: "POST" });
   }
 
   getFiles(sessionId: string): Promise<SessionFile[]> {

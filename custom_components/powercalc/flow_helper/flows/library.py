@@ -1,10 +1,11 @@
+import logging
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_DEVICE
 from homeassistant.helpers import selector, translation
 from homeassistant.helpers.device_registry import DeviceEntry
-import voluptuous as vol
+from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
@@ -38,6 +39,7 @@ from custom_components.powercalc.helpers import (
     iter_related_entity_placeholders,
     resolve_related_entity_placeholder,
 )
+from custom_components.powercalc.power_profile.error import LibraryError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.library_url import profile_url
 from custom_components.powercalc.power_profile.power_profile import (
@@ -47,11 +49,13 @@ from custom_components.powercalc.power_profile.power_profile import (
     DiscoveryBy,
     PowerProfile,
 )
+from custom_components.powercalc.validation import vol
 
 if TYPE_CHECKING:
     from custom_components.powercalc.config_flow import PowercalcCommonFlow, PowercalcConfigFlow, PowercalcOptionsFlow
 
 CONF_CONFIRM_AUTODISCOVERED_MODEL = "confirm_autodisovered_model"
+_LOGGER = logging.getLogger(__name__)
 
 SCHEMA_POWER_AUTODISCOVERED = vol.Schema(
     {vol.Optional(CONF_CONFIRM_AUTODISCOVERED_MODEL, default=True): bool},
@@ -140,8 +144,20 @@ class LibraryFlow:
             )
             self.flow.selected_profile = profile
             if self.flow.selected_profile and not await self.flow.selected_profile.needs_user_configuration:
-                await self.flow.validate_strategy_config()
+                try:
+                    resolved_profile = await library.get_profile(
+                        ModelInfo(str(self.flow.sensor_config.get(CONF_MANUFACTURER)), str(user_input.get(CONF_MODEL))),
+                        self.flow.source_entity,
+                    )
+                except LibraryError as error:
+                    _LOGGER.error("Problem loading model: %s", error)
+                    raise SchemaFlowError("unknown") from error
+                await self.flow.validate_strategy_config(power_profile=resolved_profile)
             return user_input
+
+        model = (
+            self.flow.selected_profile.model if self.flow.selected_profile else self.flow.sensor_config.get(CONF_MODEL)
+        )
 
         async def _create_schema() -> vol.Schema:
             """Create model schema."""
@@ -155,11 +171,6 @@ class LibraryFlow:
                     self._get_library_discovery_by(),
                 )
             ]
-            model = (
-                self.flow.selected_profile.model
-                if self.flow.selected_profile
-                else self.flow.sensor_config.get(CONF_MODEL)
-            )
             return vol.Schema(
                 {
                     vol.Required(
@@ -182,6 +193,8 @@ class LibraryFlow:
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_validate,
                 form_kwarg={"description_placeholders": {"supported_models_link": LIBRARY_URL}},
+                # The saved model may include a subprofile suffix, which the model selector cannot accept.
+                form_data={CONF_MODEL: model},
             ),
             user_input,
         )
@@ -296,9 +309,14 @@ class LibraryFlow:
 
     async def async_step_library_custom_fields(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the flow for custom fields."""
+        profile = self.flow.selected_profile
+        assert profile is not None
+        fields = profile.custom_fields
+        saved_variables = self.flow.sensor_config.get(CONF_VARIABLES, {})
+        form_data = {field.form_key: saved_variables[field.key] for field in fields if field.key in saved_variables}
 
         def _process_user_input(user_input: dict[str, Any]) -> dict[str, Any]:
-            return {CONF_VARIABLES: user_input}
+            return {CONF_VARIABLES: {field.key: user_input[field.form_key] for field in fields}}
 
         form_kwarg: dict[str, Any] | None = None
         if self.flow.selected_profile and self.flow.selected_profile.documentation_url:
@@ -313,12 +331,13 @@ class LibraryFlow:
                 step=Step.LIBRARY_CUSTOM_FIELDS,
                 schema=build_dynamic_field_schema(
                     self.flow.hass,
-                    self.flow.selected_profile,  # type: ignore
+                    profile,
                     self.flow.source_entity,
                 ),
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_process_user_input,
                 form_kwarg=form_kwarg,
+                form_data=form_data,
             ),
             user_input,
         )

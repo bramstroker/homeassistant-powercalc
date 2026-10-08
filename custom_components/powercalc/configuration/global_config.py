@@ -25,6 +25,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_UPDATE_INTERVAL,
     CONF_EXCLUDE_DEVICE_TYPES,
     CONF_EXCLUDE_SELF_USAGE,
+    CONF_FOLLOW_DEVICE_NAME,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_GROUP_POWER_UPDATE_INTERVAL,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -60,6 +61,7 @@ def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigT
     # Default configuration values
     default_config = {
         CONF_ENABLE_ANALYTICS: False,
+        CONF_FOLLOW_DEVICE_NAME: False,
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
         CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,

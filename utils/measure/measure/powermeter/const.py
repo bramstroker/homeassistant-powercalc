@@ -19,9 +19,6 @@ class OwonOwh98xxChannelType(StrEnum):
     CHANNEL2 = "2"
 
 
-QUESTION_POWERMETER_ENTITY_ID = "powermeter_entity_id"
-QUESTION_VOLTAGEMETER_ENTITY_ID = "voltagemeter_entity_id"
-
 SHELLY_INFO_ENDPOINT = "/shelly"
 SHELLY_GEN1_STATUS_ENDPOINT = "/status"
 SHELLY_RPC_DEVICE_STATUS_ENDPOINT = "/rpc/Shelly.GetStatus"

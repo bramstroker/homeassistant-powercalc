@@ -145,6 +145,11 @@
           },
           "only_self_usage": {
             "const": true
+          },
+          "calculation_strategy": {
+            "not": {
+              "const": "multi_switch"
+            }
           }
         },
         "required": [
@@ -372,6 +377,43 @@
             "type": "string",
             "description": "Label of the field"
           },
+          "translation_key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$",
+            "description": "Optional key for the form label and description translations. The field key remains the stored variable name. Must be unique among form field names in this profile."
+          },
+          "auto_select": {
+            "type": "object",
+            "description": "Prefill a single entity field when exactly one enabled entity on the source device matches all supplied criteria.",
+            "properties": {
+              "integration": {
+                "type": "string",
+                "minLength": 1
+              },
+              "translation_key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "unique_id_pattern": {
+                "type": "string",
+                "format": "regex",
+                "minLength": 1
+              }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "translation_key"
+                ]
+              },
+              {
+                "required": [
+                  "unique_id_pattern"
+                ]
+              }
+            ],
+            "additionalProperties": false
+          },
           "selector": {
             "type": "object",
             "properties": {
@@ -394,6 +436,32 @@
                   },
                   "max": {
                     "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "if": {
+          "required": [
+            "auto_select"
+          ]
+        },
+        "then": {
+          "required": [
+            "selector"
+          ],
+          "properties": {
+            "selector": {
+              "required": [
+                "entity"
+              ],
+              "properties": {
+                "entity": {
+                  "properties": {
+                    "multiple": {
+                      "const": false
+                    }
                   }
                 }
               }
@@ -580,6 +648,18 @@
         "power"
       ],
       "additionalProperties": false
+    },
+    "multiply_factor": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "pattern": "^\\[\\[[a-zA-Z0-9_]+\\]\\]$"
+        }
+      ],
+      "description": "Default multiplier for calculated power, as a number or custom field placeholder. An explicit sensor multiply_factor overrides this value. Standby power is not multiplied unless multiply_factor_standby is enabled."
     },
     "only_self_usage": {
       "type": "boolean",

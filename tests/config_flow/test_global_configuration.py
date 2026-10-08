@@ -42,6 +42,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_ENERGY_UPDATE_INTERVAL,
     CONF_FIXED,
+    CONF_FOLLOW_DEVICE_NAME,
     CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
@@ -147,6 +148,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_ENABLE_ANALYTICS: False,
+        CONF_FOLLOW_DEVICE_NAME: False,
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_STANDBY_GROUP: True,
         CONF_CREATE_ENERGY_SENSORS: True,

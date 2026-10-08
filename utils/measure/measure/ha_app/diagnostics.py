@@ -1,10 +1,10 @@
 from collections.abc import Collection, Iterable
 import platform
 
-from measure.clock import utc_now
 from measure.ha_app.session import SessionEvent, SessionEventType, SessionSnapshot
 from measure.request import MeasurementRequest
-from measure.version import measure_version
+from measure.utils.clock import utc_now
+from measure.utils.version import measure_version
 
 REDACTED = "<redacted>"
 DIAGNOSTIC_EVENT_LIMIT = 1000

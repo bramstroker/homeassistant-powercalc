@@ -70,6 +70,45 @@ async def test_vacuum_robot(
     assert_entity_state(hass, power_sensor_id, "1.50")
 
 
+async def test_vacuum_profile_tracks_dock_drying_switch(hass: HomeAssistant) -> None:
+    """Synthetic charging and drying loads update independently across the two devices."""
+    mock_devices(
+        hass,
+        {
+            "robot": {"identifiers": {("roborock", "robot")}},
+            "dock": {"identifiers": {("roborock", "robot_dock")}},
+        },
+    )
+    mock_entities_in_registry(
+        hass,
+        {
+            "vacuum.robot": {"platform": "roborock", "device_id": "robot"},
+            "switch.dock_drying": {
+                "platform": "roborock",
+                "device_id": "dock",
+                "translation_key": "mop_drying",
+            },
+        },
+    )
+    await set_states(hass, [("vacuum.robot", VacuumActivity.DOCKED), ("switch.dock_drying", "off")])
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "vacuum.robot",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("vacuum_dock"),
+        },
+    )
+
+    assert_entity_state(hass, "sensor.robot_power", "30.00")
+    await set_states(hass, [("switch.dock_drying", "on")])
+    assert_entity_state(hass, "sensor.robot_power", "80.00")
+    await set_states(hass, [("vacuum.robot", VacuumActivity.CLEANING)])
+    assert_entity_state(hass, "sensor.robot_power", "50.00")
+    await set_states(hass, [("switch.dock_drying", "off")])
+    assert_entity_state(hass, "sensor.robot_power", "0.00")
+
+
 async def test_with_tapering_playbook(hass: HomeAssistant) -> None:
     vacuum_id = "vacuum.roomba"
     battery_id = "sensor.roomba_battery"

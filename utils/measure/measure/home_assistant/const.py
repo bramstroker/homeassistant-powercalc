@@ -1,0 +1,18 @@
+HASS_DEVICE_REGISTRY_LIST = "config/device_registry/list"
+HASS_ENTITY_REGISTRY_LIST = "config/entity_registry/list"
+HASS_ZEROCONF_SUBSCRIBE_DISCOVERY = "zeroconf/subscribe_discovery"
+HASS_EVENT_MEASURE_STATUS = "powercalc_measure_status"
+HASS_DEVICE_REGISTRY_ID = "id"
+HASS_DEVICE_REGISTRY_MANUFACTURER = "manufacturer"
+HASS_DEVICE_REGISTRY_MODEL = "model"
+HASS_DEVICE_REGISTRY_MODEL_ID = "model_id"
+HASS_DEVICE_REGISTRY_IDENTIFIERS = "identifiers"
+HASS_DEVICE_REGISTRY_CONFIG_ENTRY_ID = "config_entry_id"
+#: Deprecated in Home Assistant 2026.8, which gives each device a single config_entry_id.
+HASS_DEVICE_REGISTRY_CONFIG_ENTRIES = "config_entries"
+HASS_DEVICE_REGISTRY_PARENT_DEVICE_ID = "parent_device_id"
+HASS_ENTITY_REGISTRY_UNIQUE_ID = "unique_id"
+HASS_ENTITY_DEVICE_CLASS = "device_class"
+HASS_ENTITY_UNIT_OF_MEASUREMENT = "unit_of_measurement"
+#: Light groups list the entities they drive under this state attribute.
+HASS_ENTITY_GROUP_MEMBERS = "entity_id"

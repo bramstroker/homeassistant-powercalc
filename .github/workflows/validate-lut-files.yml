@@ -3,6 +3,7 @@ name: Validate LUT files
 on:
   pull_request:
     paths:
+      - '**/*.csv'
       - '**/*.csv.gz'
       - '.github/workflows/validate-lut-files.yml'
       - 'utils/library/common.py'

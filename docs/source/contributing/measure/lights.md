@@ -144,4 +144,6 @@ Before submitting, inspect the CSV data for obvious issues:
 - Missing color modes that the light supports.
 - Wrong model ID or model name in `model.json`.
 
-If the uncompressed `.csv` and `.csv.gz` both exist, keep the `.csv.gz` file for submission.
+Powercalc Measure may keep this local output compressed. Submit plain `.csv` files to the profile library; the
+automatic contribution flow decompresses them for you. For a manual contribution, decompress each `.csv.gz` file
+without changing its contents.
