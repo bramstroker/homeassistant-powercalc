@@ -1,0 +1,36 @@
+{
+  "name": "Back-UPS ES BE1050G2",
+  "product_url": "https://www.se.com/nl/en/product/BE1050G2-GR/apc-backups-1050va-600w-floor-wall-mount-230v-8x-schuko-cee-7-3-outlets-usb-type-a+c-port-user-replaceable-battery/",
+  "aliases": [
+    "Back-UPS BE1050G2"
+  ],
+  "description": "Power profile for the APC Back-UPS ES BE1050G2 (1050VA/600W). Estimates real-time output power from NUT load percentage.",
+  "device_type": "ups",
+  "device_specs": {
+    "connectivity": [
+      "usb"
+    ]
+  },
+  "gtin": [
+    "0731304738275"
+  ],
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "compatible_integrations": [
+    "nut"
+  ],
+  "created_at": "2026-04-28T00:00:00Z",
+  "measure_method": "manual",
+  "measure_device": "N/A",
+  "config_flow_discovery_remarks": "This calculation uses the 'Nominal real power' diagnostic in the NUT integration. You need to enable that first.",
+  "fixed_config": {
+    "power": "{{ states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_realpower_nominal]]') | float(600)  }}"
+  },
+  "authors": [
+    {
+      "name": "RM Hogervorst",
+      "github": "rmhogervorst",
+      "email": "hogervorst.rm@gmail.com"
+    }
+  ]
+}
