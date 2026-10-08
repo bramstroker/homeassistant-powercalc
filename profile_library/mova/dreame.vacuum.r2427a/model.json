@@ -1,48 +1,162 @@
 {
+  "name": "E30 Ultra Robot Vacuum Cleaner",
+  "device_type": "vacuum_robot",
+  "calculation_strategy": "composite",
+  "compatible_integrations": [
+    "dreame_vacuum"
+  ],
   "aliases": [
-    "E30 Ultra"
+    "dreame.vacuum.r2427a",
+    "MOVA E30 Ultra"
   ],
   "authors": [
     {
-      "github": "Maxik933",
-      "name": "Maxik933"
+      "name": "Maxik933",
+      "github": "Maxik933"
     }
   ],
-  "calculation_strategy": "fixed",
-  "created_at": "2026-09-15T17:58:57Z",
+  "composite_config": {
+    "mode": "sum_all",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+          "state": "active"
+        },
+        "fixed": {
+          "power": 322
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+          "state": "washing"
+        },
+        "fixed": {
+          "power": 17.1
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+          "state": "drying"
+        },
+        "fixed": {
+          "power": 12.0
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:charging_state]]",
+          "state": "on"
+        },
+        "linear": {
+          "sensor": "[[entity_by_translation_key:battery]]",
+          "calibrate": [
+            "10 -> 33.1",
+            "15 -> 33.47",
+            "20 -> 32.29",
+            "25 -> 32.47",
+            "30 -> 32.6",
+            "35 -> 32.74",
+            "40 -> 33.04",
+            "45 -> 33.07",
+            "50 -> 33.26",
+            "55 -> 33.43",
+            "60 -> 33.65",
+            "65 -> 33.96",
+            "70 -> 34.3",
+            "75 -> 34.72",
+            "80 -> 35.08",
+            "85 -> 35.48",
+            "90 -> 35.83",
+            "95 -> 34.72",
+            "100 -> 15.84"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:charging_state]]",
+              "state": "off"
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": "cleaning"
+            }
+          ]
+        },
+        "fixed": {
+          "power": 0.75
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:charging_state]]",
+              "state": "off"
+            },
+            {
+              "condition": "or",
+              "conditions": [
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:status]]",
+                  "state": "sleeping"
+                },
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:status]]",
+                  "state": "idle"
+                },
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:status]]",
+                  "state": "docked"
+                }
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 3.16
+        }
+      }
+    ]
+  },
+  "created_at": "2026-10-04T15:30:00Z",
   "device_specs": {
     "connectivity": [
       "wifi"
     ],
-    "rated_power": 1000
+    "rated_power": 46
   },
-  "device_type": "vacuum_robot",
-  "fixed_config": {
-    "states_power": {
-      "vacuum_state|auto_emptying": 580.18,
-      "vacuum_state|charging": 35.23,
-      "vacuum_state|charging_completed": 7.58,
-      "vacuum_state|drying": 11.05,
-      "vacuum_state|idle": 0.27,
-      "vacuum_state|returning": 0.27,
-      "vacuum_state|sweeping_and_mopping": 0.22,
-      "vacuum_state|washing": 23.2
-    }
-  },
+  "legacy_ids": [
+    "e30-ultra"
+  ],
   "mains_voltage": 230,
-  "measure_description": "Measured with utils/measure script",
+  "measure_description": "Preliminary values measured with the Powercalc Measure app (record.jsonl, 2026-10-04) on a Shelly Plug S Gen3 feeding the base station. Integrated through the Dreame Vacuum integration. Auto-empty 322 W (single partial cycle; provisional value), charging curve recorded from 10% to 100% (33-36 W, dropping to 15.8 W above ~95%), washing 17.1 W, drying 12.0 W, standby/idle/docked 3.16 W. While the robot vacuums it runs on battery, so the station only draws 0.75 W.",
   "measure_device": "Shelly Plug S Gen3",
-  "measure_method": "script",
-  "measure_settings": {
-    "DUMMY_LOAD": false,
-    "SAMPLE_COUNT": 1,
-    "SLEEP_TIME": 2.0,
-    "VERSION": "v0.7.0:app"
-  },
-  "name": "E30 Ultra",
-  "product_url": "https://www.mova.tech/products/mova-e30-ultra-robot-vacuum",
+  "measure_method": "manual",
+  "product_url": "https://mova.tech/products/mova-e30-ultra-robot-vacuum",
+  "standby_power": 3.16,
   "voltage_range": {
-    "max": 231.8,
-    "min": 227.4
-  }
+    "min": 225,
+    "max": 235
+  },
+  "gtin": [
+    "6976233679983"
+  ]
 }
