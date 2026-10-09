@@ -1,0 +1,35 @@
+{
+  "name": "Back-UPS BX950MI",
+  "product_url": "https://www.se.com/de/de/product/BX950MI-GR/apc-backups-950-va-230-v-avr-4-schuko-ausg%C3%A4nge/",
+  "aliases": [
+    "Back-UPS BX950MI-GR",
+    "BX950MI"
+  ],
+  "description": "Power profile for the APC Back-UPS BX950MI (950 VA / 520 W). Estimates real-time input power (drawn from the wall) from the NUT load percentage, nominal real power plus the UPS self-consumption.",
+  "device_type": "ups",
+  "device_specs": {
+    "connectivity": [
+      "usb"
+    ]
+  },
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "compatible_integrations": [
+    "nut"
+  ],
+  "mains_voltage": 230,
+  "created_at": "2026-10-09T00:32:34Z",
+  "measure_method": "manual",
+  "measure_device": "2x Shelly Plug S Gen3 (before/after UPS)",
+  "measure_description": "Self-consumption measured as the difference between two Shelly Plug S Gen3 meters placed one before and one after the UPS; the median delta over 10 samples was ~15 W.",
+  "config_flow_discovery_remarks": "This calculation uses the 'Nominal real power' diagnostic in the NUT integration. You need to enable that first.",
+  "fixed_config": {
+    "power": "{{ (states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_realpower_nominal]]') | float(520)) + 15 }}"
+  },
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
+  ]
+}
