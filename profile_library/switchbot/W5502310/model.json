@@ -16,7 +16,7 @@
     "power_monitoring": true
   },
   "gtin": [
-    "00860038001703"
+    "810150542219"
   ],
   "measure_description": "Manually measured power consumption of the Relay Switch 1PM with the relay switched off and on.",
   "measure_device": "Shelly Plug S Gen3",
