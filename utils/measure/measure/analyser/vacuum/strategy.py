@@ -105,7 +105,7 @@ class VacuumCompositeCandidate:
 
     @property
     def features(self) -> list[FeatureReference]:
-        features = [signal.feature for signal in self.signals]
+        features = [feature for signal in self.signals for feature in signal.features]
         if self.battery is not None:
             features.append(self.battery)
         return list(dict.fromkeys(features))
@@ -248,8 +248,10 @@ def _has_overlapping_charge(
     levels = [
         level
         for sample in samples
-        if resolve_activity(sample, signals) == Activity.DRYING
-        and charging.matches(sample)
+        if (
+            (activity := resolve_activity(sample, signals)) == Activity.DRYING_WHILE_CHARGING
+            or (activity == Activity.DRYING and charging.matches(sample))
+        )
         and (level := get_battery_level(sample, battery)) is not None
     ]
     return bool(levels) and max(levels) - min(levels) >= MIN_CHARGING_SPAN
@@ -384,6 +386,7 @@ def split_vacuum_samples(
     else:
         split = _split_by_episode(samples, episodes, grouped, signals)
         fallback_activities = {activity for activity, items in grouped.items() if len(items) < 2}
+        fallback_activities.update(_find_brief_activity_validation(samples, grouped, split))
     # Charging needs its own hold-out when the shared split leaves it untestable,
     # without giving up the independent split of the other activities.
     if not _supports_charging_split(split, context, charges):
@@ -402,6 +405,26 @@ def split_vacuum_samples(
             "record longer, complete vacuum/dock activities with enough readings for both fitting and validation."
         )
     return split
+
+
+def _find_brief_activity_validation(
+    samples: Sequence[RecordingSample],
+    grouped: Mapping[Activity, list[VacuumEpisode]],
+    split: TrainingValidationSplit,
+) -> set[Activity]:
+    """Short snippets cannot validate a much longer fixed-power activity."""
+    validation_ids = {id(sample) for sample in split.validation}
+    brief: set[Activity] = set()
+    for activity, episodes in grouped.items():
+        if activity == Activity.CHARGING:
+            continue
+        activity_samples = [sample for episode in episodes for sample in episode.samples]
+        held_out = [sample for sample in activity_samples if id(sample) in validation_ids]
+        total_seconds = sum(calculate_sample_durations(samples, activity_samples).values())
+        held_out_seconds = sum(calculate_sample_durations(samples, held_out).values())
+        if held_out_seconds < MIN_HELD_OUT_SHARE * total_seconds:
+            brief.add(activity)
+    return brief
 
 
 def _supports_charging_split(
