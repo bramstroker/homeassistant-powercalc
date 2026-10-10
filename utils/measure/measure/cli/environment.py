@@ -325,6 +325,11 @@ class CliEnvironment:
         return _config_value("SHELLY_TIMEOUT", default=5, converter=int)
 
     @property
+    def shelly_channel(self) -> int | None:
+        value = _config_value("SHELLY_CHANNEL", default="", converter=str)
+        return int(value) if value else None
+
+    @property
     def tuya_device_id(self) -> str:
         return _config_value("TUYA_DEVICE_ID", converter=str)
 

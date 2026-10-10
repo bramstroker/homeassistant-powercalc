@@ -359,7 +359,11 @@ def _power_meter_spec(settings: AppPreferences) -> PowerMeterSpec:
     if settings.power_meter == PowerMeterType.SHELLY:
         if not settings.shelly_ip:
             raise PowerMeterError("Enter the Shelly IP address first")
-        return ShellyPowerMeterSpec(device_ip=settings.shelly_ip, username=settings.shelly_username)
+        return ShellyPowerMeterSpec(
+            device_ip=settings.shelly_ip,
+            username=settings.shelly_username,
+            channel=settings.shelly_channel,
+        )
     if settings.power_meter == PowerMeterType.KASA:
         if not settings.kasa_ip:
             raise PowerMeterError("Enter the Kasa IP address first")

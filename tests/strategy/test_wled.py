@@ -74,6 +74,17 @@ async def test_can_calculate_power(
     assert float(await strategy.calculate(state)) == pytest.approx(0.225, 0.01)
 
 
+async def test_calculate_returns_none_before_current_entity_is_resolved(hass: HomeAssistant) -> None:
+    await set_states(hass, [("light.test", STATE_ON)])
+    strategy = WledStrategy(
+        config={CONF_VOLTAGE: 5},
+        light_entity=create_source_entity("light.test", hass),
+        hass=hass,
+    )
+
+    assert await strategy.calculate(State("light.test", STATE_ON)) is None
+
+
 async def test_calculate_returns_none_when_dependent_state_is_missing(
     hass: HomeAssistant,
 ) -> None:

@@ -20,6 +20,7 @@ class Activity(StrEnum):
     AUTO_EMPTYING = "auto_emptying"
     STATION_CLEANING = "station_cleaning"
     WASHING = "washing"
+    DRYING_WHILE_CHARGING = "drying_while_charging"
     DRYING = "drying"
     CHARGING = "charging"
     SLEEPING = "sleeping"

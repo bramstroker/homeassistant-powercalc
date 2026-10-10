@@ -26,6 +26,7 @@ class ShellyProbeFailure(StrEnum):
     INVALID_RESPONSE = "invalid_response"
     NO_POWER_COMPONENT = "no_power_component"
     MULTIPLE_POWER_COMPONENTS = "multiple_power_components"
+    INVALID_CHANNEL = "invalid_channel"
 
 
 class ShellyPowerComponentType(StrEnum):
@@ -64,7 +65,23 @@ class ShellyPowerComponent:
 @dataclass(frozen=True)
 class ShellyDevice:
     info: ShellyDeviceInfo
-    power_component: ShellyPowerComponent
+    power_components: list[ShellyPowerComponent]
+
+    def select_power_component(self, channel: int | None) -> ShellyPowerComponent:
+        components = self.power_components
+        if channel is not None:
+            components = [component for component in components if component.id == channel]
+            if not components:
+                raise ShellyProbeError(
+                    ShellyProbeFailure.INVALID_CHANNEL,
+                    f"Shelly outlet {channel + 1} does not have a supported power measurement component",
+                )
+        if len(components) > 1:
+            raise ShellyProbeError(
+                ShellyProbeFailure.MULTIPLE_POWER_COMPONENTS,
+                "Multiple power measurement components were found; select the outlet to measure",
+            )
+        return components[0]
 
 
 class ShellyProbeError(Exception):
@@ -123,15 +140,15 @@ class ShellyClient:
             )
 
         try:
-            component = self._probe_gen1() if info.generation == 1 else self._probe_rpc()
+            components = self._probe_gen1() if info.generation == 1 else self._probe_rpc()
         except ShellyProbeError as error:
             raise ShellyProbeError(error.failure, str(error), device_info=info) from error
-        return ShellyDevice(info=info, power_component=component)
+        return ShellyDevice(info=info, power_components=components)
 
     def read(self, component: ShellyPowerComponent, *, include_voltage: bool) -> PowerMeasurementResult:
         data = self._request_json(component.status_endpoint, "power measurement")
         if component.type is ShellyPowerComponentType.GEN1_METER:
-            return self._parse_gen1_reading(data)
+            return self._parse_gen1_reading(data, component.id)
         return self._parse_rpc_reading(data, include_voltage=include_voltage)
 
     def _get_device_info(self) -> ShellyDeviceInfo:
@@ -157,12 +174,19 @@ class ShellyClient:
             auth_required=data.get("auth_en") is True or data.get("auth") is True,
         )
 
-    def _probe_gen1(self) -> ShellyPowerComponent:
+    def _probe_gen1(self) -> list[ShellyPowerComponent]:
         data = self._request_json(SHELLY_GEN1_STATUS_ENDPOINT, "power status")
         self._gen1_meter(data)
-        return ShellyPowerComponent(type=ShellyPowerComponentType.GEN1_METER, id=0, supports_voltage=False)
+        assert isinstance(data, dict)
+        components = []
+        for channel, meter in enumerate(data["meters"]):
+            if isinstance(meter, dict) and _is_number(meter.get("power")):
+                components.append(
+                    ShellyPowerComponent(type=ShellyPowerComponentType.GEN1_METER, id=channel, supports_voltage=False),
+                )
+        return components
 
-    def _probe_rpc(self) -> ShellyPowerComponent:
+    def _probe_rpc(self) -> list[ShellyPowerComponent]:
         data = self._request_json(SHELLY_RPC_DEVICE_STATUS_ENDPOINT, "RPC status")
         if not isinstance(data, dict):
             raise self._invalid_response("The Shelly RPC status response was invalid")
@@ -178,12 +202,7 @@ class ShellyClient:
                 ShellyProbeFailure.NO_POWER_COMPONENT,
                 "No supported power measurement component was found",
             )
-        if len(components) > 1:
-            raise ShellyProbeError(
-                ShellyProbeFailure.MULTIPLE_POWER_COMPONENTS,
-                "Multiple power measurement components were found; multi-channel devices are not supported yet",
-            )
-        return components[0]
+        return sorted(components, key=lambda component: component.id)
 
     def _request_json(self, endpoint: str, description: str) -> object:
         response = self._get(endpoint)
@@ -226,8 +245,8 @@ class ShellyClient:
                 "The Shelly device could not be reached",
             ) from error
 
-    def _parse_gen1_reading(self, data: object) -> PowerMeasurementResult:
-        meter = self._gen1_meter(data)
+    def _parse_gen1_reading(self, data: object, channel: int) -> PowerMeasurementResult:
+        meter = self._gen1_meter(data, channel)
         timestamp = meter.get("timestamp")
         if not _is_number(timestamp):
             raise self._invalid_response("The Shelly Gen1 power status response did not contain a valid timestamp")
@@ -250,21 +269,22 @@ class ShellyClient:
             updated=time.time(),
         )
 
-    def _gen1_meter(self, data: object) -> dict[str, Any]:
+    def _gen1_meter(self, data: object, channel: int = 0) -> dict[str, Any]:
         if not isinstance(data, dict):
             raise self._invalid_response("The Shelly Gen1 power status response was invalid")
         meters = data.get("meters")
         valid_meter = (
             isinstance(meters, list)
-            and bool(meters)
-            and isinstance(meters[0], dict)
-            and _is_number(meters[0].get("power"))
+            and 0 <= channel < len(meters)
+            and isinstance(meters[channel], dict)
+            and _is_number(meters[channel].get("power"))
         )
         if not valid_meter:
             raise self._invalid_response("The Shelly Gen1 power status response did not contain a valid power value")
         assert isinstance(meters, list)
-        assert isinstance(meters[0], dict)
-        return meters[0]
+        meter = meters[channel]
+        assert isinstance(meter, dict)
+        return meter
 
     @staticmethod
     def _invalid_response(message: str) -> ShellyProbeError:

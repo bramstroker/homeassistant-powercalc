@@ -343,12 +343,14 @@ def test_assembler_reads_tuya_key_from_cli_config_dependency() -> None:
     power_meter.assert_called_once_with("device-id", "192.0.2.20", "device-key", "3.4")
 
 
-def test_assembler_reads_shelly_password_from_secret_dependency() -> None:
+@pytest.mark.parametrize("channel", [None, 0, 3])
+def test_assembler_reads_shelly_password_from_secret_dependency(channel: int | None) -> None:
     request = AverageMeasurementRequest(
         power_meter=ShellyPowerMeterSpec(
             device_ip="192.0.2.30",
             username="measurement",
             timeout=10,
+            channel=channel,
         ),
     )
 
@@ -361,6 +363,7 @@ def test_assembler_reads_shelly_password_from_secret_dependency() -> None:
         10,
         username="measurement",
         password="device-password",  # noqa: S106
+        channel=channel,
     )
 
 

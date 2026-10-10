@@ -14,6 +14,13 @@ _DERIVED_LIMIT_FIELDS = {"bri_bri_steps", "hs_bri_steps", "hs_hue_steps", "hs_sa
 _ENV_BACKED_LIMIT_FIELDS = sorted(set(PARAMETER_LIMITS) - _DERIVED_LIMIT_FIELDS)
 
 
+@pytest.mark.parametrize("value,expected", [("", None), ("0", 0), ("3", 3)])
+def test_shelly_channel_environment(value: str, expected: int | None, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SHELLY_CHANNEL", value)
+
+    assert CliEnvironment().shelly_channel == expected
+
+
 def test_missing_measurement_selection_leaves_the_cli_interactive(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("SELECTED_MEASURE_TYPE", raising=False)
     monkeypatch.setattr(environment, "config", Config({}))

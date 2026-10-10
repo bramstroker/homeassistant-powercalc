@@ -154,6 +154,7 @@ def _power_meter_spec(environment: CliEnvironment, answers: dict[str, Any]) -> P
             device_ip=environment.shelly_ip,
             username=environment.shelly_username,
             timeout=environment.shelly_timeout,
+            channel=environment.shelly_channel,
         )
     if selected == PowerMeterType.TASMOTA:
         return TasmotaPowerMeterSpec(device_ip=environment.tasmota_device_ip)

@@ -1,6 +1,5 @@
 """Platform for sensor integration."""
 
-from collections.abc import Mapping
 from dataclasses import dataclass, field
 import logging
 from typing import Any, cast
@@ -23,6 +22,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.entity_registry import (
     EVENT_ENTITY_REGISTRY_UPDATED,
+    EventEntityRegistryUpdatedData,
     RegistryEntryDisabler,
 )
 from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
@@ -268,9 +268,9 @@ def _register_entity_id_change_listener(
     """
 
     @callback
-    def _entity_rename_listener(event: Event) -> None:
+    def _entity_rename_listener(event: Event[EventEntityRegistryUpdatedData]) -> None:
         """Handle renaming of the entity"""
-        old_entity_id = event.data["old_entity_id"]
+        old_entity_id = event.data.get("old_entity_id")
         new_entity_id = event.data[CONF_ENTITY_ID]
         _LOGGER.debug(
             "Entity id has been changed, updating powercalc config. old_id=%s, new_id=%s",
@@ -283,11 +283,8 @@ def _register_entity_id_change_listener(
         )
 
     @callback
-    def _filter_entity_id(event: Mapping[str, Any] | Event) -> bool:
-        """Only dispatch the listener for update events concerning the source entity"""
-
-        # Breaking change in 2024.4.0, check for Event for versions prior to this
-        event_data = event.data if isinstance(event, Event) else event
+    def _filter_entity_id(event_data: EventEntityRegistryUpdatedData) -> bool:
+        """Only dispatch the listener for update events concerning the source entity."""
         return (
             event_data["action"] == "update"
             and "old_entity_id" in event_data

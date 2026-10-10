@@ -211,6 +211,9 @@ The standalone device-type enum mirrors the profile schema and is checked for pa
 [signals.py](measure/analyser/vacuum/signals.py) recognises runtime activities:
 auto-emptying, station cleaning, washing, drying, charging, sleeping, charging completed,
 docked, and operation away from the dock. Aliases normalise integration-specific labels.
+When a recognised live charging flag records both states during drying, drying while
+charging and drying after charging finishes become separate activities. Each learns
+total outlet power independently; consumption is not decomposed or added together.
 `Activity`, defined in the analyser models, is the shared string enum for signals, branches,
 episodes and reports; `ACTIVITY_PRIORITY` defines their matching order. Unidentified activity
 is represented internally by `None`, exported as `"unexplained"`. Recording labels and JSON
@@ -231,6 +234,11 @@ charging and sleeping signals fill specific gaps. Unknown inputs remain uncovere
 
 Station idle leaves the primary activity in control. `docked` alone does not identify
 charging or completion. Errors and unrecognised modes require better runtime signals.
+Dreame/Mova paused and idle states use the primary vacuum's recorded boolean `docked`
+attribute to distinguish docked idle from operation away from the dock. A recognised
+live charging flag identifies charging during these ambiguous states. Explicit dock
+activities, completion, sleep and errors retain their own semantics. Missing context
+remains uncovered rather than assigning an away or zero-power fallback.
 
 [entity_references.py](measure/analyser/entity_references.py) resolves portable references
 using captured registry metadata and inventory, including disabled duplicates. The exporter
@@ -258,8 +266,9 @@ intervals, fitting falls back to the arithmetic mean. Charging gets a bounded pi
 `VacuumBranch` is the union of `FixedBranch`, with a required fixed power, and
 `ChargingBranch`, with required `ChargingPoint` values. A charging curve validates that it
 has at least two points with strictly increasing battery levels before interpolation.
-`ActivitySignal` stores its feature and observed active/inactive values, and builds equivalent
-configuration conditions.
+`ActivitySignal` stores its feature, observed active/inactive values, and any required
+context signals, and builds equivalent configuration conditions. Context features are
+included in the model inputs. Inactive guards preserve unknown source and context values.
 Boolean attributes use identity comparisons to distinguish booleans from numeric enums.
 
 Export uses `stop_at_first`: guards enforce activity priority, including overlapping or
@@ -278,8 +287,10 @@ When compatible source files contain all activities on both sides, the last reco
 held out in full if it covers at least 10% of every activity's eligible recorded time and
 training can cover its charging range. Otherwise, alternate qualifying episodes of each
 activity are held out where suitable. Activities with only one qualifying episode, or
-charging without sufficient independent range coverage, use a within-cycle split: the
-middle third (at least two samples) is held out from each episode, separately within each
+less than 10% of their eligible recorded time held out by the episode split, use a
+within-cycle split while other activities retain their independent validation. Charging
+without sufficient independent range coverage also uses this fallback: the middle third
+(at least two samples) is held out from each episode, separately within each
 5-percentage-point battery bucket for charging. Bucket edges remain available for fitting.
 All samples belong to only one side of the split. Existing minimum fitting support and
 per-activity validation thresholds still apply.
@@ -299,6 +310,10 @@ the overall MAE and constant-power baseline do not veto a repeatable cycling loa
 Samples matching no activity are tolerated up to 10% of the recording, so a brief
 unavailable blip or transient state does not reject it; beyond that acceptance fails.
 These checks keep long low-power periods from masking a poor short, high-power dock cycle.
+Failed sleeping, completed or docked energy validation explains that one reported state
+may contain both post-charge settling and stable standby. One fixed power cannot always
+represent both; repeating identical recordings may not solve this modelling limitation.
+The analyser does not infer a time-since-charge model or silently discard settling energy.
 
 MAE is average absolute prediction error in watts. RMSE gives larger errors more weight.
 Transition MAE covers the first/last observations of episodes. Per-activity results help

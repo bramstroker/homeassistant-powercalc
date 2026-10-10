@@ -28,6 +28,7 @@ export class SettingsPowerMeterSection extends LitElement {
   @state() private measureDeviceValue = "";
   @state() private hassPowerEntity = "";
   @state() private shellyIp?: string;
+  @state() private shellyOutlet?: string;
   @state() private shellyUsername?: string;
   @state() private shellyPassword = "";
   @state() private clearShellyPassword = false;
@@ -158,6 +159,7 @@ export class SettingsPowerMeterSection extends LitElement {
         <input name="shelly_ip" .value=${address} required autocomplete="off" placeholder="192.168.1.50" @input=${this.shellyIpChanged} />
         <small class="field-hint">Select a discovered device above or enter its IP address manually.</small>
       </label>
+      ${this.renderShellyOutlet(address)}
       <div class="grid">
         <label>
           <span>Shelly username</span>
@@ -171,6 +173,24 @@ export class SettingsPowerMeterSection extends LitElement {
         </label>
       </div>
       ${this.renderClearShellyPassword()}`;
+  }
+
+  private renderShellyOutlet(address: string) {
+    const channels = this.shellyDiscoveryDevices.find((device) => device.ip_address === address)?.channels ?? [];
+    const savedChannel = this.settings?.shelly_channel;
+    const outlet = this.shellyOutlet ?? (savedChannel == null ? "" : String(savedChannel + 1));
+    if (channels.length > 0) {
+      return optionSelect("shelly_outlet", "Outlet", [
+        { value: "", label: channels.length === 1 ? "Automatic (single outlet)" : "Select an outlet" },
+        ...channels.map((channel) => ({ value: String(channel + 1), label: `Outlet ${channel + 1}` })),
+      ], { selected: outlet, required: channels.length > 1, onChange: this.shellyOutletChanged });
+    }
+    return html`
+      <label>
+        <span>Outlet</span>
+        <input name="shelly_outlet" type="number" min="1" step="1" .value=${outlet} placeholder="Automatic" @input=${this.shellyOutletChanged} />
+        <small class="field-hint">For multi-outlet devices, enter the outlet number starting at 1. Leave blank for a single-outlet device.</small>
+      </label>`;
   }
 
   private renderClearShellyPassword() {
@@ -260,6 +280,12 @@ export class SettingsPowerMeterSection extends LitElement {
 
   private readonly shellyIpChanged = (event: Event): void => {
     this.shellyIp = (event.currentTarget as HTMLInputElement).value;
+    this.shellyOutlet = "";
+    this.powerMeterSettingsChanged();
+  };
+
+  private readonly shellyOutletChanged = (event: Event): void => {
+    this.shellyOutlet = (event.currentTarget as HTMLInputElement).value;
     this.powerMeterSettingsChanged();
   };
 
@@ -310,6 +336,7 @@ export class SettingsPowerMeterSection extends LitElement {
     const address = (event.currentTarget as HTMLInputElement).value;
     if (!address) return;
     this.shellyIp = address;
+    this.shellyOutlet = "";
     this.powerMeterSettingsChanged();
   };
 
