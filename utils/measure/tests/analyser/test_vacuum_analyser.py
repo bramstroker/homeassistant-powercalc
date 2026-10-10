@@ -467,7 +467,10 @@ def test_repeated_charges_still_check_independent_power_differences(tmp_path: Pa
 
 
 @pytest.mark.parametrize("different_charge", [False, True])
-def test_complete_charge_is_held_out_when_trickle_episodes_hide_it(tmp_path: Path, different_charge: bool) -> None:
+@pytest.mark.parametrize("transient_level", [49, 100])
+def test_complete_charge_is_held_out_when_trickle_episodes_hide_it(
+    tmp_path: Path, different_charge: bool, transient_level: int
+) -> None:
     def trickle(count: int) -> list[RecordingSample]:
         return [sample("charging", 3, level=100) for _ in range(count)]
 
@@ -482,7 +485,11 @@ def test_complete_charge_is_held_out_when_trickle_episodes_hide_it(tmp_path: Pat
     emptying = [sample("auto_emptying", 600) for _ in range(10)]
     recordings = [
         trickle(10) + activities + trickle(40),
-        trickle(10) + emptying + trickle(15) + activities + trickle(40),
+        trickle(10)
+        + emptying
+        + [sample("charging", 30 if transient_level < 100 else 3, level=transient_level) for _ in range(15)]
+        + activities
+        + trickle(40),
         trickle(10) + emptying + trickle(2) + emptying + charge(53, 2 if different_charge else 1),
         trickle(10) + emptying + charge(25),
     ]

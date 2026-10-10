@@ -386,7 +386,7 @@ def split_vacuum_samples(
         fallback_activities = {activity for activity, items in grouped.items() if len(items) < 2}
     # Charging needs its own hold-out when the shared split leaves it untestable,
     # without giving up the independent split of the other activities.
-    if not _supports_charging_split(split, context):
+    if not _supports_charging_split(split, context, charges):
         charging_split = _try_split_charging_cycles(samples, episodes, charges, split, context)
         if charging_split is None:
             fallback_activities.add(Activity.CHARGING)
@@ -404,8 +404,10 @@ def split_vacuum_samples(
     return split
 
 
-def _supports_charging_split(split: TrainingValidationSplit, context: RecordingContext) -> bool:
-    """Whether training fits a charging curve that covers validation rising over a real battery range."""
+def _supports_charging_split(
+    split: TrainingValidationSplit, context: RecordingContext, charges: Sequence[VacuumEpisode]
+) -> bool:
+    """Require a covered, independent charge that actually rises over a usable battery range."""
     training = [sample for sample in split.training if resolve_activity(sample, split.signals) == Activity.CHARGING]
     validation = [sample for sample in split.validation if resolve_activity(sample, split.signals) == Activity.CHARGING]
     if not training and not validation:
@@ -414,8 +416,16 @@ def _supports_charging_split(split: TrainingValidationSplit, context: RecordingC
     branch = _fit_charging_branch(training, battery)
     if isinstance(branch, StrategyNotApplicable):
         return False
-    validation_levels = [level for sample in validation if (level := get_battery_level(sample, battery)) is not None]
-    if not validation_levels or max(validation_levels) - min(validation_levels) < MIN_VALIDATION_CHARGING_SPAN:
+    validation_ids = {id(sample) for sample in validation}
+    has_rising_charge = False
+    for charge in charges:
+        if any(id(sample) not in validation_ids for sample in charge.samples):
+            continue
+        levels = [level for sample in charge.samples if (level := get_battery_level(sample, battery)) is not None]
+        if len(levels) >= MIN_EPISODE_SAMPLES and levels[-1] - levels[0] >= MIN_VALIDATION_CHARGING_SPAN:
+            has_rising_charge = True
+            break
+    if not has_rising_charge:
         return False
     covered = sum(branch.estimate(sample, battery) is not None for sample in validation)
     return covered >= 0.9 * len(validation)
@@ -457,7 +467,7 @@ def _try_split_charging_cycles(
             method=hold_out.method,
             signals=split.signals,
         )
-        if _supports_charging_split(candidate, context):
+        if _supports_charging_split(candidate, context, charges):
             return candidate
     return None
 
