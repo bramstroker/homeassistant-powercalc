@@ -1,0 +1,31 @@
+{
+  "authors": [
+    {
+      "github": "TDIspeed",
+      "name": "Seth Letterly"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-10-07T04:07:57Z",
+  "device_type": "light",
+  "mains_voltage": 120,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plug US Gen4",
+  "measure_device_firmware": "20260923-075613/2.0.1-ge1a198b",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.12.0:app"
+  },
+  "name": "RGBIC Outdoor LED Strip lights",
+  "product_url": "https://us.govee.com/products/govee-wi-fi-rgbic-outdoor-strip-lights?srsltid=AU7gw4Ufdo3lWDpqqnY8WqDWfEQoIWoBwrlCUoLgH5uCqFN-wOFsBkCF",
+  "standby_power": 0.05,
+  "standby_power_estimated": true,
+  "voltage_range": {
+    "max": 125.4,
+    "min": 123.6
+  }
+}
