@@ -1,6 +1,6 @@
 {
   "aliases": [
-    "Relay-Switch-2PM"
+    "Relay Switch 2PM"
   ],
   "calculation_strategy": "multi_switch",
   "created_at": "2026-10-09T02:00:20Z",
@@ -12,13 +12,13 @@
       "matter"
     ],
     "form_factor": "in_wall",
-    "max_load_watts": 2300,
+    "max_load_watts": 3680,
     "power_monitoring": true
   },
   "gtin": [
     "0810150546521"
   ],
-  "measure_description": "Manually measured self-usage of the Relay Switch 2PM with both relays off and with one relay switched on. Base self-usage (relays off) 0.84 W, each relay adds 0.28 W when switched on.",
+  "measure_description": "Manually measured self-usage of the Relay Switch 2PM with both relays off and with one relay switched on. Base self-usage (relays off) 0.84 W, each relay adds 0.31 W when switched on.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "name": "Relay Switch 2PM",
