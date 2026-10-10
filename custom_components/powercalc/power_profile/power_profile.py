@@ -6,7 +6,7 @@ from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 import logging
 import os
-from typing import Any, TypedDict, cast
+from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 from homeassistant.components.camera.const import DOMAIN as CAMERA_DOMAIN
 from homeassistant.components.climate.const import DOMAIN as CLIMATE_DOMAIN
@@ -19,7 +19,6 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch.const import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.vacuum.const import DOMAIN as VACUUM_DOMAIN
 from homeassistant.components.water_heater.const import DOMAIN as WATER_HEATER_DOMAIN
-from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import translation
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -47,6 +46,14 @@ from custom_components.powercalc.errors import (
     UnsupportedStrategyError,
 )
 from custom_components.powercalc.power_profile.sub_profile_selector import SubProfileSelectConfig
+
+# Older supported HA releases define these domains in the component modules.
+if TYPE_CHECKING:
+    from homeassistant.components.binary_sensor.const import DOMAIN as BINARY_SENSOR_DOMAIN
+    from homeassistant.components.fan.const import DOMAIN as FAN_DOMAIN
+else:
+    from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+    from homeassistant.components.fan import DOMAIN as FAN_DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -106,10 +113,10 @@ class CustomField:
 
 DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.AIR_CONDITIONER: CLIMATE_DOMAIN,
-    DeviceType.AIR_PURIFIER: Platform.FAN,
+    DeviceType.AIR_PURIFIER: FAN_DOMAIN,
     DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.COVER: COVER_DOMAIN,
-    DeviceType.FAN: Platform.FAN,
+    DeviceType.FAN: FAN_DOMAIN,
     DeviceType.GENERIC_IOT: {SENSOR_DOMAIN, MEDIA_PLAYER_DOMAIN},
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.POWER_METER: SENSOR_DOMAIN,
@@ -118,7 +125,7 @@ DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.SMART_SWITCH: {SWITCH_DOMAIN, LIGHT_DOMAIN},
     DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
     DeviceType.TELEVISION: MEDIA_PLAYER_DOMAIN,
-    DeviceType.NETWORK: Platform.BINARY_SENSOR,
+    DeviceType.NETWORK: BINARY_SENSOR_DOMAIN,
     DeviceType.PRINTER: SENSOR_DOMAIN,
     DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
     DeviceType.LAWN_MOWER_ROBOT: LAWN_MOWER_DOMAIN,
