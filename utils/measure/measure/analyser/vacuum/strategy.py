@@ -376,6 +376,11 @@ def split_vacuum_samples(
         return recording_split
     split = _split_by_episode(samples, episodes, grouped, signals)
     charging_supported = _supports_charging_split(split, context)
+    if not charging_supported:
+        charging_split = _try_split_charging_cycles(samples, episodes, split, context)
+        if charging_split is not None:
+            split = charging_split
+            charging_supported = True
     fallback_activities = {activity for activity, items in grouped.items() if len(items) < 2}
     if not charging_supported:
         fallback_activities.add(Activity.CHARGING)
@@ -398,10 +403,50 @@ def _supports_charging_split(split: TrainingValidationSplit, context: RecordingC
         return True
     battery = find_battery_feature(training, context)
     branch = _fit_charging_branch(training, battery)
-    if isinstance(branch, StrategyNotApplicable) or not validation:
+    validation_branch = _fit_charging_branch(validation, battery)
+    if isinstance(branch, StrategyNotApplicable) or isinstance(validation_branch, StrategyNotApplicable):
         return False
     covered = sum(branch.estimate(sample, battery) is not None for sample in validation)
     return covered >= 0.9 * len(validation)
+
+
+def _try_split_charging_cycles(
+    samples: Sequence[RecordingSample],
+    episodes: Sequence[VacuumEpisode],
+    split: TrainingValidationSplit,
+    context: RecordingContext,
+) -> TrainingValidationSplit | None:
+    """Hold out a rising charge even when other activities need a different split.
+
+    Prefer all charging from an independent recording, then whole episodes. A
+    near-full trickle alone cannot validate the battery-dependent curve.
+    """
+    charging_episodes = [episode for episode in episodes if episode.activity == Activity.CHARGING]
+    charging_by_recording: dict[int, list[RecordingSample]] = defaultdict(list)
+    for episode in charging_episodes:
+        charging_by_recording[episode.samples[0].recording_id].extend(episode.samples)
+    groups = list(reversed(charging_by_recording.values())) if len(charging_by_recording) > 1 else []
+    groups.extend(episode.samples for episode in reversed(charging_episodes))
+    charging_ids = {id(sample) for episode in charging_episodes for sample in episode.samples}
+    other_validation_ids = {id(sample) for sample in split.validation if id(sample) not in charging_ids}
+    short_episode_ids = {
+        id(sample)
+        for episode in charging_episodes
+        if len(episode.samples) < MIN_EPISODE_SAMPLES
+        for sample in episode.samples
+    }
+    # Latest first, but only when the remaining charges cover its battery range.
+    for held_out in groups:
+        validation_ids = other_validation_ids | short_episode_ids | {id(sample) for sample in held_out}
+        candidate = TrainingValidationSplit(
+            training=[sample for sample in samples if id(sample) not in validation_ids],
+            validation=[sample for sample in samples if id(sample) in validation_ids],
+            method=ValidationMethod.HELD_OUT_EPISODES,
+            signals=split.signals,
+        )
+        if _supports_charging_split(candidate, context):
+            return candidate
+    return None
 
 
 def _split_within_activities(

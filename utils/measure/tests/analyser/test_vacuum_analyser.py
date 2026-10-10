@@ -466,6 +466,108 @@ def test_repeated_charges_still_check_independent_power_differences(tmp_path: Pa
     assert "charging validation error" in str(result.reason)
 
 
+@pytest.mark.parametrize("different_charge", [False, True])
+def test_complete_charge_is_held_out_when_trickle_episodes_hide_it(tmp_path: Path, different_charge: bool) -> None:
+    def trickle(count: int) -> list[RecordingSample]:
+        return [sample("charging", 3, level=100) for _ in range(count)]
+
+    def charge(start: int, multiplier: float = 1) -> list[RecordingSample]:
+        result = []
+        for level in range(start, 101):
+            power = 30 if level < 75 else max(3, 30 - (level - 75) * 1.2)
+            result.extend(sample("charging", power * multiplier, level=level) for _ in range(6))
+        return result
+
+    activities = [item for item in dense_cycle() if item.entities[STATE].state != "charging"]
+    emptying = [sample("auto_emptying", 600) for _ in range(10)]
+    recordings = [
+        trickle(10) + activities + trickle(40),
+        trickle(10) + emptying + trickle(15) + activities + trickle(40),
+        trickle(10) + emptying + charge(53, 2 if different_charge else 1),
+        trickle(10) + emptying + charge(25),
+    ]
+    paths = [
+        write_recording(
+            tmp_path / f"record-{index}.jsonl",
+            [replace(item, elapsed_seconds=float(offset)) for offset, item in enumerate(items)],
+        )
+        for index, items in enumerate(recordings)
+    ]
+    samples = load_recordings(paths).dataset.samples
+
+    split = split_vacuum_samples(samples, CONTEXT)
+
+    assert isinstance(split, TrainingValidationSplit)
+    assert split.method == ValidationMethod.HELD_OUT_EPISODES
+    charging_validation = [
+        item for item in split.validation if resolve_activity(item, split.signals) == Activity.CHARGING
+    ]
+    charging_training = [item for item in split.training if resolve_activity(item, split.signals) == Activity.CHARGING]
+    # Run 4 covers the widest battery range, so it trains the curve while the
+    # independent run 3 exercises the rise and taper, even without mop activities.
+    assert {item.recording_id for item in charging_validation} == {2}
+    assert min(int(item.entities[BATTERY].state) for item in charging_validation) == 53
+    assert min(int(item.entities[BATTERY].state) for item in charging_training) == 25
+    assert {id(item) for item in split.training}.isdisjoint(id(item) for item in split.validation)
+    assert len(split.training) + len(split.validation) == len(samples)
+
+    result = RecorderAnalyser().analyse(paths, CONTEXT)
+
+    assert result.model_ready is not different_charge
+    if different_charge:
+        assert "charging validation error" in str(result.reason)
+    else:
+        assert result.validation_method == ValidationMethod.HELD_OUT_EPISODES
+        assert not result.warnings
+
+
+def test_charging_can_hold_out_a_complete_episode_within_one_recording(tmp_path: Path) -> None:
+    activities = [item for item in repeated() if item.entities[STATE].state != "charging"]
+    charging = [item for item in dense_cycle() if item.entities[STATE].state == "charging"]
+    # Alternating episodes would hold out only the two trickle periods.
+    items = (
+        charging
+        + activities
+        + [sample("charging", 10, level=80) for _ in range(10)]
+        + activities
+        + charging
+        + activities
+        + [sample("charging", 10, level=80) for _ in range(10)]
+    )
+    samples = [replace(item, elapsed_seconds=float(index)) for index, item in enumerate(items)]
+
+    split = split_vacuum_samples(samples, CONTEXT)
+
+    assert isinstance(split, TrainingValidationSplit)
+    assert split.method == ValidationMethod.HELD_OUT_EPISODES
+    for episode in group_vacuum_episodes(samples, split.signals):
+        episode_ids = {id(item) for item in episode.samples}
+        assert episode_ids <= {id(item) for item in split.training} or episode_ids <= {
+            id(item) for item in split.validation
+        }
+    result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", samples), CONTEXT)
+    assert result.model_ready
+    assert result.validation_method == ValidationMethod.HELD_OUT_EPISODES
+
+
+def test_trickle_only_recording_cannot_validate_a_charging_curve(tmp_path: Path) -> None:
+    first = write_recording(tmp_path / "record-1.jsonl", dense_cycle())
+    items = [item for item in dense_cycle() if item.entities[STATE].state != "charging"]
+    items.extend(sample("charging", 10, level=80) for _ in range(100))
+    last = write_recording(
+        tmp_path / "record-2.jsonl",
+        [replace(item, elapsed_seconds=float(index)) for index, item in enumerate(items)],
+    )
+
+    result = RecorderAnalyser().analyse([first, last], CONTEXT)
+
+    assert result.model_ready
+    assert result.validation_method == ValidationMethod.HELD_OUT_BLOCKS
+    report = next(report for report in result.activity_reports if report.activity == Activity.CHARGING)
+    assert report.coverage == 1
+    assert any("repeatability across cycles has not been tested" in warning for warning in result.warnings)
+
+
 def test_single_cycle_still_rejects_a_bad_fit(tmp_path: Path) -> None:
     samples = dense_cycle()
     washing = [item for item in samples if item.entities[STATE].state == "washing"]
