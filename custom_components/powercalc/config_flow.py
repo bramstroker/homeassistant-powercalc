@@ -226,7 +226,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
     def create_source_entity_selector(
         self,
-    ) -> selector.EntitySelector:
+    ) -> selector.Selector[selector.EntitySelectorConfig]:
         """Create the entity selector for the source entity."""
         if self.is_library_flow:
             return selector.EntitySelector(
@@ -234,7 +234,9 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             )
         return selector.EntitySelector()
 
-    def create_device_entity_selector(self, domains: list[str], multiple: bool = False) -> selector.EntitySelector:
+    def create_device_entity_selector(
+        self, domains: list[str], multiple: bool = False
+    ) -> selector.Selector[selector.EntitySelectorConfig]:
         entity_registry = er.async_get(self.hass)
         if self.source_entity and self.source_entity.device_entry:
             entities = [

@@ -127,10 +127,13 @@ def _find_energy_failure(report: ActivityReport) -> str | None:
     allowance = max(MIN_ACTIVITY_ERROR_ALLOWANCE_W, MAX_RELATIVE_ACTIVITY_ERROR * measured_w)
     if abs(predicted_w - measured_w) <= allowance:
         return None
-    return (
-        f"The {activity} validation predicts {predicted_w:.2f} W on average, but {measured_w:.2f} W was measured; "
-        f"record repeated, complete {activity} cycles and the entities that report this activity"
-    )
+    reason = f"The {activity} validation predicts {predicted_w:.2f} W on average, but {measured_w:.2f} W was measured; "
+    if activity in {Activity.SLEEPING, Activity.COMPLETED, Activity.DOCKED}:
+        return (
+            reason + "this state may include both post-charge settling and stable standby, which one fixed-power "
+            "branch cannot represent. More identical recordings may not resolve this limitation"
+        )
+    return reason + f"record repeated, complete {activity} cycles and the entities that report this activity"
 
 
 def _calculate_energy_metrics(

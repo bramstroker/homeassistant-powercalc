@@ -8,14 +8,13 @@ import logging
 import re
 from typing import Any
 
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.light.const import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER, ConfigEntry
-from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_PLATFORM, CONF_UNIQUE_ID
+from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_PLATFORM, CONF_UNIQUE_ID, EntityCategory
 from homeassistant.core import CALLBACK_TYPE, HassJob, HomeAssistant
 from homeassistant.helpers import discovery_flow
 import homeassistant.helpers.device_registry as dr
-from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import async_call_later, async_track_time_interval
 from homeassistant.helpers.typing import ConfigType

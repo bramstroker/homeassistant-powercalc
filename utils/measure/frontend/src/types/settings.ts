@@ -12,6 +12,7 @@ export interface AppSettings {
   power_meter: PowerMeterType | null;
   shelly_ip: string | null;
   shelly_username?: string;
+  shelly_channel?: number | null;
   shelly_password_configured?: boolean;
   kasa_ip: string | null;
   tapo_credentials_configured?: boolean;

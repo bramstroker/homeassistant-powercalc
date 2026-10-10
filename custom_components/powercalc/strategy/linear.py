@@ -1,18 +1,18 @@
 from bisect import bisect_left, bisect_right
 from decimal import Decimal
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from homeassistant.components import fan, lawn_mower, light, media_player, vacuum
-from homeassistant.components.fan import ATTR_PERCENTAGE
-from homeassistant.components.light import ATTR_BRIGHTNESS
-from homeassistant.components.media_player import (
+from homeassistant.components.lawn_mower.const import DOMAIN as LAWN_MOWER_DOMAIN
+from homeassistant.components.light.const import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.media_player.const import (
     ATTR_MEDIA_VOLUME_LEVEL,
     ATTR_MEDIA_VOLUME_MUTED,
-    STATE_PLAYING,
+    DOMAIN as MEDIA_PLAYER_DOMAIN,
 )
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import CONF_ATTRIBUTE
+from homeassistant.components.vacuum.const import DOMAIN as VACUUM_DOMAIN
+from homeassistant.const import CONF_ATTRIBUTE, STATE_PLAYING
 from homeassistant.core import HomeAssistant, State
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.event import TrackTemplate
@@ -33,7 +33,15 @@ from custom_components.powercalc.validation import vol
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
-ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN, vacuum.DOMAIN, lawn_mower.DOMAIN]
+# Keep runtime imports compatible with older supported HA releases.
+if TYPE_CHECKING:
+    from homeassistant.components.fan.const import ATTR_PERCENTAGE, DOMAIN as FAN_DOMAIN
+    from homeassistant.components.light.const import ATTR_BRIGHTNESS
+else:
+    from homeassistant.components.fan import ATTR_PERCENTAGE, DOMAIN as FAN_DOMAIN
+    from homeassistant.components.light import ATTR_BRIGHTNESS
+
+ALLOWED_DOMAINS = [FAN_DOMAIN, LIGHT_DOMAIN, MEDIA_PLAYER_DOMAIN, VACUUM_DOMAIN, LAWN_MOWER_DOMAIN]
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CALIBRATE): vol.All(
@@ -53,9 +61,9 @@ CONFIG_SCHEMA = vol.Schema(
 )
 
 ENTITY_ATTRIBUTE_MAPPING = {
-    fan.DOMAIN: ATTR_PERCENTAGE,
-    light.DOMAIN: ATTR_BRIGHTNESS,
-    media_player.DOMAIN: ATTR_MEDIA_VOLUME_LEVEL,
+    FAN_DOMAIN: ATTR_PERCENTAGE,
+    LIGHT_DOMAIN: ATTR_BRIGHTNESS,
+    MEDIA_PLAYER_DOMAIN: ATTR_MEDIA_VOLUME_LEVEL,
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -123,7 +131,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def is_enabled(self, entity_state: State) -> bool:
         """Return if this strategy is enabled based on entity state."""
-        return not (self._source_entity.domain == media_player.DOMAIN and entity_state.state != STATE_PLAYING)
+        return not (self._source_entity.domain == MEDIA_PLAYER_DOMAIN and entity_state.state != STATE_PLAYING)
 
     def get_calibration_segment(self, value: int) -> tuple[tuple[int, float], tuple[int, float]]:
         """Get the two calibration points to interpolate between, in ascending order.
@@ -209,7 +217,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def get_entity_value_range(self) -> tuple[int, int]:
         """Get the min/max range for a given entity domain."""
-        if self.get_initialized_value_entity().domain == light.DOMAIN:
+        if self.get_initialized_value_entity().domain == LIGHT_DOMAIN:
             return 0, 255
 
         return 0, 100
@@ -228,13 +236,14 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         value_entity = self.get_initialized_value_entity()
         if value_entity.entity_id != self._source_entity.entity_id:
             # If the value entity is different from the source entity, we need to fetch the state of the value entity
-            entity_state = self._hass.states.get(value_entity.entity_id)
-            if not entity_state:
+            value_state = self._hass.states.get(value_entity.entity_id)
+            if value_state is None:
                 _LOGGER.error(
                     "Value entity %s not found",
                     value_entity.entity_id,
                 )
                 return None
+            entity_state = value_state
 
         try:
             return int(float(entity_state.state))
@@ -305,7 +314,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     async def get_value_entity(self) -> SourceEntity:
         """Set the value entity based on the current state."""
         if (
-            self._source_entity.domain in (vacuum.DOMAIN, lawn_mower.DOMAIN)
+            self._source_entity.domain in (VACUUM_DOMAIN, LAWN_MOWER_DOMAIN)
             and self._attribute is None
             and self._source_entity.entity_entry
         ):

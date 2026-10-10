@@ -20,6 +20,7 @@ export interface MeterDescription {
 export interface PowerMeterSettings {
   default_power_entity_id: string | null;
   shelly_ip: string | null;
+  shelly_channel: number | null;
   kasa_ip: string | null;
 }
 
@@ -104,12 +105,19 @@ export const POWER_METERS: { [T in PowerMeterType]: PowerMeterDescriptor<T> } = 
       type: "shelly",
       device_ip: settings?.shelly_ip ?? "",
       username: settings?.shelly_username ?? DEFAULT_SHELLY_USERNAME,
+      channel: settings?.shelly_channel ?? null,
     }),
-    settingsFromForm: (form) => ({ shelly_ip: formTextOrNull(form, "shelly_ip") }),
+    settingsFromForm: (form) => {
+      const outlet = formTextOrNull(form, "shelly_outlet");
+      return { shelly_ip: formTextOrNull(form, "shelly_ip"), shelly_channel: outlet ? Number(outlet) - 1 : null };
+    },
     isAddressed: (spec) => Boolean(spec.device_ip),
     // Powercalc reads voltage straight off the device.
     hasVoltageReading: () => true,
-    describe: (spec) => ({ source: "Shelly power meter", detail: spec.device_ip }),
+    describe: (spec) => ({
+      source: "Shelly power meter",
+      detail: spec.channel == null ? spec.device_ip : `${spec.device_ip} · Outlet ${spec.channel + 1}`,
+    }),
   },
 
   kasa: {
@@ -171,6 +179,7 @@ export function settingsFromForm(form: FormData): PowerMeterSettings & { power_m
     power_meter: type,
     default_power_entity_id: null,
     shelly_ip: null,
+    shelly_channel: null,
     kasa_ip: null,
     ...meterFor(type).settingsFromForm(form),
   };
@@ -193,6 +202,7 @@ export function describe(spec: PowerMeterSpec, context: MeterContext): MeterDesc
 
 /** The meter as one line on the review screen, where the entity catalogue is not at hand. */
 export function summarize(spec: PowerMeterSpec): string {
+  if (spec.type === "shelly" && spec.channel != null) return `Shelly plug · Outlet ${spec.channel + 1}`;
   return spec.type === "hass" ? spec.entity_id : meterFor(spec.type).label;
 }
 

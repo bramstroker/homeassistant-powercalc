@@ -115,6 +115,8 @@ Set only the variables needed by your selected `POWER_METER`.
 ```env
 SHELLY_IP=x.x.x.x
 SHELLY_TIMEOUT=60
+# For multi-outlet Shelly meters: 0 = outlet 1, 1 = outlet 2, etc.
+# SHELLY_CHANNEL=0
 
 TASMOTA_DEVICE_IP=x.x.x.x
 

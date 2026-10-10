@@ -174,6 +174,7 @@ class MeasurementAssembler:
                 spec.timeout,
                 username=spec.username,
                 password=self._shelly_password,
+                channel=spec.channel,
             )
         if isinstance(spec, TasmotaPowerMeterSpec):
             return TasmotaPowerMeter(spec.device_ip)

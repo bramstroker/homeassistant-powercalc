@@ -3,7 +3,8 @@
 from enum import StrEnum
 from typing import Literal
 
-from homeassistant.components import cover, device_tracker
+from homeassistant.components import cover
+from homeassistant.components.device_tracker.const import DOMAIN as DEVICE_TRACKER_DOMAIN
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
 from homeassistant.const import (
     STATE_CLOSED,
@@ -286,7 +287,7 @@ OFF_STATES = {STATE_OFF, STATE_STANDBY, STATE_UNAVAILABLE}
 UNAVAILABLE_STATES = frozenset({STATE_UNAVAILABLE, STATE_UNKNOWN})
 OFF_STATES_BY_DOMAIN: dict[str, set[str]] = {
     cover.DOMAIN: {STATE_CLOSED, STATE_OPEN},
-    device_tracker.DOMAIN: {STATE_NOT_HOME},
+    DEVICE_TRACKER_DOMAIN: {STATE_NOT_HOME},
 }
 
 DOCS_URI = "https://docs.powercalc.nl/configuration/global-configuration/"

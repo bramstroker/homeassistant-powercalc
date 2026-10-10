@@ -29,6 +29,7 @@ class ShellyDiscoveredDevice(BaseModel):
     supported: bool
     reason: str | None = None
     auth_required: bool = False
+    channels: list[int] = Field(default_factory=list)
 
 
 class ShellyDiscoveryResponse(BaseModel):
@@ -126,7 +127,13 @@ class ShellyDiscoveryService:
             return _device_from_info(candidate, error.device_info).model_copy(
                 update={"reason": str(error), "auth_required": error.auth_required},
             )
-        return _device_from_info(candidate, device.info).model_copy(update={"supported": True, "reason": None})
+        return _device_from_info(candidate, device.info).model_copy(
+            update={
+                "supported": True,
+                "reason": None,
+                "channels": [component.id for component in device.power_components],
+            },
+        )
 
 
 def _parse_address(value: str) -> IPv4Address | IPv6Address | None:

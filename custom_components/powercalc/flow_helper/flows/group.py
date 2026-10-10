@@ -280,7 +280,7 @@ def create_group_selector(
     hass: HomeAssistant,
     current_entry: ConfigEntry | None = None,
     group_entries: list[ConfigEntry] | None = None,
-) -> selector.SelectSelector:
+) -> selector.Selector[selector.SelectSelectorConfig]:
     """Create the group selector."""
     options = [
         selector.SelectOptionDict(
