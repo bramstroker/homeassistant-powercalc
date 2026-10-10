@@ -483,7 +483,7 @@ def test_complete_charge_is_held_out_when_trickle_episodes_hide_it(tmp_path: Pat
     recordings = [
         trickle(10) + activities + trickle(40),
         trickle(10) + emptying + trickle(15) + activities + trickle(40),
-        trickle(10) + emptying + charge(53, 2 if different_charge else 1),
+        trickle(10) + emptying + trickle(2) + emptying + charge(53, 2 if different_charge else 1),
         trickle(10) + emptying + charge(25),
     ]
     paths = [
@@ -565,6 +565,90 @@ def test_trickle_only_recording_cannot_validate_a_charging_curve(tmp_path: Path)
     assert result.validation_method == ValidationMethod.HELD_OUT_BLOCKS
     report = next(report for report in result.activity_reports if report.activity == Activity.CHARGING)
     assert report.coverage == 1
+    assert any("repeatability across cycles has not been tested" in warning for warning in result.warnings)
+
+    # Only charging falls back to blocks; the other activities keep the independent recording.
+    split = split_vacuum_samples(load_recordings([first, last]).dataset.samples, CONTEXT)
+    assert isinstance(split, TrainingValidationSplit)
+    for item in split.validation:
+        if resolve_activity(item, split.signals) != Activity.CHARGING:
+            assert item.recording_id == 1
+    for item in split.training:
+        if resolve_activity(item, split.signals) != Activity.CHARGING:
+            assert item.recording_id == 0
+
+
+def charge_from(start: int, end: int = 80) -> list[RecordingSample]:
+    return [sample("charging", 50 - level / 2, level=level) for level in range(start, end + 1) for _ in range(3)]
+
+
+def unidentified() -> RecordingSample:
+    item = sample("charging", 30, level=50)
+    return replace(item, entities={**item.entities, STATE: RecordedEntityState("error_dustbin_full", {})})
+
+
+def test_partial_top_off_in_last_recording_validates_charging(tmp_path: Path) -> None:
+    first = write_recording(tmp_path / "record-1.jsonl", dense_cycle())
+    items = [item for item in dense_cycle() if item.entities[STATE].state != "charging"]
+    items.extend(charge_from(70))
+    last = write_recording(
+        tmp_path / "record-2.jsonl",
+        [replace(item, elapsed_seconds=float(index)) for index, item in enumerate(items)],
+    )
+
+    result = RecorderAnalyser().analyse([first, last], CONTEXT)
+
+    assert result.model_ready
+    assert result.validation_method == ValidationMethod.HELD_OUT_RECORDING
+    assert not result.warnings
+
+
+def test_trickle_in_last_recording_holds_out_an_earlier_recording_charge(tmp_path: Path) -> None:
+    activities = [item for item in dense_cycle() if item.entities[STATE].state != "charging"]
+    recordings = [
+        dense_cycle(),
+        dense_cycle(),
+        activities + [sample("charging", 10, level=80) for _ in range(100)],
+    ]
+    paths = [
+        write_recording(
+            tmp_path / f"record-{index}.jsonl",
+            [replace(item, elapsed_seconds=float(offset)) for offset, item in enumerate(items)],
+        )
+        for index, items in enumerate(recordings)
+    ]
+
+    split = split_vacuum_samples(load_recordings(paths).dataset.samples, CONTEXT)
+
+    assert isinstance(split, TrainingValidationSplit)
+    assert split.method == ValidationMethod.HELD_OUT_RECORDING
+    charging_validation = {
+        item.recording_id for item in split.validation if resolve_activity(item, split.signals) == Activity.CHARGING
+    }
+    assert charging_validation == {1}
+    other_validation = {
+        item.recording_id for item in split.validation if resolve_activity(item, split.signals) != Activity.CHARGING
+    }
+    assert other_validation == {2}
+
+    result = RecorderAnalyser().analyse(paths, CONTEXT)
+    assert result.model_ready
+    assert result.validation_method == ValidationMethod.HELD_OUT_RECORDING
+    assert not result.warnings
+
+
+def test_charge_interrupted_by_unidentified_reading_is_not_validated_against_itself(tmp_path: Path) -> None:
+    activities = [item for item in repeated() if item.entities[STATE].state != "charging"]
+    # A battery reading that dips back after the gap must not pass as a second charge.
+    items = activities + charge_from(20) + [unidentified()] + charge_from(60)
+    samples = [replace(item, elapsed_seconds=float(index)) for index, item in enumerate(items)]
+    assert resolve_activity(samples[len(activities) + len(charge_from(20))], discover_signals(samples, CONTEXT)) is None
+
+    split = split_vacuum_samples(samples, CONTEXT)
+
+    assert isinstance(split, TrainingValidationSplit)
+    assert split.method == ValidationMethod.HELD_OUT_BLOCKS
+    result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", samples), CONTEXT)
     assert any("repeatability across cycles has not been tested" in warning for warning in result.warnings)
 
 
