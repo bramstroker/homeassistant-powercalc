@@ -5,7 +5,7 @@ from measure.controller.light.const import LightControllerType, LutMode
 from measure.controller.light.spec import HassMultiLightControllerSpec
 from measure.controller.switch.spec import HassMultiSwitchControllerSpec
 from measure.powermeter.const import PowerMeterType
-from measure.powermeter.spec import DummyPowerMeterSpec
+from measure.powermeter.spec import DummyPowerMeterSpec, ShellyPowerMeterSpec
 from measure.request import (
     _BASE_PARAMETER_FIELDS,
     _LIGHT_PARAMETER_FIELDS,
@@ -35,6 +35,19 @@ def valid_request() -> dict[str, object]:
         "controller": {"type": "hass", "entity_id": "light.test"},
         "power_meter": {"type": "hass", "entity_id": "sensor.test_power"},
     }
+
+
+@pytest.mark.parametrize("channel", [None, 0, 3])
+def test_shelly_request_round_trip_preserves_channel(channel: int | None) -> None:
+    request = AverageMeasurementRequest(power_meter=ShellyPowerMeterSpec(device_ip="192.168.1.50", channel=channel))
+
+    assert parse_measurement_request(request.model_dump(mode="json")) == request
+
+
+@pytest.mark.parametrize("channel", [-1, True, 1.5, "1"])
+def test_shelly_request_rejects_invalid_channel(channel: object) -> None:
+    with pytest.raises(ValidationError):
+        ShellyPowerMeterSpec.model_validate({"device_ip": "192.168.1.50", "channel": channel})
 
 
 def test_smart_switch_request_round_trip_preserves_multi_relay_configuration() -> None:

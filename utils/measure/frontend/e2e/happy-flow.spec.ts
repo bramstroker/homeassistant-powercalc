@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { completedSession, completedSnapshot, contributionPreview, lightRequest, mockApi, parameters, startedSnapshot } from "./mock-api";
+import { completedSession, completedSnapshot, contributionPreview, lightRequest, mockApi, parameters, settings, startedSnapshot } from "./mock-api";
 import type { SessionSnapshot, SessionSummary } from "../src/types";
 
 /**
@@ -790,4 +790,34 @@ test("opens settings from setup with the configured power meter", async ({ page 
   await expect(page.getByLabel("Contributor name")).toHaveValue("Powercalc Tester");
   await expect(page.getByLabel("GitHub username")).toHaveValue("powercalc-tester");
   await expect(page.getByLabel("Email (optional)")).toHaveValue("tester@example.com");
+});
+
+test("selects a Shelly strip outlet and includes it in the measurement request", async ({ page }, testInfo) => {
+  await page.route("**/api/power-meters/shelly", (route) => route.fulfill({ json: {
+    available: true, message: null, devices: [{
+      id: "strip", name: "Power Strip", model: "S4PL-00416EU", generation: 4,
+      ip_address: "192.168.1.50", supported: true, reason: null, auth_required: false, channels: [0, 1, 2, 3],
+    }],
+  } }));
+  await page.route("**/api/settings", (route) => route.fulfill({ json: {
+    ...settings, ...route.request().postDataJSON(),
+  } }));
+  await startAverageSetup(page);
+  await page.getByRole("button", { name: "Change power meter" }).click();
+  await page.getByRole("combobox", { name: "Type", exact: true }).click();
+  await page.getByRole("option", { name: "Shelly plug", exact: true }).click();
+  await page.getByRole("combobox", { name: "Select device", exact: true }).click();
+  await page.getByRole("option", { name: /Power Strip/ }).click();
+  await expect(page.getByRole("combobox", { name: "Outlet", exact: true })).toHaveValue("Select an outlet");
+  await page.getByRole("combobox", { name: "Outlet", exact: true }).click();
+  await page.getByRole("option", { name: "Outlet 4", exact: true }).click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: testInfo.outputPath("shelly-outlet-settings.png"), fullPage: true });
+  const saved = page.waitForRequest((request) => request.url().endsWith("/api/settings") && request.method() === "PUT");
+  await page.getByRole("button", { name: "Save settings" }).click();
+  expect((await saved).postDataJSON()).toMatchObject({ shelly_channel: 3, shelly_ip: "192.168.1.50" });
+  await expect(page.getByText("192.168.1.50 · Outlet 4", { exact: true })).toBeVisible();
+  const checked = page.waitForRequest("**/api/preflight");
+  await page.getByRole("button", { name: "Check setup" }).click();
+  expect((await checked).postDataJSON().power_meter).toMatchObject({ type: "shelly", channel: 3 });
 });
