@@ -1,9 +1,64 @@
-import type { AppSettings, AppSettingsUpdate, EntityDescriptor, PowerMeterDiagnostic } from "../../types";
+import type { AppSettings, AppSettingsUpdate, EntityDescriptor, PowerMeterDiagnostic, ShellyDiscoveryDevice } from "../../types";
 import "./view";
 import { defaultSettings, goodPowerMeterDiagnostic } from "../testing/fixtures";
 import { chooseOption, settingsCombobox } from "./test-helpers";
 
 describe("settings power meter test", () => {
+  it("requires an outlet for a discovered strip and saves the selected channel", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      settings: AppSettings; shellyDiscoveryDevices: ShellyDiscoveryDevice[];
+      updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.settings = { ...defaultSettings, power_meter: "shelly", shelly_ip: "192.168.1.50", shelly_channel: 2 };
+    element.shellyDiscoveryDevices = [{
+      id: "strip", name: "Power Strip", model: "S4PL-00416EU", generation: 4,
+      ip_address: "192.168.1.50", supported: true, reason: null, auth_required: false, channels: [0, 1, 2, 3],
+    }];
+    document.body.append(element);
+    await element.updateComplete;
+
+    const picker = settingsCombobox(element.shadowRoot, "shelly_outlet");
+    expect(picker.hasAttribute("required")).toBe(true);
+    expect(picker.value).toBe("3");
+    expect(picker.options.map((option) => option.label)).toEqual(["Select an outlet", "Outlet 1", "Outlet 2", "Outlet 3", "Outlet 4"]);
+    const cleared = vi.fn();
+    element.addEventListener("test-clear", cleared);
+    chooseOption(picker, "4");
+    await element.updateComplete;
+    expect(cleared).toHaveBeenCalledOnce();
+
+    const saved = new Promise<AppSettingsUpdate>((resolve) => {
+      element.addEventListener("save", (event) => resolve((event as CustomEvent<AppSettingsUpdate>).detail));
+    });
+    (element.shadowRoot.querySelector("form") as HTMLFormElement).requestSubmit();
+    expect((await saved).shelly_channel).toBe(3);
+
+    const address = element.shadowRoot.querySelector('input[name="shelly_ip"]') as HTMLInputElement;
+    address.value = "192.168.1.51";
+    address.dispatchEvent(new Event("input"));
+    await element.updateComplete;
+    expect((element.shadowRoot.querySelector('input[name="shelly_outlet"]') as HTMLInputElement).value).toBe("");
+  });
+
+  it("accepts an outlet number for manual or authenticated Shelly setup", async () => {
+    const element = document.createElement("measure-settings-view") as HTMLElement & {
+      settings: AppSettings; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
+    };
+    element.settings = { ...defaultSettings, power_meter: "shelly", shelly_ip: "192.168.1.50" };
+    document.body.append(element);
+    await element.updateComplete;
+    const outlet = element.shadowRoot.querySelector('input[name="shelly_outlet"]') as HTMLInputElement;
+    expect(outlet.value).toBe("");
+    outlet.value = "1";
+    outlet.dispatchEvent(new Event("input"));
+    await element.updateComplete;
+    const tested = new Promise<AppSettingsUpdate>((resolve) => {
+      element.addEventListener("test", (event) => resolve((event as CustomEvent<AppSettingsUpdate>).detail));
+    });
+    [...element.shadowRoot.querySelectorAll("button")].find((button) => button.textContent?.includes("Validate measurement device"))?.click();
+    expect((await tested).shelly_channel).toBe(0);
+  });
+
   it("explains the meter requirements, emits a validation event, and shows diagnostic metrics", async () => {
     const element = document.createElement("measure-settings-view") as HTMLElement & {
       powers: EntityDescriptor[]; settings: AppSettings; testResult: PowerMeterDiagnostic;

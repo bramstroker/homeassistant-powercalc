@@ -119,11 +119,11 @@ def _energy_price_units(hass: HomeAssistant, current_entity_id: str | None) -> l
         if not current_state or not is_energy_price_unit(current_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)):
             return None
 
-    units = {
-        unit
-        for state in hass.states.async_all(SENSOR_DOMAIN)
-        if is_energy_price_unit(unit := state.attributes.get(ATTR_UNIT_OF_MEASUREMENT))
-    }
+    units: set[str] = set()
+    for state in hass.states.async_all(SENSOR_DOMAIN):
+        unit = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+        if unit is not None and is_energy_price_unit(unit):
+            units.add(unit)
     return sorted(units) or None
 
 

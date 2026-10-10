@@ -48,6 +48,7 @@ class AppPreferences(BaseModel):
     power_meter: AppPowerMeterType = PowerMeterType.HASS
     shelly_ip: str | None = Field(default=None, max_length=255)
     shelly_username: str = Field(default="admin", min_length=1, max_length=50)
+    shelly_channel: int | None = Field(default=None, ge=0, strict=True)
     kasa_ip: str | None = Field(default=None, max_length=255)
     fast_test_mode: bool = False
     allow_zero_power: bool = False

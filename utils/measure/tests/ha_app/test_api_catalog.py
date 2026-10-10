@@ -22,6 +22,7 @@ from measure.tuning import MeasurementParameters
 from measure.utils.version import measure_version
 import pytest
 
+from tests.conftest import MockRequestsGetFactory
 from tests.ha_app.api_test_support import (
     AppClientFactory,
     FakeClient,
@@ -747,6 +748,45 @@ def test_power_meter_test_endpoint(app_client: TestClient) -> None:
     assert validated.json()["supports_voltage"] is False
     assert validated.json()["precision_decimals"] == 1
     assert validated.json()["update_interval_status"] == "poor"
+
+
+@pytest.mark.parametrize("channel", [None, 0, 3, 4])
+def test_shelly_meter_validation_uses_selected_outlet(
+    app_client: TestClient,
+    mock_requests_get_factory: MockRequestsGetFactory,
+    channel: int | None,
+) -> None:
+    responses = {
+        "http://192.168.1.50/shelly": ({"gen": 4, "model": "S4PL-00416EU"}, 200),
+        "http://192.168.1.50/rpc/Shelly.GetStatus": (
+            {f"switch:{index}": {"apower": index + 0.5, "voltage": 230.0} for index in range(4)},
+            200,
+        ),
+    }
+    for index in range(4):
+        responses[f"http://192.168.1.50/rpc/Switch.GetStatus?id={index}"] = (
+            {"apower": index + 0.5, "voltage": 230.0},
+            200,
+        )
+    mock_requests_get_factory(responses)
+
+    response = app_client.post(
+        "/api/settings/test-power-meter",
+        json={"power_meter": "shelly", "shelly_ip": "192.168.1.50", "shelly_channel": channel},
+    )
+
+    assert response.status_code == 200
+    result = response.json()
+    if channel is None:
+        assert result["success"] is False
+        assert "select the outlet" in result["message"]
+    elif channel == 4:
+        assert result["success"] is False
+        assert "does not have" in result["message"]
+    else:
+        assert result["success"] is True
+        assert result["power"] == pytest.approx(channel + 0.5)
+        assert result["supports_voltage"] is True
 
 
 @pytest.mark.parametrize(

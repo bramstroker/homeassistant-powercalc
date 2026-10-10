@@ -1,7 +1,7 @@
 from decimal import Decimal
 import logging
 
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
+from homeassistant.components.switch.const import DOMAIN as SWITCH_DOMAIN
 from homeassistant.const import CONF_ENTITIES, STATE_CLOSING, STATE_ON, STATE_OPENING, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
 import homeassistant.helpers.config_validation as cv

@@ -146,6 +146,7 @@ def test_settings_default_and_update(app_client: TestClient) -> None:
         "power_meter": "hass",
         "shelly_ip": None,
         "shelly_username": "admin",
+        "shelly_channel": None,
         "shelly_password_configured": False,
         "kasa_ip": None,
         "tapo_credentials_configured": False,
@@ -218,6 +219,25 @@ def test_settings_store_shelly_password_separately_and_never_return_it(app_clien
     cleared = app_client.put("/api/settings", json=payload | {"shelly_password": None, "clear_shelly_password": True})
     assert cleared.json()["shelly_password_configured"] is False
     assert not (tmp_path / "shelly_credentials.json").exists()
+
+
+@pytest.mark.parametrize("channel", [None, 0, 3])
+def test_settings_persist_shelly_channel(app_client: TestClient, channel: int | None) -> None:
+    saved = app_client.put(
+        "/api/settings",
+        json={"power_meter": "shelly", "shelly_ip": "192.168.1.50", "shelly_channel": channel},
+    )
+
+    assert saved.status_code == 200
+    assert saved.json()["shelly_channel"] == channel
+    assert app_client.get("/api/settings").json()["shelly_channel"] == channel
+
+
+@pytest.mark.parametrize("channel", [-1, True, 1.5, "1"])
+def test_settings_reject_invalid_shelly_channel(app_client: TestClient, channel: object) -> None:
+    response = app_client.put("/api/settings", json={"power_meter": "shelly", "shelly_channel": channel})
+
+    assert response.status_code == 400
 
 
 def test_fast_test_mode_requires_developer_mode_and_dummy_adapters(app_client_factory: AppClientFactory) -> None:

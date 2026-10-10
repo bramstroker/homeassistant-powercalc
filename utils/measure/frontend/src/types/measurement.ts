@@ -216,7 +216,7 @@ export type AppMeasurementDefaults = Pick<
 export type PowerMeterSpec =
   | { type: "dummy" }
   | { type: "hass"; entity_id: string; voltage_entity_id?: string | null; call_update_entity?: boolean }
-  | { type: "shelly"; device_ip: string; username?: string; timeout?: number }
+  | { type: "shelly"; device_ip: string; username?: string; timeout?: number; channel?: number | null }
   | { type: "kasa"; device_ip: string };
 
 export type LightControllerSpec =

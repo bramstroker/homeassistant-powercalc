@@ -197,13 +197,15 @@ def test_tuya_key_stays_in_cli_config(mock_config_factory: MockConfigFactory) ->
     assert "device-key" not in request.model_dump_json()
 
 
-def test_shelly_password_stays_in_cli_config(mock_config_factory: MockConfigFactory) -> None:
+@pytest.mark.parametrize("channel", [None, 0, 3])
+def test_shelly_password_stays_in_cli_config(mock_config_factory: MockConfigFactory, channel: int | None) -> None:
     environment = mock_config_factory()
     environment.selected_power_meter = PowerMeterType.SHELLY
     environment.shelly_ip = "192.0.2.30"
     environment.shelly_username = "measurement"
     environment.shelly_password = "device-password"  # noqa: S105
     environment.shelly_timeout = 10
+    environment.shelly_channel = channel
 
     request = request_from_answers(MeasureType.AVERAGE, {QUESTION_DURATION: 60}, environment)
 
@@ -211,6 +213,7 @@ def test_shelly_password_stays_in_cli_config(mock_config_factory: MockConfigFact
         device_ip="192.0.2.30",
         username="measurement",
         timeout=10,
+        channel=channel,
     )
     assert "device-password" not in request.model_dump_json()
 

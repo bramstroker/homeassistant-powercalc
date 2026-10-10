@@ -1037,7 +1037,7 @@ class PreviousStateStore:
 class PreviousStateStoreStore(Store[StoredStates]):
     """Store area registry data."""
 
-    async def _async_migrate_func(  # type: ignore
+    async def _async_migrate_func(
         self,
         old_major_version: int,
         old_minor_version: int,

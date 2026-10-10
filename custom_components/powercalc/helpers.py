@@ -3,16 +3,21 @@ from functools import wraps
 import logging
 import os.path
 import re
-from typing import Any, NamedTuple, TypeVar, cast
+from typing import TYPE_CHECKING, Any, NamedTuple, TypeVar, cast
 import uuid
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.typing import ConfigType
+
+# Older supported HA releases do not have a binary_sensor.const module.
+if TYPE_CHECKING:
+    from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
+else:
+    from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (

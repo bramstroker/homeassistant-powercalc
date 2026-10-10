@@ -104,7 +104,8 @@ const isPowerMeterSpec: Guard<PowerMeterSpec> = (value): value is PowerMeterSpec
       return isString(value.entity_id) && optionalNullable(isString)(value.voltage_entity_id)
         && optional(isBoolean)(value.call_update_entity);
     case "shelly":
-      return isString(value.device_ip) && optional(isString)(value.username) && optional(isNumber)(value.timeout);
+      return isString(value.device_ip) && optional(isString)(value.username) && optional(isNumber)(value.timeout)
+        && optionalNullable(isNumber)(value.channel);
     case "kasa": return isString(value.device_ip);
     default: return false;
   }
@@ -279,6 +280,7 @@ const isAppSettings: Guard<AppSettings> = objectOf({
   power_meter: nullable(oneOf("hass", "shelly", "kasa", "dummy")),
   shelly_ip: nullable(isString),
   shelly_username: optional(isString),
+  shelly_channel: optionalNullable(isNumber),
   shelly_password_configured: optional(isBoolean),
   kasa_ip: nullable(isString),
   tapo_credentials_configured: optional(isBoolean),
@@ -447,7 +449,8 @@ export const decodeContributionStatus = decoder("contribution status", isContrib
 export const decodePowerMeterDiagnostic = decoder("power-meter diagnostic", isDiagnostic);
 export const decodeShellyDiscovery: Decoder<ShellyDiscoveryResponse> = decoder("Shelly discovery", objectOf({
   devices: arrayOf(objectOf({ id: isString, name: isString, model: nullable(isString), generation: nullable(isNumber),
-    ip_address: isString, supported: isBoolean, reason: nullable(isString), auth_required: isBoolean })),
+    ip_address: isString, supported: isBoolean, reason: nullable(isString), auth_required: isBoolean,
+    channels: optional(arrayOf(isNumber)) })),
   available: isBoolean, message: nullable(isString),
 }));
 export const decodeEntityCatalog: Decoder<EntityCatalog> = decoder("entity catalog", objectOf({
