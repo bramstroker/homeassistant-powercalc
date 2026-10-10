@@ -18,7 +18,7 @@
   "gtin": [
     "00860038001703"
   ],
-  "measure_description": "Manually measured power consumption of the 300S in standby and with the Relay Switch 1PM relay switched on/off",
+  "measure_description": "Manually measured power consumption of the Relay Switch 1PM with the relay switched off and on.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "name": "Relay Switch 1PM",
