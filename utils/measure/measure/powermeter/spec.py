@@ -51,6 +51,7 @@ class ShellyPowerMeterSpec(_PowerMeterSpec):
     device_ip: str
     username: str = Field(default="admin", min_length=1, max_length=50)
     timeout: int = 5
+    channel: int | None = Field(default=None, ge=0, strict=True)
 
 
 class TasmotaPowerMeterSpec(_PowerMeterSpec):

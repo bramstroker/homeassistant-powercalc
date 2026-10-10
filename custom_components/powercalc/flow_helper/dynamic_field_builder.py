@@ -4,7 +4,7 @@ from typing import cast
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.selector import EntitySelector, selector
+from homeassistant.helpers.selector import EntitySelector, EntitySelectorConfig, Selector, selector
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.power_profile.error import LibraryError
@@ -64,7 +64,7 @@ def build_dynamic_field_schema(
 
 def find_auto_selected_entity(
     entities: list[er.RegistryEntry],
-    entity_selector: EntitySelector,
+    entity_selector: Selector[EntitySelectorConfig],
     auto_select: EntityAutoSelectConfig,
 ) -> str | None:
     """Return a single enabled match without guessing when the selection is ambiguous."""
@@ -79,7 +79,7 @@ def find_auto_selected_entity(
     return matches[0] if len(matches) == 1 else None
 
 
-def matches_entity_selector(entity: er.RegistryEntry, entity_selector: EntitySelector) -> bool:
+def matches_entity_selector(entity: er.RegistryEntry, entity_selector: Selector[EntitySelectorConfig]) -> bool:
     """Check the selector's allowed entities and metadata filters against the registry."""
     config = entity_selector.config
     included = config.get("include_entities")

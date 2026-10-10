@@ -132,7 +132,7 @@ async def create_daily_fixed_energy_power_sensor(
     if mode_config.get(CONF_ON_TIME) != timedelta(days=1):
         return None
 
-    power_value: float = mode_config.get(CONF_VALUE)  # type: ignore
+    power_value: float | Template = mode_config.get(CONF_VALUE)  # type: ignore
     if mode_config.get(CONF_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR and not isinstance(
         power_value,
         Template,

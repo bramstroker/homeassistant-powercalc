@@ -61,6 +61,9 @@ class WledStrategy(PowerCalculationStrategyInterface):
         if light_state.state in OFF_STATES and self._standby_power:
             return self._standby_power
 
+        if self._estimated_current_entity is None:
+            return None
+
         current_state = (
             entity_state
             if entity_state.entity_id == self._estimated_current_entity

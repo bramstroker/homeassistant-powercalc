@@ -3,6 +3,7 @@
 from dataclasses import replace
 
 from measure.analyser.entity_references import resolve_portable_entity
+from measure.analyser.models import FeatureReference, FeatureSource
 from measure.analyser.vacuum.entity_rules import (
     INTEGRATION_ENTITY_RULES,
     EntitySignalRule,
@@ -12,6 +13,7 @@ from measure.analyser.vacuum.entity_rules import (
 from measure.analyser.vacuum.signals import (
     ALIASES,
     Activity,
+    ActivitySignal,
     discover_signals,
     resolve_activity,
     suggest_recording_entities,
@@ -152,6 +154,162 @@ def test_other_activity_does_not_replace_deprecated_signal() -> None:
 def test_deprecation_rule_is_scoped_to_roborock() -> None:
     ctx = context(entity("drying", "switch"), entity("mop_drying_status", "binary_sensor", "other_integration"))
     assert suggest_recording_entities(ctx).selected == ["switch.drying", "binary_sensor.mop_drying_status"]
+
+
+def contextual_sample(status: str, docked: bool | None, charging: str) -> RecordingSample:
+    item = sample(**{"sensor.state": status, "binary_sensor.charging_state": charging})
+    return replace(item, entities={**item.entities, PRIMARY: RecordedEntityState("docked", {"docked": docked})})
+
+
+@pytest.mark.parametrize("status", ["paused", "idle"])
+def test_dreame_paused_and_idle_use_live_dock_context(status: str) -> None:
+    ctx = context(entity("state"), entity("charging_state", "binary_sensor"))
+    items = [
+        contextual_sample(status, True, "on"),
+        contextual_sample(status, True, "off"),
+        contextual_sample(status, False, "off"),
+        contextual_sample(status, True, "unavailable"),
+        contextual_sample(status, None, "off"),
+        contextual_sample("docked", True, "off"),
+    ]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [
+        Activity.CHARGING,
+        Activity.DOCKED,
+        Activity.AWAY,
+        None,
+        None,
+        Activity.DOCKED,
+    ]
+
+
+@pytest.mark.parametrize(
+    "status,expected",
+    [
+        ("charging", Activity.CHARGING),
+        ("washing", Activity.WASHING),
+        ("drying", Activity.DRYING),
+        ("charging_completed", Activity.COMPLETED),
+        ("sleeping", Activity.SLEEPING),
+        ("error_dustbin_full", None),
+    ],
+)
+def test_dreame_charging_flag_does_not_override_explicit_modes(status: str, expected: Activity | None) -> None:
+    ctx = context(entity("state"), entity("charging_state", "binary_sensor"))
+    items = [contextual_sample("paused", False, "off"), contextual_sample(status, True, "on")]
+    assert resolve_activity(items[-1], discover_signals(items, ctx)) == expected
+
+
+def test_dreame_docked_pause_without_a_charging_flag() -> None:
+    ctx = context(entity("state"))
+    items = [contextual_sample("paused", True, "on"), contextual_sample("paused", False, "off")]
+    assert [resolve_activity(item, discover_signals(items, ctx)) for item in items] == [Activity.DOCKED, Activity.AWAY]
+
+
+def test_dreame_primary_metadata_supports_legacy_status_attributes() -> None:
+    ctx = replace(context(), entities=[replace(context().entities[0], integration="dreame_vacuum")])
+    item = replace(
+        sample(), entities={PRIMARY: RecordedEntityState("docked", {"vacuum_state": "paused", "docked": True})}
+    )
+    assert resolve_activity(item, discover_signals([item], ctx)) == Activity.DOCKED
+
+
+def test_dreame_context_requires_observed_boolean_docked_attribute() -> None:
+    ctx = context(entity("state"), entity("charging_state", "binary_sensor"))
+    item = contextual_sample("paused", None, "off")
+    assert resolve_activity(item, discover_signals([item], ctx)) == Activity.AWAY
+
+
+def test_other_integrations_keep_their_paused_semantics() -> None:
+    ctx = context(entity("state", integration="roborock"))
+    item = contextual_sample("paused", True, "on")
+    assert resolve_activity(item, discover_signals([item], ctx)) == Activity.AWAY
+
+
+@pytest.mark.parametrize(
+    "charging_states,expected",
+    [
+        (["on", "off", "unknown"], [Activity.DRYING_WHILE_CHARGING, Activity.DRYING, None]),
+        (["on", "on"], [Activity.DRYING, Activity.DRYING]),
+        (["off", "off"], [Activity.DRYING, Activity.DRYING]),
+    ],
+)
+def test_drying_uses_two_modes_only_when_both_charging_states_are_observed(
+    charging_states: list[str], expected: list[Activity | None]
+) -> None:
+    ctx = context(entity("state"), entity("charging_state", "binary_sensor"))
+    items = [contextual_sample("drying", True, value) for value in charging_states]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == expected
+
+
+@pytest.mark.parametrize(
+    "charging_entity",
+    [
+        entity("auto_drying", "switch"),
+        replace(entity("charging_state", "binary_sensor"), disabled_by="user"),
+        replace(entity("charging_state", "binary_sensor"), has_live_state=False),
+        replace(entity("battery_charging", "binary_sensor", "roborock"), device_class="battery_charging"),
+    ],
+)
+def test_drying_split_requires_an_available_semantic_charging_flag(charging_entity: RecordedEntity) -> None:
+    ctx = context(entity("state"), charging_entity)
+    items = [sample(**{"sensor.state": "drying", charging_entity.entity_id: value}) for value in ["on", "off"]]
+    signals = discover_signals(items, ctx)
+    assert all(resolve_activity(item, signals) == Activity.DRYING for item in items)
+
+
+@pytest.mark.parametrize(
+    "status,charging,expected",
+    [
+        ("drying", "on", True),
+        ("drying", "off", False),
+        ("drying", "unknown", None),
+        ("charging", "unknown", False),
+        ("unknown", "off", None),
+    ],
+)
+def test_contextual_signal_preserves_unknown_source_and_qualifier(
+    status: str, charging: str, expected: bool | None
+) -> None:
+    signal = ActivitySignal(
+        Activity.DRYING_WHILE_CHARGING,
+        FeatureReference("sensor.state", FeatureSource.STATE),
+        ["drying"],
+        ["charging"],
+        [
+            ActivitySignal(
+                Activity.CHARGING,
+                FeatureReference("binary_sensor.charging_state", FeatureSource.STATE),
+                ["on"],
+                ["off"],
+            )
+        ],
+    )
+    assert signal.matches(contextual_sample(status, True, charging)) is expected
+
+
+def test_contextual_signal_exports_explicit_active_and_inactive_conditions() -> None:
+    ctx = context(entity("state"), entity("charging_state", "binary_sensor"))
+    items = [contextual_sample("drying", True, value) for value in ["on", "off"]]
+    signals = discover_signals(items, ctx)
+    signal = next(signal for signal in signals if signal.activity == Activity.DRYING_WHILE_CHARGING)
+    source_on = {"condition": "state", "entity_id": "[[entity_by_translation_key:state]]", "state": ["drying"]}
+    source_off = {**source_on, "state": []}
+    flag_on = {"condition": "state", "entity_id": "[[entity_by_translation_key:charging_state]]", "state": ["on"]}
+    flag_off = {**flag_on, "state": ["off"]}
+    assert signal.build_condition(ctx) == {"condition": "and", "conditions": [source_on, flag_on]}
+    assert signal.build_condition(ctx, active=False) == {
+        "condition": "or",
+        "conditions": [
+            source_off,
+            {"condition": "and", "conditions": [source_on, {"condition": "or", "conditions": [flag_off]}]},
+        ],
+    }
+    assert signal.features == [
+        FeatureReference("sensor.state", FeatureSource.STATE),
+        FeatureReference("binary_sensor.charging_state", FeatureSource.STATE),
+    ]
 
 
 def test_integration_mapping_extends_selection_and_analysis(monkeypatch: pytest.MonkeyPatch) -> None:

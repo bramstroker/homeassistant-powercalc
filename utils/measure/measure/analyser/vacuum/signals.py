@@ -1,7 +1,7 @@
 """Map recorded runtime signals to canonical vacuum activities."""
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 import json
 
 from measure.analyser.entity_references import resolve_portable_entity
@@ -21,6 +21,7 @@ ACTIVITY_PRIORITY = (
     Activity.AUTO_EMPTYING,
     Activity.STATION_CLEANING,
     Activity.WASHING,
+    Activity.DRYING_WHILE_CHARGING,
     Activity.DRYING,
     Activity.CHARGING,
     Activity.SLEEPING,
@@ -45,16 +46,57 @@ class ActivitySignal:
     feature: FeatureReference
     active: list[ScalarStateValue]
     inactive: list[ScalarStateValue]
+    requirements: list[ActivitySignal] = field(default_factory=list)
+
+    @property
+    def features(self) -> list[FeatureReference]:
+        features = [self.feature]
+        for requirement in self.requirements:
+            features.extend(requirement.features)
+        return features
 
     def matches(self, sample: RecordingSample) -> bool | None:
         value = self.feature.get_value(sample)
         if value is None:
             return None
         if _contains(self.active, value):
-            return True
+            matches = [requirement.matches(sample) for requirement in self.requirements]
+            if False in matches:
+                return False
+            return None if None in matches else True
         return False if _contains(self.inactive, value) else None
 
     def build_condition(self, context: RecordingContext, *, active: bool = True) -> dict[str, object]:
+        condition = self._build_value_condition(context, active=active)
+        if not self.requirements:
+            return condition
+        if active:
+            return {
+                "condition": "and",
+                "conditions": [condition, *[requirement.build_condition(context) for requirement in self.requirements]],
+            }
+        # An inactive source needs no qualifier. An active source is inactive
+        # only when a qualifier is explicitly false; unknown values stay unknown.
+        return {
+            "condition": "or",
+            "conditions": [
+                condition,
+                {
+                    "condition": "and",
+                    "conditions": [
+                        self._build_value_condition(context, active=True),
+                        {
+                            "condition": "or",
+                            "conditions": [
+                                requirement.build_condition(context, active=False) for requirement in self.requirements
+                            ],
+                        },
+                    ],
+                },
+            ],
+        }
+
+    def _build_value_condition(self, context: RecordingContext, *, active: bool) -> dict[str, object]:
         entity = _resolve_signal_entity(self.feature.entity_id, context)
         assert entity is not None
         values = self.active if active else self.inactive
@@ -204,7 +246,100 @@ def discover_signals(samples: Sequence[RecordingSample], context: RecordingConte
         if candidate.priority >= SignalPriority.RELATED_STATE and signal.feature != status_feature:
             continue
         chosen.setdefault(signal.activity, signal)
+    _apply_dreame_docked_context(samples, entities, primary, status_feature, chosen)
+    _split_drying_by_charging(samples, entities, chosen)
     return [chosen[activity] for activity in ACTIVITY_PRIORITY if activity in chosen]
+
+
+def _find_charging_flag(
+    samples: Sequence[RecordingSample], entities: Sequence[RecordedEntity]
+) -> ActivitySignal | None:
+    flags: list[_SignalCandidate] = []
+    for entity in entities:
+        rule = get_entity_signal_rule(entity)
+        if rule is not None and rule.signal_type == EntitySignalType.CHARGING_FLAG:
+            _add_flags(
+                flags,
+                samples,
+                FeatureReference(entity.entity_id, FeatureSource.STATE),
+                Activity.CHARGING,
+                rule.priority,
+            )
+    if not flags:
+        return None
+    return min(flags, key=lambda candidate: (candidate.priority, candidate.signal.feature.identifier)).signal
+
+
+def _split_drying_by_charging(
+    samples: Sequence[RecordingSample],
+    entities: Sequence[RecordedEntity],
+    chosen: dict[Activity, ActivitySignal],
+) -> None:
+    """Learn two total-power drying modes only when a live charging flag distinguishes them."""
+    drying = chosen.get(Activity.DRYING)
+    charging = _find_charging_flag(samples, entities)
+    if drying is None or charging is None:
+        return
+    states = {charging.matches(sample) for sample in samples if drying.matches(sample) is True}
+    if True not in states or False not in states:
+        return
+    chosen[Activity.DRYING_WHILE_CHARGING] = replace(
+        drying, activity=Activity.DRYING_WHILE_CHARGING, requirements=[*drying.requirements, charging]
+    )
+    not_charging = replace(charging, active=charging.inactive, inactive=charging.active)
+    chosen[Activity.DRYING] = replace(drying, requirements=[*drying.requirements, not_charging])
+
+
+def _apply_dreame_docked_context(
+    samples: Sequence[RecordingSample],
+    entities: Sequence[RecordedEntity],
+    primary: str,
+    status_feature: FeatureReference | None,
+    chosen: dict[Activity, ActivitySignal],
+) -> None:
+    """Dreame's paused/idle state can describe either a docked or an away robot."""
+    if status_feature is None or not any(
+        entity.integration == "dreame_vacuum" and entity.entity_id in {primary, status_feature.entity_id}
+        for entity in entities
+    ):
+        return
+    docked = FeatureReference(primary, FeatureSource.ATTRIBUTE, "docked")
+    if not any(isinstance(docked.get_value(sample), bool) for sample in samples):
+        return
+    status_values = _collect_feature_values(samples, status_feature)
+    ambiguous = [value for value in status_values if _normalise(value) in {"paused", "idle"}]
+    if not ambiguous:
+        return
+    if away := chosen.get(Activity.AWAY):
+        chosen[Activity.AWAY] = replace(away, requirements=[ActivitySignal(Activity.AWAY, docked, [False], [True])])
+    # Preserve explicit docked states alongside contextual pauses.
+    docked_values = list(ambiguous)
+    previous_docked = chosen.get(Activity.DOCKED)
+    if previous_docked is not None and previous_docked.feature == status_feature:
+        docked_values.extend(previous_docked.active)
+    chosen[Activity.DOCKED] = ActivitySignal(
+        Activity.DOCKED,
+        status_feature,
+        docked_values,
+        [value for value in status_values if value not in docked_values],
+        [ActivitySignal(Activity.DOCKED, docked, [True], [False])],
+    )
+    charging = _find_charging_flag(samples, entities)
+    if charging is None:
+        return
+    charging_values = [value for value in status_values if _normalise(value) == "charging" or value in ambiguous]
+    chosen[Activity.CHARGING] = replace(
+        charging,
+        requirements=[
+            ActivitySignal(Activity.CHARGING, docked, [True], [False]),
+            ActivitySignal(
+                Activity.CHARGING,
+                status_feature,
+                charging_values,
+                [value for value in status_values if value not in charging_values],
+            ),
+        ],
+    )
 
 
 def _add_supplements(

@@ -428,7 +428,7 @@ async def setup_yaml_sensors(
         else:
             primary_sensors.append(sensor_config)
 
-    async def _load_secondary_sensors(_: None) -> None:
+    async def _load_secondary_sensors(_: Event) -> None:
         """Load secondary sensors after primary sensors."""
         await asyncio.gather(
             *(

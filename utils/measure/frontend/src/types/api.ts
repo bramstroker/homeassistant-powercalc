@@ -7,6 +7,7 @@ export interface ShellyDiscoveryDevice {
   supported: boolean;
   reason: string | null;
   auth_required: boolean;
+  channels?: number[];
 }
 
 export interface ShellyDiscoveryResponse {
