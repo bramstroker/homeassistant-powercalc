@@ -3,7 +3,8 @@
   "product_url": "https://www.battery-direct.de/apc-back-ups-950-bx950mi.html",
   "aliases": [
     "Back-UPS BX950MI-GR",
-    "BX950MI"
+    "BX950MI",
+    "Back-UPS BX950MI"
   ],
   "description": "Power profile for the APC Back-UPS BX950MI (950 VA / 520 W). Estimates real-time input power (drawn from the wall) from the NUT load percentage, nominal real power plus the UPS self-consumption.",
   "device_type": "ups",
