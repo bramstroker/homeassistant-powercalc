@@ -274,6 +274,76 @@ def test_multiple_power_components_are_rejected(mock_requests_get_factory: MockR
         ShellyPowerMeter(DEFAULT_SHELLY_IP)
 
 
+@pytest.mark.parametrize("channel", [0, 1, 2, 3])
+def test_power_strip_reads_only_the_selected_outlet(
+    mock_requests_get_factory: MockRequestsGetFactory,
+    channel: int,
+) -> None:
+    status = {f"switch:{index}": {"apower": index + 0.5, "voltage": 230 + index} for index in reversed(range(4))}
+    requests_get = mock_requests_get_factory(
+        {
+            SHELLY_ENDPOINT: ({"gen": 4, "model": "S4PL-00416EU"}, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Shelly.GetStatus": (status, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Switch.GetStatus?id={channel}": (status[f"switch:{channel}"], 200),
+        },
+    )
+
+    meter = ShellyPowerMeter(DEFAULT_SHELLY_IP, channel=channel)
+    reading = meter.get_power(include_voltage=True)
+
+    assert reading.power == pytest.approx(channel + 0.5)
+    assert reading.voltage == pytest.approx(230 + channel)
+    assert meter.has_voltage_support() is True
+    assert requests_get.call_args.args[0] == f"http://{DEFAULT_SHELLY_IP}/rpc/Switch.GetStatus?id={channel}"
+
+
+@pytest.mark.parametrize("channel", [-1, 1, 5])
+def test_missing_channel_is_rejected(mock_requests_get_factory: MockRequestsGetFactory, channel: int) -> None:
+    mock_requests_get_factory(
+        {
+            SHELLY_ENDPOINT: ({"gen": 4}, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Shelly.GetStatus": ({"switch:0": {"apower": 0.0}}, 200),
+        },
+    )
+
+    with pytest.raises(ApiConnectionError, match="does not have a supported power measurement component"):
+        ShellyPowerMeter(DEFAULT_SHELLY_IP, channel=channel)
+
+
+def test_channel_selection_does_not_guess_between_component_types(
+    mock_requests_get_factory: MockRequestsGetFactory,
+) -> None:
+    mock_requests_get_factory(
+        {
+            SHELLY_ENDPOINT: ({"gen": 4}, 200),
+            f"http://{DEFAULT_SHELLY_IP}/rpc/Shelly.GetStatus": (
+                {"switch:0": {"apower": 1.0}, "pm1:0": {"apower": 2.0}},
+                200,
+            ),
+        },
+    )
+    with pytest.raises(ApiConnectionError, match="Multiple power measurement components"):
+        ShellyPowerMeter(DEFAULT_SHELLY_IP, channel=0)
+
+
+@pytest.mark.parametrize("channel", [0, 1])
+def test_gen1_reads_selected_meter(mock_requests_get_factory: MockRequestsGetFactory, channel: int) -> None:
+    mock_requests_get_factory(
+        {
+            SHELLY_ENDPOINT: ({"gen": 1}, 200),
+            f"http://{DEFAULT_SHELLY_IP}/status": (
+                {"meters": [{"power": 1.5, "timestamp": 100}, {"power": 8.5, "timestamp": 200}, None]},
+                200,
+            ),
+        },
+    )
+
+    reading = ShellyPowerMeter(DEFAULT_SHELLY_IP, channel=channel).get_power()
+
+    assert reading.power == pytest.approx([1.5, 8.5][channel])
+    assert reading.updated == [100, 200][channel]
+
+
 @pytest.mark.parametrize(
     "status_payload",
     [

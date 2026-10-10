@@ -355,7 +355,7 @@ def test_discovers_gen3_pm1_component() -> None:
     assert result.devices[0].supported is True
 
 
-def test_lists_multichannel_device_as_unsupported() -> None:
+def test_discovers_multichannel_device_with_available_outlets() -> None:
     home_assistant = FakeHomeAssistant((service("shelly-2pm", "_shelly._tcp.local.", ["192.168.1.51"]),))
     http_get = response_map(
         {
@@ -368,5 +368,6 @@ def test_lists_multichannel_device_as_unsupported() -> None:
 
     result = asyncio.run(ShellyDiscoveryService(home_assistant, http_get=http_get).discover())  # type: ignore[arg-type]
 
-    assert result.devices[0].supported is False
-    assert "Multiple power measurement components" in str(result.devices[0].reason)
+    assert result.devices[0].supported is True
+    assert result.devices[0].reason is None
+    assert result.devices[0].channels == [0, 1]

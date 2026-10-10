@@ -2,7 +2,7 @@ import hashlib
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from measure.powermeter.spec import PowerMeterSpec
+from measure.powermeter.spec import PowerMeterSpec, ShellyPowerMeterSpec
 
 
 class DummyLoadCalibration(BaseModel):
@@ -19,5 +19,7 @@ class DummyLoadCalibration(BaseModel):
 def power_meter_fingerprint(spec: PowerMeterSpec) -> str:
     """Return a stable, non-secret identity for calibration compatibility."""
 
-    value = spec.model_dump_json(exclude_none=False)
+    # Preserve fingerprints created before outlet selection was supported.
+    exclude = {"channel"} if isinstance(spec, ShellyPowerMeterSpec) and spec.channel is None else set()
+    value = spec.model_dump_json(exclude_none=False, exclude=exclude)
     return hashlib.sha256(value.encode()).hexdigest()

@@ -63,7 +63,7 @@ describe("power meter registry", () => {
 
   it.each([
     { type: "hass" as const, expected: { type: "hass", entity_id: "sensor.plug_power", voltage_entity_id: "sensor.plug_voltage" } },
-    { type: "shelly" as const, expected: { type: "shelly", device_ip: "192.0.2.20", username: "operator" } },
+    { type: "shelly" as const, expected: { type: "shelly", device_ip: "192.0.2.20", username: "operator", channel: null } },
     { type: "kasa" as const, expected: { type: "kasa", device_ip: "192.0.2.30" } },
     { type: "dummy" as const, expected: { type: "dummy" } },
   ])("builds the $type meter the saved settings configure", ({ type, expected }) => {
@@ -78,7 +78,7 @@ describe("power meter registry", () => {
 
   it("falls back to the default Shelly username when none is saved", () => {
     const spec = specFromSettings({ ...settings, power_meter: "shelly", shelly_username: undefined }, context);
-    expect(spec).toEqual({ type: "shelly", device_ip: "192.0.2.20", username: DEFAULT_SHELLY_USERNAME });
+    expect(spec).toEqual({ type: "shelly", device_ip: "192.0.2.20", username: DEFAULT_SHELLY_USERNAME, channel: null });
   });
 
   it("keeps the meter a session was started with, rather than the current default", () => {
@@ -96,7 +96,16 @@ describe("power meter registry", () => {
     { type: "kasa", fields: { kasa_ip: "192.0.2.31" }, expected: { default_power_entity_id: null, shelly_ip: null, kasa_ip: "192.0.2.31" } },
     { type: "dummy", fields: {}, expected: { default_power_entity_id: null, shelly_ip: null, kasa_ip: null } },
   ])("saves only the address keys the selected $type meter owns", ({ type, fields, expected }) => {
-    expect(settingsFromForm(form({ power_meter: type, ...fields }))).toEqual({ power_meter: type, ...expected });
+    expect(settingsFromForm(form({ power_meter: type, ...fields }))).toEqual({ power_meter: type, shelly_channel: null, ...expected });
+  });
+
+  it("carries the selected outlet into measurement requests and descriptions", () => {
+    const saved = settingsFromForm(form({ power_meter: "shelly", shelly_ip: "192.0.2.20", shelly_outlet: "4" }));
+    expect(saved.shelly_channel).toBe(3);
+    const spec = specFromSettings({ ...settings, ...saved }, context);
+    expect(spec).toMatchObject({ type: "shelly", channel: 3 });
+    expect(describeMeter(spec, context).detail).toBe("192.0.2.20 · Outlet 4");
+    expect(summarize(spec)).toBe("Shelly plug · Outlet 4");
   });
 
   it("ignores addresses left over from a meter that is no longer selected", () => {

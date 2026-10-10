@@ -20,6 +20,8 @@ Use **Test connection** to sample the configured meter before starting a long ru
 
 An update interval of two seconds or faster is recommended. Intervals above five seconds, no observed updates, or insufficient precision are reported as poor measurement quality. Directly polled Shelly, Kasa, and Tapo meters are checked for connectivity and a valid reading; Home Assistant reporting cadence does not apply to them.
 
+For a Shelly with several power measurement channels, such as the Power Strip 4 Gen4, select the device and then the **Outlet** to measure. The app reads only that outlet's power and voltage. Outlet numbers start at 1. When entering an IP address manually or using a password-protected device, enter the outlet number yourself. Single-channel devices can leave the outlet unset for automatic selection. Use **Validate measurement device** to check your choice before measuring.
+
 ## Using a resistive dummy load
 
 For devices below the meter's measurement floor, see [Measuring low-power devices](../low-power-measurements.md#add-a-resistive-dummy-load) for voltage requirements, calibration, and reuse of a stored calibration.
