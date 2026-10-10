@@ -1,3 +1,5 @@
+from typing import TypeGuard
+
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter.const import CONF_METER_TYPE, METER_TYPES
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, UnitOfPower
@@ -92,7 +94,7 @@ SCHEMA_GLOBAL_COST_NAMING = vol.Schema(
 )
 
 
-def is_energy_price_unit(unit: str | None) -> bool:
+def is_energy_price_unit(unit: str | None) -> TypeGuard[str]:
     """Check whether a unit of measurement expresses a price per unit of energy.
 
     Price sensors use `<currency>/<energy unit>`, for example `€/kWh`, `EUR/kWh` or `ct/MWh`.

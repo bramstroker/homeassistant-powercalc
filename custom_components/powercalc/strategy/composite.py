@@ -192,9 +192,10 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         for sub_strategy in self.strategies:
             sub_state = entity_state
             if sub_strategy.entity_id is not None:
-                sub_state = self.hass.states.get(sub_strategy.entity_id)
-                if sub_state is None or sub_state.state in UNAVAILABLE_STATES:
+                fetched_state = self.hass.states.get(sub_strategy.entity_id)
+                if fetched_state is None or fetched_state.state in UNAVAILABLE_STATES:
                     return None
+                sub_state = fetched_state
             value = await self._calculate_sub_strategy(sub_strategy, sub_state)
             if value is None:
                 continue

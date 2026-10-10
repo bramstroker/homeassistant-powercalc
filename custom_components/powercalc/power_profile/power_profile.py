@@ -8,19 +8,18 @@ import logging
 import os
 from typing import Any, TypedDict, cast
 
-from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
-from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
-from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN
+from homeassistant.components.camera.const import DOMAIN as CAMERA_DOMAIN
+from homeassistant.components.climate.const import DOMAIN as CLIMATE_DOMAIN
 from homeassistant.components.cover import DOMAIN as COVER_DOMAIN
-from homeassistant.components.fan import DOMAIN as FAN_DOMAIN
-from homeassistant.components.humidifier import DOMAIN as HUMIDIFIER_DOMAIN
-from homeassistant.components.lawn_mower import DOMAIN as LAWN_MOWER_DOMAIN
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
+from homeassistant.components.humidifier.const import DOMAIN as HUMIDIFIER_DOMAIN
+from homeassistant.components.lawn_mower.const import DOMAIN as LAWN_MOWER_DOMAIN
+from homeassistant.components.light.const import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.media_player.const import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.components.vacuum import DOMAIN as VACUUM_DOMAIN
-from homeassistant.components.water_heater import DOMAIN as WATER_HEATER_DOMAIN
+from homeassistant.components.switch.const import DOMAIN as SWITCH_DOMAIN
+from homeassistant.components.vacuum.const import DOMAIN as VACUUM_DOMAIN
+from homeassistant.components.water_heater.const import DOMAIN as WATER_HEATER_DOMAIN
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import translation
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -107,10 +106,10 @@ class CustomField:
 
 DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.AIR_CONDITIONER: CLIMATE_DOMAIN,
-    DeviceType.AIR_PURIFIER: FAN_DOMAIN,
+    DeviceType.AIR_PURIFIER: Platform.FAN,
     DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.COVER: COVER_DOMAIN,
-    DeviceType.FAN: FAN_DOMAIN,
+    DeviceType.FAN: Platform.FAN,
     DeviceType.GENERIC_IOT: {SENSOR_DOMAIN, MEDIA_PLAYER_DOMAIN},
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.POWER_METER: SENSOR_DOMAIN,
@@ -119,7 +118,7 @@ DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.SMART_SWITCH: {SWITCH_DOMAIN, LIGHT_DOMAIN},
     DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
     DeviceType.TELEVISION: MEDIA_PLAYER_DOMAIN,
-    DeviceType.NETWORK: BINARY_SENSOR_DOMAIN,
+    DeviceType.NETWORK: Platform.BINARY_SENSOR,
     DeviceType.PRINTER: SENSOR_DOMAIN,
     DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
     DeviceType.LAWN_MOWER_ROBOT: LAWN_MOWER_DOMAIN,
