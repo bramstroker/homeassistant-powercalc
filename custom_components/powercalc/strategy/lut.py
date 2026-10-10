@@ -7,16 +7,11 @@ from enum import StrEnum
 from functools import partial
 import logging
 import os
-from typing import Any, TextIO, cast
+from typing import TYPE_CHECKING, Any, TextIO, cast
 
-from homeassistant.components import light
-from homeassistant.components.light import (
-    ATTR_BRIGHTNESS,
-    ATTR_COLOR_MODE,
-    ATTR_COLOR_TEMP_KELVIN,
-    ATTR_EFFECT,
-    ATTR_HS_COLOR,
+from homeassistant.components.light.const import (
     COLOR_MODES_COLOR,
+    DOMAIN as LIGHT_DOMAIN,
     ColorMode,
 )
 from homeassistant.core import HomeAssistant, State
@@ -31,6 +26,24 @@ from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 from .profile_data import open_profile_csv
 from .strategy_interface import PowerCalculationStrategyInterface
+
+# These attributes were defined in the light component before moving to light.const.
+if TYPE_CHECKING:
+    from homeassistant.components.light.const import (
+        ATTR_BRIGHTNESS,
+        ATTR_COLOR_MODE,
+        ATTR_COLOR_TEMP_KELVIN,
+        ATTR_EFFECT,
+        ATTR_HS_COLOR,
+    )
+else:
+    from homeassistant.components.light import (
+        ATTR_BRIGHTNESS,
+        ATTR_COLOR_MODE,
+        ATTR_COLOR_TEMP_KELVIN,
+        ATTR_EFFECT,
+        ATTR_HS_COLOR,
+    )
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -427,7 +440,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         return lookup_dict[nearest]
 
     async def validate_config(self) -> None:
-        if self._source_entity.domain != light.DOMAIN:
+        if self._source_entity.domain != LIGHT_DOMAIN:
             raise StrategyConfigurationError(
                 "Only light entities can use the LUT mode",
                 "lut_unsupported_color_mode",

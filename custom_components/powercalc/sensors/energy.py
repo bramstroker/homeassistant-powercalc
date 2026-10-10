@@ -9,12 +9,12 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorDevic
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
+    EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, State, callback
-from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 

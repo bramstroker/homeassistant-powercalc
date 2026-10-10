@@ -19,6 +19,7 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
+    EntityCategory,
     UnitOfPower,
 )
 from homeassistant.core import (
@@ -32,7 +33,6 @@ from homeassistant.core import (
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import issue_registry as ir, start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import (
     EventStateChangedData,
@@ -697,7 +697,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         ):
             return state
 
-        return cast(State | None, self.hass.states.get(self._source_entity.entity_id))
+        return self.hass.states.get(self._source_entity.entity_id)
 
     async def _calculate_state_standby_power(self, entity_state: State) -> Decimal | None:
         if entity_state.state not in self._off_states and await self.is_calculation_enabled(entity_state):
