@@ -4,6 +4,35 @@ import type { ResultView } from "./view";
 import "./view";
 
 describe("result view", () => {
+  it("focuses new action errors without replacing the saved result", async () => {
+    const element = document.createElement("measure-result-view") as ResultView;
+    element.snapshot = { state: "completed", summary: { "Samples recorded": "2099" } };
+    element.canAnalyse = true;
+    document.body.append(element);
+    await element.updateComplete;
+
+    element.errorMessage = "Selected vacuum is unavailable";
+    await element.updateComplete;
+    const error = element.shadowRoot!.querySelector<HTMLElement>('[role="alert"]')!;
+    expect(error.textContent).toContain("Selected vacuum is unavailable");
+    expect(element.shadowRoot!.activeElement).toBe(error);
+    expect(element.shadowRoot!.textContent).toContain("2099");
+
+    const button = element.shadowRoot!.querySelector<HTMLButtonElement>(".analysis-retry button")!;
+    button.focus();
+    element.analysisComplete = true;
+    await element.updateComplete;
+    expect(element.shadowRoot!.activeElement).toBe(button);
+
+    element.errorMessage = "";
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector('[role="alert"]')).toBeNull();
+
+    element.errorMessage = "Selected vacuum is unavailable";
+    await element.updateComplete;
+    expect(element.shadowRoot!.activeElement).toBe(element.shadowRoot!.querySelector('[role="alert"]'));
+  });
+
   it("offers another recording only for retained profile recordings", async () => {
     const element = document.createElement("measure-result-view") as ResultView;
     element.snapshot = { state: "completed" };
@@ -320,14 +349,14 @@ describe("result view", () => {
     await element.updateComplete;
 
     const button = element.shadowRoot.querySelector(".analysis-retry button") as HTMLButtonElement;
-    expect(element.shadowRoot.querySelector(".analysis-retry")?.textContent).toContain("No new measurement is needed");
+    expect(element.shadowRoot.querySelector(".analysis-retry")?.textContent).toContain("without recording new data");
     button.click();
     expect(analyse).toHaveBeenCalledOnce();
 
     element.busy = true;
     await element.updateComplete;
     expect((element.shadowRoot.querySelector(".analysis-retry button") as HTMLButtonElement).disabled).toBe(true);
-    expect(element.shadowRoot.querySelector(".analysis-retry")?.textContent).toContain("Analysing…");
+    expect(element.shadowRoot.querySelector(".analysis-retry")?.textContent).toContain("Analyse recording again");
 
     element.busy = false;
     element.analysisComplete = true;

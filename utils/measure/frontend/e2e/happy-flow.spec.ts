@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { completedSession, completedSnapshot, contributionPreview, lightRequest, mockApi, parameters, settings, startedSnapshot } from "./mock-api";
-import type { SessionSnapshot, SessionSummary } from "../src/types";
+import type { ApiErrorBody, SessionSnapshot, SessionSummary } from "../src/types";
 
 /**
  * Happy-flow smoke tests in a real browser.
@@ -463,6 +463,54 @@ test("explains incomplete vacuum analysis without offering profile preparation",
   await expect(page.getByRole("link", { name: "low-power measurement guide" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Record more" })).toBeVisible();
 });
+
+for (const width of [1280, 390]) {
+  test(`shows record-more preflight errors in the viewport and allows retry at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    const snapshot: SessionSnapshot = {
+      ...completedSnapshot, can_analyse: true, mode: "Recording",
+      summary: { "Recording analysis": "Composite vacuum profile created" },
+      request: {
+        measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+        model_id: "Eureka", product_name: "Vacuum", measure_device: "Dock", generate_model: true,
+        parameters, resume_policy: "new", power_meter: { type: "hass", entity_id: "sensor.plug_power" },
+      },
+    };
+    await page.route("**/api/sessions/session-completed", (route) => route.fulfill({ json: snapshot }));
+    let attempts = 0;
+    await page.route("**/api/sessions/session-completed/record-more", (route) => {
+      expect(route.request().method()).toBe("POST");
+      attempts += 1;
+      return attempts === 1
+        ? route.fulfill({ status: 422, json: {
+          code: "preflight_failed", message: "Selected vacuum is unavailable", field: null,
+          help_url: "https://docs.powercalc.nl/contributing/measure/troubleshooting/", help_label: "Troubleshooting guide",
+        } satisfies ApiErrorBody })
+        : route.fulfill({ json: { ...snapshot, state: "running", phase: "Recording" } });
+    });
+    await page.route("**/api/sessions/session-completed/events", (route) => route.fulfill({
+      contentType: "text/event-stream", body: "retry: 3600000\n\n",
+    }));
+    await page.getByRole("button", { name: "Open", exact: true }).click();
+    const recordMore = page.getByRole("button", { name: "Record more", exact: true });
+    await recordMore.click();
+
+    const error = page.getByRole("alert");
+    await expect(error).toContainText("Selected vacuum is unavailable");
+    await expect(error).toBeInViewport();
+    await expect(error).toBeFocused();
+    await expect(error.getByRole("link", { name: "Troubleshooting guide" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Measurement complete" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Download model.json" })).toBeVisible();
+    await expect(recordMore).toBeEnabled();
+    await expect(page.getByText("Analysing…", { exact: true })).toHaveCount(0);
+
+    await recordMore.click();
+    await expect(page.locator("measure-running-view")).toBeVisible();
+    await expect(error).toHaveCount(0);
+    expect(attempts).toBe(2);
+  });
+}
 
 test("offers a graceful stop for average measurements", async ({ page }) => {
   await page.route("**/api/sessions/session-running/cancel", async (route) => {
