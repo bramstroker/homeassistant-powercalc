@@ -24,6 +24,7 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
     EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
@@ -522,6 +523,36 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
         ),
         (
             State("sensor.testgroup_energy", STATE_UNAVAILABLE),
+            {"native_unit_of_measurement": None, "native_value": "256.1785"},
+            "256.1785",
+            False,
+        ),
+        (
+            State("sensor.testgroup_energy", STATE_UNKNOWN),
+            {"native_unit_of_measurement": None, "native_value": "256.1785"},
+            "256.1785",
+            False,
+        ),
+        (
+            State("sensor.testgroup_energy", "0.5000"),
+            {"native_unit_of_measurement": None, "native_value": 0},
+            "0.0000",
+            False,
+        ),
+        (
+            State("sensor.testgroup_energy", "0.5000"),
+            None,
+            "0.5000",
+            False,
+        ),
+        (
+            State("sensor.testgroup_energy", "0.5000"),
+            {"native_unit_of_measurement": None, "native_value": "invalid"},
+            "0.5000",
+            False,
+        ),
+        (
+            State("sensor.testgroup_energy", STATE_UNAVAILABLE),
             {"native_unit_of_measurement": None, "native_value": None},
             "0.0000",
             False,
@@ -538,7 +569,7 @@ async def test_restore_state(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
     last_state: State,
-    last_sensor_data: Mapping[str, Any],
+    last_sensor_data: Mapping[str, Any] | None,
     expected_state: str,
     expect_warning: bool,
 ) -> None:
@@ -568,6 +599,46 @@ async def test_restore_state(
         assert "Could not restore last state" in caplog.text
 
     assert_entity_state(hass, "sensor.testgroup_energy", expected_state)
+
+
+@pytest.mark.parametrize("outage_state", [STATE_UNAVAILABLE, STATE_UNKNOWN])
+async def test_energy_group_preserves_total_after_reloads_during_outage(
+    hass: HomeAssistant,
+    outage_state: str,
+) -> None:
+    """Reloading an unavailable group must retain its total and member baseline."""
+    member_attributes = {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR}
+    await set_states(hass, [("sensor.studio_plug_energy", "1185.69", member_attributes)])
+    group_entry = await create_mock_group_entry(
+        hass,
+        "Studio",
+        {
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.studio_plug_energy"],
+            CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
+            CONF_GROUP_ENERGY_UPDATE_INTERVAL: 0,
+        },
+    )
+    await hass.async_start()
+    await hass.async_block_till_done()
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_CALIBRATE_ENERGY,
+        {ATTR_ENTITY_ID: "sensor.studio_energy", "value": "256.1785"},
+        blocking=True,
+    )
+
+    await set_states(hass, [("sensor.studio_plug_energy", outage_state, member_attributes)])
+    assert_entity_state(hass, "sensor.studio_energy", "256.1785")
+
+    # The first reload marks the group unavailable; the second must still restore
+    # the numeric total saved separately from its unavailable displayed state.
+    for _ in range(2):
+        assert await hass.config_entries.async_reload(group_entry.entry_id)
+        await hass.async_block_till_done()
+        assert_entity_state(hass, "sensor.studio_energy", STATE_UNAVAILABLE)
+
+    await set_states(hass, [("sensor.studio_plug_energy", "1186", member_attributes)])
+    assert_entity_state(hass, "sensor.studio_energy", "256.4885")
 
 
 async def test_mega_watt_hour(hass: HomeAssistant) -> None:
