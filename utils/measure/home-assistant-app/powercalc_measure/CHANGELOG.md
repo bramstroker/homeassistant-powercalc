@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 0.13.0 - 2026-10-11
+
+### 🚀 Features
+
+- #4955 Support multi-outlet Shelly meters in the Measure app @bramstroker
+
+### 🐛 Bug Fixes
+
+- #4954 Improve vacuum charging validation and Mova activity modelling @bramstroker
+- #4966 Show backend errors when recording more measurements @bramstroker
+- #4967 Show dates for measurement recording files @bramstroker
+
 ## 0.12.0 - 2026-10-03
 
 ### 🚀 Features
