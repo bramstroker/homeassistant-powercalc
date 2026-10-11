@@ -1,4 +1,0 @@
-interface:
-  display_name: "PowerCalc Author Replies"
-  short_description: "Find replies after your latest PowerCalc PR comment"
-  default_prompt: "Use $powercalc-author-replies to check waiting-for-author PRs for new comments after my latest comment."
