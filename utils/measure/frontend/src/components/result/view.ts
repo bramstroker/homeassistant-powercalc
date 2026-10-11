@@ -1,4 +1,4 @@
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SessionState } from "../../types";
 import { emit } from "../../utils/events";
@@ -123,9 +123,14 @@ export class ResultView extends LitElement {
   @state() private jsonInspector?: JsonInspectorState;
   private inspectorTrigger?: HTMLElement;
 
-  protected updated(): void {
+  protected updated(changed: PropertyValues<this>): void {
     const dialog = this.shadowRoot?.querySelector<HTMLDialogElement>(".json-dialog");
     if (dialog && !dialog.open) dialog.showModal();
+    if (changed.has("errorMessage") && this.errorMessage) {
+      const notice = this.shadowRoot?.querySelector<HTMLElement>(".action-error");
+      notice?.focus();
+      notice?.scrollIntoView?.({ block: "center" });
+    }
   }
 
   static readonly styles = [sharedStyles, css`
@@ -207,6 +212,7 @@ export class ResultView extends LitElement {
           <div><h2 id="result-title">${outcome.title}</h2><p class="muted">${outcome.description}</p></div>
         </div>
         ${error ? html`<p class="notice error" role="alert">${this.renderError(error)}</p>` : nothing}
+        ${this.errorMessage ? html`<p class="notice error action-error" role="alert" tabindex="-1">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${state !== "completed" && this.files.length ? html`<p class="notice" role="status">
           Saved output is available below. This measurement is incomplete; these files are partial results.
           ${this.canResume ? "Resume to continue from the last complete variation." : "You can download the saved data before starting again."}
@@ -220,7 +226,6 @@ export class ResultView extends LitElement {
         ${showArtifacts && state === "completed" && this.canPrepareProfile
           ? hasModelArtifact(this.files) ? this.renderPrepareAction() : this.renderMissingModelNotice()
           : nothing}
-        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${diagnosticsDownload(this.diagnosticsUrl)}
         <div class="actions">
           <button type="button" @click=${() => this.emit("sessions")}>All sessions</button>
@@ -429,14 +434,12 @@ export class ResultView extends LitElement {
         ${this.canAnalyse ? html`
           <div class="analysis-retry">
             <p class=${this.analysisComplete ? "complete" : ""} role=${this.analysisComplete ? "status" : nothing}>
-              ${this.busy
-                ? "Analysing the saved recording and refreshing the result…"
-                : this.analysisComplete
-                  ? "✓ Recording analysed again. The result and generated files are now up to date."
-                  : "Run all saved recordings through the current analyser again. No new measurement is needed."}
+              ${this.analysisComplete
+                ? "✓ Recording analysed again. The result and generated files are now up to date."
+                : "Analyse all saved recordings again without recording new data."}
             </p>
             <button type="button" @click=${() => this.emit("analyse")} ?disabled=${this.busy}>
-              ${this.busy ? "Analysing…" : "Analyse recording again"}
+              Analyse recording again
             </button>
           </div>
           <div class="analysis-retry">
