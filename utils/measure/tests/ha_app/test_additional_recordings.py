@@ -1,5 +1,7 @@
 from dataclasses import replace
+from datetime import UTC, datetime
 import json
+import os
 from pathlib import Path
 from threading import Event
 from unittest.mock import MagicMock, patch
@@ -78,6 +80,30 @@ def retained_session(storage: SessionStorage, request: RecorderMeasurementReques
     output.mkdir()
     write_recording(output / request.export_filename, request, "off")
     return snapshot
+
+
+def test_recording_file_dates_survive_archiving(
+    app_client: TestClient, recorder_request: RecorderMeasurementRequest
+) -> None:
+    storage = app_client.app.state.context.storage
+    session = retained_session(storage, recorder_request)
+    output = storage.artifact_directory(session.id, recorder_request.model_id)
+    recording = output / recorder_request.export_filename
+    first_date = datetime(2026, 10, 9, 12, 30, tzinfo=UTC).timestamp()
+    os.utime(recording, (first_date, first_date))
+
+    storage.archive_recording(session.id, recorder_request)
+    write_recording(recording, recorder_request, "on")
+    latest_date = datetime(2026, 10, 10, 14, 45, tzinfo=UTC).timestamp()
+    os.utime(recording, (latest_date, latest_date))
+
+    response = app_client.get(f"/api/sessions/{session.id}/files")
+
+    assert response.status_code == 200
+    assert {file["name"]: file["modified_at"] for file in response.json()} == {
+        "measurement/record-1.jsonl": "2026-10-09T12:30:00Z",
+        "measurement/record.jsonl": "2026-10-10T14:45:00Z",
+    }
 
 
 def test_record_more_keeps_session_and_fits_both_runs(

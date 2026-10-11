@@ -93,6 +93,7 @@ export interface SessionFile {
   name: string;
   size: number;
   media_type: string;
+  modified_at?: string;
 }
 
 export interface PlotPoint {

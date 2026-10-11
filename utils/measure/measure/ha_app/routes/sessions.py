@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import AsyncIterator
 from dataclasses import asdict
+from datetime import UTC, datetime
 import json
 import logging
 import mimetypes
@@ -469,10 +470,12 @@ def _duration_seconds(value: str | None) -> int | None:
 
 
 def _file_descriptor(path: Path, name: str) -> SessionFile:
+    stat = path.stat()
     return SessionFile(
         name=name,
-        size=path.stat().st_size,
+        size=stat.st_size,
         media_type=mimetypes.guess_type(path.name)[0] or "application/octet-stream",
+        modified_at=datetime.fromtimestamp(stat.st_mtime, UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
     )
 
 
