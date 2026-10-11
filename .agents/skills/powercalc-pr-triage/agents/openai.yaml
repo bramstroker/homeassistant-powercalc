@@ -1,0 +1,4 @@
+interface:
+  display_name: "PowerCalc PR Triage"
+  short_description: "Find PowerCalc PRs that may need your attention"
+  default_prompt: "Use $powercalc-pr-triage to find waiting-for-author PRs with new comments after my latest comment."
