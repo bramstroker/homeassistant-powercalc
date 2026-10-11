@@ -23,7 +23,6 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STOP,
     STATE_UNAVAILABLE,
-    STATE_UNKNOWN,
     EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
@@ -922,16 +921,15 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
     async def restore_last_state(self) -> None:
         """Restore the last known state of the group sensor."""
         last_state = await self.async_get_last_state()
-        if last_state and last_state.state in [None, STATE_UNKNOWN, STATE_UNAVAILABLE]:
-            return
-
         last_sensor_state = await self.async_get_last_sensor_data()
-        if last_sensor_state and last_sensor_state.native_value:
-            restored = parse_decimal(last_sensor_state.native_value)
-        elif last_state:
+
+        # Native sensor data retains the total even when the displayed state
+        # was unknown or unavailable when the entity was removed.
+        restored = parse_decimal(last_sensor_state.native_value) if last_sensor_state else None
+        if restored is None and last_state:
+            if last_state.state in UNAVAILABLE_STATES:
+                return
             restored = parse_decimal(last_state.state)
-        else:
-            restored = None
 
         if restored is None:
             _LOGGER.warning("%s: Could not restore last state", self.entity_id)
