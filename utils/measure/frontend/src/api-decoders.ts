@@ -472,7 +472,9 @@ export const decodeOptionalCalibrationJob: Decoder<CalibrationJob | null> = deco
 export const decodePreflight = decoder("preflight", isPreflight);
 export const decodeSessionSnapshot = decoder("session snapshot", isSessionSnapshot);
 export const decodeSessionSummaries = decoder("session list", arrayOf(isSessionSummary));
-export const decodeSessionFiles: Decoder<SessionFile[]> = decoder("session files", arrayOf(objectOf({ name: isString, size: isNumber, media_type: isString })));
+export const decodeSessionFiles: Decoder<SessionFile[]> = decoder("session files", arrayOf(objectOf({
+  name: isString, size: isNumber, media_type: isString, modified_at: optional(isString),
+})));
 export const decodePlots = decoder("plots", isPlotCollection);
 export const decodeContributionPreview = decoder("contribution preview", isContributionPreview);
 export const decodeStandbyEstimate: Decoder<StandbyEstimate> = decoder("standby estimate", objectOf({

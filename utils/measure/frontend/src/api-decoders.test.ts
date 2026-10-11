@@ -1,4 +1,4 @@
-import { decodeEntities, decodeMeasureDefinitions, decodePreflight, decodeSessionSnapshot, decodeSessionSummaries, isMeasurementRequest } from "./api-decoders";
+import { decodeEntities, decodeMeasureDefinitions, decodePreflight, decodeSessionFiles, decodeSessionSnapshot, decodeSessionSummaries, isMeasurementRequest } from "./api-decoders";
 import { capabilities, lightDefinition } from "./components/testing/fixtures";
 
 const averageRequest = {
@@ -51,6 +51,14 @@ describe("measurement request boundary", () => {
 });
 
 describe("response boundary", () => {
+  it("accepts file dates and files from older backends without dates", () => {
+    const file = { name: "measurement/record.jsonl", size: 1024, media_type: "application/octet-stream" };
+    expect(decodeSessionFiles([file])).toEqual([file]);
+    const datedFile = { ...file, modified_at: "2026-10-10T14:45:00Z" };
+    expect(decodeSessionFiles([datedFile])).toEqual([datedFile]);
+    expect(() => decodeSessionFiles([{ ...file, modified_at: 123 }])).toThrow();
+  });
+
   it("accepts the device selector in a fixed measurement definition", () => {
     const definitions = [{
       ...lightDefinition,

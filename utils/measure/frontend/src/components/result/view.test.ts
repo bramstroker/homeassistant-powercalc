@@ -1,9 +1,38 @@
 import type { SessionSnapshot } from "../../types";
 import { capabilities } from "../../testing/controller";
+import { timestamp } from "../../utils/format";
 import type { ResultView } from "./view";
 import "./view";
 
 describe("result view", () => {
+  it("shows file modification dates in local time and explains recording names", async () => {
+    const element = document.createElement("measure-result-view") as ResultView;
+    element.snapshot = { state: "completed" };
+    element.canAnalyse = true;
+    element.files = [
+      { name: "measurement/record-1.jsonl", size: 1234, media_type: "application/octet-stream", modified_at: "2026-10-09T12:30:00Z" },
+      { name: "measurement/record.jsonl", size: 5678, media_type: "application/octet-stream", modified_at: "2026-10-10T14:45:00Z" },
+      { name: "model.json", size: 100, media_type: "application/json" },
+    ];
+    document.body.append(element);
+    await element.updateComplete;
+
+    const rows = [...element.shadowRoot!.querySelectorAll("li")];
+    for (const [index, date] of ["2026-10-09T12:30:00Z", "2026-10-10T14:45:00Z"].entries()) {
+      const time = rows[index]!.querySelector("time")!;
+      expect(time.getAttribute("datetime")).toBe(date);
+      expect(time.textContent).toBe(timestamp(date));
+      expect(rows[index]!.textContent).toContain("Modified");
+    }
+    expect(rows[2]!.querySelector("time")).toBeNull();
+    expect(element.shadowRoot!.textContent).toContain("The unnumbered recording is the latest run");
+    expect(element.shadowRoot!.textContent).toContain("Earlier runs are kept and analysed together");
+
+    element.canAnalyse = false;
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector(".recording-files-help")).toBeNull();
+  });
+
   it("focuses new action errors without replacing the saved result", async () => {
     const element = document.createElement("measure-result-view") as ResultView;
     element.snapshot = { state: "completed", summary: { "Samples recorded": "2099" } };

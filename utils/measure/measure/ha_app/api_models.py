@@ -79,6 +79,7 @@ class SessionFile(BaseModel):
     name: str
     size: int
     media_type: str
+    modified_at: str
 
 
 class SessionPlots(BaseModel):

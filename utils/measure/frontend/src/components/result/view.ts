@@ -4,7 +4,7 @@ import type { ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SessionSt
 import { emit } from "../../utils/events";
 import { isVacuumProfileRequest } from "../../measurement/definition";
 import { hasModelArtifact } from "../../utils/artifacts";
-import { fileSize } from "../../utils/format";
+import { fileSize, timestamp } from "../../utils/format";
 import { diagnosticsDownload, sharedStyles } from "../../styles";
 import { errorHelpLink } from "../shared/error-help-link";
 import "./plot";
@@ -167,6 +167,9 @@ export class ResultView extends LitElement {
     .files-header h3 { margin: 0; font-size: 1rem; }
     .download-all { min-height: 36px; padding: 0.45rem 0.75rem; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
     .file-actions { display: flex; align-items: center; gap: 0.55rem; }
+    .file-details { display: grid; gap: 0.25rem; min-width: 0; }
+    .recording-files-help { margin: 0.75rem 0 0; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+    .recording-files-help code { overflow-wrap: anywhere; }
     .inspect-file { display: grid; place-items: center; width: 38px; min-height: 38px; padding: 0; color: var(--signal-strong); }
     .inspect-file svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
     .json-dialog::backdrop { background: rgb(0 0 0 / 0.72); }
@@ -286,8 +289,15 @@ export class ResultView extends LitElement {
           <h3>${this.snapshot.state === "completed" ? "Generated files" : "Saved partial files"}</h3>
           <button class="download-all" type="button" @click=${() => this.downloadAll()}>Download all</button>
         </div>
+        ${this.canAnalyse ? html`<p class="recording-files-help">
+          The unnumbered recording is the latest run. When you choose Record more, it is renamed with the next
+          available number and a new recording is started. Earlier runs are kept and analysed together.
+          Dates below show when each file was last modified, in your local time.
+        </p>` : nothing}
         <ul>${this.files.map((file) => html`
-          <li><span>${file.name}</span><small>${fileSize(file.size)}</small><div class="file-actions">
+          <li><div class="file-details"><span>${file.name}</span>
+            ${file.modified_at ? html`<small>Modified <time datetime=${file.modified_at}>${timestamp(file.modified_at)}</time></small>` : nothing}
+          </div><small>${fileSize(file.size)}</small><div class="file-actions">
             ${this.isInspectableJson(file) ? html`
               <button class="inspect-file" type="button" title=${`View ${file.name}`} aria-label=${`View ${file.name}`} @click=${(event: MouseEvent) => void this.openJsonInspector(file.name, event.currentTarget as HTMLElement)}>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
