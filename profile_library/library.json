@@ -11959,6 +11959,64 @@
           "hash": "715cbeb8d39663493b391fdb77a1cec7"
         },
         {
+          "authors": [
+            {
+              "github": "S7evinK",
+              "name": "Till"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-10T15:21:35Z",
+          "device_specs": {
+            "socket": "GU10",
+            "form_factor": "bulb",
+            "lumens": 345,
+            "rated_power": 3.6,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "TP-Link Tapo P110",
+          "measure_device_firmware": "1.3.4",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 3,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.12.0:app"
+          },
+          "name": "TRADFRI bulb GU10, color/white spectrum, 345 lm",
+          "standby_power": 0.11,
+          "voltage_range": {
+            "max": 234.15,
+            "min": 227.09
+          },
+          "id": "LED2110R3",
+          "manufacturer": "ikea",
+          "updated_at": "2026-10-11T07:30:27",
+          "max_power": 3.63,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-10T15:35:51",
+          "power_range": {
+            "min": 0.09,
+            "max": 3.63
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.0,
+            "color_temp": 97.0
+          },
+          "hash": "9fd98c79766c89ae87507cdde1b060dc"
+        },
+        {
           "aliases": [
             "TRADFRI bulb E14 CWS globe 806lm"
           ],
@@ -26635,7 +26693,10 @@
             "929003045001_01",
             "929003045001_02",
             "929003045001_03",
-            "9290019533"
+            "9290019533",
+            "5041131P9",
+            "915005916401",
+            "929003047101"
           ],
           "gtin": [
             "8719514342842"
@@ -26672,7 +26733,7 @@
           ],
           "id": "929003045001",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-11T07:00:38",
           "max_power": 4.7,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -26687,7 +26748,7 @@
             "score": 97.4,
             "color_temp": 97.4
           },
-          "hash": "8493ff1fa8b7d40f1e988746afda8a78"
+          "hash": "3c4e1362261d90ef3c7c7c724ae693ca"
         },
         {
           "aliases": [

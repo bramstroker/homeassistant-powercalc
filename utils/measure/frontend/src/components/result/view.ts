@@ -1,10 +1,10 @@
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { ErrorHelp, PlotCollection, SessionFile, SessionSnapshot, SessionState } from "../../types";
 import { emit } from "../../utils/events";
 import { isVacuumProfileRequest } from "../../measurement/definition";
 import { hasModelArtifact } from "../../utils/artifacts";
-import { fileSize } from "../../utils/format";
+import { fileSize, timestamp } from "../../utils/format";
 import { diagnosticsDownload, sharedStyles } from "../../styles";
 import { errorHelpLink } from "../shared/error-help-link";
 import "./plot";
@@ -123,9 +123,14 @@ export class ResultView extends LitElement {
   @state() private jsonInspector?: JsonInspectorState;
   private inspectorTrigger?: HTMLElement;
 
-  protected updated(): void {
+  protected updated(changed: PropertyValues<this>): void {
     const dialog = this.shadowRoot?.querySelector<HTMLDialogElement>(".json-dialog");
     if (dialog && !dialog.open) dialog.showModal();
+    if (changed.has("errorMessage") && this.errorMessage) {
+      const notice = this.shadowRoot?.querySelector<HTMLElement>(".action-error");
+      notice?.focus();
+      notice?.scrollIntoView?.({ block: "center" });
+    }
   }
 
   static readonly styles = [sharedStyles, css`
@@ -162,6 +167,9 @@ export class ResultView extends LitElement {
     .files-header h3 { margin: 0; font-size: 1rem; }
     .download-all { min-height: 36px; padding: 0.45rem 0.75rem; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
     .file-actions { display: flex; align-items: center; gap: 0.55rem; }
+    .file-details { display: grid; gap: 0.25rem; min-width: 0; }
+    .recording-files-help { margin: 0.75rem 0 0; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+    .recording-files-help code { overflow-wrap: anywhere; }
     .inspect-file { display: grid; place-items: center; width: 38px; min-height: 38px; padding: 0; color: var(--signal-strong); }
     .inspect-file svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
     .json-dialog::backdrop { background: rgb(0 0 0 / 0.72); }
@@ -204,6 +212,7 @@ export class ResultView extends LitElement {
           <div><h2 id="result-title">${outcome.title}</h2><p class="muted">${outcome.description}</p></div>
         </div>
         ${error ? html`<p class="notice error" role="alert">${this.renderError(error)}</p>` : nothing}
+        ${this.errorMessage ? html`<p class="notice error action-error" role="alert" tabindex="-1">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${state !== "completed" && this.files.length ? html`<p class="notice" role="status">
           Saved output is available below. This measurement is incomplete; these files are partial results.
           ${this.canResume ? "Resume to continue from the last complete variation." : "You can download the saved data before starting again."}
@@ -217,7 +226,6 @@ export class ResultView extends LitElement {
         ${showArtifacts && state === "completed" && this.canPrepareProfile
           ? hasModelArtifact(this.files) ? this.renderPrepareAction() : this.renderMissingModelNotice()
           : nothing}
-        ${this.errorMessage ? html`<p class="notice error" role="alert">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
         ${diagnosticsDownload(this.diagnosticsUrl)}
         <div class="actions">
           <button type="button" @click=${() => this.emit("sessions")}>All sessions</button>
@@ -281,8 +289,15 @@ export class ResultView extends LitElement {
           <h3>${this.snapshot.state === "completed" ? "Generated files" : "Saved partial files"}</h3>
           <button class="download-all" type="button" @click=${() => this.downloadAll()}>Download all</button>
         </div>
+        ${this.canAnalyse ? html`<p class="recording-files-help">
+          The unnumbered recording is the latest run. When you choose Record more, it is renamed with the next
+          available number and a new recording is started. Earlier runs are kept and analysed together.
+          Dates below show when each file was last modified, in your local time.
+        </p>` : nothing}
         <ul>${this.files.map((file) => html`
-          <li><span>${file.name}</span><small>${fileSize(file.size)}</small><div class="file-actions">
+          <li><div class="file-details"><span>${file.name}</span>
+            ${file.modified_at ? html`<small>Modified <time datetime=${file.modified_at}>${timestamp(file.modified_at)}</time></small>` : nothing}
+          </div><small>${fileSize(file.size)}</small><div class="file-actions">
             ${this.isInspectableJson(file) ? html`
               <button class="inspect-file" type="button" title=${`View ${file.name}`} aria-label=${`View ${file.name}`} @click=${(event: MouseEvent) => void this.openJsonInspector(file.name, event.currentTarget as HTMLElement)}>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
@@ -419,14 +434,12 @@ export class ResultView extends LitElement {
         ${this.canAnalyse ? html`
           <div class="analysis-retry">
             <p class=${this.analysisComplete ? "complete" : ""} role=${this.analysisComplete ? "status" : nothing}>
-              ${this.busy
-                ? "Analysing the saved recording and refreshing the result…"
-                : this.analysisComplete
-                  ? "✓ Recording analysed again. The result and generated files are now up to date."
-                  : "Run all saved recordings through the current analyser again. No new measurement is needed."}
+              ${this.analysisComplete
+                ? "✓ Recording analysed again. The result and generated files are now up to date."
+                : "Analyse all saved recordings again without recording new data."}
             </p>
             <button type="button" @click=${() => this.emit("analyse")} ?disabled=${this.busy}>
-              ${this.busy ? "Analysing…" : "Analyse recording again"}
+              Analyse recording again
             </button>
           </div>
           <div class="analysis-retry">
