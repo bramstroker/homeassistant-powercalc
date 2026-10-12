@@ -11997,10 +11997,10 @@
           },
           "id": "LED2110R3",
           "manufacturer": "ikea",
-          "updated_at": "2026-10-11T07:30:27",
+          "updated_at": "2026-10-11T07:36:40",
           "max_power": 3.63,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2026-10-10T15:35:51",
+          "measurement_updated_at": "2026-10-11T07:36:03",
           "power_range": {
             "min": 0.09,
             "max": 3.63
@@ -12014,7 +12014,7 @@
             "score": 97.0,
             "color_temp": 97.0
           },
-          "hash": "9fd98c79766c89ae87507cdde1b060dc"
+          "hash": "6d4304d488620f1ab7cddff269e61371"
         },
         {
           "aliases": [
@@ -38192,6 +38192,56 @@
       "country": "CN",
       "description": "Smart-home brand known for retrofit devices that automate existing switches, curtains and door locks.",
       "models": [
+        {
+          "aliases": [
+            "Relay Switch 2PM"
+          ],
+          "calculation_strategy": "multi_switch",
+          "created_at": "2026-10-09T02:00:20Z",
+          "device_specs": {
+            "rated_power": 1,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "matter"
+            ],
+            "form_factor": "in_wall",
+            "max_load_watts": 3680,
+            "power_monitoring": true
+          },
+          "gtin": [
+            "0810150546521"
+          ],
+          "measure_description": "Manually measured self-usage of the Relay Switch 2PM with both relays off and with one relay switched on. Base self-usage (relays off) 0.84 W, each relay adds 0.31 W when switched on.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "name": "Relay Switch 2PM",
+          "standby_power": 0.84,
+          "only_self_usage": true,
+          "product_url": "https://www.switch-bot.com/products/switchbot-relay-switch-2pm",
+          "device_type": "smart_switch",
+          "discovery_by": "device",
+          "min_version": "2.1",
+          "multi_switch_config": {
+            "power": 0.31
+          },
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.12.0:app"
+          },
+          "authors": [
+            {
+              "github": "Maxik933",
+              "name": "Maxik933"
+            }
+          ],
+          "id": "W5502320",
+          "manufacturer": "switchbot",
+          "updated_at": "2026-10-10T09:39:13",
+          "max_power": null,
+          "sub_profile_count": 0,
+          "hash": "7b220448a14e2e28d2f99310cf190624"
+        },
         {
           "aliases": [
             "plug-mini-eu"
