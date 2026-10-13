@@ -7,6 +7,7 @@ from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from custom_components.powercalc.measure import MEASURE_SESSION_STATES, MeasureAppCoordinator
 
 
+# Home Assistant allows live properties to override its writable cached properties.
 class MeasureSessionStatusSensor(SensorEntity):
     """Represent the current or most recently retained Measure session."""
 
@@ -21,17 +22,17 @@ class MeasureSessionStatusSensor(SensorEntity):
         self._attr_options = list(MEASURE_SESSION_STATES)
 
     @property
-    def native_value(self) -> str | None:
+    def native_value(self) -> str | None:  # ty: ignore[invalid-property-type-override]
         """Return the latest session state."""
         return self._coordinator.data.state if self._coordinator.data is not None else None
 
     @property
-    def available(self) -> bool:
+    def available(self) -> bool:  # ty: ignore[invalid-property-type-override]
         """Return whether the Measure app heartbeat is current."""
         return self._coordinator.available
 
     @property
-    def extra_state_attributes(self) -> dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:  # ty: ignore[invalid-property-type-override]
         """Return stable metadata useful in completion and failure automations."""
         status = self._coordinator.data
         if status is None:
