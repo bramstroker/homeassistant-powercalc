@@ -160,6 +160,7 @@ async def create_daily_fixed_energy_power_sensor(
     )
 
 
+# Home Assistant allows live properties to override its writable cached properties.
 class DailyEnergySensor(EnergySensor, RestoreEntity, SensorEntity):
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_state_class = SensorStateClass.TOTAL
@@ -283,7 +284,7 @@ class DailyEnergySensor(EnergySensor, RestoreEntity, SensorEntity):
         return Decimal((energy_per_day / 86400) * elapsed_seconds)
 
     @property
-    def native_value(self) -> Decimal:
+    def native_value(self) -> Decimal:  # ty: ignore[invalid-property-type-override]
         """Return the state of the sensor."""
         return Decimal(round(self._state, self._rounding_digits))
 
