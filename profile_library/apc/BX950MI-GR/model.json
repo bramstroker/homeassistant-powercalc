@@ -6,7 +6,7 @@
     "BX950MI",
     "Back-UPS BX950MI"
   ],
-  "description": "Power profile for the APC Back-UPS BX950MI (950 VA / 520 W). Estimates real-time input power (drawn from the wall) from the NUT load percentage, nominal real power plus the UPS self-consumption.",
+  "description": "Power profile for the APC Back-UPS BX950MI (950 VA / 520 W). Estimates real-time input power (drawn from the wall) from the NUT load percentage, nominal real power plus the UPS self-consumption. Reports 0 W while the UPS is running on battery, as the UPS then draws no power from the wall.",
   "device_type": "ups",
   "device_specs": {
     "connectivity": [
@@ -23,9 +23,9 @@
   "measure_method": "manual",
   "measure_device": "2x Shelly Plug S Gen3 (before/after UPS)",
   "measure_description": "Self-consumption measured as the difference between two Shelly Plug S Gen3 meters placed one before and one after the UPS; the median delta over 10 samples was ~15 W.",
-  "config_flow_discovery_remarks": "This calculation uses the 'Nominal real power' diagnostic in the NUT integration. You need to enable that first.",
+  "config_flow_discovery_remarks": "This calculation uses the 'Nominal real power' diagnostic and the 'Status data' (ups.status) sensor of the NUT integration. The 'Nominal real power' diagnostic is disabled by default and must be enabled first; the 'Status data' sensor is enabled by default.",
   "fixed_config": {
-    "power": "{{ (states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_realpower_nominal]]') | float(520)) + 15 }}"
+    "power": "{% set status = states('[[entity_by_translation_key:ups_status]]') | upper %}{% if 'OB' in status %}0{% else %}{{ (states('[[entity_by_translation_key:ups_load]]') | float(0) / 100 * states('[[entity_by_translation_key:ups_realpower_nominal]]') | float(520)) + 15 }}{% endif %}"
   },
   "authors": [
     {
