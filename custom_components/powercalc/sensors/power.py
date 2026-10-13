@@ -366,6 +366,7 @@ def is_fully_configured(config: ConfigType) -> bool:
     return any(key in config for key in CALCULATION_STRATEGY_CONF_KEYS)
 
 
+# Home Assistant allows live properties to override its writable cached properties.
 class PowerSensor(BaseEntity):
     """Class which all power sensors should extend from."""
 
@@ -808,7 +809,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         return self._source_entity.entity_id
 
     @property
-    def native_value(self) -> StateType:
+    def native_value(self) -> StateType:  # ty: ignore[invalid-property-type-override]
         """Return the state of the sensor."""
         return cast(StateType, self._power)
 
@@ -919,6 +920,6 @@ class RealPowerSensor(PowerSensor):
         return self._device_id
 
     @property
-    def unique_id(self) -> str | None:
+    def unique_id(self) -> str | None:  # ty: ignore[invalid-property-type-override]
         """Return the unique_id of the sensor."""
         return self._unique_id
