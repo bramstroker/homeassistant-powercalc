@@ -22,7 +22,7 @@
       "thread"
     ]
   },
-  "fixed": {
+  "fixed_config": {
     "power": 0.415
   },
   "measure_description": "Measured on the USB port of the device (it does *not* come with a power adapter). The value is an average of a three day measurement session, where the device showed it has periods of higher and lower power usage. The voltage range is from a separate measurement session of a single day, which showed the same behavior. For more information see discussion #4750.\n\nMeasurement was taken with the display turned on.",
