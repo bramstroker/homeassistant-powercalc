@@ -12,7 +12,7 @@
     }
   ],
   "aliases": [
-  	"ALPSTUGA air quality monitor",
+    "ALPSTUGA air quality monitor",
     "12289"
   ],
   "device_specs": {
@@ -20,7 +20,7 @@
     "connectivity": [
       "matter",
       "thread"
-     ]
+    ]
   },
   "fixed": {
     "power": 0.415
