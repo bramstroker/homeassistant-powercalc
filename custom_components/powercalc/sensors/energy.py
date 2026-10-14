@@ -279,6 +279,7 @@ def _find_related_real_energy_sensor(
     return RealEnergySensor.from_registry_entry(energy_sensors[0])
 
 
+# Home Assistant allows live properties to override its writable cached properties.
 class EnergySensor(BaseEntity):
     """Class which all energy sensors should extend from."""
 
@@ -460,7 +461,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         )
 
     @property
-    def icon(self) -> str:
+    def icon(self) -> str:  # ty: ignore[invalid-property-type-override]
         return ENERGY_ICON
 
     @callback
@@ -570,11 +571,11 @@ class RealEnergySensor(EnergySensor):
         return cls(entry.entity_id, entry.name or entry.original_name, entry.unique_id)
 
     @property
-    def name(self) -> str | None:
+    def name(self) -> str | None:  # ty: ignore[invalid-property-type-override]
         """Return the name of the sensor."""
         return self._name
 
     @property
-    def unique_id(self) -> str | None:
+    def unique_id(self) -> str | None:  # ty: ignore[invalid-property-type-override]
         """Return the unique_id of the sensor."""
         return self._unique_id

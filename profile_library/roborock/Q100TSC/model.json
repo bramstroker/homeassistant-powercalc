@@ -1,0 +1,210 @@
+{
+  "aliases": [
+    "roborock.vacuum.a65"
+  ],
+  "authors": [
+    {
+      "name": "Laurens",
+      "github": "LaurensBot"
+    }
+  ],
+  "calculation_strategy": "composite",
+  "compatible_integrations": [
+    "roborock"
+  ],
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 1010.36
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:mop_washing]]",
+              "state": [
+                "on"
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 10.49
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:mop_washing]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:mop_drying]]",
+              "state": [
+                "on"
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 58.41
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:mop_washing]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:mop_drying]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "charging"
+              ]
+            },
+            {
+              "condition": "template",
+              "value_template": "{{ states('[[entity_by_device_class:battery]]') is not boolean and 0 <= (states('[[entity_by_device_class:battery]]') | float(-1)) <= 100 and 25 <= (states('[[entity_by_device_class:battery]]') | float(-1) | int) <= 100 }}"
+            }
+          ]
+        },
+        "entity_id": "[[entity_by_device_class:battery]]",
+        "linear": {
+          "calibrate": [
+            "25 -> 28.3",
+            "32 -> 28.8",
+            "37 -> 29.0",
+            "42 -> 29.2",
+            "47 -> 29.3",
+            "52 -> 29.6",
+            "57 -> 29.9",
+            "62 -> 30.2",
+            "67 -> 30.6",
+            "72 -> 31.0",
+            "77 -> 31.3",
+            "82 -> 26.4",
+            "87 -> 13.2",
+            "92 -> 10.3",
+            "97 -> 2.8",
+            "100 -> 2.8"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:mop_washing]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:mop_drying]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "segment_cleaning",
+                "going_to_wash_the_mop",
+                "returning_home",
+                "cleaning",
+                "paused"
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 0.55
+        }
+      }
+    ]
+  },
+  "created_at": "2026-10-12T20:28:12Z",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "device_type": "vacuum_robot",
+  "mains_voltage": 230,
+  "measure_description": "Measured with the Powercalc Measure app (0.13.0, robot vacuum recipe) and a Shelly Plus Plug UK on the dock's mains lead, so every figure covers the whole RockDock Ultra plus robot. Four recordings: two mop runs with warm-air drying on (charges from 66 % and 43 %) and two vacuum-only runs with drying off (charges from 53 % and 25 %). Activities come from the dock's dust_emptying, mop_washing and mop_drying switches and the robot's status and battery. The charge tapers at a different battery level from run to run (about 80 % in one, 90 % in the other), and a hard run can be followed by about 15 minutes at 9.5 W before charging ramps up; neither is modelled, which is why charging validates at 2.6 W MAE. Robot label Q100TSC, dock label EWFD04HRR (UK 230 V).",
+  "measure_device": "Shelly Plus Plug UK",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.13.0:app"
+  },
+  "min_version": "v1.26.0",
+  "name": "S7 Max Ultra",
+  "product_url": "https://global.roborock.com/pages/roborock-s7-max-ultra",
+  "standby_power": 0.55
+}

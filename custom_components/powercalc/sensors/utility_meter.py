@@ -302,6 +302,7 @@ def create_utility_meter(
     return utility_meter
 
 
+# Home Assistant allows live properties to override its writable cached properties.
 class VirtualTariffSelect(BaseEntity, TariffSelect):
     """Tariff selector supporting opt-in device naming."""
 
@@ -312,17 +313,17 @@ class VirtualUtilityMeter(BaseEntity, UtilityMeterSensor):
     _sensor_config: ConfigType
 
     @property
-    def unique_id(self) -> str | None:
+    def unique_id(self) -> str | None:  # ty: ignore[invalid-property-type-override]
         """Return the unique id."""
         return self._attr_unique_id
 
     @property
-    def suggested_display_precision(self) -> int | None:
+    def suggested_display_precision(self) -> int | None:  # ty: ignore[invalid-property-type-override]
         """Return the suggested number of decimal digits for display."""
         return self.rounding_digits
 
     @property
-    def native_value(self) -> StateType | Decimal:
+    def native_value(self) -> StateType | Decimal:  # ty: ignore[invalid-property-type-override]
         """Return the state of the sensor."""
         value = cast(Decimal | int | None, self._attr_native_value)
         if self.rounding_digits and value is not None:
