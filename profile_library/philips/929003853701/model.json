@@ -1,0 +1,47 @@
+{
+  "aliases": [
+    "LCA013"
+  ],
+  "authors": [
+    {
+      "email": "earlymorninghours@gmail.com",
+      "github": "earlymorninghours",
+      "name": "Dave Stein"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-10-06T19:55:05Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee",
+      "matter",
+      "bluetooth"
+    ],
+    "form_factor": "bulb",
+    "lumens": 810,
+    "socket": "E26"
+  },
+  "device_type": "light",
+  "mains_voltage": 120,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Zooz Z-Wave Plus Power Switch ZEN15",
+  "measure_device_firmware": "1.2",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 8.57,
+    "DUMMY_LOAD_RESISTANCE": 1727.83,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.12.0:app"
+  },
+  "name": "Hue white ambiance and color 806lm A19 E26",
+  "product_url": "https://www.philips-hue.com/en-us/p/hue-white-and-color-ambiance-60w-a19-e26-smart-bulb/046677590826",
+  "standby_power": 0.4,
+  "standby_power_estimated": true,
+  "voltage_range": {
+    "max": 121.71,
+    "min": 121.71
+  }
+}
