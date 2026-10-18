@@ -1,0 +1,37 @@
+{
+  "authors": [
+    {
+      "email": "me@akashihi.org",
+      "github": "akashihi",
+      "name": "Denis Chaplygin"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-10-18T21:23:19Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "SONOFF S60ZBTPF",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 40.13,
+    "DUMMY_LOAD_RESISTANCE": 1354.52,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 12.0,
+    "VERSION": "v0.13.0:app"
+  },
+  "name": "Smart Color Bulb ZL4",
+  "standby_power": 0.33,
+  "standby_power_estimated": true,
+  "voltage_range": {
+    "max": 236.78,
+    "min": 225.86
+  }
+}
