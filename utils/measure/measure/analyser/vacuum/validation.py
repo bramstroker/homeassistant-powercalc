@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 
 from measure.analyser.models import ActivityReport, EnergyMetrics
 from measure.analyser.sample_intervals import calculate_sample_durations
+from measure.analyser.vacuum.settling import SettlingBranch
 from measure.analyser.vacuum.signals import Activity
 from measure.analyser.vacuum.strategy import FixedBranch, VacuumCompositeCandidate, VacuumEpisode, group_vacuum_episodes
 from measure.recording.models import RecordingSample
@@ -69,7 +70,9 @@ def build_activity_reports(
         power = candidate.estimate_activity_power(sample, activity)
         if power is not None:
             data.predictions[id(sample)] = power
-    fixed_activities = {branch.activity for branch in candidate.branches if isinstance(branch, FixedBranch)}
+    fixed_activities = {
+        branch.activity for branch in candidate.branches if isinstance(branch, FixedBranch | SettlingBranch)
+    }
     return [
         data.build_report(activity, samples, has_fixed_power=activity in fixed_activities)
         for activity, data in grouped.items()

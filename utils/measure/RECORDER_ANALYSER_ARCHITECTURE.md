@@ -263,7 +263,15 @@ intervals, fitting falls back to the arithmetic mean. Charging gets a bounded pi
 - Require at least three supported bins, 20 percentage points of span, and no gap over
   20 percentage points. Predictions are bounded to the fitted range.
 
-`VacuumBranch` is the union of `FixedBranch`, with a required fixed power, and
+Idle activities (sleeping, completed and docked) can additionally use a `SettlingBranch`
+with separate time-weighted powers before and after 30 minutes since charge completion.
+A recognised, live, portable charging flag must show an active-to-inactive transition
+within the same recording. Both phases need at least five training samples with usable
+intervals; settling must exceed standby by at least 1 W and 20%. The simpler fixed model
+remains a candidate. Timing uses recorded states only; held-out power never affects fitting.
+Unobserved charge ends, unavailable flags and recording boundaries do not provide timing.
+
+`VacuumBranch` is the union of `FixedBranch`, `SettlingBranch` and
 `ChargingBranch`, with required `ChargingPoint` values. A charging curve validates that it
 has at least two points with strictly increasing battery levels before interpolation.
 `ActivitySignal` stores its feature, observed active/inactive values, and any required
@@ -274,6 +282,10 @@ Boolean attributes use identity comparisons to distinguish booleans from numeric
 Export uses `stop_at_first`: guards enforce activity priority, including overlapping or
 unknown inputs. Mutually exclusive values of the same enum share fewer guards. Charging
 uses an explicit battery source and numeric/range guards matching candidate conversions.
+Settling uses a fixed power template referencing the charging State object's `last_changed`,
+guarded by its observed inactive values. This clock restarts when Home Assistant recreates
+the charging state after a restart or recovers from an unavailable state; runtime power
+can therefore use the settling value for another 30 minutes in those cases.
 
 Branches model total outlet power, including overlapping consumption. Per-activity validation
 checks repeatability and requests better signals or isolated runs when errors are too large.
@@ -291,7 +303,9 @@ less than 10% of their eligible recorded time held out by the episode split, use
 within-cycle split while other activities retain their independent validation. Charging
 without sufficient independent range coverage also uses this fallback: the middle third
 (at least two samples) is held out from each episode, separately within each
-5-percentage-point battery bucket for charging. Bucket edges remain available for fitting.
+5-percentage-point battery bucket for charging. Idle activities with known charge timing
+hold out a block from each time phase, keeping both within the same activity. Bucket edges
+remain available for fitting.
 All samples belong to only one side of the split. Existing minimum fitting support and
 per-activity validation thresholds still apply.
 
@@ -313,7 +327,8 @@ These checks keep long low-power periods from masking a poor short, high-power d
 Failed sleeping, completed or docked energy validation explains that one reported state
 may contain both post-charge settling and stable standby. One fixed power cannot always
 represent both; repeating identical recordings may not solve this modelling limitation.
-The analyser does not infer a time-since-charge model or silently discard settling energy.
+When supported, the time-since-charge candidate retains both phases in the same activity
+and validates their energy together. Settling energy is never silently discarded.
 
 MAE is average absolute prediction error in watts. RMSE gives larger errors more weight.
 Transition MAE covers the first/last observations of episodes. Per-activity results help
