@@ -318,10 +318,14 @@ async def test_energy_sensor_setup_with_required_device_class(
         unit_prefix: str | None,
         unit_time: UnitOfTime,
         max_sub_interval: timedelta | None,
+        hass: HomeAssistant | None = None,
     ) -> None:
         assert device_class == SensorDeviceClass.ENERGY
         params = {}
-        if "device_class" in inspect.signature(original_init).parameters:
+        signature = inspect.signature(original_init)
+        if "hass" in signature.parameters:
+            params["hass"] = hass
+        if "device_class" in signature.parameters:
             params["device_class"] = device_class
         original_init(
             self,
