@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.13.1 - 2026-10-19
+
+### 🐛 Bug Fixes
+
+- #5004 Model vacuum post-charge settling separately from standby @bramstroker
+
 ## 0.13.0 - 2026-10-11
 
 ### 🚀 Features
