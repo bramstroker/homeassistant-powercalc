@@ -309,7 +309,7 @@ class VirtualTariffSelect(BaseEntity, TariffSelect):
 
 
 class VirtualUtilityMeter(BaseEntity, UtilityMeterSensor):
-    device_name: DeviceName = DeviceName("utility_meter_cycle")
+    device_name: DeviceName | None = DeviceName("utility_meter_cycle")
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
     _sensor_config: ConfigType
 
