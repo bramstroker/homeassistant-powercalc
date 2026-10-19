@@ -4331,10 +4331,10 @@
           },
           "id": "DR-HTF024S",
           "manufacturer": "dreo",
-          "updated_at": "2026-10-19T11:57:59",
+          "updated_at": "2026-10-19T12:36:44",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "64ebb299c76a22eb18c01cf16bb07559"
+          "hash": "0de10eb0a5fc0f77daf2b242114d759c"
         }
       ],
       "device_types": [
@@ -21340,6 +21340,65 @@
           "hash": "b443bbe9030392faf091c35511eb1737"
         },
         {
+          "authors": [
+            {
+              "github": "Knuspel",
+              "name": "Knuspel"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-11T11:43:11Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure, Five Pole Basic Configuration",
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 9.76,
+            "DUMMY_LOAD_RESISTANCE": 5704.71,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.12.0:app"
+          },
+          "name": "Gardenpole RGBW LIGHTIFY (5 poles)",
+          "standby_power": 0.38,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 238.4,
+            "min": 233.7
+          },
+          "aliases": [
+            "Gardenpole RGBW-Lightify"
+          ],
+          "id": "AC0009401NJ",
+          "manufacturer": "osram",
+          "updated_at": "2026-10-19T11:58:01",
+          "max_power": 9.05,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-13T16:10:43",
+          "power_range": {
+            "min": 0.47,
+            "max": 9.05
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 96.7,
+            "color_temp": 96.7
+          },
+          "hash": "7ff50db7cb97b7a66020f60482e08251"
+        },
+        {
           "aliases": [
             "Classic A60 W clear - LIGHTIFY"
           ],
@@ -27382,7 +27441,10 @@
         {
           "aliases": [
             "9290035261",
-            "929001953101"
+            "929001953101",
+            "929003526202_01",
+            "929003526202_02",
+            "929003526202_03"
           ],
           "calculation_strategy": "lut",
           "created_at": "2025-12-20T00:35:52Z",
@@ -27419,7 +27481,7 @@
           ],
           "id": "929003526101",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-19T11:58:04",
           "max_power": 4.61,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -27435,7 +27497,7 @@
             "score": 97.6,
             "color_temp": 97.6
           },
-          "hash": "99c19497d5234c521bf9cb6612359ca4"
+          "hash": "97a194b0c31377da3bca0b3df5170c6b"
         },
         {
           "aliases": [
@@ -31836,7 +31898,7 @@
           "measure_method": "script",
           "mains_voltage": 230,
           "name": "Hue LightStrip Plus (2m)",
-          "standby_power": 0.18,
+          "standby_power": 0.4,
           "authors": [
             {
               "name": "Simon H\u00f6rrle",
@@ -31846,12 +31908,12 @@
           ],
           "id": "LST002",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-19T11:58:02",
           "max_power": 21.88,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-09-24T18:09:05",
+          "sub_profile_count": 2,
+          "measurement_updated_at": "2026-10-19T11:58:02",
           "power_range": {
-            "min": 1.0,
+            "min": 0.1,
             "max": 21.88
           },
           "color_modes": [
@@ -31862,7 +31924,7 @@
             "score": 32.7,
             "color_temp": 32.7
           },
-          "hash": "9b0dcc9c5aeeeca68810c85cc27ee39e"
+          "hash": "27f372956fc937e105e2cae5937e6913"
         },
         {
           "aliases": [
