@@ -4296,6 +4296,45 @@
             "max": 36.03
           },
           "hash": "942b8fa2ba4f05c88648fd2d4274bc45"
+        },
+        {
+          "authors": [
+            {
+              "github": "LewisSpring",
+              "name": "LewisSpring"
+            }
+          ],
+          "calculation_strategy": "composite",
+          "created_at": "2026-10-12T12:12:55Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi"
+            ],
+            "form_factor": "tower"
+          },
+          "device_type": "fan",
+          "mains_voltage": 230,
+          "measure_description": "Speed curve measured with Powercalc Measure with oscillation off. Oscillation adds an average of 2.39 W, measured at 11%, 55% and 100% speed.",
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.12.0:app"
+          },
+          "name": "554S Smart Tower Fan",
+          "standby_power": 1.16,
+          "voltage_range": {
+            "max": 246.06,
+            "min": 243.05
+          },
+          "id": "DR-HTF024S",
+          "manufacturer": "dreo",
+          "updated_at": "2026-10-19T11:57:59",
+          "max_power": null,
+          "sub_profile_count": 0,
+          "hash": "64ebb299c76a22eb18c01cf16bb07559"
         }
       ],
       "device_types": [
