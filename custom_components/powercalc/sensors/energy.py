@@ -326,6 +326,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             "unit_time": UnitOfTime.HOURS,
             "integration_method": integration_method,
             "unique_id": unique_id,
+            "device_class": SensorDeviceClass.ENERGY,
             "max_sub_interval": timedelta(
                 seconds=sensor_config.get(CONF_ENERGY_UPDATE_INTERVAL, DEFAULT_ENERGY_UPDATE_INTERVAL),
             ),
