@@ -29,5 +29,8 @@
       "email": "simon.hoerrle@gmail.com",
       "github": "CM000n"
     }
-  ]
+  ],
+  "sub_profile_select": {
+    "default": "230v"
+  }
 }

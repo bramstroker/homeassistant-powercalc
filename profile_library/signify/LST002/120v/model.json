@@ -9,7 +9,7 @@
   "created_at": "2026-10-08T03:09:00Z",
   "device_type": "light",
   "mains_voltage": 120,
-  "measure_description": "Measured with Powercalc Measure",
+  "measure_description": "Measured with Powercalc Measure at 120 V in Canada, with a 2 m strip and no extensions.",
   "measure_device": "Ikea Grillplats",
   "measure_method": "script",
   "measure_settings": {
@@ -19,11 +19,19 @@
     "SLEEP_TIME": 4.0,
     "VERSION": "v0.12.0:app"
   },
-  "name": "Hue lightstrip plus",
+  "name": "Hue LightStrip Plus (2m, 120V)",
   "standby_power": 0.4,
   "standby_power_estimated": true,
   "voltage_range": {
     "max": 122.0,
     "min": 117.0
+  },
+  "gtin": [],
+  "device_specs": {
+    "socket": "integrated",
+    "form_factor": "strip",
+    "connectivity": [
+      "zigbee"
+    ]
   }
 }
