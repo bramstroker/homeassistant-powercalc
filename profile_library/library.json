@@ -21379,7 +21379,7 @@
           ],
           "id": "AC0009401NJ",
           "manufacturer": "osram",
-          "updated_at": "2026-10-19T11:58:01",
+          "updated_at": "2026-10-19T12:45:29",
           "max_power": 9.05,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-10-13T16:10:43",
@@ -21396,7 +21396,7 @@
             "score": 96.7,
             "color_temp": 96.7
           },
-          "hash": "7ff50db7cb97b7a66020f60482e08251"
+          "hash": "680b4489c098838aee52fab429b30be6"
         },
         {
           "aliases": [
@@ -25889,7 +25889,9 @@
         {
           "aliases": [
             "9150059869",
-            "915005987001"
+            "915005987001",
+            "9150059873",
+            "915005987301"
           ],
           "calculation_strategy": "lut",
           "created_at": "2024-07-21T11:13:03Z",
@@ -25926,7 +25928,7 @@
           ],
           "id": "915005986901",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-14T18:16:50",
           "max_power": 14.35,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -25942,7 +25944,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "1eff4a6c1dd97133c85f22ee9f9bee84"
+          "hash": "44cca81aa6d85538944f441f944f3d3b"
         },
         {
           "aliases": [
@@ -30754,6 +30756,7 @@
         {
           "aliases": [
             "7602031P7",
+            "7602031U7",
             "9150058219",
             "9150058220",
             "9150058221",
@@ -30792,7 +30795,7 @@
           ],
           "id": "LCT026",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-14T18:16:50",
           "max_power": 7.07,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -30808,7 +30811,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "65bbe6477a3aae8375a4ca6c72f7b7d5"
+          "hash": "0b049e1952cbe24c68c320fe93d9ce58"
         },
         {
           "aliases": [
@@ -31908,7 +31911,7 @@
           ],
           "id": "LST002",
           "manufacturer": "signify",
-          "updated_at": "2026-10-19T11:58:02",
+          "updated_at": "2026-10-19T12:45:29",
           "max_power": 21.88,
           "sub_profile_count": 2,
           "measurement_updated_at": "2026-10-19T11:58:02",
@@ -31924,7 +31927,7 @@
             "score": 32.7,
             "color_temp": 32.7
           },
-          "hash": "27f372956fc937e105e2cae5937e6913"
+          "hash": "bb16e010330a1b8f98a7ebf8b63e05b0"
         },
         {
           "aliases": [
