@@ -32,5 +32,8 @@
   "voltage_range": {
     "max": 238.4,
     "min": 233.7
-  }
+  },
+  "aliases": [
+    "Gardenpole RGBW-Lightify"
+  ]
 }
