@@ -211,7 +211,7 @@ def create_cost_sensor(
         price_config=price_config,
         reset_on_source_reset=reset_on_source_reset,
     )
-    if isinstance(energy_sensor, VirtualUtilityMeter):
+    if isinstance(energy_sensor, VirtualUtilityMeter) and energy_sensor.device_name is not None:
         meter_name = energy_sensor.device_name
         cost_sensor.device_name = DeviceName(f"{meter_name.translation_key}_cost", meter_name.placeholders)
     return cost_sensor
