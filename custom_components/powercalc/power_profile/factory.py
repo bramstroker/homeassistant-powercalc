@@ -72,7 +72,7 @@ async def get_power_profile(
         if log_errors:
             _LOGGER.error("Problem loading model: %s", err)
         raise ModelNotSupportedError(
-            f"Model not found in library (manufacturer: {manufacturer}, model: {model})",
+            f"Could not load power profile (manufacturer: {manufacturer}, model: {model}): {err}",
         ) from err
 
     return profile
