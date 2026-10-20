@@ -16002,7 +16002,7 @@
           ],
           "id": "AC4129900NJ",
           "manufacturer": "ledvance",
-          "updated_at": "2026-10-19T14:56:23",
+          "updated_at": "2026-10-19T15:06:05",
           "max_power": 11.58,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-10-13T16:14:33",
@@ -16018,7 +16018,7 @@
             "score": 97.1,
             "color_temp": 97.1
           },
-          "hash": "bba5eec4bca321bbca5b4325b0dd3847"
+          "hash": "e8ea596a9ec4e226dc016a2f4012625d"
         },
         {
           "gtin": [
@@ -28110,6 +28110,74 @@
             "color_temp": 98.2
           },
           "hash": "d994dc7b52bbe36585ac15b98c2b5fc0"
+        },
+        {
+          "aliases": [
+            "LCA013"
+          ],
+          "authors": [
+            {
+              "email": "earlymorninghours@gmail.com",
+              "github": "earlymorninghours",
+              "name": "Dave Stein"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-06T19:55:05Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "matter",
+              "thread",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 810,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Zooz Z-Wave Plus Power Switch ZEN15",
+          "measure_device_firmware": "1.2",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 8.57,
+            "DUMMY_LOAD_RESISTANCE": 1727.83,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.12.0:app"
+          },
+          "name": "Hue white ambiance and color 806lm A19 E26",
+          "product_url": "https://www.philips-hue.com/en-us/p/hue-white-and-color-ambiance-60w-a19-e26-smart-bulb/046677590826",
+          "standby_power": 0.4,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 121.71,
+            "min": 121.71
+          },
+          "id": "929003853701",
+          "manufacturer": "signify",
+          "updated_at": "2026-10-20T06:44:39",
+          "max_power": 6.83,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-20T06:44:39",
+          "power_range": {
+            "min": 0.43,
+            "max": 6.83
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "1b3a21c2ba08c169f2ca636f6c5c32fd"
         },
         {
           "aliases": [
