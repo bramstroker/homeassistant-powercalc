@@ -59,6 +59,10 @@ SESSION_LOAD_ERRORS = (OSError, KeyError, TypeError, ValueError)
 _ModelT = TypeVar("_ModelT", bound=BaseModel)
 
 
+class RecordingLabels(BaseModel):
+    labels: dict[str, str]
+
+
 class SessionStorage:
     """Persist session state and outputs below a confined data root."""
 
@@ -363,6 +367,27 @@ class SessionStorage:
             find_recording_paths(self.artifact_directory(session_id, request.model_id), request.export_filename)
         )
 
+    def recording_labels(self, session_id: str) -> dict[str, str]:
+        request = self.load_request(session_id)
+        if not isinstance(request, RecorderMeasurementRequest):
+            return {}
+        output = self.output_directory(session_id)
+        recordings = find_recording_paths(
+            self.artifact_directory(session_id, request.model_id), request.export_filename
+        )
+        stored = self._load_model(
+            self.session_directory(session_id) / "recording_labels.json", RecordingLabels, "recording labels"
+        )
+        labels = stored.labels if stored is not None else {}
+        return {str(path.relative_to(output)): labels.get(str(path.relative_to(output)), "") for path in recordings}
+
+    def set_recording_label(self, session_id: str, name: str, label: str) -> None:
+        labels = self.recording_labels(session_id)
+        if name not in labels:
+            raise ValueError("Only saved recordings can be labelled")
+        labels[name] = label.strip()
+        self._write_json(self.session_directory(session_id) / "recording_labels.json", {"labels": labels})
+
     def archive_recording(self, session_id: str, request: RecorderMeasurementRequest) -> None:
         """Keep the previous run before the recorder opens its fixed output filename."""
         directory = self.artifact_directory(session_id, request.model_id)
@@ -376,7 +401,13 @@ class SessionStorage:
         while archived.exists() or archived.is_symlink():
             index += 1
             archived = current.with_stem(f"{current.stem}-{index}")
+        labels = self.recording_labels(session_id)
+        name = str(current.relative_to(self.output_directory(session_id)))
+        label = labels.pop(name, "")
         current.rename(archived)
+        if label:
+            labels[str(archived.relative_to(self.output_directory(session_id)))] = label
+            self._write_json(self.session_directory(session_id) / "recording_labels.json", {"labels": labels})
 
     def verify_writable(self) -> None:
         """Exercise the same create/fsync/remove operations used by session persistence."""

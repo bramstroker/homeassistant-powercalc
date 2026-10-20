@@ -94,6 +94,7 @@ export interface SessionFile {
   size: number;
   media_type: string;
   modified_at?: string;
+  recording_label?: string | null;
 }
 
 export interface PlotPoint {

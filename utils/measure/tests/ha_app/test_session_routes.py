@@ -211,3 +211,54 @@ def test_events_endpoint_rejects_missing_session(session_client: TestClient) -> 
 
     assert response.status_code == 404
     stream.assert_not_called()
+
+
+@pytest.fixture
+def labelled_recording_client(session_client: TestClient) -> TestClient:
+    from measure.request import RecorderMeasurementRequest
+
+    context = session_client.app.state.context
+    snapshot = SessionSnapshot(id="recording", state=SessionState.COMPLETED, created_at="now", updated_at="now")
+    request = RecorderMeasurementRequest(power_meter=DummyPowerMeterSpec())
+    context.storage.create(snapshot, request)
+    context.coordinator.get.return_value = snapshot
+    output = context.storage.artifact_directory(snapshot.id, request.model_id)
+    output.mkdir(parents=True, exist_ok=True)
+    (output / request.export_filename).write_text("1,2\n", encoding="utf-8")
+    (output / "model.json").write_text("{}", encoding="utf-8")
+    return session_client
+
+
+def test_edit_and_clear_recording_label(labelled_recording_client: TestClient) -> None:
+    client = labelled_recording_client
+    files = client.get("/api/sessions/recording/files").json()
+    recording = next(file for file in files if file["recording_label"] == "")
+    assert next(file for file in files if file["name"].endswith("model.json"))["recording_label"] is None
+    for label, expected in [("  Full cleaning cycle  ", "Full cleaning cycle"), ("", "")]:
+        response = client.put(
+            "/api/sessions/recording/recording-label", json={"name": recording["name"], "label": label}
+        )
+        assert response.status_code == 200
+        saved = next(file for file in response.json() if file["name"] == recording["name"])
+        assert saved["recording_label"] == expected
+        assert saved["modified_at"] == recording["modified_at"]
+        assert client.get("/api/sessions/recording/files").json() == response.json()
+
+
+@pytest.mark.parametrize(
+    "name,label,status", [("model.json", "Test", 422), ("../request.json", "Test", 422), ("record.csv", "x" * 121, 400)]
+)
+def test_invalid_recording_label(labelled_recording_client: TestClient, name: str, label: str, status: int) -> None:
+    response = labelled_recording_client.put(
+        "/api/sessions/recording/recording-label", json={"name": name, "label": label}
+    )
+    assert response.status_code == status
+
+
+def test_active_recording_cannot_be_labelled(labelled_recording_client: TestClient) -> None:
+    context = labelled_recording_client.app.state.context
+    context.coordinator.get.return_value = replace(context.coordinator.get.return_value, state=SessionState.RUNNING)
+    response = labelled_recording_client.put(
+        "/api/sessions/recording/recording-label", json={"name": "record.csv", "label": "Test"}
+    )
+    assert response.status_code == 409
