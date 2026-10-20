@@ -774,6 +774,16 @@ export class MeasureAppController {
     }
   }
 
+  async saveRecordingLabel(name: string, label: string): Promise<void> {
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) throw new Error("No session is selected");
+    const files = await this.api().setRecordingLabel(sessionId, name, label);
+    if (this.state.snapshot?.session_id === sessionId) {
+      this.state.files = files;
+      this.changed();
+    }
+  }
+
   private async loadResultArtifacts(): Promise<void> {
     const sessionId = this.state.snapshot?.session_id;
     if (!sessionId) return;

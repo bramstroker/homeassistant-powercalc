@@ -196,3 +196,26 @@ describe("measure app controller: sessions", () => {
 
 
 });
+
+
+it("refreshes labels after saving without replacing another selected session", async () => {
+  const appState = state();
+  appState.snapshot = { state: "completed", session_id: "session-1" };
+  const files = [{ name: "record.jsonl", size: 20, media_type: "application/octet-stream", recording_label: "Full cycle" }];
+  const controller = new MeasureAppController(appState, () => api({ setRecordingLabel: async () => files }), () => connection(), () => undefined);
+  await controller.saveRecordingLabel("record.jsonl", "Full cycle");
+  expect(appState.files).toEqual(files);
+
+  const previousFiles = appState.files;
+  const switchedController = new MeasureAppController(appState, () => api({
+    setRecordingLabel: async () => {
+      appState.snapshot = { state: "completed", session_id: "session-2" };
+      return [];
+    },
+  }), () => connection(), () => undefined);
+  await switchedController.saveRecordingLabel("record.jsonl", "Updated label");
+  expect(appState.files).toBe(previousFiles);
+
+  appState.snapshot = undefined;
+  await expect(controller.saveRecordingLabel("record.jsonl", "Test")).rejects.toThrow("No session");
+});

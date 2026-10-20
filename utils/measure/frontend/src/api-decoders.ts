@@ -473,7 +473,7 @@ export const decodePreflight = decoder("preflight", isPreflight);
 export const decodeSessionSnapshot = decoder("session snapshot", isSessionSnapshot);
 export const decodeSessionSummaries = decoder("session list", arrayOf(isSessionSummary));
 export const decodeSessionFiles: Decoder<SessionFile[]> = decoder("session files", arrayOf(objectOf({
-  name: isString, size: isNumber, media_type: isString, modified_at: optional(isString),
+  name: isString, size: isNumber, media_type: isString, modified_at: optional(isString), recording_label: optional(nullable(isString)),
 })));
 export const decodePlots = decoder("plots", isPlotCollection);
 export const decodeContributionPreview = decoder("contribution preview", isContributionPreview);

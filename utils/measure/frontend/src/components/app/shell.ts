@@ -326,6 +326,7 @@ export class AppShell extends LitElement implements MeasureAppState {
           && !(request?.measure_type === "recorder" && request.recorder_purpose === "playbook")}
         .fileUrl=${this.resultFileUrl} .downloadAll=${this.downloadAllFiles}
         .inspectJsonFile=${this.inspectResultJsonFile}
+        .saveRecordingLabel=${this.saveRecordingLabel}
         .diagnosticsUrl=${this.api.diagnosticsUrl(sessionId)}
         .busy=${this.busy} .canResume=${this.canResumeSession()} .canAnalyse=${Boolean(snapshot.can_analyse)}
         .analysisComplete=${this.lastAnalysedSessionId === sessionId}
@@ -467,6 +468,9 @@ export class AppShell extends LitElement implements MeasureAppState {
     this.api.getStandbyEstimate(manufacturer, connectivity);
 
   private readonly measureStandby = (sessionId: string, setup?: LightMeasurementRequest) => this.api.measureStandby(sessionId, setup);
+
+  private readonly saveRecordingLabel = (name: string, label: string): Promise<void> =>
+    this.controller.saveRecordingLabel(name, label);
 
   private readonly inspectResultJsonFile = (name: string): Promise<unknown> =>
     this.api.getJsonFile(this.snapshot?.session_id ?? "", name);
