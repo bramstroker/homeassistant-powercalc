@@ -1,6 +1,7 @@
 {
   "name": "ALPSTUGA air quality monitor",
   "device_type": "generic_iot",
+  "discovery_by": "device",
   "calculation_strategy": "fixed",
   "measure_method": "manual",
   "measure_device": "OWON OWH9811",
@@ -25,12 +26,7 @@
   "fixed_config": {
     "power": 0.415
   },
-  "measure_description": "Measured on the USB port of the device (it does *not* come with a power adapter). The value is an average of a three day measurement session, where the device showed it has periods of higher and lower power usage. The voltage range is from a separate measurement session of a single day, which showed the same behavior. For more information see discussion #4750.\n\nMeasurement was taken with the display turned on.",
-  "measure_device_firmware": "1.0.26",
+  "measure_description": "Measured on the 5V USB port of the device (it does *not* come with a power adapter). This means the measurement *excludes* power adapter losses. The value is an average of a three day measurement session, where the device showed it has periods of higher and lower power usage. For more information see discussion #4750.\n\nMeasurement was taken with the display turned on.",
   "product_url": "https://www.ikea.com/de/en/p/alpstuga-air-quality-sensor-smart-50604187/",
-  "standby_power_on": 0.415,
-  "voltage_range": {
-    "max": 4.974,
-    "min": 4.942
-  }
+  "standby_power_on": 0.415
 }
