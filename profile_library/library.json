@@ -2217,7 +2217,7 @@
           ],
           "id": "LB01-15W-E27",
           "manufacturer": "athom",
-          "updated_at": "2026-10-19T18:41:59",
+          "updated_at": "2026-10-20T09:58:12",
           "max_power": 12.75,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-10-19T18:41:59",
@@ -2233,7 +2233,7 @@
             "score": 95.4,
             "color_temp": 95.4
           },
-          "hash": "bc9f31d29b9d8a998169a8890565b4f3"
+          "hash": "0c3a27c2ff89b04b92f42de22bf54f2a"
         },
         {
           "aliases": [
