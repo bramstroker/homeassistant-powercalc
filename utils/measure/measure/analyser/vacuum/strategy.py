@@ -269,8 +269,10 @@ def _fit_settling_branch(
     standby: list[RecordingSample] = []
     for sample in samples:
         elapsed = timing.get_elapsed(sample)
-        if elapsed is not None:
-            (settling if elapsed < SETTLING_SECONDS else standby).append(sample)
+        # A recording can start after the charge already ended, so the transition is not part of
+        # the data. The exported template reads the live entity's last_changed, and such a sample
+        # is stable standby in practice.
+        (settling if elapsed is not None and elapsed < SETTLING_SECONDS else standby).append(sample)
     if min(len(settling), len(standby)) < MIN_EPISODE_SAMPLES:
         return branch
     settling_durations = calculate_sample_durations(recording_samples, settling)
@@ -445,6 +447,7 @@ def split_vacuum_samples(
         split = _split_by_episode(samples, episodes, grouped, signals)
         fallback_activities = {activity for activity, items in grouped.items() if len(items) < 2}
         fallback_activities.update(_find_brief_activity_validation(samples, grouped, split))
+        fallback_activities.update(_find_unevenly_split_activities(grouped, split))
     # Charging needs its own hold-out when the shared split leaves it untestable,
     # without giving up the independent split of the other activities.
     if not _supports_charging_split(split, context, charges):
@@ -483,6 +486,30 @@ def _find_brief_activity_validation(
         if held_out_seconds < MIN_HELD_OUT_SHARE * total_seconds:
             brief.add(activity)
     return brief
+
+
+def _find_unevenly_split_activities(
+    grouped: Mapping[Activity, list[VacuumEpisode]],
+    split: TrainingValidationSplit,
+) -> set[Activity]:
+    """An activity held out as whole episodes cannot be fitted from a tiny leftover episode.
+
+    When a single long episode lands entirely in validation, fitting keeps only a short remnant.
+    That remnant is too small to describe the activity, so hold out a block of the long episode
+    instead (see _split_within_activities).
+    """
+    training_ids = {id(sample) for sample in split.training}
+    uneven: set[Activity] = set()
+    for activity, episodes in grouped.items():
+        if activity == Activity.CHARGING:
+            continue
+        training_count = sum(id(sample) in training_ids for episode in episodes for sample in episode.samples)
+        held_out_count = sum(
+            len([sample for sample in episode.samples if id(sample) not in training_ids]) for episode in episodes
+        )
+        if training_count < MIN_EPISODE_SAMPLES * 4 and held_out_count > training_count:
+            uneven.add(activity)
+    return uneven
 
 
 def _supports_charging_split(

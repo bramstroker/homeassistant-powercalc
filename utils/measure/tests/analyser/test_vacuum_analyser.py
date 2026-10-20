@@ -1571,6 +1571,48 @@ def test_single_recording_holds_out_both_idle_phases() -> None:
         assert any(elapsed is not None and elapsed >= SETTLING_SECONDS for elapsed in idle_times)
 
 
+def test_recording_without_charge_transition_is_stable_standby(tmp_path: Path) -> None:
+    """A session whose later recordings start with the flag already off.
+
+    Only the first recording contains the charge end, so the remaining idle samples have no
+    post-charge timing. They are stable standby and must still allow the settling split; the
+    exported template keeps using the live entity's last_changed.
+    """
+    first = post_charge_cycle(standby_seconds=3600)
+    later = [
+        replace(item, recording_id=1, elapsed_seconds=float(index * 10))
+        for index, item in enumerate(post_charge_cycle(standby_seconds=3600)[IDLE_START:])
+    ]
+    paths = [
+        write_recording(tmp_path / "first.jsonl", first, SETTLING_CONTEXT),
+        write_recording(tmp_path / "later.jsonl", later, SETTLING_CONTEXT),
+    ]
+    result = RecorderAnalyser().analyse(paths, SETTLING_CONTEXT)
+    assert result.model_ready, result.reason
+    idle = next(
+        report
+        for report in result.activity_reports
+        if report.activity in {Activity.SLEEPING, Activity.COMPLETED, Activity.DOCKED}
+    )
+    assert idle.coverage == 1
+    assert idle.energy.bias_percent == pytest.approx(0, abs=1)
+
+    samples = [*first, *later]
+    split = split_vacuum_samples(samples, SETTLING_CONTEXT)
+    assert isinstance(split, TrainingValidationSplit)
+    models = VacuumCompositeStrategy().build_candidates(
+        split.training, SETTLING_CONTEXT, split.signals, recording_samples=samples
+    )
+    assert isinstance(models, list)
+    settling_models = [
+        candidate for candidate in models if any(isinstance(branch, SettlingBranch) for branch in candidate.branches)
+    ]
+    assert settling_models, "idle samples without a recorded charge end must still allow the split"
+    model = settling_models[-1]
+    branch = next(branch for branch in model.branches if isinstance(branch, SettlingBranch))
+    assert branch.estimate(later[0], None) == branch.standby_power
+
+
 def test_settling_fit_uses_only_training_power() -> None:
     data = post_charge_cycle()
     split = split_vacuum_samples(data, SETTLING_CONTEXT)
@@ -1682,7 +1724,8 @@ def test_charge_timing_does_not_cross_recordings_or_assume_an_initial_charge() -
     assert timing.get_elapsed(second[0]) is None
     assert timing.get_elapsed(second[-1]) is None
     branch = SettlingBranch(Activity.SLEEPING, 11.44, 3.17, timing)
-    assert branch.estimate(second[0], None) is None
+    # A recording without a charge transition is stable standby, not an unknown phase.
+    assert branch.estimate(second[0], None) == 3.17
 
 
 @pytest.mark.parametrize(
