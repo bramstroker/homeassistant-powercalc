@@ -15,6 +15,7 @@
     "connectivity": [
       "zigbee",
       "matter",
+      "thread",
       "bluetooth"
     ],
     "form_factor": "bulb",
