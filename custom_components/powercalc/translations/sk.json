@@ -1022,6 +1022,7 @@
           "energy_options": "Vlastnosti energie",
           "fixed": "Pevné možnosti",
           "group_custom": "Možnosti skupiny",
+          "group_domain": "Možnosti skupiny",
           "group_subtract": "Možnosti skupiny",
           "group_tracked_untracked": "Možnosti skupiny",
           "group_tracked_untracked_manual": "Sleované entity",

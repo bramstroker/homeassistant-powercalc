@@ -1022,6 +1022,7 @@
           "energy_options": "Opciones de energía",
           "fixed": "Opciones fijadas",
           "group_custom": "Opciones de grupo",
+          "group_domain": "Opciones de grupo",
           "group_subtract": "Opciones de grupo",
           "group_tracked_untracked": "Opciones de grupo",
           "group_tracked_untracked_manual": "Entidades rastreadas",

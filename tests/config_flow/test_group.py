@@ -15,6 +15,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.selector import SelectSelector
+from homeassistant.helpers.translation import async_get_translations
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 import voluptuous as vol
 
@@ -674,5 +675,10 @@ async def test_domain_group_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.MENU
     assert Step.BASIC_OPTIONS in result["menu_options"]
+    assert Step.GROUP_DOMAIN in result["menu_options"]
     assert Step.GROUP_CUSTOM not in result["menu_options"]
     assert Step.UTILITY_METER_OPTIONS not in result["menu_options"]
+
+    translations = await async_get_translations(hass, "en", "options", {DOMAIN})
+    for menu_option in result["menu_options"]:
+        assert translations[f"component.{DOMAIN}.options.step.init.menu_options.{menu_option}"]
