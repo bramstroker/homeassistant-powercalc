@@ -263,6 +263,7 @@ ATTR_INTEGRATION = "integration"
 ATTR_IS_GROUP = "is_group"
 ATTR_STATE = "state"
 ATTR_SOURCE_ENTITY = "source_entity"
+ATTR_SOURCE_GROUP = "source_group"
 ATTR_SOURCE_DOMAIN = "source_domain"
 
 SERVICE_ACTIVATE_PLAYBOOK = "activate_playbook"

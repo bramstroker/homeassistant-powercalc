@@ -301,6 +301,10 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _unrecorded_attributes = frozenset({ATTR_SOURCE_DOMAIN, ATTR_SOURCE_ENTITY})
 
+    @property
+    def source_entity_id(self) -> str:
+        return self._source_entity
+
     def __init__(
         self,
         hass: HomeAssistant,
