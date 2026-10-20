@@ -485,6 +485,37 @@ async def test_error_when_model_not_supported(
     assert not hass.states.get("sensor.test_power")
 
     assert "Skipping sensor setup" in caplog.text
+    assert "Could not load power profile (manufacturer: Foo, model: Bar)" in caplog.text
+
+
+async def test_profile_setup_error_preserves_missing_dependency(
+    hass: HomeAssistant,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    profile = {
+        "name": "Missing dependency",
+        "calculation_strategy": "fixed",
+        "fixed_config": {"power": "{{ states('[[entity_by_translation_key:water_temperature]]') }}"},
+    }
+    (tmp_path / "model.json").write_text(json.dumps(profile))
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "vacuum.robot",
+            CONF_MANUFACTURER: "dreame",
+            CONF_MODEL: "RLX63CE-2",
+            CONF_CUSTOM_MODEL_DIRECTORY: str(tmp_path),
+        },
+    )
+
+    assert not hass.states.get("sensor.robot_power")
+    assert (
+        "Skipping sensor setup: Could not load power profile (manufacturer: dreame, model: RLX63CE-2): "
+        "Could not find related entity for translation key water_temperature of entity vacuum.robot"
+    ) in caplog.text
+    assert "Model not found in library" not in caplog.text
 
 
 async def test_sleep_power(hass: HomeAssistant) -> None:
