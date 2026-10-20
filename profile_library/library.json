@@ -2174,6 +2174,69 @@
       "models": [
         {
           "aliases": [
+            "rgbct-light",
+            "Athom RGBCCT Bulb"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-15T20:12:28Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E27",
+            "form_factor": "bulb",
+            "lumens": 1400,
+            "rated_power": 15.0,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Athom Smart Plug v2",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.13.0:cli"
+          },
+          "name": "15W E27 RGBCCT Bulb for ESPHome (1400 lm)",
+          "legacy_ids": [
+            "rgbct-light"
+          ],
+          "standby_power": 0.07,
+          "voltage_range": {
+            "max": 242.6,
+            "min": 239.38
+          },
+          "authors": [
+            {
+              "name": "Mike Miller",
+              "github": "mikeage"
+            }
+          ],
+          "id": "LB01-15W-E27",
+          "manufacturer": "athom",
+          "updated_at": "2026-10-19T18:41:59",
+          "max_power": 12.75,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-19T18:41:59",
+          "power_range": {
+            "min": 0.01,
+            "max": 12.75
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 95.4,
+            "color_temp": 95.4
+          },
+          "hash": "bc9f31d29b9d8a998169a8890565b4f3"
+        },
+        {
+          "aliases": [
             "rgbww-light",
             "athom.rgbww-light",
             "Athom RGBCW Bulb"
@@ -28160,7 +28223,7 @@
           },
           "id": "929003853701",
           "manufacturer": "signify",
-          "updated_at": "2026-10-20T06:44:39",
+          "updated_at": "2026-10-20T07:14:29",
           "max_power": 6.83,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-10-20T06:44:39",
@@ -28177,7 +28240,7 @@
             "score": 98.2,
             "color_temp": 98.2
           },
-          "hash": "1b3a21c2ba08c169f2ca636f6c5c32fd"
+          "hash": "46588f72cefadf3f5a72d01b2c963009"
         },
         {
           "aliases": [
