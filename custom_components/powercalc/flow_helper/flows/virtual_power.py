@@ -564,7 +564,11 @@ class VirtualPowerOptionsFlow(VirtualPowerFlow):
         step = STRATEGY_STEP_MAPPING.get(self.flow.strategy or CalculationStrategy.FIXED, Step.FIXED)
 
         schema = await self.create_strategy_schema()
-        if self.flow.selected_profile and self.flow.selected_profile.device_type == DeviceType.SMART_SWITCH:
+        if (
+            self.flow.strategy == CalculationStrategy.FIXED
+            and self.flow.selected_profile
+            and self.flow.selected_profile.device_type == DeviceType.SMART_SWITCH
+        ):
             schema = SCHEMA_POWER_SMART_SWITCH
 
         strategy_options = self.flow.sensor_config.get(str(self.flow.strategy)) or {}
