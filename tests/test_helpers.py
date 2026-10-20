@@ -21,6 +21,7 @@ from custom_components.powercalc.helpers import (
     get_or_create_unique_id,
     get_related_entity_by_device_class,
     get_related_entity_by_translation_key,
+    iter_related_entity_placeholders,
     make_hashable,
     replace_placeholders,
     resolve_related_entity_placeholder,
@@ -323,6 +324,17 @@ def test_replace_placeholder() -> None:
     placeholders = {"entity_by_device_class:temperature": "sensor.test"}
     replace_placeholders(json_data, placeholders)
     assert json_data["name"] == "Test sensor.test"
+
+
+@pytest.mark.parametrize("include_optional", [True, False])
+def test_related_entity_placeholder_filter(include_optional: bool) -> None:
+    required = "entity_by_translation_key:state"
+    optional = "optional:entity_by_translation_key:water_temperature"
+    placeholders = collect_placeholders(f"[[{required}]] [[{optional}]] [[entity]] [[optional:unknown]]")
+
+    result = set(iter_related_entity_placeholders(placeholders, include_optional=include_optional))
+
+    assert result == ({required, optional} if include_optional else {required})
 
 
 def test_resolve_related_entity_placeholder_no_source_entity(hass: HomeAssistant) -> None:

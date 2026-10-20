@@ -1,0 +1,13 @@
+{
+  "name": "Discovery optional entity test",
+  "device_type": "ups",
+  "discovery_by": "device",
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": "{% set entity = '[[optional:entity_by_translation_key:ups_power_nominal]]' %}{{ states(entity) if entity and has_value(entity) else state_attr('[[entity]]', 'nominal_power') }}"
+  },
+  "config_flow_discovery_remarks": "Enable the Nominal Power entity first.",
+  "measure_method": "manual",
+  "measure_device": "N/A",
+  "created_at": "2026-10-20T00:00:00Z"
+}

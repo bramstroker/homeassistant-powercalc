@@ -1,0 +1,28 @@
+{
+  "name": "Optional entity fallback",
+  "device_type": "vacuum_robot",
+  "calculation_strategy": "composite",
+  "composite_config": [
+    {
+      "condition": {
+        "condition": "template",
+        "value_template": "{% set entity = '[[optional:entity_by_translation_key:water_temperature]]' %}{% set temperature = states(entity) if entity and has_value(entity) else state_attr('[[entity]]', 'water_temperature') %}{{ temperature | lower == 'hot' }}"
+      },
+      "fixed": {
+        "power": 110.3
+      }
+    },
+    {
+      "condition": {
+        "condition": "template",
+        "value_template": "{% set entity = '[[optional:entity_by_translation_key:water_temperature]]' %}{% set temperature = states(entity) if entity and has_value(entity) else state_attr('[[entity]]', 'water_temperature') %}{{ temperature | lower == 'normal' }}"
+      },
+      "fixed": {
+        "power": 26.9
+      }
+    }
+  ],
+  "measure_method": "manual",
+  "measure_device": "N/A",
+  "created_at": "2026-10-20T00:00:00Z"
+}

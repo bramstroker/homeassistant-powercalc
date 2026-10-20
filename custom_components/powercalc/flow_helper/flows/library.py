@@ -457,7 +457,9 @@ class LibraryFlow:
         if not profile or not device_entry:
             return None
 
-        for placeholder in iter_related_entity_placeholders(collect_placeholders(profile.json_data)):
+        for placeholder in iter_related_entity_placeholders(
+            collect_placeholders(profile.json_data), include_optional=False
+        ):
             entity = resolve_related_entity_placeholder(
                 self.flow.hass,
                 placeholder,
@@ -677,7 +679,10 @@ class LibraryConfigFlow(LibraryFlow):
         if not device_entry:
             return remarks
 
-        related_placeholders = iter_related_entity_placeholders(collect_placeholders(profile.json_data))
+        related_placeholders = iter_related_entity_placeholders(
+            collect_placeholders(profile.json_data),
+            include_optional=False,
+        )
         all_resolved = all(
             resolve_related_entity_placeholder(
                 self.flow.hass,

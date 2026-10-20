@@ -5,6 +5,7 @@ from unittest.mock import AsyncMock, patch
 
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_registry import RegistryEntryDisabler
 import pytest
 
 from custom_components.powercalc import CONF_DISABLE_LIBRARY_DOWNLOAD
@@ -19,6 +20,8 @@ from tests.common import (
     build_device_entry,
     get_test_profile_dir,
     mock_device_with_entities,
+    mock_devices,
+    mock_entities_in_registry,
     run_powercalc_setup,
     set_states,
 )
@@ -252,6 +255,36 @@ def test_compute_replacement_variables_raises_clear_error_when_related_entity_mi
 
     with pytest.raises(LibraryError, match=expected_message):
         library.compute_replacement_variables({placeholder}, {}, source_entity)
+
+
+@pytest.mark.parametrize(
+    "lookup",
+    ["entity_by_device_class:battery", "entity_by_translation_key:battery", "entity_by_unique_id_suffix:_battery"],
+)
+@pytest.mark.parametrize("entity_status", ["enabled", "disabled", "missing"])
+def test_optional_related_entity_replacements(hass: HomeAssistant, lookup: str, entity_status: str) -> None:
+    mock_devices(hass, {"robot": {}})
+    entities = {"vacuum.robot": {"device_id": "robot", "platform": "test"}}
+    if entity_status != "missing":
+        entities["sensor.robot_battery"] = {
+            "device_id": "robot",
+            "platform": "test",
+            "unique_id": "robot_battery",
+            "device_class": "battery",
+            "translation_key": "battery",
+            "disabled_by": RegistryEntryDisabler.USER if entity_status == "disabled" else None,
+        }
+    mock_entities_in_registry(hass, entities)
+    source = create_source_entity("vacuum.robot", hass)
+    library = ProfileLibrary(hass, loader=LocalLoader(hass, ""))
+    placeholder = f"optional:{lookup}"
+
+    replacements = library.compute_replacement_variables({placeholder}, {}, source)
+
+    assert replacements[placeholder] == ("sensor.robot_battery" if entity_status == "enabled" else "")
+    if entity_status != "enabled":
+        with pytest.raises(LibraryError, match="Could not find related entity"):
+            library.compute_replacement_variables({placeholder, lookup}, {}, source)
 
 
 async def test_download_feature_can_be_disabled(hass: HomeAssistant) -> None:
