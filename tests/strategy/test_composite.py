@@ -12,6 +12,7 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_registry import RegistryEntryDisabler
 import pytest
 import voluptuous as vol
 
@@ -112,6 +113,54 @@ async def test_recorded_secondary_states_track_power_including_off(hass: HomeAss
     assert_entity_state(hass, "sensor.device_power", "2.00")
     await set_states(hass, [("switch.device", STATE_ON), ("binary_sensor.mode", STATE_UNAVAILABLE)])
     assert_entity_state(hass, "sensor.device_power", STATE_UNAVAILABLE)
+
+
+@pytest.mark.parametrize("select_status", ["enabled", "disabled", "missing"])
+async def test_profile_optional_entity_falls_back_to_source_attribute(hass: HomeAssistant, select_status: str) -> None:
+    mock_devices(hass, {"robot": {"manufacturer": "test", "model": "optional_entity_fallback"}})
+    entities = {"vacuum.robot": {"device_id": "robot", "platform": "test"}}
+    if select_status != "missing":
+        entities["select.robot_temperature"] = {
+            "device_id": "robot",
+            "platform": "test",
+            "translation_key": "water_temperature",
+            "disabled_by": RegistryEntryDisabler.USER if select_status == "disabled" else None,
+        }
+    mock_entities_in_registry(hass, entities)
+    await set_states(hass, [("vacuum.robot", "docked", {"water_temperature": "Normal"})])
+    if select_status == "enabled":
+        await set_states(hass, [("select.robot_temperature", "hot")])
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "vacuum.robot",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("optional_entity_fallback"),
+        },
+    )
+
+    assert_entity_state(hass, "sensor.robot_power", "110.30" if select_status == "enabled" else "26.90")
+
+    if select_status == "enabled":
+        await set_states(hass, [("select.robot_temperature", "normal")], block_count=2)
+        assert_entity_state(hass, "sensor.robot_power", "26.90")
+        await set_states(hass, [("select.robot_temperature", STATE_UNAVAILABLE)], block_count=2)
+
+    # Attribute-only changes must trigger a recalculation while using the fallback.
+    await set_states(hass, [("vacuum.robot", "docked", {"water_temperature": "Hot"})], block_count=2)
+    assert_entity_state(hass, "sensor.robot_power", "110.30")
+    await set_states(hass, [("vacuum.robot", "docked", {"water_temperature": "Normal"})], block_count=2)
+    assert_entity_state(hass, "sensor.robot_power", "26.90")
+
+    if select_status == "enabled":
+        await set_states(hass, [("select.robot_temperature", STATE_UNKNOWN)], block_count=2)
+        assert_entity_state(hass, "sensor.robot_power", "26.90")
+        await set_states(hass, [("select.robot_temperature", "hot")], block_count=2)
+        assert_entity_state(hass, "sensor.robot_power", "110.30")
+        await set_states(hass, [("select.robot_temperature", STATE_UNAVAILABLE)], block_count=2)
+
+    await set_states(hass, [("vacuum.robot", "docked", {})], block_count=2)
+    assert_entity_state(hass, "sensor.robot_power", STATE_UNAVAILABLE)
 
 
 async def test_template_condition(hass: HomeAssistant) -> None:
