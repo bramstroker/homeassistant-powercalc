@@ -269,10 +269,10 @@ def _fit_settling_branch(
     standby: list[RecordingSample] = []
     for sample in samples:
         elapsed = timing.get_elapsed(sample)
-        # A recording can start after the charge already ended, so the transition is not part of
-        # the data. The exported template reads the live entity's last_changed, and such a sample
-        # is stable standby in practice.
-        (settling if elapsed is not None and elapsed < SETTLING_SECONDS else standby).append(sample)
+        # A sample whose charge end is unknown may be settling or standby, so it is neither.
+        if elapsed is None:
+            continue
+        (settling if elapsed < SETTLING_SECONDS else standby).append(sample)
     if min(len(settling), len(standby)) < MIN_EPISODE_SAMPLES:
         return branch
     settling_durations = calculate_sample_durations(recording_samples, settling)

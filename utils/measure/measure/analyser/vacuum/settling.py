@@ -62,10 +62,7 @@ class SettlingBranch:
     def estimate(self, sample: RecordingSample, battery: FeatureReference | None) -> float | None:
         elapsed = self.timing.get_elapsed(sample)
         if elapsed is None:
-            # The recording may start after the charge already ended, so its transition is not
-            # part of the data. The exported template reads the live entity's last_changed, and
-            # such a sample is stable standby in practice, not a settling tail.
-            return self.standby_power
+            return None
         return self.settling_power if elapsed < SETTLING_SECONDS else self.standby_power
 
     def build_power_template(self, context: RecordingContext) -> str:
