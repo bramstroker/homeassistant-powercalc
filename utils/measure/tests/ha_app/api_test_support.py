@@ -7,6 +7,7 @@ from typing import Any
 from unittest.mock import MagicMock
 
 from fastapi.testclient import TestClient
+from homeassistant_api import State
 from measure.const import MeasureType
 from measure.controller.light.const import LutMode
 from measure.ha_app.api import create_app
@@ -160,10 +161,10 @@ class FakeClient:
         entity_id: str | None = None,
         group_id: str | None = None,
         slug: str | None = None,
-    ) -> SimpleNamespace:
+    ) -> State:
         self.state_calls += 1
         now = datetime.now(UTC)
-        return SimpleNamespace(state="4.2", last_reported=now, last_updated=now)
+        return State(entity_id=entity_id or "sensor.test_power", state="4.2", last_reported=now, last_updated=now)
 
 
 class CompletingService(SessionMeasurementService):

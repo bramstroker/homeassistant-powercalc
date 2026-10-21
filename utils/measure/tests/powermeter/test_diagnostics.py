@@ -1,9 +1,9 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from types import SimpleNamespace
 from unittest.mock import MagicMock
 
+from homeassistant_api import State
 from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.diagnostics import DiagnosticStatus, PowerMeterDiagnostics
 from measure.powermeter.hass import HassPowerMeter
@@ -219,7 +219,8 @@ def test_diagnostics_leave_voltage_capability_unknown_when_building_fails() -> N
 def test_hass_diagnostic_sample_uses_raw_state_and_never_forces_an_update() -> None:
     reported = datetime(2026, 7, 15, 10, 0, tzinfo=UTC)
     home_assistant = MagicMock(spec=HomeAssistantManager)
-    home_assistant.get_state.return_value = SimpleNamespace(
+    home_assistant.get_state.return_value = State(
+        entity_id="sensor.power",
         state="12.30",
         last_reported=reported,
         last_updated=datetime(2026, 7, 15, 9, 59, tzinfo=UTC),
