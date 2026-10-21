@@ -1,6 +1,8 @@
 from collections.abc import Callable
 import time
 
+from homeassistant_api import State
+
 from measure.home_assistant.client import HomeAssistantManager
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter, PowerMeterDiagnosticSample
@@ -35,7 +37,7 @@ class HassPowerMeter(PowerMeter):
         state = self.client.get_state(entity_id=self._entity_id)
         if state.state == "unavailable":
             raise PowerMeterError(f"Power sensor {self._entity_id} unavailable")
-        last_updated = state.last_updated.timestamp() if state.last_updated is not None else time.time()
+        reported_at = _get_reported_timestamp(state)
         power_value = float(state.state)
 
         # Availability of the voltage entity is checked by the read below; avoid the
@@ -52,10 +54,10 @@ class HassPowerMeter(PowerMeter):
             return PowerMeasurementResult(
                 power=power_value,
                 voltage=voltage_value,
-                updated=last_updated,
+                updated=reported_at,
             )
 
-        return PowerMeasurementResult(power=power_value, updated=last_updated)
+        return PowerMeasurementResult(power=power_value, updated=reported_at)
 
     def has_voltage_support(self) -> bool:
         if not self._voltage_entity_id:
@@ -72,9 +74,16 @@ class HassPowerMeter(PowerMeter):
         state = self.client.get_state(entity_id=self._entity_id)
         if state.state in {"unavailable", "unknown"}:
             raise PowerMeterError(f"Power sensor {self._entity_id} {state.state}")
-        reported = state.last_reported or state.last_updated
         return PowerMeterDiagnosticSample(
             power=float(state.state),
             raw_value=state.state,
-            reported_at=reported.timestamp() if reported is not None else time.time(),
+            reported_at=_get_reported_timestamp(state),
         )
+
+
+def _get_reported_timestamp(state: State) -> float:
+    # The API library defaults omitted last_reported fields to the current time.
+    # Only a timestamp supplied by HA can prove that an unchanged value was reported again.
+    reported = state.last_reported if "last_reported" in state.model_fields_set else None
+    timestamp = reported or state.last_updated
+    return timestamp.timestamp() if timestamp is not None else time.time()
