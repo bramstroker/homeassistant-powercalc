@@ -98,11 +98,16 @@ def find_credibility_failure(reports: Sequence[ActivityReport]) -> str | None:
 def _find_activity_failure(report: ActivityReport) -> str | None:
     """Check coverage and the appropriate error metric for one identified activity."""
     activity = report.activity
-    if report.coverage < 0.9 and not report.has_fixed_power:
+    if report.coverage < 0.9 and activity == Activity.CHARGING and not report.has_fixed_power:
         # A charging curve cannot estimate battery levels its training charges never reached.
         return (
             f"The {activity} model covers only {report.coverage:.0%} of its validation samples; "
             "record one continuous charge from a low battery through to full with mop drying off"
+        )
+    if report.coverage < 0.9 and not report.has_fixed_power:
+        return (
+            f"No model was fitted for {activity}; record longer, complete {activity} cycles with enough "
+            "consecutive readings for fitting and validation, and the entities that report this activity"
         )
     if report.coverage < 0.9:
         return (
