@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.14.1 - 2026-10-22
+
+### 🐛 Bug Fixes
+
+- #5013 fix(measure): hold out a block when the episode split leaves too little training data @Maxik933
+
 ## 0.14.0 - 2026-10-20
 
 ### 🚀 Features
