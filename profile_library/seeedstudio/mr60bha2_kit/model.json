@@ -1,0 +1,20 @@
+{
+  "name": "MR60BHA2 Kit",
+  "device_type": "generic_iot",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "fixed_config": {
+    "power": 0.72
+  },
+  "standby_power": 0.72,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "USB-powered device, measured at 5V with USB power meter.",
+  "created_at": "2026-03-25T14:20:22Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
