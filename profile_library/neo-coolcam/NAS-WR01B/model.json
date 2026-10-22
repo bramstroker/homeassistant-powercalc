@@ -1,0 +1,28 @@
+{
+  "name": "Smart plug (with electrical measurements)",
+  "aliases": [
+    "TS011F_plug_1"
+  ],
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "linked_profile": "tuya/TS011F",
+  "only_self_usage": true,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "NEO NAS-WR01B is a white-label Tuya TS011F_plug_1. Uses linked_profile to tuya/TS011F.",
+  "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "created_at": "2026-03-25T14:20:22Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
