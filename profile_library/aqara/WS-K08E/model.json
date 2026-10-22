@@ -1,0 +1,27 @@
+{
+  "name": "Light switch H2 EU (double rocker)",
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "fixed_config": {
+    "power": 0.23
+  },
+  "standby_power": 0.23,
+  "measure_method": "manual",
+  "measure_device": "Crenova MS8233D Digital Multimeter",
+  "measure_description": "Aqara Light switch H2 EU double rocker, standby power consumption",
+  "device_specs": {
+    "form_factor": "wall_switch",
+    "power_monitoring": false,
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "created_at": "2026-03-25T14:20:20Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
