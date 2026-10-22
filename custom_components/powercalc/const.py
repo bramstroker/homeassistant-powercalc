@@ -54,6 +54,7 @@ ENTRY_GLOBAL_CONFIG_UNIQUE_ID = "powercalc_global_configuration"
 PLACEHOLDER_ENTITY_BY_DEVICE_CLASS = "entity_by_device_class:"
 PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY = "entity_by_translation_key:"
 PLACEHOLDER_ENTITY_BY_UNIQUE_ID_SUFFIX = "entity_by_unique_id_suffix:"
+PLACEHOLDER_OPTIONAL_PREFIX = "optional:"
 
 DUMMY_ENTITY_ID = "sensor.dummy"
 
@@ -263,6 +264,7 @@ ATTR_INTEGRATION = "integration"
 ATTR_IS_GROUP = "is_group"
 ATTR_STATE = "state"
 ATTR_SOURCE_ENTITY = "source_entity"
+ATTR_SOURCE_GROUP = "source_group"
 ATTR_SOURCE_DOMAIN = "source_domain"
 
 SERVICE_ACTIVATE_PLAYBOOK = "activate_playbook"

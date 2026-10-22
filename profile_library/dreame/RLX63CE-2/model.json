@@ -92,9 +92,8 @@
             "state": "drying"
           },
           {
-            "condition": "state",
-            "entity_id": "[[entity_by_translation_key:drying_time]]",
-            "state": "4h"
+            "condition": "template",
+            "value_template": "{{ state_attr('[[entity]]', 'drying_time') | float(-1) == 4 }}"
           }
         ]
       },
@@ -112,9 +111,8 @@
             "state": "drying"
           },
           {
-            "condition": "state",
-            "entity_id": "[[entity_by_translation_key:drying_time]]",
-            "state": "3h"
+            "condition": "template",
+            "value_template": "{{ state_attr('[[entity]]', 'drying_time') | float(-1) == 3 }}"
           }
         ]
       },
@@ -132,9 +130,8 @@
             "state": "drying"
           },
           {
-            "condition": "state",
-            "entity_id": "[[entity_by_translation_key:drying_time]]",
-            "state": "2h"
+            "condition": "template",
+            "value_template": "{{ state_attr('[[entity]]', 'drying_time') | float(-1) == 2 }}"
           }
         ]
       },
@@ -155,9 +152,8 @@
             ]
           },
           {
-            "condition": "state",
-            "entity_id": "[[entity_by_translation_key:water_temperature]]",
-            "state": "hot"
+            "condition": "template",
+            "value_template": "{{ state_attr('[[entity]]', 'water_temperature') | lower == 'hot' }}"
           }
         ]
       },
@@ -178,9 +174,8 @@
             ]
           },
           {
-            "condition": "state",
-            "entity_id": "[[entity_by_translation_key:water_temperature]]",
-            "state": "warm"
+            "condition": "template",
+            "value_template": "{{ state_attr('[[entity]]', 'water_temperature') | lower == 'warm' }}"
           }
         ]
       },
@@ -201,9 +196,8 @@
             ]
           },
           {
-            "condition": "state",
-            "entity_id": "[[entity_by_translation_key:water_temperature]]",
-            "state": "mild"
+            "condition": "template",
+            "value_template": "{{ state_attr('[[entity]]', 'water_temperature') | lower == 'mild' }}"
           }
         ]
       },
@@ -224,9 +218,8 @@
             ]
           },
           {
-            "condition": "state",
-            "entity_id": "[[entity_by_translation_key:water_temperature]]",
-            "state": "normal"
+            "condition": "template",
+            "value_template": "{{ state_attr('[[entity]]', 'water_temperature') | lower == 'normal' }}"
           }
         ]
       },

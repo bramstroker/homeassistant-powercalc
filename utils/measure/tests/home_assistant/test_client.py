@@ -69,6 +69,25 @@ def test_entity_registry_normalizes_unique_id(unique_id: object, expected: str) 
     client.recv_result_list.assert_called_once_with(42)
 
 
+@pytest.mark.parametrize("has_entity_name", [None, False, True])
+def test_entity_registry_handles_optional_entity_name_flag(has_entity_name: bool | None) -> None:
+    raw_entry = _entity_registry_entry(entity_id="binary_sensor.remote_ui", unique_id="remote-ui-connectivity")
+    if has_entity_name is None:
+        del raw_entry["has_entity_name"]
+    else:
+        raw_entry["has_entity_name"] = has_entity_name
+    client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
+    with (
+        patch.object(client, "send", return_value=42),
+        patch.object(client, "recv_result_list", return_value=[raw_entry]),
+    ):
+        entries = client.list_entity_registry()
+
+    assert len(entries) == 1
+    assert entries[0].entity_id == "binary_sensor.remote_ui"
+    assert entries[0].has_entity_name is (has_entity_name if has_entity_name is not None else False)
+
+
 def test_client_reuses_connection_and_can_reconnect_after_close() -> None:
     client = HomeAssistantWebsocketClient("ws://127.0.0.1:8123/api/websocket", "token")
     with patch.object(WebsocketClient, "__enter__") as connect, patch.object(WebsocketClient, "__exit__") as close:

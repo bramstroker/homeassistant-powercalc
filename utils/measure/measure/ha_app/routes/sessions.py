@@ -11,7 +11,7 @@ from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse, Response, StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
 from measure.dummy_load import DummyLoadCalibration, power_meter_fingerprint
@@ -298,6 +298,26 @@ async def session_files(session_id: str, request: Request) -> list[SessionFile]:
     return _session_files(context, snapshot)
 
 
+class RecordingLabelRequest(BaseModel):
+    name: str
+    label: str = Field(max_length=120)
+
+
+@router.put(
+    "/sessions/{session_id}/recording-label", responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE, 422: ERROR_RESPONSE}
+)
+async def set_recording_label(session_id: str, payload: RecordingLabelRequest, request: Request) -> list[SessionFile]:
+    context = get_app_context(request)
+    snapshot = require_session(context, session_id)
+    if snapshot.state in ACTIVE_SESSION_STATES:
+        raise HTTPException(status_code=409, detail="Labels can be edited after the recording stops")
+    try:
+        context.storage.set_recording_label(session_id, payload.name, payload.label)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    return _session_files(context, snapshot)
+
+
 @router.get("/sessions/{session_id}/plots", responses={404: ERROR_RESPONSE, 409: ERROR_RESPONSE})
 async def session_plots(session_id: str, request: Request) -> SessionPlots:
     context = get_app_context(request)
@@ -350,8 +370,9 @@ async def _resume_session(context: AppContext, session_id: str) -> SessionSnapsh
 
 
 def _session_files(context: AppContext, snapshot: SessionSnapshot) -> list[SessionFile]:
+    labels = context.storage.recording_labels(snapshot.id)
     return [
-        _file_descriptor(context.storage.file_path(snapshot.id, name), name)
+        _file_descriptor(context.storage.file_path(snapshot.id, name), name, labels.get(name))
         for name in context.storage.list_files(snapshot.id)
     ]
 
@@ -469,11 +490,12 @@ def _duration_seconds(value: str | None) -> int | None:
     return round(float(match.group(1)) * multiplier)
 
 
-def _file_descriptor(path: Path, name: str) -> SessionFile:
+def _file_descriptor(path: Path, name: str, recording_label: str | None = None) -> SessionFile:
     stat = path.stat()
     return SessionFile(
         name=name,
         size=stat.st_size,
+        recording_label=recording_label,
         media_type=mimetypes.guess_type(path.name)[0] or "application/octet-stream",
         modified_at=datetime.fromtimestamp(stat.st_mtime, UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
     )

@@ -1022,6 +1022,7 @@
           "energy_options": "Energy options",
           "fixed": "Fixed options",
           "group_custom": "Group options",
+          "group_domain": "Group options",
           "group_subtract": "Group options",
           "group_tracked_untracked": "Group options",
           "group_tracked_untracked_manual": "Tracked entities",

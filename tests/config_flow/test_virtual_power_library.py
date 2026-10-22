@@ -21,6 +21,8 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_MANUFACTURER,
     CONF_MODEL,
+    CONF_POWER,
+    CONF_SELF_USAGE_INCLUDED,
     CONF_SENSOR_TYPE,
     CONF_SUB_PROFILE,
     CONF_VARIABLES,
@@ -865,6 +867,12 @@ async def test_sub_profiles_select_options(hass: HomeAssistant) -> None:
         result["flow_id"],
         {CONF_SUB_PROFILE: "a"},
     )
+    assert result["step_id"] == Step.SMART_SWITCH
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_POWER: 5, CONF_SELF_USAGE_INCLUDED: False},
+    )
+    assert result["step_id"] == Step.POWER_ADVANCED
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {},

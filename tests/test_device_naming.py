@@ -282,6 +282,7 @@ async def test_platform_tariff_select_with_device(
     select_id = f"select.{base_id}"
     assert hass.states.get(select_id).state == "peak"
     assert entity_registry.async_get(select_id).config_entry_id is None
+    assert entity_registry.async_get(select_id).device_id == source_device.id
     assert entity_registry.async_get(f"sensor.{base_id}_peak").device_id == source_device.id
     assert "attempts to attach a device to an entity without a config entry" not in caplog.text
     await hass.services.async_call(

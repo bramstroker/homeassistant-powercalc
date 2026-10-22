@@ -7,6 +7,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.helpers.selector import EntitySelector
+import pytest
 from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 import voluptuous as vol
 
@@ -22,7 +23,9 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_OFF,
     CONF_SENSOR_TYPE,
+    CONF_SUB_PROFILE,
     DUMMY_ENTITY_ID,
+    ENTRY_DATA_POWER_ENTITY,
     CalculationStrategy,
     SensorType,
 )
@@ -39,10 +42,12 @@ from tests.common import (
 )
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
+    confirm_auto_discovered_model,
     goto_virtual_power_strategy_step,
     handle_options_flow_update,
     initialize_discovery_flow,
     initialize_options_flow,
+    select_menu_item,
     set_virtual_power_configuration,
 )
 
@@ -117,6 +122,103 @@ async def test_discovery_flow(
 
     await set_states(hass, [("switch.test2", STATE_ON)])
     assert_entity_state(hass, "sensor.test_device_power", "1.95")
+
+
+@pytest.mark.parametrize("discovered", [True, False])
+@pytest.mark.parametrize("selected_entities", [["switch.test1", "switch.test2"], []])
+async def test_shelly_sub_profile_requires_switch_selection(
+    hass: HomeAssistant,
+    discovered: bool,
+    selected_entities: list[str],
+) -> None:
+    """Sub-profile selection must still ask which relays to track, including an explicit empty selection."""
+    await run_powercalc_setup(hass)
+    device_entry = mock_device_with_switches(hass, 2, "shelly", "S4SW-002P16EU")
+
+    if discovered:
+        result = await initialize_device_discovery_flow(hass, device_entry)
+    else:
+        result = await select_menu_item(hass, Step.MENU_LIBRARY)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            {CONF_ENTITY_ID: "switch.test1", CONF_NAME: "Test"},
+        )
+        result = await confirm_auto_discovered_model(hass, result)
+
+    assert result["step_id"] == Step.AVAILABILITY_ENTITY
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_AVAILABILITY_ENTITY: "switch.test1"},
+    )
+    assert result["step_id"] == Step.SUB_PROFILE_PER_DEVICE
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_SUB_PROFILE: "wlan_+bt_+eco"},
+    )
+
+    assert result["step_id"] == Step.MULTI_SWITCH
+    assert not result.get("errors")
+    selector: EntitySelector = result["data_schema"].schema[CONF_ENTITIES]
+    assert selector.config["include_entities"] == ["switch.test1", "switch.test2"]
+
+    switch_input = {CONF_ENTITIES: selected_entities}
+    if discovered:
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], switch_input)
+    else:
+        result = await set_virtual_power_configuration(hass, result, switch_input)
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_MODEL] == "S4SW-002P16EU/wlan_+bt_+eco"
+    assert result["data"][CONF_MULTI_SWITCH] == switch_input
+    await hass.async_block_till_done()
+
+    power_entity_id = result["result"].data[ENTRY_DATA_POWER_ENTITY]
+    await set_states(hass, [("switch.test1", STATE_ON), ("switch.test2", STATE_ON)])
+    assert_entity_state(hass, power_entity_id, "1.02" if selected_entities else "0.40")
+
+
+@pytest.mark.parametrize("configured_entities", [None, ["switch.test1"]])
+async def test_shelly_sub_profile_can_configure_switches_in_options(
+    hass: HomeAssistant,
+    configured_entities: list[str] | None,
+) -> None:
+    """Changing a sub-profile also repairs entries created without a relay selection."""
+    device_entry = mock_device_with_switches(hass, 2, "shelly", "S4SW-002P16EU")
+    config = {
+        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+        CONF_DEVICE: device_entry.id,
+        CONF_AVAILABILITY_ENTITY: "switch.test1",
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_MANUFACTURER: "shelly",
+        CONF_MODEL: "S4SW-002P16EU/wlan_+bt_+eco",
+    }
+    if configured_entities is not None:
+        config[CONF_MULTI_SWITCH] = {CONF_ENTITIES: configured_entities}
+    entry = await create_mock_config_entry(hass, config)
+
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {})
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {CONF_MANUFACTURER: "shelly"})
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {CONF_MODEL: "S4SW-002P16EU"})
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {CONF_AVAILABILITY_ENTITY: "switch.test1"},
+    )
+    assert result["step_id"] == Step.SUB_PROFILE_PER_DEVICE
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {CONF_SUB_PROFILE: "wlan"})
+
+    assert result["step_id"] == Step.MULTI_SWITCH
+    schema: vol.Schema = result["data_schema"]
+    entity_key = next(iter(schema.schema))
+    assert entity_key.default() == (configured_entities or ["switch.test1", "switch.test2"])
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {CONF_ENTITIES: ["switch.test1", "switch.test2"]},
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_MODEL] == "S4SW-002P16EU/wlan"
+    assert entry.data[CONF_MULTI_SWITCH] == {CONF_ENTITIES: ["switch.test1", "switch.test2"]}
 
 
 async def test_switch_entities_automatically_populated_from_device(hass: HomeAssistant) -> None:

@@ -20,6 +20,13 @@ from measure.analyser.models import (
     ValidationMethod,
 )
 from measure.analyser.sample_intervals import calculate_sample_durations
+from measure.analyser.vacuum.settling import (
+    IDLE_ACTIVITIES,
+    SETTLING_SECONDS,
+    PostChargeTiming,
+    SettlingBranch,
+    build_post_charge_timing,
+)
 from measure.analyser.vacuum.signals import (
     Activity,
     ActivitySignal,
@@ -88,7 +95,7 @@ class ChargingBranch:
         return left.power + (right.power - left.power) * fraction
 
 
-type VacuumBranch = FixedBranch | ChargingBranch
+type VacuumBranch = FixedBranch | ChargingBranch | SettlingBranch
 
 
 @dataclass(frozen=True)
@@ -108,6 +115,9 @@ class VacuumCompositeCandidate:
         features = [feature for signal in self.signals for feature in signal.features]
         if self.battery is not None:
             features.append(self.battery)
+        features.extend(
+            branch.timing.charging.feature for branch in self.branches if isinstance(branch, SettlingBranch)
+        )
         return list(dict.fromkeys(features))
 
     @property
@@ -122,6 +132,8 @@ class VacuumCompositeCandidate:
             for branch in self.branches:
                 if isinstance(branch, FixedBranch) and branch.activity == activity:
                     return branch.power
+                if isinstance(branch, SettlingBranch) and branch.activity == activity:
+                    return branch.standby_power
         return None
 
     def get_support_key(self, sample: RecordingSample) -> Activity | None:
@@ -179,6 +191,9 @@ class VacuumCompositeCandidate:
             if self.battery.source == FeatureSource.ATTRIBUTE:
                 linear["attribute"] = self.battery.attribute
             item["linear"] = linear
+        elif isinstance(branch, SettlingBranch):
+            conditions.append(branch.timing.charging.build_condition(self.context, active=False))
+            item["fixed"] = {"power": branch.build_power_template(self.context)}
         else:
             item["fixed"] = {"power": branch.power}
         item["condition"] = conditions[0] if len(conditions) == 1 else {"condition": "and", "conditions": conditions}
@@ -223,7 +238,52 @@ class VacuumCompositeStrategy(ProfileAnalysisStrategy):
                     )
                 return branch
             branches.append(branch)
-        return [VacuumCompositeCandidate(list(signals), branches, battery, context)]
+        candidate = VacuumCompositeCandidate(list(signals), branches, battery, context)
+        return [candidate, *_fit_settling_candidates(candidate, grouped, original_samples)]
+
+
+def _fit_settling_candidates(
+    candidate: VacuumCompositeCandidate,
+    grouped: Mapping[Activity, Sequence[RecordingSample]],
+    recording_samples: Sequence[RecordingSample],
+) -> list[VacuumCompositeCandidate]:
+    timing = build_post_charge_timing(recording_samples, candidate.context)
+    if timing is None:
+        return []
+    branches = [
+        _fit_settling_branch(branch, grouped[branch.activity], recording_samples, timing)
+        if isinstance(branch, FixedBranch) and branch.activity in IDLE_ACTIVITIES
+        else branch
+        for branch in candidate.branches
+    ]
+    return [replace(candidate, branches=branches)] if branches != candidate.branches else []
+
+
+def _fit_settling_branch(
+    branch: FixedBranch,
+    samples: Sequence[RecordingSample],
+    recording_samples: Sequence[RecordingSample],
+    timing: PostChargeTiming,
+) -> FixedBranch | SettlingBranch:
+    settling: list[RecordingSample] = []
+    standby: list[RecordingSample] = []
+    for sample in samples:
+        elapsed = timing.get_elapsed(sample)
+        # A sample whose charge end is unknown may be settling or standby, so it is neither.
+        if elapsed is None:
+            continue
+        (settling if elapsed < SETTLING_SECONDS else standby).append(sample)
+    if min(len(settling), len(standby)) < MIN_EPISODE_SAMPLES:
+        return branch
+    settling_durations = calculate_sample_durations(recording_samples, settling)
+    standby_durations = calculate_sample_durations(recording_samples, standby)
+    if not sum(settling_durations.values()) or not sum(standby_durations.values()):
+        return branch
+    settling_power = round(calculate_average_power(settling, settling_durations), 2)
+    standby_power = round(calculate_average_power(standby, standby_durations), 2)
+    if settling_power - standby_power < max(1.0, 0.2 * standby_power):
+        return branch
+    return SettlingBranch(branch.activity, settling_power, standby_power, timing)
 
 
 def _fit_branch(
@@ -387,6 +447,7 @@ def split_vacuum_samples(
         split = _split_by_episode(samples, episodes, grouped, signals)
         fallback_activities = {activity for activity, items in grouped.items() if len(items) < 2}
         fallback_activities.update(_find_brief_activity_validation(samples, grouped, split))
+        fallback_activities.update(_find_unevenly_split_activities(grouped, split))
     # Charging needs its own hold-out when the shared split leaves it untestable,
     # without giving up the independent split of the other activities.
     if not _supports_charging_split(split, context, charges):
@@ -425,6 +486,30 @@ def _find_brief_activity_validation(
         if held_out_seconds < MIN_HELD_OUT_SHARE * total_seconds:
             brief.add(activity)
     return brief
+
+
+def _find_unevenly_split_activities(
+    grouped: Mapping[Activity, list[VacuumEpisode]],
+    split: TrainingValidationSplit,
+) -> set[Activity]:
+    """An activity held out as whole episodes cannot be fitted from a tiny leftover episode.
+
+    When a single long episode lands entirely in validation, fitting keeps only a short remnant.
+    That remnant is too small to describe the activity, so hold out a block of the long episode
+    instead (see _split_within_activities).
+    """
+    training_ids = {id(sample) for sample in split.training}
+    uneven: set[Activity] = set()
+    for activity, episodes in grouped.items():
+        if activity == Activity.CHARGING:
+            continue
+        training_count = sum(id(sample) in training_ids for episode in episodes for sample in episode.samples)
+        held_out_count = sum(
+            len([sample for sample in episode.samples if id(sample) not in training_ids]) for episode in episodes
+        )
+        if training_count < MIN_EPISODE_SAMPLES * 4 and held_out_count > training_count:
+            uneven.add(activity)
+    return uneven
 
 
 def _supports_charging_split(
@@ -565,6 +650,7 @@ def _split_within_activities(
     """
     validation_ids = {id(sample) for sample in split.validation}
     battery = find_battery_feature(samples, context)
+    timing = build_post_charge_timing(samples, context)
     for episode in episodes:
         if episode.activity not in activities or len(episode.samples) < MIN_EPISODE_SAMPLES:
             continue
@@ -573,6 +659,9 @@ def _split_within_activities(
         for sample in episode.samples:
             level = get_battery_level(sample, battery) if episode.activity == Activity.CHARGING else None
             key = level // CHARGING_BIN_WIDTH if level is not None else None
+            if timing is not None and episode.activity in IDLE_ACTIVITIES:
+                elapsed = timing.get_elapsed(sample)
+                key = int(elapsed >= SETTLING_SECONDS) if elapsed is not None else None
             blocks[key].append(sample)
         for block in blocks.values():
             count = max(2, len(block) // 3)

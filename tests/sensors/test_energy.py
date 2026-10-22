@@ -1,11 +1,12 @@
 from datetime import timedelta
 from decimal import Decimal
+import inspect
 import json
 import logging
 from unittest.mock import patch
 
 from freezegun.api import FrozenDateTimeFactory
-from homeassistant.components.integration.sensor import IntegrationSensorExtraStoredData
+from homeassistant.components.integration.sensor import IntegrationSensor, IntegrationSensorExtraStoredData
 from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
@@ -22,6 +23,7 @@ from homeassistant.const import (
     EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
+    UnitOfTime,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
@@ -296,6 +298,53 @@ async def test_unit_prefix(hass: HomeAssistant, domain_config: ConfigType, expec
 
     await set_states(hass, [("sensor.test_power", "50.00", {ATTR_UNIT_OF_MEASUREMENT: "W"})])
     assert_entity_state(hass, "sensor.test_energy", attributes={ATTR_UNIT_OF_MEASUREMENT: expected_unit})
+
+
+async def test_energy_sensor_setup_with_required_device_class(
+    hass: HomeAssistant,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original_init = IntegrationSensor.__init__
+
+    def init_with_required_device_class(
+        self: IntegrationSensor,
+        *,
+        device_class: SensorDeviceClass,
+        integration_method: str,
+        name: str | None,
+        round_digits: int | None,
+        source_entity: str,
+        unique_id: str | None,
+        unit_prefix: str | None,
+        unit_time: UnitOfTime,
+        max_sub_interval: timedelta | None,
+        hass: HomeAssistant | None = None,
+    ) -> None:
+        assert device_class == SensorDeviceClass.ENERGY
+        params = {}
+        signature = inspect.signature(original_init)
+        if "hass" in signature.parameters:
+            params["hass"] = hass
+        if "device_class" in signature.parameters:
+            params["device_class"] = device_class
+        original_init(
+            self,
+            integration_method=integration_method,
+            name=name,
+            round_digits=round_digits,
+            source_entity=source_entity,
+            unique_id=unique_id,
+            unit_prefix=unit_prefix,
+            unit_time=unit_time,
+            max_sub_interval=max_sub_interval,
+            **params,
+        )
+
+    monkeypatch.setattr(IntegrationSensor, "__init__", init_with_required_device_class)
+
+    await run_powercalc_setup(hass, get_simple_fixed_config("input_boolean.test"))
+
+    assert_entity_state(hass, "sensor.test_energy", attributes={ATTR_DEVICE_CLASS: SensorDeviceClass.ENERGY})
 
 
 def test_set_entity_category(hass: HomeAssistant) -> None:

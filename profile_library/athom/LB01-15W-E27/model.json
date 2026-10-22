@@ -1,0 +1,44 @@
+{
+  "aliases": [
+    "rgbct-light",
+    "Athom RGBCCT Bulb"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-10-15T20:12:28Z",
+  "device_type": "light",
+  "device_specs": {
+    "socket": "E27",
+    "form_factor": "bulb",
+    "lumens": 1400,
+    "rated_power": 15.0,
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Athom Smart Plug v2",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.13.0:cli"
+  },
+  "name": "15W E27 RGBCCT Bulb for ESPHome (1400 lm)",
+  "legacy_ids": [
+    "rgbct-light"
+  ],
+  "standby_power": 0.07,
+  "voltage_range": {
+    "max": 242.6,
+    "min": 239.38
+  },
+  "authors": [
+    {
+      "name": "Mike Miller",
+      "github": "mikeage"
+    }
+  ]
+}

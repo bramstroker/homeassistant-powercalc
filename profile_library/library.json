@@ -2174,6 +2174,69 @@
       "models": [
         {
           "aliases": [
+            "rgbct-light",
+            "Athom RGBCCT Bulb"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-15T20:12:28Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E27",
+            "form_factor": "bulb",
+            "lumens": 1400,
+            "rated_power": 15.0,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Athom Smart Plug v2",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.13.0:cli"
+          },
+          "name": "15W E27 RGBCCT Bulb for ESPHome (1400 lm)",
+          "legacy_ids": [
+            "rgbct-light"
+          ],
+          "standby_power": 0.07,
+          "voltage_range": {
+            "max": 242.6,
+            "min": 239.38
+          },
+          "authors": [
+            {
+              "name": "Mike Miller",
+              "github": "mikeage"
+            }
+          ],
+          "id": "LB01-15W-E27",
+          "manufacturer": "athom",
+          "updated_at": "2026-10-20T09:58:12",
+          "max_power": 12.75,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-19T18:41:59",
+          "power_range": {
+            "min": 0.01,
+            "max": 12.75
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 95.4,
+            "color_temp": 95.4
+          },
+          "hash": "0c3a27c2ff89b04b92f42de22bf54f2a"
+        },
+        {
+          "aliases": [
             "rgbww-light",
             "athom.rgbww-light",
             "Athom RGBCW Bulb"
@@ -3994,10 +4057,10 @@
           "calculation_strategy": "composite",
           "id": "RLX63CE-2",
           "manufacturer": "dreame",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-10-20T11:14:20",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "23a92bf6f66a8b6c570bb2833c17d976"
+          "hash": "02ac9500d83dda9b26be51586c023ef1"
         },
         {
           "aliases": [
@@ -4296,6 +4359,45 @@
             "max": 36.03
           },
           "hash": "942b8fa2ba4f05c88648fd2d4274bc45"
+        },
+        {
+          "authors": [
+            {
+              "github": "LewisSpring",
+              "name": "LewisSpring"
+            }
+          ],
+          "calculation_strategy": "composite",
+          "created_at": "2026-10-12T12:12:55Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi"
+            ],
+            "form_factor": "tower"
+          },
+          "device_type": "fan",
+          "mains_voltage": 230,
+          "measure_description": "Speed curve measured with Powercalc Measure with oscillation off. Oscillation adds an average of 2.39 W, measured at 11%, 55% and 100% speed.",
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.12.0:app"
+          },
+          "name": "554S Smart Tower Fan",
+          "standby_power": 1.16,
+          "voltage_range": {
+            "max": 246.06,
+            "min": 243.05
+          },
+          "id": "DR-HTF024S",
+          "manufacturer": "dreo",
+          "updated_at": "2026-10-19T12:36:44",
+          "max_power": null,
+          "sub_profile_count": 0,
+          "hash": "0de10eb0a5fc0f77daf2b242114d759c"
         }
       ],
       "device_types": [
@@ -15939,6 +16041,49 @@
           "hash": "02c54b384b4df393a81022370a9d04c8"
         },
         {
+          "calculation_strategy": "lut",
+          "created_at": "2025-12-10T02:27:02Z",
+          "device_type": "light",
+          "measure_description": "Measured with utils/measure script using the base set of five poles plus two extensions with three poles each and the default powersupply",
+          "measure_device": "Shelly, PM mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.19.2:docker"
+          },
+          "name": "GARDENPOLE RGBW T (11 poles)",
+          "standby_power": 0.46,
+          "authors": [
+            {
+              "name": "Knuspel",
+              "github": "Knuspel"
+            }
+          ],
+          "aliases": [
+            "GARDENPOLE RGBW T"
+          ],
+          "id": "AC4129900NJ",
+          "manufacturer": "ledvance",
+          "updated_at": "2026-10-19T15:06:05",
+          "max_power": 11.58,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-13T16:14:33",
+          "power_range": {
+            "min": 0.45,
+            "max": 11.58
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
+          "hash": "e8ea596a9ec4e226dc016a2f4012625d"
+        },
+        {
           "gtin": [
             "4099854461330"
           ],
@@ -21301,6 +21446,65 @@
           "hash": "b443bbe9030392faf091c35511eb1737"
         },
         {
+          "authors": [
+            {
+              "github": "Knuspel",
+              "name": "Knuspel"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-11T11:43:11Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure, Five Pole Basic Configuration",
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 9.76,
+            "DUMMY_LOAD_RESISTANCE": 5704.71,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.12.0:app"
+          },
+          "name": "Gardenpole RGBW LIGHTIFY (5 poles)",
+          "standby_power": 0.38,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 238.4,
+            "min": 233.7
+          },
+          "aliases": [
+            "Gardenpole RGBW-Lightify"
+          ],
+          "id": "AC0009401NJ",
+          "manufacturer": "osram",
+          "updated_at": "2026-10-19T12:45:29",
+          "max_power": 9.05,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-13T16:10:43",
+          "power_range": {
+            "min": 0.47,
+            "max": 9.05
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 96.7,
+            "color_temp": 96.7
+          },
+          "hash": "680b4489c098838aee52fab429b30be6"
+        },
+        {
           "aliases": [
             "Classic A60 W clear - LIGHTIFY"
           ],
@@ -25791,7 +25995,9 @@
         {
           "aliases": [
             "9150059869",
-            "915005987001"
+            "915005987001",
+            "9150059873",
+            "915005987301"
           ],
           "calculation_strategy": "lut",
           "created_at": "2024-07-21T11:13:03Z",
@@ -25828,7 +26034,7 @@
           ],
           "id": "915005986901",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-14T18:16:50",
           "max_power": 14.35,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -25844,7 +26050,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "1eff4a6c1dd97133c85f22ee9f9bee84"
+          "hash": "44cca81aa6d85538944f441f944f3d3b"
         },
         {
           "aliases": [
@@ -27343,7 +27549,10 @@
         {
           "aliases": [
             "9290035261",
-            "929001953101"
+            "929001953101",
+            "929003526202_01",
+            "929003526202_02",
+            "929003526202_03"
           ],
           "calculation_strategy": "lut",
           "created_at": "2025-12-20T00:35:52Z",
@@ -27380,7 +27589,7 @@
           ],
           "id": "929003526101",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-19T11:58:04",
           "max_power": 4.61,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -27396,7 +27605,7 @@
             "score": 97.6,
             "color_temp": 97.6
           },
-          "hash": "99c19497d5234c521bf9cb6612359ca4"
+          "hash": "97a194b0c31377da3bca0b3df5170c6b"
         },
         {
           "aliases": [
@@ -27964,6 +28173,74 @@
             "color_temp": 98.2
           },
           "hash": "d994dc7b52bbe36585ac15b98c2b5fc0"
+        },
+        {
+          "aliases": [
+            "LCA013"
+          ],
+          "authors": [
+            {
+              "email": "earlymorninghours@gmail.com",
+              "github": "earlymorninghours",
+              "name": "Dave Stein"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-06T19:55:05Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "matter",
+              "thread",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 810,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Zooz Z-Wave Plus Power Switch ZEN15",
+          "measure_device_firmware": "1.2",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 8.57,
+            "DUMMY_LOAD_RESISTANCE": 1727.83,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.12.0:app"
+          },
+          "name": "Hue white ambiance and color 806lm A19 E26",
+          "product_url": "https://www.philips-hue.com/en-us/p/hue-white-and-color-ambiance-60w-a19-e26-smart-bulb/046677590826",
+          "standby_power": 0.4,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 121.71,
+            "min": 121.71
+          },
+          "id": "929003853701",
+          "manufacturer": "signify",
+          "updated_at": "2026-10-20T07:14:29",
+          "max_power": 6.83,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-20T06:44:39",
+          "power_range": {
+            "min": 0.43,
+            "max": 6.83
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "46588f72cefadf3f5a72d01b2c963009"
         },
         {
           "aliases": [
@@ -30653,6 +30930,7 @@
         {
           "aliases": [
             "7602031P7",
+            "7602031U7",
             "9150058219",
             "9150058220",
             "9150058221",
@@ -30691,7 +30969,7 @@
           ],
           "id": "LCT026",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-14T18:16:50",
           "max_power": 7.07,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -30707,7 +30985,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "65bbe6477a3aae8375a4ca6c72f7b7d5"
+          "hash": "0b049e1952cbe24c68c320fe93d9ce58"
         },
         {
           "aliases": [
@@ -31797,7 +32075,7 @@
           "measure_method": "script",
           "mains_voltage": 230,
           "name": "Hue LightStrip Plus (2m)",
-          "standby_power": 0.18,
+          "standby_power": 0.4,
           "authors": [
             {
               "name": "Simon H\u00f6rrle",
@@ -31807,12 +32085,12 @@
           ],
           "id": "LST002",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-19T12:45:29",
           "max_power": 21.88,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-09-24T18:09:05",
+          "sub_profile_count": 2,
+          "measurement_updated_at": "2026-10-19T11:58:02",
           "power_range": {
-            "min": 1.0,
+            "min": 0.1,
             "max": 21.88
           },
           "color_modes": [
@@ -31823,7 +32101,7 @@
             "score": 32.7,
             "color_temp": 32.7
           },
-          "hash": "9b0dcc9c5aeeeca68810c85cc27ee39e"
+          "hash": "bb16e010330a1b8f98a7ebf8b63e05b0"
         },
         {
           "aliases": [

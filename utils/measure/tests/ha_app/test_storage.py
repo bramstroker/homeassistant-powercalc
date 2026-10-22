@@ -597,3 +597,45 @@ def test_storage_ignores_invalid_dummy_load_calibration(tmp_path: Path, caplog: 
 
     assert calibration is None
     assert "invalid dummy-load calibration" in caplog.text
+
+
+@pytest.mark.parametrize("purpose", [RecorderPurpose.COMPLEX_PROFILE, RecorderPurpose.PLAYBOOK])
+def test_recording_labels_survive_restart_and_record_more(tmp_path: Path, purpose: RecorderPurpose) -> None:
+    storage = SessionStorage(tmp_path)
+    current = snapshot(SessionState.COMPLETED)
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose=purpose,
+        profile_recipe=RecorderProfileRecipe.GENERIC if purpose == RecorderPurpose.COMPLEX_PROFILE else None,
+        primary_entity_id="switch.device" if purpose == RecorderPurpose.COMPLEX_PROFILE else None,
+    )
+    storage.create(current, request)
+    output = storage.artifact_directory(current.id, request.model_id)
+    output.mkdir(parents=True, exist_ok=True)
+    recording = output / request.export_filename
+    recording.write_text("original data", encoding="utf-8")
+    name = str(recording.relative_to(storage.output_directory(current.id)))
+    assert storage.recording_labels(current.id) == {name: ""}
+    before = recording.stat().st_mtime_ns
+    storage.set_recording_label(current.id, name, "  Overnight standby  ")
+    storage = SessionStorage(tmp_path)
+    assert storage.recording_labels(current.id) == {name: "Overnight standby"}
+    assert recording.read_text() == "original data"
+    assert recording.stat().st_mtime_ns == before
+    storage.archive_recording(current.id, request)
+    archived = recording.with_stem(f"{recording.stem}-1")
+    archived_name = str(archived.relative_to(storage.output_directory(current.id)))
+    recording.write_text("new data", encoding="utf-8")
+    assert storage.recording_labels(current.id) == {archived_name: "Overnight standby", name: ""}
+    storage.archive_recording(current.id, request)
+    assert storage.recording_labels(current.id)[archived_name] == "Overnight standby"
+    storage.set_recording_label(current.id, archived_name, "")
+    assert storage.recording_labels(current.id)[archived_name] == ""
+
+
+def test_light_session_has_no_recording_labels(tmp_path: Path) -> None:
+    storage = SessionStorage(tmp_path)
+    storage.create(snapshot(), light_request())
+    assert storage.recording_labels("a1b2-c3d4") == {}
+    with pytest.raises(ValueError, match="Only saved recordings"):
+        storage.set_recording_label("a1b2-c3d4", "model.json", "Example")

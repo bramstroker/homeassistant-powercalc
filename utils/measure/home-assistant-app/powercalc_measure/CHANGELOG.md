@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 0.14.0 - 2026-10-20
+
+### 🚀 Features
+
+- #5015 Add labels to recordings in the measure app @bramstroker
+
+### 🐛 Bug Fixes
+
+- #5022 Handle missing entity name flags in Measure registry responses @bramstroker
+
+## 0.13.1 - 2026-10-19
+
+### 🐛 Bug Fixes
+
+- #5004 Model vacuum post-charge settling separately from standby @bramstroker
+
 ## 0.13.0 - 2026-10-11
 
 ### 🚀 Features

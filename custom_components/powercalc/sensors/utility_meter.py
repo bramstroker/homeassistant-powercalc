@@ -230,6 +230,7 @@ def create_tariff_select(
     # Platform entities (YAML and group selects) cannot attach a device directly.
     if config_entry:
         tariff_select.device_entry = device_entry
+    setattr(tariff_select, "_powercalc_device_entry", device_entry)  # noqa: B010
     if follow_device_name:
         tariff_select.device_name = DeviceName("utility_meter_cycle", {"period": meter_type})
         tariff_select.enable_device_naming()
@@ -308,7 +309,7 @@ class VirtualTariffSelect(BaseEntity, TariffSelect):
 
 
 class VirtualUtilityMeter(BaseEntity, UtilityMeterSensor):
-    device_name: DeviceName = DeviceName("utility_meter_cycle")
+    device_name: DeviceName | None = DeviceName("utility_meter_cycle")
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
     _sensor_config: ConfigType
 

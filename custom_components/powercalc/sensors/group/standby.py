@@ -15,6 +15,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
+    ATTR_ENTITIES,
     ATTR_MEMBERS,
     ATTR_STATE,
     CONF_CREATE_ENERGY_SENSORS,
@@ -103,6 +104,9 @@ class StandbyPowerSensor(PowerSensor, SensorEntity):
         else:
             self._attr_native_value = None
         self.async_schedule_update_ha_state(True)
+
+    def get_group_entities(self) -> dict[str, set[str]]:
+        return {ATTR_ENTITIES: set(self.standby_sensors)}
 
     def debug_group(self) -> dict[str, Any]:
         """Return the current standby contribution of each tracked power sensor."""

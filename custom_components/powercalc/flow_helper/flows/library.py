@@ -232,7 +232,11 @@ class LibraryFlow:
             if result:
                 return result
 
-        if Step.SUB_PROFILE not in handled_steps and await profile.requires_manual_sub_profile_selection:
+        if (
+            Step.SUB_PROFILE not in handled_steps
+            and Step.SUB_PROFILE_PER_DEVICE not in handled_steps
+            and await profile.requires_manual_sub_profile_selection
+        ):
             return await self.async_step_sub_profile()
 
         return None
@@ -349,8 +353,11 @@ class LibraryFlow:
         """Handle the flow for sub profile selection."""
         assert self.flow.selected_profile is not None
 
-        def _validate(user_input: dict[str, Any]) -> dict[str, str]:
-            return {CONF_MODEL: f"{self.flow.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"}
+        async def _validate(user_input: dict[str, Any]) -> dict[str, str]:
+            sub_profile = str(user_input[CONF_SUB_PROFILE])
+            await profile.select_sub_profile(sub_profile)
+            self.flow.selected_profile = profile
+            return {CONF_MODEL: f"{profile.model}/{sub_profile}"}
 
         library = await ProfileLibrary.factory(self.flow.hass)
         profile = await library.get_profile(
@@ -375,7 +382,7 @@ class LibraryFlow:
             PowercalcFormStep(
                 step=step,
                 schema=await build_sub_profile_schema(profile, self.flow.selected_sub_profile),
-                next_step=Step.POWER_ADVANCED,
+                next_step=Step.POST_LIBRARY,
                 validate_user_input=_validate,
                 form_kwarg={
                     "description_placeholders": {
@@ -457,7 +464,9 @@ class LibraryFlow:
         if not profile or not device_entry:
             return None
 
-        for placeholder in iter_related_entity_placeholders(collect_placeholders(profile.json_data)):
+        for placeholder in iter_related_entity_placeholders(
+            collect_placeholders(profile.json_data), include_optional=False
+        ):
             entity = resolve_related_entity_placeholder(
                 self.flow.hass,
                 placeholder,
@@ -677,7 +686,10 @@ class LibraryConfigFlow(LibraryFlow):
         if not device_entry:
             return remarks
 
-        related_placeholders = iter_related_entity_placeholders(collect_placeholders(profile.json_data))
+        related_placeholders = iter_related_entity_placeholders(
+            collect_placeholders(profile.json_data),
+            include_optional=False,
+        )
         all_resolved = all(
             resolve_related_entity_placeholder(
                 self.flow.hass,

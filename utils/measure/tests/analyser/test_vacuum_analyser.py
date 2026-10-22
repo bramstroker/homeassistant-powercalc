@@ -2,6 +2,7 @@ from dataclasses import replace
 import json
 from pathlib import Path
 
+from jsonschema import validate
 from measure.analyser.entity_references import resolve_portable_entity
 from measure.analyser.execution import RecorderAnalysisExecution
 from measure.analyser.fixed import FixedStatesPowerCandidate
@@ -19,6 +20,7 @@ from measure.analyser.models import (
 from measure.analyser.recording import load_recordings, restore_recording_context
 from measure.analyser.sample_intervals import calculate_sample_durations
 from measure.analyser.service import RecorderAnalyser
+from measure.analyser.vacuum.settling import SETTLING_SECONDS, SettlingBranch, build_post_charge_timing
 from measure.analyser.vacuum.signals import (
     Activity,
     ActivitySignal,
@@ -26,6 +28,7 @@ from measure.analyser.vacuum.signals import (
     resolve_activity,
 )
 from measure.analyser.vacuum.strategy import (
+    MIN_EPISODE_SAMPLES,
     ChargingBranch,
     ChargingPoint,
     FixedBranch,
@@ -1457,3 +1460,340 @@ def test_combining_recordings_preserves_unknown_recipe_identity(tmp_path: Path) 
 
     with pytest.raises(ValueError, match="same recipe"):
         load_recordings(paths)
+
+
+CHARGING_FLAG = "binary_sensor.charging"
+IDLE_START = 52
+SETTLING_CONTEXT = replace(
+    CONTEXT,
+    entities=[
+        *CONTEXT.entities,
+        RecordedEntity(
+            CHARGING_FLAG,
+            "binary_sensor",
+            "tracked",
+            translation_key="charging_state",
+            device_class="battery_charging",
+            device_id="robot",
+            integration="dreame_vacuum",
+        ),
+    ],
+)
+
+
+def post_charge_cycle(
+    activity: str = "sleeping", settling_w: float = 11.44, standby_w: float = 3.17, standby_seconds: int = 3600
+) -> list[RecordingSample]:
+    """Synthetic charge, 30-minute decay and one hour of stable idle from #4997."""
+    data = [sample("washing", 22) for _ in range(10)]
+    for level in range(20, 81, 10):
+        data.extend(sample("charging", 50 - level / 2, level=level) for _ in range(6))
+    for second in range(0, SETTLING_SECONDS + standby_seconds, 10):
+        power = (
+            settling_w + min(5, settling_w / 2) * (1 - 2 * second / 1790) if second < SETTLING_SECONDS else standby_w
+        )
+        data.append(sample(activity, power, level=100))
+    return [
+        replace(
+            item,
+            elapsed_seconds=float(index * 10),
+            entities={
+                **item.entities,
+                CHARGING_FLAG: RecordedEntityState("on" if item.entities[STATE].state == "charging" else "off", {}),
+            },
+        )
+        for index, item in enumerate(data)
+    ]
+
+
+@pytest.mark.parametrize("activity", ["sleeping", "charging_completed", "docked"])
+@pytest.mark.parametrize("recordings", [1, 2])
+def test_post_charge_settling_preserves_idle_energy(tmp_path: Path, activity: str, recordings: int) -> None:
+    paths = [
+        write_recording(
+            tmp_path / f"record-{index}.jsonl",
+            post_charge_cycle(activity, standby_seconds=3600 * (index + 1)),
+            SETTLING_CONTEXT,
+        )
+        for index in range(recordings)
+    ]
+
+    result = RecorderAnalyser().analyse(paths, SETTLING_CONTEXT)
+
+    assert result.model_ready, result.reason
+    idle = next(
+        report
+        for report in result.activity_reports
+        if report.activity in {Activity.SLEEPING, Activity.COMPLETED, Activity.DOCKED}
+    )
+    assert idle.coverage == 1
+    assert idle.has_fixed_power
+    assert idle.energy.bias_percent == pytest.approx(0, abs=1)
+    assert result.standby_power == (None if activity == "charging_completed" else 3.17)
+    assert FeatureReference(CHARGING_FLAG, FeatureSource.STATE) in result.features
+    assert result.model_config_fragment is not None
+    config = result.model_config_fragment.configuration
+    strategies = config["strategies"]
+    assert isinstance(strategies, list)
+    idle_config = strategies[-1]
+    assert idle_config["fixed"]["power"] == (
+        "{{ 11.44 if (now() - states['[[entity_by_translation_key:charging_state]]'].last_changed)"
+        ".total_seconds() < 1800 else 3.17 }}"
+    )
+    assert {
+        "condition": "state",
+        "entity_id": "[[entity_by_translation_key:charging_state]]",
+        "state": ["off"],
+    } in idle_config["condition"]["conditions"]
+    schema = json.loads((Path(__file__).parents[4] / "profile_library/model_schema.json").read_text())
+    validate(
+        {
+            "name": "Synthetic vacuum",
+            "device_type": "vacuum_robot",
+            "measure_method": "script",
+            "measure_device": "Test meter",
+            "created_at": "2026-10-19T00:00:00Z",
+            "calculation_strategy": "composite",
+            "composite_config": config,
+        },
+        schema,
+    )
+
+
+def test_single_recording_holds_out_both_idle_phases() -> None:
+    data = post_charge_cycle()
+    split = split_vacuum_samples(data, SETTLING_CONTEXT)
+    assert isinstance(split, TrainingValidationSplit)
+    timing = build_post_charge_timing(data, SETTLING_CONTEXT)
+    assert timing is not None
+    for subset in [split.training, split.validation]:
+        idle_times = [timing.get_elapsed(item) for item in subset if item.entities[STATE].state == "sleeping"]
+        assert any(elapsed is not None and elapsed < SETTLING_SECONDS for elapsed in idle_times)
+        assert any(elapsed is not None and elapsed >= SETTLING_SECONDS for elapsed in idle_times)
+
+
+def test_unknown_post_charge_timing_is_neither_settling_nor_standby(tmp_path: Path) -> None:
+    """Idle samples without a recorded charge end stay unclassified.
+
+    A recording can start inside the 30-minute settling window, so treating those samples as
+    stable standby would raise the fitted standby power. The fit must ignore them instead.
+    """
+    whole = post_charge_cycle(standby_seconds=3600)
+    first_ten_idle_minutes = [
+        replace(item, recording_id=1, elapsed_seconds=float(index * 10))
+        for index, item in enumerate(whole[IDLE_START : IDLE_START + 60])
+    ]
+    samples = [*whole, *first_ten_idle_minutes]
+    paths = [
+        write_recording(tmp_path / "first.jsonl", whole, SETTLING_CONTEXT),
+        write_recording(tmp_path / "second.jsonl", first_ten_idle_minutes, SETTLING_CONTEXT),
+    ]
+
+    timing = build_post_charge_timing(samples, SETTLING_CONTEXT)
+    assert timing is not None
+    # The second recording has no charge end of its own.
+    assert all(timing.get_elapsed(item) is None for item in first_ten_idle_minutes)
+
+    split = split_vacuum_samples(samples, SETTLING_CONTEXT)
+    assert isinstance(split, TrainingValidationSplit)
+    models = VacuumCompositeStrategy().build_candidates(
+        split.training, SETTLING_CONTEXT, split.signals, recording_samples=samples
+    )
+    assert isinstance(models, list)
+    model = next(
+        candidate for candidate in models if any(isinstance(branch, SettlingBranch) for branch in candidate.branches)
+    )
+    branch = next(branch for branch in model.branches if isinstance(branch, SettlingBranch))
+    assert branch.settling_power == 11.44
+    assert branch.standby_power == 3.17
+    for item in first_ten_idle_minutes:
+        assert branch.estimate(item, None) is None
+
+    result = RecorderAnalyser().analyse(paths, SETTLING_CONTEXT)
+    assert result.model_ready, result.reason
+    idle = next(
+        report
+        for report in result.activity_reports
+        if report.activity in {Activity.SLEEPING, Activity.COMPLETED, Activity.DOCKED}
+    )
+    assert idle.energy.bias_percent == pytest.approx(0, abs=1)
+    strategies = result.model_config_fragment.configuration["strategies"]
+    assert strategies[-1]["fixed"]["power"] == (
+        "{{ 11.44 if (now() - states['[[entity_by_translation_key:charging_state]]'].last_changed)"
+        ".total_seconds() < 1800 else 3.17 }}"
+    )
+
+
+def test_unavailable_charging_signal_drops_post_charge_timing() -> None:
+    """An unavailable charging flag breaks the window; those samples stay unclassified."""
+    data = post_charge_cycle(standby_seconds=3600)
+    unavailable_from = IDLE_START + 60
+    data = [
+        replace(item, entities={**item.entities, CHARGING_FLAG: RecordedEntityState("unavailable", {})})
+        if index >= unavailable_from
+        else item
+        for index, item in enumerate(data)
+    ]
+    timing = build_post_charge_timing(data, SETTLING_CONTEXT)
+    assert timing is not None
+    assert timing.get_elapsed(data[IDLE_START]) is not None
+    assert timing.get_elapsed(data[unavailable_from]) is None
+    assert timing.get_elapsed(data[-1]) is None
+
+    branch = SettlingBranch(Activity.SLEEPING, 11.44, 3.17, timing)
+    assert branch.estimate(data[IDLE_START], None) == 11.44
+    assert branch.estimate(data[unavailable_from], None) is None
+
+
+def test_uneven_episode_split_keeps_enough_training_samples() -> None:
+    """A long idle episode held out as a whole must not leave a tiny remnant for fitting."""
+    head = post_charge_cycle(standby_seconds=3600)[:IDLE_START]
+    idle_tail = post_charge_cycle(standby_seconds=3600)[IDLE_START:]
+    short_idle = [sample("sleeping", 3.17) for _ in range(MIN_EPISODE_SAMPLES)]
+    away = [sample("away", 0.8) for _ in range(MIN_EPISODE_SAMPLES)]
+    data = [*head, *short_idle, *away, *idle_tail]
+    data = [replace(item, elapsed_seconds=float(index * 10)) for index, item in enumerate(data)]
+
+    split = split_vacuum_samples(data, SETTLING_CONTEXT)
+    assert isinstance(split, TrainingValidationSplit)
+    training_ids = {id(item) for item in split.training}
+    validation_ids = {id(item) for item in split.validation}
+    assert not training_ids & validation_ids
+    assert training_ids | validation_ids == {id(item) for item in data}
+
+    sleeping = [item for item in data if item.entities[STATE].state == "sleeping"]
+    fitted = [item for item in sleeping if id(item) in training_ids]
+    validated = [item for item in sleeping if id(item) in validation_ids]
+    assert len(fitted) >= MIN_EPISODE_SAMPLES * 4
+    assert validated
+    assert len({id(item) for item in fitted} & {id(item) for item in validated}) == 0
+
+
+def test_settling_fit_uses_only_training_power() -> None:
+    data = post_charge_cycle()
+    split = split_vacuum_samples(data, SETTLING_CONTEXT)
+    assert isinstance(split, TrainingValidationSplit)
+    validation_ids = {id(item) for item in split.validation}
+    recording = [replace(item, power=9000) if id(item) in validation_ids else item for item in data]
+    models = VacuumCompositeStrategy().build_candidates(
+        split.training, SETTLING_CONTEXT, split.signals, recording_samples=recording
+    )
+    assert isinstance(models, list)
+    model = models[-1]
+    assert isinstance(model, VacuumCompositeCandidate)
+    branch = next(branch for branch in model.branches if isinstance(branch, SettlingBranch))
+    assert branch.settling_power == 11.44
+    assert branch.standby_power == 3.17
+    assert model.complexity == models[0].complexity + 1
+    assert branch.estimate(data[IDLE_START], None) == 11.44
+    assert branch.estimate(data[IDLE_START + 180], None) == 3.17
+
+
+def test_settling_fit_weights_irregular_measurement_intervals() -> None:
+    data = post_charge_cycle()
+    # A burst of high readings occupies just four seconds, followed by lower
+    # readings 20 seconds apart. Counting samples would overestimate its energy.
+    idle = [
+        replace(data[IDLE_START + index], elapsed_seconds=float(IDLE_START * 10 + second), power=power)
+        for index, (second, power) in enumerate(
+            [(0, 30), (1, 30), (2, 30), (3, 30), (4, 30), (24, 10), (44, 10), (64, 10), (84, 10), (104, 10)]
+        )
+    ]
+    data = [*data[:IDLE_START], *idle, *data[IDLE_START + 180 :]]
+    models = VacuumCompositeStrategy().build_candidates(
+        data, SETTLING_CONTEXT, discover_signals(data, SETTLING_CONTEXT)
+    )
+    assert isinstance(models, list)
+    model = models[-1]
+    assert isinstance(model, VacuumCompositeCandidate)
+    branch = next(branch for branch in model.branches if isinstance(branch, SettlingBranch))
+    assert branch.settling_power == 12.69  # (4 * 30 + 20 * 20 + 80 * 10) / 104
+    assert branch.standby_power == 3.17
+
+
+def test_settling_still_rejects_non_repeating_idle_power(tmp_path: Path) -> None:
+    paths = [
+        write_recording(tmp_path / "training.jsonl", post_charge_cycle(), SETTLING_CONTEXT),
+        write_recording(tmp_path / "validation.jsonl", post_charge_cycle(standby_w=8), SETTLING_CONTEXT),
+    ]
+    result = RecorderAnalyser().analyse(paths, SETTLING_CONTEXT)
+    assert not result.model_ready
+    assert "sleeping validation predicts" in str(result.reason)
+
+
+@pytest.mark.parametrize("settling_w, standby_w", [(3.6, 3.17), (11, 10), (2, 3)])
+def test_small_or_reversed_idle_difference_keeps_fixed_model(settling_w: float, standby_w: float) -> None:
+    data = post_charge_cycle(settling_w=settling_w, standby_w=standby_w)
+    models = VacuumCompositeStrategy().build_candidates(
+        data, SETTLING_CONTEXT, discover_signals(data, SETTLING_CONTEXT)
+    )
+    assert isinstance(models, list)
+    assert len(models) == 1
+
+
+@pytest.mark.parametrize("phase", ["settling", "standby", "no_intervals"])
+def test_unsupported_idle_phase_keeps_fixed_model(phase: str) -> None:
+    data = post_charge_cycle()
+    if phase == "settling":
+        data = [*data[: IDLE_START + 4], *data[IDLE_START + 180 :]]
+    elif phase == "standby":
+        data = data[: IDLE_START + 184]
+    else:
+        data = [replace(item, elapsed_seconds=item.elapsed_seconds * 4) for item in data]
+    models = VacuumCompositeStrategy().build_candidates(
+        data, SETTLING_CONTEXT, discover_signals(data, SETTLING_CONTEXT)
+    )
+    assert isinstance(models, list)
+    assert len(models) == 1
+
+
+@pytest.mark.parametrize("state", [None, "unknown", "unavailable", "on", "inactive"])
+def test_charge_timing_requires_an_observed_charge_end(state: str | None) -> None:
+    data = post_charge_cycle()
+    first_off = data[IDLE_START]
+    altered = replace(
+        first_off,
+        entities={key: value for key, value in first_off.entities.items() if key != CHARGING_FLAG},
+    )
+    if state is not None:
+        altered = replace(altered, entities={**altered.entities, CHARGING_FLAG: RecordedEntityState(state, {})})
+    sequence = [
+        *data[: IDLE_START + 1],
+        replace(altered, elapsed_seconds=(IDLE_START + 1) * 10),
+        *data[IDLE_START + 2 :],
+    ]
+    timing = build_post_charge_timing(sequence, SETTLING_CONTEXT)
+    assert timing is not None
+    assert timing.get_elapsed(sequence[IDLE_START]) == 0
+    assert timing.get_elapsed(sequence[IDLE_START + 1]) is None
+    assert timing.get_elapsed(sequence[IDLE_START + 2]) == (0 if state == "on" else None)
+
+
+def test_charge_timing_does_not_cross_recordings_or_assume_an_initial_charge() -> None:
+    data = post_charge_cycle()
+    second = [
+        replace(item, recording_id=1, elapsed_seconds=float(index * 10)) for index, item in enumerate(data[IDLE_START:])
+    ]
+    timing = build_post_charge_timing([*data, *second], SETTLING_CONTEXT)
+    assert timing is not None
+    assert timing.get_elapsed(data[-1]) == 5390
+    assert timing.get_elapsed(second[0]) is None
+    assert timing.get_elapsed(second[-1]) is None
+    branch = SettlingBranch(Activity.SLEEPING, 11.44, 3.17, timing)
+    assert branch.estimate(second[0], None) is None
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"disabled_by": "integration"},
+        {"has_live_state": False},
+        {"device_id": "unrelated"},
+        {"integration": "powercalc"},
+        {"translation_key": "unrecognised", "device_class": None},
+    ],
+)
+def test_settling_requires_a_live_portable_charging_flag(changes: dict[str, object]) -> None:
+    flag = SETTLING_CONTEXT.entities[-1]
+    context = replace(SETTLING_CONTEXT, entities=[*CONTEXT.entities, replace(flag, **changes)])
+    assert build_post_charge_timing(post_charge_cycle(), context) is None

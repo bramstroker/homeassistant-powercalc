@@ -80,6 +80,7 @@ class SessionFile(BaseModel):
     size: int
     media_type: str
     modified_at: str
+    recording_label: str | None = None
 
 
 class SessionPlots(BaseModel):

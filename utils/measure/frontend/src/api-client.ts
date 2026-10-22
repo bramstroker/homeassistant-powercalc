@@ -257,6 +257,12 @@ export class MeasureApiClient {
     return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/files`, decodeSessionFiles);
   }
 
+  setRecordingLabel(sessionId: string, name: string, label: string): Promise<SessionFile[]> {
+    return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/recording-label`, decodeSessionFiles, {
+      method: "PUT", body: JSON.stringify({ name, label }),
+    });
+  }
+
   getJsonFile(sessionId: string, name: string): Promise<unknown> {
     return this.requestJson(`api/sessions/${encodeURIComponent(sessionId)}/files/${encodeURIComponent(name)}`, (value) => value);
   }
