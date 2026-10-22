@@ -1,0 +1,23 @@
+{
+  "name": "Mini human breathe sensor",
+  "aliases": [
+    "ZY-M100-S_2"
+  ],
+  "device_type": "generic_iot",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "fixed_config": {
+    "power": 0.69
+  },
+  "standby_power": 0.69,
+  "measure_method": "manual",
+  "measure_device": "Crenova MS8233D Digital Multimeter",
+  "measure_description": "Tuya Mini human breathe sensor (presence sensor). Measured at 230V: 0.003A (0.69W) constant draw.",
+  "created_at": "2026-03-25T14:20:23Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
