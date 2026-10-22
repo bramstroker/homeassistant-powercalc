@@ -1,0 +1,20 @@
+{
+  "name": "Presence Sensor FP1",
+  "device_type": "generic_iot",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "fixed_config": {
+    "power": 0.28
+  },
+  "standby_power": 0.28,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "Measured via USB power meter, values fluctuate significantly (0.01–0.79 W) due to sensor resolution limits at low power",
+  "created_at": "2026-03-25T14:20:20Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
