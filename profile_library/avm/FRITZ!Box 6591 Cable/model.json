@@ -1,5 +1,5 @@
 {
-  "name": "FRITZ!Box 6591 Cable",
+  "name": "Cable Router",
   "device_type": "network",
   "calculation_strategy": "fixed",
   "measure_method": "script",
@@ -20,7 +20,8 @@
     "connectivity": [
       "wifi",
       "ethernet",
-      "usb"
+      "usb",
+      "proprietary"
     ]
   },
   "gtin": [
