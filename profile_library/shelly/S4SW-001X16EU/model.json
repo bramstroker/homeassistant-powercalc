@@ -11,7 +11,7 @@
   "device_specs": {
     "form_factor": "in_wall",
     "max_load_watts": 3600,
-    "power_monitoring": true,
+    "power_monitoring": false,
     "rated_power": 1,
     "connectivity": [
       "wifi",
@@ -23,7 +23,7 @@
   "gtin": [
     "3800238070687"
   ],
-  "measure_description": "Measured with 33.7 W dummy load, averaged over 60 seconds. Multiple combinations of settings were tested. Firmware version 2.0.1.",
+  "measure_description": "Self-consumption only, measured with the Powercalc measure tool in smart switch mode. A calibrated 33.7 W resistive dummy load was wired in parallel with the switch and its power (U²/R) was subtracted from every sample, so the reported values are the relay's own consumption. Relay off/on states were sampled repeatedly across multiple setting combinations. Firmware 2.0.1.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "mains_voltage": 230,
@@ -31,8 +31,8 @@
     "VERSION": "v0.14.0:app"
   },
   "name": "1 Gen4",
-  "only_self_usage": true,
-  "product_url": "https://www.shelly.com/products/shelly-1-gen4?_pos=1&_sid=1f219918c&_ss=r",
+  "only_self_usage": false,
+  "product_url": "https://www.shelly.com/products/shelly-1-gen4",
   "authors": [
     {
       "name": "Maxik933",
