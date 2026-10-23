@@ -37,7 +37,7 @@ jobs:
         # The type checkers now cover utils/library and .github/scripts, so the
         # groups holding their third-party imports have to be installed too.
       - run: uv sync --locked --group library --group profile-library
-      - uses: j178/prek-action@1382ad72dea72f9d53832f2bcb65b3e87a947204 # v3.0.1
+      - uses: j178/prek-action@44924fe9ef4a6f88253c4b6b1bf11c689d3ce53d # v3.1.0
         with:
           cache: true
       - uses: pre-commit-ci/lite-action@062bca0919bc9d6e66755cc05074b70c77e111fc # v1.2.0
