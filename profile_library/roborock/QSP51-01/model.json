@@ -1,0 +1,136 @@
+{
+  "name": "Qrevo S Pro",
+  "aliases": [
+    "roborock.vacuum.a326"
+  ],
+  "compatible_integrations": [
+    "roborock"
+  ],
+  "device_type": "vacuum_robot",
+  "calculation_strategy": "composite",
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 510
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:mop_washing]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 28
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:mop_drying]]",
+              "state": [
+                "on"
+              ]
+            },
+            {
+              "condition": "numeric_state",
+              "entity_id": "[[entity_by_device_class:battery]]",
+              "below": 100
+            }
+          ]
+        },
+        "fixed": {
+          "power": 82.5
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:mop_drying]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 63.5
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "charging"
+              ]
+            },
+            {
+              "condition": "numeric_state",
+              "entity_id": "[[entity_by_device_class:battery]]",
+              "below": 100
+            }
+          ]
+        },
+        "fixed": {
+          "power": 21
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:status]]",
+          "state": [
+            "cleaning",
+            "segment_cleaning",
+            "zoned_cleaning",
+            "spot_cleaning",
+            "returning_home",
+            "going_to_wash_the_mop",
+            "going_to_target",
+            "paused",
+            "detaching_the_mop",
+            "attaching_the_mop"
+          ]
+        },
+        "fixed": {
+          "power": 0.3
+        }
+      },
+      {
+        "fixed": {
+          "power": 2.0
+        }
+      }
+    ]
+  },
+  "standby_power": 0.3,
+  "measure_method": "manual",
+  "measure_device": "ThirdReality 3RSP02064Z",
+  "measure_description": "Whole dock + robot measured at the wall with a ThirdReality Gen3 plug (2 s / 3 W power reporting, 1 Wh energy counter) over Oct 20-23 2026 runs; activity energies cross-checked against the plug's energy counter. Activities come from the dock's dust_emptying, mop_washing and mop_drying switches and the robot's status and battery. Mop wash value is for the High Temperature setting (small ~78 W heater for ~57 s per wash, ~1.3 Wh); Room Temperature washes draw ~3 W. Robot charging input is rated 20 V / 1 A (20 W), so charging cannot run much above the ~19 W measured; the flat value should hold from any battery level. Robot label: model RRE0PEE, product ID QSP51-01 (US 120 V).",
+  "mains_voltage": 120,
+  "min_version": "v1.26.0",
+  "product_url": "https://global.roborock.com/pages/roborock-qrevo-s-pro",
+  "created_at": "2026-10-24T00:00:00Z",
+  "authors": [
+    {
+      "name": "SmithsonianDSP",
+      "github": "SmithsonianDSP"
+    }
+  ]
+}
