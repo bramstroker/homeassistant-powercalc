@@ -1,0 +1,37 @@
+{
+  "name": "Cable Router",
+  "device_type": "network",
+  "calculation_strategy": "fixed",
+  "measure_method": "script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_description": "Measured with Powercalc measure tool in Average mode (600 seconds)",
+  "measure_settings": {
+    "VERSION": "v0.14.0:app"
+  },
+  "fixed_config": {
+    "power": 12.4
+  },
+  "mains_voltage": 230,
+  "created_at": "2026-10-22T22:44:23Z",
+  "discovery_by": "device",
+  "device_specs": {
+    "form_factor": "router",
+    "rated_power": 27.5,
+    "connectivity": [
+      "wifi",
+      "ethernet",
+      "usb",
+      "proprietary"
+    ]
+  },
+  "gtin": [
+    "4023125028571"
+  ],
+  "product_url": "https://fritz.com/pages/service-fritz-box-6591-cable",
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
+  ]
+}
