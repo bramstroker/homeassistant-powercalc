@@ -1,0 +1,282 @@
+{
+  "aliases": [
+    "D10 Plus"
+  ],
+  "authors": [
+    {
+      "github": "Maxik933",
+      "name": "Maxik933"
+    }
+  ],
+  "calculation_strategy": "composite",
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+          "state": [
+            "active"
+          ]
+        },
+        "fixed": {
+          "power": 347.21
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+              "state": [
+                "idle"
+              ]
+            },
+            {
+              "condition": "and",
+              "conditions": [
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:charging_state]]",
+                  "state": [
+                    "on"
+                  ]
+                },
+                {
+                  "condition": "template",
+                  "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas true }}"
+                },
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:state]]",
+                  "state": [
+                    "paused",
+                    "idle",
+                    "charging"
+                  ]
+                }
+              ]
+            },
+            {
+              "condition": "template",
+              "value_template": "{{ states('[[entity_by_translation_key:battery_level]]') is not boolean and 0 <= (states('[[entity_by_translation_key:battery_level]]') | float(-1)) <= 100 and 66 <= (states('[[entity_by_translation_key:battery_level]]') | float(-1) | int) <= 99 }}"
+            }
+          ]
+        },
+        "entity_id": "[[entity_by_translation_key:battery_level]]",
+        "linear": {
+          "calibrate": [
+            "66 -> 21.62",
+            "73 -> 21.77",
+            "77 -> 21.86",
+            "83 -> 21.93",
+            "87 -> 22.13",
+            "92 -> 22.37",
+            "99 -> 21.86"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+              "state": [
+                "idle"
+              ]
+            },
+            {
+              "condition": "or",
+              "conditions": [
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:charging_state]]",
+                  "state": [
+                    "off"
+                  ]
+                },
+                {
+                  "condition": "and",
+                  "conditions": [
+                    {
+                      "condition": "state",
+                      "entity_id": "[[entity_by_translation_key:charging_state]]",
+                      "state": [
+                        "on"
+                      ]
+                    },
+                    {
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "template",
+                          "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas false }}"
+                        },
+                        {
+                          "condition": "state",
+                          "entity_id": "[[entity_by_translation_key:state]]",
+                          "state": [
+                            "sweeping",
+                            "error",
+                            "sweeping_and_mopping",
+                            "returning",
+                            "charging_completed"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "sleeping"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:charging_state]]",
+              "state": [
+                "off"
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": "{{ 8.06 if (now() - states['[[entity_by_translation_key:charging_state]]'].last_changed).total_seconds() < 1800 else 2.27 }}"
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+              "state": [
+                "idle"
+              ]
+            },
+            {
+              "condition": "or",
+              "conditions": [
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:charging_state]]",
+                  "state": [
+                    "off"
+                  ]
+                },
+                {
+                  "condition": "and",
+                  "conditions": [
+                    {
+                      "condition": "state",
+                      "entity_id": "[[entity_by_translation_key:charging_state]]",
+                      "state": [
+                        "on"
+                      ]
+                    },
+                    {
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "template",
+                          "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas false }}"
+                        },
+                        {
+                          "condition": "state",
+                          "entity_id": "[[entity_by_translation_key:state]]",
+                          "state": [
+                            "sweeping",
+                            "error",
+                            "sweeping_and_mopping",
+                            "returning",
+                            "charging_completed"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "room_cleaning",
+                "error",
+                "paused",
+                "standby",
+                "returning",
+                "charging",
+                "idle"
+              ]
+            },
+            {
+              "condition": "and",
+              "conditions": [
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:state]]",
+                  "state": [
+                    "sweeping",
+                    "paused",
+                    "sweeping_and_mopping",
+                    "idle",
+                    "returning"
+                  ]
+                },
+                {
+                  "condition": "template",
+                  "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas false }}"
+                }
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 0.58
+        }
+      }
+    ]
+  },
+  "created_at": "2026-10-25T23:28:43Z",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ],
+    "rated_power": 600
+  },
+  "device_type": "vacuum_robot",
+  "gtin": [
+    "6976233675879"
+  ],
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_device_firmware": "2.0.1",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.1:app"
+  },
+  "name": "D10 Plus",
+  "product_url": "https://global.dreametech.com/products/dreame-d10-plus",
+  "standby_power": 2.27,
+  "voltage_range": {
+    "max": 232.3,
+    "min": 226.2
+  }
+}
