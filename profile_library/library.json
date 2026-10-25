@@ -18942,6 +18942,72 @@
         },
         {
           "aliases": [
+            "4224"
+          ],
+          "authors": [
+            {
+              "github": "Maxik933",
+              "name": "Maxik933"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-24T19:46:52Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "matter"
+            ],
+            "form_factor": "bulb",
+            "lumens": 1600,
+            "rated_power": 14,
+            "socket": "E27"
+          },
+          "device_type": "light",
+          "gtin": [
+            "810175712833"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_device_firmware": "2.0.1",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 33.64,
+            "DUMMY_LOAD_RESISTANCE": 1599.21,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.0:app"
+          },
+          "name": "Matter RGBTW Bulb, E27 (14W, 1600lm)",
+          "standby_power": 0.21,
+          "voltage_range": {
+            "max": 233.5,
+            "min": 230.2
+          },
+          "id": "LS0125051883A",
+          "manufacturer": "linkind",
+          "updated_at": "2026-10-24T19:54:48",
+          "max_power": 13.89,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-24T19:54:48",
+          "power_range": {
+            "min": 0.24,
+            "max": 13.89
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "0990be74642cb60e6d1ed63fde2cf254"
+        },
+        {
+          "aliases": [
             "ZBT-DIMLight-D0120"
           ],
           "calculation_strategy": "lut",
