@@ -18988,7 +18988,7 @@
           },
           "id": "LS0125051883A",
           "manufacturer": "linkind",
-          "updated_at": "2026-10-24T19:54:48",
+          "updated_at": "2026-10-25T07:13:46",
           "max_power": 13.89,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-10-24T19:54:48",
@@ -19004,7 +19004,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "0990be74642cb60e6d1ed63fde2cf254"
+          "hash": "b4bfb72e45a5b277760d147670a66025"
         },
         {
           "aliases": [
@@ -23707,6 +23707,58 @@
           },
           "standby_power": 0.732,
           "hash": "94221ad3aaa76461dabed1232e6112e5"
+        },
+        {
+          "aliases": [
+            "Shelly 1 Gen4"
+          ],
+          "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Relay Switch with Dry Contacts",
+          "discovery_by": "device",
+          "created_at": "2026-10-23T01:30:00Z",
+          "device_type": "smart_switch",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 3600,
+            "power_monitoring": false,
+            "rated_power": 1,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "zigbee",
+              "matter"
+            ]
+          },
+          "gtin": [
+            "3800238070687"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 60 seconds. Multiple combinations of settings were tested. Firmware version 2.0.1",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.14.0:app"
+          },
+          "name": "1 Gen4",
+          "only_self_usage": false,
+          "product_url": "https://www.shelly.com/products/shelly-1-gen4",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S4SW-001X16EU",
+          "manufacturer": "shelly",
+          "updated_at": "2026-10-24T02:11:06",
+          "max_power": 0.86,
+          "sub_profile_count": 8,
+          "power_range": {
+            "min": 0.29,
+            "max": 0.86
+          },
+          "standby_power": 0.6,
+          "hash": "3b3a4b443f42c074df85b5d7eb83de16"
         },
         {
           "aliases": [
