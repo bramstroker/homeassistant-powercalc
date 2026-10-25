@@ -1,0 +1,120 @@
+{
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 510
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:mop_washing]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 28
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:mop_drying]]",
+              "state": [
+                "on"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "charging"
+              ]
+            },
+            {
+              "condition": "numeric_state",
+              "entity_id": "[[entity_by_device_class:battery]]",
+              "below": 100
+            }
+          ]
+        },
+        "fixed": {
+          "power": 82.5
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:mop_drying]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 63.5
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "charging"
+              ]
+            },
+            {
+              "condition": "numeric_state",
+              "entity_id": "[[entity_by_device_class:battery]]",
+              "below": 100
+            }
+          ]
+        },
+        "fixed": {
+          "power": 21
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:status]]",
+          "state": [
+            "cleaning",
+            "segment_cleaning",
+            "zoned_cleaning",
+            "spot_cleaning",
+            "returning_home",
+            "going_to_wash_the_mop",
+            "going_to_target",
+            "paused",
+            "detaching_the_mop",
+            "attaching_the_mop"
+          ]
+        },
+        "fixed": {
+          "power": 0.3
+        }
+      },
+      {
+        "fixed": {
+          "power": 2.0
+        }
+      }
+    ]
+  }
+}
