@@ -1,4 +1,7 @@
 {
+  "aliases": [
+    "A3EH2E0YZ30OD6"
+  ],
   "authors": [
     {
       "github": "wagnerpizza",
@@ -34,7 +37,7 @@
     "SLEEP_TIME": 1.0,
     "VERSION": "v0.14.1:app"
   },
-  "name": "Echo Spot",
+  "name": "Echo Spot (Gen2)",
   "standby_power": 1.5,
   "voltage_range": {
     "max": 236.8,
