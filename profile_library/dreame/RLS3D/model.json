@@ -1,4 +1,13 @@
 {
+  "aliases": [
+    "dreame.vacuum.r2205"
+  ],
+  "authors": [
+    {
+      "github": "Maxik933",
+      "name": "Maxik933"
+    }
+  ],
   "calculation_strategy": "composite",
   "compatible_integrations": [
     "dreame_vacuum"
@@ -11,7 +20,7 @@
         "state": "active"
       },
       "fixed": {
-        "power": 648
+        "power": 347.21
       }
     },
     {
@@ -27,6 +36,10 @@
             "condition": "state",
             "entity_id": "[[entity_by_translation_key:charging_state]]",
             "state": "on"
+          },
+          {
+            "condition": "template",
+            "value_template": "{{ 15 <= (states('[[entity_by_translation_key:battery_level]]') | float(-1) | int) <= 100 }}"
           }
         ]
       },
@@ -83,33 +96,33 @@
           "63 -> 21.19",
           "64 -> 21.21",
           "65 -> 21.26",
-          "66 -> 21.26",
+          "66 -> 21.62",
           "67 -> 21.29",
           "68 -> 21.35",
           "69 -> 21.36",
           "70 -> 21.42",
           "71 -> 21.48",
           "72 -> 21.55",
-          "73 -> 21.56",
+          "73 -> 21.77",
           "74 -> 21.6",
           "75 -> 21.6",
           "76 -> 21.68",
-          "77 -> 21.72",
+          "77 -> 21.86",
           "78 -> 21.8",
           "79 -> 21.85",
           "80 -> 21.87",
           "81 -> 21.91",
           "82 -> 21.95",
-          "83 -> 21.98",
+          "83 -> 21.93",
           "84 -> 22.08",
           "85 -> 22.09",
           "86 -> 22.13",
-          "87 -> 22.23",
+          "87 -> 22.13",
           "88 -> 22.21",
           "89 -> 22.26",
           "90 -> 22.32",
           "91 -> 22.37",
-          "92 -> 22.42",
+          "92 -> 22.37",
           "93 -> 22.45",
           "94 -> 22.47",
           "95 -> 22.54",
@@ -122,45 +135,71 @@
       }
     },
     {
+      "condition": {
+        "condition": "and",
+        "conditions": [
+          {
+            "condition": "state",
+            "entity_id": "[[entity]]",
+            "state": "docked"
+          },
+          {
+            "condition": "state",
+            "entity_id": "[[entity_by_translation_key:charging_state]]",
+            "state": "off"
+          }
+        ]
+      },
       "fixed": {
-        "power": 2.6
+        "power": "{{ 8.06 if (now() - states['[[entity_by_translation_key:charging_state]]'].last_changed).total_seconds() < 1800 else 2.27 }}"
+      }
+    },
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "[[entity]]",
+        "state": "docked"
+      },
+      "fixed": {
+        "power": 2.27
+      }
+    },
+    {
+      "fixed": {
+        "power": 0.58
       }
     }
   ],
   "created_at": "2026-07-27T17:24:26Z",
-  "device_type": "vacuum_robot",
   "device_specs": {
     "connectivity": [
       "wifi"
     ],
-    "rated_power": 46
+    "rated_power": 600
   },
-  "measure_description": "Measured with utils/measure script",
-  "measure_device": "Shelly Plug S Gen3",
-  "measure_method": "script",
-  "mains_voltage": 230,
-  "measure_settings": {
-    "SAMPLE_COUNT": 1,
-    "SLEEP_TIME": 2.0,
-    "VERSION": "v0.2.1:app"
-  },
-  "name": "D10 Plus Robot Vacuum Cleaner",
-  "product_url": "https://global.dreametech.com/products/dreame-d10-plus",
-  "standby_power": 2.6,
-  "voltage_range": {
-    "min": 227.5,
-    "max": 234.9
-  },
-  "aliases": [
-    "dreame.vacuum.r2205"
+  "device_type": "vacuum_robot",
+  "gtin": [
+    "6973734684966"
   ],
   "legacy_ids": [
     "d10-plus"
   ],
-  "authors": [
-    {
-      "name": "Maxik933",
-      "github": "Maxik933"
-    }
-  ]
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure with 33.7 W dummy load. Charging values below 66 % and the taper above 96 % reused from the previous profile.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_device_firmware": "2.0.1",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.1:app"
+  },
+  "name": "D10 Plus Robot Vacuum Cleaner",
+  "product_url": "https://global.dreametech.com/products/dreame-d10-plus",
+  "standby_power": 2.27,
+  "voltage_range": {
+    "max": 232.3,
+    "min": 226.2
+  }
 }
