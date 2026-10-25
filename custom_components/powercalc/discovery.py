@@ -39,6 +39,7 @@ from .device_binding import (
     get_config_entry_ids,
     get_non_composite_devices,
     get_related_device_ids,
+    resolve_device_discovery_source,
 )
 from .group_include.filter import (
     CategoryFilter,
@@ -472,7 +473,12 @@ class DiscoveryManager:
 
     def _create_device_candidates(self, devices: Iterable[dr.DeviceEntry]) -> Iterator[DiscoveryCandidate]:
         """Yield normalized device discovery candidates."""
+        seen_devices: set[str] = set()
         for device_entry in devices:
+            device_entry = resolve_device_discovery_source(self.hass, device_entry)
+            if device_entry.id in seen_devices:
+                continue
+            seen_devices.add(device_entry.id)
             yield DiscoveryCandidate(
                 source_entity=self.create_device_source(device_entry),
                 discovery_type=DiscoveryBy.DEVICE,

@@ -2,6 +2,7 @@ import logging
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntryDisabler, DeviceRegistry
@@ -35,6 +36,7 @@ from custom_components.powercalc.device_binding import (
     get_profile_related_devices,
     get_related_device_ids,
     is_composite_device_id,
+    resolve_device_discovery_source,
     resolve_source_device,
 )
 from tests.common import (
@@ -79,6 +81,129 @@ def test_get_related_device_ids_for_unknown_device(hass: HomeAssistant) -> None:
     mock_device_registry(hass)
 
     assert get_related_device_ids(hass, "missing-device") == {"missing-device"}
+
+
+@pytest.mark.parametrize(
+    "source,source_device_id,valid_config_entry,expected_device_id",
+    [
+        (SOURCE_INTEGRATION_DISCOVERY, "source", True, "source"),
+        (SOURCE_INTEGRATION_DISCOVERY, None, True, "scanner"),
+        (SOURCE_INTEGRATION_DISCOVERY, "missing", True, "scanner"),
+        (SOURCE_INTEGRATION_DISCOVERY, "source", False, "scanner"),
+        (SOURCE_USER, "source", True, "scanner"),
+    ],
+)
+def test_bluetooth_discovery_requires_explicit_source_ownership(
+    hass: HomeAssistant,
+    source: str,
+    source_device_id: str | None,
+    valid_config_entry: bool,
+    expected_device_id: str,
+) -> None:
+    source_entry = MockConfigEntry(domain="esphome")
+    source_entry.add_to_hass(hass)
+    bluetooth_entry = MockConfigEntry(
+        domain="bluetooth",
+        source=source,
+        data={
+            "source_device_id": source_device_id,
+            "source_config_entry_id": source_entry.entry_id if valid_config_entry else "wrong-entry",
+        },
+    )
+    bluetooth_entry.add_to_hass(hass)
+    devices = mock_devices(
+        hass,
+        {
+            "source": {"config_entry_id": source_entry.entry_id},
+            "scanner": {"config_entry_id": bluetooth_entry.entry_id, "via_device_id": "source"},
+        },
+    )
+
+    assert resolve_device_discovery_source(hass, devices["scanner"]) == devices[expected_device_id]
+
+
+@pytest.mark.parametrize("missing_parent", [False, True])
+@requires_child_devices
+def test_bluetooth_scanner_source_can_be_a_structural_child(
+    hass: HomeAssistant,
+    device_registry: DeviceRegistry,
+    missing_parent: bool,
+) -> None:
+    source_entry = MockConfigEntry(domain="esphome")
+    source_entry.add_to_hass(hass)
+    parent = device_registry.async_get_or_create(
+        config_entry_id=source_entry.entry_id,
+        identifiers={("esphome", "parent")},
+    )
+    child = device_registry.async_get_or_create_child(
+        config_entry_id=source_entry.entry_id,
+        parent_device_id=parent.id,
+        identifiers={("esphome", "scanner")},
+    )
+    bluetooth_entry = MockConfigEntry(
+        domain="bluetooth",
+        source=SOURCE_INTEGRATION_DISCOVERY,
+        data={"source_device_id": child.id, "source_config_entry_id": source_entry.entry_id},
+    )
+    bluetooth_entry.add_to_hass(hass)
+    scanner = device_registry.async_get_or_create(
+        config_entry_id=bluetooth_entry.entry_id,
+        connections={("bluetooth", "aa:bb:cc:dd:ee:ff")},
+    )
+    if missing_parent:
+        # Simulate a stale source reference while its parent is no longer in the registry.
+        device_registry.async_remove_device(parent.id)
+
+    expected_device = scanner if missing_parent else parent
+    assert resolve_device_discovery_source(hass, scanner) == expected_device
+
+
+@pytest.mark.parametrize(
+    "same_config_entry,parent_exists,identifier_domain",
+    [
+        (True, True, "shelly"),
+        (False, True, "shelly"),
+        (True, False, "shelly"),
+        (True, True, "other"),
+    ],
+)
+def test_shelly_discovery_requires_its_channel_identifier_convention(
+    hass: HomeAssistant,
+    same_config_entry: bool,
+    parent_exists: bool,
+    identifier_domain: str,
+) -> None:
+    entry = MockConfigEntry(domain="shelly")
+    entry.add_to_hass(hass)
+    other_entry = MockConfigEntry(domain="shelly")
+    other_entry.add_to_hass(hass)
+    metadata = {
+        "parent": {"config_entry_id": entry.entry_id, "identifiers": {(identifier_domain, "serial")}},
+        "channel": {
+            "config_entry_id": entry.entry_id if same_config_entry else other_entry.entry_id,
+            "identifiers": {(identifier_domain, "serial-switch:0")},
+            "via_device_id": "parent",
+        },
+    }
+    if not parent_exists:
+        del metadata["parent"]
+    devices = mock_devices(hass, metadata)
+
+    is_channel = same_config_entry and parent_exists and identifier_domain == "shelly"
+    expected_device = devices["parent"] if is_channel else devices["channel"]
+    assert resolve_device_discovery_source(hass, devices["channel"]) == expected_device
+
+
+def test_scanner_discovery_does_not_loop_on_cyclic_source_metadata(hass: HomeAssistant) -> None:
+    entry = MockConfigEntry(domain="bluetooth", source=SOURCE_INTEGRATION_DISCOVERY)
+    entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        entry,
+        data={"source_device_id": "scanner", "source_config_entry_id": entry.entry_id},
+    )
+    scanner = mock_device(hass, "scanner", config_entry_id=entry.entry_id)
+
+    assert resolve_device_discovery_source(hass, scanner) == scanner
 
 
 def test_get_profile_related_devices_for_unknown_device(hass: HomeAssistant) -> None:
