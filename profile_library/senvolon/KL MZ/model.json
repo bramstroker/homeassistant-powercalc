@@ -1,0 +1,23 @@
+{
+  "name": "KL MZ",
+  "aliases": [
+    "1.2.3 / 1.26.1"
+  ],
+  "device_type": "generic_iot",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "fixed_config": {
+    "power": 1.4
+  },
+  "standby_power": 1.4,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "Measured via USB power meter, fluctuates between 1.26 and 1.79 W. The device reports its firmware version (1.2.3 / 1.26.1) as model to Home Assistant, which is used as alias for discovery.",
+  "created_at": "2026-03-25T14:20:22Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
