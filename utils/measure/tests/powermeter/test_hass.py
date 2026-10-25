@@ -1,10 +1,12 @@
-from datetime import UTC, datetime
-from types import SimpleNamespace
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, call, patch
 
+from homeassistant_api import State
 from measure.home_assistant.client import HomeAssistantManager
-from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
+from measure.powermeter.errors import OutdatedMeasurementError, PowerMeterError, UnsupportedFeatureError
 from measure.powermeter.hass import HassPowerMeter
+from measure.tuning import MeasurementParameters
+from measure.utils.sampling import PowerSampler
 import pytest
 
 UPDATED = datetime(2026, 9, 18, 10, tzinfo=UTC)
@@ -17,8 +19,8 @@ def test_power_reading_uses_source_timestamp_and_only_requested_sensors(
 ) -> None:
     client = MagicMock(spec=HomeAssistantManager)
     client.get_state.side_effect = [
-        SimpleNamespace(state="12.30", last_updated=UPDATED),
-        SimpleNamespace(state="231.5"),
+        State(entity_id="sensor.power", state="12.30", last_updated=UPDATED),
+        State(entity_id="sensor.voltage", state="231.5"),
     ]
     wait = MagicMock()
     client.attach_mock(wait, "wait")
@@ -44,7 +46,7 @@ def test_power_reading_uses_source_timestamp_and_only_requested_sensors(
 
 def test_power_reading_falls_back_to_current_time_when_timestamp_is_missing() -> None:
     client = MagicMock(spec=HomeAssistantManager)
-    client.get_state.return_value = SimpleNamespace(state="0", last_updated=None)
+    client.get_state.return_value = State(entity_id="sensor.power", state="0", last_updated=None)
     meter = HassPowerMeter(client, False, entity_id="sensor.power")
 
     with patch("measure.powermeter.hass.time.time", return_value=1234):
@@ -59,8 +61,8 @@ def test_power_reading_falls_back_to_current_time_when_timestamp_is_missing() ->
 def test_invalid_sensor_reading_is_not_returned_as_a_measurement(sensor: str, state: str) -> None:
     client = MagicMock(spec=HomeAssistantManager)
     client.get_state.side_effect = [
-        SimpleNamespace(state=state if sensor == "power" else "12.3", last_updated=UPDATED),
-        SimpleNamespace(state=state),
+        State(entity_id="sensor.power", state=state if sensor == "power" else "12.3", last_updated=UPDATED),
+        State(entity_id="sensor.voltage", state=state),
     ]
     meter = HassPowerMeter(client, False, entity_id="sensor.power", voltage_entity_id="sensor.voltage")
     expected_error = PowerMeterError if state == "unavailable" else ValueError
@@ -73,7 +75,7 @@ def test_invalid_sensor_reading_is_not_returned_as_a_measurement(sensor: str, st
 
 def test_requesting_voltage_without_a_sensor_fails_explicitly() -> None:
     client = MagicMock(spec=HomeAssistantManager)
-    client.get_state.return_value = SimpleNamespace(state="12.3", last_updated=UPDATED)
+    client.get_state.return_value = State(entity_id="sensor.power", state="12.3", last_updated=UPDATED)
     meter = HassPowerMeter(client, False, entity_id="sensor.power")
 
     assert meter.has_voltage_support() is False
@@ -86,7 +88,7 @@ def test_requesting_voltage_without_a_sensor_fails_explicitly() -> None:
 @pytest.mark.parametrize("available", [False, True])
 def test_voltage_support_checks_configured_sensor_availability(available: bool) -> None:
     client = MagicMock(spec=HomeAssistantManager)
-    client.get_state.return_value = SimpleNamespace(state="230" if available else "unavailable")
+    client.get_state.return_value = State(entity_id="sensor.voltage", state="230" if available else "unavailable")
     meter = HassPowerMeter(client, False, entity_id="sensor.power", voltage_entity_id="sensor.voltage")
 
     if available:
@@ -100,7 +102,7 @@ def test_voltage_support_checks_configured_sensor_availability(available: bool) 
 @pytest.mark.parametrize("state", ["unknown", "unavailable"])
 def test_diagnostic_sample_rejects_unavailable_sensor_without_forcing_update(state: str) -> None:
     client = MagicMock(spec=HomeAssistantManager)
-    client.get_state.return_value = SimpleNamespace(state=state)
+    client.get_state.return_value = State(entity_id="sensor.power", state=state)
     wait = MagicMock()
     meter = HassPowerMeter(client, True, entity_id="sensor.power", wait=wait)
 
@@ -113,7 +115,9 @@ def test_diagnostic_sample_rejects_unavailable_sensor_without_forcing_update(sta
 @pytest.mark.parametrize("updated", [None, UPDATED])
 def test_diagnostic_timestamp_falls_back_when_last_reported_is_missing(updated: datetime | None) -> None:
     client = MagicMock(spec=HomeAssistantManager)
-    client.get_state.return_value = SimpleNamespace(state="12.30", last_reported=None, last_updated=updated)
+    client.get_state.return_value = State(
+        entity_id="sensor.power", state="12.30", last_reported=None, last_updated=updated
+    )
     meter = HassPowerMeter(client, False, entity_id="sensor.power")
 
     with patch("measure.powermeter.hass.time.time", return_value=1234):
@@ -122,3 +126,24 @@ def test_diagnostic_timestamp_falls_back_when_last_reported_is_missing(updated: 
     assert reading.power == 12.3
     assert reading.raw_value == "12.30"
     assert reading.reported_at == (updated.timestamp() if updated else 1234)
+
+
+@pytest.mark.parametrize("report", ["fresh", "stale", "omitted", "null"])
+def test_unchanged_power_requires_a_fresh_source_report(report: str) -> None:
+    state = State(entity_id="sensor.power", state="40", last_updated=UPDATED)
+    if report != "omitted":
+        reported = UPDATED + timedelta(seconds=20) if report == "fresh" else UPDATED
+        state = state.model_copy(update={"last_reported": None if report == "null" else reported})
+    client = MagicMock(spec=HomeAssistantManager)
+    client.get_state.return_value = state
+    meter = HassPowerMeter(client, False, entity_id="sensor.power")
+    sampler = PowerSampler(meter, MeasurementParameters(sample_count=1, max_retries=0), wait=lambda _: None)
+    start = UPDATED.timestamp() + 10
+
+    if report == "fresh":
+        assert sampler.take_measurement(start_timestamp=start).power == 40
+        assert meter.diagnostic_sample().reported_at == UPDATED.timestamp() + 20
+    else:
+        with pytest.raises(OutdatedMeasurementError):
+            sampler.take_measurement(start_timestamp=start)
+        assert meter.diagnostic_sample().reported_at == UPDATED.timestamp()

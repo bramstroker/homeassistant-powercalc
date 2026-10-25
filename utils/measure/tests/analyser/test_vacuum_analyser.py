@@ -1284,6 +1284,30 @@ def test_fixed_idle_state_failure_explains_the_modelling_limit(activity: Activit
     assert "More identical recordings may not resolve" in failure
 
 
+@pytest.mark.parametrize("activity", ["cleaning", "washing", "drying"])
+def test_short_activity_fragments_request_the_missing_activity(tmp_path: Path, activity: str) -> None:
+    data = []
+    for count in [3, 4, 2, 3]:
+        data.extend(sample(activity, 10, len(data) + index) for index in range(count))
+        data.extend(sample("sleeping", 3, len(data) + index) for index in range(20))
+        data.extend(sample("auto_emptying", 600, len(data) + index) for index in range(20))
+
+    result = RecorderAnalyser().analyse(write_recording(tmp_path / "record.jsonl", data), CONTEXT)
+
+    expected_activity = Activity.AWAY if activity == "cleaning" else Activity(activity)
+    assert result.status is AnalysisStatus.INSUFFICIENT_DATA
+    assert result.model_config_fragment is None
+    assert result.reason == (
+        f"No model was fitted for {expected_activity}; record longer, complete {expected_activity} cycles with enough "
+        "consecutive readings for fitting and validation, and the entities that report this activity"
+    )
+    report = next(report for report in result.activity_reports if report.activity == expected_activity)
+    assert report.sample_count == 12
+    assert report.episode_count == 4
+    assert report.validation_count == 12
+    assert report.coverage == 0
+
+
 def test_fixed_power_activities_are_validated_on_energy() -> None:
     data = repeated()
     split = split_vacuum_samples(data, CONTEXT)

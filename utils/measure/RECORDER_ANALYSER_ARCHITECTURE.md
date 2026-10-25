@@ -324,6 +324,8 @@ the overall MAE and constant-power baseline do not veto a repeatable cycling loa
 Samples matching no activity are tolerated up to 10% of the recording, so a brief
 unavailable blip or transient state does not reject it; beyond that acceptance fails.
 These checks keep long low-power periods from masking a poor short, high-power dock cycle.
+Activities seen only in short validation fragments request longer recordings of that activity
+for fitting and validation. Advice to record a charge with drying off is reserved for charging coverage failures.
 Failed sleeping, completed or docked energy validation explains that one reported state
 may contain both post-charge settling and stable standby. One fixed power cannot always
 represent both; repeating identical recordings may not solve this modelling limitation.
