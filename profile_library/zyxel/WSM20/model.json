@@ -1,0 +1,32 @@
+{
+  "aliases": [
+    "WSM20"
+  ],
+  "calculation_strategy": "fixed",
+  "created_at": "2026-10-26T18:35:00Z",
+  "device_type": "network",
+  "device_specs": {
+    "form_factor": "router",
+    "rated_power": 15,
+    "connectivity": [
+      "wifi",
+      "ethernet"
+    ]
+  },
+  "discovery_by": "device",
+  "fixed_config": {
+    "power": 5.0
+  },
+  "measure_description": "Manually measured with the IKEA GRILLPLATS smart plug (Strommessung Schreibtisch) via Home Assistant while running as an OpenWrt-based Multy M1 (WSM20) mesh node",
+  "measure_device": "Ikea Grillplats",
+  "measure_method": "manual",
+  "mains_voltage": 230,
+  "name": "Multy M1",
+  "product_url": "https://www.zyxel.com/global/en/newsroom/press-releases/zyxel-introduces-affordable-answer-to-home-wifi-woes-with-new-wifi-6-products",
+  "authors": [
+    {
+      "name": "Christian Schmidt",
+      "github": "christianschmidt123"
+    }
+  ]
+}
