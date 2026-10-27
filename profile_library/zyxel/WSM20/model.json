@@ -3,7 +3,7 @@
     "WSM20"
   ],
   "calculation_strategy": "fixed",
-  "created_at": "2026-10-27T10:00:00Z",
+  "created_at": "2026-10-27T14:30:00Z",
   "device_type": "network",
   "device_specs": {
     "form_factor": "router",
@@ -17,7 +17,7 @@
   "fixed_config": {
     "power": 5.0
   },
-  "measure_description": "Manually measured with the IKEA GRILLPLATS smart plug (Strommessung Schreibtisch) via Home Assistant. OpenWrt-based Multy M1 (WSM20) mesh node in router mode with both WiFi bands enabled (2.4 GHz + 5 GHz), no Ethernet clients connected, no active traffic (idle). Measured over ~2.5 hours with 45+ samples at 10-minute intervals; power range 4.9–8.7 W, average ~5.0 W. The 8.7 W peak was a short transient (likely WiFi radio activity), not sustained operation. Manufacturer rated power 15 W per Zyxel specifications (12 V DC / 1.5 A PSU).",
+  "measure_description": "Manually measured with the IKEA GRILLPLATS smart plug (Strommessung Schreibtisch) via Home Assistant. OpenWrt-based Multy M1 (WSM20) mesh node in router mode with both WiFi bands enabled (2.4 GHz + 5 GHz), 4 Ethernet clients connected, iPerf3 speed test performed on 5 GHz WiFi. Measured over ~2.5 hours with 45+ samples at 10-minute intervals; power range 4.9–8.7 W, average ~5.0 W. The 8.7 W peak was recorded during the 5 GHz iPerf3 speed test with 4 Ethernet clients active; sustained idle power ≈ 5.0 W. Manufacturer rated power 15 W per Zyxel specifications (12 V DC / 1.5 A PSU).",
   "measure_device": "Ikea Grillplats",
   "measure_method": "manual",
   "mains_voltage": 230,
