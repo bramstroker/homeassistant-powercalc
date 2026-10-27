@@ -22731,6 +22731,37 @@
           "hash": "e4657f272f8f86ac6248c87951f18e2a"
         },
         {
+          "name": "Qrevo S Pro",
+          "aliases": [
+            "roborock.vacuum.a326"
+          ],
+          "compatible_integrations": [
+            "roborock"
+          ],
+          "device_type": "vacuum_robot",
+          "calculation_strategy": "composite",
+          "standby_power": 0.3,
+          "measure_method": "manual",
+          "measure_device": "ThirdReality 3RSP02064Z",
+          "measure_description": "Whole dock + robot measured at the wall with a ThirdReality Gen3 plug (2 s / 3 W power reporting, 1 Wh energy counter) over Oct 20-25 2026 runs; activity energies cross-checked against the plug's energy counter. Activities come from the dock's dust_emptying, mop_washing and mop_drying switches and the robot's status and battery. Sub-profiles match the dock's mop wash temperature setting: high_temperature and room_temperature. Branch values are total wall power: 0.3 W with the robot away (dock alone), 2.0 W with the robot docked at 100%, and charging is mapped from battery % using a clean charge from 14% to 100% (Oct 25 2026, washing and drying off): 18.1 W at the wall at 15% rising to 20.2 W at 99%, averaging 19.0 W, with no taper; it drops straight to the 2.0 W docked idle when full. A ~10 min ~8.5 W pause before charging from very low battery is not modelled. Robot label: model RRE0PEE, product ID QSP51-01 (US 120 V).",
+          "mains_voltage": 120,
+          "min_version": "v1.26.0",
+          "product_url": "https://global.roborock.com/pages/roborock-qrevo-s-pro",
+          "created_at": "2026-10-24T00:00:00Z",
+          "authors": [
+            {
+              "name": "SmithsonianDSP",
+              "github": "SmithsonianDSP"
+            }
+          ],
+          "id": "QSP51-01",
+          "manufacturer": "roborock",
+          "updated_at": "2026-10-25T22:54:51",
+          "max_power": null,
+          "sub_profile_count": 2,
+          "hash": "f61119eca83f3708df78bd0a6effcade"
+        },
+        {
           "aliases": [
             "roborock.vacuum.s5e",
             "S5E52-00"
