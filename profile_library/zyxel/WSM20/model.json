@@ -3,7 +3,7 @@
     "WSM20"
   ],
   "calculation_strategy": "fixed",
-  "created_at": "2026-10-26T18:35:00Z",
+  "created_at": "2026-10-27T10:00:00Z",
   "device_type": "network",
   "device_specs": {
     "form_factor": "router",
@@ -13,16 +13,16 @@
       "ethernet"
     ]
   },
-  "discovery_by": "device",
+  "discovery_by": "manual",
   "fixed_config": {
     "power": 5.0
   },
-  "measure_description": "Manually measured with the IKEA GRILLPLATS smart plug (Strommessung Schreibtisch) via Home Assistant while running as an OpenWrt-based Multy M1 (WSM20) mesh node",
+  "measure_description": "Manually measured with the IKEA GRILLPLATS smart plug (Strommessung Schreibtisch) via Home Assistant. OpenWrt-based Multy M1 (WSM20) mesh node in router mode with both WiFi bands enabled (2.4 GHz + 5 GHz), no Ethernet clients connected, no active traffic (idle). Measured over ~2.5 hours with 45+ samples at 10-minute intervals; power range 4.9–8.7 W, average ~5.0 W. The 8.7 W peak was a short transient (likely WiFi radio activity), not sustained operation. Manufacturer rated power 15 W per Zyxel specifications (12 V DC / 1.5 A PSU).",
   "measure_device": "Ikea Grillplats",
   "measure_method": "manual",
   "mains_voltage": 230,
-  "name": "Multy M1",
-  "product_url": "https://www.zyxel.com/global/en/newsroom/press-releases/zyxel-introduces-affordable-answer-to-home-wifi-woes-with-new-wifi-6-products",
+  "name": "Multy M1 (OpenWrt)",
+  "product_url": "https://download.zyxel.com/Multy_M1_(WSM20)/user_guide/Multy%20M1%20(WSM20)_V2.40_Ed2.pdf",
   "authors": [
     {
       "name": "Christian Schmidt",
