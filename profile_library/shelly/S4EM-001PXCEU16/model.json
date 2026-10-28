@@ -24,14 +24,14 @@
   "gtin": [
     "3800238070823"
   ],
-  "measure_description": "Measured with 33.7 W dummy load, averaged over 300 seconds. Multiple combinations of settings were tested. Firmware version 2.0.1.",
+  "measure_description": "Measured with 33.7 W dummy load, averaged over 300 seconds. Multiple combinations of settings were tested. Firmware version 2.1.1.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "mains_voltage": 230,
   "measure_settings": {
     "VERSION": "v0.14.1:app"
   },
-  "name": "Shelly EM Mini Gen4",
+  "name": "EM Mini Gen4",
   "only_self_usage": true,
   "product_url": "https://www.shelly.com/products/shelly-em-mini-gen4",
   "authors": [
