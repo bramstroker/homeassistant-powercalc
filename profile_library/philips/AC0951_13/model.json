@@ -24,19 +24,71 @@
   "product_url": "https://www.home-appliances.philips/p/AC0951",
   "created_at": "2026-10-27T00:20:00Z",
   "composite_config": {
-    "states_power": {
-      "off": 1.38,
-      "preset_mode|sleep": 2.2,
-      "preset_mode|medium": 7.1,
-      "preset_mode|turbo": 20.02,
-      "preset_mode|auto": "{{ {0: 1.38, 33: 2.5, 66: 7.1, 100: 20.02}.get(state_attr('[[entity]]', 'percentage') | int(0), 2.61) }}",
-      "percentage": {
-        "0": 1.38,
-        "33": 2.5,
-        "66": 7.1,
-        "100": 20.02
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": [
+            "[[entity]]"
+          ],
+          "attribute": "preset_mode",
+          "state": "auto"
+        },
+        "fixed": {
+          "power": "{{ {0: 1.38, 33: 2.5, 66: 7.1, 100: 20.02}.get(state_attr('[[entity]]', 'percentage') | int(0), 2.61) }}"
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": [
+            "[[entity]]"
+          ],
+          "attribute": "preset_mode",
+          "state": "sleep"
+        },
+        "fixed": {
+          "power": 2.2
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": [
+            "[[entity]]"
+          ],
+          "attribute": "preset_mode",
+          "state": "medium"
+        },
+        "fixed": {
+          "power": 7.1
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": [
+            "[[entity]]"
+          ],
+          "attribute": "preset_mode",
+          "state": "turbo"
+        },
+        "fixed": {
+          "power": 20.02
+        }
+      },
+      {
+        "linear": {
+          "calibrate": [
+            "0 -> 1.38",
+            "33 -> 2.5",
+            "66 -> 7.1",
+            "100 -> 20.02"
+          ]
+        }
       }
-    }
+    ]
   },
   "authors": [
     {
