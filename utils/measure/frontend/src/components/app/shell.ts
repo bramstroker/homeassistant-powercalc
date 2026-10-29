@@ -8,7 +8,7 @@ import { MeasureAppController } from "../../app-controller";
 import type { AppView, MeasureAppState } from "../../app-controller";
 
 import { reviewMetrics, reviewSummary } from "../preflight/summary";
-import { isAddressed, specFromRequest, specFromSettings } from "../../power-meter/registry";
+import { isAddressed, specFromRequest } from "../../power-meter/registry";
 import type { MeterContext } from "../../power-meter/registry";
 import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionFormValues, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SettingsSection, ShellyDiscoveryDevice } from "../../types";
 import { sharedStyles, themeStyles } from "../../styles";
@@ -395,7 +395,6 @@ export class AppShell extends LitElement implements MeasureAppState {
         @preflight=${(event: CustomEvent<MeasurementRequest>) => void this.controller.preflight(event.detail)}
         @measure-type-selected=${(event: CustomEvent<MeasureType>) => this.controller.selectMeasureType(event.detail)}
         @entity-domains-requested=${(event: CustomEvent<string[]>) => this.controller.loadEntityDomains(event.detail)}
-        @use-current-settings=${this.useCurrentSettings}
         @open-settings=${this.openSettings}
       ></measure-setup-view>`;
   }
@@ -414,14 +413,6 @@ export class AppShell extends LitElement implements MeasureAppState {
     if (!device) return false;
     if (!this.request && !this.settings?.power_meter) return false;
     return isAddressed(this.meterSpec());
-  }
-
-  /** Drop the session's stored environment and continue from the app defaults instead. */
-  private useCurrentSettings(): void {
-    const settings = this.settings;
-    if (!settings) return;
-    const spec = specFromSettings(settings, this.meterContext());
-    this.controller.replaceDraftEnvironment(spec, settings.default_measure_device ?? "");
   }
 
   private pendingType(): MeasureType | undefined {

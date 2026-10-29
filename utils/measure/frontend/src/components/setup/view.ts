@@ -242,10 +242,6 @@ export class SetupView extends LitElement {
             <h2 id="setup-title">Configure the measurement</h2>
           </div>
         </div>
-        ${this.initialRequest ? html`<p class="notice" role="status">
-          This draft uses the selected session's measurement device and power-meter configuration.
-          <button type="button" @click=${this.useCurrentSettings}>Use current app defaults</button>
-        </p>` : nothing}
         ${this.powerMeterConfigured ? this.renderSetupContent() : renderPowerMeterRequired(this.openSettings)}
       </section>
     `;
@@ -282,10 +278,6 @@ export class SetupView extends LitElement {
           : renderDevicePicker(devices, this.deviceSearch, this.searchDevices, this.selectDevice, freeRoutes.length > 0)}
       ${hasForm && this.selectedType ? this.renderMeasurementForm(this.selectedType, selectedRoute) : nothing}
     `;
-  }
-
-  private useCurrentSettings(): void {
-    emit(this, "use-current-settings");
   }
 
   private renderMeasurementForm(type: MeasureType, route?: MeasurementRoute) {
