@@ -19032,10 +19032,10 @@
           },
           "id": "LS0125051883A",
           "manufacturer": "linkind",
-          "updated_at": "2026-10-25T07:13:46",
+          "updated_at": "2026-10-29T08:16:54",
           "max_power": 13.89,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2026-10-24T19:54:48",
+          "measurement_updated_at": "2026-10-29T08:16:54",
           "power_range": {
             "min": 0.24,
             "max": 13.89
@@ -19048,7 +19048,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "b4bfb72e45a5b277760d147670a66025"
+          "hash": "093a0ce313e77e679eab76cd6084680a"
         },
         {
           "aliases": [
