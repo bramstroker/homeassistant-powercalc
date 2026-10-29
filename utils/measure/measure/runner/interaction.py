@@ -57,6 +57,7 @@ class RunInteraction(Protocol):
         phase: str,
         remaining_seconds: float | None = None,
         skipped: int = 0,
+        waiting_for_entities: bool = False,
     ) -> None:
         """Report measurement progress. ``total`` of 0 means the run is open-ended."""
 
@@ -96,6 +97,7 @@ class ImmediateInteraction(RunInteraction):
         phase: str,
         remaining_seconds: float | None = None,
         skipped: int = 0,
+        waiting_for_entities: bool = False,
     ) -> None:
         return  # pragma: no cover - unattended progress is intentionally a no-op
 

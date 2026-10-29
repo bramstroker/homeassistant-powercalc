@@ -82,6 +82,8 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
         start_time = time.time()
         voltages: list[float] = []
         recorded = 0
+        skipped = 0
+        waiting_for_entities = False
         # Both Ctrl-C in the CLI and the app's Stop recording action are successful
         # terminal conditions for this intentionally open-ended runner.
         try:
@@ -94,17 +96,30 @@ class RecorderRunner(MeasurementRunner[RecorderMeasurementRequest]):
                     measurement = self.sampler.take_measurement(timestamp)
                     _LOGGER.info("Measurement %.2f", measurement.power)
                     elapsed_seconds = timestamp - start_time
-                    if self._write_sample(output_file, request, elapsed_seconds, measurement.power):
+                    sample_written = self._write_sample(output_file, request, elapsed_seconds, measurement.power)
+                    if sample_written:
                         voltages.extend(measurement.voltages)
                         recorded += 1
-                        # Open-ended recording: total 0 means indeterminate progress.
-                        self.interaction.progress(recorded, 0, phase="Recording")
+                        if waiting_for_entities:
+                            _LOGGER.info("Home Assistant entity reads recovered; recording resumed")
+                    else:
+                        skipped += 1
+                    waiting_for_entities = not sample_written
+                    # Report failures too, including before the first valid sample.
+                    self.interaction.progress(
+                        recorded,
+                        0,
+                        phase="Recording",
+                        skipped=skipped,
+                        waiting_for_entities=waiting_for_entities,
+                    )
                     self.interaction.wait(INTERVAL)
         except KeyboardInterrupt, MeasurementCancelledError:
             _LOGGER.info("Stopped recording")
 
         summary = {
             "Samples recorded": str(recorded),
+            "Samples skipped": str(skipped),
             "Duration": f"{round(time.time() - start_time)} s",
         }
         if self._missing_optional_entities:

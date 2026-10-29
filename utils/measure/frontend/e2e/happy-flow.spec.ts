@@ -869,3 +869,38 @@ test("selects a Shelly strip outlet and includes it in the measurement request",
   await page.getByRole("button", { name: "Check setup" }).click();
   expect((await checked).postDataJSON().power_meter).toMatchObject({ type: "shelly", channel: 3 });
 });
+
+
+test("shows an interrupted recording and its recovery after reloading on mobile", async ({ page }, testInfo) => {
+  let snapshot: SessionSnapshot = {
+    ...startedSnapshot, mode: "Recording", phase: "Recording",
+    progress: { ...startedSnapshot.progress!, completed: 752, total: 0, skipped: 25, waiting_for_entities: true },
+    entity_states: { "vacuum.robot": "docked", "sensor.battery": "100" },
+    warnings: ["Skipping sample, could not read entity states: 502 Bad Gateway"],
+    request: {
+      measure_type: "recorder", recorder_purpose: "complex_profile", profile_recipe: "vacuum_robot",
+      model_id: "", product_name: "Robot vacuum", measure_device: "Dock", generate_model: true,
+      parameters, resume_policy: "new", power_meter: { type: "dummy" },
+    },
+  };
+  await mockApi(page, { sessions: [{
+    ...completedSession, session_id: "session-running", state: "running", measure_type: "recorder", active: true,
+  }] });
+  await page.route("**/api/sessions/session-running", (route) => route.fulfill({ json: snapshot }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+  await expect(page.getByRole("alert")).toContainText("Retrying automatically");
+  await expect(page.getByRole("alert")).toBeInViewport();
+  await expect(page.locator(".metric").filter({ hasText: "Skipped" })).toContainText("25");
+  await expect(page.locator(".entity-states")).toContainText("last known values");
+  await page.screenshot({ path: testInfo.outputPath("recording-interrupted.png"), fullPage: true });
+
+  snapshot = { ...snapshot, progress: { ...snapshot.progress!, completed: 753, waiting_for_entities: false } };
+  await page.reload();
+  await expect(page.locator(".recording-status")).toContainText("Recording has resumed");
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.locator(".metric").filter({ hasText: "Skipped" })).toContainText("25");
+  await expect(page.locator(".entity-states")).not.toContainText("last known values");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.screenshot({ path: testInfo.outputPath("recording-recovered.png"), fullPage: true });
+});

@@ -438,6 +438,7 @@ def _snapshot_response(context: AppContext, snapshot: SessionSnapshot) -> Sessio
             completed=snapshot.completed,
             total=snapshot.total,
             skipped=snapshot.skipped,
+            waiting_for_entities=snapshot.waiting_for_entities,
             percent=snapshot.progress,
             estimated_remaining_seconds=_duration_seconds(snapshot.estimated_remaining),
         ),

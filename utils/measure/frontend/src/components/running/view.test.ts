@@ -326,6 +326,66 @@ describe("running view", () => {
     expect(element.shadowRoot.querySelector("button.danger")).toBeNull();
   });
 
+  it("shows skipped samples even before the first valid sample and reports recovery", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    element.connected = true;
+    element.snapshot = {
+      state: "running", mode: "Recording", progress: { completed: 0, total: 0, skipped: 0, waiting_for_entities: false },
+    };
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector(".recording-status")).toBeNull();
+    expect(element.shadowRoot!.textContent).toContain("Skipped");
+    expect(element.shadowRoot!.querySelector(".preparation")).toBeNull();
+
+    const readWarning = "Skipping sample, could not read entity states: 502 Bad Gateway";
+    element.snapshot = {
+      ...element.snapshot, progress: { completed: 0, total: 0, skipped: 2, waiting_for_entities: true },
+      warnings: [readWarning],
+    };
+    await element.updateComplete;
+    const notice = element.shadowRoot!.querySelector(".recording-status")!;
+    expect(notice.getAttribute("role")).toBe("alert");
+    expect(notice.textContent).toContain("Retrying automatically");
+    expect(element.shadowRoot!.querySelector(".connection")!.textContent).toContain("Live updates");
+    expect(element.shadowRoot!.textContent).not.toContain(readWarning);
+    expect(element.shadowRoot!.querySelector(".value")!.textContent).toContain("0");
+
+    element.snapshot = {
+      ...element.snapshot, entity_states: { "switch.plug": "on" },
+      progress: { completed: 1, total: 0, skipped: 3, waiting_for_entities: true },
+      warnings: ["Check the power meter", readWarning],
+    };
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector(".entity-states")!.textContent).toContain("last known values");
+    expect(element.shadowRoot!.textContent).toContain("Check the power meter");
+
+    element.snapshot = { ...element.snapshot, progress: { completed: 2, total: 0, skipped: 3, waiting_for_entities: false } };
+    await element.updateComplete;
+    const recovered = element.shadowRoot!.querySelector(".recording-status")!;
+    expect(recovered.getAttribute("role")).toBe("status");
+    expect(recovered.textContent).toContain("Recording has resumed");
+    expect(element.shadowRoot!.textContent).not.toContain("Retrying automatically");
+    expect(element.shadowRoot!.querySelector(".entity-states")!.textContent).not.toContain("last known values");
+    expect(element.shadowRoot!.textContent).toContain("Check the power meter");
+  });
+
+  it("keeps read warnings visible for older backends without recording status", async () => {
+    const element = document.createElement("measure-running-view") as import("./view").RunningView;
+    const warning = "Skipping sample, could not read entity states: 502 Bad Gateway";
+    element.snapshot = {
+      state: "running", mode: "Recording", progress: { completed: 1, total: 0, skipped: 2 }, warnings: [warning],
+    };
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector(".recording-status")).toBeNull();
+    expect(element.shadowRoot!.textContent).toContain(warning);
+
+    element.snapshot = { ...element.snapshot, state: "cancelling", progress: { completed: 1, total: 0, skipped: 2, waiting_for_entities: true } };
+    await element.updateComplete;
+    expect(element.shadowRoot!.querySelector(".recording-status")).toBeNull();
+  });
+
   it("shows the latest tracked entity states during a complex recording", async () => {
     const element = document.createElement("measure-running-view") as HTMLElement & {
       snapshot: SessionSnapshot; updateComplete: Promise<boolean>; shadowRoot: ShadowRoot;
