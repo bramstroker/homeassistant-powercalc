@@ -23729,6 +23729,55 @@
         },
         {
           "aliases": [
+            "Shelly EM Mini Gen4"
+          ],
+          "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Energy Meter Mini Gen4",
+          "discovery_by": "device",
+          "standby_power_estimated": false,
+          "created_at": "2026-10-28T19:01:00Z",
+          "device_type": "power_meter",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 3840,
+            "power_monitoring": true,
+            "rated_power": 1,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "zigbee",
+              "matter"
+            ]
+          },
+          "gtin": [
+            "3800238070823"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 300 seconds. Multiple combinations of settings were tested. Firmware version 2.1.1.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.14.1:app"
+          },
+          "name": "EM Mini Gen4",
+          "only_self_usage": true,
+          "product_url": "https://www.shelly.com/products/shelly-em-mini-gen4",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S4EM-001PXCEU16",
+          "manufacturer": "shelly",
+          "updated_at": "2026-10-29T07:19:25",
+          "max_power": 0.0,
+          "sub_profile_count": 4,
+          "standby_power": 0.63,
+          "hash": "5efa8090595618c9b11ab393cad72912"
+        },
+        {
+          "aliases": [
             "Shelly 1PM Mini Gen4",
             "Shelly Mini1PMG4"
           ],
