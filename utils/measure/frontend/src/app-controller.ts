@@ -2,7 +2,7 @@ import { ApiError } from "./api-client";
 import type { MeasureApiClient } from "./api-client";
 import { AuthController } from "./contribution/auth";
 import { entityDomains, requestFormData } from "./measurement/definition";
-import { meterFor } from "./power-meter/registry";
+import { meterFor, specFromSettings } from "./power-meter/registry";
 import { hasModelArtifact } from "./utils/artifacts";
 import { emptyPlots } from "./types";
 import type {
@@ -338,12 +338,6 @@ export class MeasureAppController {
     this.changed();
   }
 
-  replaceDraftEnvironment(powerMeter: MeasurementRequest["power_meter"], measureDevice: string): void {
-    if (!this.state.request) return;
-    this.state.request = { ...this.state.request, power_meter: powerMeter, measure_device: measureDevice };
-    this.changed();
-  }
-
   async showSessions(): Promise<void> {
     this.eventConnection?.close();
     this.state.connectedToEvents = false;
@@ -492,6 +486,13 @@ export class MeasureAppController {
   async saveSettings(settings: AppSettingsUpdate): Promise<void> {
     await this.run(async () => {
       this.state.settings = await this.api().saveSettings(settings);
+      if (this.settingsReturnView === "setup" && this.state.request) {
+        this.state.request = {
+          ...this.state.request,
+          power_meter: specFromSettings(this.state.settings, { powers: this.state.powers, voltages: this.state.voltages }),
+          measure_device: this.state.settings.default_measure_device ?? "",
+        };
+      }
       [this.state.capabilities] = await Promise.all([
         this.api().getCapabilities(),
         this.refreshDummyLoadCalibration(),
