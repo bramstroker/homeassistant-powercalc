@@ -16,6 +16,7 @@ def apply_session_event(snapshot: SessionSnapshot, event: SessionEvent) -> Sessi
             completed=int(data["completed"]),
             total=int(data["total"]),
             skipped=int(data.get("skipped", 0)),
+            waiting_for_entities=bool(data.get("waiting_for_entities", False)),
             phase=str(data["mode"]),
             mode=str(data["mode"]),
             estimated_remaining=str(data["estimated_remaining"]),

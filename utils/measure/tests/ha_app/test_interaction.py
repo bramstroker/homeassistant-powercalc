@@ -31,6 +31,7 @@ def test_progress_formats_remaining_time(remaining_seconds: float | None, expect
         "mode": "brightness",
         "estimated_remaining": expected,
         "skipped": 1,
+        "waiting_for_entities": False,
     }
 
 
@@ -85,3 +86,16 @@ def test_session_interaction_checkpoint_honors_cancellation() -> None:
 
     with pytest.raises(MeasurementCancelledError):
         interaction.checkpoint()
+
+
+def test_progress_reports_entity_read_interruption_and_recovery() -> None:
+    control = SessionControl()
+    events: list[SessionEvent] = []
+    control.subscribe(events.append)
+    interaction = SessionInteraction(control)
+
+    interaction.progress(0, 0, phase="Recording", skipped=1, waiting_for_entities=True)
+    interaction.progress(1, 0, phase="Recording", skipped=1)
+
+    assert [event.data["waiting_for_entities"] for event in events] == [True, False]
+    assert [event.data["skipped"] for event in events] == [1, 1]

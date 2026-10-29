@@ -110,6 +110,7 @@ export class RunningView extends LitElement {
       <section class="panel" aria-labelledby="running-title">
         <p class="eyebrow">03 / Measurement</p>
         <h2 id="running-title">${this.runningTitle(preparing)}</h2>
+        ${this.renderRecordingStatus()}
         <div class="instrument">
           <div class="topline">
             <span class="muted" aria-live="polite">${this.snapshot.phase ?? "Preparing measurement"}</span>
@@ -141,7 +142,7 @@ export class RunningView extends LitElement {
 
   private renderConnection() {
     return html`<span class="connection ${this.connected ? "connected" : ""}" role="status">
-      ${this.connected ? "Live" : "Reconnecting"}
+      ${this.connected ? "Live updates" : "Reconnecting"}
     </span>`;
   }
 
@@ -207,7 +208,7 @@ export class RunningView extends LitElement {
     if (!states.length) return nothing;
     return html`
       <div class="entity-states" aria-live="polite">
-        <span>Tracked entities</span>
+        <span>${this.snapshot.progress?.waiting_for_entities ? "Tracked entities · last known values" : "Tracked entities"}</span>
         <div class="entity-state-grid">
           ${states.map(([entityId, state]) => html`
             <div class="entity-state"><code title=${entityId}>${entityId}</code><strong>${state}</strong></div>
@@ -244,7 +245,7 @@ export class RunningView extends LitElement {
       <div class="metrics">
         <div class="metric"><span>Mode</span><strong>${this.snapshot.mode ?? "—"}</strong></div>
         <div class="metric"><span>${progressLabel}</span><strong>${openEnded ? progress.completed : html`${progress.completed} / ${progress.total}`}</strong></div>
-        ${progress.skipped ? html`<div class="metric"><span>Skipped</span><strong>${progress.skipped}</strong></div>` : nothing}
+        ${openEnded || progress.skipped ? html`<div class="metric"><span>Skipped</span><strong>${progress.skipped ?? 0}</strong></div>` : nothing}
         <div class="metric"><span>Remaining</span><strong>${openEnded ? "Until stopped" : remaining(progress.estimated_remaining_seconds)}</strong></div>
       </div>
     `;
@@ -275,8 +276,30 @@ export class RunningView extends LitElement {
     return html`<button class="danger" type="button" @click=${this.cancel} ?disabled=${this.busy || cancelling}>${cancelling ? "Cancelling…" : "Cancel measurement"}</button>`;
   }
 
+  private renderRecordingStatus() {
+    if (this.snapshot.mode !== "Recording" || this.snapshot.state !== "running") return nothing;
+    const progress = this.snapshot.progress;
+    if (progress?.waiting_for_entities) {
+      return html`<div class="notice warning recording-status" role="alert">
+        Cannot read Home Assistant entity states. Retrying automatically; affected samples are skipped.
+        Recording will resume when entity reads succeed.
+      </div>`;
+    }
+    if (progress?.skipped && progress.waiting_for_entities === false) {
+      return html`<div class="notice recording-status" role="status">
+        Home Assistant entity reads recovered. Recording has resumed. Skipped samples remain excluded from the recording.
+      </div>`;
+    }
+    return nothing;
+  }
+
   private renderLatestWarning() {
-    const warning = this.snapshot.warnings?.at(-1);
+    // The recording status replaces historical read errors; keep unrelated warnings visible.
+    const hasRecordingStatus = this.snapshot.mode === "Recording"
+      && this.snapshot.progress?.waiting_for_entities !== undefined;
+    const warning = this.snapshot.warnings?.filter((message) =>
+      !(hasRecordingStatus && message.startsWith("Skipping sample, could not read entity states:"))).at(-1);
+
     if (!warning) return nothing;
     const request = this.snapshot.request;
     if (warning.includes("0 watt was read from the power meter")
