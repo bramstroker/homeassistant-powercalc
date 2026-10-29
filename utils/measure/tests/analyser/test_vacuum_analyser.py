@@ -1280,7 +1280,8 @@ def test_fixed_idle_state_failure_explains_the_modelling_limit(activity: Activit
     report = replace(activity_report(mae_w=8, measured_wh=3, predicted_wh=11), activity=activity)
     failure = find_credibility_failure([report])
     assert failure is not None
-    assert "post-charge settling and stable standby" in failure
+    assert "recorded state may cover different power-consumption phases" in failure
+    assert "Check whether additional entities distinguish those phases" in failure
     assert "More identical recordings may not resolve" in failure
 
 
