@@ -209,6 +209,7 @@ class SessionStorage:
             completed=int(state.get("completed", 0)),
             total=int(state.get("total", 0)),
             skipped=int(state.get("skipped", 0)),
+            waiting_for_entities=bool(state.get("waiting_for_entities", False)),
             phase=state.get("phase"),
             confirmation_message=state.get("confirmation_message"),
             confirmation_action=state.get("confirmation_action"),
@@ -221,6 +222,7 @@ class SessionStorage:
             summary=state.get("summary"),
             operating_point=state.get("operating_point"),
             calibration_sample=state.get("calibration_sample"),
+            entity_states=state.get("entity_states", {}),
         )
         if snapshot.id != session_id:
             raise ValueError("Session state id does not match its directory")

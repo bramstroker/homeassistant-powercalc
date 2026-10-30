@@ -19032,10 +19032,10 @@
           },
           "id": "LS0125051883A",
           "manufacturer": "linkind",
-          "updated_at": "2026-10-25T07:13:46",
+          "updated_at": "2026-10-29T08:16:54",
           "max_power": 13.89,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2026-10-24T19:54:48",
+          "measurement_updated_at": "2026-10-29T08:16:54",
           "power_range": {
             "min": 0.24,
             "max": 13.89
@@ -19048,7 +19048,7 @@
             "score": 98.0,
             "color_temp": 98.0
           },
-          "hash": "b4bfb72e45a5b277760d147670a66025"
+          "hash": "093a0ce313e77e679eab76cd6084680a"
         },
         {
           "aliases": [
@@ -23726,6 +23726,55 @@
           },
           "standby_power": 0.15,
           "hash": "9899df27a01d6e687dcb5de8b7dbda1c"
+        },
+        {
+          "aliases": [
+            "Shelly EM Mini Gen4"
+          ],
+          "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Energy Meter Mini Gen4",
+          "discovery_by": "device",
+          "standby_power_estimated": false,
+          "created_at": "2026-10-28T19:01:00Z",
+          "device_type": "power_meter",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 3840,
+            "power_monitoring": true,
+            "rated_power": 1,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "zigbee",
+              "matter"
+            ]
+          },
+          "gtin": [
+            "3800238070823"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 300 seconds. Multiple combinations of settings were tested. Firmware version 2.1.1.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.14.1:app"
+          },
+          "name": "EM Mini Gen4",
+          "only_self_usage": true,
+          "product_url": "https://www.shelly.com/products/shelly-em-mini-gen4",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S4EM-001PXCEU16",
+          "manufacturer": "shelly",
+          "updated_at": "2026-10-29T07:19:25",
+          "max_power": 0.0,
+          "sub_profile_count": 4,
+          "standby_power": 0.63,
+          "hash": "5efa8090595618c9b11ab393cad72912"
         },
         {
           "aliases": [
@@ -30801,7 +30850,8 @@
         },
         {
           "aliases": [
-            "9290012573A"
+            "9290012573A",
+            "9290012574"
           ],
           "calculation_strategy": "lut",
           "created_at": "2021-06-11T22:01:53Z",
@@ -30830,7 +30880,7 @@
           ],
           "id": "LCT010",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-28T23:28:20",
           "max_power": 9.7,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -30847,7 +30897,7 @@
             "score": 96.9,
             "color_temp": 96.9
           },
-          "hash": "8173fa6ed93a6170dcd12d7cb00a65b9"
+          "hash": "14551128d63884a393050263872fdb86"
         },
         {
           "aliases": [
