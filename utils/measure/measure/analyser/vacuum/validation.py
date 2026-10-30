@@ -138,8 +138,9 @@ def _find_energy_failure(report: ActivityReport) -> str | None:
     reason = f"The {activity} validation predicts {predicted_w:.2f} W on average, but {measured_w:.2f} W was measured; "
     if activity in {Activity.SLEEPING, Activity.COMPLETED, Activity.DOCKED}:
         return (
-            reason + "this state may include both post-charge settling and stable standby, which one fixed-power "
-            "branch cannot represent. More identical recordings may not resolve this limitation"
+            reason + "this recorded state may cover different power-consumption phases that one fixed-power "
+            "value cannot represent. Check whether additional entities distinguish those phases. "
+            "More identical recordings may not resolve this limitation"
         )
     return reason + f"record repeated, complete {activity} cycles and the entities that report this activity"
 

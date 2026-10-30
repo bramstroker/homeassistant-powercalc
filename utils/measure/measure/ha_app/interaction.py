@@ -32,6 +32,7 @@ class SessionInteraction(RunInteraction):
         phase: str,
         remaining_seconds: float | None = None,
         skipped: int = 0,
+        waiting_for_entities: bool = False,
     ) -> None:
         remaining = "" if remaining_seconds is None else f"{int(remaining_seconds)}s"
         self.control.progress(
@@ -40,6 +41,7 @@ class SessionInteraction(RunInteraction):
             mode=phase,
             estimated_remaining=remaining,
             skipped=skipped,
+            waiting_for_entities=waiting_for_entities,
         )
 
     def wait(self, seconds: float) -> None:

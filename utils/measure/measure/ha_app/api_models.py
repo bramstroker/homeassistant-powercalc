@@ -111,6 +111,7 @@ class SessionProgressResponse(BaseModel):
     completed: int
     total: int
     skipped: int
+    waiting_for_entities: bool
     percent: float
     estimated_remaining_seconds: int | None
 

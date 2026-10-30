@@ -639,3 +639,18 @@ def test_light_session_has_no_recording_labels(tmp_path: Path) -> None:
     assert storage.recording_labels("a1b2-c3d4") == {}
     with pytest.raises(ValueError, match="Only saved recordings"):
         storage.set_recording_label("a1b2-c3d4", "model.json", "Example")
+
+
+@pytest.mark.parametrize("waiting", [True, False])
+def test_storage_retains_recording_read_status(tmp_path: Path, waiting: bool) -> None:
+    storage = SessionStorage(tmp_path)
+    current = replace(
+        snapshot(SessionState.RUNNING),
+        completed=2,
+        skipped=3,
+        waiting_for_entities=waiting,
+        entity_states={"switch.plug": "on"},
+    )
+    storage.create(current, light_request())
+
+    assert storage.load_snapshot(current.id) == current

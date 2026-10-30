@@ -397,6 +397,7 @@ const isSessionState = oneOf(
 );
 const isSessionProgress = objectOf({
   completed: isInteger, total: isInteger, skipped: isInteger, percent: isNumber,
+  waiting_for_entities: optional(isBoolean),
   estimated_remaining_seconds: nullable(isInteger),
 });
 const isSessionSnapshot: Guard<SessionSnapshot> = objectOf({
@@ -532,7 +533,8 @@ export function decodeSessionEnvelope(value: unknown): DecodedSessionEnvelope {
       break;
     case "progress":
       if (!(isInteger(value.data.completed) && isInteger(value.data.total) && isInteger(value.data.skipped)
-        && isString(value.data.mode) && isString(value.data.estimated_remaining))) {
+        && isString(value.data.mode) && isString(value.data.estimated_remaining)
+        && optional(isBoolean)(value.data.waiting_for_entities))) {
         throw new Error("Invalid progress event");
       }
       break;
