@@ -61,7 +61,8 @@ jobs:
             -o console_output_style=count \
             -p no:sugar \
             tests
-          uv run --locked --extra dev --group visualize pytest -q tests/test_visualization_renderer.py
+          uv run --locked --extra dev --group visualize pytest -q \
+            tests/test_visualization_renderer.py tests/test_visualization_pr_plots.py
 
   frontend-lint:
     runs-on: "ubuntu-latest"
