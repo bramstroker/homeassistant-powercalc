@@ -43,6 +43,17 @@ and `pyproject.toml`, `uv.lock`, and `.github/workflows/test.yml` for the tested
 versions and compatibility checks. Do not assume the locked version is the latest
 release or that it covers a forthcoming release.
 
+PowerCalc's latest release must support at least the five most recent monthly
+stable Home Assistant releases, counting the newest as one. Betas do not advance
+that window. Respect any older minimum still advertised by the checkout; do not
+raise it automatically. For optional improvements, prefer waiting until the new
+API covers the supported window when adopting it now would require disproportionate
+compatibility code. Keep breakage fixes and deprecation deadlines prioritized.
+
+Read [deferred follow-ups](references/follow-ups.md) on every review, even when
+their announcements fall outside the requested date window. Recheck the current
+code and supported versions before repeating or resolving a finding.
+
 Search the symbols and behaviours mentioned by each post, then read the surrounding
 code and relevant tests. Useful starting points, when present:
 
