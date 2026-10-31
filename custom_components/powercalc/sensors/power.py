@@ -31,7 +31,7 @@ from homeassistant.core import (
     callback,
 )
 from homeassistant.exceptions import ServiceValidationError
-from homeassistant.helpers import issue_registry as ir, start
+from homeassistant.helpers import start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import (
@@ -95,6 +95,7 @@ from custom_components.powercalc.errors import (
     StrategyConfigurationError,
     UnsupportedStrategyError,
 )
+from custom_components.powercalc.issues import async_create_config_entry_issue
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.power_profile.sub_profile_selector import SubProfileSelectConfig, SubProfileSelector
@@ -154,15 +155,12 @@ async def create_virtual_power_sensor(
                 and await power_profile.requires_manual_sub_profile_selection
                 and "/" not in sensor_config.get(CONF_MODEL, "")
             ):
-                ir.async_create_issue(
+                async_create_config_entry_issue(
                     hass,
-                    DOMAIN,
+                    config_entry,
                     f"sub_profile_{config_entry.entry_id}",
-                    is_fixable=True,
-                    severity=ir.IssueSeverity.WARNING,
                     translation_key="sub_profile",
                     translation_placeholders={"entry": config_entry.title},
-                    data={"config_entry_id": config_entry.entry_id},
                 )
 
         name = generate_power_sensor_name(

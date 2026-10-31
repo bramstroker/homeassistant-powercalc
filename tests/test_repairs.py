@@ -1,5 +1,5 @@
 from homeassistant.components.repairs import RepairsFlowManager
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigEntryDisabler
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er, issue_registry as ir
@@ -34,6 +34,9 @@ async def test_sub_profile_repair(hass: HomeAssistant, issue_registry: ir.IssueR
 
     issue = issue_registry.async_get_issue("powercalc", f"sub_profile_{config_entry.entry_id}")
     assert issue
+    assert issue.data == {"config_entry_id": config_entry.entry_id}
+    if hasattr(ir.IssueEntry, "config_entry_id"):
+        assert issue.config_entry_id == config_entry.entry_id
 
     # Dispatch repair flow and see if we can change the sub_profile
     # After the repair, the config entry should have the new sub_profile set in the data
@@ -62,6 +65,84 @@ async def test_no_sub_profile_repair_raised(hass: HomeAssistant, issue_registry:
 
     issue = issue_registry.async_get_issue("powercalc", f"sub_profile_{config_entry.entry_id}")
     assert not issue
+
+
+async def test_sub_profile_repair_stays_ignored_on_reload(
+    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+) -> None:
+    """Reloading an unresolved repair preserves the user's dismissal."""
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "sub_profile",
+        },
+    )
+    issue_id = f"sub_profile_{entry.entry_id}"
+    ignored_issue = issue_registry.async_ignore(DOMAIN, issue_id, True)
+
+    assert await hass.config_entries.async_reload(entry.entry_id)
+
+    issue = issue_registry.async_get_issue(DOMAIN, issue_id)
+    assert issue
+    assert issue.created == ignored_issue.created
+    assert issue.dismissed_version == ignored_issue.dismissed_version
+
+
+@pytest.mark.skipif(not hasattr(ir.IssueEntry, "config_entry_id"), reason="Issue ownership requires HA >=2026.11")
+async def test_sub_profile_repair_is_hidden_when_entry_disabled(
+    hass: HomeAssistant,
+    issue_registry: ir.IssueRegistry,
+) -> None:
+    """Disabling the entry hides its repair without deleting it."""
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "sub_profile",
+        },
+    )
+    issue_id = f"sub_profile_{entry.entry_id}"
+    issue = issue_registry.async_get_issue(DOMAIN, issue_id)
+    assert issue
+    assert not issue_registry.async_is_hidden(issue)
+
+    await hass.config_entries.async_set_disabled_by(entry.entry_id, ConfigEntryDisabler.USER)
+    await hass.async_block_till_done()
+
+    assert issue_registry.async_get_issue(DOMAIN, issue_id) is not None
+    assert issue_registry.async_is_hidden(issue)
+
+
+@pytest.mark.parametrize("issue_prefix", ["sub_profile", ISSUE_COMPOSITE_DEVICE_ID])
+async def test_removing_entry_cleans_up_legacy_repairs(
+    hass: HomeAssistant,
+    issue_registry: ir.IssueRegistry,
+    issue_prefix: str,
+) -> None:
+    """Unowned repairs are removed with their entry, without touching another entry's repair."""
+    entry = await _setup_powercalc_entry(hass, None)
+    other_entry = await _setup_powercalc_entry(hass, None)
+    for config_entry in [entry, other_entry]:
+        ir.async_create_issue(
+            hass,
+            DOMAIN,
+            f"{issue_prefix}_{config_entry.entry_id}",
+            data={"config_entry_id": config_entry.entry_id},
+            is_fixable=True,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key=issue_prefix,
+        )
+
+    assert await hass.config_entries.async_remove(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert issue_registry.async_get_issue(DOMAIN, f"{issue_prefix}_{entry.entry_id}") is None
+    assert issue_registry.async_get_issue(DOMAIN, f"{issue_prefix}_{other_entry.entry_id}") is not None
 
 
 @pytest.mark.parametrize(
@@ -118,6 +199,8 @@ async def test_composite_device_creates_repair_issue(
     assert issue
     assert issue.data == {"config_entry_id": config_entry.entry_id}
     assert issue.translation_placeholders == {"name": "Legacy helper"}
+    if hasattr(ir.IssueEntry, "config_entry_id"):
+        assert issue.config_entry_id == config_entry.entry_id
 
     entities = er.async_entries_for_config_entry(entity_registry, config_entry.entry_id)
     assert entities
