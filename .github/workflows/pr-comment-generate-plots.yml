@@ -57,7 +57,8 @@ jobs:
         id: generate-plots
         run: |
           mkdir -p plot-artifacts
-          uv --project base/utils/measure run --group visualize python -m measure.visualization.pr_plots \
+          uv sync --project base/utils/measure --locked --group visualize
+          uv --project base/utils/measure run --locked --no-sync --no-build python -m measure.visualization.pr_plots \
             --checkout-root pr \
             --changed-files changed-files.json \
             --output-directory plot-artifacts

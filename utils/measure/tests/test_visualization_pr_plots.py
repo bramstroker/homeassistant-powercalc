@@ -151,6 +151,7 @@ def test_cli_generates_plots_and_reports_count(
 def test_module_entry_point_writes_png_artifacts(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
+    pytest.importorskip("matplotlib")
     model = write_model(
         tmp_path / "profile_library" / "acme" / "plug",
         {"calculation_strategy": "composite", "composite_config": [{"fixed": {"power": 5}}]},
