@@ -1,0 +1,27 @@
+{
+  "name": "Saros 10R",
+  "aliases": [
+    "roborock.vacuum.a144"
+  ],
+  "compatible_integrations": [
+    "roborock"
+  ],
+  "device_type": "vacuum_robot",
+  "calculation_strategy": "composite",
+  "standby_power": 0.3,
+  "measure_method": "manual",
+  "measure_device": "ThirdReality 3RSP02064Z",
+  "measure_description": "Whole dock + robot measured at the wall with a ThirdReality Gen3 plug (2 s / 3 W power reporting, 1 Wh energy counter) over Oct 20-26 2026 runs and manual washes; activity energies cross-checked against the plug's energy counter. Activities come from the dock's dust_emptying, mop_washing and mop_drying switches and the robot's status and battery. Sub-profiles match the dock's mop wash temperature setting: hot, warm and room_temperature. Branch values are total wall power: 0.3 W with the robot away (dock alone), 3.5 W with the robot docked at 100%. Charging is mapped from battery % using a clean slow-mode charge (Oct 24, 14% to 100%, washing and drying off): 23 W at the wall rising to 26.6 W near 85-91%, then tapering to ~16 W above ~92%. Mop drying measured at the wall over a 2 h drying-only run at 100% battery. Charging limitations: Smart Charging sometimes runs a 40-50 W fast mode for part of a charge. The table follows slow mode, so fast-mode charges will be underestimated (-13% for a full run with drying; -43% for a fast mid-run recharge; -4.0% across all measured charges). Charging continues for ~5 min at ~15 W after the battery reports 100%, and there is a ~10 min ~10 W pause before charging from very low battery; neither are modeled. Robot label: model S91COP, product ID S10R51-01, rated input 20 V / 2.5 A. Dock label: model EWFD28LRR, rated input 120 V 60 Hz (charging & drying 1.4 A, hot-water mop washing 12 A, dust collection 6 A). US 120 V supply.",
+  "config_flow_discovery_remarks": "Charging is modelled on the Saros 10R's slow charging speed. When the robot uses fast mode (~45-50 W) during charging, that charge's energy is underestimated by up to ~40%.",
+  "config_flow_sub_profile_remarks": "Select the sub-profile that matches the mop washing water temperature set for the dock in the Roborock app: \"hot\", \"warm\" or \"room_temperature\". Home Assistant can't read this setting, so if you change it in the app, change the sub-profile here too.",
+  "mains_voltage": 120,
+  "min_version": "v1.26.0",
+  "product_url": "https://global.roborock.com/pages/roborock-saros-10r",
+  "created_at": "2026-10-25T00:00:00Z",
+  "authors": [
+    {
+      "name": "SmithsonianDSP",
+      "github": "SmithsonianDSP"
+    }
+  ]
+}
