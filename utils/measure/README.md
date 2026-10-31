@@ -94,6 +94,11 @@ To generate or refresh every supported plot in the profile library, including co
 uv run --group visualize powercalc-visualize ../../profile_library --force
 ```
 
+Sub-profile `model.json` files inherit their parent profile's settings, including
+the calculation strategy and device type. Directory generation writes plots
+beside each supported sub-profile. PR plot generation also refreshes those
+sub-profiles when their parent model changes.
+
 ## Developing the Home Assistant app locally
 
 The app prefills profile connectivity from reliable Home Assistant device metadata:

@@ -119,6 +119,26 @@ def test_generate_directory_plots_skips_existing_composite_outputs(tmp_path: Pat
     assert cli.generate_directory_plots(tmp_path) == 0
 
 
+def test_generate_directory_plots_includes_inherited_sub_profiles(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    (tmp_path / "model.json").write_text('{"calculation_strategy":"composite","device_type":"vacuum_robot"}')
+    child = tmp_path / "warm" / "model.json"
+    child.parent.mkdir()
+    child.write_text('{"composite_config":[{"linear":{"calibrate":["15 -> 23","99 -> 16"]}}]}')
+    rendered: list[Path] = []
+    monkeypatch.setattr(cli, "render_plot", lambda _plot, output: rendered.append(output))
+    monkeypatch.setattr(cli, "render_composite_diagram", lambda _diagram, output: rendered.append(output))
+
+    assert cli.generate_directory_plots(tmp_path) == 4
+    assert rendered == [
+        child.with_name("calibration.png"),
+        child.with_name("calibration.svg"),
+        child.with_name("composite.png"),
+        child.with_name("composite.svg"),
+    ]
+
+
 @pytest.mark.parametrize(
     "output, expected",
     [(None, None), ("auto", Path("composite.png")), ("flow.svg", Path("flow.svg"))],
