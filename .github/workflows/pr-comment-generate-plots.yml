@@ -55,9 +55,11 @@ jobs:
             fs.writeFileSync('changed-files.json', JSON.stringify(changed.map((entry) => entry.filename)))
       - name: Run visualization tool
         id: generate-plots
+        env:
+          PYTHONPATH: base/utils/measure
         run: |
           mkdir -p plot-artifacts
-          uv sync --project base/utils/measure --locked --group visualize
+          uv sync --project base/utils/measure --locked --group visualize --no-build --no-install-project
           uv --project base/utils/measure run --locked --no-sync --no-build python -m measure.visualization.pr_plots \
             --checkout-root pr \
             --changed-files changed-files.json \
