@@ -1,5 +1,5 @@
 {
   "name": "+WLAN +ECO +BT +LED",
-  "standby_power": null,
-  "standby_power_on": null
+  "standby_power": 0.7,
+  "standby_power_on": 0.97
 }

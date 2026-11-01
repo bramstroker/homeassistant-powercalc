@@ -1,5 +1,5 @@
 {
   "name": "+WLAN +BT",
-  "standby_power": null,
-  "standby_power_on": null
+  "standby_power": 0.67,
+  "standby_power_on": 0.94
 }

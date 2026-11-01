@@ -7,8 +7,8 @@
   ],
   "calculation_strategy": "fixed",
   "description": "Smart Wi-Fi Plug with Power Monitoring & Matter",
-  "config_flow_sub_profile_remarks": "You need to select a profile depending on your device settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw. Different WLAN signal can change power draw.\n\"+WLAN\": WLAN client on, repeater (Wifi-AP) off, BT off, ECO off, LED indication off.\n\"Wifi-AP\": the device acts as an access point / range extender; this mode has its own sub profiles.\n\"+BT\": Bluetooth enabled. \"+ECO\": ECO mode enabled. \"+LED\": LED indication enabled.",
-  "created_at": "2025-05-01T21:56:26Z",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN + BT + ECO\": All three turned on, repeater turned off.\n\"WLAN + ECO\": Both turned on, repeater turned off.\n\"WLAN + BT\": Both turned on, ECO and repeater turned off.\n\"WLAN\": Only WLAN turned on, ECO and repeater turned off.",
+  "created_at": "2026-11-01T21:30:05Z",
   "device_type": "smart_switch",
   "device_specs": {
     "form_factor": "plug",
@@ -25,12 +25,12 @@
     "3800235261859"
   ],
   "discovery_by": "entity",
-  "measure_description": "Measured with 1.5W (average over 600s) dummy load over 600s and calculated average. WLAN RSSI: -40 dBm, Firmware version 1.2.3. Note: firmware have Shelly's confirmed bug with LED settings when ECO mode used, LED settings are not always applying correctly, and measurements are made only in a situation where the settings correspond to the actual behavior of the LED",
-  "measure_device": "Shelly PM Mini Gen3",
-  "measure_method": "script",
+  "measure_description": "Measured with 33.7 W dummy load, averaged over 600 seconds. Multiple combinations of settings were tested. Firmware version 2.1.1.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "manual",
   "mains_voltage": 230,
   "measure_settings": {
-    "VERSION": "v1.17.11:docker"
+    "VERSION": "v0.14.1:app"
   },
   "name": "Plug S Gen3",
   "only_self_usage": true,
@@ -40,6 +40,10 @@
       "name": "Largelos",
       "email": "vasilenkoeyu@gmail.com",
       "github": "Largelos"
+    },
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
     }
   ]
 }
