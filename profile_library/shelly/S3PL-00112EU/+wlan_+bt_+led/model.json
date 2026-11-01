@@ -1,0 +1,5 @@
+{
+  "name": "+WLAN +BT +LED",
+  "standby_power": 0.82,
+  "standby_power_on": 1.1
+}
