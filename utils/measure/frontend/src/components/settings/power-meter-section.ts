@@ -1,17 +1,35 @@
-import { LitElement, html, nothing, type PropertyValues } from "lit";
+import { LitElement, css, html, nothing, type PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { AppSettings, EntityDescriptor, PowerMeterDiagnostic, PowerMeterType, ShellyDiscoveryDevice } from "../../types";
-import { DEFAULT_SHELLY_USERNAME, POWER_METER_LIST, meterFor } from "../../power-meter/registry";
+import { DEFAULT_SHELLY_USERNAME, POWER_METER_LIST, meterFor, relatedVoltageEntityId } from "../../power-meter/registry";
 import { emit } from "../../utils/events";
 import type { ComboboxOption } from "../shared/combobox";
 import "../shared/combobox";
 import { entityOption, optionSelect } from "../shared/fields";
 import "../shared/power-meter-diagnostic";
 
+/** Shared styles for the light-DOM meter fields in both editor forms. */
+export const powerMeterStyles = css`
+    .section-fields { display: grid; gap: 1rem; }
+    .quality-requirements { margin: -0.15rem 0 0; padding: 0.7rem 0.8rem; border-left: 3px solid var(--signal); background: color-mix(in srgb, var(--signal) 8%, transparent); color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
+    .test-row { display: grid; gap: 0.75rem; }
+    .test-row > button { justify-self: start; }
+    .test-row button { min-height: 40px; }
+    .discovery { display: grid; gap: 0.65rem; padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: color-mix(in srgb, var(--field) 68%, transparent); }
+    .discovery-header { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; }
+    .discovery-header strong { color: var(--ink); font-size: 0.82rem; }
+    .discovery-header button { min-height: 36px; padding: 0.45rem 0.7rem; }
+    .discovery-status { margin: 0; color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
+    .discovery-status.error { color: var(--danger); }
+`;
+
 @customElement("measure-settings-power-meter-section")
 export class SettingsPowerMeterSection extends LitElement {
   @property({ attribute: false }) powers: EntityDescriptor[] = [];
   @property({ attribute: false }) settings?: AppSettings;
+  @property({ type: Boolean }) sessionOnly = false;
+  @property({ attribute: false }) voltages: EntityDescriptor[] = [];
+  @property({ attribute: false }) initialVoltageEntityId?: string | null;
   @property({ attribute: false }) measureDevices: string[] = [];
   @property({ type: Boolean }) measureDevicesLoading = false;
   @property({ type: String }) measureDevicesError = "";
@@ -27,6 +45,7 @@ export class SettingsPowerMeterSection extends LitElement {
   @state() private meter?: PowerMeterType;
   @state() private measureDeviceValue = "";
   @state() private hassPowerEntity = "";
+  @state() private voltageEntityId = "";
   @state() private shellyIp?: string;
   @state() private shellyOutlet?: string;
   @state() private shellyUsername?: string;
@@ -45,6 +64,7 @@ export class SettingsPowerMeterSection extends LitElement {
     if (changedProperties.has("settings")) {
       this.measureDeviceValue = this.settings?.default_measure_device ?? "";
       this.hassPowerEntity = this.settings?.default_power_entity_id ?? "";
+      this.voltageEntityId = this.initialVoltageEntityId ?? "";
     }
   }
 
@@ -61,7 +81,9 @@ export class SettingsPowerMeterSection extends LitElement {
           placeholder="e.g. Shelly Plug S"
           .hint=${this.measureDevicesLoading
             ? "Loading names used by existing Powercalc profiles…"
-            : "Manufacturer and model of the meter used to take readings. This is prefilled in each profile and can still be changed there."}
+            : this.sessionOnly
+              ? "Manufacturer and model of the meter used for this measurement."
+              : "Manufacturer and model of the meter used to take readings. This is prefilled in each profile and can still be changed there."}
           required
           allowCustom
           @combobox-change=${this.measureDeviceChanged}
@@ -71,7 +93,7 @@ export class SettingsPowerMeterSection extends LitElement {
         ${this.measureDevicesError
           ? html`<small class="field-hint error" role="status">Library suggestions are unavailable; manual entry still works.</small>`
           : nothing}
-        <label>
+        ${this.sessionOnly ? nothing : html`<label>
           <span>Power measurement device firmware</span>
           <input
             name="default_measure_device_firmware"
@@ -80,7 +102,7 @@ export class SettingsPowerMeterSection extends LitElement {
             placeholder="Optional firmware version"
           />
           <small class="field-hint">Prefilled in new profile metadata and editable for each profile.</small>
-        </label>
+        </label>`}
         ${optionSelect("power_meter", "Type", POWER_METER_LIST.map((meter) => ({ value: meter.type, label: meter.label })), {
           selected: powerMeter,
           required: true,
@@ -105,6 +127,7 @@ export class SettingsPowerMeterSection extends LitElement {
 
   private readonly hassPowerEntityChanged = (event: CustomEvent<{ value: string }>): void => {
     this.hassPowerEntity = event.detail.value;
+    this.voltageEntityId = relatedVoltageEntityId(this.powers, this.hassPowerEntity);
     this.powerMeterSettingsChanged();
   };
 
@@ -131,8 +154,19 @@ export class SettingsPowerMeterSection extends LitElement {
         @combobox-change=${this.hassPowerEntityChanged}
       >
         <input slot="value" type="hidden" name="default_power_entity_id" .value=${this.hassPowerEntity} />
-      </measure-combobox>`;
+      </measure-combobox>
+      ${this.sessionOnly ? html`
+        <measure-combobox name="voltage_entity_id" label="Voltage sensor (optional)"
+          .value=${this.voltageEntityId} .options=${this.voltages.map((entity) => entityOption(entity))}
+          placeholder="No voltage sensor" @combobox-change=${this.voltageEntityChanged}>
+          <input slot="value" type="hidden" name="voltage_entity_id" .value=${this.voltageEntityId} />
+        </measure-combobox>` : nothing}`;
   }
+
+  private readonly voltageEntityChanged = (event: CustomEvent<{ value: string }>): void => {
+    this.voltageEntityId = event.detail.value;
+    this.powerMeterSettingsChanged();
+  };
 
   private renderTestRow() {
     return html`
@@ -166,13 +200,13 @@ export class SettingsPowerMeterSection extends LitElement {
           <input name="shelly_username" .value=${this.shellyUsername ?? this.settings?.shelly_username ?? DEFAULT_SHELLY_USERNAME} required autocomplete="username" maxlength="50" @input=${this.shellyUsernameChanged} />
           <small class="field-hint">Gen1 devices may use a custom username. Gen2 and newer always use admin.</small>
         </label>
-        <label>
+        ${this.sessionOnly ? nothing : html`<label>
           <span>Shelly password</span>
           <input name="shelly_password" type="password" .value=${this.shellyPassword} autocomplete="new-password" maxlength="255" placeholder=${this.settings?.shelly_password_configured ? "Saved password (leave blank to keep)" : "Optional"} @input=${this.shellyPasswordChanged} />
           <small class="field-hint">Stored privately in the app and never returned by the API.</small>
-        </label>
+        </label>`}
       </div>
-      ${this.renderClearShellyPassword()}`;
+      ${this.sessionOnly ? html`<small class="field-hint">Authentication uses the credentials saved in Settings.</small>` : this.renderClearShellyPassword()}`;
   }
 
   private renderShellyOutlet(address: string) {
@@ -231,7 +265,7 @@ export class SettingsPowerMeterSection extends LitElement {
         <input name="kasa_ip" .value=${address} required autocomplete="off" placeholder="192.168.1.50" @input=${this.kasaIpChanged} />
         <small class="field-hint">Enter the IP address of an energy-monitoring Kasa or Tapo plug. Give it a static lease in your router so it stays reachable.</small>
       </label>
-      <div class="grid">
+      ${this.sessionOnly ? html`<small class="field-hint">Authentication uses the credentials saved in Settings.</small>` : html`<div class="grid">
         <label>
           <span>TP-Link account email</span>
           <input name="tapo_username" type="email" .value=${this.tapoUsername} autocomplete="username" maxlength="255" @input=${this.tapoUsernameChanged} />
@@ -242,7 +276,7 @@ export class SettingsPowerMeterSection extends LitElement {
           <small class="field-hint">Stored privately in the app and used only to authenticate local Tapo connections.</small>
         </label>
       </div>
-      ${this.renderClearTapoCredentials()}`;
+      ${this.renderClearTapoCredentials()}`}`;
   }
 
   private renderClearTapoCredentials() {

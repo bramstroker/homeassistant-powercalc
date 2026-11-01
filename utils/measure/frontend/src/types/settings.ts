@@ -1,4 +1,9 @@
-import type { AppMeasurementDefaults, PowerMeterType } from "./measurement";
+import type { AppMeasurementDefaults, PowerMeterSpec, PowerMeterType } from "./measurement";
+
+export interface SessionPowerMeter {
+  power_meter: PowerMeterSpec;
+  measure_device: string;
+}
 
 export type SettingsSection = "power_meter" | "profile" | "measure_tuning" | "github";
 

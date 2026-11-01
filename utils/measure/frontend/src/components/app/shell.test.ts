@@ -1,4 +1,5 @@
-import type { MeasureDefinition, MeasureParameter, MeasurementRequest } from "../../types";
+import type { MeasureDefinition, MeasureParameter, MeasurementRequest, SessionPowerMeter } from "../../types";
+import { api as createApi } from "../../testing/controller";
 import { AppShell } from "./shell";
 import type { ResultView } from "../result/view";
 import type { ProfileSubmitView } from "../profile/submit-view";
@@ -93,6 +94,58 @@ describe("app shell device entities", () => {
 });
 
 describe("app shell", () => {
+  it("routes setup meter edits, diagnostics and cancellation through the session editor", async () => {
+    const saveSettings = vi.fn();
+    const testPowerMeter = vi.fn(async () => goodPowerMeterDiagnostic);
+    const getShellyDevices = vi.fn(async () => ({ available: true, message: "Discovery ready", devices: [] }));
+    const element = new AppShell();
+    (element as unknown as { api: unknown }).api = createApi({
+      getSettings: async () => ({ ...defaultSettings, power_meter: "dummy", default_measure_device: "Global meter" }),
+      saveSettings, testPowerMeter, getShellyDevices,
+    });
+    document.body.append(element);
+    await vi.waitFor(() => expect(element.view).toBe("sessions"));
+    controllerOf(element).newMeasurement();
+    await element.updateComplete;
+
+    const openEditor = async () => {
+      element.shadowRoot!.querySelector("measure-setup-view")!.dispatchEvent(new CustomEvent("open-settings"));
+      await element.updateComplete;
+      const editor = element.shadowRoot!.querySelector("measure-session-power-meter-view")!;
+      expect(element.view).toBe("power_meter");
+      expect(element.shadowRoot!.querySelector<HTMLButtonElement>(".settings-toggle")!.disabled).toBe(true);
+      return editor;
+    };
+    const editor = await openEditor();
+    editor.dispatchEvent(new CustomEvent("test", { detail: element.settings }));
+    await vi.waitFor(() => expect(element.powerMeterTestResult).toEqual(goodPowerMeterDiagnostic));
+    expect(testPowerMeter).toHaveBeenCalledWith(element.settings);
+    editor.dispatchEvent(new CustomEvent("test-clear"));
+    expect(element.powerMeterTestResult).toBeUndefined();
+    editor.dispatchEvent(new CustomEvent("shelly-discover"));
+    await vi.waitFor(() => expect(element.shellyDiscoveryMessage).toBe("Discovery ready"));
+    expect(getShellyDevices).toHaveBeenCalledOnce();
+    editor.dispatchEvent(new CustomEvent("back"));
+    await element.updateComplete;
+    expect(element.view).toBe("setup");
+    expect(element.draftPowerMeter?.measure_device).toBe("Global meter");
+
+    const reopened = await openEditor();
+    const configuration: SessionPowerMeter = {
+      power_meter: { type: "shelly", device_ip: "192.0.2.20", channel: 2 }, measure_device: "Session meter",
+    };
+    reopened.dispatchEvent(new CustomEvent("save", { detail: configuration }));
+    await vi.waitFor(() => expect(element.view).toBe("setup"));
+    await element.updateComplete;
+    const setup = element.shadowRoot!.querySelector("measure-setup-view") as HTMLElement & {
+      meter: SessionPowerMeter["power_meter"]; defaultMeasureDevice: string;
+    };
+    expect(setup.meter).toEqual(configuration.power_meter);
+    expect(setup.defaultMeasureDevice).toBe("Session meter");
+    expect(element.settings?.default_measure_device).toBe("Global meter");
+    expect(saveSettings).not.toHaveBeenCalled();
+  });
+
   it("cycles and persists the color theme independently from backend settings", async () => {
     const element = new AppShell();
     vi.spyOn(controllerOf(element), "boot").mockResolvedValue();
