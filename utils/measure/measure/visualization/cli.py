@@ -11,6 +11,7 @@ from measure.visualization import (
     model_has_composite_branches,
     model_has_linear_calibration,
 )
+from measure.visualization.profile import load_model_data
 from measure.visualization.renderer import render_composite_diagram, render_plot
 
 # Every marker stays a separate element in an SVG, so the largest LUTs (~25k rows) would
@@ -88,7 +89,7 @@ def _directory_composite_inputs(directory: Path) -> list[Path]:
 
 def _has_linear_calibration(path: Path) -> bool:
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = load_model_data(path)
     except OSError, json.JSONDecodeError:
         return False
     return model_has_linear_calibration(data)
@@ -96,7 +97,7 @@ def _has_linear_calibration(path: Path) -> bool:
 
 def _has_composite_branches(path: Path) -> bool:
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = load_model_data(path)
     except OSError, json.JSONDecodeError:
         return False
     return model_has_composite_branches(data)

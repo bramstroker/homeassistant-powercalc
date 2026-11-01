@@ -34,9 +34,9 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           path: pr
           persist-credentials: false
-      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
-          version: '0.13.5'
+          version: '0.13.6'
           working-directory: './base/utils/measure'
           enable-cache: true
           cache-dependency-glob: |
@@ -44,7 +44,6 @@ jobs:
             base/utils/measure/uv.lock
       - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         name: List changed files from the PR
-        id: list-files
         with:
           script: |
             const fs = require('fs')
@@ -53,77 +52,29 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.payload.pull_request.number
             })
-            const files = changed.map((entry) => entry.filename).filter((file) => {
-              if (/^profile_library\/.+\/(brightness|color_temp|hs|effect)\.csv(?:\.gz)?$/.test(file)) {
-                return fs.existsSync(`pr/${file}`)
-              }
-              if (!/^profile_library\/.+\/model\.json$/.test(file) || !fs.existsSync(`pr/${file}`)) return false
-              try {
-                const model = JSON.parse(fs.readFileSync(`pr/${file}`, 'utf8'))
-                if (model.calculation_strategy === 'linear') return Array.isArray(model.linear_config?.calibrate)
-                return model.calculation_strategy === 'composite'
-              } catch {
-                return false
-              }
-            })
-            core.setOutput('changedFiles', files.join('\n'))
-            core.setOutput('hasPlots', files.length ? 'true' : 'false')
+            fs.writeFileSync('changed-files.json', JSON.stringify(changed.map((entry) => entry.filename)))
       - name: Run visualization tool
-        if: steps.list-files.outputs.hasPlots == 'true'
+        id: generate-plots
+        env:
+          PYTHONPATH: base/utils/measure
         run: |
           mkdir -p plot-artifacts
-          while IFS= read -r file; do
-            if [ -z "${file}" ]; then
-              continue
-            fi
-            echo "Generating plot for - ${file}."
-            source="${{ github.workspace }}/pr/${file}"
-            if [ -f "${source}" ]; then
-              relative="${file#profile_library/}"
-              if [[ "${relative}" == */model.json ]]; then
-                strategy="$(jq -r '.calculation_strategy // empty' "${source}")"
-                if [[ "${strategy}" == "composite" ]]; then
-                  uv --project base/utils/measure run --group visualize powercalc-visualize \
-                    "${source}" --kind=composite \
-                    --output="plot-artifacts/${relative%model.json}composite.png"
-                  if jq -e '
-                    .composite_config
-                    | if type == "array" then . else .strategies end
-                    | any(.linear.calibrate? | type == "array")
-                  ' "${source}" > /dev/null; then
-                    uv --project base/utils/measure run --group visualize powercalc-visualize \
-                      "${source}" \
-                      --output="plot-artifacts/${relative%model.json}calibration.png"
-                  fi
-                  continue
-                fi
-                output="plot-artifacts/${relative%model.json}calibration.png"
-              else
-                csv_path="${relative%.gz}"
-                output="plot-artifacts/${csv_path%.csv}.png"
-              fi
-              uv --project base/utils/measure run --group visualize powercalc-visualize \
-                "${source}" --output="${output}"
-            else
-              echo "::error::Changed file is missing from checkout: ${file}"
-              exit 1
-            fi
-          done <<< "${STEPS_LIST_FILES_OUTPUTS_CHANGEDFILES}"
-        env:
-          STEPS_LIST_FILES_OUTPUTS_CHANGEDFILES: ${{ steps.list-files.outputs.changedFiles }}
-      - name: Verify plots generated
-        if: steps.list-files.outputs.hasPlots == 'true'
-        run: |
-          if ! find plot-artifacts -type f -name '*.png' -print -quit | grep -q .; then
-            echo "::error::No plot PNG files were generated"
-            exit 1
+          uv sync --project base/utils/measure --locked --group visualize --no-build --no-install-project
+          uv --project base/utils/measure run --locked --no-sync --no-build python -m measure.visualization.pr_plots \
+            --checkout-root pr \
+            --changed-files changed-files.json \
+            --output-directory plot-artifacts
+          if find plot-artifacts -type f -name '*.png' -print -quit | grep -q .; then
+            echo "hasPlots=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "hasPlots=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Write PR number
-        if: steps.list-files.outputs.hasPlots == 'true'
+        if: steps.generate-plots.outputs.hasPlots == 'true'
         run: |
           echo "${{ github.event.pull_request.number }}" > plot-artifacts/pr_number.txt
       - name: Upload Artifact
-        if: steps.list-files.outputs.hasPlots == 'true'
+        if: steps.generate-plots.outputs.hasPlots == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: plots

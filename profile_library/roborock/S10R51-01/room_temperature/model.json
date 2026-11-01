@@ -1,0 +1,152 @@
+{
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 440
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:mop_washing]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 5
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:mop_drying]]",
+              "state": [
+                "on"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "charging"
+              ]
+            },
+            {
+              "condition": "numeric_state",
+              "entity_id": "[[entity_by_device_class:battery]]",
+              "below": 100
+            }
+          ]
+        },
+        "entity_id": "[[entity_by_device_class:battery]]",
+        "linear": {
+          "calibrate": [
+            "15 -> 80.4",
+            "25 -> 80.8",
+            "35 -> 81.3",
+            "45 -> 81.8",
+            "55 -> 82.2",
+            "65 -> 82.6",
+            "75 -> 83.1",
+            "85 -> 83.8",
+            "91 -> 83.3",
+            "93 -> 81.0",
+            "94 -> 79.0",
+            "95 -> 77.4",
+            "96 -> 75.6",
+            "99 -> 73.6"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:mop_drying]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 60.7
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "charging"
+              ]
+            },
+            {
+              "condition": "numeric_state",
+              "entity_id": "[[entity_by_device_class:battery]]",
+              "below": 100
+            }
+          ]
+        },
+        "entity_id": "[[entity_by_device_class:battery]]",
+        "linear": {
+          "calibrate": [
+            "15 -> 23.2",
+            "25 -> 23.6",
+            "35 -> 24.1",
+            "45 -> 24.6",
+            "55 -> 25.0",
+            "65 -> 25.4",
+            "75 -> 25.9",
+            "85 -> 26.6",
+            "91 -> 26.1",
+            "93 -> 23.8",
+            "94 -> 21.8",
+            "95 -> 20.2",
+            "96 -> 18.4",
+            "99 -> 16.4"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:status]]",
+          "state": [
+            "cleaning",
+            "segment_cleaning",
+            "zoned_cleaning",
+            "spot_cleaning",
+            "returning_home",
+            "going_to_wash_the_mop",
+            "going_to_target",
+            "paused",
+            "detaching_the_mop",
+            "attaching_the_mop"
+          ]
+        },
+        "fixed": {
+          "power": 0.3
+        }
+      },
+      {
+        "fixed": {
+          "power": 3.5
+        }
+      }
+    ]
+  }
+}

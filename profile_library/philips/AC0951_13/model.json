@@ -1,0 +1,87 @@
+{
+  "name": "PureProtect Mini 900 Series Air Purifier",
+  "aliases": [
+    "AC0951/13",
+    "AC0951_13"
+  ],
+  "device_type": "fan",
+  "calculation_strategy": "composite",
+  "compatible_integrations": [
+    "philips_airpurifier_coap"
+  ],
+  "device_specs": {
+    "form_factor": "air_purifier",
+    "connectivity": [
+      "wifi"
+    ],
+    "rated_power": 23
+  },
+  "measure_method": "script",
+  "measure_device": "Shelly Plug S",
+  "measure_description": "Measured on a Shelly Plug S (first generation, model SHPLG-S) with the Powercalc measure tool. Four 60 s average sessions at fan speed 33/66/100 % plus standby, and two recordings (868 and 558 samples). Preset values come from transition-free plateaus of at least 30 s; where a plateau exceeded 900 s it is preferred over the 60 s session, because a one-minute window cannot rule out that the fan was still settling - turbo measured 20.02 W over 1001 s versus 20.41 W over 60 s. The display backlight is not modelled as a separate branch: it is a plain brightness light without its own switch, and its share overlaps the sample scatter, so it cannot be separated reliably from the fan load. LIMITATION: the 'auto' preset is deliberately not modelled. The integration derives the fan 'percentage' attribute only from the fixed sleep/medium/turbo patterns, so auto mode reports no percentage at all - there is no reading to map. Assigning a value there would be a guess, so powercalc reports no value in that mode instead of standby power. LIMITATION: manual fan speed without a preset reports no percentage in this integration, so the fallback calibration only covers the measured 0/33/66/100 % points.",
+  "standby_power": 1.38,
+  "mains_voltage": 230,
+  "min_version": "v1.25.3",
+  "product_url": "https://www.home-appliances.philips/gb/en/p/AC0951_13",
+  "created_at": "2026-10-27T00:20:00Z",
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": [
+            "[[entity]]"
+          ],
+          "attribute": "preset_mode",
+          "state": "sleep"
+        },
+        "fixed": {
+          "power": 2.2
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": [
+            "[[entity]]"
+          ],
+          "attribute": "preset_mode",
+          "state": "medium"
+        },
+        "fixed": {
+          "power": 7.1
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": [
+            "[[entity]]"
+          ],
+          "attribute": "preset_mode",
+          "state": "turbo"
+        },
+        "fixed": {
+          "power": 20.02
+        }
+      },
+      {
+        "linear": {
+          "calibrate": [
+            "0 -> 1.38",
+            "33 -> 2.5",
+            "66 -> 7.1",
+            "100 -> 20.02"
+          ]
+        }
+      }
+    ]
+  },
+  "authors": [
+    {
+      "name": "Maxi",
+      "github": "Maxik933"
+    }
+  ]
+}
