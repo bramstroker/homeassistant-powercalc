@@ -1,166 +1,262 @@
 {
   "calculation_strategy": "composite",
-  "compatible_integrations": [
-    "dreame_vacuum"
-  ],
-  "composite_config": [
-    {
-      "condition": {
-        "condition": "state",
-        "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
-        "state": "active"
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+          "state": [
+            "active"
+          ]
+        },
+        "fixed": {
+          "power": 381.51
+        }
       },
-      "fixed": {
-        "power": 648
-      }
-    },
-    {
-      "condition": {
-        "condition": "and",
-        "conditions": [
-          {
-            "condition": "state",
-            "entity_id": "[[entity]]",
-            "state": "docked"
-          },
-          {
-            "condition": "state",
-            "entity_id": "[[entity_by_translation_key:charging_state]]",
-            "state": "on"
-          }
-        ]
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+              "state": [
+                "idle"
+              ]
+            },
+            {
+              "condition": "and",
+              "conditions": [
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:charging_state]]",
+                  "state": [
+                    "on"
+                  ]
+                },
+                {
+                  "condition": "template",
+                  "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas true }}"
+                },
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:state]]",
+                  "state": [
+                    "paused",
+                    "idle",
+                    "charging"
+                  ]
+                }
+              ]
+            },
+            {
+              "condition": "template",
+              "value_template": "{{ states('[[entity_by_translation_key:battery_level]]') is not boolean and 0 <= (states('[[entity_by_translation_key:battery_level]]') | float(-1)) <= 100 and 34 <= (states('[[entity_by_translation_key:battery_level]]') | float(-1) | int) <= 99 }}"
+            }
+          ]
+        },
+        "entity_id": "[[entity_by_translation_key:battery_level]]",
+        "linear": {
+          "calibrate": [
+            "34 -> 13.14",
+            "36 -> 20.75",
+            "42 -> 20.85",
+            "47 -> 20.88",
+            "53 -> 21.02",
+            "58 -> 21.11",
+            "62 -> 21.25",
+            "67 -> 21.48",
+            "73 -> 21.68",
+            "77 -> 21.88",
+            "82 -> 22.05",
+            "88 -> 22.32",
+            "92 -> 22.55",
+            "99 -> 22.58"
+          ]
+        }
       },
-      "linear": {
-        "calibrate": [
-          "15 -> 17.31",
-          "16 -> 20.14",
-          "17 -> 20.19",
-          "18 -> 20.26",
-          "19 -> 20.24",
-          "20 -> 20.27",
-          "21 -> 20.28",
-          "22 -> 20.3",
-          "23 -> 20.37",
-          "24 -> 20.37",
-          "25 -> 20.42",
-          "26 -> 20.39",
-          "27 -> 20.44",
-          "28 -> 20.49",
-          "29 -> 20.46",
-          "30 -> 20.48",
-          "31 -> 20.54",
-          "32 -> 20.54",
-          "33 -> 20.57",
-          "34 -> 20.55",
-          "35 -> 20.57",
-          "36 -> 20.64",
-          "37 -> 20.6",
-          "38 -> 20.67",
-          "39 -> 20.65",
-          "40 -> 20.75",
-          "41 -> 20.73",
-          "42 -> 20.71",
-          "43 -> 20.71",
-          "44 -> 20.73",
-          "45 -> 20.75",
-          "46 -> 20.77",
-          "47 -> 20.77",
-          "48 -> 20.79",
-          "49 -> 20.86",
-          "50 -> 20.84",
-          "51 -> 20.92",
-          "52 -> 20.93",
-          "53 -> 20.86",
-          "54 -> 21.0",
-          "55 -> 20.93",
-          "56 -> 21.02",
-          "57 -> 21.0",
-          "58 -> 21.04",
-          "59 -> 21.08",
-          "60 -> 21.09",
-          "61 -> 21.13",
-          "62 -> 21.17",
-          "63 -> 21.19",
-          "64 -> 21.21",
-          "65 -> 21.26",
-          "66 -> 21.26",
-          "67 -> 21.29",
-          "68 -> 21.35",
-          "69 -> 21.36",
-          "70 -> 21.42",
-          "71 -> 21.48",
-          "72 -> 21.55",
-          "73 -> 21.56",
-          "74 -> 21.6",
-          "75 -> 21.6",
-          "76 -> 21.68",
-          "77 -> 21.72",
-          "78 -> 21.8",
-          "79 -> 21.85",
-          "80 -> 21.87",
-          "81 -> 21.91",
-          "82 -> 21.95",
-          "83 -> 21.98",
-          "84 -> 22.08",
-          "85 -> 22.09",
-          "86 -> 22.13",
-          "87 -> 22.23",
-          "88 -> 22.21",
-          "89 -> 22.26",
-          "90 -> 22.32",
-          "91 -> 22.37",
-          "92 -> 22.42",
-          "93 -> 22.45",
-          "94 -> 22.47",
-          "95 -> 22.54",
-          "96 -> 22.62",
-          "97 -> 22.67",
-          "98 -> 21.66",
-          "99 -> 15.97",
-          "100 -> 8.14"
-        ]
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+              "state": [
+                "idle"
+              ]
+            },
+            {
+              "condition": "or",
+              "conditions": [
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:charging_state]]",
+                  "state": [
+                    "off"
+                  ]
+                },
+                {
+                  "condition": "and",
+                  "conditions": [
+                    {
+                      "condition": "state",
+                      "entity_id": "[[entity_by_translation_key:charging_state]]",
+                      "state": [
+                        "on"
+                      ]
+                    },
+                    {
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "template",
+                          "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas false }}"
+                        },
+                        {
+                          "condition": "state",
+                          "entity_id": "[[entity_by_translation_key:state]]",
+                          "state": [
+                            "sweeping_and_mopping",
+                            "returning",
+                            "error",
+                            "sweeping",
+                            "charging_completed"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "sleeping"
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 8.14
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+              "state": [
+                "idle"
+              ]
+            },
+            {
+              "condition": "or",
+              "conditions": [
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:charging_state]]",
+                  "state": [
+                    "off"
+                  ]
+                },
+                {
+                  "condition": "and",
+                  "conditions": [
+                    {
+                      "condition": "state",
+                      "entity_id": "[[entity_by_translation_key:charging_state]]",
+                      "state": [
+                        "on"
+                      ]
+                    },
+                    {
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "template",
+                          "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas false }}"
+                        },
+                        {
+                          "condition": "state",
+                          "entity_id": "[[entity_by_translation_key:state]]",
+                          "state": [
+                            "sweeping_and_mopping",
+                            "returning",
+                            "error",
+                            "sweeping",
+                            "charging_completed"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "room_cleaning",
+                "standby",
+                "returning",
+                "error",
+                "paused",
+                "charging",
+                "idle"
+              ]
+            },
+            {
+              "condition": "and",
+              "conditions": [
+                {
+                  "condition": "state",
+                  "entity_id": "[[entity_by_translation_key:state]]",
+                  "state": [
+                    "sweeping_and_mopping",
+                    "paused",
+                    "returning",
+                    "idle",
+                    "sweeping"
+                  ]
+                },
+                {
+                  "condition": "template",
+                  "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas false }}"
+                }
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 0.42
+        }
       }
-    },
-    {
-      "fixed": {
-        "power": 2.6
-      }
-    }
-  ],
-  "created_at": "2026-07-27T17:24:26Z",
-  "device_type": "vacuum_robot",
-  "device_specs": {
-    "connectivity": [
-      "wifi"
-    ],
-    "rated_power": 46
+    ]
   },
-  "measure_description": "Measured with utils/measure script",
+  "created_at": "2026-11-01T18:27:30Z",
+  "device_type": "vacuum_robot",
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
-  "mains_voltage": 230,
   "measure_settings": {
+    "DUMMY_LOAD": false,
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 2.0,
-    "VERSION": "v0.2.1:app"
+    "VERSION": "v0.14.1:app"
   },
-  "name": "D10 Plus Robot Vacuum Cleaner",
-  "product_url": "https://global.dreametech.com/products/dreame-d10-plus",
-  "standby_power": 2.6,
+  "name": "",
+  "standby_power": 8.14,
   "voltage_range": {
-    "min": 227.5,
-    "max": 234.9
-  },
-  "aliases": [
-    "dreame.vacuum.r2205"
-  ],
-  "legacy_ids": [
-    "d10-plus"
-  ],
-  "authors": [
-    {
-      "name": "Maxik933",
-      "github": "Maxik933"
-    }
-  ]
+    "max": 229.6,
+    "min": 227.8
+  }
 }
