@@ -7,7 +7,7 @@ import { emit } from "../../utils/events";
 import { formChecked, formNumber, formRaw, formText, formTextOrNull } from "../../utils/form";
 import { sharedStyles } from "../../styles";
 import "./github-section";
-import "./power-meter-section";
+import { powerMeterStyles } from "./power-meter-section";
 
 interface SettingsSectionDescriptor {
   id: SettingsSection;
@@ -120,7 +120,7 @@ export class SettingsView extends LitElement {
 
   private readonly form = createRef<HTMLFormElement>();
 
-  static readonly styles = [sharedStyles, css`
+  static readonly styles = [sharedStyles, powerMeterStyles, css`
     :host { display: block; min-width: 0; max-width: 100%; }
     measure-settings-github-section, measure-settings-power-meter-section { display: contents; }
     form { display: grid; gap: 1rem; min-width: 0; max-width: 100%; margin-top: 1rem; }
@@ -134,21 +134,10 @@ export class SettingsView extends LitElement {
     .settings-section { min-width: 0; padding: 1rem 1.1rem 1.2rem; border: 1px solid var(--line); border-radius: 12px; }
     .settings-section h3 { margin: 0 0 0.35rem; color: var(--ink); font-size: 1rem; }
     .settings-section > .muted { margin: 0 0 1rem; }
-    .section-fields { display: grid; gap: 1rem; }
     .check { align-items: flex-start; gap: 0.6rem; }
     .check input { margin-top: 0.2rem; }
     .developer-option { margin-bottom: 1rem; padding: 0.85rem; border: 1px solid var(--signal); border-radius: 10px; background: color-mix(in srgb, var(--signal) 8%, transparent); }
     .developer-option strong { color: var(--ink); }
-    .quality-requirements { margin: -0.15rem 0 0; padding: 0.7rem 0.8rem; border-left: 3px solid var(--signal); background: color-mix(in srgb, var(--signal) 8%, transparent); color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
-    .test-row { display: grid; gap: 0.75rem; }
-    .test-row > button { justify-self: start; }
-    .test-row button { min-height: 40px; }
-    .discovery { display: grid; gap: 0.65rem; padding: 0.8rem; border: 1px solid var(--line); border-radius: 10px; background: color-mix(in srgb, var(--field) 68%, transparent); }
-    .discovery-header { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; }
-    .discovery-header strong { color: var(--ink); font-size: 0.82rem; }
-    .discovery-header button { min-height: 36px; padding: 0.45rem 0.7rem; }
-    .discovery-status { margin: 0; color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
-    .discovery-status.error { color: var(--danger); }
     .github-card { display: grid; gap: 0.8rem; padding: 0.85rem; border: 1px solid var(--line); border-radius: 10px; background: color-mix(in srgb, var(--field) 70%, transparent); }
     .github-card > button, .device-flow > button { justify-self: start; }
     .identity { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
@@ -215,7 +204,7 @@ export class SettingsView extends LitElement {
             <h2 id="settings-title">Measurement defaults</h2>
           </div>
         </div>
-        <p class="muted">Configure the measurement hardware once and set reusable defaults for new sessions.</p>
+        <p class="muted">Set defaults for new measurements. Existing drafts, running measurements, and completed sessions keep their own configuration.</p>
         <form ${ref(this.form)} @submit=${this.submit}>
           <div class="settings-layout">
             <nav class="settings-nav" aria-label="Settings sections">
