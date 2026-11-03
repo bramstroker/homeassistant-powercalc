@@ -10,7 +10,7 @@ import type { AppView, MeasureAppState } from "../../app-controller";
 import { reviewMetrics, reviewSummary } from "../preflight/summary";
 import { isAddressed, specFromRequest } from "../../power-meter/registry";
 import type { MeterContext } from "../../power-meter/registry";
-import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionFormValues, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SettingsSection, ShellyDiscoveryDevice } from "../../types";
+import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionFormValues, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SessionPowerMeter, SettingsSection, ShellyDiscoveryDevice } from "../../types";
 import { sharedStyles, themeStyles } from "../../styles";
 import { THEME_CHANGE_EVENT, applyDocumentTheme, nextThemePreference, readThemePreference, saveThemePreference } from "../../theme";
 import type { ThemePreference } from "../../theme";
@@ -20,6 +20,7 @@ import "../profile/submit-view";
 import "../result/view";
 import "../running/view";
 import "../settings/view";
+import "../settings/session-power-meter-view";
 import "../setup/view";
 import "../sessions/view";
 
@@ -59,6 +60,7 @@ export class AppShell extends LitElement implements MeasureAppState {
   snapshot?: SessionSnapshot;
   sessions: SessionSummary[] = [];
   request?: MeasurementRequest;
+  draftPowerMeter?: SessionPowerMeter;
   selectedMeasureType?: MeasureType;
   preflight?: PreflightResponse;
   files: SessionFile[] = [];
@@ -200,7 +202,7 @@ export class AppShell extends LitElement implements MeasureAppState {
                 <span aria-hidden="true">${themeIcon(this.themePreference)}</span>
               </button>
               <button class="topbar-action sessions-toggle" type="button" @click=${this.showSessions} ?disabled=${this.view === "loading" || this.view === "sessions"}>All sessions</button>
-              <button class="topbar-action settings-toggle" type="button" @click=${this.openSettings} ?disabled=${this.view === "loading" || this.view === "settings"}>Settings</button>
+              <button class="topbar-action settings-toggle" type="button" @click=${this.openSettings} ?disabled=${this.view === "loading" || this.view === "settings" || this.view === "power_meter"}>Settings</button>
             </div>
           </div>
           <div class="intro ${this.view === "sessions" ? "" : "compact"}">
@@ -241,6 +243,7 @@ export class AppShell extends LitElement implements MeasureAppState {
     switch (this.view) {
       case "loading": return this.renderLoading();
       case "settings": return this.renderSettings();
+      case "power_meter": return this.renderSessionPowerMeter();
       case "sessions": return this.renderSessions();
       case "review": return this.preflight && this.request ? this.renderReview() : this.renderSetup();
       case "running": return this.snapshot ? this.renderRunning(this.snapshot) : this.renderSetup();
@@ -281,6 +284,25 @@ export class AppShell extends LitElement implements MeasureAppState {
         @duplicate=${(event: CustomEvent<string>) => void this.controller.duplicateSession(event.detail)}
         @delete=${(event: CustomEvent<string>) => void this.controller.deleteSession(event.detail)}
       ></measure-sessions-view>`;
+  }
+
+  private renderSessionPowerMeter() {
+    return html`
+      <measure-session-power-meter-view
+        .configuration=${this.draftPowerMeter} .settings=${this.settings}
+        .powers=${this.powers} .voltages=${this.voltages}
+        .measureDevices=${this.measureDevices} .measureDevicesLoading=${this.measureDevicesLoading}
+        .measureDevicesError=${this.measureDevicesError} .busy=${this.busy}
+        .testing=${this.testingPowerMeter} .testResult=${this.powerMeterTestResult}
+        .shellyDiscoveryDevices=${this.shellyDiscoveryDevices} .discoveringShellys=${this.discoveringShellys}
+        .shellyDiscoveryError=${this.shellyDiscoveryError} .shellyDiscoveryAvailable=${this.shellyDiscoveryAvailable}
+        .shellyDiscoveryMessage=${this.shellyDiscoveryMessage}
+        @back=${() => this.controller.closePowerMeterEditor()}
+        @save=${(event: CustomEvent<SessionPowerMeter>) => void this.controller.saveSessionPowerMeter(event.detail)}
+        @test=${(event: CustomEvent<AppSettingsUpdate>) => void this.controller.testPowerMeter(event.detail)}
+        @test-clear=${() => this.controller.clearPowerMeterTestResult()}
+        @shelly-discover=${() => void this.controller.discoverShellys()}
+      ></measure-session-power-meter-view>`;
   }
 
   private renderReview() {
@@ -389,19 +411,19 @@ export class AppShell extends LitElement implements MeasureAppState {
         .initialType=${this.pendingType()} .initialRequest=${this.request}
         .dummyLoadCalibration=${this.dummyLoadCalibration}
         .meter=${this.meterSpec()}
-        .defaultMeasureDevice=${this.request?.measure_device ?? this.settings?.default_measure_device ?? ""}
+        .defaultMeasureDevice=${this.draftPowerMeter?.measure_device ?? this.request?.measure_device ?? this.settings?.default_measure_device ?? ""}
         .powerMeterConfigured=${this.powerMeterConfigured()}
         .busy=${this.busy} .errorMessage=${this.errorMessage} .errorHelp=${this.errorHelp}
         @preflight=${(event: CustomEvent<MeasurementRequest>) => void this.controller.preflight(event.detail)}
         @measure-type-selected=${(event: CustomEvent<MeasureType>) => this.controller.selectMeasureType(event.detail)}
         @entity-domains-requested=${(event: CustomEvent<string[]>) => this.controller.loadEntityDomains(event.detail)}
-        @open-settings=${this.openSettings}
+        @open-settings=${() => this.controller.openPowerMeterEditor()}
       ></measure-setup-view>`;
   }
 
   /** The meter the setup form should start from: the draft's own, else the saved default. */
   private meterSpec(): PowerMeterSpec {
-    return specFromRequest(this.request, this.settings, this.meterContext());
+    return this.draftPowerMeter?.power_meter ?? specFromRequest(this.request, this.settings, this.meterContext());
   }
 
   private meterContext(): MeterContext {
@@ -409,9 +431,9 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
 
   private powerMeterConfigured(): boolean {
-    const device = this.request ? this.request.measure_device : this.settings?.default_measure_device;
+    const device = this.draftPowerMeter?.measure_device ?? this.request?.measure_device ?? this.settings?.default_measure_device;
     if (!device) return false;
-    if (!this.request && !this.settings?.power_meter) return false;
+    if (!this.draftPowerMeter && !this.request && !this.settings?.power_meter) return false;
     return isAddressed(this.meterSpec());
   }
 
