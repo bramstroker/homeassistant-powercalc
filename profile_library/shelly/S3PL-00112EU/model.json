@@ -25,7 +25,8 @@
     "3800235261859"
   ],
   "discovery_by": "entity",
-  "measure_description": "Measured using the Powercalc measurement tool with a second Shelly Plug S Gen3 reference meter and a 33.7 W ohmic load configured as a dummy load in the tool. Values averaged over 60 seconds per state across multiple settings combinations. Firmware version 2.1.1.",  "measure_device": "Shelly Plug S Gen3",
+  "measure_description": "Measured using the Powercalc measurement tool with a second Shelly Plug S Gen3 reference meter and a 33.7 W ohmic load configured as a dummy load in the tool. Values averaged over 60 seconds per state across multiple settings combinations. Firmware version 2.1.1.",
+  "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "mains_voltage": 230,
   "measure_settings": {
