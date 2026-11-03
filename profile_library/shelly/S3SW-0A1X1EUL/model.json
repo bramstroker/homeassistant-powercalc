@@ -15,8 +15,9 @@
     "power_monitoring": false,
     "connectivity": [
       "wifi",
+      "bluetooth",
       "matter",
-      "bluetooth"
+      "knx"
     ],
     "rated_power": 1.2
   },
