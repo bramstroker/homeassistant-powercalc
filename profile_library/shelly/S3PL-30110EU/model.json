@@ -16,7 +16,8 @@
     "connectivity": [
       "wifi",
       "bluetooth",
-      "matter"
+      "matter",
+      "knx"
     ]
   },
   "gtin": [

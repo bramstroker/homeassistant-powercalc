@@ -17,7 +17,8 @@
       "wifi",
       "bluetooth",
       "matter",
-      "zigbee"
+      "zigbee",
+      "knx"
     ]
   },
   "gtin": [
