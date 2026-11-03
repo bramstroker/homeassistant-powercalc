@@ -7,8 +7,7 @@
   ],
   "calculation_strategy": "fixed",
   "description": "Smart Wi-Fi Plug with Power Monitoring & Matter",
-  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\"WLAN + BT + ECO\": All three turned on, repeater turned off.\n\"WLAN + ECO\": Both turned on, repeater turned off.\n\"WLAN + BT\": Both turned on, ECO and repeater turned off.\n\"WLAN\": Only WLAN turned on, ECO and repeater turned off.",
-  "created_at": "2026-11-01T21:30:05Z",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\nNote: The Wi-Fi repeater function was disabled during all measurements.\n\nLED status indicator variants:\n- \"LED\": LED mode set to \"Power/Status\", green color at 100% brightness when relay is ON, off when relay is OFF.\n- \"No LED\": Status LED indicator disabled completely.\n\nSub-profile configurations:\n\"WLAN + BT + ECO\": All three turned on.\n\"WLAN + ECO\": Both turned on.\n\"WLAN + BT\": Both turned on, ECO turned off.\n\"WLAN\": Only WLAN turned on, ECO turned off.",  "created_at": "2026-11-01T21:30:05Z",
   "device_type": "smart_switch",
   "device_specs": {
     "form_factor": "plug",
@@ -25,8 +24,7 @@
     "3800235261859"
   ],
   "discovery_by": "entity",
-  "measure_description": "Measured using the Powercalc measurement tool with a second Shelly Plug S Gen3 reference meter and a 33.7 W ohmic load configured as a dummy load in the tool. Values averaged over 60 seconds per state across multiple settings combinations. Firmware version 2.1.1.",
-  "measure_device": "Shelly Plug S Gen3",
+  "measure_description": "Measured using the Powercalc measurement tool with a second Shelly Plug S Gen3 reference meter and a 33.7 W ohmic load configured as a dummy load in the tool. Values averaged over 60 seconds per state across multiple settings combinations. For sub-profiles with LED enabled, the LED was set to full brightness only when the relay was active. Firmware version 2.1.1."  "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "mains_voltage": 230,
   "measure_settings": {
