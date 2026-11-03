@@ -11,6 +11,12 @@ The app supports these power-meter types:
 
 Configure the measurement device once from the app settings before creating a session. Select the power-meter type, choose or discover the sensor or plug, and choose the meter name used by existing Powercalc profiles. The app loads these canonical names from the published library. You can still type a name when your meter is not listed or the library is temporarily unavailable.
 
+**Settings** saves defaults for future measurements. Saving Settings leaves existing drafts, running measurements, and completed sessions unchanged, including when opened from the setup screen.
+
+Use **Change** beside the power meter in measurement setup to select a different meter or measurement-device name for that draft only. The editor starts with the draft's current configuration. For Home Assistant sensors, it also lets you change or clear the associated voltage sensor. **Cancel** discards your edits. Shelly and Tapo authentication continues to use credentials saved in Settings.
+
+New measurements start with the global defaults. **Measure again** copies the original session's configuration into a new draft, which you can edit without changing the original session or the global defaults.
+
 Use **Test connection** to sample the configured meter before starting a long run. For Home Assistant sensors, the app checks:
 
 - whether readings can be retrieved;
