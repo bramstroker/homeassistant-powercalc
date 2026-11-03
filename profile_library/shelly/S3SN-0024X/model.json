@@ -16,7 +16,6 @@
     "connectivity": [
       "wifi",
       "bluetooth",
-      "matter",
       "knx"
     ]
   },
