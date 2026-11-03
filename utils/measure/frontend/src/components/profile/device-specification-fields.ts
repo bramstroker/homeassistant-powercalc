@@ -126,6 +126,7 @@ function optionLabel(value: string): string {
     usb: "USB",
     wifi: "Wi-Fi",
     zwave: "Z-Wave",
+    knx: "KNX",
   };
   if (abbreviations[value]) return abbreviations[value];
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
