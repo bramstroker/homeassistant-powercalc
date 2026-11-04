@@ -1,0 +1,20 @@
+{
+  "name": "SBS50 Base Station",
+  "device_type": "network",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "fixed_config": {
+    "power": 0.37
+  },
+  "standby_power": 0.37,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "Measured via USB power meter, fluctuates between 0.30 and 0.58 W",
+  "created_at": "2026-03-25T14:20:24Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
