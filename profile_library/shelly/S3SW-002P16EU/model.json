@@ -10,7 +10,9 @@
     "rated_power": 1.4,
     "connectivity": [
       "wifi",
-      "bluetooth"
+      "bluetooth",
+      "matter",
+      "knx"
     ]
   },
   "calculation_strategy": "multi_switch",
