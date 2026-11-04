@@ -23436,8 +23436,9 @@
             "rated_power": 1,
             "connectivity": [
               "wifi",
+              "bluetooth",
               "matter",
-              "bluetooth"
+              "knx"
             ]
           },
           "gtin": [
@@ -23464,7 +23465,7 @@
           ],
           "id": "S3PL-00112EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T02:37:16",
           "max_power": 0.69,
           "sub_profile_count": 2,
           "power_range": {
@@ -23472,7 +23473,7 @@
             "max": 0.69
           },
           "standby_power": 0.4,
-          "hash": "d39460605d87587923d8b4ec1348ced3"
+          "hash": "af6be15b41df51ab0ad97bdb68efa8a0"
         },
         {
           "aliases": [
@@ -23491,7 +23492,8 @@
             "connectivity": [
               "wifi",
               "bluetooth",
-              "matter"
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -23515,7 +23517,7 @@
           ],
           "id": "S3PL-30110EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-10-03T16:55:09",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": 1.22,
           "sub_profile_count": 8,
           "power_range": {
@@ -23523,7 +23525,7 @@
             "max": 1.22
           },
           "standby_power": 0.68,
-          "hash": "9f0a12bb3a3fb684ceabb30ddc4ba963"
+          "hash": "cea6c3690dbb54b1576f60087b7fd589"
         },
         {
           "aliases": [
@@ -23584,7 +23586,8 @@
             "rated_power": 1,
             "connectivity": [
               "wifi",
-              "bluetooth"
+              "bluetooth",
+              "knx"
             ]
           },
           "gtin": [
@@ -23608,14 +23611,14 @@
           ],
           "id": "S3SN-0024X",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T22:00:28",
           "max_power": 0.52,
           "sub_profile_count": 3,
           "power_range": {
             "min": 0.15,
             "max": 0.52
           },
-          "hash": "c7aa95c2862e98488d360605dae47e81"
+          "hash": "a7038e626100b4c7d262bb24f6413fcd"
         },
         {
           "aliases": [
@@ -23633,7 +23636,8 @@
             "connectivity": [
               "wifi",
               "bluetooth",
-              "matter"
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -23657,7 +23661,7 @@
           ],
           "id": "S3SW-001P16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T01:51:11",
           "max_power": 0.87,
           "sub_profile_count": 4,
           "power_range": {
@@ -23665,7 +23669,7 @@
             "max": 0.87
           },
           "standby_power": 0.62,
-          "hash": "c48fd6103309de7a61264d61f10c5d66"
+          "hash": "b1c5c58d4c4174c53334ea7dc170b5e3"
         },
         {
           "aliases": [
@@ -23685,7 +23689,9 @@
             "rated_power": 1.2,
             "connectivity": [
               "wifi",
-              "bluetooth"
+              "bluetooth",
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -23709,7 +23715,7 @@
           ],
           "id": "S3SW-001P8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T01:51:11",
           "max_power": 0.86,
           "sub_profile_count": 3,
           "power_range": {
@@ -23717,7 +23723,7 @@
             "max": 0.86
           },
           "standby_power": 0.58,
-          "hash": "d631728ffa668f0c9eea63881f12a7f3"
+          "hash": "9ec2acb2fa362c9fab9c539afb428d6d"
         },
         {
           "measure_description": "The measured device fw: 1.7.1. The result represents the average value of measurements collected from the measuring device API for the following scenarios: dumb device/baseline consumption (~3.8W) and several device configurations. See sub-profiles.",
@@ -23744,7 +23750,9 @@
             "rated_power": 1.2,
             "connectivity": [
               "wifi",
-              "bluetooth"
+              "bluetooth",
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -23764,7 +23772,7 @@
           ],
           "id": "S3SW-001X16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": 1.332,
           "sub_profile_count": 16,
           "power_range": {
@@ -23772,7 +23780,7 @@
             "max": 1.332
           },
           "standby_power": 1.087,
-          "hash": "38f18640b59566c7255dfa54076652ff"
+          "hash": "14d31a7feedd6fa9c3af31628a74f7ca"
         },
         {
           "aliases": [
@@ -23791,7 +23799,9 @@
             "rated_power": 1.2,
             "connectivity": [
               "wifi",
-              "bluetooth"
+              "bluetooth",
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -23814,7 +23824,7 @@
           ],
           "id": "S3SW-001X8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T01:51:11",
           "max_power": 0.81,
           "sub_profile_count": 3,
           "power_range": {
@@ -23822,7 +23832,7 @@
             "max": 0.81
           },
           "standby_power": 0.53,
-          "hash": "acfbf127975cfd26a8f54f8c2fa6cd45"
+          "hash": "ee802c773bd967ed72f147360d2ee521"
         },
         {
           "name": "2PM Gen3",
@@ -23836,7 +23846,9 @@
             "rated_power": 1.4,
             "connectivity": [
               "wifi",
-              "bluetooth"
+              "bluetooth",
+              "matter",
+              "knx"
             ]
           },
           "calculation_strategy": "multi_switch",
@@ -23858,10 +23870,10 @@
           ],
           "id": "S3SW-002P16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-10-04T16:42:37",
+          "updated_at": "2026-11-03T01:51:11",
           "max_power": null,
           "sub_profile_count": 8,
-          "hash": "ef0b81d95f048b90b0b4e166758769bf"
+          "hash": "64885624e6c96c495290b520d6da9fc2"
         },
         {
           "aliases": [
@@ -23879,8 +23891,9 @@
             "power_monitoring": false,
             "connectivity": [
               "wifi",
+              "bluetooth",
               "matter",
-              "bluetooth"
+              "knx"
             ],
             "rated_power": 1.2
           },
@@ -23908,7 +23921,7 @@
           ],
           "id": "S3SW-0A1X1EUL",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-19T10:31:28",
+          "updated_at": "2026-11-03T01:51:11",
           "max_power": 2.366,
           "sub_profile_count": 5,
           "power_range": {
@@ -23916,7 +23929,7 @@
             "max": 2.366
           },
           "standby_power": 0.15,
-          "hash": "9899df27a01d6e687dcb5de8b7dbda1c"
+          "hash": "37be1c0a3222f58798ff15ed94756ddf"
         },
         {
           "aliases": [
@@ -23986,7 +23999,8 @@
               "zigbee",
               "wifi",
               "matter",
-              "bluetooth"
+              "bluetooth",
+              "knx"
             ]
           },
           "gtin": [
@@ -24013,7 +24027,7 @@
           ],
           "id": "S4SW-001P8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": 0.996,
           "sub_profile_count": 4,
           "power_range": {
@@ -24021,7 +24035,7 @@
             "max": 0.996
           },
           "standby_power": 0.732,
-          "hash": "94221ad3aaa76461dabed1232e6112e5"
+          "hash": "4b2c77371ed4a7c6861740ae9171ad23"
         },
         {
           "aliases": [
@@ -24041,7 +24055,8 @@
               "wifi",
               "bluetooth",
               "zigbee",
-              "matter"
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -24065,7 +24080,7 @@
           ],
           "id": "S4SW-001X16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-10-24T02:11:06",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": 0.86,
           "sub_profile_count": 8,
           "power_range": {
@@ -24073,7 +24088,7 @@
             "max": 0.86
           },
           "standby_power": 0.6,
-          "hash": "3b3a4b443f42c074df85b5d7eb83de16"
+          "hash": "8f5c024f19ad13108c6f6231e1fea70f"
         },
         {
           "aliases": [
@@ -24094,7 +24109,8 @@
               "zigbee",
               "wifi",
               "matter",
-              "bluetooth"
+              "bluetooth",
+              "knx"
             ]
           },
           "gtin": [
@@ -24120,7 +24136,7 @@
           ],
           "id": "S4SW-001X8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": 0.94,
           "sub_profile_count": 4,
           "power_range": {
@@ -24128,7 +24144,7 @@
             "max": 0.94
           },
           "standby_power": 0.655,
-          "hash": "66e8e8875570cf4dfe68b9f0434bdb27"
+          "hash": "9ca0da8b0e328122e0a2203da4eec880"
         },
         {
           "aliases": [
@@ -24148,7 +24164,8 @@
               "wifi",
               "bluetooth",
               "matter",
-              "zigbee"
+              "zigbee",
+              "knx"
             ]
           },
           "gtin": [
@@ -24172,11 +24189,11 @@
           ],
           "id": "S4SW-002P16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T22:57:57",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": null,
           "sub_profile_count": 4,
           "standby_power": 0.62,
-          "hash": "e3d9bfd34e63150abcb439043b141e18"
+          "hash": "823f78830174d7c00ce5133eb0b4062a"
         },
         {
           "aliases": [
