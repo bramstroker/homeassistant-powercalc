@@ -15,7 +15,8 @@
     "rated_power": 1,
     "connectivity": [
       "wifi",
-      "bluetooth"
+      "bluetooth",
+      "knx"
     ]
   },
   "gtin": [

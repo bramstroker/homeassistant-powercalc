@@ -826,7 +826,8 @@
               "usb",
               "rf433",
               "infrared",
-              "proprietary"
+              "proprietary",
+              "knx"
             ]
           },
           "description": "Protocols the device communicates over"

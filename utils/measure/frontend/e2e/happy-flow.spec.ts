@@ -97,7 +97,7 @@ test("preserves unfinished setup through settings and resets it for a new measur
   await duration.fill("300");
   await sessionName.fill("Living room standby");
   await page.getByRole("button", { name: "Change power meter" }).click();
-  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
   await expect(duration).toHaveValue("300");
   await expect(sessionName).toHaveValue("Living room standby");
   await duration.fill("");
@@ -814,13 +814,13 @@ test("validates email and repeated manufacturer names when leaving the field", a
   await expect(email).toHaveAttribute("aria-invalid", "false");
 });
 
-test("opens settings from setup with the configured power meter", async ({ page }) => {
+test("opens the session editor from setup with the configured power meter", async ({ page }) => {
   await startAverageSetup(page);
   await page.getByRole("button", { name: "Change power meter" }).click();
 
-  await expect(page.getByRole("heading", { name: "Measurement defaults" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Power meter for this measurement" })).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Power measurement device" })).toHaveValue("Shelly Plug S");
-  await expect(page.getByLabel("Power measurement device firmware")).toHaveValue("1.2.3");
+  await expect(page.getByLabel("Power measurement device firmware")).toHaveCount(0);
   await expect(page.getByRole("combobox", { name: "Type", exact: true })).toHaveValue("Home Assistant sensor");
   await expect(page.getByRole("combobox", { name: "Power sensor" })).toHaveValue("Plug power");
 
@@ -834,10 +834,7 @@ test("opens settings from setup with the configured power meter", async ({ page 
   await expect(deviceName).toHaveValue("Shelly Plus Plug S");
   await expect(page.getByRole("listbox", { name: "Power measurement device options" })).toBeHidden();
 
-  await page.getByRole("button", { name: "Profile metadata" }).click();
-  await expect(page.getByLabel("Contributor name")).toHaveValue("Powercalc Tester");
-  await expect(page.getByLabel("GitHub username")).toHaveValue("powercalc-tester");
-  await expect(page.getByLabel("Email (optional)")).toHaveValue("tester@example.com");
+  await expect(page.getByRole("button", { name: "Profile metadata" })).toHaveCount(0);
 });
 
 for (const duplicated of [false, true]) {
@@ -848,9 +845,10 @@ for (const duplicated of [false, true]) {
         ip_address: "192.168.1.50", supported: true, reason: null, auth_required: false, channels: [0, 1, 2, 3],
       }],
     } }));
-    await page.route("**/api/settings", (route) => route.fulfill({ json: {
-      ...settings, ...route.request().postDataJSON(),
-    } }));
+    let settingsWrites = 0;
+    page.on("request", (request) => {
+      if (request.url().endsWith("/api/settings") && request.method() === "PUT") settingsWrites += 1;
+    });
     if (duplicated) {
       await page.route("**/api/sessions/session-completed", (route) => route.fulfill({ json: {
         ...completedSnapshot,
@@ -878,12 +876,20 @@ for (const duplicated of [false, true]) {
     await page.getByRole("option", { name: "Outlet 4", exact: true }).click();
     await page.setViewportSize({ width: 390, height: 844 });
     await page.screenshot({ path: testInfo.outputPath("shelly-outlet-settings.png"), fullPage: true });
-    const saved = page.waitForRequest((request) => request.url().endsWith("/api/settings") && request.method() === "PUT");
-    await page.getByRole("button", { name: "Save settings" }).click();
-    expect((await saved).postDataJSON()).toMatchObject({ shelly_channel: 3, shelly_ip: "192.168.1.50", default_measure_device: "Shelly Plus Plug S" });
+    await page.getByRole("button", { name: "Use for this measurement" }).click();
     await expect(page.getByText("192.168.1.50 · Outlet 4", { exact: true })).toBeVisible();
     await expect(page.getByText("Measurement device: Shelly Plus Plug S", { exact: true })).toBeVisible();
     await expect(page.locator('input[name="session_name"]')).toHaveValue("Updated meter measurement");
+    await page.getByRole("button", { name: /Settings/ }).click();
+    await expect(page.getByRole("combobox", { name: "Power measurement device", exact: true })).toHaveValue("Shelly Plug S");
+    await expect(page.getByRole("combobox", { name: "Type", exact: true })).toHaveValue("Home Assistant sensor");
+    await page.getByRole("button", { name: "Back", exact: true }).click();
+    await page.getByRole("button", { name: "Change power meter" }).click();
+    await expect(page.getByRole("combobox", { name: "Type", exact: true })).toHaveValue("Shelly plug");
+    await expect(page.getByRole("textbox", { name: /Shelly IP address/ })).toHaveValue("192.168.1.50");
+    await expect(page.getByRole("combobox", { name: "Outlet", exact: true })).toHaveValue("Outlet 4");
+    await page.getByRole("button", { name: "Cancel", exact: true }).click();
+    expect(settingsWrites).toBe(0);
     const checked = page.waitForRequest("**/api/preflight");
     await page.getByRole("button", { name: "Check setup" }).click();
     expect((await checked).postDataJSON()).toMatchObject({
@@ -893,6 +899,39 @@ for (const duplicated of [false, true]) {
     });
   });
 }
+
+test("keeps a draft's meter when saving global settings and uses the new defaults for a fresh measurement", async ({ page }) => {
+  await startAverageSetup(page);
+  const sessionName = page.locator('input[name="session_name"]');
+  await sessionName.fill("Keep this draft");
+  let savedSettings = settings;
+  await page.route("**/api/settings", (route) => {
+    if (route.request().method() === "PUT") savedSettings = { ...savedSettings, ...route.request().postDataJSON() };
+    return route.fulfill({ json: savedSettings });
+  });
+  await page.getByRole("button", { name: /Settings/ }).click();
+  await page.getByRole("combobox", { name: "Power measurement device", exact: true }).fill("Future meter");
+  await page.getByRole("combobox", { name: "Type", exact: true }).click();
+  await page.getByRole("option", { name: "TP-Link Kasa / Tapo plug", exact: true }).click();
+  await page.getByLabel("TP-Link Kasa / Tapo IP address").fill("192.0.2.20");
+  await page.getByRole("button", { name: "Save settings", exact: true }).click();
+  await expect(sessionName).toHaveValue("Keep this draft");
+  await expect(page.getByText("Measurement device: Shelly Plug S", { exact: true })).toBeVisible();
+  await expect(page.getByText("Plug power · sensor.plug_power", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Change power meter" }).click();
+  await expect(page.getByRole("combobox", { name: "Power measurement device", exact: true })).toHaveValue("Shelly Plug S");
+  await expect(page.getByRole("combobox", { name: "Type", exact: true })).toHaveValue("Home Assistant sensor");
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  const checked = page.waitForRequest("**/api/preflight");
+  await page.getByRole("button", { name: "Check setup" }).click();
+  expect((await checked).postDataJSON()).toMatchObject({
+    power_meter: { type: "hass", entity_id: "sensor.plug_power" }, measure_device: "Shelly Plug S",
+  });
+  await page.getByRole("button", { name: "All sessions", exact: true }).click();
+  await startAverageSetup(page);
+  await expect(page.getByText("Measurement device: Future meter", { exact: true })).toBeVisible();
+  await expect(page.getByText("192.0.2.20", { exact: true })).toBeVisible();
+});
 
 test("shows an interrupted recording and its recovery after reloading on mobile", async ({ page }, testInfo) => {
   let snapshot: SessionSnapshot = {
