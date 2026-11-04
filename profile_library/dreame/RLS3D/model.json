@@ -1,132 +1,173 @@
 {
+  "aliases": [
+    "dreame.vacuum.r2205"
+  ],
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
+  ],
   "calculation_strategy": "composite",
   "compatible_integrations": [
     "dreame_vacuum"
   ],
-  "composite_config": [
-    {
-      "condition": {
-        "condition": "state",
-        "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
-        "state": "active"
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+          "state": [
+            "active"
+          ]
+        },
+        "fixed": {
+          "power": 400
+        }
       },
-      "fixed": {
-        "power": 648
-      }
-    },
-    {
-      "condition": {
-        "condition": "and",
-        "conditions": [
-          {
-            "condition": "state",
-            "entity_id": "[[entity]]",
-            "state": "docked"
-          },
-          {
-            "condition": "state",
-            "entity_id": "[[entity_by_translation_key:charging_state]]",
-            "state": "on"
-          }
-        ]
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+              "state": [
+                "idle"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:charging_state]]",
+              "state": [
+                "on"
+              ]
+            },
+            {
+              "condition": "template",
+              "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas true }}"
+            },
+            {
+              "condition": "numeric_state",
+              "entity_id": "[[entity_by_translation_key:battery_level]]",
+              "below": 100
+            }
+          ]
+        },
+        "entity_id": "[[entity_by_translation_key:battery_level]]",
+        "linear": {
+          "calibrate": [
+            "0 -> 20.14",
+            "16 -> 20.14",
+            "17 -> 20.19",
+            "18 -> 20.26",
+            "19 -> 20.24",
+            "20 -> 20.27",
+            "21 -> 20.28",
+            "22 -> 20.30",
+            "23 -> 20.37",
+            "24 -> 20.37",
+            "25 -> 20.42",
+            "26 -> 20.39",
+            "27 -> 20.44",
+            "28 -> 20.49",
+            "29 -> 20.46",
+            "30 -> 20.48",
+            "31 -> 20.54",
+            "32 -> 20.54",
+            "33 -> 20.57",
+            "34 -> 20.55",
+            "35 -> 20.69",
+            "36 -> 20.75",
+            "37 -> 20.74",
+            "38 -> 20.81",
+            "39 -> 20.81",
+            "40 -> 20.81",
+            "41 -> 21.08",
+            "42 -> 21.11",
+            "43 -> 20.96",
+            "44 -> 20.85",
+            "45 -> 20.81",
+            "46 -> 20.86",
+            "47 -> 20.84",
+            "48 -> 20.92",
+            "49 -> 20.91",
+            "50 -> 21.01",
+            "51 -> 20.96",
+            "52 -> 20.97",
+            "53 -> 21.02",
+            "54 -> 21.09",
+            "55 -> 21.08",
+            "56 -> 21.14",
+            "57 -> 21.14",
+            "58 -> 21.14",
+            "59 -> 21.15",
+            "60 -> 21.18",
+            "61 -> 21.2",
+            "62 -> 21.29",
+            "63 -> 21.28",
+            "64 -> 21.31",
+            "65 -> 21.37",
+            "66 -> 21.39",
+            "67 -> 21.44",
+            "68 -> 21.67",
+            "69 -> 21.58",
+            "70 -> 21.61",
+            "71 -> 21.62",
+            "72 -> 21.61",
+            "73 -> 21.71",
+            "74 -> 21.74",
+            "75 -> 21.81",
+            "76 -> 21.84",
+            "77 -> 21.86",
+            "78 -> 21.95",
+            "79 -> 21.95",
+            "80 -> 21.98",
+            "81 -> 22.01",
+            "82 -> 22.05",
+            "83 -> 22.14",
+            "84 -> 22.12",
+            "85 -> 22.22",
+            "86 -> 22.25",
+            "87 -> 22.32",
+            "88 -> 22.35",
+            "89 -> 22.42",
+            "90 -> 22.42",
+            "91 -> 22.48",
+            "92 -> 22.51",
+            "93 -> 22.61",
+            "94 -> 22.64",
+            "95 -> 22.66",
+            "96 -> 22.74",
+            "97 -> 22.72",
+            "98 -> 22.79",
+            "99 -> 17.34"
+          ]
+        }
       },
-      "linear": {
-        "calibrate": [
-          "15 -> 17.31",
-          "16 -> 20.14",
-          "17 -> 20.19",
-          "18 -> 20.26",
-          "19 -> 20.24",
-          "20 -> 20.27",
-          "21 -> 20.28",
-          "22 -> 20.3",
-          "23 -> 20.37",
-          "24 -> 20.37",
-          "25 -> 20.42",
-          "26 -> 20.39",
-          "27 -> 20.44",
-          "28 -> 20.49",
-          "29 -> 20.46",
-          "30 -> 20.48",
-          "31 -> 20.54",
-          "32 -> 20.54",
-          "33 -> 20.57",
-          "34 -> 20.55",
-          "35 -> 20.57",
-          "36 -> 20.64",
-          "37 -> 20.6",
-          "38 -> 20.67",
-          "39 -> 20.65",
-          "40 -> 20.75",
-          "41 -> 20.73",
-          "42 -> 20.71",
-          "43 -> 20.71",
-          "44 -> 20.73",
-          "45 -> 20.75",
-          "46 -> 20.77",
-          "47 -> 20.77",
-          "48 -> 20.79",
-          "49 -> 20.86",
-          "50 -> 20.84",
-          "51 -> 20.92",
-          "52 -> 20.93",
-          "53 -> 20.86",
-          "54 -> 21.0",
-          "55 -> 20.93",
-          "56 -> 21.02",
-          "57 -> 21.0",
-          "58 -> 21.04",
-          "59 -> 21.08",
-          "60 -> 21.09",
-          "61 -> 21.13",
-          "62 -> 21.17",
-          "63 -> 21.19",
-          "64 -> 21.21",
-          "65 -> 21.26",
-          "66 -> 21.26",
-          "67 -> 21.29",
-          "68 -> 21.35",
-          "69 -> 21.36",
-          "70 -> 21.42",
-          "71 -> 21.48",
-          "72 -> 21.55",
-          "73 -> 21.56",
-          "74 -> 21.6",
-          "75 -> 21.6",
-          "76 -> 21.68",
-          "77 -> 21.72",
-          "78 -> 21.8",
-          "79 -> 21.85",
-          "80 -> 21.87",
-          "81 -> 21.91",
-          "82 -> 21.95",
-          "83 -> 21.98",
-          "84 -> 22.08",
-          "85 -> 22.09",
-          "86 -> 22.13",
-          "87 -> 22.23",
-          "88 -> 22.21",
-          "89 -> 22.26",
-          "90 -> 22.32",
-          "91 -> 22.37",
-          "92 -> 22.42",
-          "93 -> 22.45",
-          "94 -> 22.47",
-          "95 -> 22.54",
-          "96 -> 22.62",
-          "97 -> 22.67",
-          "98 -> 21.66",
-          "99 -> 15.97",
-          "100 -> 8.14"
-        ]
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "template",
+              "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas true }}"
+            }
+          ]
+        },
+        "fixed": {
+          "power": 2.36
+        }
+      },
+      {
+        "fixed": {
+          "power": 0.45
+        }
       }
-    },
-    {
-      "fixed": {
-        "power": 2.6
-      }
-    }
-  ],
+    ]
+  },
   "created_at": "2026-07-27T17:24:26Z",
   "device_type": "vacuum_robot",
   "device_specs": {
@@ -135,32 +176,25 @@
     ],
     "rated_power": 46
   },
-  "measure_description": "Measured with utils/measure script",
+  "mains_voltage": 230,
+  "measure_description": "Measured on a Dreame D10 Plus (dreame.vacuum.r2205) through the dreame_vacuum integration with a Shelly Plug S Gen3 between the wall socket and the base station, so every value covers the whole station rather than the robot alone. All values are time averages over the window in which the matching condition holds, not peak values.\n\nRecordings:\n- 4.66 h run covering a full clean from 99 % down to 34 % and the charge back to 100 % (8,083 samples, about 2 s interval).\n- Two dock-only runs of about 2 minutes each at 100 %, used to confirm the settled docked level.\n\nCoverage:\n- Away from the dock (cleaning, returning, paused, error): 0.45 W, from 1,911 samples between 0.35 and 0.54 W.\n- Auto-empty: auto_empty_status is active for only about 8 to 13 s per cycle. The plateau inside that window is 668 W on the long run and 653 W on the dock-only runs, but its first 4 to 6 s are still at dock level (2 to 21 W) and one intermediate sample of 198 to 242 W was captured. The 400 W used here is the average over the complete active interval (33 samples), which is the interval the condition actually spans, so the ramp-up is included instead of being reported as a peak.\n- Docked and idle: 2.36 W. The long run settles at 2.36 W and both dock-only runs confirm it (2.36 W and 2.42 W).\n- Charging: one calibration point per battery level, median of each level. 35 % to 99 % comes from the new recording (32 to 124 samples per level, spread within a level about 0.1 W). 16 % to 34 % is taken unchanged from the previous recording of the same device, because that range was not covered by the new run; in the overlapping range 35 % to 39 % both recordings agree within 0.2 W (the new values sit 0.12 to 0.16 W higher). The 15 % point of the previous profile (17.31 W) was not carried over because it captures the charging ramp-in rather than the steady level, so everything below 16 % uses the 16 % value as a flat estimate.\n\nWhole-run energy: over the complete long recording the measured consumption is 75.63 Wh, while the profile predicts 71.15 Wh, an underestimate of 5.9 %. Most of that difference comes from the unmodelled post-charge decay described below.\n\nLimitations:\n- The first 31 minutes after a charge are not modelled separately. Directly after charging finishes the station still draws 14.9 W and decays to about 2.4 W over roughly 31 minutes (measured: 4.47 Wh in that window). Since the profile reports the settled 2.36 W there instead, each completed charge is under-counted by about 3.25 Wh. Modelling the decay would require a time-based template on charging_state.last_changed, which restarts on every Home Assistant restart or unavailable-to-off transition of that entity and would then overstate power for a full window, so the settled value is used instead on purpose.\n- The transition at 100 % is therefore not distinguished either: charging_state drops while the robot still reports 'charging' (about 15.0 W for roughly 10 s after a full charge, but only 2.4 to 2.8 W on a settled dock). That window falls into the docked branch.\n- Charging below 16 % is a flat extrapolation and not measured.\n- Two samples in the long run show an auto-empty while auto_empty_status still reports 'idle' (651 W). That combination is not modelled and falls through to the docked branch.\n- All values were recorded at a single mains voltage around 229 V.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "script",
-  "mains_voltage": 230,
   "measure_settings": {
+    "DUMMY_LOAD": false,
     "SAMPLE_COUNT": 1,
     "SLEEP_TIME": 2.0,
-    "VERSION": "v0.2.1:app"
+    "VERSION": "v0.14.1:app"
   },
   "name": "D10 Plus Robot Vacuum Cleaner",
   "product_url": "https://global.dreametech.com/products/dreame-d10-plus",
-  "standby_power": 2.6,
-  "voltage_range": {
-    "min": 227.5,
-    "max": 234.9
-  },
-  "aliases": [
-    "dreame.vacuum.r2205"
-  ],
   "legacy_ids": [
     "d10-plus"
   ],
-  "authors": [
-    {
-      "name": "Maxik933",
-      "github": "Maxik933"
-    }
-  ]
+  "min_version": "v1.25.5",
+  "standby_power": 2.36,
+  "voltage_range": {
+    "min": 227.5,
+    "max": 234.9
+  }
 }
