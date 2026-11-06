@@ -35,6 +35,7 @@ from custom_components.powercalc.errors import (
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.validation import vol
 
+from .battery_rate import BatteryRateStrategy
 from .composite import (
     COMPOUND_CONDITIONS,
     CONFIG_SCHEMA as COMPOSITE_SCHEMA,
@@ -90,6 +91,9 @@ class PowerCalculatorStrategyFactory:
     ) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration."""
         strategy_mapping: dict[str, Callable[[], PowerCalculationStrategyInterface]] = {
+            CalculationStrategy.BATTERY_RATE: lambda: BatteryRateStrategy(
+                self._hass, self._get_strategy_config(CalculationStrategy.BATTERY_RATE, config, power_profile)
+            ),
             CalculationStrategy.LINEAR: lambda: self._create_linear(source_entity, config, power_profile),
             CalculationStrategy.FIXED: lambda: self._create_fixed(source_entity, config, power_profile),
             CalculationStrategy.LUT: lambda: self._create_lut(source_entity, power_profile),

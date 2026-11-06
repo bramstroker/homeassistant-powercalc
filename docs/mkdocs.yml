@@ -83,6 +83,7 @@ nav:
       - 'strategies/playbook.md'
       - 'strategies/wled.md'
       - 'strategies/composite.md'
+      - 'strategies/battery-rate.md'
   - 'Configuration':
       - 'configuration/index.md'
       - 'configuration/global-configuration.md'
