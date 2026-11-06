@@ -1,0 +1,36 @@
+{
+  "authors": [
+    {
+      "github": "sletterly@gmail.com",
+      "name": "Seth Letterly"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-10-29T18:48:03Z",
+  "device_specs": {
+    "connectivity": [
+      "bluetooth",
+      "wifi"
+    ]
+  },
+  "device_type": "light",
+  "mains_voltage": 120,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plug US Gen4",
+  "measure_device_firmware": "20260923-075613/2.0.1-ge1a198b",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 2,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.1:app"
+  },
+  "name": "RGBIC Outdoor LED Strip lights",
+  "product_url": "https://us.govee.com",
+  "standby_power": 1.0,
+  "voltage_range": {
+    "max": 125.4,
+    "min": 122.0
+  }
+}
