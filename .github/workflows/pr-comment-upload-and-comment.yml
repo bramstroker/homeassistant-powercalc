@@ -76,17 +76,16 @@ jobs:
       - name: Build PR message
         if: steps.artifact.outputs.exists == 'true'
         id: build-pr-message
+        env:
+          IMGUR_URLS: ${{ steps.imgur_step.outputs.imgur_urls }}
         run: |
           {
             echo 'PR_MESSAGE<<EOF'
             echo "Thank you for submitting Powercalc measurements!"
             echo -e "Here are visualizations of the contributed profile data.\n"
+            jq -r '.[] | "![Image](" + . + ")"' <<< "$IMGUR_URLS"
+            echo 'EOF'
           } >> "$GITHUB_OUTPUT"
-          for url in ${{ join(fromJSON(steps.imgur_step.outputs.imgur_urls), ' ') }}
-          do
-            echo "![Image](${url})" >> "$GITHUB_OUTPUT"
-          done
-          echo 'EOF' >> "$GITHUB_OUTPUT"
       - name: Post Comment on PR
         if: steps.artifact.outputs.exists == 'true'
         uses: ./.github/actions/upsert-pr-comment
