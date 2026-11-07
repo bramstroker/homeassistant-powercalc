@@ -1,0 +1,41 @@
+{
+  "authors": [
+    {
+      "github": "jkap",
+      "name": "jkap"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-06T21:38:52Z",
+  "device_specs": {
+    "connectivity": [
+      "matter",
+      "thread"
+    ],
+    "lumens": 800,
+    "rated_power": 6.5,
+    "socket": "E12"
+  },
+  "device_type": "light",
+  "mains_voltage": 120,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plug US Gen4",
+  "measure_device_firmware": "2.0.3",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 88.81,
+    "DUMMY_LOAD_RESISTANCE": 160.59,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.2:app"
+  },
+  "name": "KAJPLATS E12 WS globe 800lm",
+  "product_url": "https://www.ikea.com/us/en/p/kajplats-led-bulb-e12-800-lm-smart-white-spectrum-globe-opal-white-10611316/",
+  "standby_power": 0.28,
+  "voltage_range": {
+    "max": 119.8,
+    "min": 119.0
+  }
+}
