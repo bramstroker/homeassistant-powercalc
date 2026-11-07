@@ -8262,6 +8262,69 @@
       "description": "Chinese maker of smart lighting, best known for its addressable RGBIC strips and lamps.",
       "models": [
         {
+          "authors": [
+            {
+              "github": "jkap",
+              "name": "jae kaplan"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-06T19:45:47Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "matter",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 1600,
+            "rated_power": 13,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plug US Gen4",
+          "measure_device_firmware": "2.0.3",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 89.19,
+            "DUMMY_LOAD_RESISTANCE": 160.59,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "A21 Smart LED Light Bulb E26 1600lm",
+          "product_url": "https://us.govee.com/products/a21-e26-led-light-bulb",
+          "standby_power": 0.28,
+          "voltage_range": {
+            "max": 120.6,
+            "min": 119.0
+          },
+          "id": "H1401",
+          "manufacturer": "govee",
+          "updated_at": "2026-11-06T19:59:27",
+          "max_power": 13.47,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-06T19:59:27",
+          "power_range": {
+            "min": 0.13,
+            "max": 13.47
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
+          "hash": "acc4c335106b61b3576f56fecd4e7fda"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2026-06-30T04:03:04Z",
           "device_type": "light",
@@ -14675,10 +14738,10 @@
           },
           "id": "RS 226",
           "manufacturer": "innr",
-          "updated_at": "2026-11-06T20:08:21",
+          "updated_at": "2026-11-07T08:32:03",
           "max_power": 4.86,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2026-11-05T12:23:58",
+          "measurement_updated_at": "2026-11-07T08:31:36",
           "power_range": {
             "min": 0.39,
             "max": 4.86
@@ -14690,7 +14753,7 @@
             "score": 99.0,
             "brightness": 99.0
           },
-          "hash": "aeb1111602aa8e331e7dd6cad7fabb39"
+          "hash": "2487e84f554fab647a6520a7eb8b2057"
         },
         {
           "calculation_strategy": "lut",
