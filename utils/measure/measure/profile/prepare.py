@@ -341,15 +341,18 @@ class ProfilePreparer:
         if relative_path.name == MANUFACTURER_JSON:
             return _dump_json({"name": metadata.manufacturer, "aliases": self._artifact_aliases(artifact_directory)})
         artifact_path = artifact_directory / relative_path.name
-        if artifact_path.exists():
-            return artifact_path.read_bytes()
         compressed_path = artifact_directory / f"{relative_path.name}.gz"
-        if relative_path.name.endswith(".csv") and compressed_path.exists():
+        if artifact_path.exists():
+            content = artifact_path.read_bytes()
+        elif relative_path.name.endswith(".csv") and compressed_path.exists():
             try:
-                return gzip.decompress(compressed_path.read_bytes())
+                content = gzip.decompress(compressed_path.read_bytes())
             except (OSError, EOFError) as error:
                 raise ProfilePreparationError(f"Artifact file is not valid gzip: {compressed_path.name}") from error
-        raise ProfilePreparationError(f"Artifact file is missing: {relative_path.name}")
+        else:
+            raise ProfilePreparationError(f"Artifact file is missing: {relative_path.name}")
+        # GitHub API uploads bypass .gitattributes, so normalize before preview hashing and delivery.
+        return content.replace(b"\r\n", b"\n")
 
     def _artifact_aliases(self, artifact_directory: Path) -> list[Any]:
         manifest = artifact_directory / MANUFACTURER_JSON
