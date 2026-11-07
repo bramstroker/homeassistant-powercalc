@@ -1,0 +1,35 @@
+{
+  "authors": [
+    {
+      "github": "woutike1",
+      "name": "woutike"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-05T12:16:58Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly 1PM Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 27.69,
+    "DUMMY_LOAD_RESISTANCE": 2001.81,
+    "NUM_LIGHTS": 2,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.1:app"
+  },
+  "name": "GU10 Spot",
+  "standby_power": 0.3,
+  "voltage_range": {
+    "max": 236.0,
+    "min": 234.3
+  }
+}
