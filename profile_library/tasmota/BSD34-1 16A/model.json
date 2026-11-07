@@ -1,0 +1,26 @@
+{
+  "name": "BSD34-1 16A",
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "only_self_usage": true,
+  "standby_power": 0.8,
+  "standby_power_on": 1.0,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "Tasmota-flashed smart plug BSD34-1 16A, measured standby off and on without load",
+  "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "created_at": "2026-03-25T14:20:23Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
