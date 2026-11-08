@@ -1,0 +1,23 @@
+{
+  "name": "ONE",
+  "aliases": [
+    "AirGradient ONE"
+  ],
+  "device_type": "generic_iot",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "fixed_config": {
+    "power": 0.79
+  },
+  "standby_power": 0.79,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "Measured via USB power meter, fluctuates between 0.57 and 1.19 W depending on sensor activity",
+  "created_at": "2026-03-25T14:20:20Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
