@@ -1,0 +1,24 @@
+{
+  "name": "Strip Light 3",
+  "aliases": [
+    "SwitchBot Strip Light 3"
+  ],
+  "device_type": "light",
+  "calculation_strategy": "lut",
+  "standby_power": 0.7,
+  "measure_method": "script",
+  "measure_device": "Athom Smart Plug V3 (CSE7766)",
+  "measure_description": "Measured with utils/measure script via Home Assistant. ESPHome CSE7766 lambda filter lowered to 0.5 W for accurate low-power readings.",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.20.9:docker"
+  },
+  "created_at": "2026-03-23T11:04:31Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
