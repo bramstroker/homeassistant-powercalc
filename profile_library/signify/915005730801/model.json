@@ -1,7 +1,7 @@
 {
   "authors": [
     {
-      "email": "gjs@sonnit.dk",
+      "email": "118590236+gjsiiger@users.noreply.github.com",
       "github": "gjsiiger",
       "name": "Gorm J. Siiger"
     }
@@ -21,6 +21,7 @@
     "VERSION": "v0.14.2:app"
   },
   "name": "Hue Impress outdoor wall",
+  "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-impress-outdoor-wall-light/1743030P7,
   "standby_power": 0.3,
   "voltage_range": {
     "max": 237.4,
