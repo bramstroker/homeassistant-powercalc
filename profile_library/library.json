@@ -25265,6 +25265,55 @@
           "hash": "30619f9daca2fb78c857c32ccf4f0553"
         },
         {
+          "authors": [
+            {
+              "email": "118590236+gjsiiger@users.noreply.github.com",
+              "github": "gjsiiger",
+              "name": "Gorm J. Siiger"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-09T15:11:48Z",
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plus Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "Hue Impress outdoor wall",
+          "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-impress-outdoor-wall-light/1743030P7",
+          "standby_power": 0.3,
+          "voltage_range": {
+            "max": 237.4,
+            "min": 225.4
+          },
+          "id": "915005730801",
+          "manufacturer": "signify",
+          "updated_at": "2026-11-09T19:41:20",
+          "max_power": 18.2,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-09T19:28:49",
+          "power_range": {
+            "min": 0.2,
+            "max": 18.2
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "8c2a2763f12b06a19aeab1bd66a3c169"
+        },
+        {
           "aliases": [
             "1743130P7",
             "1743430P7",
@@ -29028,7 +29077,7 @@
           },
           "id": "929004610402",
           "manufacturer": "signify",
-          "updated_at": "2026-11-07T08:40:35",
+          "updated_at": "2026-11-07T08:44:59",
           "max_power": 14.3,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-11-07T08:40:35",
@@ -29045,7 +29094,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "e7e5760d6cc9bcda5c81938ebb28ed6b"
+          "hash": "8647e0260b33af926b9aceac187cf561"
         },
         {
           "calculation_strategy": "fixed",
