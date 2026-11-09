@@ -1,0 +1,9 @@
+{
+  "name": "Seeed Studio",
+  "aliases": [
+    "seeedstudio"
+  ],
+  "website": "https://www.seeedstudio.com",
+  "country": "CN",
+  "description": "Shenzhen maker of open hardware, development kits and mmWave sensor kits for ESPHome."
+}
