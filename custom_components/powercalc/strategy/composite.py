@@ -117,10 +117,34 @@ def get_state_schema(value: object) -> dict[str, Any]:
     return cv.key_dependency("for", "state")(validated)
 
 
+def expand_condition_shorthand(value: object) -> object:
+    """Expand shorthand while leaving child validation to Powercalc's condition schemas."""
+    if not isinstance(value, dict) or CONF_CONDITIONS in value:
+        return value
+
+    if CONF_CONDITION not in value:
+        for condition_type in COMPOUND_CONDITIONS:
+            if condition_type in value:
+                return {
+                    CONF_CONDITION: condition_type.value,
+                    CONF_CONDITIONS: value[condition_type],
+                    **{key: item for key, item in value.items() if key != condition_type},
+                }
+
+    if isinstance(value.get(CONF_CONDITION), list):
+        return {
+            CONF_CONDITION: ConditionType.AND.value,
+            CONF_CONDITIONS: value[CONF_CONDITION],
+            **{key: item for key, item in value.items() if key != CONF_CONDITION},
+        }
+
+    return value
+
+
 CONDITION_SCHEMA: vol.Schema = vol.Schema(
     vol.Any(
         vol.All(
-            cv.expand_condition_shorthand,
+            expand_condition_shorthand,
             cv.key_value_schemas(
                 CONF_CONDITION,
                 {
