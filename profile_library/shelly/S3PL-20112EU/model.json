@@ -1,0 +1,30 @@
+{
+  "name": "Outdoor Plug S Gen3",
+  "aliases": [
+    "Shelly Outdoor Plug S Gen3"
+  ],
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "only_self_usage": true,
+  "standby_power": 0.7,
+  "standby_power_on": 1.1,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "Shelly Outdoor Plug S Gen3, measured standby off and on without load",
+  "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
+  },
+  "created_at": "2026-03-25T14:20:22Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
