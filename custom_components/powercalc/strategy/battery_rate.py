@@ -75,6 +75,8 @@ class BatteryRateStrategy(PowerCalculationStrategyInterface):
         self._base_power = Decimal(str(config[CONF_BASE_POWER]))
         self._max_power = Decimal(str(config[CONF_MAX_POWER])) if CONF_MAX_POWER in config else None
         self._samples: list[BatterySample] = []
+        self._last_valid_reading_at: datetime | None = None
+        self._has_invalid_reading = False
 
     async def async_update_state(self) -> None:
         state = self._hass.states.get(self._entity_id)
@@ -93,14 +95,30 @@ class BatteryRateStrategy(PowerCalculationStrategyInterface):
     def get_update_interval(self) -> timedelta:
         return min(timedelta(seconds=60), self._window)
 
+    def get_next_update_time(self) -> datetime | None:
+        if len(self._samples) > 1:
+            return self._samples[1].timestamp + self._window
+        return None
+
     def record_reading(self, now: datetime, percentage: Decimal | None) -> None:
-        """Record a valid reading, or discard history across an invalid reading."""
+        """Retain recent history across short invalid gaps, without bridging a discharge."""
         if percentage is None or not percentage.is_finite() or not 0 <= percentage <= 100:
-            self._samples.clear()
+            self._has_invalid_reading = True
+            if self._last_valid_reading_at is not None and now - self._last_valid_reading_at >= self._window:
+                self._samples.clear()
+            self._prune_samples(now)
             return
 
-        if self._samples and now < self._samples[-1].timestamp:
-            self._samples.clear()
+        if self._last_valid_reading_at is not None:
+            gap = now - self._last_valid_reading_at
+            has_long_invalid_gap = self._has_invalid_reading and gap >= self._window
+            dropped_across_gap = (
+                self._has_invalid_reading and bool(self._samples) and percentage < self._samples[-1].percentage
+            )
+            if gap < timedelta(0) or has_long_invalid_gap or dropped_across_gap:
+                self._samples.clear()
+        self._last_valid_reading_at = now
+        self._has_invalid_reading = False
         sample = BatterySample(now, percentage)
         if self._samples and now == self._samples[-1].timestamp:
             self._samples[-1] = sample
@@ -113,7 +131,8 @@ class BatteryRateStrategy(PowerCalculationStrategyInterface):
         if not self._samples:
             return None
         self._prune_samples(now)
-        gained = max(Decimal(0), self._samples[-1].percentage - self._samples[0].percentage)
+        lowest_percentage = min(sample.percentage for sample in self._samples)
+        gained = self._samples[-1].percentage - lowest_percentage
         rate = gained * Decimal(3600) / Decimal(str(self._window.total_seconds()))
         power = self._base_power + rate * self._energy_per_percent
         return min(power, self._max_power) if self._max_power is not None else power

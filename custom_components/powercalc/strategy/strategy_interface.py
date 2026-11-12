@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from homeassistant.core import HomeAssistant, State
@@ -12,6 +12,10 @@ class PowerCalculationStrategyInterface:
 
     def get_update_interval(self) -> timedelta | None:
         """Return the interval needed for time-dependent calculations, if any."""
+        return None
+
+    def get_next_update_time(self) -> datetime | None:
+        """Return the next time a held calculation changes without a source event."""
         return None
 
     async def initialize(self) -> None:

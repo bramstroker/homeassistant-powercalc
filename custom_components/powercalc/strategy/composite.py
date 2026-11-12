@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import StrEnum
 import logging
@@ -199,6 +199,14 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
             if (interval := sub_strategy.strategy.get_update_interval()) is not None
         ]
         return min(intervals) if intervals else None
+
+    def get_next_update_time(self) -> datetime | None:
+        update_times = [
+            update_time
+            for sub_strategy in self.strategies
+            if (update_time := sub_strategy.strategy.get_next_update_time()) is not None
+        ]
+        return min(update_times) if update_times else None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate power consumption based on entity state."""

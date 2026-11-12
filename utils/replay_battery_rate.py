@@ -14,6 +14,7 @@ import csv
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
+import heapq
 import io
 from pathlib import Path
 from zipfile import ZipFile
@@ -123,7 +124,10 @@ class Replay:
                 events.add(reading.timestamp)
             previous = reading
         self.points: list[PowerPoint] = []
-        for timestamp in sorted(events):
+        scheduled_events = list(events)
+        heapq.heapify(scheduled_events)
+        while scheduled_events:
+            timestamp = heapq.heappop(scheduled_events)
             reading = trace.at(timestamp)
             strategy.record_reading(timestamp, reading.battery)
             power = strategy.calculate_power(timestamp)
@@ -131,6 +135,10 @@ class Replay:
             charging = float(power - BASE) if reading.charging else 0
             base = float(BASE + (DRYING if reading.drying else 0))
             self.points.append(PowerPoint(timestamp, base + charging, charging))
+            expiry = strategy.get_next_update_time()
+            if expiry is not None and timestamp < expiry < end and expiry not in events:
+                events.add(expiry)
+                heapq.heappush(scheduled_events, expiry)
 
     def energy(
         self, start: datetime, end: datetime, *, charging_only: bool = False, cut_at_full: bool = False
@@ -259,8 +267,8 @@ def main() -> None:
     print("# Battery-rate native replay\n")
     print("Fixed coefficient: 0.96 Wh/%, baseline: 3.5 W, drying: +57.2 W. No power clamp or energy compensation.")
     print(
-        "Fresh window at each charge start. Battery/status/drying events and a 60 s timer update power; "
-        "integration holds power between events."
+        "Fresh window at each charge start. Battery/status/drying events, exact sample expiry and a 60 s timer "
+        "update power; integration holds power between events."
     )
     print("The first four charges are calibration data; the last three are holdout data. No coefficient is refitted.")
     asyncio.run(async_replay(args.source))

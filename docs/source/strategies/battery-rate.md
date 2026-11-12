@@ -7,7 +7,7 @@ This strategy is available in YAML and library profiles; there is no manual conf
 Power is calculated as:
 
 ```text
-power [W] = base_power + max(0, battery_now - battery_window_start) * 3600/window * energy_per_percent
+power [W] = base_power + (battery_now - lowest_battery_in_window) * 3600/window * energy_per_percent
 ```
 
 The battery percentage is held constant between readings. `window` is measured in seconds and
@@ -50,9 +50,16 @@ powercalc:
 Use the device's docked or charging status for the condition. Avoid a condition such as
 `battery < 100`: the delayed contribution after the last percentage increment helps account for
 the energy used earlier in the charge. Once the percentage stops changing, the contribution above
-`base_power` reaches zero within one window, plus up to one periodic update interval.
-Powercalc recalculates at least every 60 seconds, or every `window` seconds for shorter windows.
+`base_power` reaches zero within one window. Powercalc schedules a recalculation when each
+percentage increment leaves the window, with a periodic update at least every 60 seconds
+(or every `window` seconds for shorter windows) as a fallback.
 No derivative helper or separate `power_update_interval` setting is needed.
+
+With `stop_at_first` (the default), put wash and auto-empty branches before the charging branch,
+because a docked device can perform these operations too. Drying can happen while charging;
+use `sum_all` to add its independent power, or separate charging branches with the corresponding
+`base_power` for drying on and off. For Roborock devices whose status remains `charging` at 100%,
+that status can be used directly as the charging condition.
 
 A `battery_rate` block can also be used directly on a sensor. It then applies whenever the parent
 source is active; add a composite condition when charging needs to be distinguished from other states.
@@ -91,15 +98,17 @@ After setup, reload or restart, the first valid reading supplies the starting pe
 no Recorder history lookup or restored rate. The full window remains the denominator during startup,
 so the estimate initially runs low rather than assuming the battery started at 0%.
 
-Missing, unknown, unavailable, non-numeric, non-finite and out-of-range battery readings discard the
-window. The next valid reading starts a new window without treating the gap as a charging jump.
-An invalid battery reading yields no calculation; composite then follows its normal branch and
-fallback rules. A negative net percentage change contributes no charging power.
+Missing, unknown, unavailable, non-numeric, non-finite and out-of-range battery readings are ignored
+for up to one window since the last valid reading. During a short gap, recent increments still
+expire on schedule. A gap lasting one window discards the history and yields no calculation;
+composite then follows its normal branch and fallback rules. Recovery after a long gap, or with a
+lower percentage after an invalid reading, starts a new window without counting a charging jump.
 
 Battery readings continue to populate the window while another composite branch is selected.
 When the charging condition becomes false, its power contribution stops immediately. No pending
 energy is added or compensated. A quick return to the charging branch reuses the recent valid
-history; a restart or invalid reading clears it.
+history. The lowest percentage in the window supplies the reference, so a higher reading from
+before docking does not hide a new charge. A restart or a long invalid gap clears the history.
 
 The smoothing window delays changes in estimated power. A longer window reduces fluctuations from
 whole-percentage steps but increases startup lag and energy lost when a charge is interrupted.

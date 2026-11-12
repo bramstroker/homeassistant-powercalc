@@ -60,14 +60,45 @@ def test_constant_rate_and_complete_tail_preserve_energy(hass: HomeAssistant) ->
 
 
 @pytest.mark.parametrize("invalid", [None, Decimal(-1), Decimal(101), Decimal("NaN"), Decimal("Infinity")])
-def test_invalid_reading_breaks_history(hass: HomeAssistant, invalid: Decimal | None) -> None:
+def test_short_invalid_gap_preserves_history(hass: HomeAssistant, invalid: Decimal | None) -> None:
     strategy = create_strategy(hass)
     strategy.record_reading(START, Decimal(20))
     strategy.record_reading(START + timedelta(minutes=1), Decimal(25))
     strategy.record_reading(START + timedelta(minutes=2), invalid)
-    assert strategy.calculate_power(START + timedelta(minutes=2)) is None
+    assert strategy.calculate_power(START + timedelta(minutes=2)) == Decimal("32.3")
     strategy.record_reading(START + timedelta(minutes=3), Decimal(40))
-    assert strategy.calculate_power(START + timedelta(minutes=3)) == Decimal("3.5")
+    assert strategy.calculate_power(START + timedelta(minutes=3)) == Decimal("118.7")
+
+
+def test_long_invalid_gap_discards_history(hass: HomeAssistant) -> None:
+    strategy = create_strategy(hass)
+    strategy.record_reading(START, None)
+    assert strategy.calculate_power(START) is None
+    strategy.record_reading(START, Decimal(20))
+    strategy.record_reading(START + timedelta(minutes=1), Decimal(25))
+    strategy.record_reading(START + timedelta(minutes=11), None)
+    assert strategy.calculate_power(START + timedelta(minutes=11)) is None
+    strategy.record_reading(START + timedelta(minutes=12), Decimal(40))
+    assert strategy.calculate_power(START + timedelta(minutes=12)) == Decimal("3.5")
+
+
+@pytest.mark.parametrize("minutes,percentage", [(3, 24), (11, 40)])
+def test_recovery_does_not_bridge_discharge_or_long_gap(hass: HomeAssistant, minutes: int, percentage: int) -> None:
+    strategy = create_strategy(hass)
+    strategy.record_reading(START, Decimal(20))
+    strategy.record_reading(START + timedelta(minutes=1), Decimal(25))
+    strategy.record_reading(START + timedelta(minutes=2), None)
+    recovery = START + timedelta(minutes=minutes)
+    strategy.record_reading(recovery, Decimal(percentage))
+    assert strategy.calculate_power(recovery) == Decimal("3.5")
+
+
+def test_pre_docking_discharge_does_not_hide_new_charge(hass: HomeAssistant) -> None:
+    strategy = create_strategy(hass)
+    strategy.record_reading(START, Decimal(50))
+    strategy.record_reading(START + timedelta(minutes=1), Decimal(40))
+    strategy.record_reading(START + timedelta(minutes=2), Decimal(41))
+    assert strategy.calculate_power(START + timedelta(minutes=2)) == Decimal("9.26")
 
 
 def test_drop_limit_duplicate_and_clock_reset(hass: HomeAssistant) -> None:
@@ -143,13 +174,18 @@ async def test_factory_rejects_invalid_raw_profile(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize("invalid", ["unknown", "unavailable", "not numeric", "nan", "101"])
-async def test_strategy_clears_invalid_state(hass: HomeAssistant, invalid: str) -> None:
+async def test_strategy_preserves_short_invalid_state(
+    hass: HomeAssistant, invalid: str, freezer: FrozenDateTimeFactory
+) -> None:
     strategy = BatteryRateStrategy(hass, {**BATTERY_CONFIG, "window": 30, "max_power": 60})
     assert strategy.get_update_interval() == timedelta(seconds=30)
     assert strategy.get_entities_to_track() == ["sensor.battery"]
     await set_states(hass, [("sensor.battery", "20")])
     await strategy.async_update_state()
     await set_states(hass, [("sensor.battery", invalid)])
+    await strategy.async_update_state()
+    assert await strategy.calculate(State("vacuum.robot", "docked")) == Decimal("3.5")
+    freezer.tick(31)
     await strategy.async_update_state()
     assert await strategy.calculate(State("vacuum.robot", "docked")) is None
     await set_states(hass, [("sensor.battery", "30")])
@@ -174,6 +210,32 @@ async def test_standalone_yaml_tracks_battery_and_decays_without_events(
     assert_entity_state(hass, "sensor.robot_power", "64.60")
     await advance(hass, freezer, 601)
     assert_entity_state(hass, "sensor.robot_power", "7.00")
+
+
+@pytest.mark.parametrize("mode", ["standalone", "stop_at_first", "sum_all", "dummy"])
+async def test_percentage_increments_expire_between_periodic_ticks(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, mode: str
+) -> None:
+    await set_states(hass, [("sensor.battery", "20"), ("vacuum.robot", "docked")])
+    config: ConfigType = {"entity_id": "vacuum.robot"}
+    if mode in {"standalone", "dummy"}:
+        config["battery_rate"] = BATTERY_CONFIG
+        if mode == "dummy":
+            config = {"entity_id": "sensor.dummy", "name": "Robot", "battery_rate": BATTERY_CONFIG}
+    else:
+        config["composite"] = {"mode": mode, "strategies": [{"battery_rate": BATTERY_CONFIG}]}
+    await run_powercalc_setup(hass, config)
+    await advance(hass, freezer, 13)
+    await set_states(hass, [("sensor.battery", "21")])
+    await advance(hass, freezer, 24)
+    await set_states(hass, [("sensor.battery", "23")])
+    assert_entity_state(hass, "sensor.robot_power", "20.78")
+    await advance(hass, freezer, 575)
+    assert_entity_state(hass, "sensor.robot_power", "20.78")
+    await advance(hass, freezer, 1)
+    assert_entity_state(hass, "sensor.robot_power", "15.02")
+    await advance(hass, freezer, 24)
+    assert_entity_state(hass, "sensor.robot_power", "3.50")
 
 
 @pytest.mark.parametrize("mode", ["stop_at_first", "sum_all", "list"])
@@ -295,6 +357,8 @@ async def test_strategy_timer_follows_subprofile_and_is_removed(
         hass,
         {"entity_id": "vacuum.robot", "model": "battery/initial", "custom_model_directory": str(tmp_path)},
     )
+    await advance(hass, freezer, 1)
+    await set_states(hass, [("sensor.battery", "21")])
     for profile in ["short", "fixed", "short"]:
         await hass.services.async_call(
             "powercalc", "switch_sub_profile", {"entity_id": "sensor.robot_power", "profile": profile}, blocking=True
@@ -304,10 +368,12 @@ async def test_strategy_timer_follows_subprofile_and_is_removed(
             await advance(hass, freezer, 61)
             assert_entity_state(hass, "sensor.robot_power", "2.00")
     await advance(hass, freezer, 1)
-    await set_states(hass, [("sensor.battery", "21")])
+    await set_states(hass, [("sensor.battery", "22")])
     assert_entity_state(hass, "sensor.robot_power", "118.70")
     await advance(hass, freezer, 31)
     assert_entity_state(hass, "sensor.robot_power", "3.50")
+    await set_states(hass, [("sensor.battery", "23")])
+    assert_entity_state(hass, "sensor.robot_power", "118.70")
     entity = hass.data["sensor"].get_entity("sensor.robot_power")
     assert entity is not None
     await entity.async_remove()
