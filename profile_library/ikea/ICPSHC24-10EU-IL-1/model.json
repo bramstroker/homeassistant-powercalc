@@ -1,0 +1,41 @@
+{
+  "authors": [
+    {
+      "github": "jan-brinkmann",
+      "name": "Jan Brinkmann"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-07T14:28:52Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee"
+    ]
+  },
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plug S",
+  "measure_device_firmware": "1.7.6",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 3,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.2:app"
+  },
+  "name": "TRADFRI LED driver, 10 w (ICPSHC24-10EU-IL-1)",
+  "standby_power": 0.1,
+  "standby_power_estimated": true,
+  "voltage_range": {
+    "max": 235.9,
+    "min": 233.2
+  },
+  "aliases": [
+    "TRADFRI LED driver, 10 w",
+    "ICPSHC24-10EU-IL-1/ICPSHC24-10EU-IL-2"
+  ],
+  "config_flow_discovery_remarks": "Select this profile only if the printed driver type is ICPSHC24-10EU-IL-1. The shared Home Assistant identifier may also match IL-2. Select the driver revision and connected load you actually have.",
+  "config_flow_sub_profile_remarks": "Select '1x NORRFLY 5W' only for an ICPSHC24-10EU-IL-1 driver connected to one NORRFLY 5W lamp. This profile estimates the complete assembly: the driver plus that one lamp. It applies only to this load, not to the lamp alone or any other driver load. Standby power is estimated."
+}
