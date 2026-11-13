@@ -73,9 +73,11 @@ from custom_components.powercalc.const import (
     CONF_SELF_USAGE_INCLUDED,
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
+    CONF_STANDBY_POWER_ON,
     CONF_UNAVAILABLE_POWER,
     DATA_POWER_PROFILE_SOURCES,
     DATA_POWER_PROFILES,
+    DATA_SELF_USAGE_POWER_SENSORS,
     DATA_STANDBY_POWER_SENSORS,
     DATA_STRATEGIES,
     DEFAULT_POWER_SENSOR_PRECISION,
@@ -315,13 +317,20 @@ def _get_standby_power(
     if sensor_config.get(CONF_SELF_USAGE_INCLUDED, False) or sensor_config.get(CONF_DISABLE_STANDBY_POWER):
         return Decimal(0), Decimal(0)
 
+    configured_power_on = sensor_config.get(CONF_STANDBY_POWER_ON)
+    standby_power_on = Decimal(str(configured_power_on)) if configured_power_on is not None else None
+
     if sensor_config.get(CONF_STANDBY_POWER) is not None:
-        return _resolve_standby_power_value(hass, sensor_config.get(CONF_STANDBY_POWER)), Decimal(0)
+        return (
+            _resolve_standby_power_value(hass, sensor_config.get(CONF_STANDBY_POWER)),
+            standby_power_on if standby_power_on is not None else Decimal(0),
+        )
 
     if power_profile is not None:
-        return _get_standby_power_from_profile(hass, power_profile)
+        standby_power, profile_standby_power_on = _get_standby_power_from_profile(hass, power_profile)
+        return standby_power, standby_power_on if standby_power_on is not None else profile_standby_power_on
 
-    return Decimal(0), Decimal(0)
+    return Decimal(0), standby_power_on if standby_power_on is not None else Decimal(0)
 
 
 def create_real_power_sensor(
@@ -433,6 +442,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         if not self._ignore_unavailable_state and self._sensor_config.get(CONF_UNAVAILABLE_POWER) is not None:
             self._ignore_unavailable_state = True
         self._standby_sensors: ConfigType = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
+        self._self_usage_sensors: ConfigType = hass.data[DOMAIN][DATA_SELF_USAGE_POWER_SENSORS]
         self.calculation_strategy_factory = calculation_strategy_factory
         self._strategy_instance: PowerCalculationStrategyInterface | None = None
         self._availability_entity: str | None = sensor_config.get(CONF_AVAILABILITY_ENTITY)
@@ -595,6 +605,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
     ) -> None:
         """Update power sensor based on new dependent entity state."""
         self._clear_standby_power()
+        self._clear_self_usage_power()
         if self._sleep_power_timer:
             self._sleep_power_timer()
             self._sleep_power_timer = None
@@ -722,6 +733,9 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             self._track_standby_power(standby_power_on)
             power += standby_power_on
 
+        # The device is switched on, expose its current power in the active group.
+        self._track_self_usage_power(power)
+
         return power
 
     def _apply_multiply_factor(self, power: Decimal) -> Decimal:
@@ -792,6 +806,14 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
     def _clear_standby_power(self) -> None:
         """Forget the standby portion, the device is no longer known to be in standby."""
         self._standby_sensors.pop(self.entity_id, None)
+
+    def _track_self_usage_power(self, power: Decimal) -> None:
+        """Record the self-usage while the device is ON, read by the self-usage group."""
+        self._self_usage_sensors[self.entity_id] = power
+
+    def _clear_self_usage_power(self) -> None:
+        """Forget the self-usage portion, the device is no longer known to be running."""
+        self._self_usage_sensors.pop(self.entity_id, None)
 
     async def is_calculation_enabled(self, entity_state: State) -> bool:
         """Check if calculation is enabled based on the condition template."""

@@ -121,12 +121,14 @@
               "create_energy_sensors": "Energiaérzékelők létrehozása",
               "create_cost_sensors": "Költségérzékelők létrehozása",
               "create_standby_group": "Készenléti csoport létrehozása",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Közüzemi mérők létrehozása"
             },
             "data_description": {
               "create_energy_sensors": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőket",
               "create_cost_sensors": "Meghatározza, hogy a Powercalc létrehozzon-e költségérzékelőket. Ehhez a következő lépésekben energiaárat kell beállítani",
               "create_standby_group": "Csoport létrehozása, amely összegzi az összes készenléti teljesítményfelvételt és az IoT-eszközök saját fogyasztását",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal"
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Energiaérzékelők létrehozása",
               "create_cost_sensors": "Költségérzékelők létrehozása",
               "create_standby_group": "Készenléti csoport létrehozása",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Közüzemi mérők létrehozása"
             },
             "data_description": {
               "create_energy_sensors": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőket",
               "create_cost_sensors": "Meghatározza, hogy a Powercalc létrehozzon-e költségérzékelőket. Ehhez a következő lépésekben energiaárat kell beállítani",
               "create_standby_group": "Csoport létrehozása, amely összegzi az összes készenléti teljesítményfelvételt és az IoT-eszközök saját fogyasztását",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "A Powercalc közüzemi mérőket hoz létre például napi és óránkénti ciklussal"
             }
           },

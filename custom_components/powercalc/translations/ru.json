@@ -121,12 +121,14 @@
               "create_energy_sensors": "Создавать сенсоры энергии",
               "create_cost_sensors": "Создайте датчики затрат",
               "create_standby_group": "Создать группу ожидания",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Создавать счётчики"
             },
             "data_description": {
               "create_energy_sensors": "Создавать ли сенсоры потребления в кВт·ч",
               "create_cost_sensors": "Нужно ли powercalc создавать датчики затрат. Требуется настроить цену на электроэнергию на следующих шагах.",
               "create_standby_group": "Создать группу, суммирующую потребление в режиме ожидания и собственное потребление IoT-устройств",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами"
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Создавать сенсоры энергии",
               "create_cost_sensors": "Создайте датчики затрат",
               "create_standby_group": "Создать группу ожидания",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Создавать счётчики"
             },
             "data_description": {
               "create_energy_sensors": "Создавать ли сенсоры потребления в кВт·ч",
               "create_cost_sensors": "Нужно ли powercalc создавать датчики затрат. Требуется настроить цену на электроэнергию на следующих шагах.",
               "create_standby_group": "Создать группу, суммирующую потребление в режиме ожидания и собственное потребление IoT-устройств",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Создавать счётчики с ежедневным, почасовым и другими циклами"
             }
           },
