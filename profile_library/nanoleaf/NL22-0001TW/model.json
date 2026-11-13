@@ -1,0 +1,23 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2026-07-06T23:55:30Z",
+  "device_type": "light",
+  "max_voltage": 116.41,
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "TP-Link KP-115",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.21.2:docker"
+  },
+  "min_voltage": 114.44,
+  "name": "Nanoleaf Light Panels (formerly Aurora)",
+  "description": "Power values are for a single triangle panel (measured on a 24-panel layout, total divided by 24). Set multiply_factor to the number of panels in your setup.",
+  "standby_power": 0.33,
+  "author": "dantidote <14890009+dantidote@users.noreply.github.com>",
+  "author_info": {
+    "name": "dantidote",
+    "github": "dantidote"
+  }
+}
