@@ -3,10 +3,10 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
-import json
 from pathlib import Path
 
 from measure.visualization.labels import format_entity_label, format_value_label
+from measure.visualization.profile import load_model_data
 
 
 class CompositeMode(StrEnum):
@@ -44,7 +44,7 @@ def build_composite_diagram_from_file(path: str | Path) -> CompositeDiagramSpec:
     """Build a composite branch diagram from a model.json artifact."""
 
     file_path = Path(path)
-    data = json.loads(file_path.read_text(encoding="utf-8"))
+    data = load_model_data(file_path)
     if not isinstance(data, dict) or data.get("calculation_strategy") != "composite":
         raise CompositeDiagramError("model does not contain a composite calculation strategy")
 

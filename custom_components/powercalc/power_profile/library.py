@@ -8,7 +8,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.singleton import singleton
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DOMAIN, DOMAIN_CONFIG
+from custom_components.powercalc.const import (
+    CONF_DISABLE_LIBRARY_DOWNLOAD,
+    DOMAIN,
+    DOMAIN_CONFIG,
+    PLACEHOLDER_OPTIONAL_PREFIX,
+)
 from custom_components.powercalc.helpers import (
     build_related_entity_placeholder_not_found_message,
     collect_placeholders,
@@ -259,11 +264,11 @@ class ProfileLibrary:
                     placeholder,
                     source_entity=source_entity,
                 )
-                if not related_entity:
+                if not related_entity and not placeholder.startswith(PLACEHOLDER_OPTIONAL_PREFIX):
                     raise LibraryError(
                         build_related_entity_placeholder_not_found_message(placeholder, source_entity.entity_id),
                     )
-                variables[placeholder] = related_entity
+                variables[placeholder] = related_entity or ""
 
         return variables
 

@@ -71,6 +71,8 @@ def retained_session(storage: SessionStorage, request: RecorderMeasurementReques
         created_at="2026-09-17T08:00:00Z",
         updated_at="2026-09-17T08:00:00Z",
         completed=10,
+        skipped=2,
+        waiting_for_entities=True,
         event_sequence=5,
         entity_states={"switch.device": "off"},
         summary={"Samples recorded": "10"},
@@ -138,6 +140,8 @@ def test_record_more_keeps_session_and_fits_both_runs(
     assert started.created_at == previous.created_at
     assert started.completed == 0
     assert started.entity_states == {}
+    assert started.skipped == 0
+    assert started.waiting_for_entities is False
     assert started.summary == previous.summary
     assert (output / "record-1.jsonl").read_bytes() == original
     assert not (output / "record.jsonl").exists()

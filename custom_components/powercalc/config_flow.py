@@ -688,7 +688,11 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         current_step: Step = Step(str(self.cur_step["step_id"]))
         is_strategy_step = current_step in STRATEGY_STEP_MAPPING.values()
         if self.strategy and is_strategy_step:
-            if self.selected_profile and self.selected_profile.device_type == DeviceType.SMART_SWITCH:
+            if (
+                self.strategy == CalculationStrategy.FIXED
+                and self.selected_profile
+                and self.selected_profile.device_type == DeviceType.SMART_SWITCH
+            ):
                 self._process_user_input(user_input, SCHEMA_POWER_SMART_SWITCH)
                 user_input = {CONF_POWER: user_input.get(CONF_POWER, 0)}
 

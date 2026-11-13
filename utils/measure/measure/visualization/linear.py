@@ -2,13 +2,13 @@
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-import json
 from pathlib import Path
 from typing import TypeGuard
 
 from measure.visualization.data import POWER_AXIS_LABEL, SERIES_COLORS, finite_float
 from measure.visualization.labels import format_entity_label, format_value_label
 from measure.visualization.models import PlotDataError, PlotKind, PlotPoint, PlotSeries, PlotSpec
+from measure.visualization.profile import load_model_data
 from measure.visualization.sampling import limit_line
 
 _COMPOSITE_STRATEGY = "composite"
@@ -28,7 +28,7 @@ def model_has_linear_calibration(data: object) -> bool:
 
 
 def build_linear_plot(path: Path, *, source: str, max_points: int | None) -> PlotSpec:
-    data = json.loads(path.read_text(encoding="utf-8"))
+    data = load_model_data(path)
     linear_configs = _linear_calibration_configs(data)
     if not linear_configs:
         raise PlotDataError("model does not contain linear calibration data")

@@ -58,6 +58,7 @@ from custom_components.powercalc.const import (
     CONF_VOLTAGE,
     CONF_WLED,
     DISCOVERY_INTEGRATION_NAME,
+    DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DUMMY_ENTITY_ID,
     SensorType,
@@ -875,6 +876,119 @@ async def test_discovery_by_device(
     assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery_type_device"
     assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == "pc_ABC123"
     assert len(mock_calls) == 1
+
+
+def _mock_shelly_discovery_devices(hass: HomeAssistant, reverse_order: bool = False) -> dict[str, DeviceEntry]:
+    shelly_entry = MockConfigEntry(domain="shelly", title="Shelly 2PM Gen4")
+    shelly_entry.add_to_hass(hass)
+    bluetooth_entry = MockConfigEntry(
+        domain="bluetooth",
+        source=SOURCE_INTEGRATION_DISCOVERY,
+        data={"source_device_id": "parent", "source_config_entry_id": shelly_entry.entry_id},
+    )
+    bluetooth_entry.add_to_hass(hass)
+    metadata = {
+        "config_entry_id": shelly_entry.entry_id,
+        "manufacturer": "Shelly",
+        "model": "Shelly 2PM Gen4",
+        "model_id": "S4SW-002P16EU",
+    }
+    devices = {
+        "parent": {**metadata, "identifiers": {("shelly", "48F6EECD97B4")}},
+        "channel-0": {
+            **metadata,
+            "identifiers": {("shelly", "48F6EECD97B4-switch:0")},
+            "via_device_id": "parent",
+        },
+        "channel-1": {
+            **metadata,
+            "identifiers": {("shelly", "48F6EECD97B4-switch:1")},
+            "via_device_id": "parent",
+        },
+        "scanner": {
+            "config_entry_id": bluetooth_entry.entry_id,
+            "manufacturer": "shelly",
+            "model": "S4SW-002P16EU",
+            "connections": {(dr.CONNECTION_BLUETOOTH, "48:F6:EE:CD:97:B6")},
+            "via_device_id": "parent",
+        },
+    }
+    if reverse_order:
+        devices = dict(reversed(devices.items()))
+    return mock_devices(hass, devices)
+
+
+@pytest.mark.parametrize("reverse_order", [False, True])
+async def test_shelly_channels_and_scanner_discover_the_physical_device_once(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+    reverse_order: bool,
+) -> None:
+    devices = _mock_shelly_discovery_devices(hass, reverse_order)
+
+    await run_powercalc_setup(hass)
+    await get_discovery_manager(hass).start_discovery()
+
+    assert len(mock_flow_init.mock_calls) == 1
+    discovery_data = mock_flow_init.call_args.kwargs["data"]
+    assert discovery_data[CONF_UNIQUE_ID] == "pc_parent"
+    assert discovery_data[DISCOVERY_SOURCE_ENTITY].device_entry == devices["parent"]
+
+
+@pytest.mark.parametrize("configured_device_id", ["parent", "channel-0", "channel-1", "scanner"])
+async def test_configured_shelly_representation_prevents_duplicate_discovery(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+    configured_device_id: str,
+) -> None:
+    _mock_shelly_discovery_devices(hass)
+    entry = await create_mock_config_entry(
+        hass,
+        {CONF_DEVICE: configured_device_id},
+        unique_id=f"pc_{configured_device_id}",
+        setup=False,
+    )
+
+    await run_powercalc_setup(hass)
+
+    assert not mock_flow_init.mock_calls
+
+    await hass.config_entries.async_remove(entry.entry_id)
+    await get_discovery_manager(hass).start_discovery()
+
+    assert len(mock_flow_init.mock_calls) == 1
+    assert mock_flow_init.call_args.kwargs["data"][CONF_UNIQUE_ID] == "pc_parent"
+
+
+@pytest.mark.parametrize("domain", ["test", "shelly", "bluetooth"])
+async def test_gateway_children_remain_separately_discoverable(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+    domain: str,
+) -> None:
+    entry = MockConfigEntry(domain=domain, source=SOURCE_INTEGRATION_DISCOVERY)
+    entry.add_to_hass(hass)
+    metadata = {
+        "config_entry_id": entry.entry_id,
+        "manufacturer": "test",
+        "model": "discovery_type_device",
+    }
+    mock_devices(
+        hass,
+        {
+            "gateway": {**metadata, "identifiers": {(domain, "gateway")}},
+            "child": {
+                **metadata,
+                "identifiers": {(domain, "independent-device")},
+                "via_device_id": "gateway",
+            },
+        },
+    )
+
+    await run_powercalc_setup(hass)
+
+    unique_ids = {call.kwargs["data"][CONF_UNIQUE_ID] for call in mock_flow_init.mock_calls}
+    assert unique_ids == {"pc_gateway", "pc_child"}
 
 
 async def test_discovery_by_config_entry(

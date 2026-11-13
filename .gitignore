@@ -23,3 +23,6 @@ custom_components/test
 /.vs
 
 .omx
+
+# Local maintainer inbox acknowledgments
+/.powercalc-triage/

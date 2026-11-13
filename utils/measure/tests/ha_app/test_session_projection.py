@@ -105,7 +105,7 @@ def test_warning_history_is_deduplicated_and_bounded(snapshot: SessionSnapshot) 
 
 
 def test_progress_defaults_skipped_count_to_zero(snapshot: SessionSnapshot) -> None:
-    snapshot = replace(snapshot, skipped=3)
+    snapshot = replace(snapshot, skipped=3, waiting_for_entities=True)
     event = SessionEvent(
         4,
         SessionEventType.PROGRESS,
@@ -116,4 +116,25 @@ def test_progress_defaults_skipped_count_to_zero(snapshot: SessionSnapshot) -> N
     updated = apply_session_event(snapshot, event)
 
     assert updated.skipped == 0
+    assert updated.waiting_for_entities is False
     assert updated.progress == 50
+
+
+@pytest.mark.parametrize("waiting", [True, False])
+def test_progress_projects_entity_read_status(snapshot: SessionSnapshot, waiting: bool) -> None:
+    event = SessionEvent(
+        4,
+        SessionEventType.PROGRESS,
+        snapshot.updated_at,
+        {
+            "completed": 1,
+            "total": 0,
+            "mode": "Recording",
+            "estimated_remaining": "",
+            "skipped": 2,
+            "waiting_for_entities": waiting,
+        },
+    )
+    updated = apply_session_event(snapshot, event)
+    assert updated.waiting_for_entities is waiting
+    assert updated.skipped == 2

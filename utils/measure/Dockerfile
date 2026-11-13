@@ -4,7 +4,7 @@ ARG FINAL_STAGE=runtime
 
 # Frontend output is platform-independent. Build and test it natively instead of
 # running Node through QEMU once for every target architecture.
-FROM --platform=$BUILDPLATFORM node:24-alpine AS frontend-build
+FROM --platform=$BUILDPLATFORM node:26-alpine AS frontend-build
 
 WORKDIR /frontend
 

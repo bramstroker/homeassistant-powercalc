@@ -15,10 +15,13 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
+import pytest
 
 from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP
 from custom_components.powercalc.const import (
+    ATTR_ENTITIES,
     ATTR_MEMBERS,
+    ATTR_SOURCE_GROUP,
     ATTR_STATE,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
@@ -32,6 +35,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
     SERVICE_DEBUG_GROUP,
+    SERVICE_GET_GROUP_ENTITIES,
     CalculationStrategy,
 )
 from tests.common import assert_entity_state, run_powercalc_setup, set_states
@@ -245,3 +249,65 @@ async def test_disable_group_creation(hass: HomeAssistant) -> None:
     await set_states(hass, [("input_boolean.test1", STATE_OFF)])
     power_state = hass.states.get("sensor.all_standby_power")
     assert not power_state
+
+
+@pytest.mark.parametrize("sensor_type", ["power", "energy"])
+async def test_get_standby_group_entities_action(hass: HomeAssistant, sensor_type: str) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_FIXED: {CONF_POWER: 20},
+        },
+    )
+    await set_states(hass, [("input_boolean.test", STATE_OFF)])
+    entity_id = f"sensor.all_standby_{sensor_type}"
+
+    response = await hass.services.async_call(
+        DOMAIN,
+        SERVICE_GET_GROUP_ENTITIES,
+        {ATTR_ENTITY_ID: entity_id},
+        blocking=True,
+        return_response=True,
+    )
+    assert response[entity_id][ATTR_ENTITIES] == {"sensor.test_power"}
+
+    # Turning the source on removes its standby contribution from the group.
+    await set_states(hass, [("input_boolean.test", STATE_ON)])
+    response = await hass.services.async_call(
+        DOMAIN,
+        SERVICE_GET_GROUP_ENTITIES,
+        {ATTR_ENTITY_ID: entity_id},
+        blocking=True,
+        return_response=True,
+    )
+    assert response[entity_id][ATTR_ENTITIES] == set()
+
+
+async def test_debug_standby_energy_group_action(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_FIXED: {CONF_POWER: 20},
+        },
+    )
+    await set_states(hass, [("input_boolean.test", STATE_OFF)])
+
+    response = await hass.services.async_call(
+        DOMAIN,
+        SERVICE_DEBUG_GROUP,
+        {ATTR_ENTITY_ID: "sensor.all_standby_energy"},
+        blocking=True,
+        return_response=True,
+    )
+    assert response["sensor.all_standby_energy"][ATTR_SOURCE_GROUP] == {
+        ATTR_ENTITY_ID: "sensor.all_standby_power",
+        ATTR_STATE: "0.20",
+        ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
+        ATTR_MEMBERS: {
+            "sensor.test_power": {ATTR_STATE: "0.20", ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT},
+        },
+    }

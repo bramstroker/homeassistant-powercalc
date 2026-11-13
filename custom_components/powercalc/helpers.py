@@ -24,6 +24,7 @@ from custom_components.powercalc.const import (
     PLACEHOLDER_ENTITY_BY_DEVICE_CLASS,
     PLACEHOLDER_ENTITY_BY_TRANSLATION_KEY,
     PLACEHOLDER_ENTITY_BY_UNIQUE_ID_SUFFIX,
+    PLACEHOLDER_OPTIONAL_PREFIX,
     CalculationStrategy,
 )
 from custom_components.powercalc.device_binding import get_profile_related_devices
@@ -164,9 +165,11 @@ def replace_placeholders(
     return data
 
 
-def iter_related_entity_placeholders(placeholders: Iterable[str]) -> Iterator[str]:
+def iter_related_entity_placeholders(placeholders: Iterable[str], *, include_optional: bool = True) -> Iterator[str]:
     """Yield placeholders that need lookup against related entities."""
     for placeholder in placeholders:
+        if not include_optional and placeholder.startswith(PLACEHOLDER_OPTIONAL_PREFIX):
+            continue
         if parse_related_entity_placeholder(placeholder):
             yield placeholder
 
@@ -198,6 +201,7 @@ def build_related_entity_placeholder_not_found_message(placeholder: str, source_
 
 
 def parse_related_entity_placeholder(placeholder: str) -> tuple[RelatedEntityPlaceholderDefinition, str] | None:
+    placeholder = placeholder.removeprefix(PLACEHOLDER_OPTIONAL_PREFIX)
     for definition in RELATED_ENTITY_PLACEHOLDER_DEFINITIONS:
         if placeholder.startswith(definition.prefix):
             return definition, placeholder.removeprefix(definition.prefix)

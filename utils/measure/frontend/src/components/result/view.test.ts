@@ -513,3 +513,47 @@ describe("result view", () => {
     expect(click).toHaveBeenCalled();
   });
 });
+
+
+it("edits recording labels, preserves failures for retry, and allows clearing", async () => {
+  const element = document.createElement("measure-result-view") as ResultView;
+  element.snapshot = { state: "completed" };
+  element.files = [{ name: "record.jsonl", size: 1024, media_type: "application/octet-stream", recording_label: "Full cycle" }];
+  element.saveRecordingLabel = vi.fn().mockRejectedValueOnce(new Error("Storage unavailable")).mockImplementation(async (name: string, label: string) => {
+    element.files = element.files.map((file) => file.name === name ? { ...file, recording_label: label } : file);
+  });
+  document.body.append(element);
+  await element.updateComplete;
+  const root = element.shadowRoot!;
+  root.querySelector<HTMLButtonElement>(".label-action")!.click();
+  await element.updateComplete;
+  const input = root.querySelector<HTMLInputElement>(".label-editor input")!;
+  expect(root.activeElement).toBe(input);
+  expect(input.value).toBe("Full cycle");
+  input.value = "  Overnight standby  ";
+  input.dispatchEvent(new Event("input"));
+  const submit = async () => {
+    root.querySelector("form")!.dispatchEvent(new Event("submit", { cancelable: true }));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await element.updateComplete;
+  };
+  await submit();
+  expect(root.querySelector('[role="alert"]')!.textContent).toContain("Storage unavailable");
+  expect(root.querySelector<HTMLInputElement>("input")!.value).toBe("  Overnight standby  ");
+  await submit();
+  expect(root.querySelector(".recording-label")!.textContent).toBe("Overnight standby");
+  expect(element.saveRecordingLabel).toHaveBeenLastCalledWith("record.jsonl", "Overnight standby");
+  root.querySelector<HTMLButtonElement>(".label-action")!.click();
+  await element.updateComplete;
+  const cleared = root.querySelector<HTMLInputElement>("input")!;
+  cleared.value = "";
+  cleared.dispatchEvent(new Event("input"));
+  await submit();
+  expect(root.querySelector(".recording-label")).toBeNull();
+  expect(root.querySelector(".label-action")!.textContent).toBe("Add label");
+  root.querySelector<HTMLButtonElement>(".label-action")!.click();
+  await element.updateComplete;
+  root.querySelector<HTMLButtonElement>('.label-editor button[type="button"]')!.click();
+  await element.updateComplete;
+  expect(root.querySelector("form")).toBeNull();
+});

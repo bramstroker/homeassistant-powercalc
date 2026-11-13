@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 
 from measure.analyser.models import ActivityReport, EnergyMetrics
 from measure.analyser.sample_intervals import calculate_sample_durations
+from measure.analyser.vacuum.settling import SettlingBranch
 from measure.analyser.vacuum.signals import Activity
 from measure.analyser.vacuum.strategy import FixedBranch, VacuumCompositeCandidate, VacuumEpisode, group_vacuum_episodes
 from measure.recording.models import RecordingSample
@@ -69,7 +70,9 @@ def build_activity_reports(
         power = candidate.estimate_activity_power(sample, activity)
         if power is not None:
             data.predictions[id(sample)] = power
-    fixed_activities = {branch.activity for branch in candidate.branches if isinstance(branch, FixedBranch)}
+    fixed_activities = {
+        branch.activity for branch in candidate.branches if isinstance(branch, FixedBranch | SettlingBranch)
+    }
     return [
         data.build_report(activity, samples, has_fixed_power=activity in fixed_activities)
         for activity, data in grouped.items()
@@ -95,11 +98,16 @@ def find_credibility_failure(reports: Sequence[ActivityReport]) -> str | None:
 def _find_activity_failure(report: ActivityReport) -> str | None:
     """Check coverage and the appropriate error metric for one identified activity."""
     activity = report.activity
-    if report.coverage < 0.9 and not report.has_fixed_power:
+    if report.coverage < 0.9 and activity == Activity.CHARGING and not report.has_fixed_power:
         # A charging curve cannot estimate battery levels its training charges never reached.
         return (
             f"The {activity} model covers only {report.coverage:.0%} of its validation samples; "
             "record one continuous charge from a low battery through to full with mop drying off"
+        )
+    if report.coverage < 0.9 and not report.has_fixed_power:
+        return (
+            f"No model was fitted for {activity}; record longer, complete {activity} cycles with enough "
+            "consecutive readings for fitting and validation, and the entities that report this activity"
         )
     if report.coverage < 0.9:
         return (
@@ -130,8 +138,9 @@ def _find_energy_failure(report: ActivityReport) -> str | None:
     reason = f"The {activity} validation predicts {predicted_w:.2f} W on average, but {measured_w:.2f} W was measured; "
     if activity in {Activity.SLEEPING, Activity.COMPLETED, Activity.DOCKED}:
         return (
-            reason + "this state may include both post-charge settling and stable standby, which one fixed-power "
-            "branch cannot represent. More identical recordings may not resolve this limitation"
+            reason + "this recorded state may cover different power-consumption phases that one fixed-power "
+            "value cannot represent. Check whether additional entities distinguish those phases. "
+            "More identical recordings may not resolve this limitation"
         )
     return reason + f"record repeated, complete {activity} cycles and the entities that report this activity"
 

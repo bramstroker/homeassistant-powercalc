@@ -139,6 +139,13 @@ describe("response boundary", () => {
     };
 
     expect(decodeSessionSnapshot(response)).toBe(response);
+    for (const waiting of [true, false]) {
+      const recording = { ...response, progress: { ...response.progress, waiting_for_entities: waiting } };
+      expect(decodeSessionSnapshot(recording)).toBe(recording);
+    }
+    expect(() => decodeSessionSnapshot({
+      ...response, progress: { ...response.progress, waiting_for_entities: "true" },
+    })).toThrow("Invalid session snapshot response");
     const { can_analyse: _missing, ...withoutCapability } = response;
     expect(() => decodeSessionSnapshot(withoutCapability)).toThrow("Invalid session snapshot response");
     expect(() => decodeSessionSnapshot({ ...response, can_analyse: "yes" })).toThrow("Invalid session snapshot response");

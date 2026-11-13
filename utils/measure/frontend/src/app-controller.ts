@@ -2,7 +2,7 @@ import { ApiError } from "./api-client";
 import type { MeasureApiClient } from "./api-client";
 import { AuthController } from "./contribution/auth";
 import { entityDomains, requestFormData } from "./measurement/definition";
-import { meterFor } from "./power-meter/registry";
+import { meterFor, specFromSettings } from "./power-meter/registry";
 import { hasModelArtifact } from "./utils/artifacts";
 import { emptyPlots } from "./types";
 import type {
@@ -33,13 +33,14 @@ import type {
   SessionEvent,
   SessionFile,
   SessionSnapshot,
+  SessionPowerMeter,
   SessionState,
   SessionSummary,
   SettingsSection,
   ShellyDiscoveryDevice,
 } from "./types";
 
-export type AppView = "loading" | "sessions" | "setup" | "review" | "running" | "result" | "profile" | "submit" | "settings";
+export type AppView = "loading" | "sessions" | "setup" | "review" | "running" | "result" | "profile" | "submit" | "settings" | "power_meter";
 
 export interface MeasureAppState {
   view: AppView;
@@ -58,6 +59,8 @@ export interface MeasureAppState {
   snapshot?: SessionSnapshot;
   sessions: SessionSummary[];
   request?: MeasurementRequest;
+  /** Meter selection in setup, independent of the last submitted request. */
+  draftPowerMeter?: SessionPowerMeter;
   selectedMeasureType?: MeasureType;
   preflight?: PreflightResponse;
   files: SessionFile[];
@@ -132,6 +135,7 @@ export class MeasureAppController {
   private settingsReturnView: AppView = "setup";
   private powerMeterTestVersion = 0;
   private shellyDiscoveryVersion = 0;
+  private calibrationVersion = 0;
   private readonly contributionAuthController: AuthController;
   private readonly contributionTouchedFields = new Set<string>();
 
@@ -157,6 +161,7 @@ export class MeasureAppController {
 
   dispose(): void {
     this.shellyDiscoveryVersion += 1;
+    this.calibrationVersion += 1;
     this.contributionAuthController.dispose();
     this.eventConnection?.close();
   }
@@ -304,6 +309,7 @@ export class MeasureAppController {
     this.resetDraft();
     this.state.view = "setup";
     this.changed();
+    void this.refreshDummyLoadCalibration().then(() => this.changed());
   }
 
   openProfile(): void {
@@ -335,12 +341,6 @@ export class MeasureAppController {
   backToResult(): void {
     this.clearError();
     this.state.view = "result";
-    this.changed();
-  }
-
-  replaceDraftEnvironment(powerMeter: MeasurementRequest["power_meter"], measureDevice: string): void {
-    if (!this.state.request) return;
-    this.state.request = { ...this.state.request, power_meter: powerMeter, measure_device: measureDevice };
     this.changed();
   }
 
@@ -384,6 +384,7 @@ export class MeasureAppController {
       const draft = { ...snapshot.request, resume_policy: "new" as const };
       this.resetDraft(draft);
       await this.loadTypeEntities(draft.measure_type, draft);
+      await this.refreshDummyLoadCalibration();
       this.state.view = "setup";
     });
   }
@@ -399,6 +400,7 @@ export class MeasureAppController {
   openSettings(section?: SettingsSection): void {
     if (this.state.view === "loading" || this.state.view === "settings") return;
     this.settingsReturnView = this.state.view;
+    if (this.state.view === "setup") this.initializeDraftPowerMeter();
     this.state.settingsSection = section;
     this.clearError();
     this.powerMeterTestVersion += 1;
@@ -415,6 +417,43 @@ export class MeasureAppController {
     this.clearError();
     this.state.view = this.settingsReturnView;
     this.changed();
+  }
+
+  private initializeDraftPowerMeter(): void {
+    if (this.state.draftPowerMeter) return;
+    this.state.draftPowerMeter = {
+      power_meter: structuredClone(this.state.request?.power_meter ?? specFromSettings(this.state.settings, {
+        powers: this.state.powers, voltages: this.state.voltages,
+      })),
+      measure_device: this.state.request?.measure_device ?? this.state.settings?.default_measure_device ?? "",
+    };
+  }
+
+  openPowerMeterEditor(): void {
+    if (this.state.view !== "setup") return;
+    this.initializeDraftPowerMeter();
+    this.clearError();
+    this.clearPowerMeterTestResult();
+    this.state.view = "power_meter";
+    this.changed();
+    void this.loadMeasureDevices();
+    if (meterFor(this.state.draftPowerMeter!.power_meter.type).discoverable) void this.discoverShellys();
+  }
+
+  closePowerMeterEditor(): void {
+    this.clearPowerMeterTestResult();
+    this.backToSetup();
+  }
+
+  async saveSessionPowerMeter(configuration: SessionPowerMeter): Promise<void> {
+    if (this.state.view !== "power_meter") return;
+    await this.run(async () => {
+      this.state.draftPowerMeter = structuredClone(configuration);
+      this.state.preflight = undefined;
+      this.state.dummyLoadCalibration = null;
+      await this.refreshDummyLoadCalibration();
+      if (this.state.view === "power_meter") this.closePowerMeterEditor();
+    });
   }
 
   private async loadMeasureDevices(): Promise<void> {
@@ -583,10 +622,17 @@ export class MeasureAppController {
   }
 
   private async refreshDummyLoadCalibration(): Promise<void> {
+    const version = ++this.calibrationVersion;
     try {
-      this.state.dummyLoadCalibration = await this.api().getDummyLoadCalibration();
+      const meter = this.state.draftPowerMeter?.power_meter;
+      const calibration = meter
+        ? await this.api().getCompatibleCalibration(meter)
+        : await this.api().getDummyLoadCalibration();
+      if (version !== this.calibrationVersion) return;
+      this.state.dummyLoadCalibration = calibration;
       this.state.dummyLoadCalibrationError = "";
     } catch (error) {
+      if (version !== this.calibrationVersion) return;
       this.state.dummyLoadCalibrationError = `Could not load the saved dummy-load calibration: ${message(error)}`;
     }
   }
@@ -695,6 +741,8 @@ export class MeasureAppController {
     this.state.connectedToEvents = false;
     this.state.snapshot = { state: "idle" };
     this.state.request = request;
+    this.state.draftPowerMeter = undefined;
+    this.initializeDraftPowerMeter();
     this.state.selectedMeasureType = request?.measure_type;
     this.state.preflight = undefined;
     this.state.files = [];
@@ -751,6 +799,7 @@ export class MeasureAppController {
     this.state.setupDraftVersion = (this.state.setupDraftVersion ?? 0) + 1;
     this.state.lastEventReceivedAt = undefined;
     this.state.request = request;
+    this.state.draftPowerMeter = undefined;
     if (request) await this.loadTypeEntities(request.measure_type, request);
   }
 
@@ -770,6 +819,16 @@ export class MeasureAppController {
       this.state.logs = [...this.state.logs, `${label} failed: ${message(error)}`];
     } finally {
       this.state.busy = false;
+      this.changed();
+    }
+  }
+
+  async saveRecordingLabel(name: string, label: string): Promise<void> {
+    const sessionId = this.state.snapshot?.session_id;
+    if (!sessionId) throw new Error("No session is selected");
+    const files = await this.api().setRecordingLabel(sessionId, name, label);
+    if (this.state.snapshot?.session_id === sessionId) {
+      this.state.files = files;
       this.changed();
     }
   }

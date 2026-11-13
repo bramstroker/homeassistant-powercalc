@@ -222,6 +222,37 @@ async def test_discovery_flow_auto_resolves_availability_entity_from_translation
     assert result["data"][CONF_AVAILABILITY_ENTITY] == "sensor.ups_nominal_power"
 
 
+@pytest.mark.parametrize("optional_entity_present", [True, False])
+async def test_discovery_optional_entities_do_not_require_enabling_or_control_availability(
+    hass: HomeAssistant,
+    optional_entity_present: bool,
+) -> None:
+    device = mock_device(hass, "ups", model="discovery_optional_entity")
+    entities = {"sensor.ups_output": {"device_id": device.id, "platform": "test"}}
+    if optional_entity_present:
+        entities["sensor.ups_nominal_power"] = {
+            "device_id": device.id,
+            "platform": "test",
+            "translation_key": "ups_power_nominal",
+        }
+    mock_entities_in_registry(hass, entities)
+    source = create_source_entity("sensor.ups_output", hass)
+    profile = await get_power_profile(
+        hass,
+        {CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("discovery_optional_entity")},
+        source,
+        ModelInfo("test", "discovery_optional_entity"),
+        process_variables=False,
+    )
+
+    result = await initialize_discovery_flow(hass, source, profile)
+    assert result["description_placeholders"]["remarks"] is None
+
+    result = await confirm_auto_discovered_model(hass, result)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.AVAILABILITY_ENTITY
+
+
 async def test_discovery_flow_with_subprofile_selection(
     hass: HomeAssistant,
 ) -> None:

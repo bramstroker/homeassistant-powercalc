@@ -152,10 +152,12 @@ class HomeAssistantWebsocketClient(WebsocketClient):
         return self.recv_result_list(self.send(HASS_DEVICE_REGISTRY_LIST))
 
     def list_entity_registry(self) -> tuple[EntityRegistryEntry, ...]:
-        """Return entity registry entries with Home Assistant unique IDs normalized to strings."""
+        """Normalize entity registry responses for the Home Assistant API model."""
 
         entries: list[EntityRegistryEntry] = []
         for raw_entry in self.recv_result_list(self.send(HASS_ENTITY_REGISTRY_LIST)):
+            # Some Home Assistant responses omit this flag when it is false.
+            raw_entry = {"has_entity_name": False, **raw_entry}
             unique_id = raw_entry.get(HASS_ENTITY_REGISTRY_UNIQUE_ID)
             if unique_id is not None and not isinstance(unique_id, str):
                 raw_entry = {**raw_entry, HASS_ENTITY_REGISTRY_UNIQUE_ID: str(unique_id)}

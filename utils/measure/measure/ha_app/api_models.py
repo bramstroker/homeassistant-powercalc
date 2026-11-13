@@ -80,6 +80,7 @@ class SessionFile(BaseModel):
     size: int
     media_type: str
     modified_at: str
+    recording_label: str | None = None
 
 
 class SessionPlots(BaseModel):
@@ -110,6 +111,7 @@ class SessionProgressResponse(BaseModel):
     completed: int
     total: int
     skipped: int
+    waiting_for_entities: bool
     percent: float
     estimated_remaining_seconds: int | None
 

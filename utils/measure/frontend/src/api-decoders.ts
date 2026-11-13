@@ -397,6 +397,7 @@ const isSessionState = oneOf(
 );
 const isSessionProgress = objectOf({
   completed: isInteger, total: isInteger, skipped: isInteger, percent: isNumber,
+  waiting_for_entities: optional(isBoolean),
   estimated_remaining_seconds: nullable(isInteger),
 });
 const isSessionSnapshot: Guard<SessionSnapshot> = objectOf({
@@ -473,7 +474,7 @@ export const decodePreflight = decoder("preflight", isPreflight);
 export const decodeSessionSnapshot = decoder("session snapshot", isSessionSnapshot);
 export const decodeSessionSummaries = decoder("session list", arrayOf(isSessionSummary));
 export const decodeSessionFiles: Decoder<SessionFile[]> = decoder("session files", arrayOf(objectOf({
-  name: isString, size: isNumber, media_type: isString, modified_at: optional(isString),
+  name: isString, size: isNumber, media_type: isString, modified_at: optional(isString), recording_label: optional(nullable(isString)),
 })));
 export const decodePlots = decoder("plots", isPlotCollection);
 export const decodeContributionPreview = decoder("contribution preview", isContributionPreview);
@@ -532,7 +533,8 @@ export function decodeSessionEnvelope(value: unknown): DecodedSessionEnvelope {
       break;
     case "progress":
       if (!(isInteger(value.data.completed) && isInteger(value.data.total) && isInteger(value.data.skipped)
-        && isString(value.data.mode) && isString(value.data.estimated_remaining))) {
+        && isString(value.data.mode) && isString(value.data.estimated_remaining)
+        && optional(isBoolean)(value.data.waiting_for_entities))) {
         throw new Error("Invalid progress event");
       }
       break;

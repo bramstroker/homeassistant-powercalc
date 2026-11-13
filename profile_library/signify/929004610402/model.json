@@ -1,0 +1,33 @@
+{
+  "authors": [
+    {
+      "github": "luuk58",
+      "name": "luuk58"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-07T00:53:53Z",
+  "device_type": "light",
+  "gtin": [
+    "8721103087812"
+  ],
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plus Plug S Gen2",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.14.2:app"
+  },
+  "name": "Hue Flux strip light (3m)",
+  "product_url": "https://www.philips-hue.com/nl-nl/p/lightstrips-flux-lightstrip-3-m/8721103087812",
+  "standby_power": 0.4,
+  "standby_power_estimated": true,
+  "voltage_range": {
+    "max": 239.8,
+    "min": 231.2
+  }
+}

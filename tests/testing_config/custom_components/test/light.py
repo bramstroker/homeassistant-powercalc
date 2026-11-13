@@ -11,6 +11,7 @@ from homeassistant.components.light import ColorMode, LightEntity, LightEntityFe
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from pytest_homeassistant_custom_component.common import MockToggleEntity
@@ -84,13 +85,13 @@ class MockLight(MockToggleEntity, LightEntity):
         self._attr_unique_id = unique_id
 
     @property
-    def device_info(self) -> dict:
-        return {
-            "identifiers": {("hue", self.unique_id)},
-            "name": self.name,
-            "manufacturer": self.manufacturer,
-            "model": self.model,
-        }
+    def device_info(self) -> DeviceInfo:
+        return DeviceInfo(
+            identifiers={("hue", self.unique_id)},
+            name=self.name,
+            manufacturer=self.manufacturer,
+            model=self.model,
+        )
 
     def turn_on(self, **kwargs) -> None:  # noqa: ANN003
         """Turn the entity on."""

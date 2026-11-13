@@ -1,4 +1,4 @@
-import type { AppSettings, EntityDescriptor, MeasurementRequest, PowerMeterSpec, PowerMeterType } from "../types";
+import type { AppSettings, EntityDescriptor, MeasurementRequest, PowerMeterSpec, PowerMeterType, SessionPowerMeter } from "../types";
 import { formChoice, formTextOrNull } from "../utils/form";
 
 /** Username Shelly devices are reached with unless the user configured another one. */
@@ -170,6 +170,21 @@ export function specFromRequest(
   context: MeterContext,
 ): PowerMeterSpec {
   return request?.power_meter ?? specFromSettings(settings, context);
+}
+
+/** Seed the shared meter fields from a session without changing the saved defaults. */
+export function settingsForSessionMeter(settings: AppSettings, configuration: SessionPowerMeter): AppSettings {
+  const meter = configuration.power_meter;
+  return {
+    ...settings,
+    power_meter: meter.type,
+    default_measure_device: configuration.measure_device,
+    default_power_entity_id: meter.type === "hass" ? meter.entity_id : null,
+    shelly_ip: meter.type === "shelly" ? meter.device_ip : null,
+    shelly_channel: meter.type === "shelly" ? meter.channel : null,
+    shelly_username: meter.type === "shelly" ? meter.username : DEFAULT_SHELLY_USERNAME,
+    kasa_ip: meter.type === "kasa" ? meter.device_ip : null,
+  };
 }
 
 /** The settings payload the form describes: the selected meter's keys, and null for the rest. */

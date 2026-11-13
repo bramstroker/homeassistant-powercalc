@@ -111,6 +111,7 @@ export class ResultView extends LitElement {
   @property({ attribute: false }) fileUrl: (name: string) => string = () => "";
   @property({ attribute: false }) downloadAll: () => void = () => {};
   @property({ attribute: false }) inspectJsonFile: (name: string) => Promise<unknown> = async () => undefined;
+  @property({ attribute: false }) saveRecordingLabel: (name: string, label: string) => Promise<void> = async () => {};
   @property({ type: String }) diagnosticsUrl = "";
   @property({ type: Boolean }) busy = false;
   @property({ type: Boolean }) canResume = false;
@@ -122,6 +123,10 @@ export class ResultView extends LitElement {
 
   @state() private jsonInspector?: JsonInspectorState;
   private inspectorTrigger?: HTMLElement;
+  @state() private editingLabel?: string;
+  @state() private labelDraft = "";
+  @state() private labelSaving = false;
+  @state() private labelError = "";
 
   protected updated(changed: PropertyValues<this>): void {
     const dialog = this.shadowRoot?.querySelector<HTMLDialogElement>(".json-dialog");
@@ -168,6 +173,12 @@ export class ResultView extends LitElement {
     .download-all { min-height: 36px; padding: 0.45rem 0.75rem; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
     .file-actions { display: flex; align-items: center; gap: 0.55rem; }
     .file-details { display: grid; gap: 0.25rem; min-width: 0; }
+    .recording-label { font-weight: 700; color: var(--ink); }
+    .label-action { min-height: 32px; padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+    .label-editor { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: end; padding: 0.75rem; border: 1px solid var(--line); border-radius: 10px; background: var(--well); }
+    .label-editor label { flex: 1 1 16rem; display: grid; gap: 0.4rem; font-size: 0.8rem; }
+    .label-editor input { width: 100%; box-sizing: border-box; }
+    .label-editor p { flex-basis: 100%; margin: 0; color: var(--danger); }
     .recording-files-help { margin: 0.75rem 0 0; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
     .recording-files-help code { overflow-wrap: anywhere; }
     .inspect-file { display: grid; place-items: center; width: 38px; min-height: 38px; padding: 0; color: var(--signal-strong); }
@@ -194,8 +205,11 @@ export class ResultView extends LitElement {
     a { color: var(--signal-strong); font-weight: 700; }
     @media (max-width: 520px) {
       .files-header { align-items: flex-start; flex-direction: column; }
-      li { grid-template-columns: 1fr auto; }
-      li small { grid-column: 1; grid-row: 2; }
+      li { grid-template-columns: minmax(0, 1fr) auto; gap: 0.6rem; }
+      .file-details { grid-column: 1 / -1; }
+      li > small { grid-column: 1; grid-row: 2; }
+      .file-actions { grid-column: 2; grid-row: 2; }
+      .label-editor { grid-row: 3; }
     }
   `];
 
@@ -284,7 +298,7 @@ export class ResultView extends LitElement {
 
   private renderFiles() {
     if (this.files.length) {
-      return html`
+      return html`<section aria-label="Saved files">
         <div class="files-header">
           <h3>${this.snapshot.state === "completed" ? "Generated files" : "Saved partial files"}</h3>
           <button class="download-all" type="button" @click=${() => this.downloadAll()}>Download all</button>
@@ -292,24 +306,67 @@ export class ResultView extends LitElement {
         ${this.canAnalyse ? html`<p class="recording-files-help">
           The unnumbered recording is the latest run. When you choose Record more, it is renamed with the next
           available number and a new recording is started. Earlier runs are kept and analysed together.
-          Dates below show when each file was last modified, in your local time.
+          Add a label to help identify each run. Dates are shown in your local time.
         </p>` : nothing}
         <ul>${this.files.map((file) => html`
-          <li><div class="file-details"><span>${file.name}</span>
+          <li><div class="file-details">
+            ${file.recording_label ? html`<span class="recording-label">${file.recording_label}</span><small>${file.name}</small>` : html`<span>${file.name}</span>`}
             ${file.modified_at ? html`<small>Modified <time datetime=${file.modified_at}>${timestamp(file.modified_at)}</time></small>` : nothing}
           </div><small>${fileSize(file.size)}</small><div class="file-actions">
+            ${file.recording_label != null ? html`<button class="label-action" type="button" ?disabled=${this.busy || this.labelSaving} aria-label=${`${file.recording_label ? "Edit" : "Add"} label for ${file.name}`} @click=${() => this.editRecordingLabel(file)}>${file.recording_label ? "Edit label" : "Add label"}</button>` : nothing}
             ${this.isInspectableJson(file) ? html`
               <button class="inspect-file" type="button" title=${`View ${file.name}`} aria-label=${`View ${file.name}`} @click=${(event: MouseEvent) => void this.openJsonInspector(file.name, event.currentTarget as HTMLElement)}>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
               </button>
             ` : nothing}
             <a href=${this.fileUrl(file.name)} download>Download<span class="sr-only"> ${file.name}</span></a>
-          </div></li>
+          </div>${this.editingLabel === file.name ? this.renderLabelEditor() : nothing}</li>
         `)}</ul>
-      `;
+      </section>`;
     }
     if (this.summaryEntries().length) return nothing;
     return html`<p class="notice">No downloadable files are available for this session.</p>`;
+  }
+
+  private async editRecordingLabel(file: SessionFile): Promise<void> {
+    this.editingLabel = file.name;
+    this.labelDraft = file.recording_label ?? "";
+    this.labelError = "";
+    await this.updateComplete;
+    this.shadowRoot?.querySelector<HTMLInputElement>(".label-editor input")?.focus();
+  }
+
+  private renderLabelEditor() {
+    return html`<form class="label-editor" @submit=${(event: SubmitEvent) => { event.preventDefault(); void this.saveLabel(); }} @keydown=${(event: KeyboardEvent) => { if (event.key === "Escape" && !this.labelSaving) { event.preventDefault(); void this.closeLabelEditor(); } }}>
+      <label>Recording label<input .value=${this.labelDraft} maxlength="120" placeholder="e.g. Overnight standby" ?disabled=${this.labelSaving} @input=${(event: InputEvent) => { this.labelDraft = (event.target as HTMLInputElement).value; }}></label>
+      <button type="submit" ?disabled=${this.labelSaving}>${this.labelSaving ? "Saving…" : "Save"}</button>
+      <button type="button" ?disabled=${this.labelSaving} @click=${() => void this.closeLabelEditor()}>Cancel</button>
+      ${this.labelError ? html`<p role="alert">${this.labelError}</p>` : nothing}
+    </form>`;
+  }
+
+  private async closeLabelEditor(): Promise<void> {
+    const name = this.editingLabel;
+    this.editingLabel = undefined;
+    await this.updateComplete;
+    const buttons = this.shadowRoot?.querySelectorAll<HTMLButtonElement>(".label-action");
+    [...buttons ?? []].find((button) => button.getAttribute("aria-label")?.endsWith(`for ${name}`))?.focus();
+  }
+
+  private async saveLabel(): Promise<void> {
+    const name = this.editingLabel;
+    if (!name || this.labelSaving) return;
+    this.labelSaving = true;
+    this.labelError = "";
+    try {
+      await this.saveRecordingLabel(name, this.labelDraft.trim());
+      this.labelSaving = false;
+      await this.closeLabelEditor();
+    } catch (error) {
+      this.labelError = error instanceof Error ? error.message : "Could not save the recording label.";
+    } finally {
+      this.labelSaving = false;
+    }
   }
 
   private isInspectableJson(file: SessionFile): boolean {

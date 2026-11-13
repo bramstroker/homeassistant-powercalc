@@ -5,6 +5,10 @@
     "integration",
     "utility_meter"
   ],
+  "categories": [
+    "helpers.calculate_value",
+    "energy.meters_monitoring"
+  ],
   "codeowners": [
     "@bramstroker"
   ],

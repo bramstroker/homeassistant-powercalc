@@ -61,6 +61,50 @@ For example, a Roborock profile can reference the dock's active drying switch in
 
 The `_dock` identifier rule is specific to the Roborock integration. Other integrations may expose dock entities directly on the vacuum device or as native child devices.
 
+### Optional related entities and fallbacks
+
+Prefix a related-entity placeholder with `optional:` to allow profile setup when the entity is missing or disabled:
+
+```jinja
+[[optional:entity_by_translation_key:water_temperature]]
+```
+
+This works with `entity_by_device_class`, `entity_by_translation_key`, and `entity_by_unique_id_suffix`.
+The placeholder becomes the entity ID when the lookup succeeds, or an empty string when it cannot resolve a match.
+The usual device boundaries and ambiguity rules still apply. Existing placeholders without `optional:` remain required.
+
+Use optional placeholders inside templates, guarding the empty string before calling entity functions.
+The template defines the fallback and any value conversion. For example, this composite branch prefers an enabled
+water-temperature select and falls back to the vacuum attribute when the select is missing, disabled, `unknown`, or `unavailable`:
+
+```json
+{
+  "condition": {
+    "condition": "template",
+    "value_template": "{% set entity = '[[optional:entity_by_translation_key:water_temperature]]' %}{% set temperature = states(entity) if entity and has_value(entity) else state_attr('[[entity]]', 'water_temperature') %}{{ temperature | lower == 'hot' }}"
+  },
+  "fixed": {
+    "power": 110.3
+  }
+}
+```
+
+Here the select value `hot` and attribute value `Hot` are normalized to the same value.
+Other settings may need different conversions: a drying-time select might expose `3h` while an attribute contains the number `3`.
+Check each integration's actual values when writing a profile.
+
+Templates track changes to resolved entities and to attributes they read, so the fallback updates during operation.
+Entity lookup happens when the profile loads. Reload the Powercalc configuration after enabling or adding an optional entity
+to use it as the preferred source. Runtime state changes such as `unavailable` do not require a reload.
+
+Optional entities do not trigger discovery remarks about missing required entities and are not automatically selected as
+the sensor's availability entity. Do not use an optional placeholder directly as an `entity_id` in a state condition:
+an empty string is not a valid entity ID. Define what happens when both sources lack a usable value; a composite profile
+with no matching branch makes the power sensor unavailable.
+
+This feature is unreleased. Before publishing a library profile using it, set `min_version` to the Powercalc release
+that introduces optional placeholders so older installations do not load an incompatible profile.
+
 ## Custom fields
 
 Sometimes there is a need to ask the user to provide some additional data for a profile.

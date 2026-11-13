@@ -7,8 +7,8 @@
   ],
   "calculation_strategy": "fixed",
   "description": "Smart Wi-Fi Plug with Power Monitoring & Matter",
-  "config_flow_sub_profile_remarks": "You need to select a profile depending on your device settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw. Different WLAN signal can change power draw.\n\"+WLAN +ECO +LED\": WLAN client on, repeater turned off, BT turned off, 100% green/red brightness with switch state LED indication mode\n\"+WLAN +ECO -LED\": WLAN client on, repeater turned off, BT turned off, LED indication turned off.",
-  "created_at": "2025-05-01T21:56:26Z",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\nNote: The Wi-Fi repeater function was disabled during all measurements.\n\nLED status indicator variants (PLUGS_UI `leds.mode`):\n- \"LED\": `leds.mode = \"switch\"`, i.e. the LED follows the output state, not the measured power. `colors.switch:0.on` = rgb [0, 100, 0] at brightness 100, `colors.switch:0.off` = brightness 0 (LED dark). Night mode disabled.\n- \"No LED\": `leds.mode = \"off\"`, LED indication disabled completely. The `power` mode was not used for any measurement.\n\nSub-profile configurations:\n\"WLAN + BT + ECO\": All three turned on.\n\"WLAN + ECO\": Both turned on.\n\"WLAN + BT\": Both turned on, ECO turned off.\n\"WLAN\": Only WLAN turned on, ECO turned off.",
+  "created_at": "2026-11-01T21:30:05Z",
   "device_type": "smart_switch",
   "device_specs": {
     "form_factor": "plug",
@@ -16,8 +16,9 @@
     "rated_power": 1,
     "connectivity": [
       "wifi",
+      "bluetooth",
       "matter",
-      "bluetooth"
+      "knx"
     ]
   },
   "gtin": [
@@ -25,12 +26,15 @@
     "3800235261859"
   ],
   "discovery_by": "entity",
-  "measure_description": "Measured with 1.5W (average over 600s) dummy load over 600s and calculated average. WLAN RSSI: -40 dBm, Firmware version 1.2.3. Note: firmware have Shelly's confirmed bug with LED settings when ECO mode used, LED settings are not always applying correctly, and measurements are made only in a situation where the settings correspond to the actual behavior of the LED",
-  "measure_device": "Shelly PM Mini Gen3",
-  "measure_method": "script",
+  "measure_description": "Setup: the tested plug and a calibrated resistive dummy load are connected in parallel to the same mains input, and a second Shelly Plug S Gen3 measures upstream of both. The dummy load is never connected to the relay output, so the reference meter always reads about 33 W and can resolve the sub-watt self-consumption of the plug. The plug stays powered in both relay states; only the output relay changes, so the meter always sees the plug plus the dummy load.\n\nThe dummy load was calibrated with the measurement tool at 1600.01 Ohm, i.e. about 33 W at 230 V. Its contribution is subtracted from every sample instead of being applied as a fixed offset, because it follows the mains voltage:\n\n    P_self = P_upstream - (V^2 / R)\n\nThe tool applies this per sample and averages over the measurement window for each state. Two plateaus from the reference meter log during the run, one with the relay off and one with it on:\n\n- Relay OFF: V = 229.9 V, P_upstream = 33.70 W, V^2/R = 33.03 W, resulting P_self = 0.67 W.\n- Relay ON (no load at the output): V = 230.0 V, P_upstream = 34.10 W, V^2/R = 33.06 W, resulting P_self = 1.04 W.\n\nThe stored sub-profile values are the averages of these per-sample subtractions over the whole window, so a single plateau can differ from the stored value by a few tenths of a watt. For sub-profiles with LED enabled, the LED was active at full brightness only while the relay was switched on. Firmware version 2.1.1.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "manual",
   "mains_voltage": 230,
   "measure_settings": {
-    "VERSION": "v1.17.11:docker"
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 33.0,
+    "DUMMY_LOAD_RESISTANCE": 1600.01,
+    "VERSION": "v0.14.1:app"
   },
   "name": "Plug S Gen3",
   "only_self_usage": true,
@@ -40,6 +44,10 @@
       "name": "Largelos",
       "email": "vasilenkoeyu@gmail.com",
       "github": "Largelos"
+    },
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
     }
   ]
 }

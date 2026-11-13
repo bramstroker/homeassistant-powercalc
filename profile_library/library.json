@@ -606,6 +606,46 @@
         },
         {
           "aliases": [
+            "A3EH2E0YZ30OD6"
+          ],
+          "authors": [
+            {
+              "github": "wagnerpizza",
+              "name": "wagnerpizza"
+            }
+          ],
+          "calculation_strategy": "linear",
+          "created_at": "2026-10-25T14:11:44Z",
+          "device_type": "smart_speaker",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure using pink noise played manually through Spotify on the Echo Spot, with automatic streaming disabled.",
+          "measure_device": "Shelly Plus 1 PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 1.0,
+            "VERSION": "v0.14.1:app"
+          },
+          "name": "Echo Spot (Gen2)",
+          "standby_power": 1.8,
+          "voltage_range": {
+            "max": 236.8,
+            "min": 233.0
+          },
+          "id": "BV84J9",
+          "manufacturer": "amazon",
+          "updated_at": "2026-10-31T08:25:42",
+          "max_power": 3.98,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 1.96,
+            "max": 3.98
+          },
+          "hash": "d416d630bd23d1d0b6c7689842279053"
+        },
+        {
+          "aliases": [
             "ASQZWP4GPYUT7",
             "ECHO ASQZWP4GPYUT7"
           ],
@@ -2174,6 +2214,69 @@
       "models": [
         {
           "aliases": [
+            "rgbct-light",
+            "Athom RGBCCT Bulb"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-15T20:12:28Z",
+          "device_type": "light",
+          "device_specs": {
+            "socket": "E27",
+            "form_factor": "bulb",
+            "lumens": 1400,
+            "rated_power": 15.0,
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Athom Smart Plug v2",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.13.0:cli"
+          },
+          "name": "15W E27 RGBCCT Bulb for ESPHome (1400 lm)",
+          "legacy_ids": [
+            "rgbct-light"
+          ],
+          "standby_power": 0.07,
+          "voltage_range": {
+            "max": 242.6,
+            "min": 239.38
+          },
+          "authors": [
+            {
+              "name": "Mike Miller",
+              "github": "mikeage"
+            }
+          ],
+          "id": "LB01-15W-E27",
+          "manufacturer": "athom",
+          "updated_at": "2026-10-20T09:58:12",
+          "max_power": 12.75,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-19T18:41:59",
+          "power_range": {
+            "min": 0.01,
+            "max": 12.75
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 95.4,
+            "color_temp": 95.4
+          },
+          "hash": "0c3a27c2ff89b04b92f42de22bf54f2a"
+        },
+        {
+          "aliases": [
             "rgbww-light",
             "athom.rgbww-light",
             "Athom RGBCW Bulb"
@@ -2288,7 +2391,7 @@
       "name": "avm",
       "full_name": "AVM",
       "dir_name": "avm",
-      "website": "https://avm.de",
+      "website": "https://fritz.com",
       "country": "DE",
       "description": "Berlin manufacturer of FRITZ!Box routers and the FRITZ!DECT smart home range.",
       "models": [
@@ -2332,6 +2435,50 @@
             "max": 14.5
           },
           "hash": "bcbb183c2ea5525cdcfac7b7b34ddece"
+        },
+        {
+          "name": "Cable Router",
+          "device_type": "network",
+          "calculation_strategy": "fixed",
+          "measure_method": "script",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_description": "Measured with Powercalc measure tool in Average mode (600 seconds)",
+          "measure_settings": {
+            "VERSION": "v0.14.0:app"
+          },
+          "mains_voltage": 230,
+          "created_at": "2026-10-22T22:44:23Z",
+          "discovery_by": "device",
+          "device_specs": {
+            "form_factor": "router",
+            "rated_power": 27.5,
+            "connectivity": [
+              "wifi",
+              "ethernet",
+              "usb",
+              "proprietary"
+            ]
+          },
+          "gtin": [
+            "4023125028571"
+          ],
+          "product_url": "https://fritz.com/pages/service-fritz-box-6591-cable",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "FRITZ!Box 6591 Cable",
+          "manufacturer": "avm",
+          "updated_at": "2026-10-23T11:16:14",
+          "max_power": 12.4,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 12.4,
+            "max": 12.4
+          },
+          "hash": "4ab15da091ad317c60a6bcb91b8e28cc"
         },
         {
           "calculation_strategy": "fixed",
@@ -2744,6 +2891,46 @@
             "max": 4.79
           },
           "hash": "c8b6889ba9a42b5fd0ccce3350e2ef3d"
+        },
+        {
+          "authors": [
+            {
+              "github": "bohni",
+              "name": "Bohni"
+            }
+          ],
+          "calculation_strategy": "fixed",
+          "created_at": "2026-10-31T09:57:24Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "ethernet"
+            ],
+            "form_factor": "repeater",
+            "rated_power": 6
+          },
+          "device_type": "network",
+          "discovery_by": "device",
+          "gtin": [
+            "4023125028564"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc measure tool in Average mode (600 seconds)",
+          "measure_device": "Shelly Plug S",
+          "measure_device_firmware": "1.7.6-g01e9e18",
+          "measure_method": "script",
+          "name": "Wi-Fi Repeater",
+          "product_url": "https://fritz.com/en/pages/service-fritz-repeater-3000",
+          "id": "FRITZ!Repeater 3000",
+          "manufacturer": "avm",
+          "updated_at": "2026-11-01T14:37:53",
+          "max_power": 4.69,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 4.69,
+            "max": 4.69
+          },
+          "hash": "fbbcc11fc3fbde8b1bfdc5f8828a3c45"
         },
         {
           "calculation_strategy": "fixed",
@@ -3912,6 +4099,15 @@
       "description": "Chinese home-appliance company known for robotic vacuums and other smart cleaning devices.",
       "models": [
         {
+          "aliases": [
+            "dreame.vacuum.r2205"
+          ],
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
           "calculation_strategy": "composite",
           "compatible_integrations": [
             "dreame_vacuum"
@@ -3924,40 +4120,33 @@
             ],
             "rated_power": 46
           },
-          "measure_description": "Measured with utils/measure script",
+          "mains_voltage": 230,
+          "measure_description": "Measured on a Dreame D10 Plus (dreame.vacuum.r2205) through the dreame_vacuum integration with a Shelly Plug S Gen3 between the wall socket and the base station, so every value covers the whole station rather than the robot alone. All values are time averages over the window in which the matching condition holds, not peak values.\n\nRecordings:\n- 4.66 h run covering a full clean from 99 % down to 34 % and the charge back to 100 % (8,083 samples, about 2 s interval).\n- Two dock-only runs of about 2 minutes each at 100 %, used to confirm the settled docked level.\n\nCoverage:\n- Away from the dock (cleaning, returning, paused, error): 0.45 W, from 1,911 samples between 0.35 and 0.54 W.\n- Auto-empty: auto_empty_status is active for only about 8 to 13 s per cycle. The plateau inside that window is 668 W on the long run and 653 W on the dock-only runs, but its first 4 to 6 s are still at dock level (2 to 21 W) and one intermediate sample of 198 to 242 W was captured. The 400 W used here is the average over the complete active interval (33 samples), which is the interval the condition actually spans, so the ramp-up is included instead of being reported as a peak.\n- Docked and idle: 2.36 W. The long run settles at 2.36 W and both dock-only runs confirm it (2.36 W and 2.42 W).\n- Charging: one calibration point per battery level, median of each level. 35 % to 99 % comes from the new recording (32 to 124 samples per level, spread within a level about 0.1 W). 16 % to 34 % is taken unchanged from the previous recording of the same device, because that range was not covered by the new run; in the overlapping range 35 % to 39 % both recordings agree within 0.2 W (the new values sit 0.12 to 0.16 W higher). The 15 % point of the previous profile (17.31 W) was not carried over because it captures the charging ramp-in rather than the steady level, so everything below 16 % uses the 16 % value as a flat estimate.\n\nWhole-run energy: over the complete long recording the measured consumption is 75.63 Wh, while the profile predicts 71.15 Wh, an underestimate of 5.9 %. Most of that difference comes from the unmodelled post-charge decay described below.\n\nLimitations:\n- The first 31 minutes after a charge are not modelled separately. Directly after charging finishes the station still draws 14.9 W and decays to about 2.4 W over roughly 31 minutes (measured: 4.47 Wh in that window). Since the profile reports the settled 2.36 W there instead, each completed charge is under-counted by about 3.25 Wh. Modelling the decay would require a time-based template on charging_state.last_changed, which restarts on every Home Assistant restart or unavailable-to-off transition of that entity and would then overstate power for a full window, so the settled value is used instead on purpose.\n- The transition at 100 % is therefore not distinguished either: charging_state drops while the robot still reports 'charging' (about 15.0 W for roughly 10 s after a full charge, but only 2.4 to 2.8 W on a settled dock). That window falls into the docked branch.\n- Charging below 16 % is a flat extrapolation and not measured.\n- Two samples in the long run show an auto-empty while auto_empty_status still reports 'idle' (651 W). That combination is not modelled and falls through to the docked branch.\n- All values were recorded at a single mains voltage around 229 V.",
           "measure_device": "Shelly Plug S Gen3",
           "measure_method": "script",
-          "mains_voltage": 230,
           "measure_settings": {
+            "DUMMY_LOAD": false,
             "SAMPLE_COUNT": 1,
             "SLEEP_TIME": 2.0,
-            "VERSION": "v0.2.1:app"
+            "VERSION": "v0.14.1:app"
           },
           "name": "D10 Plus Robot Vacuum Cleaner",
           "product_url": "https://global.dreametech.com/products/dreame-d10-plus",
-          "standby_power": 2.6,
+          "legacy_ids": [
+            "d10-plus"
+          ],
+          "min_version": "v1.25.5",
+          "standby_power": 2.36,
           "voltage_range": {
             "min": 227.5,
             "max": 234.9
           },
-          "aliases": [
-            "dreame.vacuum.r2205"
-          ],
-          "legacy_ids": [
-            "d10-plus"
-          ],
-          "authors": [
-            {
-              "name": "Maxik933",
-              "github": "Maxik933"
-            }
-          ],
           "id": "RLS3D",
           "manufacturer": "dreame",
-          "updated_at": "2026-08-31T12:33:32",
+          "updated_at": "2026-11-03T21:34:33",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "017dc42a98a85333005e1e11679d98e9"
+          "hash": "847ff02281c1a5be0521ff434d84b257"
         },
         {
           "name": "X40 Ultra Complete",
@@ -3994,10 +4183,10 @@
           "calculation_strategy": "composite",
           "id": "RLX63CE-2",
           "manufacturer": "dreame",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-10-20T11:14:20",
           "max_power": null,
           "sub_profile_count": 0,
-          "hash": "23a92bf6f66a8b6c570bb2833c17d976"
+          "hash": "02ac9500d83dda9b26be51586c023ef1"
         },
         {
           "aliases": [
@@ -4296,6 +4485,45 @@
             "max": 36.03
           },
           "hash": "942b8fa2ba4f05c88648fd2d4274bc45"
+        },
+        {
+          "authors": [
+            {
+              "github": "LewisSpring",
+              "name": "LewisSpring"
+            }
+          ],
+          "calculation_strategy": "composite",
+          "created_at": "2026-10-12T12:12:55Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi"
+            ],
+            "form_factor": "tower"
+          },
+          "device_type": "fan",
+          "mains_voltage": 230,
+          "measure_description": "Speed curve measured with Powercalc Measure with oscillation off. Oscillation adds an average of 2.39 W, measured at 11%, 55% and 100% speed.",
+          "measure_device": "TP-Link Kasa HS110",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.12.0:app"
+          },
+          "name": "554S Smart Tower Fan",
+          "standby_power": 1.16,
+          "voltage_range": {
+            "max": 246.06,
+            "min": 243.05
+          },
+          "id": "DR-HTF024S",
+          "manufacturer": "dreo",
+          "updated_at": "2026-10-19T12:36:44",
+          "max_power": null,
+          "sub_profile_count": 0,
+          "hash": "0de10eb0a5fc0f77daf2b242114d759c"
         }
       ],
       "device_types": [
@@ -8033,6 +8261,69 @@
       "country": "CN",
       "description": "Chinese maker of smart lighting, best known for its addressable RGBIC strips and lamps.",
       "models": [
+        {
+          "authors": [
+            {
+              "github": "jkap",
+              "name": "jae kaplan"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-06T19:45:47Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "matter",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 1600,
+            "rated_power": 13,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plug US Gen4",
+          "measure_device_firmware": "2.0.3",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 89.19,
+            "DUMMY_LOAD_RESISTANCE": 160.59,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "A21 Smart LED Light Bulb E26 1600lm",
+          "product_url": "https://us.govee.com/products/a21-e26-led-light-bulb",
+          "standby_power": 0.28,
+          "voltage_range": {
+            "max": 120.6,
+            "min": 119.0
+          },
+          "id": "H1401",
+          "manufacturer": "govee",
+          "updated_at": "2026-11-07T08:36:07",
+          "max_power": 13.47,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-07T08:35:38",
+          "power_range": {
+            "min": 0.13,
+            "max": 13.47
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.5,
+            "color_temp": 97.5
+          },
+          "hash": "17ca381d1d94af5e332cae79cd882c5c"
+        },
         {
           "calculation_strategy": "lut",
           "created_at": "2026-06-30T04:03:04Z",
@@ -14412,6 +14703,59 @@
           "hash": "9445d82da43e76c60d3557125da7b6c7"
         },
         {
+          "authors": [
+            {
+              "github": "woutike1",
+              "name": "woutike"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-05T12:16:58Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly 1PM Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 27.69,
+            "DUMMY_LOAD_RESISTANCE": 2001.81,
+            "NUM_LIGHTS": 2,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.1:app"
+          },
+          "name": "GU10 Spot",
+          "standby_power": 0.3,
+          "voltage_range": {
+            "max": 236.0,
+            "min": 234.3
+          },
+          "id": "RS 226",
+          "manufacturer": "innr",
+          "updated_at": "2026-11-07T08:32:03",
+          "max_power": 4.86,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-07T08:31:36",
+          "power_range": {
+            "min": 0.39,
+            "max": 4.86
+          },
+          "color_modes": [
+            "brightness"
+          ],
+          "lut_quality": {
+            "score": 99.0,
+            "brightness": 99.0
+          },
+          "hash": "2487e84f554fab647a6520a7eb8b2057"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2022-08-26T08:16:53Z",
           "device_type": "light",
@@ -15937,6 +16281,49 @@
             "brightness": 99.2
           },
           "hash": "02c54b384b4df393a81022370a9d04c8"
+        },
+        {
+          "calculation_strategy": "lut",
+          "created_at": "2025-12-10T02:27:02Z",
+          "device_type": "light",
+          "measure_description": "Measured with utils/measure script using the base set of five poles plus two extensions with three poles each and the default powersupply",
+          "measure_device": "Shelly, PM mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 3,
+            "VERSION": "v1.19.2:docker"
+          },
+          "name": "GARDENPOLE RGBW T (11 poles)",
+          "standby_power": 0.46,
+          "authors": [
+            {
+              "name": "Knuspel",
+              "github": "Knuspel"
+            }
+          ],
+          "aliases": [
+            "GARDENPOLE RGBW T"
+          ],
+          "id": "AC4129900NJ",
+          "manufacturer": "ledvance",
+          "updated_at": "2026-10-19T15:06:05",
+          "max_power": 11.58,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-13T16:14:33",
+          "power_range": {
+            "min": 0.45,
+            "max": 11.58
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.1,
+            "color_temp": 97.1
+          },
+          "hash": "e8ea596a9ec4e226dc016a2f4012625d"
         },
         {
           "gtin": [
@@ -18797,6 +19184,72 @@
         },
         {
           "aliases": [
+            "4224"
+          ],
+          "authors": [
+            {
+              "github": "Maxik933",
+              "name": "Maxik933"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-24T19:46:52Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "matter"
+            ],
+            "form_factor": "bulb",
+            "lumens": 1600,
+            "rated_power": 14,
+            "socket": "E27"
+          },
+          "device_type": "light",
+          "gtin": [
+            "810175712833"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_device_firmware": "2.0.1",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 33.64,
+            "DUMMY_LOAD_RESISTANCE": 1599.21,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.0:app"
+          },
+          "name": "Matter RGBTW Bulb, E27 (14W, 1600lm)",
+          "standby_power": 0.21,
+          "voltage_range": {
+            "max": 233.5,
+            "min": 230.2
+          },
+          "id": "LS0125051883A",
+          "manufacturer": "linkind",
+          "updated_at": "2026-10-29T08:16:54",
+          "max_power": 13.89,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-29T08:16:54",
+          "power_range": {
+            "min": 0.24,
+            "max": 13.89
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.0,
+            "color_temp": 98.0
+          },
+          "hash": "093a0ce313e77e679eab76cd6084680a"
+        },
+        {
+          "aliases": [
             "ZBT-DIMLight-D0120"
           ],
           "calculation_strategy": "lut",
@@ -18854,6 +19307,47 @@
       ],
       "device_types": [
         "light"
+      ]
+    },
+    {
+      "aliases": [],
+      "name": "linptech",
+      "full_name": "Linptech",
+      "dir_name": "linptech",
+      "website": "https://www.linptech.com",
+      "country": "CN",
+      "description": "Xiaomi ecosystem brand making switches, doorbells and mmWave presence sensors.",
+      "models": [
+        {
+          "name": "mmWave Presence Sensor",
+          "device_type": "generic_iot",
+          "calculation_strategy": "fixed",
+          "discovery_by": "device",
+          "standby_power": 0.5,
+          "measure_method": "manual",
+          "measure_device": "Innovateking-EU AT35",
+          "measure_description": "USB-powered device, measured at 5V with USB power meter.",
+          "created_at": "2026-03-25T14:20:21Z",
+          "authors": [
+            {
+              "name": "simon42",
+              "github": "TheRealSimon42"
+            }
+          ],
+          "id": "ES1ZZ(TY)",
+          "manufacturer": "linptech",
+          "updated_at": "2026-10-22T17:23:58",
+          "max_power": 0.5,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.5,
+            "max": 0.5
+          },
+          "hash": "8310108b0d5db31fc32556799acaf55b"
+        }
+      ],
+      "device_types": [
+        "generic_iot"
       ]
     },
     {
@@ -21301,6 +21795,65 @@
           "hash": "b443bbe9030392faf091c35511eb1737"
         },
         {
+          "authors": [
+            {
+              "github": "Knuspel",
+              "name": "Knuspel"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-11T11:43:11Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure, Five Pole Basic Configuration",
+          "measure_device": "Shelly Plus 1PM",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 9.76,
+            "DUMMY_LOAD_RESISTANCE": 5704.71,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.12.0:app"
+          },
+          "name": "Gardenpole RGBW LIGHTIFY (5 poles)",
+          "standby_power": 0.38,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 238.4,
+            "min": 233.7
+          },
+          "aliases": [
+            "Gardenpole RGBW-Lightify"
+          ],
+          "id": "AC0009401NJ",
+          "manufacturer": "osram",
+          "updated_at": "2026-10-19T12:45:29",
+          "max_power": 9.05,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-13T16:10:43",
+          "power_range": {
+            "min": 0.47,
+            "max": 9.05
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 96.7,
+            "color_temp": 96.7
+          },
+          "hash": "680b4489c098838aee52fab429b30be6"
+        },
+        {
           "aliases": [
             "Classic A60 W clear - LIGHTIFY"
           ],
@@ -22025,6 +22578,45 @@
       "description": "Dutch health-technology company producing personal-care and household appliances, including air purifiers.",
       "models": [
         {
+          "name": "PureProtect Mini 900 Series Air Purifier",
+          "aliases": [
+            "AC0951/13",
+            "AC0951_13"
+          ],
+          "device_type": "fan",
+          "calculation_strategy": "composite",
+          "compatible_integrations": [
+            "philips_airpurifier_coap"
+          ],
+          "device_specs": {
+            "form_factor": "air_purifier",
+            "connectivity": [
+              "wifi"
+            ],
+            "rated_power": 23
+          },
+          "measure_method": "script",
+          "measure_device": "Shelly Plug S",
+          "measure_description": "Measured on a Shelly Plug S (first generation, model SHPLG-S) with the Powercalc measure tool. Four 60 s average sessions at fan speed 33/66/100 % plus standby, and two recordings (868 and 558 samples). Preset values come from transition-free plateaus of at least 30 s; where a plateau exceeded 900 s it is preferred over the 60 s session, because a one-minute window cannot rule out that the fan was still settling - turbo measured 20.02 W over 1001 s versus 20.41 W over 60 s. The display backlight is not modelled as a separate branch: it is a plain brightness light without its own switch, and its share overlaps the sample scatter, so it cannot be separated reliably from the fan load. LIMITATION: the 'auto' preset is deliberately not modelled. The integration derives the fan 'percentage' attribute only from the fixed sleep/medium/turbo patterns, so auto mode reports no percentage at all - there is no reading to map. Assigning a value there would be a guess, so powercalc reports no value in that mode instead of standby power. LIMITATION: manual fan speed without a preset reports no percentage in this integration, so the fallback calibration only covers the measured 0/33/66/100 % points.",
+          "standby_power": 1.38,
+          "mains_voltage": 230,
+          "min_version": "v1.25.3",
+          "product_url": "https://www.home-appliances.philips/gb/en/p/AC0951_13",
+          "created_at": "2026-10-27T00:20:00Z",
+          "authors": [
+            {
+              "name": "Maxi",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "AC0951_13",
+          "manufacturer": "philips",
+          "updated_at": "2026-10-31T08:26:15",
+          "max_power": null,
+          "sub_profile_count": 0,
+          "hash": "e9bf965e5d8a9554faf1a7ceb32fa7b2"
+        },
+        {
           "aliases": [
             "AC4236/14"
           ],
@@ -22415,6 +23007,68 @@
           "max_power": null,
           "sub_profile_count": 0,
           "hash": "e4657f272f8f86ac6248c87951f18e2a"
+        },
+        {
+          "name": "Qrevo S Pro",
+          "aliases": [
+            "roborock.vacuum.a326"
+          ],
+          "compatible_integrations": [
+            "roborock"
+          ],
+          "device_type": "vacuum_robot",
+          "calculation_strategy": "composite",
+          "standby_power": 0.3,
+          "measure_method": "manual",
+          "measure_device": "ThirdReality 3RSP02064Z",
+          "measure_description": "Whole dock + robot measured at the wall with a ThirdReality Gen3 plug (2 s / 3 W power reporting, 1 Wh energy counter) over Oct 20-25 2026 runs; activity energies cross-checked against the plug's energy counter. Activities come from the dock's dust_emptying, mop_washing and mop_drying switches and the robot's status and battery. Sub-profiles match the dock's mop wash temperature setting: high_temperature and room_temperature. Branch values are total wall power: 0.3 W with the robot away (dock alone), 2.0 W with the robot docked at 100%, and charging is mapped from battery % using a clean charge from 14% to 100% (Oct 25 2026, washing and drying off): 18.1 W at the wall at 15% rising to 20.2 W at 99%, averaging 19.0 W, with no taper; it drops straight to the 2.0 W docked idle when full. A ~10 min ~8.5 W pause before charging from very low battery is not modelled. Robot label: model RRE0PEE, product ID QSP51-01 (US 120 V).",
+          "mains_voltage": 120,
+          "min_version": "v1.26.0",
+          "product_url": "https://global.roborock.com/pages/roborock-qrevo-s-pro",
+          "created_at": "2026-10-24T00:00:00Z",
+          "authors": [
+            {
+              "name": "SmithsonianDSP",
+              "github": "SmithsonianDSP"
+            }
+          ],
+          "id": "QSP51-01",
+          "manufacturer": "roborock",
+          "updated_at": "2026-10-31T18:47:32",
+          "max_power": null,
+          "sub_profile_count": 2,
+          "hash": "ecf566d76762d9962b59db2fd5504c9c"
+        },
+        {
+          "name": "Saros 10R",
+          "aliases": [
+            "roborock.vacuum.a144"
+          ],
+          "compatible_integrations": [
+            "roborock"
+          ],
+          "device_type": "vacuum_robot",
+          "calculation_strategy": "composite",
+          "standby_power": 0.3,
+          "measure_method": "manual",
+          "measure_device": "ThirdReality 3RSP02064Z",
+          "measure_description": "Whole dock + robot measured at the wall with a ThirdReality Gen3 plug (2 s / 3 W power reporting, 1 Wh energy counter) over Oct 20-26 2026 runs and manual washes; activity energies cross-checked against the plug's energy counter. Activities come from the dock's dust_emptying, mop_washing and mop_drying switches and the robot's status and battery. Sub-profiles match the dock's mop wash temperature setting: hot, warm and room_temperature. Branch values are total wall power: 0.3 W with the robot away (dock alone), 3.5 W with the robot docked at 100%. Charging is mapped from battery % using a clean slow-mode charge (Oct 24, 14% to 100%, washing and drying off): 23 W at the wall rising to 26.6 W near 85-91%, then tapering to ~16 W above ~92%. Mop drying measured at the wall over a 2 h drying-only run at 100% battery. Charging limitations: Smart Charging sometimes runs a 40-50 W fast mode for part of a charge. The table follows slow mode, so fast-mode charges will be underestimated (-13% for a full run with drying; -43% for a fast mid-run recharge; -4.0% across all measured charges). Charging continues for ~5 min at ~15 W after the battery reports 100%, and there is a ~10 min ~10 W pause before charging from very low battery; neither are modeled. Robot label: model S91COP, product ID S10R51-01, rated input 20 V / 2.5 A. Dock label: model EWFD28LRR, rated input 120 V 60 Hz (charging & drying 1.4 A, hot-water mop washing 12 A, dust collection 6 A). US 120 V supply.",
+          "mains_voltage": 120,
+          "min_version": "v1.26.0",
+          "product_url": "https://global.roborock.com/pages/roborock-saros-10r",
+          "created_at": "2026-10-25T00:00:00Z",
+          "authors": [
+            {
+              "name": "SmithsonianDSP",
+              "github": "SmithsonianDSP"
+            }
+          ],
+          "id": "S10R51-01",
+          "manufacturer": "roborock",
+          "updated_at": "2026-10-31T18:47:32",
+          "max_power": null,
+          "sub_profile_count": 3,
+          "hash": "8c9a33bd685ee64af194aa38d2ca638d"
         },
         {
           "aliases": [
@@ -22892,7 +23546,7 @@
           ],
           "calculation_strategy": "fixed",
           "description": "Smart Wi-Fi Plug with Power Monitoring & Matter",
-          "created_at": "2025-05-01T21:56:26Z",
+          "created_at": "2026-11-01T21:30:05Z",
           "device_type": "smart_switch",
           "device_specs": {
             "form_factor": "plug",
@@ -22900,8 +23554,9 @@
             "rated_power": 1,
             "connectivity": [
               "wifi",
+              "bluetooth",
               "matter",
-              "bluetooth"
+              "knx"
             ]
           },
           "gtin": [
@@ -22909,12 +23564,15 @@
             "3800235261859"
           ],
           "discovery_by": "entity",
-          "measure_description": "Measured with 1.5W (average over 600s) dummy load over 600s and calculated average. WLAN RSSI: -40 dBm, Firmware version 1.2.3. Note: firmware have Shelly's confirmed bug with LED settings when ECO mode used, LED settings are not always applying correctly, and measurements are made only in a situation where the settings correspond to the actual behavior of the LED",
-          "measure_device": "Shelly PM Mini Gen3",
-          "measure_method": "script",
+          "measure_description": "Setup: the tested plug and a calibrated resistive dummy load are connected in parallel to the same mains input, and a second Shelly Plug S Gen3 measures upstream of both. The dummy load is never connected to the relay output, so the reference meter always reads about 33 W and can resolve the sub-watt self-consumption of the plug. The plug stays powered in both relay states; only the output relay changes, so the meter always sees the plug plus the dummy load.\n\nThe dummy load was calibrated with the measurement tool at 1600.01 Ohm, i.e. about 33 W at 230 V. Its contribution is subtracted from every sample instead of being applied as a fixed offset, because it follows the mains voltage:\n\n    P_self = P_upstream - (V^2 / R)\n\nThe tool applies this per sample and averages over the measurement window for each state. Two plateaus from the reference meter log during the run, one with the relay off and one with it on:\n\n- Relay OFF: V = 229.9 V, P_upstream = 33.70 W, V^2/R = 33.03 W, resulting P_self = 0.67 W.\n- Relay ON (no load at the output): V = 230.0 V, P_upstream = 34.10 W, V^2/R = 33.06 W, resulting P_self = 1.04 W.\n\nThe stored sub-profile values are the averages of these per-sample subtractions over the whole window, so a single plateau can differ from the stored value by a few tenths of a watt. For sub-profiles with LED enabled, the LED was active at full brightness only while the relay was switched on. Firmware version 2.1.1.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
           "mains_voltage": 230,
           "measure_settings": {
-            "VERSION": "v1.17.11:docker"
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 33.0,
+            "DUMMY_LOAD_RESISTANCE": 1600.01,
+            "VERSION": "v0.14.1:app"
           },
           "name": "Plug S Gen3",
           "only_self_usage": true,
@@ -22924,19 +23582,23 @@
               "name": "Largelos",
               "email": "vasilenkoeyu@gmail.com",
               "github": "Largelos"
+            },
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
             }
           ],
           "id": "S3PL-00112EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
-          "max_power": 0.69,
-          "sub_profile_count": 2,
+          "updated_at": "2026-11-04T21:15:57",
+          "max_power": 1.1,
+          "sub_profile_count": 8,
           "power_range": {
-            "min": 0.22,
-            "max": 0.69
+            "min": 0.23,
+            "max": 1.1
           },
-          "standby_power": 0.4,
-          "hash": "d39460605d87587923d8b4ec1348ced3"
+          "standby_power": 0.82,
+          "hash": "c035a5e753cf891b8627dc97399b0508"
         },
         {
           "aliases": [
@@ -22955,7 +23617,8 @@
             "connectivity": [
               "wifi",
               "bluetooth",
-              "matter"
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -22979,7 +23642,7 @@
           ],
           "id": "S3PL-30110EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-10-03T16:55:09",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": 1.22,
           "sub_profile_count": 8,
           "power_range": {
@@ -22987,7 +23650,7 @@
             "max": 1.22
           },
           "standby_power": 0.68,
-          "hash": "9f0a12bb3a3fb684ceabb30ddc4ba963"
+          "hash": "cea6c3690dbb54b1576f60087b7fd589"
         },
         {
           "aliases": [
@@ -23048,7 +23711,8 @@
             "rated_power": 1,
             "connectivity": [
               "wifi",
-              "bluetooth"
+              "bluetooth",
+              "knx"
             ]
           },
           "gtin": [
@@ -23072,14 +23736,14 @@
           ],
           "id": "S3SN-0024X",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T22:00:28",
           "max_power": 0.52,
           "sub_profile_count": 3,
           "power_range": {
             "min": 0.15,
             "max": 0.52
           },
-          "hash": "c7aa95c2862e98488d360605dae47e81"
+          "hash": "a7038e626100b4c7d262bb24f6413fcd"
         },
         {
           "aliases": [
@@ -23097,7 +23761,8 @@
             "connectivity": [
               "wifi",
               "bluetooth",
-              "matter"
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -23121,7 +23786,7 @@
           ],
           "id": "S3SW-001P16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T01:51:11",
           "max_power": 0.87,
           "sub_profile_count": 4,
           "power_range": {
@@ -23129,7 +23794,7 @@
             "max": 0.87
           },
           "standby_power": 0.62,
-          "hash": "c48fd6103309de7a61264d61f10c5d66"
+          "hash": "b1c5c58d4c4174c53334ea7dc170b5e3"
         },
         {
           "aliases": [
@@ -23149,7 +23814,9 @@
             "rated_power": 1.2,
             "connectivity": [
               "wifi",
-              "bluetooth"
+              "bluetooth",
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -23173,7 +23840,7 @@
           ],
           "id": "S3SW-001P8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T01:51:11",
           "max_power": 0.86,
           "sub_profile_count": 3,
           "power_range": {
@@ -23181,7 +23848,7 @@
             "max": 0.86
           },
           "standby_power": 0.58,
-          "hash": "d631728ffa668f0c9eea63881f12a7f3"
+          "hash": "9ec2acb2fa362c9fab9c539afb428d6d"
         },
         {
           "measure_description": "The measured device fw: 1.7.1. The result represents the average value of measurements collected from the measuring device API for the following scenarios: dumb device/baseline consumption (~3.8W) and several device configurations. See sub-profiles.",
@@ -23208,7 +23875,9 @@
             "rated_power": 1.2,
             "connectivity": [
               "wifi",
-              "bluetooth"
+              "bluetooth",
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -23228,7 +23897,7 @@
           ],
           "id": "S3SW-001X16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": 1.332,
           "sub_profile_count": 16,
           "power_range": {
@@ -23236,7 +23905,7 @@
             "max": 1.332
           },
           "standby_power": 1.087,
-          "hash": "38f18640b59566c7255dfa54076652ff"
+          "hash": "14d31a7feedd6fa9c3af31628a74f7ca"
         },
         {
           "aliases": [
@@ -23255,7 +23924,9 @@
             "rated_power": 1.2,
             "connectivity": [
               "wifi",
-              "bluetooth"
+              "bluetooth",
+              "matter",
+              "knx"
             ]
           },
           "gtin": [
@@ -23278,7 +23949,7 @@
           ],
           "id": "S3SW-001X8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T01:51:11",
           "max_power": 0.81,
           "sub_profile_count": 3,
           "power_range": {
@@ -23286,7 +23957,7 @@
             "max": 0.81
           },
           "standby_power": 0.53,
-          "hash": "acfbf127975cfd26a8f54f8c2fa6cd45"
+          "hash": "ee802c773bd967ed72f147360d2ee521"
         },
         {
           "name": "2PM Gen3",
@@ -23300,7 +23971,9 @@
             "rated_power": 1.4,
             "connectivity": [
               "wifi",
-              "bluetooth"
+              "bluetooth",
+              "matter",
+              "knx"
             ]
           },
           "calculation_strategy": "multi_switch",
@@ -23322,10 +23995,10 @@
           ],
           "id": "S3SW-002P16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-10-04T16:42:37",
+          "updated_at": "2026-11-03T01:51:11",
           "max_power": null,
           "sub_profile_count": 8,
-          "hash": "ef0b81d95f048b90b0b4e166758769bf"
+          "hash": "64885624e6c96c495290b520d6da9fc2"
         },
         {
           "aliases": [
@@ -23343,8 +24016,9 @@
             "power_monitoring": false,
             "connectivity": [
               "wifi",
+              "bluetooth",
               "matter",
-              "bluetooth"
+              "knx"
             ],
             "rated_power": 1.2
           },
@@ -23372,7 +24046,7 @@
           ],
           "id": "S3SW-0A1X1EUL",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-19T10:31:28",
+          "updated_at": "2026-11-03T01:51:11",
           "max_power": 2.366,
           "sub_profile_count": 5,
           "power_range": {
@@ -23380,7 +24054,56 @@
             "max": 2.366
           },
           "standby_power": 0.15,
-          "hash": "9899df27a01d6e687dcb5de8b7dbda1c"
+          "hash": "37be1c0a3222f58798ff15ed94756ddf"
+        },
+        {
+          "aliases": [
+            "Shelly EM Mini Gen4"
+          ],
+          "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Energy Meter Mini Gen4",
+          "discovery_by": "device",
+          "standby_power_estimated": false,
+          "created_at": "2026-10-28T19:01:00Z",
+          "device_type": "power_meter",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 3840,
+            "power_monitoring": true,
+            "rated_power": 1,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "zigbee",
+              "matter"
+            ]
+          },
+          "gtin": [
+            "3800238070823"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 300 seconds. Multiple combinations of settings were tested. Firmware version 2.1.1.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.14.1:app"
+          },
+          "name": "EM Mini Gen4",
+          "only_self_usage": true,
+          "product_url": "https://www.shelly.com/products/shelly-em-mini-gen4",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S4EM-001PXCEU16",
+          "manufacturer": "shelly",
+          "updated_at": "2026-10-29T07:19:25",
+          "max_power": 0.0,
+          "sub_profile_count": 4,
+          "standby_power": 0.63,
+          "hash": "5efa8090595618c9b11ab393cad72912"
         },
         {
           "aliases": [
@@ -23401,7 +24124,8 @@
               "zigbee",
               "wifi",
               "matter",
-              "bluetooth"
+              "bluetooth",
+              "knx"
             ]
           },
           "gtin": [
@@ -23428,7 +24152,7 @@
           ],
           "id": "S4SW-001P8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": 0.996,
           "sub_profile_count": 4,
           "power_range": {
@@ -23436,7 +24160,60 @@
             "max": 0.996
           },
           "standby_power": 0.732,
-          "hash": "94221ad3aaa76461dabed1232e6112e5"
+          "hash": "4b2c77371ed4a7c6861740ae9171ad23"
+        },
+        {
+          "aliases": [
+            "Shelly 1 Gen4"
+          ],
+          "calculation_strategy": "fixed",
+          "description": "Smart Wi-Fi Relay Switch with Dry Contacts",
+          "discovery_by": "device",
+          "created_at": "2026-10-23T01:30:00Z",
+          "device_type": "smart_switch",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 3600,
+            "power_monitoring": false,
+            "rated_power": 1,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "zigbee",
+              "matter",
+              "knx"
+            ]
+          },
+          "gtin": [
+            "3800238070687"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 60 seconds. Multiple combinations of settings were tested. Firmware version 2.0.1",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.14.0:app"
+          },
+          "name": "1 Gen4",
+          "only_self_usage": false,
+          "product_url": "https://www.shelly.com/products/shelly-1-gen4",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S4SW-001X16EU",
+          "manufacturer": "shelly",
+          "updated_at": "2026-11-03T00:05:04",
+          "max_power": 0.86,
+          "sub_profile_count": 8,
+          "power_range": {
+            "min": 0.29,
+            "max": 0.86
+          },
+          "standby_power": 0.6,
+          "hash": "8f5c024f19ad13108c6f6231e1fea70f"
         },
         {
           "aliases": [
@@ -23457,7 +24234,8 @@
               "zigbee",
               "wifi",
               "matter",
-              "bluetooth"
+              "bluetooth",
+              "knx"
             ]
           },
           "gtin": [
@@ -23483,7 +24261,7 @@
           ],
           "id": "S4SW-001X8EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": 0.94,
           "sub_profile_count": 4,
           "power_range": {
@@ -23491,7 +24269,7 @@
             "max": 0.94
           },
           "standby_power": 0.655,
-          "hash": "66e8e8875570cf4dfe68b9f0434bdb27"
+          "hash": "9ca0da8b0e328122e0a2203da4eec880"
         },
         {
           "aliases": [
@@ -23511,7 +24289,8 @@
               "wifi",
               "bluetooth",
               "matter",
-              "zigbee"
+              "zigbee",
+              "knx"
             ]
           },
           "gtin": [
@@ -23535,11 +24314,11 @@
           ],
           "id": "S4SW-002P16EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T22:57:57",
+          "updated_at": "2026-11-03T00:05:04",
           "max_power": null,
           "sub_profile_count": 4,
           "standby_power": 0.62,
-          "hash": "e3d9bfd34e63150abcb439043b141e18"
+          "hash": "823f78830174d7c00ce5133eb0b4062a"
         },
         {
           "aliases": [
@@ -24484,6 +25263,55 @@
             "color_temp": 36.1
           },
           "hash": "30619f9daca2fb78c857c32ccf4f0553"
+        },
+        {
+          "authors": [
+            {
+              "email": "118590236+gjsiiger@users.noreply.github.com",
+              "github": "gjsiiger",
+              "name": "Gorm J. Siiger"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-09T15:11:48Z",
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plus Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "Hue Impress outdoor wall",
+          "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-impress-outdoor-wall-light/1743030P7",
+          "standby_power": 0.3,
+          "voltage_range": {
+            "max": 237.4,
+            "min": 225.4
+          },
+          "id": "915005730801",
+          "manufacturer": "signify",
+          "updated_at": "2026-11-09T19:41:20",
+          "max_power": 18.2,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-09T19:28:49",
+          "power_range": {
+            "min": 0.2,
+            "max": 18.2
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "8c2a2763f12b06a19aeab1bd66a3c169"
         },
         {
           "aliases": [
@@ -25791,7 +26619,9 @@
         {
           "aliases": [
             "9150059869",
-            "915005987001"
+            "915005987001",
+            "9150059873",
+            "915005987301"
           ],
           "calculation_strategy": "lut",
           "created_at": "2024-07-21T11:13:03Z",
@@ -25828,7 +26658,7 @@
           ],
           "id": "915005986901",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-14T18:16:50",
           "max_power": 14.35,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -25844,7 +26674,7 @@
             "score": 99.1,
             "color_temp": 99.1
           },
-          "hash": "1eff4a6c1dd97133c85f22ee9f9bee84"
+          "hash": "44cca81aa6d85538944f441f944f3d3b"
         },
         {
           "aliases": [
@@ -27343,7 +28173,10 @@
         {
           "aliases": [
             "9290035261",
-            "929001953101"
+            "929001953101",
+            "929003526202_01",
+            "929003526202_02",
+            "929003526202_03"
           ],
           "calculation_strategy": "lut",
           "created_at": "2025-12-20T00:35:52Z",
@@ -27380,7 +28213,7 @@
           ],
           "id": "929003526101",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-19T11:58:04",
           "max_power": 4.61,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -27396,7 +28229,7 @@
             "score": 97.6,
             "color_temp": 97.6
           },
-          "hash": "99c19497d5234c521bf9cb6612359ca4"
+          "hash": "97a194b0c31377da3bca0b3df5170c6b"
         },
         {
           "aliases": [
@@ -27967,6 +28800,74 @@
         },
         {
           "aliases": [
+            "LCA013"
+          ],
+          "authors": [
+            {
+              "email": "earlymorninghours@gmail.com",
+              "github": "earlymorninghours",
+              "name": "Dave Stein"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-10-06T19:55:05Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "matter",
+              "thread",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 810,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Zooz Z-Wave Plus Power Switch ZEN15",
+          "measure_device_firmware": "1.2",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 8.57,
+            "DUMMY_LOAD_RESISTANCE": 1727.83,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.12.0:app"
+          },
+          "name": "Hue white ambiance and color 806lm A19 E26",
+          "product_url": "https://www.philips-hue.com/en-us/p/hue-white-and-color-ambiance-60w-a19-e26-smart-bulb/046677590826",
+          "standby_power": 0.4,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 121.71,
+            "min": 121.71
+          },
+          "id": "929003853701",
+          "manufacturer": "signify",
+          "updated_at": "2026-10-20T07:14:29",
+          "max_power": 6.83,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-10-20T06:44:39",
+          "power_range": {
+            "min": 0.43,
+            "max": 6.83
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "46588f72cefadf3f5a72d01b2c963009"
+        },
+        {
+          "aliases": [
             "929004276702"
           ],
           "authors": [
@@ -28141,6 +29042,59 @@
             "color_temp": 97.8
           },
           "hash": "a29e9248c78ce5d1b74e567c56c62f41"
+        },
+        {
+          "authors": [
+            {
+              "github": "luuk58",
+              "name": "luuk58"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-07T00:53:53Z",
+          "device_type": "light",
+          "gtin": [
+            "8721103087812"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plus Plug S Gen2",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 3.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "Hue Flux strip light (3m)",
+          "product_url": "https://www.philips-hue.com/nl-nl/p/lightstrips-flux-lightstrip-3-m/8721103087812",
+          "standby_power": 0.4,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 239.8,
+            "min": 231.2
+          },
+          "id": "929004610402",
+          "manufacturer": "signify",
+          "updated_at": "2026-11-07T08:44:59",
+          "max_power": 14.3,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-07T08:40:35",
+          "power_range": {
+            "min": 0.55,
+            "max": 14.3
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.7,
+            "color_temp": 98.7
+          },
+          "hash": "8647e0260b33af926b9aceac187cf561"
         },
         {
           "calculation_strategy": "fixed",
@@ -30331,7 +31285,8 @@
         },
         {
           "aliases": [
-            "9290012573A"
+            "9290012573A",
+            "9290012574"
           ],
           "calculation_strategy": "lut",
           "created_at": "2021-06-11T22:01:53Z",
@@ -30360,7 +31315,7 @@
           ],
           "id": "LCT010",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-28T23:28:20",
           "max_power": 9.7,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -30377,7 +31332,7 @@
             "score": 96.9,
             "color_temp": 96.9
           },
-          "hash": "8173fa6ed93a6170dcd12d7cb00a65b9"
+          "hash": "14551128d63884a393050263872fdb86"
         },
         {
           "aliases": [
@@ -30653,6 +31608,7 @@
         {
           "aliases": [
             "7602031P7",
+            "7602031U7",
             "9150058219",
             "9150058220",
             "9150058221",
@@ -30691,7 +31647,7 @@
           ],
           "id": "LCT026",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-14T18:16:50",
           "max_power": 7.07,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -30707,7 +31663,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "65bbe6477a3aae8375a4ca6c72f7b7d5"
+          "hash": "0b049e1952cbe24c68c320fe93d9ce58"
         },
         {
           "aliases": [
@@ -31797,7 +32753,7 @@
           "measure_method": "script",
           "mains_voltage": 230,
           "name": "Hue LightStrip Plus (2m)",
-          "standby_power": 0.18,
+          "standby_power": 0.4,
           "authors": [
             {
               "name": "Simon H\u00f6rrle",
@@ -31807,12 +32763,12 @@
           ],
           "id": "LST002",
           "manufacturer": "signify",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-10-19T12:45:29",
           "max_power": 21.88,
-          "sub_profile_count": 0,
-          "measurement_updated_at": "2026-09-24T18:09:05",
+          "sub_profile_count": 2,
+          "measurement_updated_at": "2026-10-19T11:58:02",
           "power_range": {
-            "min": 1.0,
+            "min": 0.1,
             "max": 21.88
           },
           "color_modes": [
@@ -31823,7 +32779,7 @@
             "score": 32.7,
             "color_temp": 32.7
           },
-          "hash": "9b0dcc9c5aeeeca68810c85cc27ee39e"
+          "hash": "bb16e010330a1b8f98a7ebf8b63e05b0"
         },
         {
           "aliases": [
@@ -39049,14 +40005,14 @@
           ],
           "id": "XF32E411M",
           "manufacturer": "telefunken",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-10-31T18:47:32",
           "max_power": 47.84,
           "sub_profile_count": 10,
           "power_range": {
             "min": 28.09,
             "max": 47.84
           },
-          "hash": "5e3d81c0b760c06b1398655cb0a16c71"
+          "hash": "73cf1e8166a423ff93afb99f14244ca3"
         }
       ],
       "device_types": [

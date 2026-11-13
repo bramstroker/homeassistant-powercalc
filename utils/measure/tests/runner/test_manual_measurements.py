@@ -2,7 +2,7 @@ from collections.abc import Callable
 import csv
 import json
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 from measure.cancellation import MeasurementCancelledError
 from measure.powermeter.spec import DummyPowerMeterSpec
@@ -239,6 +239,12 @@ def test_recorder_skips_unreadable_samples_and_keeps_recording(tmp_path: Path) -
     assert [sample["entities"]["switch.plug"]["state"] for sample in samples] == ["on", "off"]
     assert result.summary is not None
     assert result.summary["Samples recorded"] == "2"
+    assert result.summary["Samples skipped"] == "1"
+    assert interaction.progress.call_args_list == [
+        call(1, 0, phase="Recording", skipped=0, waiting_for_entities=False),
+        call(1, 0, phase="Recording", skipped=1, waiting_for_entities=True),
+        call(2, 0, phase="Recording", skipped=1, waiting_for_entities=False),
+    ]
 
 
 def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
@@ -294,7 +300,12 @@ def test_vacuum_recorder_keeps_samples_when_optional_entities_disappear(
     ]
     assert result.summary["Samples recorded"] == "3"
     assert result.voltages == [230, 230, 230]
-    assert interaction.progress.call_count == 3
+    assert interaction.progress.call_count == 4
+    assert result.summary["Samples skipped"] == "1"
+    assert interaction.progress.call_args_list[0] == call(0, 0, phase="Recording", skipped=1, waiting_for_entities=True)
+    assert interaction.progress.call_args_list[-1] == call(
+        3, 0, phase="Recording", skipped=1, waiting_for_entities=False
+    )
     assert interaction.wait.call_count == 4
     assert interaction.entity_states.call_args_list[0].args[0]["sensor.state"] == "unavailable"
     assert result.summary["Optional entities missing during recording"] == "sensor.state"
@@ -385,3 +396,29 @@ def test_recorder_requires_state_reader_for_complex_recording(tmp_path: Path) ->
 
     with pytest.raises(ValueError, match="state reader is required"):
         runner.run(request, str(tmp_path))
+
+
+def test_recorder_counts_consecutive_failures_before_any_valid_sample(tmp_path: Path) -> None:
+    sampler = MagicMock(spec=PowerSampler)
+    sampler.take_measurement.return_value = MeasurementResult(power=4.2, voltages=[230])
+    interaction = MagicMock(spec=RunInteraction)
+    interaction.wait.side_effect = [None, KeyboardInterrupt]
+    reader = MagicMock(side_effect=RuntimeError("502 Bad Gateway"))
+    request = RecorderMeasurementRequest(
+        power_meter=DummyPowerMeterSpec(),
+        recorder_purpose="complex_profile",
+        profile_recipe="generic",
+        tracked_entity_ids=("switch.plug",),
+    )
+
+    result = RecorderRunner(sampler, interaction, reader).run(request, str(tmp_path))
+
+    assert result.summary["Samples recorded"] == "0"
+    assert result.summary["Samples skipped"] == "2"
+    assert result.voltages == []
+    assert interaction.progress.call_args_list == [
+        call(0, 0, phase="Recording", skipped=1, waiting_for_entities=True),
+        call(0, 0, phase="Recording", skipped=2, waiting_for_entities=True),
+    ]
+    assert len((tmp_path / "record.jsonl").read_text().splitlines()) == 1
+    interaction.entity_states.assert_not_called()

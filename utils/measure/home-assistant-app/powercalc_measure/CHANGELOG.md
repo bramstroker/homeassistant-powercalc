@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+## 0.14.2 - 2026-11-06
+
+- #5113 Addition of a KNX connection for Gen3/Gen4 and Matter certification for Shelly Gen3 devices @Maxik933
+
+### 🐛 Bug Fixes
+
+- #5087 Apply power meter changes to the current measurement session @bramstroker
+- #5088 Show skipped recording samples and Home Assistant read recovery @bramstroker
+- #5089 Clarify recorder idle-state validation failures @bramstroker
+- #5095 Support plotting inherited power profile configurations @bramstroker
+- #5105 Separate session power meter settings from global defaults @bramstroker
+
+## 0.14.1 - 2026-10-25
+
+### 🐛 Bug Fixes
+
+- #5013 fix(measure): hold out a block when the episode split leaves too little training data @Maxik933
+- #5028 Use fresh unchanged power reports and correct vacuum analysis advice @bramstroker
+
+## 0.14.0 - 2026-10-20
+
+### 🚀 Features
+
+- #5015 Add labels to recordings in the measure app @bramstroker
+
+### 🐛 Bug Fixes
+
+- #5022 Handle missing entity name flags in Measure registry responses @bramstroker
+
+## 0.13.1 - 2026-10-19
+
+### 🐛 Bug Fixes
+
+- #5004 Model vacuum post-charge settling separately from standby @bramstroker
+
 ## 0.13.0 - 2026-10-11
 
 ### 🚀 Features

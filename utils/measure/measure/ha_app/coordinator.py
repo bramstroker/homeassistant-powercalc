@@ -218,6 +218,7 @@ class MeasurementCoordinator:
                 completed=0,
                 total=0,
                 skipped=0,
+                waiting_for_entities=False,
                 estimated_remaining=None,
                 operating_point=None,
                 entity_states={},

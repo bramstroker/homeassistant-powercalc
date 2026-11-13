@@ -1,4 +1,5 @@
 import gzip
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -569,19 +570,37 @@ def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts
         preparer.prepare(artifacts, profile_metadata)
 
 
-def test_preparer_keeps_raw_csv_for_profile_library(tmp_path: Path) -> None:
+@pytest.mark.parametrize("compressed", [False, True])
+@pytest.mark.parametrize(
+    "raw_content",
+    [
+        b"bri,watt\n1,1.0\n255,8.2\n",
+        b"bri,watt\r\n1,1.0\r\n255,8.2\r\n",
+        b"bri,watt\r\n1,1.0\n255,8.2\r\n",
+    ],
+)
+def test_preparer_normalizes_csv_line_endings_without_changing_artifacts(
+    tmp_path: Path, compressed: bool, raw_content: bytes
+) -> None:
     artifacts = tmp_path / "artifacts"
     write_library(tmp_path)
     write_profile_artifacts(artifacts)
     (artifacts / "brightness.csv.gz").unlink()
-    raw_content = b"bri,watt\n1,1.0\n"
-    (artifacts / "brightness.csv").write_bytes(raw_content)
+    artifact = artifacts / ("brightness.csv.gz" if compressed else "brightness.csv")
+    original = gzip.compress(raw_content) if compressed else raw_content
+    artifact.write_bytes(original)
     preparer = make_preparer(tmp_path)
 
     preview = preparer.prepare(artifacts, metadata())
     contents = {file.path: file.content for file in preparer.render_contents(artifacts, metadata(), preview)}
 
-    assert contents["profile_library/signify/LCT999/brightness.csv"] == raw_content
+    expected = b"bri,watt\n1,1.0\n255,8.2\n"
+    csv_path = "profile_library/signify/LCT999/brightness.csv"
+    assert contents[csv_path] == expected
+    prepared_csv = next(file for file in preview.files if file.path == csv_path)
+    assert prepared_csv.size == len(expected)
+    assert prepared_csv.sha == hashlib.sha256(expected).hexdigest()
+    assert artifact.read_bytes() == original
 
 
 def test_preparer_rejects_invalid_gzip_when_rendering_profile(tmp_path: Path) -> None:

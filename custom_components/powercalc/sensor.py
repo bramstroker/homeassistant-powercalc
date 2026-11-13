@@ -9,12 +9,15 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, SensorEntit
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    ATTR_ENTITY_ID,
+    ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
 )
-from homeassistant.core import Event, HomeAssistant, SupportsResponse, callback
+from homeassistant.core import Event, HomeAssistant, ServiceCall, SupportsResponse, callback
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import entity_platform
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
@@ -41,6 +44,9 @@ from .configuration.config_entry_conversion import convert_config_entry_to_senso
 from .configuration.discovery_info import convert_discovery_info_to_sensor_config
 from .configuration.sensor_config import PLATFORM_SCHEMA as PLATFORM_SCHEMA
 from .const import (
+    ATTR_SOURCE_ENTITY,
+    ATTR_SOURCE_GROUP,
+    ATTR_STATE,
     CONF_COST,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
@@ -106,7 +112,7 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
-from .sensors.energy import EnergySensor, create_energy_sensor, create_standby_energy_sensor
+from .sensors.energy import EnergySensor, VirtualEnergySensor, create_energy_sensor, create_standby_energy_sensor
 from .sensors.energy_related import create_energy_related_sensors
 from .sensors.group.config_entry_utils import add_to_associated_groups
 from .sensors.group.custom import GroupedSensor
@@ -415,16 +421,50 @@ def register_entity_services() -> None:
     platform.async_register_entity_service(
         SERVICE_GET_GROUP_ENTITIES,
         {},
-        "get_group_entities",
+        async_get_group_entities,
         supports_response=SupportsResponse.ONLY,
     )
 
     platform.async_register_entity_service(
         SERVICE_DEBUG_GROUP,
         {},
-        "debug_group",
+        async_debug_group,
         supports_response=SupportsResponse.ONLY,
     )
+
+
+def _resolve_group_sensor(entity: SensorEntity) -> GroupedSensor | StandbyPowerSensor:
+    """Resolve the group itself or the source power group of an integrated energy sensor."""
+    if isinstance(entity, GroupedSensor | StandbyPowerSensor):
+        return entity
+    if isinstance(entity, VirtualEnergySensor):
+        source = entity.platform.entities.get(entity.source_entity_id)
+        if isinstance(source, GroupedSensor | StandbyPowerSensor):
+            return source
+        raise ServiceValidationError(f"Entity {entity.entity_id} does not integrate a loaded Powercalc power group")
+    raise ServiceValidationError(f"Entity {entity.entity_id} is not a Powercalc group sensor")
+
+
+async def async_get_group_entities(entity: SensorEntity, _call: ServiceCall) -> dict[str, Any]:
+    """List members, identifying the source when an energy sensor integrates a power group."""
+    group = _resolve_group_sensor(entity)
+    response: dict[str, Any] = group.get_group_entities()
+    if isinstance(entity, VirtualEnergySensor):
+        response = {**response, ATTR_SOURCE_ENTITY: group.entity_id}
+    return response
+
+
+async def async_debug_group(entity: SensorEntity, _call: ServiceCall) -> dict[str, Any]:
+    """Keep an integrated energy total separate from its source group's power readings."""
+    group = _resolve_group_sensor(entity)
+    response = group.debug_group()
+    if isinstance(entity, VirtualEnergySensor):
+        return {
+            ATTR_STATE: str(entity.state),
+            ATTR_UNIT_OF_MEASUREMENT: entity.native_unit_of_measurement,
+            ATTR_SOURCE_GROUP: {ATTR_ENTITY_ID: group.entity_id, **response},
+        }
+    return response
 
 
 async def create_sensors(

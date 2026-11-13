@@ -85,6 +85,7 @@ class SessionSnapshot:
     completed: int = 0
     total: int = 0
     skipped: int = 0
+    waiting_for_entities: bool = False
     phase: str | None = None
     confirmation_message: str | None = None
     confirmation_action: str | None = None
@@ -179,13 +180,23 @@ class SessionControl:
             listener(event)
         return event
 
-    def progress(self, *, completed: int, total: int, mode: str, estimated_remaining: str, skipped: int = 0) -> None:
+    def progress(
+        self,
+        *,
+        completed: int,
+        total: int,
+        mode: str,
+        estimated_remaining: str,
+        skipped: int = 0,
+        waiting_for_entities: bool = False,
+    ) -> None:
         self.emit(
             SessionEventType.PROGRESS,
             {
                 "completed": completed,
                 "total": total,
                 "skipped": skipped,
+                "waiting_for_entities": waiting_for_entities,
                 "mode": mode,
                 "estimated_remaining": estimated_remaining,
             },

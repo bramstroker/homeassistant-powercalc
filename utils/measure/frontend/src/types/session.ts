@@ -43,6 +43,7 @@ export interface SessionProgress {
   completed: number;
   total: number;
   skipped?: number;
+  waiting_for_entities?: boolean;
   percent?: number;
   estimated_remaining_seconds?: number | null;
 }
@@ -94,6 +95,7 @@ export interface SessionFile {
   size: number;
   media_type: string;
   modified_at?: string;
+  recording_label?: string | null;
 }
 
 export interface PlotPoint {

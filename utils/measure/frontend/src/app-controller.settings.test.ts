@@ -1,8 +1,177 @@
 import { MeasureAppController, type MeasureAppApi } from "./app-controller";
-import type { PowerMeterDiagnostic, LightMeasurementRequest, CalibrationJob } from "./types";
+import type { AppSettings, MeasurementRequest, PowerMeterSpec, PowerMeterDiagnostic, LightMeasurementRequest, CalibrationJob } from "./types";
 import { api, capabilities, connection, measurementDefaults, settings, state } from "./testing/controller";
 
 describe("measure app controller: settings", () => {
+  const originalRequest: MeasurementRequest = {
+    measure_type: "average", duration: 60, model_id: "", product_name: "", session_name: "Desk standby",
+    measure_device: "Original meter", power_meter: { type: "hass", entity_id: "sensor.original_power" },
+    generate_model: false, parameters: capabilities.defaults, resume_policy: "new",
+  };
+
+  it.each<{ label: string; saved: AppSettings; meter: PowerMeterSpec }>([
+    {
+      label: "a different meter and outlet",
+      saved: { ...settings, power_meter: "shelly", shelly_ip: "192.0.2.10", shelly_channel: 3, default_measure_device: "Shelly Power Strip Gen4" },
+      meter: { type: "shelly", device_ip: "192.0.2.10", username: "admin", channel: 3 },
+    },
+    {
+      label: "only the measurement-device name",
+      saved: { ...settings, default_power_entity_id: "sensor.original_power", default_measure_device: "Renamed meter" },
+      meter: { type: "hass", entity_id: "sensor.original_power", voltage_entity_id: null },
+    },
+    {
+      label: "a power sensor with its voltage sensor",
+      saved: { ...settings, default_power_entity_id: "sensor.new_power", default_measure_device: "New meter" },
+      meter: { type: "hass", entity_id: "sensor.new_power", voltage_entity_id: "sensor.new_voltage" },
+    },
+    {
+      label: "an empty measurement-device name",
+      saved: { ...settings, default_power_entity_id: "sensor.original_power", default_measure_device: null },
+      meter: { type: "hass", entity_id: "sensor.original_power", voltage_entity_id: null },
+    },
+  ])("applies $label only to a duplicated session", async ({ saved, meter }) => {
+    const appState = state();
+    appState.settings = settings;
+    const saveSettings = vi.fn(async () => saved);
+    const preflight = vi.fn(async () => ({ valid: true, warnings: [] }));
+    const controller = new MeasureAppController(appState, () => api({
+      getSession: async () => ({ state: "completed", request: originalRequest }),
+      saveSettings,
+      preflight,
+    }), () => connection(), () => undefined);
+    await controller.duplicateSession("session-1");
+    appState.powers = [{ entity_id: "sensor.new_power", name: "New power", related_voltage_entity_id: "sensor.new_voltage" }];
+    controller.openPowerMeterEditor();
+
+    const configuration = { power_meter: meter, measure_device: saved.default_measure_device ?? "" };
+    await controller.saveSessionPowerMeter(configuration);
+
+    expect(saveSettings).not.toHaveBeenCalled();
+    expect(appState.settings).toBe(settings);
+    expect(appState.view).toBe("setup");
+    expect(appState.draftPowerMeter).toEqual(configuration);
+    expect(appState.request).toEqual(originalRequest);
+    expect(originalRequest.power_meter).toEqual({ type: "hass", entity_id: "sensor.original_power" });
+    expect(originalRequest.measure_device).toBe("Original meter");
+    await controller.preflight({ ...appState.request!, ...appState.draftPowerMeter! });
+    expect(preflight).toHaveBeenCalledWith(expect.objectContaining({ power_meter: meter, measure_device: saved.default_measure_device ?? "" }));
+  });
+
+  it.each([false, true])("keeps the draft unchanged when global Settings is saved from setup (duplicated=%s)", async (duplicated) => {
+    const appState = state();
+    appState.settings = { ...settings, default_power_entity_id: "sensor.default", default_measure_device: "Default meter" };
+    const saved = { ...settings, power_meter: "kasa" as const, kasa_ip: "192.0.2.20", default_measure_device: "Kasa KP115" };
+    const saveSettings = vi.fn(async () => saved);
+    const controller = new MeasureAppController(appState, () => api({
+      getSession: async () => ({ state: "completed", request: originalRequest }), saveSettings,
+    }), () => connection(), () => undefined);
+    if (duplicated) await controller.duplicateSession("session-1");
+    else controller.newMeasurement();
+    const draft = structuredClone(appState.draftPowerMeter);
+    const request = appState.request;
+    controller.openSettings();
+
+    await controller.saveSettings(saved);
+
+    expect(saveSettings).toHaveBeenCalledWith(saved);
+    expect(appState.settings).toEqual(saved);
+    expect(appState.draftPowerMeter).toEqual(draft);
+    expect(appState.request).toBe(request);
+    expect(appState.view).toBe("setup");
+    controller.newMeasurement();
+    expect(appState.draftPowerMeter).toEqual({ power_meter: { type: "kasa", device_ip: "192.0.2.20" }, measure_device: "Kasa KP115" });
+  });
+
+  it.each(["global", "session"])("cancels the %s editor without changing the draft or defaults", (scope) => {
+    const appState = state();
+    appState.settings = settings;
+    appState.request = originalRequest;
+    appState.view = "setup";
+    const saveSettings = vi.fn();
+    const controller = new MeasureAppController(appState, () => api({ saveSettings }), () => connection(), () => undefined);
+    if (scope === "session") {
+      controller.openPowerMeterEditor();
+      controller.closePowerMeterEditor();
+    } else {
+      controller.openSettings();
+      controller.closeSettings();
+    }
+    expect(appState.request).toBe(originalRequest);
+    expect(appState.draftPowerMeter).toEqual({ power_meter: originalRequest.power_meter, measure_device: originalRequest.measure_device });
+    expect(appState.settings).toBe(settings);
+    expect(appState.view).toBe("setup");
+    expect(saveSettings).not.toHaveBeenCalled();
+  });
+
+  it("uses the selected session meter and name for measurement and leaves the original recording untouched", async () => {
+    const appState = state();
+    appState.settings = settings;
+    const start = vi.fn(async () => ({ state: "running" as const }));
+    const compatible = vi.fn(async () => null);
+    const controller = new MeasureAppController(appState, () => api({
+      getSession: async () => ({ state: "completed", request: originalRequest }),
+      start, getCompatibleCalibration: compatible,
+    }), () => connection(), () => undefined);
+    await controller.duplicateSession("session-1");
+    controller.openPowerMeterEditor();
+    const updated = { power_meter: { type: "hass" as const, entity_id: "sensor.other", voltage_entity_id: "sensor.voltage" }, measure_device: "Other meter" };
+    await controller.saveSessionPowerMeter(updated);
+    expect(compatible).toHaveBeenCalledWith(updated.power_meter);
+    controller.openPowerMeterEditor();
+    expect(appState.draftPowerMeter).toEqual(updated);
+    controller.closePowerMeterEditor();
+    await controller.preflight({ ...appState.request!, ...appState.draftPowerMeter! });
+    await controller.start();
+    expect(start).toHaveBeenCalledWith(expect.objectContaining(updated));
+    expect(originalRequest.measure_device).toBe("Original meter");
+    expect(originalRequest.power_meter).toEqual({ type: "hass", entity_id: "sensor.original_power" });
+  });
+
+  it.each(["running", "result"] as const)("does not open or save the session meter editor from %s", async (view) => {
+    const appState = state();
+    appState.view = view;
+    appState.request = originalRequest;
+    const controller = new MeasureAppController(appState, () => api(), () => connection(), () => undefined);
+    controller.openPowerMeterEditor();
+    await controller.saveSessionPowerMeter({ power_meter: { type: "dummy" }, measure_device: "Dummy" });
+    expect(appState.view).toBe(view);
+    expect(appState.request).toBe(originalRequest);
+  });
+
+  it.each(["running", "result", "profile"] as const)("preserves an existing session when saving settings from %s", async (view) => {
+    const appState = state();
+    appState.view = view;
+    appState.request = originalRequest;
+    appState.snapshot = { state: view === "running" ? "running" : "completed", request: originalRequest };
+    const controller = new MeasureAppController(appState, () => api(), () => connection(), () => undefined);
+    controller.openSettings();
+
+    await controller.saveSettings({ ...settings, power_meter: "kasa", kasa_ip: "192.0.2.20", default_measure_device: "Kasa KP115" });
+
+    expect(appState.view).toBe(view);
+    expect(appState.request).toBe(originalRequest);
+    expect(appState.snapshot.request).toBe(originalRequest);
+  });
+
+  it("keeps the draft and defaults unchanged when saving settings fails", async () => {
+    const appState = state();
+    appState.view = "setup";
+    appState.settings = settings;
+    appState.request = originalRequest;
+    const controller = new MeasureAppController(appState, () => api({
+      saveSettings: async () => { throw new Error("Could not save settings"); },
+    }), () => connection(), () => undefined);
+    controller.openSettings();
+
+    await controller.saveSettings({ ...settings, power_meter: "kasa", kasa_ip: "192.0.2.20" });
+
+    expect(appState.view).toBe("settings");
+    expect(appState.errorMessage).toBe("Could not save settings");
+    expect(appState.request).toBe(originalRequest);
+    expect(appState.settings).toBe(settings);
+  });
+
   it("reloads effective capabilities after saving measurement defaults", async () => {
     const appState = state();
     let currentCapabilities = capabilities;

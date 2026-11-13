@@ -52,8 +52,10 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     GroupType,
 )
-from custom_components.powercalc.sensors.cost import CostSensor
+from custom_components.powercalc.device_naming import DeviceName
+from custom_components.powercalc.sensors.cost import CostSensor, create_cost_sensor
 from custom_components.powercalc.sensors.group.tracked_untracked import TrackedPowerSensorFactory
+from custom_components.powercalc.sensors.utility_meter import create_utility_meter
 from tests.common import (
     assert_entity_state,
     get_simple_fixed_config,
@@ -548,6 +550,37 @@ async def test_cost_sensor_created_per_utility_meter(hass: HomeAssistant) -> Non
             ATTR_UNIT_OF_MEASUREMENT: "EUR",
         },
     )
+
+
+@pytest.mark.parametrize("device_name", [None, DeviceName("utility_meter_cycle", {"period": DAILY})])
+async def test_utility_meter_cost_sensor_with_optional_device_name(
+    hass: HomeAssistant,
+    device_name: DeviceName | None,
+) -> None:
+    hass.data[DOMAIN] = {}
+    utility_meter = create_utility_meter(
+        hass=hass,
+        source_entity="sensor.test_energy",
+        entity_id="sensor.test_energy_daily",
+        name="Test daily",
+        sensor_config={},
+        meter_type=DAILY,
+        unique_id="test_energy_daily",
+    )
+    utility_meter.device_name = device_name
+
+    cost_sensor = create_cost_sensor(
+        hass,
+        {CONF_NAME: "Test daily", CONF_ENERGY_PRICE: 0.25},
+        utility_meter,
+    )
+
+    assert cost_sensor is not None
+    assert cost_sensor.unique_id == "test_energy_daily_cost"
+    if device_name is None:
+        assert cost_sensor.device_name == DeviceName("cost")
+    else:
+        assert cost_sensor.device_name == DeviceName("utility_meter_cycle_cost", {"period": DAILY})
 
 
 async def test_no_utility_meter_cost_sensor_when_meters_disabled(hass: HomeAssistant) -> None:

@@ -301,6 +301,10 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _unrecorded_attributes = frozenset({ATTR_SOURCE_DOMAIN, ATTR_SOURCE_ENTITY})
 
+    @property
+    def source_entity_id(self) -> str:
+        return self._source_entity
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -326,6 +330,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             "unit_time": UnitOfTime.HOURS,
             "integration_method": integration_method,
             "unique_id": unique_id,
+            "device_class": SensorDeviceClass.ENERGY,
             "max_sub_interval": timedelta(
                 seconds=sensor_config.get(CONF_ENERGY_UPDATE_INTERVAL, DEFAULT_ENERGY_UPDATE_INTERVAL),
             ),

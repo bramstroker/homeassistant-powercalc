@@ -219,6 +219,14 @@ During an ongoing manufacturer-by-manufacturer consistency audit, automatically 
 
 During a profile-library consistency audit, read and maintain [references/profile_review_todo.md](references/profile_review_todo.md). Add a checkbox only for a concrete unresolved identity, revision, discovery, barcode, or measurement question with a clear next evidence requirement; do not use it as a duplicate list of every missing metadata field. Mark an item complete when it is resolved and record the deciding evidence and commit or PR when available.
 
+### 11. Obtain Approval Before Publishing Feedback
+
+The user wants to review comments before they are posted. Show the complete proposed comment or review body together with its target PR, then explicitly ask whether to publish it. Wait for approval of that specific text and target (or an explicitly approved batch). Instructions such as "start with the first responses", "continue reviewing", or "handle these" authorize research and drafting, not publication. Once the user explicitly approves the shown draft, publish it without asking again.
+
+When the user authorizes publishing review feedback that asks the author for information or changes, also add the existing `waiting-for-author` label to that PR. This label is part of the publishing workflow and needs no separate confirmation. Preserve all other labels and verify that both the feedback and label were saved.
+
+Do not add the label for a draft response shown only in chat, an approval, or optional suggestions that do not require an author response. A review request alone does not authorize publishing feedback. Before posting, check the latest PR activity to avoid duplicating an existing response or posting a request that has already been addressed.
+
 ## Review Checklist
 
 - [ ] Directory structure correct

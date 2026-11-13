@@ -97,7 +97,7 @@ class ActivitySignal:
         }
 
     def _build_value_condition(self, context: RecordingContext, *, active: bool) -> dict[str, object]:
-        entity = _resolve_signal_entity(self.feature.entity_id, context)
+        entity = self.resolve_entity(context)
         assert entity is not None
         values = self.active if active else self.inactive
         if self.feature.source == FeatureSource.STATE:
@@ -106,6 +106,9 @@ class ActivitySignal:
             "condition": "template",
             "value_template": self._build_attribute_template(entity, values),
         }
+
+    def resolve_entity(self, context: RecordingContext) -> str | None:
+        return _resolve_signal_entity(self.feature.entity_id, context)
 
     def _build_attribute_template(self, entity: str, values: Sequence[ScalarStateValue]) -> str:
         expression = f"state_attr({entity!r}, {self.feature.attribute!r})"
@@ -268,6 +271,19 @@ def _find_charging_flag(
     if not flags:
         return None
     return min(flags, key=lambda candidate: (candidate.priority, candidate.signal.feature.identifier)).signal
+
+
+def find_charging_flag(samples: Sequence[RecordingSample], context: RecordingContext) -> ActivitySignal | None:
+    """Find a live, portable charging flag whose state changes can time charge completion."""
+    entities = [
+        entity
+        for entity in context.entities
+        if entity.disabled_by is None
+        and entity.has_live_state is not False
+        and entity.integration != "powercalc"
+        and _resolve_signal_entity(entity.entity_id, context) is not None
+    ]
+    return _find_charging_flag(samples, entities)
 
 
 def _split_drying_by_charging(

@@ -50,6 +50,14 @@ function sessionSnapshot(overrides: Record<string, unknown> = {}): Record<string
 }
 
 describe("MeasureApiClient", () => {
+  it("saves a recording label under the ingress prefix", async () => {
+    const files = [{ name: "robot/record.jsonl", size: 1024, media_type: "application/octet-stream", recording_label: "Overnight standby" }];
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response(files));
+    const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
+    await expect(client.setRecordingLabel("session 1", files[0]!.name, "Overnight standby")).resolves.toEqual(files);
+    expect(fetcher).toHaveBeenCalledWith(new URL("http://ha.local/prefix/api/sessions/session%201/recording-label"),
+      expect.objectContaining({ method: "PUT", body: JSON.stringify({ name: files[0]!.name, label: "Overnight standby" }) }));
+  });
   it("confirms a standalone standby reading under the ingress prefix", async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response({ status: "measured", power_w: 0.7 }));
     const client = new MeasureApiClient(fetcher, "http://ha.local/prefix/");
