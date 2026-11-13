@@ -7721,6 +7721,60 @@
           "hash": "37f48e53c3846daeff5313d815cdc292"
         },
         {
+          "authors": [
+            {
+              "github": "CoregaTab",
+              "name": "Klaus"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-12T17:04:30Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 4,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "Zigbee 6W anti-glare downlight RGB+CCT (pro)",
+          "product_url": "https://www.gledopto.cn/product-detail/zigbee-rgb-down-light.html",
+          "standby_power": 0.35,
+          "voltage_range": {
+            "max": 230.5,
+            "min": 226.3
+          },
+          "id": "GL-D-006P",
+          "manufacturer": "gledopto",
+          "updated_at": "2026-11-13T00:50:12",
+          "max_power": 6.14,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-13T00:50:12",
+          "power_range": {
+            "min": 0.33,
+            "max": 6.14
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "8b32f03fd0e7518f2257692ae6674289"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2022-08-21T08:18:17Z",
           "device_type": "light",
