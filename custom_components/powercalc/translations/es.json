@@ -121,12 +121,14 @@
               "create_energy_sensors": "Crear sensores de energía",
               "create_cost_sensors": "Crear sensores de costos",
               "create_standby_group": "Crear grupo de modo de espera",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Crear contadores eléctricos"
             },
             "data_description": {
               "create_energy_sensors": "Si powercalc necesita crear sensores kWh",
               "create_cost_sensors": "Si powercalc necesita crear sensores de costos. Requiere que se configure un precio de energía en los siguientes pasos",
               "create_standby_group": "Crear un grupo que sume todo el consumo de energía en modo de espera y el autoconsumo de los dispositivos IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Crear sensores de energía",
               "create_cost_sensors": "Crear sensores de costos",
               "create_standby_group": "Crear grupo de modo de espera",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Crear contadores eléctricos"
             },
             "data_description": {
               "create_energy_sensors": "Si powercalc necesita crear sensores kWh",
               "create_cost_sensors": "Si powercalc necesita crear sensores de costos. Requiere que se configure un precio de energía en los siguientes pasos",
               "create_standby_group": "Crear un grupo que sume todo el consumo de energía en modo de espera y el autoconsumo de los dispositivos IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc."
             }
           },

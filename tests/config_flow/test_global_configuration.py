@@ -11,6 +11,7 @@ import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (
+    CONF_CREATE_ACTIVE_GROUP,
     CONF_CREATE_STANDBY_GROUP,
     CONF_DISCOVERY,
     CONF_ENABLE_ANALYTICS,
@@ -151,6 +152,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         CONF_FOLLOW_DEVICE_NAME: False,
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_STANDBY_GROUP: True,
+        CONF_CREATE_ACTIVE_GROUP: False,
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_COST_SENSORS: False,
         CONF_COST_SENSOR_NAMING: "{} cost",

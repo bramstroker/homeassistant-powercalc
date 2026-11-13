@@ -17,7 +17,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 import pytest
 
-from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP
+from custom_components.powercalc import CONF_CREATE_ACTIVE_GROUP, CONF_CREATE_STANDBY_GROUP
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_MEMBERS,
@@ -31,6 +31,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_STANDBY_POWER,
+    CONF_STANDBY_POWER_ON,
     CONF_STATES_POWER,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
@@ -170,7 +171,8 @@ async def test_standby_group_utility_meter(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.all_standby_energy_daily")
 
 
-async def test_self_usage_sensors_included(hass: HomeAssistant) -> None:
+async def test_standby_group_includes_self_usage_while_on(hass: HomeAssistant) -> None:
+    """The standby total keeps its documented meaning: on state self usage is included."""
     await run_powercalc_setup(
         hass,
         [
@@ -188,6 +190,8 @@ async def test_self_usage_sensors_included(hass: HomeAssistant) -> None:
         ],
     )
 
+    assert hass.states.get("sensor.all_self_usage_power") is None
+
     await set_states(hass, [("switch.test1", STATE_ON), ("switch.test2", STATE_ON)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.70")
 
@@ -196,6 +200,110 @@ async def test_self_usage_sensors_included(hass: HomeAssistant) -> None:
 
     await set_states(hass, [("switch.test1", STATE_ON)])
     assert_entity_state(hass, "sensor.all_standby_power", "0.30")
+
+
+async def test_active_group_created_when_enabled(hass: HomeAssistant) -> None:
+    """The active group is opt-in and sums the power of the devices that are switched on."""
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_ENTITY_ID: "switch.test1",
+                CONF_STANDBY_POWER: 0.2,
+                CONF_MODE: CalculationStrategy.FIXED,
+                CONF_FIXED: {CONF_POWER: 20},
+            },
+            {
+                CONF_ENTITY_ID: "switch.test2",
+                CONF_MANUFACTURER: "test",
+                CONF_MODEL: "smart_switch_with_pm_new",
+            },
+        ],
+        {CONF_CREATE_ACTIVE_GROUP: True},
+    )
+
+    await set_states(hass, [("switch.test1", STATE_ON), ("switch.test2", STATE_ON)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", "20.70")
+    assert_entity_state(hass, "sensor.all_standby_power", "0.70")
+
+    await set_states(hass, [("switch.test1", STATE_OFF), ("switch.test2", STATE_OFF)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", STATE_UNKNOWN)
+    assert_entity_state(hass, "sensor.all_standby_power", "0.50")
+
+
+async def test_active_group_sums_running_devices(hass: HomeAssistant) -> None:
+    """The active group sums the power of every device that is switched on."""
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_ENTITY_ID: "switch.test1",
+                CONF_MANUFACTURER: "test",
+                CONF_MODEL: "smart_switch_with_pm_new",
+            },
+            {
+                CONF_ENTITY_ID: "switch.test2",
+                CONF_MANUFACTURER: "test",
+                CONF_MODEL: "smart_switch_with_pm_new",
+            },
+        ],
+        {CONF_CREATE_ACTIVE_GROUP: True},
+    )
+
+    await set_states(hass, [("switch.test1", STATE_ON)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", "0.70")
+
+    await set_states(hass, [("switch.test2", STATE_ON)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", "1.40")
+
+    await set_states(hass, [("switch.test1", STATE_OFF), ("switch.test2", STATE_OFF)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", STATE_UNKNOWN)
+    assert_entity_state(hass, "sensor.all_standby_power", "0.60")
+
+
+async def test_active_group_sums_active_power(hass: HomeAssistant) -> None:
+    """The active group contains the actual power of a switched on device."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test1",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 8.72},
+        },
+        {CONF_CREATE_ACTIVE_GROUP: True},
+    )
+
+    await set_states(hass, [("input_boolean.test1", STATE_ON)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", "8.72")
+    assert_entity_state(hass, "sensor.all_standby_power", STATE_UNKNOWN)
+
+    await set_states(hass, [("input_boolean.test1", STATE_OFF)])
+    assert_entity_state(hass, "sensor.all_standby_power", "0.20")
+    assert_entity_state(hass, "sensor.all_self_usage_power", STATE_UNKNOWN)
+
+
+async def test_standby_power_on_option(hass: HomeAssistant) -> None:
+    """A manual sensor can report self usage while ON through the standby_power_on option."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test1",
+            CONF_STANDBY_POWER: 12.4,
+            CONF_STANDBY_POWER_ON: 12.4,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 12.4},
+        },
+        {CONF_CREATE_ACTIVE_GROUP: True},
+    )
+
+    await set_states(hass, [("input_boolean.test1", STATE_ON)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", "24.80")
+    assert_entity_state(hass, "sensor.all_standby_power", "12.40")
+
+    await set_states(hass, [("input_boolean.test1", STATE_OFF)])
+    assert_entity_state(hass, "sensor.all_standby_power", "12.40")
+    assert_entity_state(hass, "sensor.all_self_usage_power", STATE_UNKNOWN)
 
 
 async def test_cover_and_media_player_entities(hass: HomeAssistant) -> None:

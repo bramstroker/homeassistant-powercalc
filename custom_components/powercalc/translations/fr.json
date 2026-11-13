@@ -121,12 +121,14 @@
               "create_energy_sensors": "Créer des capteurs d'énergie",
               "create_cost_sensors": "Créer des capteurs de coût",
               "create_standby_group": "Créer un groupe de veille",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Créer des compteurs de services publics"
             },
             "data_description": {
               "create_energy_sensors": "Indique si Powercalc doit créer des capteurs kWh",
               "create_cost_sensors": "Indique si Powercalc doit créer des capteurs de coût. Nécessite qu'un prix de l'énergie soit configuré dans les étapes suivantes",
               "create_standby_group": "Créer un groupe qui additionne toute la consommation en veille et l'auto-consommation des appareils IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Laisser Powercalc créer des compteurs de services publics, avec des cycles quotidiens, horaires, etc."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Créer des capteurs d'énergie",
               "create_cost_sensors": "Créer des capteurs de coût",
               "create_standby_group": "Créer un groupe de veille",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Créer des compteurs de services publics"
             },
             "data_description": {
               "create_energy_sensors": "Indique si Powercalc doit créer des capteurs kWh",
               "create_cost_sensors": "Indique si Powercalc doit créer des capteurs de coût. Nécessite qu'un prix de l'énergie soit configuré dans les étapes suivantes",
               "create_standby_group": "Créer un groupe qui additionne toute la consommation en veille et l'auto-consommation des appareils IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Laisser Powercalc créer des compteurs de services publics, avec des cycles quotidiens, horaires, etc."
             }
           },

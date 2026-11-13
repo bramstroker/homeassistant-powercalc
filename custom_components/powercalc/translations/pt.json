@@ -121,12 +121,14 @@
               "create_energy_sensors": "Criar sensores de energia",
               "create_cost_sensors": "Criar sensores de custo",
               "create_standby_group": "Criar grupo de standby",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Criar contadores de serviços"
             },
             "data_description": {
               "create_energy_sensors": "Se o Powercalc precisa de criar sensores kWh",
               "create_cost_sensors": "Se o Powercalc precisa de criar sensores de custo. Requer que seja configurado um preço de energia nos próximos passos",
               "create_standby_group": "Criar grupo que soma todo o consumo em standby e o consumo próprio dos dispositivos IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Permitir que o Powercalc crie contadores de serviços com ciclos diários, horários, etc."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Criar sensores de energia",
               "create_cost_sensors": "Criar sensores de custo",
               "create_standby_group": "Criar grupo de standby",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Criar contadores de serviços"
             },
             "data_description": {
               "create_energy_sensors": "Se o Powercalc precisa de criar sensores kWh",
               "create_cost_sensors": "Se o Powercalc precisa de criar sensores de custo. Requer que seja configurado um preço de energia nos próximos passos",
               "create_standby_group": "Criar grupo que soma todo o consumo em standby e o consumo próprio dos dispositivos IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Permitir que o Powercalc crie contadores de serviços com ciclos diários, horários, etc."
             }
           },
