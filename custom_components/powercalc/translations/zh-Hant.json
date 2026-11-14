@@ -1,0 +1,1291 @@
+{
+  "common": {
+    "source_entity": "來源實體",
+    "source_device": "來源裝置",
+    "remarks_smart_switch": "此設定檔僅提供待機功率值。\n 如果您的電器在開啟時會消耗固定功率，可以在設定流程的下一步提供該數值",
+    "remarks_smart_dimmer": "此設定檔僅提供待機功率值。\n 在下一步中，您可以選擇性提供所連接燈具的數值",
+    "view_measurement_details": "檢視量測詳細資訊"
+  },
+  "config": {
+    "abort": {
+      "already_configured": "感測器已設定過，請指定一個 unique_id"
+    },
+    "error": {
+      "cost_price_mandatory": "您必須提供電價或電價感測器",
+      "daily_energy_mandatory": "您必須至少提供「數值」或「數值模板」其中之一",
+      "entity_mandatory": "除了劇本以外的所有策略都必須選擇實體",
+      "fixed_mandatory": "您必須至少提供「功率」、「功率模板」或「狀態功率」其中之一",
+      "group_mandatory": "您必須至少定義子群組，或功率與能源實體",
+      "linear_mandatory": "您必須至少提供 max_power 或 calibrate 其中之一",
+      "linear_min_higher_as_max": "最大功率不能低於最小功率",
+      "linear_unsupported_domain": "線性模式不支援此實體網域，必須是 fan、light 或 mediaplayer 其中之一。不過您可以改用 calibrate 選項",
+      "lut_unsupported_color_mode": "LUT 設定檔不支援您燈具的其中一種色彩模式。詳細資訊請查看日誌",
+      "lut_wrong_domain": "只有燈光實體可以使用 LUT 模式",
+      "playbook_mandatory": "您至少需要指定一個劇本",
+      "unknown": "發生未知錯誤，詳細資訊請查看日誌"
+    },
+    "flow_title": "{name} ({manufacturer} {model})",
+    "step": {
+      "assign_groups": {
+        "data": {
+          "group": "選擇群組",
+          "new_group": "新群組"
+        },
+        "data_description": {
+          "new_group": "填入自訂群組名稱以建立新群組"
+        },
+        "title": "指派至群組"
+      },
+      "availability_entity": {
+        "data": {
+          "availability_entity": "可用性實體"
+        },
+        "data_description": {
+          "availability_entity": "當此實體無法使用時，powercalc 感測器也會一併變成無法使用"
+        },
+        "title": "可用性實體",
+        "description": "此設定檔以裝置為單位。請選擇用來判斷 powercalc 感測器可用性的實體"
+      },
+      "daily_energy": {
+        "data": {
+          "create_utility_meters": "建立功耗表",
+          "daily_energy_value": "每日能源值",
+          "name": "名稱",
+          "on_time": "開啟時長",
+          "start_time": "開始時間",
+          "unit_of_measurement": "測量單位",
+          "update_frequency": "更新頻率",
+          "value": "數值",
+          "value_template": "數值模板"
+        },
+        "data_description": {
+          "on_time": "留空時預設為 1 天，即全天開啟",
+          "update_frequency": "感測器狀態更新之間的間隔秒數"
+        },
+        "title": "建立每日固定感測器"
+      },
+      "energy_options": {
+        "title": "能源選項",
+        "data": {
+          "energy_integration_method": "積分方法",
+          "energy_sensor_unit_prefix": "單位前綴",
+          "energy_filter_outlier_enabled": "過濾離群值",
+          "energy_filter_outlier_max_step": "離群值過濾最大變化量"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "啟用能源感測器的離群值過濾",
+          "energy_filter_outlier_max_step": "離群值過濾器預期的功率值最大變化量（以瓦特為單位）"
+        }
+      },
+      "group_domain": {
+        "data": {
+          "name": "名稱",
+          "create_energy_sensor": "建立能源感測器",
+          "create_cost_sensor": "建立費用感測器",
+          "create_utility_meters": "建立功耗表",
+          "domain": "實體網域",
+          "exclude_entities": "排除實體"
+        },
+        "title": "建立以網域為基礎的群組感測器"
+      },
+      "fixed": {
+        "data": {
+          "fixed_value": "功率值"
+        },
+        "data_description": {
+          "fixed_value": "實體開啟（ON）時的功率值，單位為瓦特"
+        },
+        "description": "為您的實體定義固定功率值。詳細資訊請參閱[說明文件]({docs_uri})",
+        "title": "固定設定"
+      },
+      "global_configuration": {
+        "title": "全域設定",
+        "description": "設定 Powercalc 的全域設定。詳細資訊請參閱[說明文件]({docs_uri})。能源感測器與功耗表的其他選項可在後續步驟中提供。",
+        "sections": {
+          "power_options": {
+            "name": "功率感測器",
+            "data": {
+              "power_sensor_naming": "功率感測器名稱格式",
+              "power_sensor_friendly_naming": "功率感測器顯示名稱格式",
+              "power_sensor_category": "功率感測器類別",
+              "power_sensor_precision": "功率感測器精準度",
+              "follow_device_name": "跟隨裝置名稱"
+            },
+            "data_description": {
+              "follow_device_name": "對於在 UI 中設定且受支援的虛擬功率感測器，其產生的實體會使用所指派的裝置名稱。實體 ID 與自訂實體名稱維持不變。關閉此選項會還原為原先設定的名稱。自訂顯示名稱格式（包含全域格式）具有優先權：受影響的項目會保留其已設定的名稱。"
+            }
+          },
+          "features": {
+            "name": "建立感測器",
+            "data": {
+              "create_energy_sensors": "建立能源感測器",
+              "create_cost_sensors": "建立費用感測器",
+              "create_standby_group": "建立待機群組",
+              "create_utility_meters": "建立功耗表"
+            },
+            "data_description": {
+              "create_energy_sensors": "powercalc 是否需要建立 kWh 感測器",
+              "create_cost_sensors": "powercalc 是否需要建立費用感測器。需要在後續步驟中設定電價",
+              "create_standby_group": "建立一個群組，加總所有待機功率消耗與 IOT 裝置的自身耗電",
+              "create_utility_meters": "讓 powercalc 建立功耗表，依每日、每小時等週期重置"
+            }
+          },
+          "advanced": {
+            "name": "進階",
+            "data": {
+              "enable_analytics": "啟用匿名分析",
+              "ignore_unavailable_state": "忽略無法使用狀態",
+              "include_non_powercalc_sensors": "包含非 powercalc 感測器",
+              "disable_extended_attributes": "停用延伸屬性",
+              "disable_library_download": "停用遠端資料庫下載"
+            },
+            "data_description": {
+              "enable_analytics": "允許 Powercalc 傳送匿名的彙總使用統計資料，以協助改善此整合",
+              "ignore_unavailable_state": "即使來源實體無法使用，仍讓 Powercalc 感測器保持可用",
+              "include_non_powercalc_sensors": "控制是否要在群組中包含非 powercalc 感測器",
+              "disable_extended_attributes": "停用 powercalc 加在功率、能源與群組實體狀態上的所有額外屬性。這有助於維持較小的資料庫大小",
+              "disable_library_download": "停用 Powercalc 資料庫下載功能"
+            }
+          }
+        }
+      },
+      "global_configuration_cost": {
+        "title": "費用選項",
+        "description": "設定用來計算費用感測器的電價。可提供固定價格，或提供每 kWh 目前價格的感測器。詳細資訊請參閱[說明文件]({docs_uri})",
+        "sections": {
+          "cost_pricing": {
+            "name": "定價",
+            "data": {
+              "energy_price": "固定電價",
+              "energy_price_multiplier": "電價倍率",
+              "energy_price_sensor": "電價感測器",
+              "energy_price_surcharge": "電價附加費"
+            },
+            "data_description": {
+              "energy_price": "以當地貨幣計價的每 kWh 固定價格",
+              "energy_price_multiplier": "在附加費之後套用的倍率。可用於以百分比計算的稅金或費用，例如 21% 請填 1.21",
+              "energy_price_sensor": "提供每 kWh 目前電價的感測器（例如來自動態費率整合）。若要使用此感測器，請將固定價格留空",
+              "energy_price_surcharge": "每 kWh 額外加到固定價格或價格感測器數值上的固定金額"
+            }
+          },
+          "cost_naming": {
+            "name": "命名",
+            "data": {
+              "cost_sensor_friendly_naming": "費用感測器顯示名稱格式",
+              "cost_sensor_naming": "費用感測器名稱格式"
+            },
+            "data_description": {
+              "cost_sensor_friendly_naming": "費用感測器顯示名稱的格式。來源名稱會插入在預留位置處",
+              "cost_sensor_naming": "用來產生費用感測器名稱與實體 ID 的格式。來源名稱會插入在預留位置處"
+            }
+          }
+        }
+      },
+      "global_configuration_cost_apply": {
+        "title": "套用費用感測器",
+        "description": "您變更了全域費用感測器設定。要將此變更套用到所有透過 GUI 建立的現有 powercalc 感測器嗎？",
+        "data": {
+          "apply_to_all": "套用到現有感測器"
+        },
+        "data_description": {
+          "apply_to_all": "更新所有透過 GUI 建立的現有 powercalc 感測器，以符合新的費用感測器設定"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "探索選項",
+        "description": "Powercalc 可以掃描您的系統，找出在內建資料庫中有功率設定檔的裝置與實體。以下選項可讓您微調此行為。",
+        "data": {
+          "enabled": "啟用探索",
+          "exclude_device_types": "排除的裝置類型",
+          "exclude_self_usage": "排除自身耗電"
+        },
+        "data_description": {
+          "exclude_device_types": "將一種或多種特定裝置類型排除在探索之外。",
+          "exclude_self_usage": "排除智慧開關的自身耗電設定檔。"
+        }
+      },
+      "global_configuration_energy": {
+        "title": "能源選項",
+        "data": {
+          "energy_integration_method": "能源積分方法",
+          "energy_sensor_category": "能源感測器類別",
+          "energy_sensor_friendly_naming": "能源感測器顯示名稱格式",
+          "energy_sensor_naming": "能源感測器名稱格式",
+          "energy_sensor_precision": "能源感測器精準度",
+          "energy_sensor_unit_prefix": "能源感測器單位前綴"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "節流選項",
+        "description": "設定不同感測器類型的更新間隔。詳細資訊請參閱[說明文件]({docs_uri})",
+        "data": {
+          "group_energy_update_interval": "群組能源更新間隔",
+          "group_power_update_interval": "群組功率更新間隔",
+          "energy_update_interval": "能源更新間隔",
+          "power_update_interval": "功率更新間隔"
+        },
+        "data_description": {
+          "group_energy_update_interval": "群組能源感測器的更新間隔，以秒為單位。設為 0 即停用",
+          "group_power_update_interval": "群組功率感測器的更新間隔，以秒為單位。設為 0 即停用",
+          "energy_update_interval": "能源感測器的更新間隔，以秒為單位。設為 0 即停用",
+          "power_update_interval": "能源感測器強制更新的間隔，以秒為單位。設為 0 即停用"
+        }
+      },
+      "global_configuration_utility_meter": {
+        "title": "功耗表選項",
+        "data": {
+          "utility_meter_net_consumption": "功耗表淨消耗",
+          "utility_meter_tariffs": "功耗表費率",
+          "utility_meter_types": "功耗表類型"
+        }
+      },
+      "group_custom": {
+        "data": {
+          "name": "名稱"
+        },
+        "sections": {
+          "members": {
+            "name": "成員",
+            "data": {
+              "group_member_sensors": "成員 powercalc 感測器",
+              "group_member_devices": "成員裝置",
+              "group_power_entities": "其他功率實體",
+              "group_energy_entities": "其他能源實體",
+              "sub_groups": "子群組",
+              "area": "分區",
+              "floor": "樓層"
+            },
+            "data_description": {
+              "group_member_sensors": "要納入群組的 Powercalc 感測器",
+              "group_member_devices": "將所選裝置的功率與能源實體加入群組",
+              "group_power_entities": "要納入的其他功率感測器（W），來自您的 HA 系統",
+              "group_energy_entities": "要納入的其他能源感測器（kWh），來自您的 HA 系統",
+              "sub_groups": "所選子群組內的所有感測器也會一併加入此群組",
+              "area": "加入指定分區中的所有功率感測器",
+              "floor": "加入指定樓層中的所有功率感測器"
+            }
+          },
+          "options": {
+            "name": "選項",
+            "data": {
+              "device": "裝置",
+              "hide_members": "隱藏成員",
+              "include_non_powercalc_sensors": "包含非 powercalc 感測器",
+              "force_calculate_group_energy": "強制計算能源",
+              "group_energy_start_at_zero": "從零開始",
+              "create_energy_sensor": "建立能源感測器",
+              "create_utility_meters": "建立功耗表"
+            },
+            "data_description": {
+              "device": "將 powercalc 建立的群組實體加入現有裝置",
+              "include_non_powercalc_sensors": "控制使用分區選項時是否包含非 powercalc 感測器",
+              "force_calculate_group_energy": "powercalc 預設會加總成員感測器的能源感測器。切換此選項可強制建立黎曼和（Riemann Sum）感測器",
+              "group_energy_start_at_zero": "啟用後，能源感測器建立時會從零開始；否則會加總所有成員能源感測器目前的狀態",
+              "create_energy_sensor": "powercalc 是否需要建立 kWh 感測器"
+            }
+          }
+        },
+        "title": "建立群組感測器"
+      },
+      "group_subtract": {
+        "data": {
+          "create_energy_sensor": "建立能源感測器",
+          "create_cost_sensor": "建立費用感測器",
+          "create_utility_meters": "建立功耗表",
+          "entity_id": "基準實體",
+          "name": "名稱",
+          "subtract_entities": "要減去的實體"
+        },
+        "data_description": {
+          "entity_id": "要從中減去功率的基準實體",
+          "subtract_entities": "選擇所有要從基準實體中減去的實體"
+        },
+        "title": "相減群組感測器"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "總電源功率感測器",
+          "group_tracked_auto": "自動加入實體",
+          "create_energy_sensor": "建立能源感測器",
+          "create_cost_sensor": "建立費用感測器",
+          "create_utility_meters": "建立功耗表"
+        },
+        "data_description": {
+          "main_power_sensor": "選擇記錄您總用電功率的功率感測器。若留空，則只會建立已追蹤功率感測器",
+          "group_tracked_auto": "Powercalc 會自動將所有功率感測器加入已追蹤群組，並略過 powercalc 群組。若想手動定義已追蹤的實體，請停用此選項",
+          "create_energy_sensor": "powercalc 是否需要建立 kWh 感測器",
+          "create_utility_meters": "讓 powercalc 建立功耗表，依每日、每小時等週期重置"
+        },
+        "description": "為所有已追蹤與未追蹤的功率建立群組感測器",
+        "title": "建立已追蹤功率感測器"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "已追蹤實體"
+        },
+        "description": "選擇所有屬於已追蹤消耗的功率感測器。系統已自動填入，但您仍可手動調整",
+        "title": "選擇功率實體"
+      },
+      "group_tracked_untracked_auto": {
+        "data": {
+          "exclude_entities": "排除實體"
+        },
+        "description": "將特定實體排除在自動追蹤群組之外",
+        "title": "自動追蹤設定"
+      },
+      "library": {
+        "data": {
+          "confirm_autodisovered_model": "確認型號"
+        },
+        "data_description": {
+          "confirm_autodisovered_model": "如果您選擇不確認，可以自行輸入製造商與型號"
+        },
+        "description": "{source}\n\n已自動偵測到您裝置的製造商為「{manufacturer}」、型號為「{model}」。{remarks}{profile_details}",
+        "title": "資料庫"
+      },
+      "library_custom_fields": {
+        "title": "設定檔設定",
+        "data": {
+          "power_factor": "功率因數"
+        },
+        "data_description": {
+          "power_factor": "實際功率與視在功率的比值。電腦／電子產品請使用 0.6，混合負載使用 0.7，電暖器等電阻性負載使用 1.0。"
+        }
+      },
+      "library_multi_profile": {
+        "data": {
+          "model": "選擇型號"
+        },
+        "description": "已自動偵測到您裝置的製造商為「{manufacturer}」、型號為「{model}」。找到多個可能適用於此實體的設定檔。請在 [Powercalc 資料庫]({library_link}) 中查詢您裝置的確切型號，並選擇正確的設定檔",
+        "title": "資料庫"
+      },
+      "linear": {
+        "data": {
+          "attribute": "屬性",
+          "calibrate": "校正值",
+          "gamma_curve": "Gamma 曲線",
+          "max_power": "最大功率",
+          "min_power": "最小功率"
+        },
+        "data_description": {
+          "attribute": "指定屬性。若留空，燈光預設為亮度（brightness），喇叭為音量（volume），風扇為百分比（percentage）",
+          "calibrate": "每行輸入一個校正值。範例\n\n1: 20"
+        },
+        "description": "定義線性功率計算選項。詳細資訊請參閱[說明文件]({docs_uri})。可使用最小／最大功率，或使用可提供更多控制點的校正值。",
+        "title": "線性設定"
+      },
+      "manufacturer": {
+        "data": {
+          "manufacturer": "製造商"
+        },
+        "description": "選擇裝置製造商",
+        "title": "製造商設定"
+      },
+      "model": {
+        "data": {
+          "model": "型號 ID"
+        },
+        "description": "選擇裝置型號。詳細資訊請參閱支援型號[清單]({supported_models_link})",
+        "title": "型號設定"
+      },
+      "select_device": {
+        "data": {
+          "device": "裝置"
+        },
+        "data_description": {
+          "device": "Powercalc 實體要連結到的裝置"
+        },
+        "description": "選擇 Powercalc 感測器要連結到的裝置。",
+        "title": "選擇裝置"
+      },
+      "menu_group": {
+        "menu_options": {
+          "group_custom": "標準",
+          "group_domain": "以網域為基礎",
+          "group_subtract": "相減",
+          "group_tracked_untracked": "已追蹤／未追蹤功率"
+        },
+        "title": "選擇群組類型",
+        "description": "選擇要建立的群組感測器類型。若要將特定網域的所有實體組成群組，或建立加總所有能源感測器的感測器，請選擇「以網域為基礎」的群組；否則請選擇標準群組"
+      },
+      "multi_switch": {
+        "data": {
+          "entities": "開關實體",
+          "power": "開啟時功率",
+          "power_off": "關閉時功率"
+        },
+        "data_description": {
+          "entities": "選擇所有屬於此多開關的個別開關",
+          "power": "單一開關開啟時的功率",
+          "power_off": "單一開關關閉時的功率"
+        },
+        "description": "定義多開關功率計算選項。詳細資訊請參閱[說明文件]({docs_uri})。",
+        "title": "多開關設定"
+      },
+      "playbook": {
+        "data": {
+          "autostart": "自動啟動",
+          "playbooks": "劇本",
+          "repeat": "重複",
+          "states_trigger": "狀態觸發"
+        },
+        "data_description": {
+          "autostart": "指定 HA 啟動時要開始執行的劇本，例如「program1」",
+          "repeat": "若要在劇本執行完畢後持續重複執行，請開啟此選項",
+          "states_trigger": "依狀態變化觸發劇本。範例\n\nplaying: program1"
+        },
+        "description": "定義劇本選項。詳細資訊請參閱[說明文件]({docs_uri})。",
+        "title": "劇本設定"
+      },
+      "power_advanced": {
+        "data": {
+          "calculation_enabled_condition": "啟用計算的條件",
+          "energy_integration_method": "能源積分方法",
+          "energy_sensor_unit_prefix": "能源感測器單位前綴",
+          "energy_filter_outlier_enabled": "能源離群值過濾",
+          "energy_filter_outlier_max_step": "離群值過濾最大變化量",
+          "ignore_unavailable_state": "忽略無法使用狀態",
+          "multiply_factor": "倍率",
+          "multiply_factor_standby": "待機倍率",
+          "unavailable_power": "無法使用時的功率"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "只有當此模板的結果為 true 或 1 時，才會執行所設定的功率計算策略，否則功率感測器會顯示 0",
+          "energy_filter_outlier_enabled": "啟用能源感測器的離群值過濾",
+          "energy_filter_outlier_max_step": "離群值過濾器預期的功率值最大變化量（以瓦特為單位）",
+          "ignore_unavailable_state": "若希望即使來源實體無法使用，功率感測器仍保持可用，請開啟此設定",
+          "multiply_factor": "將計算出的功率乘上此倍率。適用於燈光群組",
+          "multiply_factor_standby": "是否也將倍率套用到待機功率",
+          "unavailable_power": "來源實體處於無法使用狀態時要記錄的功率（W）"
+        },
+        "description": "以下選項用於 powercalc 的進階設定。大多數使用者不會用到，可以略過",
+        "title": "進階選項"
+      },
+      "real_power": {
+        "data": {
+          "create_utility_meters": "建立功耗表",
+          "entity_id": "功率感測器 ID",
+          "name": "名稱",
+          "device": "裝置"
+        },
+        "data_description": {
+          "create_utility_meters": "讓 powercalc 建立功耗表，依每日、每小時等週期重置",
+          "name": "能源感測器與功耗表的基本名稱。完整實體名稱會依 energy_sensor_naming 設定產生",
+          "device": "將建立的能源感測器加入特定裝置"
+        },
+        "description": "目前部分設定只能在全域層級設定",
+        "title": "為現有功率感測器建立能源感測器"
+      },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "能源感測器",
+          "name": "名稱"
+        },
+        "data_description": {
+          "energy_sensor_id": "要計算費用的現有能源感測器（kWh）。可以是來自任何整合的感測器，不限於 Powercalc",
+          "name": "費用感測器的基本名稱。完整實體名稱會依 cost_sensor_naming 設定產生"
+        },
+        "description": "為現有能源感測器建立費用感測器。除非您在下方覆寫，否則電價會採用 Powercalc 全域設定。",
+        "sections": {
+          "cost_pricing": {
+            "name": "覆寫價格",
+            "data": {
+              "energy_price": "固定電價",
+              "energy_price_multiplier": "電價倍率",
+              "energy_price_sensor": "電價感測器",
+              "energy_price_surcharge": "電價附加費"
+            },
+            "data_description": {
+              "energy_price": "以當地貨幣計價的每 kWh 固定價格。留空則使用全域電價",
+              "energy_price_multiplier": "在附加費之後套用的倍率。可用於以百分比計算的稅金或費用，例如 21% 請填 1.21。留空則使用全域倍率",
+              "energy_price_sensor": "提供每 kWh 目前電價的感測器（例如來自動態費率整合）。若要使用此感測器，請將固定價格留空",
+              "energy_price_surcharge": "每 kWh 額外加到固定價格或價格感測器數值上的固定金額。留空則使用全域附加費"
+            }
+          }
+        },
+        "title": "建立費用感測器"
+      },
+      "sub_profile": {
+        "data": {
+          "sub_profile": "子設定檔"
+        },
+        "description": "此裝置的型號有多個子設定檔。請選擇與此裝置下列實體相對應的子設定檔：\n\n「{entity_id}」{remarks}",
+        "title": "子設定檔設定"
+      },
+      "sub_profile_per_device": {
+        "data": {
+          "sub_profile": "子設定檔"
+        },
+        "description": "此裝置的型號有多個子設定檔。{remarks}",
+        "title": "子設定檔設定"
+      },
+      "smart_switch": {
+        "data": {
+          "power": "功率",
+          "self_usage_included": "已包含自身耗電"
+        },
+        "data_description": {
+          "power": "所連接電器的固定功率值，單位為瓦特",
+          "self_usage_included": "功率值是否已包含智慧開關本身消耗的功率。若未包含，Powercalc 會將智慧開關的自身耗電（{self_usage_power}W）加到功率值上"
+        },
+        "description": "定義所連接電器的功率消耗。若電器並非消耗固定功率，可以略過此步驟。Powercalc 會為智慧開關本身的自身耗電建立功率感測器",
+        "title": "智慧開關設定"
+      },
+      "user": {
+        "data": {
+          "sensor_type": "感測器類型"
+        },
+        "menu_options": {
+          "cost": "費用感測器（來自現有能源感測器）",
+          "daily_energy": "每日能源",
+          "group": "群組",
+          "global_configuration": "全域設定",
+          "menu_group": "群組",
+          "menu_library": "虛擬功率（資料庫）",
+          "real_power": "來自實際功率感測器的能源",
+          "virtual_power": "虛擬功率（手動）"
+        },
+        "title": "選擇感測器類型"
+      },
+      "utility_meter_options": {
+        "title": "功耗表選項",
+        "description": "在此定義建立功耗表的設定",
+        "data": {
+          "utility_meter_net_consumption": "淨消耗",
+          "utility_meter_types": "週期",
+          "utility_meter_tariffs": "費率"
+        },
+        "data_description": {
+          "utility_meter_net_consumption": "若想將來源視為淨計量表，請啟用此選項。這會讓計數器可以正負雙向變動。",
+          "utility_meter_types": "為指定週期建立功耗表",
+          "utility_meter_tariffs": "支援的費率清單，若只需要單一費率請留空。"
+        }
+      },
+      "virtual_power": {
+        "data": {
+          "create_energy_sensor": "建立能源感測器",
+          "create_standby_energy_sensor": "建立待機能源感測器",
+          "create_cost_sensor": "建立費用感測器",
+          "create_utility_meters": "建立功耗表",
+          "entity_id": "來源實體",
+          "mode": "計算策略",
+          "name": "名稱",
+          "standby_power": "待機功率"
+        },
+        "data_description": {
+          "create_energy_sensor": "powercalc 是否需要建立 kWh 感測器",
+          "create_standby_energy_sensor": "Powercalc 是否要建立只追蹤待機消耗的 kWh 感測器",
+          "create_utility_meters": "讓 powercalc 建立功耗表，依每日、每小時等週期重置",
+          "entity_id": "虛擬功率所依據的實體，功率感測器會監聽此實體的狀態變化來更新",
+          "name": "留空則會使用來源實體的名稱",
+          "standby_power": "定義裝置處於關閉（OFF）狀態時消耗的功率"
+        },
+        "description": "關於可用策略與設定選項的詳細資訊，請參閱 readme。來源實體與名稱至少須提供其中之一，也可兩者都提供。",
+        "title": "建立虛擬功率感測器"
+      },
+      "wled": {
+        "data": {
+          "current_entity": "電流實體",
+          "power_factor": "功率因數",
+          "voltage": "電壓"
+        },
+        "description": "請務必在 WLED 軟體中啟用亮度限制器。另請參閱 {docs_uri}",
+        "title": "WLED 設定",
+        "data_description": {
+          "current_entity": "可選擇提供預估電流（mA）的感測器。只有在 Powercalc 無法自動找到 WLED 預估電流感測器時才需要，例如亮度限制器是依各輸出個別設定的情況。"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "invalid_integration_method": {
+      "message": "無效的積分方法「{method}」。必須是下列其中之一：{allowed_methods}。"
+    },
+    "no_sub_profile_support": {
+      "message": "{entity_id} 不支援切換子設定檔。此動作僅適用於具有子設定檔且未自動選擇子設定檔的感測器。"
+    },
+    "not_a_playbook_sensor": {
+      "message": "{entity_id} 不是啟用劇本的感測器。此動作僅適用於使用劇本策略的感測器。"
+    },
+    "unknown_sub_profile": {
+      "message": "「{profile}」不是已知的子設定檔。可用的子設定檔：{known_profiles}。"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "measure_session_status": {
+        "name": "量測工作階段狀態",
+        "state": {
+          "idle": "閒置",
+          "validating": "驗證中",
+          "ready": "就緒",
+          "awaiting_confirmation": "等待確認",
+          "running": "執行中",
+          "cancelling": "取消中",
+          "cancelled": "已取消",
+          "completed": "已完成",
+          "failed": "失敗",
+          "resumable": "可繼續"
+        }
+      },
+      "power": {
+        "name": "功率"
+      },
+      "energy": {
+        "name": "能源"
+      },
+      "standby_energy": {
+        "name": "待機能源"
+      },
+      "cost": {
+        "name": "費用"
+      },
+      "utility_meter_cycle": {
+        "name": "能源 {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "能源 {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "能源 {period} 費用"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "能源 {period} {tariff} 費用"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "能源 {period}"
+      }
+    }
+  },
+  "issues": {
+    "composite_device_id": {
+      "fix_flow": {
+        "abort": {
+          "entry_removed": "Powercalc 設定項目已被移除"
+        },
+        "error": {
+          "invalid_device": "選擇現有裝置，或將此欄位留空"
+        },
+        "step": {
+          "select_device": {
+            "data": {
+              "device": "裝置"
+            },
+            "data_description": {
+              "device": "此 Powercalc 設定所建立的實體要連結到的裝置"
+            },
+            "description": "Powercalc 設定 {name} 原本連結的裝置已被 Home Assistant 拆分為多個裝置，其實體無法再連結到舊的裝置 ID。\n\n請選擇這些實體要連結的裝置，或將此欄位留空，讓它們不屬於任何裝置。",
+            "title": "為 {name} 選擇裝置"
+          }
+        }
+      },
+      "title": "需要重新為 Powercalc 設定 {name} 選擇裝置"
+    },
+    "deprecated_platform_yaml": {
+      "description": "使用 `sensor->platform` 設定感測器的方式已棄用。您需要將設定改為 `powercalc->sensors`。點擊「了解更多」以取得進一步說明。",
+      "title": "Powercalc YAML 設定已搬移"
+    },
+    "legacy_config": {
+      "title": "YAML 設定已變更",
+      "description": "您 {type} 的 YAML 設定需要更新為新結構。點擊「了解更多」以取得進一步資訊。"
+    },
+    "sub_profile": {
+      "fix_flow": {
+        "step": {
+          "sub_profile": {
+            "description": "此裝置的型號有多個子設定檔。請選擇與此裝置下列實體相對應的子設定檔：\n\n「{entity_id}」\n\n製造商：{manufacturer}\n型號：{model}{remarks}",
+            "title": "選擇正確的子設定檔",
+            "data": {
+              "sub_profile": "子設定檔"
+            }
+          }
+        }
+      },
+      "title": "{entry} 需要選擇子設定檔"
+    }
+  },
+  "options": {
+    "abort": {
+      "model_not_support": "不支援此型號"
+    },
+    "error": {
+      "cost_price_mandatory": "您必須提供電價或電價感測器",
+      "fixed_mandatory": "您必須至少提供「功率」、「功率模板」或「狀態功率」其中之一",
+      "group_mandatory": "您必須至少定義子群組，或功率與能源實體",
+      "linear_mandatory": "您必須至少提供 max_power 或 calibrate 其中之一",
+      "linear_min_higher_as_max": "最大功率不能低於最小功率",
+      "linear_unsupported_domain": "線性模式不支援此實體網域，必須是 fan、light 或 mediaplayer 其中之一。不過您可以改用 calibrate 選項",
+      "unknown": "發生未知錯誤，詳細資訊請查看日誌"
+    },
+    "step": {
+      "advanced_options": {
+        "title": "進階選項",
+        "data": {
+          "calculation_enabled_condition": "啟用計算的條件",
+          "energy_integration_method": "能源積分方法",
+          "ignore_unavailable_state": "忽略無法使用狀態",
+          "multiply_factor": "倍率",
+          "multiply_factor_standby": "待機倍率",
+          "unavailable_power": "無法使用時的功率"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "只有當此模板的結果為 true 或 1 時，才會執行所設定的功率計算策略，否則功率感測器會顯示 0",
+          "ignore_unavailable_state": "若希望即使來源實體無法使用，功率感測器仍保持可用，請開啟此設定",
+          "multiply_factor": "將計算出的功率乘上此倍率。適用於燈光群組",
+          "multiply_factor_standby": "是否也將倍率套用到待機功率",
+          "unavailable_power": "來源實體處於無法使用狀態時要記錄的功率（W）"
+        }
+      },
+      "basic_options": {
+        "title": "基本選項",
+        "data": {
+          "create_energy_sensor": "建立能源感測器",
+          "create_standby_energy_sensor": "建立待機能源感測器",
+          "create_cost_sensor": "建立費用感測器",
+          "create_utility_meters": "建立功耗表",
+          "entity_id": "來源實體",
+          "name": "名稱",
+          "standby_power": "待機功率"
+        },
+        "data_description": {
+          "create_energy_sensor": "powercalc 是否需要建立 kWh 感測器",
+          "create_standby_energy_sensor": "Powercalc 是否要建立只追蹤待機消耗的 kWh 感測器",
+          "create_utility_meters": "讓 powercalc 建立功耗表，依每日、每小時等週期重置",
+          "entity_id": "虛擬功率所依據的實體，功率感測器會監聽此實體的狀態變化來更新",
+          "name": "留空則會使用來源實體的名稱",
+          "standby_power": "定義裝置處於關閉（OFF）狀態時消耗的功率"
+        }
+      },
+      "daily_energy": {
+        "title": "每日能源選項",
+        "data": {
+          "daily_energy_value": "每日能源值",
+          "name": "名稱",
+          "on_time": "開啟時長",
+          "start_time": "開始時間",
+          "unit_of_measurement": "測量單位",
+          "update_frequency": "更新頻率",
+          "value": "數值",
+          "value_template": "數值模板"
+        },
+        "data_description": {
+          "on_time": "留空時預設為 1 天，即全天開啟",
+          "update_frequency": "感測器狀態更新之間的間隔秒數"
+        }
+      },
+      "energy_options": {
+        "title": "能源選項",
+        "data": {
+          "energy_integration_method": "積分方法",
+          "energy_sensor_unit_prefix": "單位前綴",
+          "energy_filter_outlier_enabled": "過濾離群值",
+          "energy_filter_outlier_max_step": "離群值過濾最大變化量"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "啟用能源感測器的離群值過濾",
+          "energy_filter_outlier_max_step": "離群值過濾器預期的功率值最大變化量（以瓦特為單位）"
+        }
+      },
+      "fixed": {
+        "title": "固定選項",
+        "data": {
+          "fixed_value": "固定值",
+          "self_usage_included": "已包含自身耗電"
+        },
+        "data_description": {
+          "self_usage_included": "功率值是否已包含智慧開關本身消耗的功率。"
+        }
+      },
+      "global_configuration": {
+        "title": "基本選項",
+        "sections": {
+          "power_options": {
+            "name": "功率感測器",
+            "data": {
+              "power_sensor_naming": "功率感測器名稱格式",
+              "power_sensor_friendly_naming": "功率感測器顯示名稱格式",
+              "power_sensor_category": "功率感測器類別",
+              "power_sensor_precision": "功率感測器精準度",
+              "follow_device_name": "跟隨裝置名稱"
+            },
+            "data_description": {
+              "follow_device_name": "對於在 UI 中設定且受支援的虛擬功率感測器，其產生的實體會使用所指派的裝置名稱。實體 ID 與自訂實體名稱維持不變。關閉此選項會還原為原先設定的名稱。自訂顯示名稱格式（包含全域格式）具有優先權：受影響的項目會保留其已設定的名稱。"
+            }
+          },
+          "features": {
+            "name": "建立感測器",
+            "data": {
+              "create_energy_sensors": "建立能源感測器",
+              "create_cost_sensors": "建立費用感測器",
+              "create_standby_group": "建立待機群組",
+              "create_utility_meters": "建立功耗表"
+            },
+            "data_description": {
+              "create_energy_sensors": "powercalc 是否需要建立 kWh 感測器",
+              "create_cost_sensors": "powercalc 是否需要建立費用感測器。需要在後續步驟中設定電價",
+              "create_standby_group": "建立一個群組，加總所有待機功率消耗與 IOT 裝置的自身耗電",
+              "create_utility_meters": "讓 powercalc 建立功耗表，依每日、每小時等週期重置"
+            }
+          },
+          "advanced": {
+            "name": "進階",
+            "data": {
+              "enable_analytics": "啟用匿名分析",
+              "ignore_unavailable_state": "忽略無法使用狀態",
+              "include_non_powercalc_sensors": "包含非 powercalc 感測器",
+              "disable_extended_attributes": "停用延伸屬性",
+              "disable_library_download": "停用遠端資料庫下載"
+            },
+            "data_description": {
+              "enable_analytics": "允許 Powercalc 傳送匿名的彙總使用統計資料，以協助改善此整合",
+              "ignore_unavailable_state": "即使來源實體無法使用，仍讓 Powercalc 感測器保持可用",
+              "include_non_powercalc_sensors": "控制是否要在群組中包含非 powercalc 感測器",
+              "disable_extended_attributes": "停用 powercalc 加在功率、能源與群組實體狀態上的所有額外屬性。這有助於維持較小的資料庫大小",
+              "disable_library_download": "停用 Powercalc 資料庫下載功能"
+            }
+          }
+        }
+      },
+      "global_configuration_cost": {
+        "title": "費用選項",
+        "description": "設定用來計算費用感測器的電價。可提供固定價格，或提供每 kWh 目前價格的感測器。詳細資訊請參閱[說明文件]({docs_uri})",
+        "sections": {
+          "cost_pricing": {
+            "name": "定價",
+            "data": {
+              "energy_price": "固定電價",
+              "energy_price_multiplier": "電價倍率",
+              "energy_price_sensor": "電價感測器",
+              "energy_price_surcharge": "電價附加費"
+            },
+            "data_description": {
+              "energy_price": "以當地貨幣計價的每 kWh 固定價格",
+              "energy_price_multiplier": "在附加費之後套用的倍率。可用於以百分比計算的稅金或費用，例如 21% 請填 1.21",
+              "energy_price_sensor": "提供每 kWh 目前電價的感測器（例如來自動態費率整合）。若要使用此感測器，請將固定價格留空",
+              "energy_price_surcharge": "每 kWh 額外加到固定價格或價格感測器數值上的固定金額"
+            }
+          },
+          "cost_naming": {
+            "name": "命名",
+            "data": {
+              "cost_sensor_friendly_naming": "費用感測器顯示名稱格式",
+              "cost_sensor_naming": "費用感測器名稱格式"
+            },
+            "data_description": {
+              "cost_sensor_friendly_naming": "費用感測器顯示名稱的格式。來源名稱會插入在預留位置處",
+              "cost_sensor_naming": "用來產生費用感測器名稱與實體 ID 的格式。來源名稱會插入在預留位置處"
+            }
+          }
+        }
+      },
+      "global_configuration_cost_apply": {
+        "title": "套用費用感測器",
+        "description": "您變更了全域費用感測器設定。要將此變更套用到所有透過 GUI 建立的現有 powercalc 感測器嗎？",
+        "data": {
+          "apply_to_all": "套用到現有感測器"
+        },
+        "data_description": {
+          "apply_to_all": "更新所有透過 GUI 建立的現有 powercalc 感測器，以符合新的費用感測器設定"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "探索選項",
+        "description": "管理探索設定。詳細資訊請參閱[說明文件]({docs_uri})",
+        "data": {
+          "enabled": "啟用探索",
+          "exclude_device_types": "排除的裝置類型",
+          "exclude_self_usage": "排除自身耗電"
+        },
+        "data_description": {
+          "exclude_device_types": "將一種或多種特定裝置類型排除在探索之外。",
+          "exclude_self_usage": "排除智慧開關的自身耗電設定檔。"
+        }
+      },
+      "global_configuration_energy": {
+        "title": "能源選項",
+        "description": "在此定義能源感測器的預設設定。詳細資訊請參閱[說明文件]({docs_uri})",
+        "data": {
+          "energy_integration_method": "能源積分方法",
+          "energy_sensor_category": "能源感測器類別",
+          "energy_sensor_friendly_naming": "能源感測器顯示名稱格式",
+          "energy_sensor_naming": "能源感測器名稱格式",
+          "energy_sensor_precision": "能源感測器精準度",
+          "energy_sensor_unit_prefix": "能源感測器單位前綴"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "節流選項",
+        "description": "設定不同感測器類型的更新間隔。詳細資訊請參閱[說明文件]({docs_uri})",
+        "data": {
+          "group_energy_update_interval": "群組能源更新間隔",
+          "group_power_update_interval": "群組功率更新間隔",
+          "energy_update_interval": "能源更新間隔",
+          "power_update_interval": "功率更新間隔"
+        },
+        "data_description": {
+          "group_energy_update_interval": "群組能源感測器的更新間隔，以秒為單位。設為 0 即停用",
+          "group_power_update_interval": "群組功率感測器的更新間隔，以秒為單位。設為 0 即停用",
+          "energy_update_interval": "能源感測器的更新間隔，以秒為單位。設為 0 即停用",
+          "power_update_interval": "功率感測器強制更新的間隔，以秒為單位。設為 0 即停用"
+        }
+      },
+      "global_configuration_utility_meter": {
+        "title": "功耗表選項",
+        "description": "在此定義功耗表的預設設定。詳細資訊請參閱[說明文件]({docs_uri})",
+        "data": {
+          "utility_meter_net_consumption": "功耗表淨消耗",
+          "utility_meter_tariffs": "功耗表費率",
+          "utility_meter_types": "功耗表類型"
+        }
+      },
+      "group_custom": {
+        "title": "群組選項",
+        "sections": {
+          "members": {
+            "name": "成員",
+            "data": {
+              "group_member_sensors": "成員 powercalc 感測器",
+              "group_member_devices": "成員裝置",
+              "group_power_entities": "其他功率實體",
+              "group_energy_entities": "其他能源實體",
+              "sub_groups": "子群組",
+              "area": "分區",
+              "floor": "樓層"
+            },
+            "data_description": {
+              "group_member_sensors": "要納入群組的 Powercalc 感測器",
+              "group_member_devices": "將所選裝置的功率與能源實體加入群組",
+              "group_power_entities": "要納入的其他功率感測器（W），來自您的 HA 系統",
+              "group_energy_entities": "要納入的其他能源感測器（kWh），來自您的 HA 系統",
+              "sub_groups": "所選子群組內的所有感測器也會一併加入此群組",
+              "area": "加入指定分區中的所有功率感測器",
+              "floor": "加入指定樓層中的所有功率感測器"
+            }
+          },
+          "options": {
+            "name": "選項",
+            "data": {
+              "device": "裝置",
+              "hide_members": "隱藏成員",
+              "include_non_powercalc_sensors": "包含非 powercalc 感測器",
+              "force_calculate_group_energy": "強制計算能源"
+            },
+            "data_description": {
+              "device": "將 powercalc 建立的群組實體加入現有裝置",
+              "include_non_powercalc_sensors": "控制使用分區選項時是否包含非 powercalc 感測器",
+              "force_calculate_group_energy": "powercalc 預設會加總成員感測器的能源感測器。切換此選項可強制建立黎曼和（Riemann Sum）感測器"
+            }
+          }
+        }
+      },
+      "group_subtract": {
+        "data": {
+          "entity_id": "基準實體",
+          "subtract_entities": "要減去的實體"
+        },
+        "data_description": {
+          "entity_id": "要從中減去功率的基準實體",
+          "subtract_entities": "選擇所有要從基準實體中減去的實體"
+        },
+        "title": "群組選項"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "總電源功率感測器",
+          "group_tracked_auto": "自動加入實體",
+          "create_energy_sensor": "建立能源感測器",
+          "create_cost_sensor": "建立費用感測器",
+          "create_utility_meters": "建立功耗表"
+        },
+        "data_description": {
+          "main_power_sensor": "選擇記錄您總用電功率的功率感測器。若留空，則只會建立已追蹤功率感測器",
+          "group_tracked_auto": "Powercalc 會自動將所有功率感測器加入已追蹤群組，並略過 powercalc 群組。若想手動定義已追蹤的實體，請停用此選項",
+          "create_energy_sensor": "powercalc 是否需要建立 kWh 感測器",
+          "create_utility_meters": "讓 powercalc 建立功耗表，依每日、每小時等週期重置"
+        },
+        "title": "已追蹤／未追蹤群組選項"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "已追蹤實體"
+        },
+        "title": "選擇功率實體"
+      },
+      "init": {
+        "menu_options": {
+          "advanced_options": "進階選項",
+          "basic_options": "基本選項",
+          "cost": "費用選項",
+          "daily_energy": "每日能源選項",
+          "energy_options": "能源選項",
+          "fixed": "固定選項",
+          "group_custom": "群組選項",
+          "group_domain": "群組選項",
+          "group_subtract": "群組選項",
+          "group_tracked_untracked": "群組選項",
+          "group_tracked_untracked_manual": "已追蹤實體",
+          "library_options": "資料庫選項",
+          "linear": "線性選項",
+          "playbook": "劇本選項",
+          "multi_switch": "多開關選項",
+          "real_power": "實際功率選項",
+          "select_device": "裝置",
+          "utility_meter_options": "功耗表選項",
+          "wled": "WLED 選項",
+          "cost_options": "費用選項"
+        }
+      },
+      "library_options": {
+        "title": "資料庫選項",
+        "description": "目前選擇的資料庫設定檔如下：\n 製造商：{manufacturer}\n 型號：{model}\n\n若要變更設定檔，請點擊「下一步」。{profile_details}"
+      },
+      "select_device": {
+        "data": {
+          "device": "裝置"
+        },
+        "data_description": {
+          "device": "Powercalc 實體要連結到的裝置"
+        },
+        "description": "選擇 Powercalc 感測器要連結到的裝置。",
+        "title": "選擇裝置"
+      },
+      "linear": {
+        "title": "線性選項",
+        "data": {
+          "attribute": "屬性",
+          "calibrate": "校正值",
+          "gamma_curve": "Gamma 曲線",
+          "max_power": "最大功率",
+          "min_power": "最小功率"
+        },
+        "data_description": {
+          "attribute": "指定屬性。若留空，燈光預設為亮度（brightness），風扇為百分比（percentage）",
+          "calibrate": "每行輸入一個校正值。範例\n\n1: 20"
+        }
+      },
+      "multi_switch": {
+        "title": "多開關選項",
+        "data": {
+          "entities": "開關實體",
+          "power": "開啟時功率",
+          "power_off": "關閉時功率"
+        },
+        "data_description": {
+          "entities": "選擇所有屬於此多開關的個別開關",
+          "power": "單一開關開啟時的功率",
+          "power_off": "單一開關關閉時的功率"
+        }
+      },
+      "playbook": {
+        "title": "劇本選項",
+        "data": {
+          "autostart": "自動啟動",
+          "playbooks": "劇本",
+          "repeat": "重複",
+          "states_trigger": "狀態觸發"
+        },
+        "data_description": {
+          "autostart": "指定 HA 啟動時要開始執行的劇本，例如「program1」",
+          "repeat": "若要在劇本執行完畢後持續重複執行，請開啟此選項",
+          "states_trigger": "依狀態變化觸發劇本。範例\n\nplaying: program1"
+        }
+      },
+      "real_power": {
+        "title": "實際功率選項",
+        "data": {
+          "device": "裝置"
+        },
+        "data_description": {
+          "device": "將建立的能源感測器加入特定裝置"
+        }
+      },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "能源感測器"
+        },
+        "data_description": {
+          "energy_sensor_id": "要計算費用的現有能源感測器（kWh）"
+        },
+        "sections": {
+          "cost_pricing": {
+            "name": "覆寫價格",
+            "data": {
+              "energy_price": "固定電價",
+              "energy_price_multiplier": "電價倍率",
+              "energy_price_sensor": "電價感測器",
+              "energy_price_surcharge": "電價附加費"
+            },
+            "data_description": {
+              "energy_price": "以當地貨幣計價的每 kWh 固定價格。留空則使用全域電價",
+              "energy_price_multiplier": "在附加費之後套用的倍率。可用於以百分比計算的稅金或費用，例如 21% 請填 1.21。留空則使用全域倍率",
+              "energy_price_sensor": "提供每 kWh 目前電價的感測器（例如來自動態費率整合）。若要使用此感測器，請將固定價格留空",
+              "energy_price_surcharge": "每 kWh 額外加到固定價格或價格感測器數值上的固定金額。留空則使用全域附加費"
+            }
+          }
+        },
+        "title": "費用選項"
+      },
+      "utility_meter_options": {
+        "title": "功耗表選項",
+        "data": {
+          "utility_meter_net_consumption": "淨消耗",
+          "utility_meter_types": "週期",
+          "utility_meter_tariffs": "費率"
+        },
+        "data_description": {
+          "utility_meter_net_consumption": "若想將來源視為淨計量表，請啟用此選項。這會讓計數器可以正負雙向變動。",
+          "utility_meter_types": "為指定週期建立功耗表",
+          "utility_meter_tariffs": "支援的費率清單，若只需要單一費率請留空。"
+        }
+      },
+      "wled": {
+        "title": "WLED 選項",
+        "data": {
+          "current_entity": "電流實體",
+          "power_factor": "功率因數",
+          "voltage": "電壓"
+        },
+        "data_description": {
+          "current_entity": "可選擇提供預估電流（mA）的感測器。只有在 Powercalc 無法自動找到 WLED 預估電流感測器時才需要，例如亮度限制器是依各輸出個別設定的情況。"
+        }
+      },
+      "cost_options": {
+        "data": {
+          "energy_price": "固定電價",
+          "energy_price_multiplier": "電價倍率",
+          "energy_price_sensor": "電價感測器",
+          "energy_price_surcharge": "電價附加費"
+        },
+        "data_description": {
+          "energy_price": "以當地貨幣計價的每 kWh 固定價格。留空則使用全域電價",
+          "energy_price_multiplier": "在附加費之後套用的倍率。可用於以百分比計算的稅金或費用，例如 21% 請填 1.21。留空則使用全域倍率",
+          "energy_price_sensor": "提供每 kWh 目前電價的感測器（例如來自動態費率整合）。若要使用此感測器，請將固定價格留空",
+          "energy_price_surcharge": "每 kWh 額外加到固定價格或價格感測器數值上的固定金額。留空則使用全域附加費"
+        },
+        "description": "僅針對此感測器覆寫全域設定的電價。所有欄位留空則繼續使用全域價格。詳細資訊請參閱[說明文件]({docs_uri})",
+        "title": "費用選項"
+      }
+    }
+  },
+  "selector": {
+    "daily_energy_value": {
+      "choices": {
+        "value": "固定值",
+        "value_template": "模板"
+      }
+    },
+    "fixed_value": {
+      "choices": {
+        "power": "固定值",
+        "power_template": "模板",
+        "states_power": "狀態對應"
+      }
+    }
+  },
+  "services": {
+    "activate_playbook": {
+      "description": "開始執行劇本。",
+      "fields": {
+        "playbook_id": {
+          "description": "劇本識別碼。",
+          "name": "劇本"
+        }
+      },
+      "name": "啟動劇本"
+    },
+    "calibrate_energy": {
+      "description": "將能源感測器設為指定的 kWh 數值。",
+      "fields": {
+        "value": {
+          "description": "要設定的數值。",
+          "name": "數值"
+        }
+      },
+      "name": "校正能源感測器"
+    },
+    "calibrate_cost": {
+      "description": "將費用感測器設為指定的金額。",
+      "fields": {
+        "value": {
+          "description": "要設定的數值。",
+          "name": "數值"
+        }
+      },
+      "name": "校正費用感測器"
+    },
+    "calibrate_utility_meter": {
+      "description": "校正功耗表感測器。",
+      "fields": {
+        "value": {
+          "description": "要設定的數值。",
+          "name": "數值"
+        }
+      },
+      "name": "校正功耗表"
+    },
+    "change_gui_config": {
+      "description": "批次變更所有 Powercalc 設定項目的設定",
+      "fields": {
+        "field": {
+          "description": "要變更的欄位",
+          "name": "數值"
+        },
+        "value": {
+          "description": "要設定的數值。",
+          "name": "數值"
+        }
+      },
+      "name": "變更 GUI 設定"
+    },
+    "debug_group": {
+      "description": "取得群組功率或能源感測器的除錯概覽，包含目前各成員的數值。",
+      "name": "除錯群組"
+    },
+    "get_active_playbook": {
+      "description": "取得目前正在執行的劇本",
+      "name": "取得作用中的劇本"
+    },
+    "get_group_entities": {
+      "description": "取得群組能源或功率感測器的所有實體 ID",
+      "name": "取得群組實體"
+    },
+    "increase_daily_energy": {
+      "description": "將感測器增加指定的數量。",
+      "fields": {
+        "value": {
+          "description": "要加到感測器上的數量。",
+          "name": "數值"
+        }
+      },
+      "name": "增加每日能源感測器"
+    },
+    "reload": {
+      "description": "重新載入 Powercalc 設定與實體",
+      "name": "重新載入"
+    },
+    "reset_energy": {
+      "description": "將能源感測器重設為 0 kWh。",
+      "name": "重設能源感測器"
+    },
+    "reset_cost": {
+      "description": "將費用感測器重設為零。",
+      "name": "重設費用感測器"
+    },
+    "stop_playbook": {
+      "description": "停止目前作用中的劇本。",
+      "name": "停止劇本"
+    },
+    "switch_sub_profile": {
+      "description": "資料庫中的部分設定檔有不同的子設定檔。此服務可讓您切換到另一個子設定檔。",
+      "fields": {
+        "profile": {
+          "name": "子設定檔",
+          "description": "指定其中一個可用的子設定檔"
+        }
+      },
+      "name": "切換到另一個子設定檔"
+    }
+  }
+}
