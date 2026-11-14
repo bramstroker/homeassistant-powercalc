@@ -1,0 +1,45 @@
+{
+  "authors": [
+    {
+      "email": "pierre@queinnec.org",
+      "github": "pmq",
+      "name": "Pierre Queinnec"
+    }
+  ],
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2026-10-03T12:30:00Z",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "10 -> 6.2",
+      "20 -> 6.36",
+      "30 -> 7.01",
+      "40 -> 8.89",
+      "50 -> 9.73",
+      "60 -> 12.33",
+      "70 -> 13.39",
+      "80 -> 14.51",
+      "90 -> 13.68",
+      "100 -> 15.55",
+      "0 -> 6.3"
+    ]
+  },
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plug M Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.12.0:app"
+  },
+  "name": "HomePod 2",
+  "product_url": "https://www.apple.com/homepod-2nd-generation/",
+  "standby_power": 6.3,
+  "voltage_range": {
+    "max": 238.6,
+    "min": 235.7
+  }
+}
