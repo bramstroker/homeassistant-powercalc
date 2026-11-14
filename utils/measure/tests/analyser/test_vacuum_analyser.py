@@ -241,6 +241,77 @@ def cycle() -> list[RecordingSample]:
     return [replace(item, elapsed_seconds=float(index)) for index, item in enumerate(result)]
 
 
+@pytest.mark.parametrize("validation_charging_multiplier", [1, 2])
+def test_coarse_docked_state_uses_battery_for_charging(tmp_path: Path, validation_charging_multiplier: int) -> None:
+    station = RecordedEntity("sensor.station", "sensor", "tracked", device_id="robot", translation_key="station_state")
+    context = replace(CONTEXT, entities=[*CONTEXT.entities[:2], station])
+    paths: list[Path] = []
+    for recording in range(2):
+        data: list[RecordingSample] = []
+        for level in [20, 30, 40, 50, 60, 70, 80, 90, 99]:
+            power = 50 - level / 3
+            if recording == 1:
+                power *= validation_charging_multiplier
+            data.extend(sample("docked", power, level=level) for _ in range(10))
+        data.extend(sample("docked", 2, level=100) for _ in range(30))
+        data.extend(sample("washing", 22, level=100) for _ in range(10))
+        data.extend(sample("cleaning", 0.3, level=75) for _ in range(10))
+        # Only the coarse HA state, battery sensor and dock activity are available.
+        items = [
+            replace(
+                item,
+                elapsed_seconds=float(index),
+                entities={
+                    PRIMARY: RecordedEntityState(item.entities[PRIMARY].state, {}),
+                    BATTERY: item.entities[BATTERY],
+                    station.entity_id: RecordedEntityState(
+                        "washing" if item.entities[STATE].state == "washing" else "idle", {}
+                    ),
+                },
+            )
+            for index, item in enumerate(data)
+        ]
+        paths.append(write_recording(tmp_path / f"record-{recording}.jsonl", items, context))
+
+    result = RecorderAnalyser().analyse(paths, context)
+
+    if validation_charging_multiplier != 1:
+        assert not result.model_ready
+        assert result.reason is not None
+        assert "charging" in result.reason
+        return
+    assert result.model_ready
+    assert result.validation_method == ValidationMethod.HELD_OUT_RECORDING
+    assert result.standby_power == 2
+    assert result.metrics is not None
+    assert result.metrics.coverage == 1
+    assert {report.activity for report in result.activity_reports} == {
+        Activity.CHARGING,
+        Activity.DOCKED,
+        Activity.WASHING,
+        Activity.AWAY,
+    }
+    fragment = result.model_config_fragment
+    assert fragment is not None
+    strategies = fragment.configuration["strategies"]
+    charging = next(branch for branch in strategies if "linear" in branch)
+    assert charging["entity_id"] == "[[entity_by_device_class:battery]]"
+    assert "float(-1)) < 100" in json.dumps(charging["condition"])
+    standby = next(branch for branch in strategies if branch.get("fixed") == {"power": 2})
+    assert "float(-1)) == 100" in json.dumps(standby["condition"])
+    validate(
+        {
+            "name": "Robot",
+            "device_type": "vacuum_robot",
+            "measure_method": "script",
+            "measure_device": "Test meter",
+            "created_at": "2026-11-11T00:00:00Z",
+            **fragment.to_dict(),
+        },
+        json.loads((Path(__file__).parents[4] / "profile_library/model_schema.json").read_text()),
+    )
+
+
 def repeated() -> list[RecordingSample]:
     first = cycle()
     return first + [replace(item, elapsed_seconds=item.elapsed_seconds + len(first)) for item in cycle()]

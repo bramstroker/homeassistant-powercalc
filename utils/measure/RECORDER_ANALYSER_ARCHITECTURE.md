@@ -230,10 +230,19 @@ charging and sleeping signals fill specific gaps. Unknown inputs remain uncovere
 | Dreame | Detailed state/status aliases, auto-empty status, wash-base status, charging status and sleeping. |
 | Roborock | Detailed status aliases for cleaning/mapping/returning, mop washing, bin emptying and charging/completion. |
 | Ecovacs | Primary HA activity plus `station_state` for dustbin emptying, mop washing and drying. Legacy battery-charging binary sensors are supported. |
-| Valetudo (MQTT) | Dock status for emptying, drying and broad station cleaning. Pause and error remain unresolved; charging needs a separate explicit signal. |
+| Valetudo (MQTT) | Dock status for emptying, drying and broad station cleaning. Pause and error remain unresolved; charging can use docked plus the selected battery sensor when no explicit charging source is available. |
 
 Station idle leaves the primary activity in control. `docked` alone does not identify
 charging or completion. Errors and unrecognised modes require better runtime signals.
+When no explicit charging source is available, an observed docked state with a selected,
+live, portable battery sensor below 100% enables a charging fallback. Its condition requires
+both the docked state and a valid battery percentage in `[0, 100)`. The remaining docked
+branch requires 100%; missing, non-numeric and out-of-range levels stay uncovered.
+Explicit charging sources retain priority, including when their current values are unknown.
+Dock activities such as drying keep their higher priority. This fallback is an estimation
+assumption, subject to the same charging and activity validation as explicit signals.
+It does not create a charge-completion timer; any post-100% power variation must pass
+the existing idle-energy checks before a fixed docked branch can be exported.
 Dreame/Mova paused and idle states use the primary vacuum's recorded boolean `docked`
 attribute to distinguish docked idle from operation away from the dock. A recognised
 live charging flag identifies charging during these ambiguous states. Explicit dock
@@ -274,9 +283,9 @@ Unobserved charge ends, unavailable flags and recording boundaries do not provid
 `VacuumBranch` is the union of `FixedBranch`, `SettlingBranch` and
 `ChargingBranch`, with required `ChargingPoint` values. A charging curve validates that it
 has at least two points with strictly increasing battery levels before interpolation.
-`ActivitySignal` stores its feature, observed active/inactive values, and any required
-context signals, and builds equivalent configuration conditions. Context features are
-included in the model inputs. Inactive guards preserve unknown source and context values.
+`ActivitySignal` stores its feature, observed active/inactive values or numeric battery
+state, and any required context signals, and builds equivalent configuration conditions.
+Context features are included in the model inputs. Inactive guards preserve unknown source and context values.
 Boolean attributes use identity comparisons to distinguish booleans from numeric enums.
 
 Export uses `stop_at_first`: guards enforce activity priority, including overlapping or
