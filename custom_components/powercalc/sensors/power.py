@@ -39,6 +39,7 @@ from homeassistant.helpers.event import (
     TrackTemplate,
     TrackTemplateResult,
     async_call_later,
+    async_track_point_in_utc_time,
     async_track_state_change_event,
     async_track_template_result,
     async_track_time_interval,
@@ -419,6 +420,8 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         self._sensor_config = sensor_config
         self._track_entities: set[str] = set()
         self._sleep_power_timer: CALLBACK_TYPE | None = None
+        self._strategy_update_timer: CALLBACK_TYPE | None = None
+        self._strategy_expiry_timer: CALLBACK_TYPE | None = None
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
         if not sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
@@ -451,6 +454,8 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
                 self._power_profile,
                 self._source_entity,
             )
+            if recreate:
+                self._register_strategy_update_interval()
 
     async def async_added_to_hass(self) -> None:
         """Register callbacks."""
@@ -507,6 +512,40 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         self._strategy_instance.set_update_callback(self._update_power_sensor)
 
         self._register_force_update_interval()
+        self._register_strategy_update_interval()
+
+    def _register_strategy_update_interval(self) -> None:
+        if self._strategy_update_timer is not None:
+            self._strategy_update_timer()
+            self._strategy_update_timer = None
+        self._schedule_strategy_expiry()
+        assert self._strategy_instance is not None
+        interval = self._strategy_instance.get_update_interval()
+        if interval is None:
+            return
+
+        self._strategy_update_timer = async_track_time_interval(
+            self.hass, self._async_recalculate_strategy, interval, cancel_on_shutdown=True
+        )
+
+    def _schedule_strategy_expiry(self) -> None:
+        if self._strategy_expiry_timer is not None:
+            self._strategy_expiry_timer()
+            self._strategy_expiry_timer = None
+        assert self._strategy_instance is not None
+        update_time = self._strategy_instance.get_next_update_time()
+        if update_time is not None:
+            self._strategy_expiry_timer = async_track_point_in_utc_time(
+                self.hass, self._async_recalculate_strategy, update_time
+            )
+
+    async def _async_recalculate_strategy(self, _: datetime) -> None:
+        state = (
+            State(DUMMY_ENTITY_ID, STATE_ON)
+            if self._source_entity.is_dummy
+            else self.hass.states.get(self.source_entity)
+        )
+        await self._handle_source_entity_state_change(self.source_entity, state, periodic=True)
 
     def _register_tracking_listeners(
         self,
@@ -592,12 +631,23 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         self,
         trigger_entity_id: str,
         state: State | None,
+        *,
+        periodic: bool = False,
     ) -> None:
         """Update power sensor based on new dependent entity state."""
-        self._clear_standby_power()
-        if self._sleep_power_timer:
-            self._sleep_power_timer()
-            self._sleep_power_timer = None
+        assert self._strategy_instance is not None
+        await self._strategy_instance.async_update_state()
+        self._schedule_strategy_expiry()
+        if periodic:
+            # Source events own standby/sleep transitions. A clock tick must not
+            # restart the sleep delay or overwrite an already applied sleep value.
+            if state and (state.state in self._off_states or not await self.is_calculation_enabled(state)):
+                return
+        else:
+            self._clear_standby_power()
+            if self._sleep_power_timer:
+                self._sleep_power_timer()
+                self._sleep_power_timer = None
 
         if self.source_entity == DUMMY_ENTITY_ID and state is None:
             state = State(self.source_entity, STATE_UNKNOWN)
@@ -850,6 +900,12 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
 
     async def async_will_remove_from_hass(self) -> None:
         """Cancel outstanding timers when the entity is removed."""
+        if self._strategy_expiry_timer is not None:
+            self._strategy_expiry_timer()
+            self._strategy_expiry_timer = None
+        if self._strategy_update_timer is not None:
+            self._strategy_update_timer()
+            self._strategy_update_timer = None
         if self._sleep_power_timer is not None:
             self._sleep_power_timer()
             self._sleep_power_timer = None

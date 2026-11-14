@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from homeassistant.core import HomeAssistant, State
@@ -6,6 +7,17 @@ from homeassistant.helpers.event import TrackTemplate
 
 
 class PowerCalculationStrategyInterface:
+    async def async_update_state(self) -> None:
+        """Collect source readings, including while calculation is disabled or a composite branch is skipped."""
+
+    def get_update_interval(self) -> timedelta | None:
+        """Return the interval needed for time-dependent calculations, if any."""
+        return None
+
+    def get_next_update_time(self) -> datetime | None:
+        """Return the next time a held calculation changes without a source event."""
+        return None
+
     async def initialize(self) -> None:
         """Initialize the strategy, called once on creation."""
 

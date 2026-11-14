@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import StrEnum
 import logging
@@ -15,6 +16,7 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
+    CONF_BATTERY_RATE,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_LUT,
@@ -25,6 +27,7 @@ from custom_components.powercalc.const import (
     CONF_WLED,
     UNAVAILABLE_STATES,
 )
+from custom_components.powercalc.strategy.battery_rate import CONFIG_SCHEMA as BATTERY_RATE_SCHEMA
 from custom_components.powercalc.strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from custom_components.powercalc.strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 from custom_components.powercalc.strategy.multi_switch import CONFIG_SCHEMA as MULTI_SWITCH_SCHEMA
@@ -167,6 +170,7 @@ LUT_SCHEMA = vol.Schema({})
 
 ITEM_SCHEMA = vol.Schema(
     {
+        vol.Optional(CONF_BATTERY_RATE): BATTERY_RATE_SCHEMA,
         vol.Optional(CONF_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CONDITION): CONDITION_SCHEMA,
         vol.Optional(CONF_FIXED): FIXED_SCHEMA,
@@ -207,6 +211,26 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         self.playbook_strategies: list[PlaybookStrategy] = [
             strategy.strategy for strategy in self.strategies if isinstance(strategy.strategy, PlaybookStrategy)
         ]
+
+    async def async_update_state(self) -> None:
+        for sub_strategy in self.strategies:
+            await sub_strategy.strategy.async_update_state()
+
+    def get_update_interval(self) -> timedelta | None:
+        intervals = [
+            interval
+            for sub_strategy in self.strategies
+            if (interval := sub_strategy.strategy.get_update_interval()) is not None
+        ]
+        return min(intervals) if intervals else None
+
+    def get_next_update_time(self) -> datetime | None:
+        update_times = [
+            update_time
+            for sub_strategy in self.strategies
+            if (update_time := sub_strategy.strategy.get_next_update_time()) is not None
+        ]
+        return min(update_times) if update_times else None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate power consumption based on entity state."""

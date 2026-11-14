@@ -337,3 +337,43 @@ def test_main_validates_manufacturers_and_models(
     assert capsys.readouterr().out == (
         f"VALID: {library / 'signify' / 'manufacturer.json'}\nVALID: {library / 'signify' / 'LCT010' / 'model.json'}\n"
     )
+
+
+@pytest.mark.parametrize("shape", ["standalone", "list", "object"])
+@pytest.mark.parametrize(
+    "config,valid",
+    [
+        ({"entity_id": "[[entity_by_device_class:battery]]", "energy_per_percent": 0.96}, True),
+        (
+            {
+                "entity_id": "sensor.battery",
+                "energy_per_percent": 0.96,
+                "base_power": 3.5,
+                "window": 600,
+                "max_power": 60,
+            },
+            True,
+        ),
+        ({"entity_id": "sensor.battery"}, False),
+        ({"energy_per_percent": 0.96}, False),
+        ({"entity_id": "sensor.battery", "energy_per_percent": 0}, False),
+        ({"entity_id": "sensor.battery", "energy_per_percent": 0.96, "window": 0}, False),
+        ({"entity_id": "sensor.battery", "energy_per_percent": 0.96, "base_power": -1}, False),
+        ({"entity_id": "sensor.battery", "energy_per_percent": 0.96, "extra": 1}, False),
+    ],
+)
+def test_battery_rate_profile_schema(tmp_path: Path, shape: str, config: dict[str, object], valid: bool) -> None:
+    if shape == "standalone":
+        profile = complete_model("vacuum_robot", calculation_strategy="battery_rate", battery_rate_config=config)
+    else:
+        strategies = [{"battery_rate": config}]
+        composite = strategies if shape == "list" else {"mode": "sum_all", "strategies": strategies}
+        profile = complete_model("vacuum_robot", calculation_strategy="composite", composite_config=composite)
+    path = write_json(tmp_path / "model.json", profile)
+    assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is valid
+
+
+def test_battery_rate_profile_requires_configuration(tmp_path: Path) -> None:
+    profile = complete_model("vacuum_robot", calculation_strategy="battery_rate")
+    path = write_json(tmp_path / "model.json", profile)
+    assert validate_file(str(path), load_json(str(MODEL_SCHEMA))) is False
