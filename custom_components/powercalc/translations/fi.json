@@ -121,12 +121,14 @@
               "create_energy_sensors": "Luo energia-anturit",
               "create_cost_sensors": "Luo kustannusanturit",
               "create_standby_group": "Luo valmiustilaryhmä",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Luo kulutusmittarit"
             },
             "data_description": {
               "create_energy_sensors": "Määrittää, luoko Powercalc kWh-antureita",
               "create_cost_sensors": "Määrittää, luoko Powercalc kustannusantureita. Energian hinta on määritettävä seuraavissa vaiheissa",
               "create_standby_group": "Luo ryhmä, joka laskee yhteen IoT-laitteiden valmiustilan virrankulutuksen ja itsekäytön",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Anna Powercalcin luoda kulutusmittarit, joiden jaksot ovat esimerkiksi päivä ja tunti"
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Luo energia-antureita",
               "create_cost_sensors": "Luo kustannusantureita",
               "create_standby_group": "Luo valmiusryhmä",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Luo kulutusmittarit"
             },
             "data_description": {
               "create_energy_sensors": "Määrittää, luoko Powercalc kWh-antureita",
               "create_cost_sensors": "Määrittää, luoko Powercalc kustannusantureita. Energian hinta on määritettävä seuraavissa vaiheissa",
               "create_standby_group": "Luo ryhmä, joka laskee yhteen IoT-laitteiden valmiustilan virrankulutuksen ja itsekäytön",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Anna Powercalcin luoda kulutusmittarit, joiden jaksot ovat esimerkiksi päivä ja tunti"
             }
           },

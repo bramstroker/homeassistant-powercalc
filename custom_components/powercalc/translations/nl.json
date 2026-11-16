@@ -121,12 +121,14 @@
               "create_energy_sensors": "Energiesensoren aanmaken",
               "create_cost_sensors": "Kostensensoren aanmaken",
               "create_standby_group": "Stand-bygroep aanmaken",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Utiliteit meters aanmaken"
             },
             "data_description": {
               "create_energy_sensors": "Moet Powercalc kWh sensoren aanmaken",
               "create_cost_sensors": "Moet Powercalc kostensensoren aanmaken. Vereist dat in de volgende stappen een energieprijs wordt geconfigureerd",
               "create_standby_group": "Stand-by- en eigen verbruiksgroep van IoT-apparaten aanmaken",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Laat Powercalc utiliteit meters aanmaken. Deze resetten dagelijks, elk uur, etc."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Energiesensoren aanmaken",
               "create_cost_sensors": "Kostensensoren aanmaken",
               "create_standby_group": "Standby-groep aanmaken",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Utiliteit meters aanmaken"
             },
             "data_description": {
               "create_energy_sensors": "Of Powercalc kWh sensoren moet aanmaken",
               "create_cost_sensors": "Of Powercalc kostensensoren moet aanmaken. Vereist dat in de volgende stappen een energieprijs wordt geconfigureerd",
               "create_standby_group": "Groep met een totaal van alle stand-by en zelfgebruik van IOT apparaten aanmaken",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Laat Powercalc utiliteit meters aanmaken. Deze resetten dagelijks, uurlijks etc."
             }
           },

@@ -10,6 +10,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
     CONF_APPLY_TO_ALL,
+    CONF_CREATE_ACTIVE_GROUP,
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_COST_SENSORS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -93,6 +94,7 @@ SCHEMA_GLOBAL_CONFIGURATION_FEATURES = vol.Schema(
         vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_CREATE_COST_SENSORS, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_CREATE_STANDBY_GROUP, default=True): selector.BooleanSelector(),
+        vol.Optional(CONF_CREATE_ACTIVE_GROUP, default=False): selector.BooleanSelector(),
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 )

@@ -76,6 +76,7 @@ from custom_components.powercalc.const import (
     CONF_UNAVAILABLE_POWER,
     DATA_POWER_PROFILE_SOURCES,
     DATA_POWER_PROFILES,
+    DATA_SELF_USAGE_POWER_SENSORS,
     DATA_STANDBY_POWER_SENSORS,
     DATA_STRATEGIES,
     DEFAULT_POWER_SENSOR_PRECISION,
@@ -433,6 +434,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         if not self._ignore_unavailable_state and self._sensor_config.get(CONF_UNAVAILABLE_POWER) is not None:
             self._ignore_unavailable_state = True
         self._standby_sensors: ConfigType = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
+        self._self_usage_sensors: ConfigType = hass.data[DOMAIN][DATA_SELF_USAGE_POWER_SENSORS]
         self.calculation_strategy_factory = calculation_strategy_factory
         self._strategy_instance: PowerCalculationStrategyInterface | None = None
         self._availability_entity: str | None = sensor_config.get(CONF_AVAILABILITY_ENTITY)
@@ -595,6 +597,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
     ) -> None:
         """Update power sensor based on new dependent entity state."""
         self._clear_standby_power()
+        self._clear_self_usage_power()
         if self._sleep_power_timer:
             self._sleep_power_timer()
             self._sleep_power_timer = None
@@ -722,6 +725,9 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             self._track_standby_power(standby_power_on)
             power += standby_power_on
 
+        # The device is switched on, expose its current power in the active group.
+        self._track_self_usage_power(power)
+
         return power
 
     def _apply_multiply_factor(self, power: Decimal) -> Decimal:
@@ -792,6 +798,14 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
     def _clear_standby_power(self) -> None:
         """Forget the standby portion, the device is no longer known to be in standby."""
         self._standby_sensors.pop(self.entity_id, None)
+
+    def _track_self_usage_power(self, power: Decimal) -> None:
+        """Record the current power while the device is ON, read by the active group."""
+        self._self_usage_sensors[self.entity_id] = power
+
+    def _clear_self_usage_power(self) -> None:
+        """Forget the current power, the device is no longer known to be running."""
+        self._self_usage_sensors.pop(self.entity_id, None)
 
     async def is_calculation_enabled(self, entity_state: State) -> bool:
         """Check if calculation is enabled based on the condition template."""

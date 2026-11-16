@@ -121,12 +121,14 @@
               "create_energy_sensors": "Creați senzori de energie",
               "create_cost_sensors": "Creați senzori de cost",
               "create_standby_group": "Creați grup de așteptare",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Creați contoare de utilitate"
             },
             "data_description": {
               "create_energy_sensors": "Dacă Powercalc trebuie să creeze senzori kWh",
               "create_cost_sensors": "Dacă Powercalc trebuie să creeze senzori de cost. Necesită configurarea unui preț al energiei în următorii pași",
               "create_standby_group": "Creați un grup care însumează consumul de energie în standby și autoutilizarea dispozitivelor IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Permiteți Powercalc să creeze contoare de utilitate care se resetează zilnic, orar etc."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Creați senzori de energie",
               "create_cost_sensors": "Creați senzori de cost",
               "create_standby_group": "Creați grup de așteptare",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Creați contoare de utilitate"
             },
             "data_description": {
               "create_energy_sensors": "Dacă Powercalc trebuie să creeze senzori kWh",
               "create_cost_sensors": "Dacă Powercalc trebuie să creeze senzori de cost. Necesită configurarea unui preț al energiei în următorii pași",
               "create_standby_group": "Creați un grup care însumează consumul de energie în standby și autoutilizarea dispozitivelor IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Permiteți Powercalc să creeze contoare de utilitate care se resetează zilnic, orar etc."
             }
           },

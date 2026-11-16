@@ -14,6 +14,29 @@ After configuration, you'll end up with two sensors:
 - `sensor.all_standby_power` - Shows the total standby power consumption in watts
 - `sensor.all_standby_energy` - Tracks the accumulated energy consumption in kWh
 
+## Active group (optional)
+
+Some installations also want a total of what the devices that are currently switched on are using.
+Today that value is only available per device.
+
+The active group adds it, and is disabled by default so the meaning of the standby sensors stays
+unchanged:
+
+```yaml
+powercalc:
+  create_active_group: true
+```
+
+The same option is available in the global configuration flow, step "Create sensors".
+
+When enabled you get two additional sensors:
+
+- `sensor.all_self_usage_power` - Shows the power of all devices that are currently switched on
+- `sensor.all_self_usage_energy` - Tracks the accumulated energy consumption in kWh
+
+A device only takes part while it is switched on. When it is turned off it leaves the group again.
+The standby group is not affected by this option.
+
 ## Configuration
 
 The standby group is created by default when you set up the Powercalc integration. No additional configuration is needed to start using it.
