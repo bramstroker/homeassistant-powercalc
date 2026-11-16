@@ -155,8 +155,10 @@ def _build_filter(
             LambdaFilter(lambda entity: _is_source_entity_eligible(hass, entity, include_non_powercalc)),
             LambdaFilter(lambda entity: entity.platform != "utility_meter"),
             LambdaFilter(
-                lambda entity: not str(entity.unique_id).startswith(
-                    ("powercalc_standby_group", "powercalc_self_usage_group"),
+                lambda entity: (
+                    not str(entity.unique_id).startswith(
+                        ("powercalc_standby_group", "powercalc_self_usage_group"),
+                    )
                 ),
             ),
             LambdaFilter(lambda entity: "tracked_" not in str(entity.unique_id)),
