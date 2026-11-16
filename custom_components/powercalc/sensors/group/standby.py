@@ -19,6 +19,8 @@ from custom_components.powercalc.const import (
     ATTR_MEMBERS,
     ATTR_STATE,
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+    CONF_ENERGY_SENSOR_NAMING,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_PRECISION,
     DATA_STANDBY_POWER_SENSORS,
@@ -49,6 +51,9 @@ def create_general_standby_sensors(
         power_sensor.entity_id = "sensor.all_standby_power"
         sensor_config = config.copy()
         sensor_config[CONF_NAME] = "All standby"
+        # The group total keeps its own name, the global energy naming pattern is meant for device sensors.
+        sensor_config.pop(CONF_ENERGY_SENSOR_NAMING, None)
+        sensor_config.pop(CONF_ENERGY_SENSOR_FRIENDLY_NAMING, None)
         source_entity = create_source_entity(DUMMY_ENTITY_ID, hass)
         energy_sensor = create_energy_sensor(
             hass,
