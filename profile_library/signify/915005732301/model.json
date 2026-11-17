@@ -1,0 +1,49 @@
+{
+  "aliases": [
+    "1744030P7",
+    "915005732301"
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-17T12:24:43Z",
+  "device_type": "light",
+  "device_specs": {
+    "form_factor": "fixture",
+    "socket": "integrated",
+    "lumens": 1140,
+    "rated_power": 15,
+    "connectivity": [
+      "zigbee",
+      "bluetooth"
+    ]
+  },
+  "gtin": [
+    "8718696170588"
+  ],
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly 1PM Mini Gen4",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 59.65,
+    "DUMMY_LOAD_RESISTANCE": 857.91,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.2:cli"
+  },
+  "name": "Hue Econic Outdoor Wall Light (down lantern)",
+  "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-econic-outdoor-wall-light/1744030P7",
+  "standby_power": 0.22,
+  "voltage_range": {
+    "max": 230.4,
+    "min": 223.6
+  },
+  "authors": [
+    {
+      "name": "Daniël Schenk",
+      "github": "danielschenk",
+      "email": "danielschenk@gmail.com"
+    }
+  ]
+}
