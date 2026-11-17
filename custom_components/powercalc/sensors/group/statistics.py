@@ -12,6 +12,7 @@ from homeassistant.components.recorder.models import StatisticData, StatisticMea
 from homeassistant.components.recorder.statistics import (
     StatisticsRow,
     get_short_term_statistics_run_cache,
+    get_start_time,
     statistics_during_period,
 )
 from homeassistant.components.recorder.tasks import RecorderTask
@@ -51,6 +52,7 @@ class CombinedStatistics:
 def combine_statistics(
     hourly: dict[str, list[StatisticsRow]],
     short_term: dict[str, list[StatisticsRow]],
+    minimum_checkpoint_start: datetime,
 ) -> CombinedStatistics:
     """Add cumulative sums at interval ends, carrying the last value across gaps."""
     result = CombinedStatistics()
@@ -83,14 +85,15 @@ def combine_statistics(
             )
             (result.hourly if duration == 3600 else result.short_term).append(record)
         result.members = members
-    # If short-term history was purged, retain a checkpoint for Recorder to
-    # continue the imported cumulative sum when it next compiles statistics.
+    # Keep a recent checkpoint even when all member history is old, so a purge
+    # before the first live statistics run cannot discard the imported baseline.
     if result.members:
         latest_end = max(member["end"] for member in result.members.values())
-        if latest_end not in short_term_ends:
+        checkpoint_start = max(minimum_checkpoint_start.timestamp(), latest_end - 300)
+        if checkpoint_start + 300 not in short_term_ends:
             total = sum(member["sum"] for member in result.members.values())
             result.short_term.append(
-                StatisticData(start=dt_util.utc_from_timestamp(latest_end - 300), state=total, sum=total),
+                StatisticData(start=dt_util.utc_from_timestamp(checkpoint_start), state=total, sum=total),
             )
     return result
 
@@ -153,7 +156,7 @@ class RecreateStatisticsTask(RecorderTask):
         hass = instance.hass
         hourly = self.read_statistics(hass, "hour")
         short_term = self.read_statistics(hass, "5minute")
-        combined = combine_statistics(hourly, short_term)
+        combined = combine_statistics(hourly, short_term, get_start_time())
         metadata = StatisticMetaData(
             statistic_id=self.entity_id,
             source="recorder",

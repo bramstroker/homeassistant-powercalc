@@ -210,6 +210,7 @@ async def create_group_sensors_gui(
             )
         except HomeAssistantError as err:
             raise SensorConfigurationError(f"Could not recreate group statistics: {err}") from err
+        energy_sensor.new_statistics = summary
         sensor_config[ENTRY_DATA_GROUP_ENERGY_STATISTICS] = summary
         hass.config_entries.async_update_entry(entry, data={**entry.data, ENTRY_DATA_GROUP_ENERGY_STATISTICS: summary})
         _LOGGER.info("%s: Recreated group energy statistics: %s", energy_sensor.entity_id, summary)
@@ -857,6 +858,7 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
             UnitOfEnergy.WATT_HOUR,
         )
         self._prev_state_store: PreviousStateStore = PreviousStateStore(hass)
+        self.new_statistics: StatisticsSummary | None = None
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -865,14 +867,20 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
         # Clean up any entities that are no longer part of the group
         self._prev_state_store.cleanup_entity_states(self.entity_id, self._entities)
 
-        restored = await self.restore_last_state()
-        if not restored and (summary := self._sensor_config.get(ENTRY_DATA_GROUP_ENERGY_STATISTICS)):
+        # A newly imported group can reuse an entity ID with stale restore data.
+        # Only later setups should restore the total accumulated since the import.
+        summary = self.new_statistics
+        if summary is None and not await self.restore_last_state():
+            summary = self._sensor_config.get(ENTRY_DATA_GROUP_ENERGY_STATISTICS)
+        if summary is not None:
             self.initialize_recreated_statistics(summary)
+            self.new_statistics = None
 
         await super().async_added_to_hass()
 
     def initialize_recreated_statistics(self, summary: StatisticsSummary) -> None:
         """Continue from the imported sum, counting only subsequent member changes."""
+        self._prev_state_store.cleanup_entity_states(self.entity_id, set())
         self._set_native_value(Decimal(str(sum(member["sum"] for member in summary["members"].values()))), False)
         for entity_id in self._entities:
             member = summary["members"].get(entity_id)

@@ -10,9 +10,11 @@ from homeassistant import data_entry_flow
 from homeassistant.components.recorder import Recorder, migration
 from homeassistant.components.recorder.db_schema import Statistics, StatisticsMeta, StatisticsShortTerm
 from homeassistant.components.recorder.models import StatisticMeanType
+from homeassistant.components.recorder.tasks import PurgeTask
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_ENABLED,
     CONF_NAME,
     EVENT_HOMEASSISTANT_STARTED,
     STATE_UNAVAILABLE,
@@ -23,9 +25,11 @@ from homeassistant.core import CoreState, HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import recorder as recorder_helper
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntryDisabler
+from homeassistant.setup import async_setup_component
 from homeassistant.util import dt as dt_util
 import pytest
 from pytest_homeassistant_custom_component.components.recorder.common import (
+    async_wait_purge_done,
     async_wait_recording_done,
     do_adhoc_statistics,
     statistics_during_period,
@@ -38,6 +42,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
+    CONF_DISCOVERY,
     CONF_ENERGY_PRICE,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP_ENERGY_ENTITIES,
@@ -90,6 +95,7 @@ def test_combine_statistics_handles_gaps_resets_and_retention() -> None:
             ],
             "sensor.b": [{"start": 6900, "state": 21, "sum": 6}],
         },
+        dt_util.utc_from_timestamp(6900),
     )
     assert [row["sum"] for row in result.hourly] == [15, 17]
     assert [row["sum"] for row in result.short_term] == [16, 18]
@@ -101,10 +107,11 @@ def test_combine_statistics_handles_gaps_resets_and_retention() -> None:
 
 
 def test_hourly_only_statistics_get_a_continuation_checkpoint() -> None:
-    result = combine_statistics({"sensor.a": [{"start": 0, "state": 100, "sum": 10}]}, {})
+    checkpoint_start = dt_util.utc_from_timestamp(3300)
+    result = combine_statistics({"sensor.a": [{"start": 0, "state": 100, "sum": 10}]}, {}, checkpoint_start)
     assert result.hourly == [{"start": dt_util.utc_from_timestamp(0), "state": 10, "sum": 10}]
     assert result.short_term == [{"start": dt_util.utc_from_timestamp(3300), "state": 10, "sum": 10}]
-    assert combine_statistics({}, {}).members == {}
+    assert combine_statistics({}, {}, checkpoint_start).members == {}
 
 
 async def test_recreate_statistics_and_continue_recording(
@@ -213,12 +220,139 @@ async def test_recreate_requires_recorder(hass: HomeAssistant) -> None:
         await async_recreate_statistics(hass, "sensor.group", {"sensor.a"}, "kWh")
 
 
+async def test_fresh_import_replaces_restore_data_for_reused_entity_id(
+    hass: HomeAssistant,
+    recorder_mock: Recorder,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    recorder_mock.engine.echo = False
+    await hass.async_start()
+    now = dt_util.utcnow().replace(minute=0, second=0, microsecond=0)
+    freezer.move_to(now + timedelta(minutes=1))
+    # Advancing Recorder intervals must not also scan the unrelated profile library.
+    assert await async_setup_component(hass, DOMAIN, {DOMAIN: {CONF_DISCOVERY: {CONF_ENABLED: False}}})
+    attributes = {ATTR_UNIT_OF_MEASUREMENT: "kWh"}
+    hass.states.async_set("sensor.a", "100", attributes)
+    hass.states.async_set("sensor.no_history", "400", attributes)
+    config = {
+        CONF_GROUP_ENERGY_ENTITIES: ["sensor.a", "sensor.no_history"],
+        CONF_GROUP_ENERGY_UPDATE_INTERVAL: 0,
+    }
+    old_entry = await create_mock_group_entry(hass, "Reused history", config)
+    entity_id = "sensor.reused_history_energy"
+    assert_entity_state(hass, entity_id, "0.0000")
+    assert await hass.config_entries.async_remove(old_entry.entry_id)
+    await hass.async_block_till_done()
+
+    recorder_mock.async_import_statistics(
+        {
+            "statistic_id": "sensor.a",
+            "source": "recorder",
+            "name": None,
+            "unit_of_measurement": "kWh",
+            "unit_class": "energy",
+            "has_sum": True,
+            "mean_type": StatisticMeanType.NONE,
+        },
+        [{"start": now - timedelta(hours=1), "state": 100, "sum": 10}],
+        Statistics,
+    )
+    await async_wait_recording_done(hass)
+    hass.states.async_set("sensor.no_history", STATE_UNAVAILABLE, attributes)
+    entry = await create_mock_group_entry(
+        hass,
+        "Reused history",
+        {
+            **config,
+            CONF_GROUP_ENERGY_START_AT_ZERO: False,
+            CONF_GROUP_ENERGY_RECREATE_STATISTICS: True,
+        },
+    )
+    assert_entity_state(hass, entity_id, "10.0000")
+    hass.states.async_set("sensor.a", "102", attributes)
+    hass.states.async_set("sensor.no_history", "401", attributes)
+    await async_wait_recording_done(hass)
+    assert_entity_state(hass, entity_id, "12.0000")
+
+    freezer.move_to(now + timedelta(minutes=6))
+    do_adhoc_statistics(hass, start=now)
+    await async_wait_recording_done(hass)
+    rows = await hass.async_add_executor_job(
+        lambda: statistics_during_period(hass, now - timedelta(hours=1), statistic_ids={entity_id}, period="5minute"),
+    )
+    assert [row["sum"] for row in rows[entity_id]] == [10, 12]
+    assert await hass.config_entries.async_reload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert_entity_state(hass, entity_id, "12.0000")
+
+
+@pytest.mark.parametrize("include_short_term", [False, True])
+async def test_imported_history_survives_purge_before_first_live_statistics(
+    hass: HomeAssistant,
+    recorder_mock: Recorder,
+    freezer: FrozenDateTimeFactory,
+    include_short_term: bool,
+) -> None:
+    recorder_mock.engine.echo = False
+    await hass.async_start()
+    now = dt_util.utcnow().replace(minute=0, second=0, microsecond=0)
+    start = now - timedelta(days=30)
+    metadata = {
+        "statistic_id": "sensor.a",
+        "source": "recorder",
+        "name": None,
+        "unit_of_measurement": "kWh",
+        "unit_class": "energy",
+        "has_sum": True,
+        "mean_type": StatisticMeanType.NONE,
+    }
+    recorder_mock.async_import_statistics(metadata, [{"start": start, "state": 100, "sum": 10}], Statistics)
+    if include_short_term:
+        recorder_mock.async_import_statistics(
+            metadata,
+            [{"start": start + timedelta(minutes=55), "state": 100, "sum": 10}],
+            StatisticsShortTerm,
+        )
+    await async_wait_recording_done(hass)
+    freezer.move_to(now + timedelta(minutes=1))
+    hass.states.async_set("sensor.a", "100", {ATTR_UNIT_OF_MEASUREMENT: "kWh"})
+    await create_mock_group_entry(
+        hass,
+        "Old history",
+        {
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.a"],
+            CONF_GROUP_ENERGY_START_AT_ZERO: False,
+            CONF_GROUP_ENERGY_RECREATE_STATISTICS: True,
+            CONF_GROUP_ENERGY_UPDATE_INTERVAL: 0,
+        },
+    )
+    entity_id = "sensor.old_history_energy"
+    assert_entity_state(hass, entity_id, "10.0000")
+    await async_wait_recording_done(hass)
+    recorder_mock.queue_task(PurgeTask(now - timedelta(days=10), repack=False, apply_filter=False))
+    await async_wait_purge_done(hass)
+
+    hass.states.async_set("sensor.a", "102", {ATTR_UNIT_OF_MEASUREMENT: "kWh"})
+    await async_wait_recording_done(hass)
+    assert_entity_state(hass, entity_id, "12.0000")
+    freezer.move_to(now + timedelta(minutes=6))
+    do_adhoc_statistics(hass, start=now)
+    await async_wait_recording_done(hass)
+    rows = await hass.async_add_executor_job(
+        lambda: statistics_during_period(hass, start, statistic_ids={entity_id}, period="5minute"),
+    )
+    assert rows[entity_id][-1]["sum"] == 12
+    assert [row["sum"] for row in rows[entity_id]] == [10, 12]
+    assert rows[entity_id][0]["start"] == (now - timedelta(minutes=5)).timestamp()
+
+
 @pytest.mark.parametrize("existing_platform", ["test", DOMAIN])
 async def test_import_reserves_entity_id_occupied_by_disabled_entity(
     hass: HomeAssistant,
     recorder_mock: Recorder,
     entity_registry: EntityRegistry,
     existing_platform: str,
+    freezer: FrozenDateTimeFactory,
 ) -> None:
     await hass.async_start()
     unrelated = entity_registry.async_get_or_create(
@@ -230,6 +364,7 @@ async def test_import_reserves_entity_id_occupied_by_disabled_entity(
     )
     assert hass.states.get(unrelated.entity_id) is None
     now = dt_util.utcnow().replace(minute=0, second=0, microsecond=0)
+    freezer.move_to(now + timedelta(minutes=1))
     metadata = {
         "statistic_id": "sensor.a",
         "source": "recorder",
