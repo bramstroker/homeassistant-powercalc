@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "Das LUT-Profil unterstützt einen der Farbmodi Ihres Lichts nicht. Siehe in die Logs für weitere Informationen",
       "lut_wrong_domain": "Nur Licht Entitäten können den LUT Modus verwenden",
       "playbook_mandatory": "Sie müssen mindestens ein Playbook angeben",
-      "unknown": "Unbekannter Fehler aufgetreten, bitte sehen in die Logs für weitere Informationen"
+      "unknown": "Unbekannter Fehler aufgetreten, bitte sehen in die Logs für weitere Informationen",
+      "group_statistics_start_at_zero": "Wähle entweder „Starte bei Null“ oder „Statistiken nachbilden“, nicht beides.",
+      "group_statistics_energy_required": "Zum Nachbilden der Statistiken muss „Energiesensor erstellen“ aktiviert und „Erzwinge Berechnung der Energie“ deaktiviert sein.",
+      "group_statistics_recorder_required": "Zum Nachbilden der Statistiken muss Recorder aktiviert sein."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Nicht powercalc Sensoren einschließen",
               "force_calculate_group_energy": "Erzwinge Berechnung der Energie",
               "group_energy_start_at_zero": "Starte bei Null",
+              "group_energy_recreate_statistics": "Statistiken nachbilden",
               "create_energy_sensor": "Energiesensor erstellen",
               "create_utility_meters": "Utilitymeter erstellen"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Lege fest, ob nicht-powercalc-Sensoren bei Verwendung der Bereichs-Option mit einbezogen werden sollen",
               "force_calculate_group_energy": "Standardmäßig summiert Powercalc die Energiesensoren der Mitgliedssensoren. Schalten Sie diese Option um, um die Erstellung eines Riemann Summen Sensors zu erzwingen",
               "group_energy_start_at_zero": "Wenn aktiviert, wird der Energiesensor bei Null gestartet, wenn der Sensor erstellt wird. Andernfalls wird er den Status aller aktuellen Energiesensoren Mitglieder summieren",
+              "group_energy_recreate_statistics": "Beim Erstellen einmalig die stündlichen und verfügbaren fünfminütigen Energiestatistiken der Mitglieder addieren. „Starte bei Null“ deaktivieren. Erfordert Recorder und einen summierenden Energiesensor.",
               "create_energy_sensor": "Ob powercalc einen kWh Sensor erstellen muss"
             }
           }

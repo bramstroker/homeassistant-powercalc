@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
       "lut_wrong_domain": "Only light entities can use the LUT mode",
       "playbook_mandatory": "You need to specify at least one playbook",
-      "unknown": "Unknown error occured, please see the logs for additional information"
+      "unknown": "Unknown error occured, please see the logs for additional information",
+      "group_statistics_start_at_zero": "Choose either Start at zero or Recreate statistics, not both.",
+      "group_statistics_energy_required": "Recreating statistics requires Create energy sensor enabled and Force calculate energy disabled.",
+      "group_statistics_recorder_required": "Recreating statistics requires Recorder to be enabled."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Include non powercalc sensors",
               "force_calculate_group_energy": "Force calculate energy",
               "group_energy_start_at_zero": "Start at zero",
+              "group_energy_recreate_statistics": "Recreate statistics",
               "create_energy_sensor": "Create energy sensor",
               "create_utility_meters": "Create utility meters"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
               "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
               "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
+              "group_energy_recreate_statistics": "Once at creation, add the members’ hourly and available five-minute energy statistics. Disable Start at zero. Requires Recorder and a summed energy sensor.",
               "create_energy_sensor": "Whether powercalc needs to create a kWh sensor"
             }
           }

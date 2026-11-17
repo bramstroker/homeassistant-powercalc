@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "O perfil LUT não suporta um dos modos de cor da sua luz. Veja os logs para mais informações",
       "lut_wrong_domain": "Apenas entidades de luz podem usar o modo LUT",
       "playbook_mandatory": "Você precisa especificar pelo menos um roteiro",
-      "unknown": "Ocorreu um erro desconhecido. Consulte os logs para obter informações adicionais"
+      "unknown": "Ocorreu um erro desconhecido. Consulte os logs para obter informações adicionais",
+      "group_statistics_start_at_zero": "Escolha Iniciar com zero ou Reconstruir estatísticas, não ambas.",
+      "group_statistics_energy_required": "Para reconstruir estatísticas, ative Criar sensor de energia e desative Forçar cálculo de energia.",
+      "group_statistics_recorder_required": "O Recorder precisa estar ativado para reconstruir estatísticas."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Incluir sensores não powercalc",
               "force_calculate_group_energy": "Forçar cálculo da energia",
               "group_energy_start_at_zero": "Iniciar com zero",
+              "group_energy_recreate_statistics": "Reconstruir estatísticas",
               "create_energy_sensor": "Criar sensor de consumo",
               "create_utility_meters": "Criar medidores de utilidade"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Controle se deve incluir sensores não powercalc ao usar a opção de área",
               "force_calculate_group_energy": "Por padrão powercalc soma os sensores de energia dos sensores membros. Ative esta opção para forçar a criação de um sensor de soma Riemann",
               "group_energy_start_at_zero": "Quando ativado, o sensor de energia iniciará em zero quando o sensor é criado. Caso contrário, ele soma todos os estados do sensor de energia dos membros atual",
+              "group_energy_recreate_statistics": "Ao criar o grupo, somar uma única vez as estatísticas de energia horárias e as de cinco minutos disponíveis dos membros. Desative Iniciar com zero. Requer Recorder e um sensor que some as energias.",
               "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh"
             }
           }

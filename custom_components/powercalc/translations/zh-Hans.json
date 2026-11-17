@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "LUT 配置文件不支持灯具的一种颜色模式。详情请查看日志",
       "lut_wrong_domain": "只有 light 实体可以使用 LUT 模式",
       "playbook_mandatory": "必须指定至少一个运行方案 (playbook)",
-      "unknown": "发生未知错误，详情请查看日志"
+      "unknown": "发生未知错误，详情请查看日志",
+      "group_statistics_start_at_zero": "请选择“从零开始”或“重建统计数据”，不能同时启用。",
+      "group_statistics_energy_required": "重建统计数据需要启用“创建能源传感器”并关闭“强制计算能源”。",
+      "group_statistics_recorder_required": "重建统计数据需要启用 Recorder。"
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "包括非 Powercalc 传感器",
               "force_calculate_group_energy": "强制计算能源",
               "group_energy_start_at_zero": "从零开始",
+              "group_energy_recreate_statistics": "重建统计数据",
               "create_energy_sensor": "创建能源传感器",
               "create_utility_meters": "创建公用事业计量表"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "控制使用区域选项时是否包括非 Powercalc 传感器",
               "force_calculate_group_energy": "默认情况下，Powercalc 会汇总成员的能源传感器。启用此选项可强制创建黎曼和积分传感器",
               "group_energy_start_at_zero": "启用后，能源传感器在创建时将从零开始。否则，它会汇总所有成员能源传感器的当前状态值",
+              "group_energy_recreate_statistics": "创建时一次性汇总各成员的每小时能源统计数据及可用的五分钟统计数据。请关闭“从零开始”。需要启用 Recorder 并使用累加能源的传感器。",
               "create_energy_sensor": "是否让 Powercalc 创建 kWh 传感器"
             }
           }

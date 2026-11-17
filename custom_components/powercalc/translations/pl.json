@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "Profil LUT nie obsługuje jednego z trybów kolorów Twojego światła. Zobacz logi, aby uzyskać więcej informacji",
       "lut_wrong_domain": "Tylko encje świateł mogą korzystać z trybu LUT",
       "playbook_mandatory": "Musisz podać co najmniej jeden playbook",
-      "unknown": "Wystąpił nieznany błąd, sprawdź logi, aby uzyskać dodatkowe informacje"
+      "unknown": "Wystąpił nieznany błąd, sprawdź logi, aby uzyskać dodatkowe informacje",
+      "group_statistics_start_at_zero": "Wybierz Zacznij od zera albo Odtwórz statystyki, nie obie opcje.",
+      "group_statistics_energy_required": "Aby odtworzyć statystyki, włącz tworzenie sensora energii i wyłącz wymuszone obliczanie energii.",
+      "group_statistics_recorder_required": "Recorder musi być włączony, aby odtworzyć statystyki."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Dołącz czujniki nie-Powercalc",
               "force_calculate_group_energy": "Wymuś obliczanie energii",
               "group_energy_start_at_zero": "Zacznij od zera",
+              "group_energy_recreate_statistics": "Odtwórz statystyki",
               "create_energy_sensor": "Utwórz sensor energii",
               "create_utility_meters": "Utwórz liczniki mediów"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Zdecyduj, czy dołączyć czujniki nie-Powercalc podczas korzystania z opcji obszaru",
               "force_calculate_group_energy": "Domyślnie sensory energi Powercalc sumuje z sensorów członków. Przełącz tę opcję, aby wymusić stworzenie sensora Suma Riemanna",
               "group_energy_start_at_zero": "Gdy włączone, sensor energii zacznie się od zera przy utworzeniu tego sensora. W przeciwnym razie zsumowane będą wszystkie aktualne stany sensorów energii",
+              "group_energy_recreate_statistics": "Przy tworzeniu jednorazowo zsumuj godzinowe i dostępne pięciominutowe statystyki energii członków. Wyłącz Zacznij od zera. Wymaga Recorder i sensora sumującego energię.",
               "create_energy_sensor": "Czy Powercalc musi utworzyć czujnik kWh"
             }
           }

@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "Il profilo LUT non supporta una delle modalità di colore della luce. Vedi i registri per maggiori informazioni",
       "lut_wrong_domain": "Solo le luci possono utilizzare la modalità LUT",
       "playbook_mandatory": "È necessario specificare almeno un playbook",
-      "unknown": "Si è verificato un errore sconosciuto, consultare i registri per ulteriori informazioni"
+      "unknown": "Si è verificato un errore sconosciuto, consultare i registri per ulteriori informazioni",
+      "group_statistics_start_at_zero": "Scegli Inizia a zero oppure Ricostruisci statistiche, non entrambe.",
+      "group_statistics_energy_required": "Per ricostruire le statistiche, attiva Crea sensore di energia e disattiva Forza calcolo energia.",
+      "group_statistics_recorder_required": "Recorder deve essere attivo per ricostruire le statistiche."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Includere sensori non powercalc",
               "force_calculate_group_energy": "Forza calcolo energia",
               "group_energy_start_at_zero": "Inizia a zero",
+              "group_energy_recreate_statistics": "Ricostruisci statistiche",
               "create_energy_sensor": "Crea sensore di energia",
               "create_utility_meters": "Crea contatori di consumo"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Controllare se includere sensori non Powercalc quando si utilizza l'opzione area",
               "force_calculate_group_energy": "Per impostazione predefinita Powercalc somma i sensori di energia dei membri. Attiva questa opzione per forzare la creazione di un sensore Riemann Sum",
               "group_energy_start_at_zero": "Quando abilitata, il sensore di energia si avvia a zero quando il sensore viene creato. Altrimenti si sommerà a tutti gli altri stati attuali del sensore di energia raggruppati",
+              "group_energy_recreate_statistics": "Alla creazione, somma una sola volta le statistiche energetiche orarie e quelle disponibili di cinque minuti dei membri. Disattiva Inizia a zero. Richiede Recorder e un sensore che sommi le energie.",
               "create_energy_sensor": "Indica se powercalc deve creare un sensore kWh"
             }
           }

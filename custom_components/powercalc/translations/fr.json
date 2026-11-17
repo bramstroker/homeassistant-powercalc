@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "Le profil LUT ne prend pas en charge l'un des modes de couleur de votre lumière. Voir les journaux pour plus d'informations",
       "lut_wrong_domain": "Seules les entités lumineuses peuvent utiliser le mode LUT",
       "playbook_mandatory": "Vous devez spécifier au moins un playbook",
-      "unknown": "Une erreur inconnue s'est produite, veuillez consulter les journaux pour plus d'informations"
+      "unknown": "Une erreur inconnue s'est produite, veuillez consulter les journaux pour plus d'informations",
+      "group_statistics_start_at_zero": "Choisissez Commencer à zéro ou Reconstituer les statistiques, pas les deux.",
+      "group_statistics_energy_required": "La reconstitution nécessite la création du capteur d’énergie et la désactivation du calcul forcé de l’énergie.",
+      "group_statistics_recorder_required": "Recorder doit être activé pour reconstituer les statistiques."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Inclure les capteurs non Powercalc",
               "force_calculate_group_energy": "Forcer le calcul de l'énergie",
               "group_energy_start_at_zero": "Commencer à zéro",
+              "group_energy_recreate_statistics": "Reconstituer les statistiques",
               "create_energy_sensor": "Créer un capteur d'énergie",
               "create_utility_meters": "Créer des compteurs d'électricité"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Contrôler s'il faut inclure les capteurs non Powercalc lors de l'utilisation de l'option de zone",
               "force_calculate_group_energy": "Par défaut, Powercalc additionne les capteurs d'énergie des capteurs membres. Activez cette option pour forcer la création d'un capteur de somme de Riemann",
               "group_energy_start_at_zero": "Lorsque cette option est activée, le capteur d'énergie commencera à zéro lors de sa création. Sinon, il additionnera tous les états actuels des capteurs d'énergie membres",
+              "group_energy_recreate_statistics": "À la création, additionner une seule fois les statistiques énergétiques horaires et celles de cinq minutes disponibles des membres. Désactiver Commencer à zéro. Nécessite Recorder et un capteur qui additionne les énergies.",
               "create_energy_sensor": "Indique si Powercalc doit créer un capteur kWh"
             }
           }
