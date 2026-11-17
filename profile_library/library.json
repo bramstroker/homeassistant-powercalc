@@ -7755,10 +7755,10 @@
           },
           "id": "GL-D-006P",
           "manufacturer": "gledopto",
-          "updated_at": "2026-11-13T00:50:12",
+          "updated_at": "2026-11-17T12:54:55",
           "max_power": 6.14,
           "sub_profile_count": 0,
-          "measurement_updated_at": "2026-11-13T00:50:12",
+          "measurement_updated_at": "2026-11-17T12:54:55",
           "power_range": {
             "min": 0.33,
             "max": 6.14
@@ -7772,7 +7772,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "8b32f03fd0e7518f2257692ae6674289"
+          "hash": "cb4ac159e35345a0936b1a0dd138d156"
         },
         {
           "calculation_strategy": "lut",
