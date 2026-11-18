@@ -8,6 +8,7 @@ from statistics import mean
 import time
 from typing import TypedDict
 
+from measure.artifacts import SMART_SWITCH_READINGS_FILENAME
 from measure.controller.switch.hass import HassSwitchController
 from measure.request import SmartSwitchMeasurementRequest
 from measure.runner.interaction import RunInteraction
@@ -96,7 +97,7 @@ class SmartSwitchRunner(MeasurementRunner[SmartSwitchMeasurementRequest]):
             # Cleanup also runs after validation below; this immediately restores relays after sampling.
             self.controller.restore_states()
 
-        evidence = Path(export_directory) / "smart_switch_readings.json"
+        evidence = Path(export_directory) / SMART_SWITCH_READINGS_FILENAME
         write_json_atomic(evidence, {"entity_ids": entity_ids, "readings": readings})
         model = self._create_model(request, readings)
         return RunnerResult(model_json_data=model, voltages=voltages)
