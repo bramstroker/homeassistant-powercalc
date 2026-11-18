@@ -1,5 +1,6 @@
 {
   "name": "BLU Gateway",
+  "description": "USB-powered gateway that connects Shelly BLU sensors to Wi-Fi",
   "aliases": [
     "SNGW-BT01"
   ],
