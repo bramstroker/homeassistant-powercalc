@@ -31,6 +31,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_STANDBY_POWER,
+    CONF_STANDBY_POWER_ON,
     CONF_STATES_POWER,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
@@ -311,3 +312,25 @@ async def test_debug_standby_energy_group_action(hass: HomeAssistant) -> None:
             "sensor.test_power": {ATTR_STATE: "0.20", ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT},
         },
     }
+
+
+async def test_standby_power_on_option(hass: HomeAssistant) -> None:
+    """A manually configured sensor can declare the power it draws while it is switched on."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test1",
+            CONF_STANDBY_POWER: 0.5,
+            CONF_STANDBY_POWER_ON: 0.5,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 10},
+        },
+    )
+
+    await set_states(hass, [("input_boolean.test1", STATE_ON)])
+    assert_entity_state(hass, "sensor.test1_power", "10.50")
+    assert_entity_state(hass, "sensor.all_standby_power", "0.50")
+
+    await set_states(hass, [("input_boolean.test1", STATE_OFF)])
+    assert_entity_state(hass, "sensor.test1_power", "0.50")
+    assert_entity_state(hass, "sensor.all_standby_power", "0.50")
