@@ -17,7 +17,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 import pytest
 
-from custom_components.powercalc import CONF_CREATE_STANDBY_GROUP
+from custom_components.powercalc import CONF_CREATE_ACTIVE_GROUP, CONF_CREATE_STANDBY_GROUP
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_MEMBERS,
@@ -311,3 +311,100 @@ async def test_debug_standby_energy_group_action(hass: HomeAssistant) -> None:
             "sensor.test_power": {ATTR_STATE: "0.20", ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT},
         },
     }
+
+
+async def test_active_group_created_when_enabled(hass: HomeAssistant) -> None:
+    """The active group is opt-in and sums the power of the devices that are switched on."""
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_ENTITY_ID: "switch.test1",
+                CONF_STANDBY_POWER: 0.2,
+                CONF_MODE: CalculationStrategy.FIXED,
+                CONF_FIXED: {CONF_POWER: 20},
+            },
+            {
+                CONF_ENTITY_ID: "switch.test2",
+                CONF_MANUFACTURER: "test",
+                CONF_MODEL: "smart_switch_with_pm_new",
+            },
+        ],
+        {CONF_CREATE_ACTIVE_GROUP: True},
+    )
+
+    await set_states(hass, [("switch.test1", STATE_ON), ("switch.test2", STATE_ON)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", "20.70")
+    assert_entity_state(hass, "sensor.all_standby_power", "0.70")
+
+    await set_states(hass, [("switch.test1", STATE_OFF), ("switch.test2", STATE_OFF)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", STATE_UNKNOWN)
+    assert_entity_state(hass, "sensor.all_standby_power", "0.50")
+
+
+async def test_active_group_not_created_by_default(hass: HomeAssistant) -> None:
+    """Without the option no active group is created and the standby total is unchanged."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test1",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 20},
+        },
+    )
+
+    assert hass.states.get("sensor.all_self_usage_power") is None
+
+    await set_states(hass, [("switch.test1", STATE_ON)])
+    assert_entity_state(hass, "sensor.all_standby_power", STATE_UNKNOWN)
+
+    await set_states(hass, [("switch.test1", STATE_OFF)])
+    assert_entity_state(hass, "sensor.all_standby_power", "0.20")
+
+
+async def test_active_group_created_without_standby_group(hass: HomeAssistant) -> None:
+    """Both switches are independent: active group on, standby group off."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test1",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 20},
+        },
+        {
+            CONF_CREATE_STANDBY_GROUP: False,
+            CONF_CREATE_ACTIVE_GROUP: True,
+        },
+    )
+
+    assert hass.states.get("sensor.all_standby_power") is None
+    assert hass.states.get("sensor.all_standby_energy") is None
+    assert hass.states.get("sensor.all_self_usage_power") is not None
+
+    await set_states(hass, [("switch.test1", STATE_ON)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", "20.00")
+
+    await set_states(hass, [("switch.test1", STATE_OFF)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", STATE_UNKNOWN)
+
+
+async def test_no_group_created_when_both_switches_disabled(hass: HomeAssistant) -> None:
+    """With both switches off no group sensors are created at all."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test1",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 20},
+        },
+        {
+            CONF_CREATE_STANDBY_GROUP: False,
+            CONF_CREATE_ACTIVE_GROUP: False,
+        },
+    )
+
+    assert hass.states.get("sensor.all_standby_power") is None
+    assert hass.states.get("sensor.all_self_usage_power") is None

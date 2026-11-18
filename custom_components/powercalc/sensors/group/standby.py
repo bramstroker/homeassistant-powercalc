@@ -18,9 +18,12 @@ from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_MEMBERS,
     ATTR_STATE,
+    CONF_CREATE_ACTIVE_GROUP,
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_CREATE_STANDBY_GROUP,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_PRECISION,
+    DATA_SELF_USAGE_POWER_SENSORS,
     DATA_STANDBY_POWER_SENSORS,
     DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
@@ -39,16 +42,36 @@ def create_general_standby_sensors(
     config: ConfigType,
 ) -> list[Entity]:
     sensors: list[Entity] = []
-    power_sensor = StandbyPowerSensor(
+    if config.get(CONF_CREATE_STANDBY_GROUP, True):
+        sensors.extend(
+            _create_sensors(hass, config, StandbyPowerSensor, "sensor.all_standby_power", "All standby"),
+        )
+    if config.get(CONF_CREATE_ACTIVE_GROUP, False):
+        sensors.extend(
+            _create_sensors(hass, config, SelfUsagePowerSensor, "sensor.all_self_usage_power", "All self usage"),
+        )
+    return sensors
+
+
+def _create_sensors(
+    hass: HomeAssistant,
+    config: ConfigType,
+    sensor_class: type[SumPowerSensor],
+    entity_id: str,
+    name: str,
+) -> list[Entity]:
+    """Create a group total, optionally with its energy related sensors."""
+    sensors: list[Entity] = []
+    power_sensor = sensor_class(
         hass,
         rounding_digits=int(config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION)),
         entity_category=config.get(CONF_POWER_SENSOR_CATEGORY),
     )
+    power_sensor.entity_id = entity_id
     sensors.append(power_sensor)
     if config.get(CONF_CREATE_ENERGY_SENSORS):
-        power_sensor.entity_id = "sensor.all_standby_power"
         sensor_config = config.copy()
-        sensor_config[CONF_NAME] = "All standby"
+        sensor_config[CONF_NAME] = name
         source_entity = create_source_entity(DUMMY_ENTITY_ID, hass)
         energy_sensor = create_energy_sensor(
             hass,
@@ -132,3 +155,11 @@ class StandbyPowerSensor(SumPowerSensor):
     _attr_unique_id = "powercalc_standby_group"
     _attr_name = "All standby power"
     data_key = DATA_STANDBY_POWER_SENSORS
+
+
+class SelfUsagePowerSensor(SumPowerSensor):
+    """Sum of the power of all devices that are currently switched on."""
+
+    _attr_unique_id = "powercalc_self_usage_group"
+    _attr_name = "All self usage power"
+    data_key = DATA_SELF_USAGE_POWER_SENSORS

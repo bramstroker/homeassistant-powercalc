@@ -9,6 +9,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
     CONF_COST_SENSOR_NAMING,
+    CONF_CREATE_ACTIVE_GROUP,
     CONF_CREATE_COST_SENSORS,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -80,6 +81,7 @@ def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigT
         CONF_CREATE_COST_SENSORS: False,
         CONF_COST_SENSOR_NAMING: DEFAULT_COST_NAME_PATTERN,
         CONF_CREATE_STANDBY_GROUP: True,
+        CONF_CREATE_ACTIVE_GROUP: False,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_DISCOVERY: {
             CONF_ENABLED: True,

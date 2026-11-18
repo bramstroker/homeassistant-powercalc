@@ -121,12 +121,14 @@
               "create_energy_sensors": "建立能源感測器",
               "create_cost_sensors": "建立費用感測器",
               "create_standby_group": "建立待機群組",
+              "create_active_group": "建立運作中群組",
               "create_utility_meters": "建立功耗表"
             },
             "data_description": {
               "create_energy_sensors": "powercalc 是否需要建立 kWh 感測器",
               "create_cost_sensors": "powercalc 是否需要建立費用感測器。需要在後續步驟中設定電價",
               "create_standby_group": "建立一個群組，加總所有待機功率消耗與 IOT 裝置的自身耗電",
+              "create_active_group": "建立一個群組，加總所有目前已開啟裝置的功率",
               "create_utility_meters": "讓 powercalc 建立功耗表，依每日、每小時等週期重置"
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "建立能源感測器",
               "create_cost_sensors": "建立費用感測器",
               "create_standby_group": "建立待機群組",
+              "create_active_group": "建立運作中群組",
               "create_utility_meters": "建立功耗表"
             },
             "data_description": {
               "create_energy_sensors": "powercalc 是否需要建立 kWh 感測器",
               "create_cost_sensors": "powercalc 是否需要建立費用感測器。需要在後續步驟中設定電價",
               "create_standby_group": "建立一個群組，加總所有待機功率消耗與 IOT 裝置的自身耗電",
+              "create_active_group": "建立一個群組，加總所有目前已開啟裝置的功率",
               "create_utility_meters": "讓 powercalc 建立功耗表，依每日、每小時等週期重置"
             }
           },

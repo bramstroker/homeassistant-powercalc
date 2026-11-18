@@ -121,12 +121,14 @@
               "create_energy_sensors": "Vytvorte energetické senzory",
               "create_cost_sensors": "Vytvorte cenové senzory",
               "create_standby_group": "Vytvorte pohotovostnú skupinu",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Vytvorte merače spotreby"
             },
             "data_description": {
               "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
               "create_cost_sensors": "Či potrebuje powercalc vytvoriť snímače nákladov. Vyžaduje, aby bola v ďalších krokoch nakonfigurovaná cena energie",
               "create_standby_group": "Vytvorte skupinu, ktorá sčíta všetku spotrebu energie v pohotovostnom režime a vlastnú spotrebu zariadení IOT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Vytvorte energetické senzory",
               "create_cost_sensors": "Vytvorte cenové senzory",
               "create_standby_group": "Vytvorte pohotovostnú skupinu",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Vytvorte merače spotreby"
             },
             "data_description": {
               "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
               "create_cost_sensors": "Či potrebuje powercalc vytvoriť snímače nákladov. Vyžaduje, aby bola v ďalších krokoch nakonfigurovaná cena energie",
               "create_standby_group": "Vytvorte skupinu, ktorá sčíta všetku spotrebu energie v pohotovostnom režime a vlastnú spotrebu zariadení IOT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď."
             }
           },

@@ -121,12 +121,14 @@
               "create_energy_sensors": "Crea sensori di energia",
               "create_cost_sensors": "Creare sensori di costo",
               "create_standby_group": "Crea gruppo standby",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Crea contatori di consumo"
             },
             "data_description": {
               "create_energy_sensors": "Considera powercalc deve creare sensori kWh",
               "create_cost_sensors": "Se Powercalc deve creare sensori di costo. Richiede un prezzo energetico da configurare nei passaggi successivi",
               "create_standby_group": "Crea un gruppo che somma tutti i consumi di energia standby e l'autoutilizzo dei dispositivi IOT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Consenti a Powercalc di creare contatori di consumo con cicli giornalieri, orari, ecc."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Crea sensori di energia",
               "create_cost_sensors": "Creare sensori di costo",
               "create_standby_group": "Crea gruppo di attesa",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Crea contatori di consumo"
             },
             "data_description": {
               "create_energy_sensors": "Se Powercalc deve creare sensori kWh",
               "create_cost_sensors": "Se Powercalc deve creare sensori di costo. Richiede un prezzo energetico da configurare nei passaggi successivi",
               "create_standby_group": "Crea un gruppo che somma tutti i consumi energetici in standby e l'utilizzo autonomo dei dispositivi IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Consenti a Powercalc di creare contatori di consumo con cicli giornalieri, orari, ecc."
             }
           },
