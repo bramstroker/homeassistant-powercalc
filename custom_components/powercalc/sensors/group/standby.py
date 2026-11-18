@@ -20,6 +20,7 @@ from custom_components.powercalc.const import (
     ATTR_STATE,
     CONF_CREATE_ACTIVE_GROUP,
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_CREATE_STANDBY_GROUP,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_PRECISION,
     DATA_SELF_USAGE_POWER_SENSORS,
@@ -41,9 +42,10 @@ def create_general_standby_sensors(
     config: ConfigType,
 ) -> list[Entity]:
     sensors: list[Entity] = []
-    sensors.extend(
-        _create_sensors(hass, config, StandbyPowerSensor, "sensor.all_standby_power", "All standby"),
-    )
+    if config.get(CONF_CREATE_STANDBY_GROUP, True):
+        sensors.extend(
+            _create_sensors(hass, config, StandbyPowerSensor, "sensor.all_standby_power", "All standby"),
+        )
     if config.get(CONF_CREATE_ACTIVE_GROUP, False):
         sensors.extend(
             _create_sensors(hass, config, SelfUsagePowerSensor, "sensor.all_self_usage_power", "All self usage"),

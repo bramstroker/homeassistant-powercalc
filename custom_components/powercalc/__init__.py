@@ -375,14 +375,20 @@ async def create_standby_group(
     domain_config: ConfigType,
     event: Event[Any] | None = None,
 ) -> None:
-    if not bool(domain_config.get(CONF_CREATE_STANDBY_GROUP, True)):
+    create_standby_group_enabled = bool(domain_config.get(CONF_CREATE_STANDBY_GROUP, True))
+    create_active_group_enabled = bool(domain_config.get(CONF_CREATE_ACTIVE_GROUP, False))
+    if not create_standby_group_enabled and not create_active_group_enabled:
         return
     hass.async_create_task(
         async_load_platform(
             hass,
             SENSOR_DOMAIN,
             DOMAIN,
-            {DISCOVERY_TYPE: PowercalcDiscoveryType.STANDBY_GROUP},
+            {
+                DISCOVERY_TYPE: PowercalcDiscoveryType.STANDBY_GROUP,
+                CONF_CREATE_STANDBY_GROUP: create_standby_group_enabled,
+                CONF_CREATE_ACTIVE_GROUP: create_active_group_enabled,
+            },
             domain_config,
         ),
     )
