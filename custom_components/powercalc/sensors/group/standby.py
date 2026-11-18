@@ -61,13 +61,15 @@ def create_general_standby_sensors(
     return sensors
 
 
-class StandbyPowerSensor(PowerSensor, SensorEntity):
+class SumPowerSensor(PowerSensor, SensorEntity):
+    """Total of all power values tracked in a shared registry."""
+
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfPower.WATT
     _attr_has_entity_name = True
-    _attr_unique_id = "powercalc_standby_group"
-    _attr_name = "All standby power"
+
+    data_key: str = ""
 
     def __init__(
         self,
@@ -75,7 +77,7 @@ class StandbyPowerSensor(PowerSensor, SensorEntity):
         rounding_digits: int = 2,
         entity_category: str | None = None,
     ) -> None:
-        self.standby_sensors: dict[str, Decimal] = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
+        self.sum_sensors: dict[str, Decimal] = hass.data[DOMAIN][self.data_key]
         self._rounding_digits = rounding_digits
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
@@ -93,11 +95,11 @@ class StandbyPowerSensor(PowerSensor, SensorEntity):
         await self._recalculate()
 
     async def _recalculate(self) -> None:
-        """Calculate sum of all power sensors in standby, and update the state of the sensor."""
-        if self.standby_sensors:
+        """Calculate the sum of all tracked power sensors and update the state."""
+        if self.sum_sensors:
             self._attr_native_value = Decimal(
                 round(
-                    sum(self.standby_sensors.values(), Decimal(0)),
+                    sum(self.sum_sensors.values(), Decimal(0)),
                     self._rounding_digits,
                 ),
             )
@@ -106,19 +108,27 @@ class StandbyPowerSensor(PowerSensor, SensorEntity):
         self.async_schedule_update_ha_state(True)
 
     def get_group_entities(self) -> dict[str, set[str]]:
-        return {ATTR_ENTITIES: set(self.standby_sensors)}
+        return {ATTR_ENTITIES: set(self.sum_sensors)}
 
     def debug_group(self) -> dict[str, Any]:
-        """Return the current standby contribution of each tracked power sensor."""
+        """Return the current contribution of each tracked power sensor."""
         members = {
             entity_id: {
                 ATTR_STATE: str(round(power, self._rounding_digits)),
                 ATTR_UNIT_OF_MEASUREMENT: self.native_unit_of_measurement,
             }
-            for entity_id, power in sorted(self.standby_sensors.items())
+            for entity_id, power in sorted(self.sum_sensors.items())
         }
         return {
             ATTR_STATE: str(self.state),
             ATTR_UNIT_OF_MEASUREMENT: self.native_unit_of_measurement,
             ATTR_MEMBERS: members,
         }
+
+
+class StandbyPowerSensor(SumPowerSensor):
+    """Sum of the standby power of all devices that are currently turned off."""
+
+    _attr_unique_id = "powercalc_standby_group"
+    _attr_name = "All standby power"
+    data_key = DATA_STANDBY_POWER_SENSORS
