@@ -242,7 +242,8 @@ async def test_short_battery_gap_preserves_power_and_energy(
     await advance(hass, freezer, 20)
     await set_states(hass, [("sensor.battery", "25")])
     await advance(hass, freezer, 29)
-    await set_states(hass, [("sensor.battery", "26")])
+    # Drain the energy sensor callback queued by the power update.
+    await set_states(hass, [("sensor.battery", "26")], block_count=2)
     # 60 seconds at 3.50 W and 50 seconds at 32.30 W.
     assert_entity_state(hass, "sensor.robot_energy", "0.00050694")
 
