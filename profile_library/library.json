@@ -40176,6 +40176,60 @@
             "color_temp": 99.5
           },
           "hash": "630c8403640b8616f6dc4c7f4e499202"
+        },
+        {
+          "authors": [
+            {
+              "github": "akashihi",
+              "name": "akashihi"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-15T21:09:26Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Power Strip 4 Gen4",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "Smart Color Bulb ZL4",
+          "standby_power": 0.33,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 234.6,
+            "min": 227.9
+          },
+          "id": "3RCB02070Z",
+          "manufacturer": "third reality",
+          "updated_at": "2026-11-18T09:43:01",
+          "max_power": 10.5,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-18T09:43:01",
+          "power_range": {
+            "min": 1.9,
+            "max": 10.5
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
+          "hash": "3e641284db50765cc9d83418e6bf5f74"
         }
       ],
       "device_types": [
