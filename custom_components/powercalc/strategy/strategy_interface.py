@@ -10,6 +10,10 @@ class PowerCalculationStrategyInterface:
     async def async_update_state(self) -> None:
         """Collect source readings, including while calculation is disabled or a composite branch is skipped."""
 
+    def is_sample_entity(self, entity_id: str) -> bool:
+        """Return whether this entity supplies readings independently of the source state."""
+        return False
+
     def get_update_interval(self) -> timedelta | None:
         """Return the interval needed for time-dependent calculations, if any."""
         return None
@@ -23,6 +27,10 @@ class PowerCalculationStrategyInterface:
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate power consumption based on entity state."""
+
+    async def calculate_on_refresh(self, entity_state: State) -> Decimal | None:
+        """Refresh power after a timer or sample update."""
+        return await self.calculate(entity_state)
 
     async def validate_config(self) -> None:
         """Validate correct setup of the strategy."""

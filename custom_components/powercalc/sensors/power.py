@@ -468,7 +468,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             """Handle for state changes for dependent sensors."""
             new_state = event.data.get("new_state")
             await self._handle_source_entity_state_change(
-                self._source_entity.entity_id,
+                event.data["entity_id"],
                 new_state,
             )
 
@@ -540,12 +540,12 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             )
 
     async def _async_recalculate_strategy(self, _: datetime) -> None:
-        state = (
-            State(DUMMY_ENTITY_ID, STATE_ON)
-            if self._source_entity.is_dummy
-            else self.hass.states.get(self.source_entity)
-        )
-        await self._handle_source_entity_state_change(self.source_entity, state, periodic=True)
+        await self._handle_source_entity_state_change(self.source_entity, self._get_source_state(), refresh=True)
+
+    def _get_source_state(self) -> State | None:
+        if self._source_entity.is_dummy:
+            return State(DUMMY_ENTITY_ID, STATE_ON)
+        return self.hass.states.get(self.source_entity)
 
     def _register_tracking_listeners(
         self,
@@ -632,18 +632,18 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         trigger_entity_id: str,
         state: State | None,
         *,
-        periodic: bool = False,
+        refresh: bool = False,
     ) -> None:
         """Update power sensor based on new dependent entity state."""
         assert self._strategy_instance is not None
         await self._strategy_instance.async_update_state()
         self._schedule_strategy_expiry()
-        if periodic:
-            # Source events own standby/sleep transitions. A clock tick must not
-            # restart the sleep delay or overwrite an already applied sleep value.
-            if state and (state.state in self._off_states or not await self.is_calculation_enabled(state)):
-                return
-        else:
+        if trigger_entity_id not in (self.source_entity, self._availability_entity) and (
+            self._strategy_instance.is_sample_entity(trigger_entity_id)
+        ):
+            state = self._get_source_state()
+            refresh = True
+        if not refresh:
             self._clear_standby_power()
             if self._sleep_power_timer:
                 self._sleep_power_timer()
@@ -660,8 +660,12 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             self._update_power_and_write_state(None)
             return
 
+        # Source events own standby and sleep transitions.
+        if refresh and (state.state in self._off_states or not await self.is_calculation_enabled(state)):
+            return
+
         await self._switch_sub_profile_dynamically(state)
-        power = await self.calculate_power(state)
+        power = await self.calculate_power(state, refresh=refresh)
 
         _LOGGER.debug(
             '%s: State changed to "%s". Power:%s',
@@ -705,7 +709,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
 
         return self._ignore_unavailable_state or state.state not in UNAVAILABLE_STATES
 
-    async def calculate_power(self, state: State) -> Decimal | None:
+    async def calculate_power(self, state: State, *, refresh: bool = False) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
         assert self._strategy_instance is not None
 
@@ -728,7 +732,10 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             return standby_power
 
         # Calculate actual power using configured strategy
-        power = await self._strategy_instance.calculate(entity_state)
+        if refresh:
+            power = await self._strategy_instance.calculate_on_refresh(entity_state)
+        else:
+            power = await self._strategy_instance.calculate(entity_state)
         if power is None:
             return None
 

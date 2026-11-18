@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -187,10 +188,15 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         self.playbook_strategies: list[PlaybookStrategy] = [
             strategy.strategy for strategy in self.strategies if isinstance(strategy.strategy, PlaybookStrategy)
         ]
+        self._selected_playbooks: set[PlaybookStrategy] = set()
+        self._calculation_lock = asyncio.Lock()
 
     async def async_update_state(self) -> None:
         for sub_strategy in self.strategies:
             await sub_strategy.strategy.async_update_state()
+
+    def is_sample_entity(self, entity_id: str) -> bool:
+        return any(sub_strategy.strategy.is_sample_entity(entity_id) for sub_strategy in self.strategies)
 
     def get_update_interval(self) -> timedelta | None:
         intervals = [
@@ -209,38 +215,61 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         return min(update_times) if update_times else None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
-        """Calculate power consumption based on entity state."""
-        await self.stop_active_playbooks()
+        """Calculate power after a source state change."""
+        async with self._calculation_lock:
+            await self.stop_active_playbooks()
+            self._selected_playbooks.clear()
+            return await self._calculate_branches(entity_state)
 
+    async def calculate_on_refresh(self, entity_state: State) -> Decimal | None:
+        """Reevaluate which branches contribute while keeping selected playbooks running."""
+        async with self._calculation_lock:
+            return await self._calculate_branches(entity_state)
+
+    async def _calculate_branches(self, entity_state: State) -> Decimal | None:
+        selected_playbooks: set[PlaybookStrategy] = set()
         total = Decimal(0)
+        power: Decimal | None = None
         for sub_strategy in self.strategies:
             sub_state = entity_state
             if sub_strategy.entity_id is not None:
                 fetched_state = self.hass.states.get(sub_strategy.entity_id)
                 if fetched_state is None or fetched_state.state in UNAVAILABLE_STATES:
-                    return None
+                    break
                 sub_state = fetched_state
-            value = await self._calculate_sub_strategy(sub_strategy, sub_state)
+            value = await self._calculate_sub_strategy(sub_strategy, sub_state, selected_playbooks)
             if value is None:
                 continue
             if self.mode == CompositeMode.STOP_AT_FIRST:
-                return value
+                power = value
+                break
             total += value
+        else:
+            if self.mode == CompositeMode.SUM_ALL:
+                power = total
 
-        return total if self.mode == CompositeMode.SUM_ALL else None
+        for playbook in self._selected_playbooks - selected_playbooks:
+            await playbook.stop_playbook()
+        self._selected_playbooks = selected_playbooks
+        return power
 
-    async def _calculate_sub_strategy(self, sub_strategy: SubStrategy, entity_state: State) -> Decimal | None:
+    async def _calculate_sub_strategy(
+        self, sub_strategy: SubStrategy, entity_state: State, selected_playbooks: set[PlaybookStrategy]
+    ) -> Decimal | None:
         """Calculate the power for a single sub strategy. Returns None when the sub strategy must be skipped."""
         strategy = sub_strategy.strategy
 
         if sub_strategy.condition and not self._condition_matches(sub_strategy.condition, entity_state):
             return None
 
-        if isinstance(strategy, PlaybookStrategy):
-            await self.activate_playbook(strategy)
-
         if entity_state.state == STATE_OFF and not strategy.can_calculate_standby():
             return None
+
+        if isinstance(strategy, PlaybookStrategy):
+            selected_playbooks.add(strategy)
+            if strategy in self._selected_playbooks:
+                return strategy.current_power
+            await self.activate_playbook(strategy)
 
         return await strategy.calculate(entity_state)
 

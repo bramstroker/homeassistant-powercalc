@@ -212,6 +212,130 @@ async def test_standalone_yaml_tracks_battery_and_decays_without_events(
     assert_entity_state(hass, "sensor.robot_power", "7.00")
 
 
+@pytest.mark.parametrize("invalid_state", ["unavailable", "unknown", None])
+async def test_short_battery_gap_preserves_power_and_energy(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, invalid_state: str | None
+) -> None:
+    await set_states(hass, [("sensor.battery", "20"), ("vacuum.robot", "docked")])
+    await run_powercalc_setup(
+        hass,
+        {
+            "entity_id": "vacuum.robot",
+            "composite": [
+                {"condition": {"condition": "state", "state": "docked"}, "battery_rate": BATTERY_CONFIG},
+                {"fixed": {"power": 2}},
+            ],
+        },
+        {"energy_sensor_precision": 8},
+    )
+
+    await advance(hass, freezer, 60)
+    await set_states(hass, [("sensor.battery", "25")])
+    await advance(hass, freezer, 1)
+    if invalid_state is None:
+        hass.states.async_remove("sensor.battery")
+        await hass.async_block_till_done()
+    else:
+        await set_states(hass, [("sensor.battery", invalid_state)])
+    assert_entity_state(hass, "sensor.robot_power", "32.30")
+
+    await advance(hass, freezer, 20)
+    await set_states(hass, [("sensor.battery", "25")])
+    await advance(hass, freezer, 29)
+    await set_states(hass, [("sensor.battery", "26")])
+    # 60 seconds at 3.50 W and 50 seconds at 32.30 W.
+    assert_entity_state(hass, "sensor.robot_energy", "0.00050694")
+
+
+async def test_battery_gap_still_expires_samples_and_respects_source_availability(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    await set_states(hass, [("sensor.battery", "20"), ("vacuum.robot", "docked")])
+    await run_powercalc_setup(hass, {"entity_id": "vacuum.robot", "battery_rate": BATTERY_CONFIG})
+    await advance(hass, freezer, 13)
+    await set_states(hass, [("sensor.battery", "21")])
+    await advance(hass, freezer, 24)
+    await set_states(hass, [("sensor.battery", "23")])
+    await advance(hass, freezer, 563)
+    await set_states(hass, [("sensor.battery", "unavailable")])
+
+    await advance(hass, freezer, 13)
+    assert_entity_state(hass, "sensor.robot_power", "15.02")
+
+    await set_states(hass, [("vacuum.robot", "unavailable")])
+    await set_states(hass, [("sensor.battery", "23")])
+    assert_entity_state(hass, "sensor.robot_power", "unavailable")
+    await set_states(hass, [("vacuum.robot", "docked")])
+    assert_entity_state(hass, "sensor.robot_power", "15.02")
+
+
+@pytest.mark.parametrize("change_battery", [False, True], ids=["fallback-timer", "sample-and-expiry"])
+async def test_battery_updates_keep_selected_playbook_running(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, change_battery: bool
+) -> None:
+    await set_states(hass, [("sensor.battery", "20"), ("vacuum.robot", "docked")])
+    await run_powercalc_setup(
+        hass,
+        {
+            "entity_id": "vacuum.robot",
+            "composite": [
+                {
+                    "condition": {"condition": "state", "state": "washing"},
+                    "playbook": {"playbooks": {"wash": "composite/dishwasher.csv"}},
+                },
+                {"battery_rate": {**BATTERY_CONFIG, "window": 5}},
+            ],
+        },
+    )
+
+    await set_states(hass, [("vacuum.robot", "washing")])
+    await advance(hass, freezer, 3)
+    assert_entity_state(hass, "sensor.robot_power", "20.00")
+    if change_battery:
+        await set_states(hass, [("sensor.battery", "21")])
+        assert_entity_state(hass, "sensor.robot_power", "20.00")
+    await advance(hass, freezer, 2)
+    assert_entity_state(hass, "sensor.robot_power", "40.00")
+    await advance(hass, freezer, 3)
+    assert_entity_state(hass, "sensor.robot_power", "40.00")
+    await advance(hass, freezer, 7)
+    assert_entity_state(hass, "sensor.robot_power", "40.00")
+
+    await set_states(hass, [("vacuum.robot", "docked")])
+    assert_entity_state(hass, "sensor.robot_power", "3.50")
+
+
+async def test_timer_stops_playbook_when_another_branch_takes_over(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory
+) -> None:
+    await set_states(hass, [("sensor.battery", "20"), ("vacuum.robot", "docked")])
+    await run_powercalc_setup(
+        hass,
+        {
+            "entity_id": "vacuum.robot",
+            "composite": [
+                {
+                    "condition": {"condition": "state", "state": "washing", "for": {"seconds": 6}},
+                    "fixed": {"power": 100},
+                },
+                {
+                    "condition": {"condition": "state", "state": "washing"},
+                    "playbook": {"playbooks": {"wash": "composite/dishwasher.csv"}, "repeat": True},
+                },
+                {"battery_rate": {**BATTERY_CONFIG, "window": 5}},
+            ],
+        },
+    )
+
+    await set_states(hass, [("vacuum.robot", "washing")])
+    await advance(hass, freezer, 3)
+    assert_entity_state(hass, "sensor.robot_power", "20.00")
+    await advance(hass, freezer, 7)
+    assert_entity_state(hass, "sensor.robot_power", "100.00")
+    await advance(hass, freezer, 3)
+    assert_entity_state(hass, "sensor.robot_power", "100.00")
+
+
 @pytest.mark.parametrize("mode", ["standalone", "stop_at_first", "sum_all", "dummy"])
 async def test_percentage_increments_expire_between_periodic_ticks(
     hass: HomeAssistant, freezer: FrozenDateTimeFactory, mode: str

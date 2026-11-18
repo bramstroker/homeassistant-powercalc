@@ -92,6 +92,9 @@ class BatteryRateStrategy(PowerCalculationStrategyInterface):
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
         return [self._entity_id]
 
+    def is_sample_entity(self, entity_id: str) -> bool:
+        return entity_id == self._entity_id
+
     def get_update_interval(self) -> timedelta:
         return min(timedelta(seconds=60), self._window)
 
