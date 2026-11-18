@@ -8774,6 +8774,57 @@
           "hash": "7b740713dd58e87d6254bd274b743738"
         },
         {
+          "authors": [
+            {
+              "email": "little.ink3931@joosten.co",
+              "github": "svache",
+              "name": "J. Joosten"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-17T21:34:58Z",
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Kasa EP25",
+          "measure_device_firmware": "1.4.1 Build 260924 Rel. 202741",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "RGBIC Cube Wall Sconces",
+          "product_url": "https://us.govee.com/products/govee-rgbic-cube-wall-sconces",
+          "standby_power": 0.6,
+          "voltage_range": {
+            "max": 120.2,
+            "min": 117.5
+          },
+          "id": "H6088",
+          "manufacturer": "govee",
+          "updated_at": "2026-11-18T20:10:06",
+          "max_power": 26.5,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-18T20:10:06",
+          "power_range": {
+            "min": 1.1,
+            "max": 26.5
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 32.2,
+            "color_temp": 32.2
+          },
+          "hash": "10cd24a0ba32f65041b88e3debad99f2"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2025-12-29T22:45:08Z",
           "device_type": "light",
@@ -40212,7 +40263,7 @@
           },
           "id": "3RCB02070Z",
           "manufacturer": "third reality",
-          "updated_at": "2026-11-18T09:43:01",
+          "updated_at": "2026-11-18T09:52:32",
           "max_power": 10.5,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-11-18T09:43:01",
@@ -40229,7 +40280,7 @@
             "score": 98.1,
             "color_temp": 98.1
           },
-          "hash": "3e641284db50765cc9d83418e6bf5f74"
+          "hash": "34fb61e05204c399b21faff6baa17312"
         }
       ],
       "device_types": [
