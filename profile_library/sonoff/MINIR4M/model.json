@@ -1,8 +1,6 @@
 {
   "name": "MINI Extreme",
   "aliases": [
-    "MINIR4M",
-    "SONOFF MINI Extreme Wi-Fi Smart Switch (Matter-enabled)",
     "2"
   ],
   "device_type": "smart_switch",
