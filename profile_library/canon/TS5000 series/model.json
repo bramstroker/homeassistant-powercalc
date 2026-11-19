@@ -1,0 +1,35 @@
+{
+  "name": "Canon TS5000 series",
+  "device_type": "printer",
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "states_power": {
+      "idle": 2.15,
+      "printing": 10.8
+    }
+  },
+  "aliases": [
+    "TS5000 series"
+  ],
+  "discovery_by": "device",
+  "compatible_integrations": [
+    "ipp"
+  ],
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "usb"
+    ]
+  },
+  "measure_method": "script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_description": "Idle and printing measured with the Powercalc Measure app over 64 minutes (1857 samples; 1712 idle, 56 printing). Idle has two reachable levels (about 1.1 W deep sleep, about 3.7 W awake), so the energy-weighted average is used.",
+  "mains_voltage": 230,
+  "created_at": "2026-11-20T00:00:00Z",
+  "authors": [
+    {
+      "name": "Maximilian Kraus",
+      "github": "Maxik933"
+    }
+  ]
+}
