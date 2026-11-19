@@ -1511,14 +1511,22 @@
         {
           "aliases": [
             "6145",
+            "6147",
+            "6149",
             "LB01D",
-            "lumi.light.agl001"
+            "lumi.light.agl001",
+            "lumi.light.agl003",
+            "lumi.light.agl005"
           ],
           "calculation_strategy": "lut",
           "created_at": "2026-02-16T06:45:36Z",
           "device_type": "light",
           "device_specs": {
-            "socket": "E26",
+            "socket": [
+              "E26",
+              "E27",
+              "GU10"
+            ],
             "form_factor": "bulb",
             "lumens": 1100,
             "rated_power": 10.5,
@@ -1529,7 +1537,9 @@
             ]
           },
           "gtin": [
-            "6975833357055"
+            "6975833357055",
+            "6975833357079",
+            "6975833357093"
           ],
           "measure_description": "Measured with utils/measure script",
           "measure_device": "Shelly Plug US Gen4",
@@ -1543,7 +1553,7 @@
           "legacy_ids": [
             "LB01D"
           ],
-          "name": "LED Bulb T2 (E26, RGB CCT)",
+          "name": "LED Bulb T2 (various, RGB CCT)",
           "product_url": "https://us.aqara.com/products/led-bulb-t2-e26",
           "standby_power": 0.14,
           "authors": [
@@ -1555,7 +1565,7 @@
           ],
           "id": "LB-L01D",
           "manufacturer": "aqara",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-11-19T09:34:51",
           "max_power": 10.54,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -1571,7 +1581,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "4a438dcef904c19f9bbf1797fdf79588"
+          "hash": "1b55f218def2fcf978bd116766b72e51"
         },
         {
           "aliases": [
