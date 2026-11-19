@@ -1,0 +1,43 @@
+{
+  "name": "Mi Air Purifier 3C",
+  "aliases": [
+    "zhimi.airpurifier.mb4"
+  ],
+  "device_type": "fan",
+  "calculation_strategy": "linear",
+  "linear_config": {
+    "calibrate": [
+      "5 -> 1.9",
+      "10 -> 2.2",
+      "15 -> 2.8",
+      "20 -> 3.1",
+      "30 -> 4.2",
+      "40 -> 6.1",
+      "50 -> 8.4",
+      "60 -> 12.0",
+      "70 -> 16.7",
+      "80 -> 21.7",
+      "90 -> 28.3",
+      "100 -> 36.6"
+    ]
+  },
+  "device_specs": {
+    "form_factor": "air_purifier",
+    "connectivity": [
+      "wifi"
+    ],
+    "rated_power": 36.6
+  },
+  "measure_method": "manual",
+  "measure_device": "IKEA GRILLPLATS smart plug",
+  "measure_description": "Measured in favorite mode with an IKEA GRILLPLATS Matter plug read through a Home Assistant power sensor (0.1 W resolution). Fan speed was set in 5-10 % steps; each value is the stable power draw at that speed (5 % = 392 rpm, 100 % = 2204 rpm). Display and LED were left in their default state.",
+  "standby_power": 1.0,
+  "mains_voltage": 230,
+  "created_at": "2026-11-19T12:00:00Z",
+  "authors": [
+    {
+      "name": "Timo Wiese",
+      "github": "herrniffler"
+    }
+  ]
+}
