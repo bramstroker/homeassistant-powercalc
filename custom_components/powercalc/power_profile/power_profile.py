@@ -305,6 +305,10 @@ class PowerProfile:
         """Get configuration to set up playbook strategy."""
         return self.get_strategy_config(CalculationStrategy.PLAYBOOK)
 
+    @property
+    def battery_rate_config(self) -> ConfigType | None:
+        return self.get_strategy_config(CalculationStrategy.BATTERY_RATE)
+
     def get_strategy_config(self, strategy: CalculationStrategy) -> ConfigType | None:
         """Get configuration for a certain strategy."""
         if not self.is_strategy_supported(strategy):

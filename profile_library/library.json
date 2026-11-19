@@ -8435,6 +8435,42 @@
           "hash": "ef0554bdfe130ed4d9b82e9b584c83be"
         },
         {
+          "authors": [
+            {
+              "github": "Trilliard",
+              "name": "Trilliard"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-18T11:29:38Z",
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plug M Gen3",
+          "measure_device_firmware": "2.2.0",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "COB LED Strip Light 2 3m",
+          "product_url": "https://eu.govee.com/de-de/products/govee-cob-strip-light-2?variant=53625378799800",
+          "standby_power": 0.3,
+          "voltage_range": {
+            "max": 227.1,
+            "min": 223.2
+          },
+          "id": "H1AB1",
+          "manufacturer": "govee",
+          "updated_at": "2026-11-18T21:00:07",
+          "max_power": 0,
+          "sub_profile_count": 0,
+          "hash": "46f37b5be292cb15df527c1d2a2c3d75"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2025-12-20T22:56:04Z",
           "device_type": "light",
@@ -8772,6 +8808,57 @@
             "color_temp": 99.0
           },
           "hash": "7b740713dd58e87d6254bd274b743738"
+        },
+        {
+          "authors": [
+            {
+              "email": "little.ink3931@joosten.co",
+              "github": "svache",
+              "name": "J. Joosten"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-17T21:34:58Z",
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Kasa EP25",
+          "measure_device_firmware": "1.4.1 Build 260924 Rel. 202741",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "RGBIC Cube Wall Sconces",
+          "product_url": "https://us.govee.com/products/govee-rgbic-cube-wall-sconces",
+          "standby_power": 0.6,
+          "voltage_range": {
+            "max": 120.2,
+            "min": 117.5
+          },
+          "id": "H6088",
+          "manufacturer": "govee",
+          "updated_at": "2026-11-18T20:24:29",
+          "max_power": 26.5,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-18T20:24:29",
+          "power_range": {
+            "min": 1.1,
+            "max": 26.5
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 32.2,
+            "color_temp": 32.2
+          },
+          "hash": "099ac5070760fbc33881d26d4a03f4d3"
         },
         {
           "calculation_strategy": "lut",
@@ -10012,6 +10099,63 @@
             "hs"
           ],
           "hash": "9c6d1466e4f765a541f24aef7994f206"
+        },
+        {
+          "authors": [
+            {
+              "github": "jan-brinkmann",
+              "name": "Jan Brinkmann"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-07T14:28:52Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plug S",
+          "measure_device_firmware": "1.7.6",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "TRADFRI LED driver, 10 w (ICPSHC24-10EU-IL-1)",
+          "standby_power": 0.1,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 235.9,
+            "min": 233.2
+          },
+          "aliases": [
+            "TRADFRI LED driver, 10 w",
+            "ICPSHC24-10EU-IL-1/ICPSHC24-10EU-IL-2"
+          ],
+          "id": "ICPSHC24-10EU-IL-1",
+          "manufacturer": "ikea",
+          "updated_at": "2026-11-18T20:25:03",
+          "max_power": 5.9,
+          "sub_profile_count": 1,
+          "measurement_updated_at": "2026-11-11T18:28:53",
+          "power_range": {
+            "min": 0.53,
+            "max": 5.9
+          },
+          "color_modes": [
+            "brightness"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "brightness": 98.8
+          },
+          "hash": "66be4f06a9f5201966fae3c4400a6919"
         },
         {
           "aliases": [
@@ -40176,6 +40320,60 @@
             "color_temp": 99.5
           },
           "hash": "630c8403640b8616f6dc4c7f4e499202"
+        },
+        {
+          "authors": [
+            {
+              "github": "akashihi",
+              "name": "akashihi"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-15T21:09:26Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Power Strip 4 Gen4",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "Smart Color Bulb ZL4",
+          "standby_power": 0.33,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 234.6,
+            "min": 227.9
+          },
+          "id": "3RCB02070Z",
+          "manufacturer": "third reality",
+          "updated_at": "2026-11-18T09:52:32",
+          "max_power": 10.5,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-18T09:43:01",
+          "power_range": {
+            "min": 1.9,
+            "max": 10.5
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
+          "hash": "34fb61e05204c399b21faff6baa17312"
         }
       ],
       "device_types": [
