@@ -1,0 +1,41 @@
+{
+  "aliases": [
+    "AIDOT Air Purifier P200S-GREY Matter"
+  ],
+  "authors": [
+    {
+      "github": "Lumparland",
+      "name": "Lumparland"
+    }
+  ],
+  "calculation_strategy": "fixed",
+  "created_at": "2026-11-19T16:35:19Z",
+  "device_type": "air_purifier",
+  "fixed_config": {
+    "states_power": {
+      "percentage|100": 45.8,
+      "percentage|33": 3.6,
+      "percentage|66": 19.2
+    }
+  },
+  "gtin": [
+    "0710638776689"
+  ],
+  "mains_voltage": 120,
+  "measure_description": "Measured with Powercalc Measure\n\nMeasured with display and lights on",
+  "measure_device": "Shelly Plug US Gen4",
+  "measure_device_firmware": "Firmware: 2.2.0",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.3:app"
+  },
+  "name": "WELOV Air Purifier P200S-GREY",
+  "product_url": "https://welovhome.com/welov-air-purifier-p200s.html",
+  "voltage_range": {
+    "max": 124.9,
+    "min": 124.1
+  }
+}
