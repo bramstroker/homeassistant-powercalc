@@ -25037,6 +25037,43 @@
           "hash": "b3a3054e7ab79edb7ea642d897cbf103"
         },
         {
+          "name": "BLU Gateway",
+          "description": "USB-powered gateway that connects Shelly BLU sensors to Wi-Fi",
+          "aliases": [
+            "SNGW-BT01"
+          ],
+          "device_type": "generic_iot",
+          "calculation_strategy": "fixed",
+          "discovery_by": "device",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "bluetooth"
+            ]
+          },
+          "product_url": "https://www.shelly.com/products/shelly-blu-gateway",
+          "measure_method": "manual",
+          "measure_device": "Generic USB power meter",
+          "measure_description": "Measured by hand with an inline USB power meter on the 5 V DC supply: 80 mA at 4.98 V = 0.398 W, rounded to 0.4 W. The meter is unlabelled (its printed model has faded), so the reading is limited to its display resolution. Losses of the USB power supply are not included. Device firmware 1.7.6.",
+          "created_at": "2026-11-17T23:56:00Z",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "SNGW-BT01",
+          "manufacturer": "shelly",
+          "updated_at": "2026-11-19T03:39:34",
+          "max_power": 0.4,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.4,
+            "max": 0.4
+          },
+          "hash": "c48e1acb0fce2e23e8671badb0bd3825"
+        },
+        {
           "aliases": [
             "Shelly Plus Plug S",
             "Shelly Plus Plug S V2",
@@ -38013,6 +38050,60 @@
             "color_temp": 95.6
           },
           "hash": "079773d12a5f55ece781f8a9faa1dbfd"
+        },
+        {
+          "name": "MINI Extreme",
+          "aliases": [
+            "2"
+          ],
+          "device_type": "smart_switch",
+          "calculation_strategy": "fixed",
+          "only_self_usage": false,
+          "device_specs": {
+            "form_factor": "in_wall",
+            "power_monitoring": false,
+            "max_load_watts": 2300,
+            "connectivity": [
+              "wifi",
+              "matter"
+            ]
+          },
+          "gtin": [
+            "6920075740516"
+          ],
+          "product_url": "https://sonoff.tech/products/sonoff-mini-extreme-wi-fi-smart-switch-matter-enabled",
+          "mains_voltage": 230,
+          "standby_power": 0.332,
+          "standby_power_on": 0.7,
+          "measure_method": "script",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_device_firmware": "2.0.1",
+          "measure_description": "Measured with the Powercalc Measure app (smart switch mode), 3 cycles of 12 samples per relay state on a Shelly Plug S Gen3. A 34.06 W dummy load (1591.7 Ohm) keeps the meter in range and is subtracted per sample by the measurement tool, so both values are the switch's own consumption. The device has no power monitoring, so no appliance load was connected.",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 34.06,
+            "DUMMY_LOAD_RESISTANCE": 1591.7,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "created_at": "2026-11-17T15:42:59Z",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "MINIR4M",
+          "manufacturer": "sonoff",
+          "updated_at": "2026-11-19T02:57:48",
+          "max_power": 0.7,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.332,
+            "max": 0.7
+          },
+          "hash": "942c3736751852e2e3f0e9b3d3ebcc80"
         },
         {
           "calculation_strategy": "composite",
