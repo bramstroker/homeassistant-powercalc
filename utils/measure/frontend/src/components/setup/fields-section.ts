@@ -122,13 +122,11 @@ export class SetupFieldsSection extends LitElement {
         <div class="field-with-help">
           <div class="grid profile-grid ${definition.measure_type === "light" ? "light-grid" : ""}">
             ${fields.filter((field) => field.control !== "multi_select").map((field) => this.renderField(field))}
-            ${this.dummyController || !definition.fields.some((field) => field.role === "controller")
-              ? textField("session_name", "Session name (optional)", {
-                  value: this.request?.session_name ?? "",
-                  placeholder: "e.g. Desk lamp test",
-                  hint: "A label for finding this measurement later; it is not the product name.",
-                })
-              : nothing}
+            ${textField("session_name", "Session name (optional)", {
+              value: this.request?.session_name ?? "",
+              placeholder: "e.g. Desk lamp test",
+              hint: "A label for finding this measurement later; it is not the product name.",
+            })}
           </div>
           ${definition.measure_type === "light" && !this.dummyController
             ? this.contextHelp("Light not found?", html`<p>${LIGHT_DISCOVERY_HINT}</p>`, "discovery-help")
