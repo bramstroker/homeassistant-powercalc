@@ -63,6 +63,7 @@ from custom_components.powercalc.const import (
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_STANDBY_POWER,
     CONF_IGNORE_UNAVAILABLE_STATE,
+    CONF_LINEAR,
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
@@ -151,18 +152,25 @@ async def create_virtual_power_sensor(
             if CONF_CALCULATION_ENABLED_CONDITION not in sensor_config and power_profile.calculation_enabled_condition:
                 sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = power_profile.calculation_enabled_condition
 
-            if (
-                config_entry
-                and await power_profile.requires_manual_sub_profile_selection
-                and "/" not in sensor_config.get(CONF_MODEL, "")
-            ):
-                async_create_config_entry_issue(
-                    hass,
-                    config_entry,
-                    f"sub_profile_{config_entry.entry_id}",
-                    translation_key="sub_profile",
-                    translation_placeholders={"entry": config_entry.title},
-                )
+        strategy = detect_calculation_strategy(sensor_config, power_profile)
+        if (
+            power_profile
+            and config_entry
+            and await power_profile.requires_manual_sub_profile_selection
+            and "/" not in sensor_config.get(CONF_MODEL, "")
+            and not (
+                power_profile.allows_manual_power
+                and strategy == CalculationStrategy.LINEAR
+                and CONF_LINEAR in sensor_config
+            )
+        ):
+            async_create_config_entry_issue(
+                hass,
+                config_entry,
+                f"sub_profile_{config_entry.entry_id}",
+                translation_key="sub_profile",
+                translation_placeholders={"entry": config_entry.title},
+            )
 
         name = generate_power_sensor_name(
             sensor_config,
@@ -177,7 +185,6 @@ async def create_virtual_power_sensor(
             unique_id=unique_id,
         )
         entity_category: str | None = sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
-        strategy = detect_calculation_strategy(sensor_config, power_profile)
         calculation_strategy_factory = PowerCalculatorStrategyFactory.get_instance(hass)
 
         standby_power, standby_power_on = _get_standby_power(hass, sensor_config, power_profile)
@@ -926,6 +933,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             not self._power_profile
             or not await self._power_profile.has_sub_profiles
             or self._power_profile.sub_profile_select
+            or (self._power_profile.allows_manual_power and self._calculation_strategy != CalculationStrategy.LUT)
         ):
             raise ServiceValidationError(
                 translation_domain=DOMAIN,

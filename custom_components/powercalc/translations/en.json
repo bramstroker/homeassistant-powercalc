@@ -4,6 +4,8 @@
     "source_device": "Source device",
     "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
     "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light",
+    "manual_dimmer_power": "Other lights (enter power manually)",
+    "manual_dimmer_power_remarks": "Enter the power of the connected lights at minimum and maximum brightness, excluding the driver's own consumption. Leave all fields blank to track only the driver's own consumption.",
     "view_measurement_details": "View measurement details"
   },
   "config": {
@@ -371,7 +373,7 @@
           "attribute": "Specify the attribute. When left empty will be brightness for lights, volume for speakers, and percentage for fans",
           "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
         },
-        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.",
+        "description": "Define the linear power calculation options. See the [documentation]({docs_uri}) for more information. Use either min/max power or calibration values which allows for more points of control.{manual_dimmer_power_remarks}",
         "title": "Linear config"
       },
       "manufacturer": {
@@ -1053,6 +1055,7 @@
       },
       "linear": {
         "title": "Linear options",
+        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Attribute",
           "calibrate": "Calibration values",

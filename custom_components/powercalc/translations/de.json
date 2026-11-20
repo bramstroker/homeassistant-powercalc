@@ -4,6 +4,8 @@
     "source_device": "Quell-Gerät",
     "remarks_smart_switch": "Dieses Profil liefert nur Werte für die Standby-Leistung. \n Wenn Sie ein Gerät haben, das beim Einschalten eine bestimmte Menge an Strom verbraucht, können Sie diesen Wert im nächsten Schritt des Konfigurationsablaufs angeben",
     "remarks_smart_dimmer": "Dieses Profil bietet nur Standby-Leistungswerte. \n Im nächsten Schritt können Sie optional die Werte der angeschlossenen Lampe angeben",
+    "manual_dimmer_power": "Andere Leuchten (Leistung manuell eingeben)",
+    "manual_dimmer_power_remarks": "Gib die Leistung der angeschlossenen Leuchten bei minimaler und maximaler Helligkeit ohne den Eigenverbrauch des LED-Treibers ein. Lass alle Felder leer, um nur den Eigenverbrauch des LED-Treibers zu erfassen.",
     "view_measurement_details": "Messdetails anzeigen"
   },
   "config": {
@@ -371,7 +373,7 @@
           "attribute": "Gib das Attribut an. Wenn es leer bleibt, wird für Lichter brightness, für Lautsprecher volume und für Ventilatoren percentage verwendet",
           "calibrate": "Geben Sie in jeder Zeile einen Kalibrierungswert an. Beispiel\n\n1: 20"
         },
-        "description": "Definiere die Optionen für die lineare Leistungsberechnung. Weitere Informationen findest du in der [Dokumentation]({docs_uri}). Verwende entweder Min-/Max-Leistung oder Kalibrierungswerte, wodurch mehr Kontrollpunkte möglich sind.",
+        "description": "Definiere die Optionen für die lineare Leistungsberechnung. Weitere Informationen findest du in der [Dokumentation]({docs_uri}). Verwende entweder Min-/Max-Leistung oder Kalibrierungswerte, wodurch mehr Kontrollpunkte möglich sind.{manual_dimmer_power_remarks}",
         "title": "Linear Konfiguration"
       },
       "manufacturer": {
@@ -1053,6 +1055,7 @@
       },
       "linear": {
         "title": "Lineare Optionen",
+        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Attribut",
           "calibrate": "Kalibrierungswerte",

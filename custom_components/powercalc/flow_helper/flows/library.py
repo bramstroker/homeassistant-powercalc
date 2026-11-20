@@ -10,6 +10,7 @@ from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
     CONF_FIXED,
+    CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -29,6 +30,7 @@ from custom_components.powercalc.discovery import (
 from custom_components.powercalc.flow_helper.common import FlowType, PowercalcFormStep, Step
 from custom_components.powercalc.flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from custom_components.powercalc.flow_helper.schema import (
+    MANUAL_POWER_OPTION,
     SCHEMA_ENERGY_SENSOR_TOGGLE,
     SCHEMA_STANDBY_ENERGY_SENSOR_TOGGLE,
     SCHEMA_UTILITY_METER_TOGGLE,
@@ -142,6 +144,16 @@ class LibraryFlow:
                 self.flow.source_entity,
                 process_variables=False,
             )
+            previous_profile = self.flow.selected_profile
+            if (
+                previous_profile
+                and previous_profile.allows_manual_power
+                and previous_profile.unique_id != profile.unique_id
+            ):
+                self.flow.sensor_config.pop(CONF_LINEAR, None)
+                self.flow.sensor_config.pop(CONF_MODE, None)
+                self.flow.strategy = profile.calculation_strategy
+                self.flow.selected_sub_profile = None
             self.flow.selected_profile = profile
             if self.flow.selected_profile and not await self.flow.selected_profile.needs_user_configuration:
                 try:
@@ -355,9 +367,18 @@ class LibraryFlow:
 
         async def _validate(user_input: dict[str, Any]) -> dict[str, str]:
             sub_profile = str(user_input[CONF_SUB_PROFILE])
-            await profile.select_sub_profile(sub_profile)
+            model = profile.model
+            if sub_profile != MANUAL_POWER_OPTION or not allows_manual_power:
+                await profile.select_sub_profile(sub_profile)
+                model = f"{model}/{sub_profile}"
+
+            if allows_manual_power:
+                self.flow.strategy = profile.calculation_strategy
+                self.flow.sensor_config[CONF_MODE] = profile.calculation_strategy
+                if profile.calculation_strategy == CalculationStrategy.LUT:
+                    self.flow.sensor_config.pop(CONF_LINEAR, None)
             self.flow.selected_profile = profile
-            return {CONF_MODEL: f"{profile.model}/{sub_profile}"}
+            return {CONF_MODEL: model}
 
         library = await ProfileLibrary.factory(self.flow.hass)
         profile = await library.get_profile(
@@ -368,6 +389,17 @@ class LibraryFlow:
             self.flow.source_entity,
             process_variables=False,
         )
+        allows_manual_power = profile.allows_manual_power and profile.needs_linear_config
+        manual_power_label = None
+        if allows_manual_power:
+            translations = await translation.async_get_translations(
+                self.flow.hass,
+                self.flow.hass.config.language,
+                "common",
+                integrations={DOMAIN},
+            )
+            manual_power_label = translations["component.powercalc.common.manual_dimmer_power"]
+
         remarks = profile.config_flow_sub_profile_remarks
         if remarks:
             remarks = "\n\n" + remarks
@@ -381,7 +413,7 @@ class LibraryFlow:
         return await self.flow.handle_form_step(
             PowercalcFormStep(
                 step=step,
-                schema=await build_sub_profile_schema(profile, self.flow.selected_sub_profile),
+                schema=await build_sub_profile_schema(profile, self.flow.selected_sub_profile, manual_power_label),
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_validate,
                 form_kwarg={
@@ -717,12 +749,14 @@ class LibraryOptionsFlow(LibraryFlow):
     async def async_step_library_options(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the basic options flow."""
         self.flow.is_library_flow = True
-        self.flow.selected_sub_profile = self.flow.selected_profile.sub_profile  # type: ignore
+        profile = self.flow.selected_profile
+        assert profile is not None
+        self.flow.selected_sub_profile = profile.sub_profile
+        if profile.allows_manual_power and profile.sub_profile is None:
+            self.flow.selected_sub_profile = MANUAL_POWER_OPTION
         if user_input is not None:
             return await self.async_step_manufacturer()
 
-        profile = self.flow.selected_profile
-        assert profile is not None
         return self.flow.async_show_form(
             step_id=Step.LIBRARY_OPTIONS,
             description_placeholders={

@@ -4,6 +4,8 @@
     "source_device": "Urządzenie źródłowe",
     "remarks_smart_switch": "Ten profil dostarcza tylko wartości poboru mocy w trybie czuwania. \n Gdy masz urządzenie, które zużywa stałą ilość energii po włączeniu, możesz podać tę wartość w następnym kroku przepływu konfiguracji",
     "remarks_smart_dimmer": "Ten profil dostarcza tylko wartości poboru mocy w trybie czuwania. \n W następnym kroku możesz opcjonalnie podać wartości dla podłączonego światła",
+    "manual_dimmer_power": "Inne oświetlenie (wprowadź moc ręcznie)",
+    "manual_dimmer_power_remarks": "Podaj moc podłączonego oświetlenia przy minimalnej i maksymalnej jasności, z pominięciem zużycia energii przez sam zasilacz. Pozostaw wszystkie pola puste, aby monitorować tylko zużycie energii przez zasilacz.",
     "view_measurement_details": "Zobacz szczegóły pomiaru"
   },
   "config": {
@@ -371,7 +373,7 @@
           "attribute": "Określ Atrybut. Gdy pole pozostanie puste, będzie to jasność dla świateł i procent dla wentylatorów",
           "calibrate": "Umieść wartość kalibracji w każdym wierszu. Przykład\n\n1: 20"
         },
-        "description": "Zdefiniuj opcje obliczania mocy liniowej. Więcej informacji można znaleźć w [dokumentacji]({docs_uri}). Użyj mocy minimalnej/maksymalnej lub wartości kalibracji, co pozwala na więcej punktów kontroli.",
+        "description": "Zdefiniuj opcje obliczania mocy liniowej. Więcej informacji można znaleźć w [dokumentacji]({docs_uri}). Użyj mocy minimalnej/maksymalnej lub wartości kalibracji, co pozwala na więcej punktów kontroli.{manual_dimmer_power_remarks}",
         "title": "Konfiguracja liniowa"
       },
       "manufacturer": {
@@ -1053,6 +1055,7 @@
       },
       "linear": {
         "title": "Opcje liniowe",
+        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Atrybut",
           "calibrate": "Wartości kalibracji",

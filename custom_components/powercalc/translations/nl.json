@@ -4,6 +4,8 @@
     "source_device": "Bron apparaat",
     "remarks_smart_switch": "Dit profiel biedt alleen stand-by stroomwaarden. \n Wanneer je een apparaat hebt dat een vaste hoeveelheid stroom verbruikt wanneer het is ingeschakeld, kunt u die waarde opgeven in de volgende stap van de configuratie flow",
     "remarks_smart_dimmer": "Dit profiel biedt alleen waarden voor standby vermogen. \n In de volgende stap kunt u optioneel de waarden van het aangesloten licht opgeven",
+    "manual_dimmer_power": "Andere verlichting (vermogen zelf invullen)",
+    "manual_dimmer_power_remarks": "Vul het vermogen van de aangesloten verlichting in bij de laagste en hoogste helderheid, zonder het eigen verbruik van de driver. Laat alle velden leeg om alleen het eigen verbruik van de driver bij te houden.",
     "view_measurement_details": "Meetdetails bekijken"
   },
   "config": {
@@ -371,7 +373,7 @@
           "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
           "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20"
         },
-        "description": "Definieer de lineaire vermogensberekeningsopties. Zie de [documentatie]({docs_uri}) voor meer informatie. Gebruik min/max vermogen of kalibratiewaarden die meer controlepunten mogelijk maken.",
+        "description": "Definieer de lineaire vermogensberekeningsopties. Zie de [documentatie]({docs_uri}) voor meer informatie. Gebruik min/max vermogen of kalibratiewaarden die meer controlepunten mogelijk maken.{manual_dimmer_power_remarks}",
         "title": "Lineaire configuratie"
       },
       "manufacturer": {
@@ -1053,6 +1055,7 @@
       },
       "linear": {
         "title": "Lineaire opties",
+        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Attribuut",
           "calibrate": "Kalibratie waardes",

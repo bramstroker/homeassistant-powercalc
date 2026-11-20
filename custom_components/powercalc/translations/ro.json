@@ -4,6 +4,8 @@
     "source_device": "Dispozitiv sursă",
     "remarks_smart_switch": "Acest profil furnizează doar valorile puterii de așteptare. \n Când aveți un aparat care consumă o cantitate fixă ​​de energie atunci când este pornit, puteți furniza acea valoare în următorul pas al fluxului de configurare",
     "remarks_smart_dimmer": "Acest profil furnizează doar valorile puterii de așteptare. \n În pasul următor puteți furniza opțional valorile luminii conectate",
+    "manual_dimmer_power": "Alte lumini (introduceți manual puterea)",
+    "manual_dimmer_power_remarks": "Introduceți puterea luminilor conectate la luminozitatea minimă și maximă, fără consumul propriu al driverului. Lăsați toate câmpurile necompletate pentru a monitoriza doar consumul propriu al driverului.",
     "view_measurement_details": "Vedeți detaliile măsurătorii"
   },
   "config": {
@@ -371,7 +373,7 @@
           "attribute": "Specificați atributul. Când este lăsat gol, va fi luminozitate pentru lumini și procent pentru ventilatoare",
           "calibrate": "Pune o valoare de calibrare pe fiecare linie. Exemplu\n\n1: 20"
         },
-        "description": "Definiți opțiunile de calcul al puterii liniare. Consultați [documentația]({docs_uri}) pentru mai multe informații. Utilizați fie puterea min/max, fie valorile de calibrare, care permite mai multe puncte de control.",
+        "description": "Definiți opțiunile de calcul al puterii liniare. Consultați [documentația]({docs_uri}) pentru mai multe informații. Utilizați fie puterea min/max, fie valorile de calibrare, care permite mai multe puncte de control.{manual_dimmer_power_remarks}",
         "title": "Configurație liniară"
       },
       "manufacturer": {
@@ -1053,6 +1055,7 @@
       },
       "linear": {
         "title": "Opțiuni liniare",
+        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Atribut",
           "calibrate": "Valori de calibrare",

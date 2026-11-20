@@ -4,6 +4,8 @@
     "source_device": "Kildeenhed",
     "remarks_smart_switch": "Denne profil indeholder kun effektværdier for standby. \n Hvis du har et apparat, der bruger en fast mængde effekt, når det er tændt, kan du angive denne værdi i næste trin i konfigurationsforløbet",
     "remarks_smart_dimmer": "Denne profil indeholder kun effektværdier for standby. \n I næste trin kan du valgfrit angive værdierne for det tilsluttede lys",
+    "manual_dimmer_power": "Andre lyskilder (indtast effekt manuelt)",
+    "manual_dimmer_power_remarks": "Indtast effekten for de tilsluttede lyskilder ved laveste og højeste lysstyrke uden driverens eget forbrug. Lad alle felter være tomme for kun at registrere driverens eget forbrug.",
     "view_measurement_details": "Se måledetaljer"
   },
   "config": {
@@ -371,7 +373,7 @@
           "attribute": "Angiv attributten. Når det er tomt, vil lysstyrke for lys, lydstyrke for højttalere og procent for fans være",
           "calibrate": "Sæt en kalibreringsværdi på hver linje. Eksempel\n\n1:20"
         },
-        "description": "Definer mulighederne for lineær effektberegning. Se [dokumentationen]({docs_uri}) for mere information. Brug enten min/max effekt eller kalibreringsværdier, som giver mulighed for flere kontrolpunkter.",
+        "description": "Definer mulighederne for lineær effektberegning. Se [dokumentationen]({docs_uri}) for mere information. Brug enten min/max effekt eller kalibreringsværdier, som giver mulighed for flere kontrolpunkter.{manual_dimmer_power_remarks}",
         "title": "Lineær konfiguration"
       },
       "manufacturer": {
@@ -1053,6 +1055,7 @@
       },
       "linear": {
         "title": "Lineære indstillinger",
+        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Attribut",
           "calibrate": "Kalibreringsværdier",

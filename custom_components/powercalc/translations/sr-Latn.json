@@ -4,6 +4,8 @@
     "source_device": "Izvorni uređaj",
     "remarks_smart_switch": "Ovaj profil pruža samo vrednosti potrošnje u stanju pripravnosti. \n Kada imate uređaj koji troši fiksnu količinu energije dok je uključen, tu vrednost možete uneti u sledećem koraku konfiguracije",
     "remarks_smart_dimmer": "Ovaj profil pruža samo vrednosti potrošnje u stanju pripravnosti. \n U sledećem koraku opciono možete uneti vrednosti povezanog svetla",
+    "manual_dimmer_power": "Druga rasveta (ručno unesite snagu)",
+    "manual_dimmer_power_remarks": "Unesite snagu priključene rasvete pri najmanjoj i najvećoj osvetljenosti, bez sopstvene potrošnje LED drajvera. Ostavite sva polja prazna da biste pratili samo potrošnju LED drajvera.",
     "view_measurement_details": "Prikaži detalje merenja"
   },
   "config": {
@@ -371,7 +373,7 @@
           "attribute": "Navedite atribut. Ako ostane prazno, biće osvetljenost za svetla, jačina zvuka za zvučnike i procenat za ventilatore",
           "calibrate": "Unesite po jednu vrednost kalibracije u svaki red. Primer\n\n1: 20"
         },
-        "description": "Definišite opcije linearnog izračunavanja snage. Pogledajte [dokumentaciju]({docs_uri}) za više informacija. Koristite ili min/maks snagu ili vrednosti kalibracije koje omogućavaju više kontrolnih tačaka.",
+        "description": "Definišite opcije linearnog izračunavanja snage. Pogledajte [dokumentaciju]({docs_uri}) za više informacija. Koristite ili min/maks snagu ili vrednosti kalibracije koje omogućavaju više kontrolnih tačaka.{manual_dimmer_power_remarks}",
         "title": "Linearna konfiguracija"
       },
       "manufacturer": {
@@ -1053,6 +1055,7 @@
       },
       "linear": {
         "title": "Linearne opcije",
+        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Atribut",
           "calibrate": "Vrednosti kalibracije",

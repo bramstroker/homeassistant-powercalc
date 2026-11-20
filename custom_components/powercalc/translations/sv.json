@@ -4,6 +4,8 @@
     "source_device": "Källenhet",
     "remarks_smart_switch": "Denna profil visar endast effekt i standby-läge. \n Har du apparater som förbrukar ett fast effekt-värde när de är påslagna, kan du ange detta värde i nästa steg",
     "remarks_smart_dimmer": "Den här profilen ger endast standby-effektvärden. \n I nästa steg kan du ange värden för det anslutna ljuset som tillval",
+    "manual_dimmer_power": "Andra ljuskällor (ange effekt manuellt)",
+    "manual_dimmer_power_remarks": "Ange effekten för de anslutna ljuskällorna vid lägsta och högsta ljusstyrka, utan drivdonets egenförbrukning. Lämna alla fält tomma för att bara följa drivdonets egenförbrukning.",
     "view_measurement_details": "Visa mätdetaljer"
   },
   "config": {
@@ -371,7 +373,7 @@
           "attribute": "Ange attributet. Om tomt används ljusstyrka för lampor och procent för fläktar",
           "calibrate": "Skriv ett kalibreringsvärde per rad. Exempel\n\n1: 20"
         },
-        "description": "Definiera alternativen för linjär effektberäkning. Se [dokumentationen]({docs_uri}) för mer information. Använd antingen min/max effekt eller kalibreringsvärden som möjliggör fler kontrollpunkter.",
+        "description": "Definiera alternativen för linjär effektberäkning. Se [dokumentationen]({docs_uri}) för mer information. Använd antingen min/max effekt eller kalibreringsvärden som möjliggör fler kontrollpunkter.{manual_dimmer_power_remarks}",
         "title": "Linjär konfiguration"
       },
       "manufacturer": {
@@ -1053,6 +1055,7 @@
       },
       "linear": {
         "title": "Linjära alternativ",
+        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Attribut",
           "calibrate": "Kalibreringsvärde",
