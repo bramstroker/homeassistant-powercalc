@@ -1,0 +1,35 @@
+{
+  "name": "Wall Display XL",
+  "aliases": [
+    "Shelly Wall Display XL"
+  ],
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": 3.84
+  },
+  "standby_power": 3.74,
+  "measure_method": "script",
+  "measure_device": "Nous A1T",
+  "measure_description": "Average measurement over 50 samples (5 min). Display set to auto-brightness with 10s screen-off timeout. 3.74 W with relay off, 3.84 W with relay on (no load connected).",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 5,
+    "VERSION": "v1.20.9:docker"
+  },
+  "device_specs": {
+    "form_factor": "other",
+    "power_monitoring": false,
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
+  },
+  "created_at": "2026-03-25T14:20:22Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
