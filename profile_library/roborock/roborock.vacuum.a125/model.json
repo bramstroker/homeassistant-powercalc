@@ -1,0 +1,106 @@
+{
+  "authors": [
+    {
+      "github": "wagnerpizza",
+      "name": "wagnerpizza"
+    }
+  ],
+  "calculation_strategy": "composite",
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+          "state": [
+            "on"
+          ]
+        },
+        "fixed": {
+          "power": 836.27
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "charging"
+              ]
+            },
+            {
+              "condition": "template",
+              "value_template": "{{ states('[[entity_by_device_class:battery]]') is not boolean and 0 <= (states('[[entity_by_device_class:battery]]') | float(-1)) <= 100 and 74 <= (states('[[entity_by_device_class:battery]]') | float(-1) | int) <= 100 }}"
+            }
+          ]
+        },
+        "entity_id": "[[entity_by_device_class:battery]]",
+        "linear": {
+          "calibrate": [
+            "74 -> 21.9",
+            "77 -> 22.1",
+            "82 -> 22.3",
+            "87 -> 22.55",
+            "92 -> 22.8",
+            "98 -> 22.9",
+            "100 -> 3.5"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:dust_emptying]]",
+              "state": [
+                "off"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:status]]",
+              "state": [
+                "cleaning",
+                "returning_home",
+                "segment_cleaning"
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 0.47
+        }
+      }
+    ]
+  },
+  "created_at": "2026-11-02T08:52:32Z",
+  "device_type": "vacuum_robot",
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plus Plug S Gen2",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 1.0,
+    "VERSION": "v0.14.1:app"
+  },
+  "name": "Q5 Pro+",
+  "voltage_range": {
+    "max": 239.1,
+    "min": 230.6
+  }
+}
