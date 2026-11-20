@@ -1,0 +1,57 @@
+{
+  "authors": [
+    {
+      "github": "wagnerpizza",
+      "name": "wagnerpizza"
+    }
+  ],
+  "calculation_strategy": "composite",
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity]]",
+          "state": [
+            "docked"
+          ]
+        },
+        "fixed": {
+          "power": 13.63
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity]]",
+          "state": [
+            "cleaning",
+            "returning"
+          ]
+        },
+        "fixed": {
+          "power": 0.28
+        }
+      }
+    ]
+  },
+  "created_at": "2026-11-01T17:45:41Z",
+  "device_type": "vacuum_robot",
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 1.0,
+    "VERSION": "v0.14.1:app"
+  },
+  "name": "Roomba 960",
+  "standby_power": 3.0,
+  "voltage_range": {
+    "max": 237.9,
+    "min": 230.2
+  }
+}
