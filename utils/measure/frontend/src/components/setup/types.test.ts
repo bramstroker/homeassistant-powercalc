@@ -246,7 +246,7 @@ describe("setup type picker", () => {
       entities: { fan: [{ entity_id: "fan.bedroom", name: "Bedroom fan", model_id: "FAN-001" }] },
       entityField: "fan_entity_id",
       entityId: "fan.bedroom",
-      expectedFields: ["fan_entity_id"],
+      expectedFields: ["fan_entity_id", "session_name"],
       modelId: "FAN-001",
     },
     {
@@ -269,7 +269,7 @@ describe("setup type picker", () => {
       entities: { media_player: [{ entity_id: "media_player.office", name: "Office speaker", model_id: "SPEAKER-001" }] },
       entityField: "media_player_entity_id",
       entityId: "media_player.office",
-      expectedFields: ["media_player_entity_id", "disable_streaming"],
+      expectedFields: ["media_player_entity_id", "disable_streaming", "session_name"],
       modelId: "SPEAKER-001",
     },
     {
@@ -310,7 +310,7 @@ describe("setup type picker", () => {
       entities: { vacuum: [{ entity_id: "vacuum.downstairs", name: "Downstairs vacuum", model_id: "VAC-001" }] },
       entityField: "charging_entity_id",
       entityId: "vacuum.downstairs",
-      expectedFields: ["charging_device_type", "charging_entity_id"],
+      expectedFields: ["charging_device_type", "charging_entity_id", "session_name"],
       modelId: "VAC-001",
     },
   ])("orders $type fields by dependency and prefills the selected device model ID", async ({
