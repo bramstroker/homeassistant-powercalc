@@ -330,6 +330,10 @@
         }
       ]
     },
+    "allow_manual_power": {
+      "type": "boolean",
+      "description": "Offer manual power input alongside measured subprofiles for a linear smart dimmer."
+    },
     "config_flow_discovery_remarks": {
       "type": "string",
       "description": "Some remarks to show in the GUI config flow on first step of discovery"
