@@ -3,9 +3,7 @@
     "source_entity": "Zdrojová entita",
     "source_device": "Zdrojové zariadenie",
     "remarks_smart_switch": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n Keď máte spotrebič, ktorý po zapnutí spotrebúva pevné množstvo energie, môžete túto hodnotu zadať v ďalšom kroku konfiguračného postupu",
-    "remarks_smart_dimmer": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n V ďalšom kroku môžete voliteľne zadať hodnoty pripojeného svetla",
-    "manual_dimmer_power": "Iné svietidlá (zadať príkon ručne)",
-    "manual_dimmer_power_remarks": "Zadajte príkon pripojených svietidiel pri minimálnom a maximálnom jase bez vlastnej spotreby napájacieho zdroja. Ak chcete sledovať iba vlastnú spotrebu napájacieho zdroja, nechajte všetky polia prázdne.",
+    "remarks_smart_dimmer": "Zadajte príkon pripojených svietidiel pri minimálnom a maximálnom jase bez vlastnej spotreby napájacieho zdroja. Ak chcete sledovať iba vlastnú spotrebu napájacieho zdroja, nechajte všetky polia prázdne.",
     "view_measurement_details": "Zobraziť podrobnosti merania"
   },
   "config": {
@@ -373,7 +371,7 @@
           "attribute": "Zadajte atribút. Keď zostane prázdne, bude jas pre svetlá a percento pre ventilátory",
           "calibrate": "Na každý riadok uveďte kalibračnú hodnotu. Príklad\n\n1: 20"
         },
-        "description": "Definujte možnosti výpočtu lineárneho výkonu. Ďalšie informácie nájdete v [dokumentácii]({docs_uri}). Použite buď minimálny/maximálny výkon alebo kalibračné hodnoty, ktoré umožňujú viac bodov kontroly.{manual_dimmer_power_remarks}",
+        "description": "Definujte možnosti výpočtu lineárneho výkonu. Ďalšie informácie nájdete v [dokumentácii]({docs_uri}). Použite buď minimálny/maximálny výkon alebo kalibračné hodnoty, ktoré umožňujú viac bodov kontroly.",
         "title": "Lineárna konfigurácia"
       },
       "manufacturer": {
@@ -1055,7 +1053,6 @@
       },
       "linear": {
         "title": "lineárne možnosti",
-        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Attribút",
           "calibrate": "Kalibračné hodnoty",

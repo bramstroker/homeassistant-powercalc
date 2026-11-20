@@ -3,9 +3,7 @@
     "source_entity": "Entità sorgente",
     "source_device": "Dispositivo sorgente",
     "remarks_smart_switch": "Questo profilo fornisce solo valori di potenza in standby. Quando hai un dispositivo che consuma una quantità fissa di potenza quando è acceso, puoi fornire quel valore nel passaggio successivo del flusso di configurazione",
-    "remarks_smart_dimmer": "Questo profilo fornisce solo valori di potenza in standby. \n Nel passo successivo è possibile fornire facoltativamente i valori della luce collegata",
-    "manual_dimmer_power": "Altre luci (inserisci la potenza manualmente)",
-    "manual_dimmer_power_remarks": "Inserisci la potenza delle luci collegate alla luminosità minima e massima, escludendo il consumo dell'alimentatore. Lascia tutti i campi vuoti per monitorare solo il consumo dell'alimentatore.",
+    "remarks_smart_dimmer": "Inserisci la potenza delle luci collegate alla luminosità minima e massima, escludendo il consumo dell'alimentatore. Lascia tutti i campi vuoti per monitorare solo il consumo dell'alimentatore.",
     "view_measurement_details": "Visualizza i dettagli della misurazione"
   },
   "config": {
@@ -373,7 +371,7 @@
           "attribute": "Specifica l'attributo. Quando lasciato vuoto sarà luminosità per le luci e percentuale per i ventilatori",
           "calibrate": "Inserire un valore di calibrazione su ogni riga. Esempio\n\n1: 20"
         },
-        "description": "Definire le opzioni di calcolo della potenza lineare. Per ulteriori informazioni, consultare la [documentazione]({docs_uri}). Utilizzare la potenza minima/massima o i valori di calibrazione che consentono più punti di controllo.{manual_dimmer_power_remarks}",
+        "description": "Definire le opzioni di calcolo della potenza lineare. Per ulteriori informazioni, consultare la [documentazione]({docs_uri}). Utilizzare la potenza minima/massima o i valori di calibrazione che consentono più punti di controllo.",
         "title": "Configurazione lineare"
       },
       "manufacturer": {
@@ -1055,7 +1053,6 @@
       },
       "linear": {
         "title": "Opzioni lineari",
-        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Attributo",
           "calibrate": "Valori di calibrazione",

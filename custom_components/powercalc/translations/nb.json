@@ -3,9 +3,7 @@
     "source_entity": "Kildeentitet",
     "source_device": "Kildeenhet",
     "remarks_smart_switch": "Denne profilen inneholder bare effektverdier for standby. \n Hvis du har et apparat med fast effekt når det er slått på, kan du angi denne verdien i neste trinn i konfigurasjonen",
-    "remarks_smart_dimmer": "Denne profilen inneholder bare effektverdier for standby. \n I neste trinn kan du valgfritt oppgi verdiene for det tilkoblede lyset",
-    "manual_dimmer_power": "Andre lyskilder (angi effekt manuelt)",
-    "manual_dimmer_power_remarks": "Angi effekten til de tilkoblede lyskildene ved laveste og høyeste lysstyrke, uten driverens eget forbruk. La alle feltene stå tomme for å registrere bare driverens eget forbruk.",
+    "remarks_smart_dimmer": "Angi effekten til de tilkoblede lyskildene ved laveste og høyeste lysstyrke, uten driverens eget forbruk. La alle feltene stå tomme for å registrere bare driverens eget forbruk.",
     "view_measurement_details": "Vis måledetaljer"
   },
   "config": {
@@ -373,7 +371,7 @@
           "attribute": "Spesifiser attributtet. Når det står tomt, vil lysstyrken for lysene, volum for høyttalerne og prosentandelen for viftene være",
           "calibrate": "Sett en kalibreringsverdi på hver linje. Eksempel\n\n1:20"
         },
-        "description": "Definer alternativene for lineær effektberegning. Se [dokumentasjonen]({docs_uri}) for mer informasjon. Bruk enten min/maks effekt eller kalibreringsverdier som gir mulighet for flere kontrollpunkter.{manual_dimmer_power_remarks}",
+        "description": "Definer alternativene for lineær effektberegning. Se [dokumentasjonen]({docs_uri}) for mer informasjon. Bruk enten min/maks effekt eller kalibreringsverdier som gir mulighet for flere kontrollpunkter.",
         "title": "Lineær konfigurasjon"
       },
       "manufacturer": {
@@ -1055,7 +1053,6 @@
       },
       "linear": {
         "title": "Lineære alternativer",
-        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Attributt",
           "calibrate": "Kalibreringsverdier",

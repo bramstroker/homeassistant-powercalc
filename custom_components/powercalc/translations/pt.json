@@ -3,9 +3,7 @@
     "source_entity": "Entidade de origem",
     "source_device": "Dispositivo de origem",
     "remarks_smart_switch": "Este perfil fornece apenas valores de potência em standby. \n Quando tiver um aparelho que consome uma quantidade fixa de potência quando ligado, pode fornecer esse valor no próximo passo do fluxo de configuração",
-    "remarks_smart_dimmer": "Este perfil fornece apenas valores de potência em standby. \n No próximo passo pode fornecer opcionalmente os valores da luz ligada",
-    "manual_dimmer_power": "Outras luzes (introduzir a potência manualmente)",
-    "manual_dimmer_power_remarks": "Introduza a potência das luzes ligadas com o brilho mínimo e máximo, sem incluir o consumo do controlador. Deixe todos os campos em branco para monitorizar apenas o consumo do controlador.",
+    "remarks_smart_dimmer": "Introduza a potência das luzes ligadas com o brilho mínimo e máximo, sem incluir o consumo do controlador. Deixe todos os campos em branco para monitorizar apenas o consumo do controlador.",
     "view_measurement_details": "Ver detalhes da medição"
   },
   "config": {
@@ -373,7 +371,7 @@
           "attribute": "Especifique o atributo. Quando deixado em branco, será usado brilho para luzes, volume para altifalantes e percentagem para ventoinhas",
           "calibrate": "Coloque um valor de calibração em cada linha. Exemplo\n\n1: 20"
         },
-        "description": "Defina as opções de cálculo linear de potência. Consulte a [documentação]({docs_uri}) para mais informações. Use potência mínima/máxima ou valores de calibração, o que permite mais pontos de controlo.{manual_dimmer_power_remarks}",
+        "description": "Defina as opções de cálculo linear de potência. Consulte a [documentação]({docs_uri}) para mais informações. Use potência mínima/máxima ou valores de calibração, o que permite mais pontos de controlo.",
         "title": "Configuração linear"
       },
       "manufacturer": {
@@ -1055,7 +1053,6 @@
       },
       "linear": {
         "title": "Opções lineares",
-        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Atributo",
           "calibrate": "Valores de calibração",

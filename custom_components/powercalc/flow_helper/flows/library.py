@@ -391,18 +391,25 @@ class LibraryFlow:
         )
         allows_manual_power = profile.allows_manual_power and profile.needs_linear_config
         manual_power_label = None
+        remarks = profile.config_flow_sub_profile_remarks or ""
+        if remarks:
+            remarks = "\n\n" + remarks
+
         if allows_manual_power:
-            translations = await translation.async_get_translations(
+            config_translations = await translation.async_get_translations(
+                self.flow.hass,
+                self.flow.hass.config.language,
+                "config",
+                integrations={DOMAIN},
+            )
+            manual_power_label = config_translations[f"component.{DOMAIN}.config.step.user.menu_options.virtual_power"]
+            common_translations = await translation.async_get_translations(
                 self.flow.hass,
                 self.flow.hass.config.language,
                 "common",
                 integrations={DOMAIN},
             )
-            manual_power_label = translations["component.powercalc.common.manual_dimmer_power"]
-
-        remarks = profile.config_flow_sub_profile_remarks
-        if remarks:
-            remarks = "\n\n" + remarks
+            remarks += f"\n\n{common_translations[f'component.{DOMAIN}.common.remarks_smart_dimmer']}"
 
         step = (
             Step.SUB_PROFILE_PER_DEVICE

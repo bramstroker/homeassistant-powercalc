@@ -14,7 +14,7 @@ from homeassistant.const import (
     Platform,
     UnitOfElectricCurrent,
 )
-from homeassistant.helpers import selector, translation
+from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 
 from custom_components.powercalc.common import create_source_entity
@@ -47,7 +47,6 @@ from custom_components.powercalc.const import (
     CONF_STATES_POWER,
     CONF_UNAVAILABLE_POWER,
     CONF_VALUE,
-    DOMAIN,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
     SensorType,
@@ -220,19 +219,6 @@ class VirtualPowerFlow:
     def __init__(self, flow: PowercalcCommonFlow) -> None:
         self.flow = flow
 
-    async def _manual_dimmer_power_remarks(self) -> str:
-        profile = self.flow.selected_profile
-        if not profile or not profile.allows_manual_power:
-            return ""
-
-        translations = await translation.async_get_translations(
-            self.flow.hass,
-            self.flow.hass.config.language,
-            "common",
-            integrations={DOMAIN},
-        )
-        return "\n\n" + translations["component.powercalc.common.manual_dimmer_power_remarks"]
-
     async def create_strategy_schema(self) -> vol.Schema:
         """Get the config schema for a given power calculation strategy."""
         if not self.flow.strategy:
@@ -370,8 +356,6 @@ class VirtualPowerFlow:
         description_placeholders = {
             "docs_uri": f"https://docs.powercalc.nl/strategies/{strategy.value.replace('_', '-')}/",
         }
-        if strategy == CalculationStrategy.LINEAR:
-            description_placeholders["manual_dimmer_power_remarks"] = await self._manual_dimmer_power_remarks()
 
         form_kwarg: dict[str, Any] = {"description_placeholders": description_placeholders}
         if strategy not in STRATEGIES_WITHOUT_PREVIEW:
@@ -595,13 +579,7 @@ class VirtualPowerOptionsFlow(VirtualPowerFlow):
         if self.flow.strategy:
             merged_options = wrap_strategy_form_data(self.flow.strategy, merged_options)
         schema = fill_schema_defaults(schema, merged_options)
-        form_kwarg: dict[str, Any] = {}
-        if self.flow.strategy not in STRATEGIES_WITHOUT_PREVIEW:
-            form_kwarg["preview"] = PREVIEW_NAME
-        if self.flow.strategy == CalculationStrategy.LINEAR:
-            form_kwarg["description_placeholders"] = {
-                "manual_dimmer_power_remarks": await self._manual_dimmer_power_remarks(),
-            }
+        form_kwarg = {"preview": PREVIEW_NAME} if self.flow.strategy not in STRATEGIES_WITHOUT_PREVIEW else None
         return await self.flow.async_handle_options_step(
             user_input,
             schema,

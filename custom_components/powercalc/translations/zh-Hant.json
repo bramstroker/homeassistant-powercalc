@@ -3,9 +3,7 @@
     "source_entity": "來源實體",
     "source_device": "來源裝置",
     "remarks_smart_switch": "此設定檔僅提供待機功率值。\n 如果您的電器在開啟時會消耗固定功率，可以在設定流程的下一步提供該數值",
-    "remarks_smart_dimmer": "此設定檔僅提供待機功率值。\n 在下一步中，您可以選擇性提供所連接燈具的數值",
-    "manual_dimmer_power": "其他燈具（手動輸入功率）",
-    "manual_dimmer_power_remarks": "輸入所連接燈具在最低和最高亮度時的功率，不計入驅動器本身的耗電。將所有欄位留空，即可只追蹤驅動器本身的耗電。",
+    "remarks_smart_dimmer": "輸入所連接燈具在最低和最高亮度時的功率，不計入驅動器本身的耗電。將所有欄位留空，即可只追蹤驅動器本身的耗電。",
     "view_measurement_details": "檢視量測詳細資訊"
   },
   "config": {
@@ -373,7 +371,7 @@
           "attribute": "指定屬性。若留空，燈光預設為亮度（brightness），喇叭為音量（volume），風扇為百分比（percentage）",
           "calibrate": "每行輸入一個校正值。範例\n\n1: 20"
         },
-        "description": "定義線性功率計算選項。詳細資訊請參閱[說明文件]({docs_uri})。可使用最小／最大功率，或使用可提供更多控制點的校正值。{manual_dimmer_power_remarks}",
+        "description": "定義線性功率計算選項。詳細資訊請參閱[說明文件]({docs_uri})。可使用最小／最大功率，或使用可提供更多控制點的校正值。",
         "title": "線性設定"
       },
       "manufacturer": {
@@ -1055,7 +1053,6 @@
       },
       "linear": {
         "title": "線性選項",
-        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "屬性",
           "calibrate": "校正值",

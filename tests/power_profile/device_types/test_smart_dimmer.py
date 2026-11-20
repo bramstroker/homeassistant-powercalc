@@ -76,13 +76,14 @@ async def test_tradfri_driver_discovery(
     picker = schema.schema[CONF_SUB_PROFILE]
     assert isinstance(picker, SelectSelector)
     assert [option["value"] for option in picker.config["options"]] == [NORRFLY_SUB_PROFILE, MANUAL_POWER_OPTION]
+    assert picker.config["options"][1]["label"] == "Virtual power (manual)"
+    placeholders = result["description_placeholders"]
+    assert placeholders is not None
+    assert "Leave all fields blank" in placeholders["remarks"]
 
     result = await hass.config_entries.flow.async_configure(flow["flow_id"], {CONF_SUB_PROFILE: choice})
     if linear_input is not None:
         assert result["step_id"] == Step.LINEAR
-        placeholders = result["description_placeholders"]
-        assert placeholders is not None
-        assert "Leave all fields blank" in placeholders["manual_dimmer_power_remarks"]
         result = await hass.config_entries.flow.async_configure(flow["flow_id"], linear_input)
 
     assert result["type"] == FlowResultType.CREATE_ENTRY

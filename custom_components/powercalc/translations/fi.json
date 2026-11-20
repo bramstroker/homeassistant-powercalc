@@ -3,9 +3,7 @@
     "source_entity": "Lähde-entiteetti",
     "source_device": "Lähdelaite",
     "remarks_smart_switch": "Tämä profiili sisältää vain valmiustilan tehoarvot. \n Jos laite kuluttaa käynnissä ollessaan kiinteän määrän tehoa, voit antaa arvon määrityksen seuraavassa vaiheessa",
-    "remarks_smart_dimmer": "Tämä profiili sisältää vain valmiustilan tehoarvot. \n Seuraavassa vaiheessa voit halutessasi antaa liitetyn valon arvot",
-    "manual_dimmer_power": "Muut valot (syötä teho käsin)",
-    "manual_dimmer_power_remarks": "Syötä liitettyjen valojen teho pienimmällä ja suurimmalla kirkkaudella ilman liitäntälaitteen omaa kulutusta. Jätä kaikki kentät tyhjiksi, jos haluat seurata vain liitäntälaitteen omaa kulutusta.",
+    "remarks_smart_dimmer": "Syötä liitettyjen valojen teho pienimmällä ja suurimmalla kirkkaudella ilman liitäntälaitteen omaa kulutusta. Jätä kaikki kentät tyhjiksi, jos haluat seurata vain liitäntälaitteen omaa kulutusta.",
     "view_measurement_details": "Näytä mittaustiedot"
   },
   "config": {
@@ -373,7 +371,7 @@
           "attribute": "Määritä attribuutti. Kun jätetään tyhjäksi, valojen kirkkaus, kaiuttimien äänenvoimakkuus ja tuulettimien prosenttiosuus",
           "calibrate": "Laita kalibrointiarvo jokaiselle riville. Esimerkki\n\n1:20"
         },
-        "description": "Määritä lineaarisen tehon laskentavaihtoehdot. Katso lisätietoja [dokumentaatiosta]({docs_uri}). Käytä joko min/maksimitehoa tai kalibrointiarvoja, jotka mahdollistavat enemmän ohjauspisteitä.{manual_dimmer_power_remarks}",
+        "description": "Määritä lineaarisen tehon laskentavaihtoehdot. Katso lisätietoja [dokumentaatiosta]({docs_uri}). Käytä joko min/maksimitehoa tai kalibrointiarvoja, jotka mahdollistavat enemmän ohjauspisteitä.",
         "title": "Lineaarinen konfigurointi"
       },
       "manufacturer": {
@@ -1055,7 +1053,6 @@
       },
       "linear": {
         "title": "Lineaariset vaihtoehdot",
-        "description": "{manual_dimmer_power_remarks}",
         "data": {
           "attribute": "Attribuutti",
           "calibrate": "Kalibrointiarvot",

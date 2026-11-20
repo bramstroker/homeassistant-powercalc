@@ -40,7 +40,7 @@ powercalc:
 
 When using GUI configuration flow (either discovery or manual), the user will be able to define the linear configuration for the light.
 
-If the driver profile offers measured combinations, select the one that matches the connected lights or choose **Other lights (enter power manually)**. Enter the power of the connected lights without the driver's own consumption. Leave the fields blank to track only the driver.
+If the driver profile offers measured combinations, select the one that matches the connected lights or choose **Virtual power (manual)**. Enter the power of the connected lights without the driver's own consumption. Leave the fields blank to track only the driver.
 
 To offer this choice in the library, set `allow_manual_power: true` on the linear smart dimmer profile and provide the measured combinations as LUT subprofiles. Set `standby_power_on: 0` on each LUT subprofile that already includes the driver's consumption.
 
