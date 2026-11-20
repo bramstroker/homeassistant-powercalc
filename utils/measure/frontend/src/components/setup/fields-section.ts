@@ -215,52 +215,8 @@ export class SetupFieldsSection extends LitElement {
         ${field.hint ? fieldHint(field.hint) : nothing}
       </div>`;
     }
-    if (field.control === "device") {
-      if (this.deviceEntityErrors["*"]) {
-        return html`<div class="notice error" role="alert">Could not load Home Assistant devices: ${this.deviceEntityErrors["*"]}</div>`;
-      }
-      const options = deviceOptions(this.deviceEntities["*"] ?? []);
-      const selected = String(stored ?? field.default ?? "");
-      return html`<div class="field-block">
-        ${optionSelect(name, field.label, options, { selected, required: field.required, placeholder: "Select a device" })}
-        ${field.hint ? fieldHint(field.hint) : nothing}
-      </div>`;
-    }
-    if (field.control === "entity") {
-      const value = (stored ?? field.default ?? "").toString();
-      const source = narrowingField(definition, field);
-      const domains = source
-        ? entityDomainsForOption(definition, field, selectValue(source, this.fieldState))
-        : this.fieldDomains(field);
-      const failed = field.all_entities
-        ? (this.deviceEntityErrors["*"] ? "*" : undefined)
-        : domains.find((domain) => this.deviceEntityErrors[domain]);
-      if (failed) {
-        return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
-      }
-      const entities = entityChoices(field, this.fieldState, domains);
-      if (field.multiple && (!field.multiple_toggle || this.multipleLights)) {
-        return this.renderMultiEntity(field, entities);
-      }
-      let selected = this.selectedEntities[name] !== undefined ? selectedEntityId(field, this.fieldState) : value;
-      if (source && selected && !entities.some((entity) => entity.entity_id === selected)) selected = "";
-      if (!selected && field.same_device_only && entities.length === 1) selected = entities[0]?.entity_id ?? "";
-      const relatedField = definition.fields.find((candidate) => candidate.name === field.related_to);
-      const relatedMissing = Boolean(
-        field.same_device_only && relatedField && selectedEntityId(relatedField, this.fieldState) && entities.length === 0,
-      );
-      const selector = entitySelect(name, field.label, entities, {
-        selected,
-        required: field.required,
-        onChange: this.entityChanged,
-      });
-      if (!field.hint && !relatedMissing) return selector;
-      return html`<div class="field-block">
-        ${selector}
-        ${fieldHint(field.hint ?? "")}
-        ${relatedMissing ? html`<p class="notice error" role="alert">No usable battery percentage sensor was found on the same Home Assistant device. PowerCalc vacuum profiles require one; expose or add that sensor before recording.</p>` : nothing}
-      </div>`;
-    }
+    if (field.control === "device") return this.renderDeviceField(field, stored);
+    if (field.control === "entity") return this.renderEntityField(field, definition, this.fieldState, stored);
     if (field.control === "select") {
       if (name in this.presetValues) {
         return html`<input type="hidden" name=${name} .value=${this.presetValues[name] ?? ""} />`;
@@ -274,6 +230,60 @@ export class SetupFieldsSection extends LitElement {
       })}${this.optionGuidance(selectedOption)}</div>`;
     }
     return this.valueField(field, (stored ?? field.default ?? "").toString());
+  }
+
+  private renderDeviceField(field: FormField, stored: unknown) {
+    if (this.deviceEntityErrors["*"]) {
+      return html`<div class="notice error" role="alert">Could not load Home Assistant devices: ${this.deviceEntityErrors["*"]}</div>`;
+    }
+    const options = deviceOptions(this.deviceEntities["*"] ?? []);
+    const selected = String(stored ?? field.default ?? "");
+    return html`<div class="field-block">
+      ${optionSelect(field.name, field.label, options, { selected, required: field.required, placeholder: "Select a device" })}
+      ${field.hint ? fieldHint(field.hint) : nothing}
+    </div>`;
+  }
+
+  private renderEntityField(field: FormField, definition: MeasureDefinition, state: FieldState, stored: unknown) {
+    const value = (stored ?? field.default ?? "").toString();
+    const source = narrowingField(definition, field);
+    const domains = source
+      ? entityDomainsForOption(definition, field, selectValue(source, state))
+      : this.fieldDomains(field);
+    const requestedDomains = field.all_entities ? ["*"] : domains;
+    const failed = requestedDomains.find((domain) => this.deviceEntityErrors[domain]);
+    if (failed) {
+      return html`<div class="notice error" role="alert">Could not load ${field.label.toLowerCase()} entities: ${this.deviceEntityErrors[failed]}</div>`;
+    }
+    const entities = entityChoices(field, state, domains);
+    if (field.multiple && (!field.multiple_toggle || this.multipleLights)) {
+      return this.renderMultiEntity(field, entities);
+    }
+    const selected = this.resolveSelectedEntity(field, state, entities, Boolean(source), value);
+    const relatedField = definition.fields.find((candidate) => candidate.name === field.related_to);
+    const relatedMissing = Boolean(
+      field.same_device_only && relatedField && selectedEntityId(relatedField, state) && entities.length === 0,
+    );
+    const selector = entitySelect(field.name, field.label, entities, {
+      selected,
+      required: field.required,
+      onChange: this.entityChanged,
+    });
+    if (!field.hint && !relatedMissing) return selector;
+    return html`<div class="field-block">
+      ${selector}
+      ${fieldHint(field.hint ?? "")}
+      ${relatedMissing ? html`<p class="notice error" role="alert">No usable battery percentage sensor was found on the same Home Assistant device. PowerCalc vacuum profiles require one; expose or add that sensor before recording.</p>` : nothing}
+    </div>`;
+  }
+
+  private resolveSelectedEntity(
+    field: FormField, state: FieldState, entities: EntityDescriptor[], narrowed: boolean, fallback: string,
+  ): string {
+    let selected = this.selectedEntities[field.name] === undefined ? fallback : selectedEntityId(field, state);
+    if (narrowed && selected && !entities.some((entity) => entity.entity_id === selected)) selected = "";
+    if (!selected && field.same_device_only && entities.length === 1) return entities[0]?.entity_id ?? "";
+    return selected;
   }
 
   private optionGuidance(option?: FormFieldOption) {
@@ -295,7 +305,7 @@ export class SetupFieldsSection extends LitElement {
       ?required=${field.required}
       autocomplete="off"
       @input=${onInput}
-    />${field.hint ? html`<small class="field-hint">${field.hint}</small>` : nothing}</label>`;
+    />${field.hint ? fieldHint(field.hint) : nothing}</label>`;
   }
 
   private renderDerivedCount(field: FormField) {
@@ -317,9 +327,11 @@ export class SetupFieldsSection extends LitElement {
     const placeholder = field.role === "controller"
       ? `Select ${(field.plural_label || field.label).toLowerCase()}`
       : "Select additional entities";
+    const defaultHint = field.hint ? fieldHint(field.hint) : nothing;
+    const hint = vacuumAdditional ? this.renderVacuumRecordingHint(field) : defaultHint;
     return html`<div class="field-block">
       ${this.renderEntityCombobox(field, entities, placeholder)}
-      ${vacuumAdditional ? this.renderVacuumRecordingHint(field) : field.hint ? fieldHint(field.hint) : nothing}
+      ${hint}
     </div>`;
   }
 

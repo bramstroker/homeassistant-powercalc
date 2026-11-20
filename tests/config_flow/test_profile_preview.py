@@ -75,8 +75,9 @@ async def test_async_setup_preview_registers_websocket_command(hass: HomeAssista
 def test_preview_websocket_requires_admin(hass: HomeAssistant) -> None:
     connection = _make_ws_connection(is_admin=False)
 
+    message = _build_ws_message("flow-id", {CONF_POWER: 10})
     with pytest.raises(Unauthorized):
-        ws_start_preview(hass, connection, _build_ws_message("flow-id", {CONF_POWER: 10}))
+        ws_start_preview(hass, connection, message)
 
 
 async def test_build_profile_preview_returns_current_power(hass: HomeAssistant) -> None:

@@ -227,19 +227,14 @@ export class ResultView extends LitElement {
         </div>
         ${error ? html`<p class="notice error" role="alert">${this.renderError(error)}</p>` : nothing}
         ${this.errorMessage ? html`<p class="notice error action-error" role="alert" tabindex="-1">${this.errorMessage}${errorHelpLink(this.errorHelp)}</p>` : nothing}
-        ${state !== "completed" && this.files.length ? html`<p class="notice" role="status">
-          Saved output is available below. This measurement is incomplete; these files are partial results.
-          ${this.canResume ? "Resume to continue from the last complete variation." : "You can download the saved data before starting again."}
-        </p>` : nothing}
+        ${this.renderPartialOutputNotice(state)}
         ${showArtifacts ? this.renderSummary() : nothing}
         ${showArtifacts || this.canAnalyse ? this.renderAnalysis() : nothing}
         ${showArtifacts ? this.renderWarnings() : nothing}
         ${showArtifacts ? this.renderPlots() : nothing}
         ${showArtifacts ? this.renderFiles() : nothing}
         ${this.renderJsonInspector()}
-        ${showArtifacts && state === "completed" && this.canPrepareProfile
-          ? hasModelArtifact(this.files) ? this.renderPrepareAction() : this.renderMissingModelNotice()
-          : nothing}
+        ${this.renderProfilePreparation(state)}
         ${diagnosticsDownload(this.diagnosticsUrl)}
         <div class="actions">
           <button type="button" @click=${() => this.emit("sessions")}>All sessions</button>
@@ -248,6 +243,22 @@ export class ResultView extends LitElement {
         </div>
       </section>
     `;
+  }
+
+  private renderPartialOutputNotice(state: SessionSnapshot["state"]) {
+    if (state === "completed" || !this.files.length) return nothing;
+    const guidance = this.canResume
+      ? "Resume to continue from the last complete variation."
+      : "You can download the saved data before starting again.";
+    return html`<p class="notice" role="status">
+      Saved output is available below. This measurement is incomplete; these files are partial results.
+      ${guidance}
+    </p>`;
+  }
+
+  private renderProfilePreparation(state: SessionSnapshot["state"]) {
+    if (state !== "completed" || !this.canPrepareProfile) return nothing;
+    return hasModelArtifact(this.files) ? this.renderPrepareAction() : this.renderMissingModelNotice();
   }
 
   private renderPrepareAction() {
@@ -313,7 +324,7 @@ export class ResultView extends LitElement {
             ${file.recording_label ? html`<span class="recording-label">${file.recording_label}</span><small>${file.name}</small>` : html`<span>${file.name}</span>`}
             ${file.modified_at ? html`<small>Modified <time datetime=${file.modified_at}>${timestamp(file.modified_at)}</time></small>` : nothing}
           </div><small>${fileSize(file.size)}</small><div class="file-actions">
-            ${file.recording_label != null ? html`<button class="label-action" type="button" ?disabled=${this.busy || this.labelSaving} aria-label=${`${file.recording_label ? "Edit" : "Add"} label for ${file.name}`} @click=${() => this.editRecordingLabel(file)}>${file.recording_label ? "Edit label" : "Add label"}</button>` : nothing}
+            ${this.renderRecordingLabelAction(file)}
             ${this.isInspectableJson(file) ? html`
               <button class="inspect-file" type="button" title=${`View ${file.name}`} aria-label=${`View ${file.name}`} @click=${(event: MouseEvent) => void this.openJsonInspector(file.name, event.currentTarget as HTMLElement)}>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
@@ -326,6 +337,14 @@ export class ResultView extends LitElement {
     }
     if (this.summaryEntries().length) return nothing;
     return html`<p class="notice">No downloadable files are available for this session.</p>`;
+  }
+
+  private renderRecordingLabelAction(file: SessionFile) {
+    if (file.recording_label == null) return nothing;
+    const action = file.recording_label ? "Edit" : "Add";
+    const label = `${action} label`;
+    const ariaLabel = `${label} for ${file.name}`;
+    return html`<button class="label-action" type="button" ?disabled=${this.busy || this.labelSaving} aria-label=${ariaLabel} @click=${() => this.editRecordingLabel(file)}>${label}</button>`;
   }
 
   private async editRecordingLabel(file: SessionFile): Promise<void> {
@@ -455,6 +474,7 @@ export class ResultView extends LitElement {
       ?? entries.find(([label]) => label === "Profile analysis reason")?.[1];
     const feature = entries.find(([label]) => label === "Analysed feature")?.[1];
     const composite = entries.some(([label]) => label === "Analysed inputs");
+    const missingAway = this.isVacuumRecording() && this.hasMissingAwayEpisodes(reason);
     const details = entries.filter(([label]) => !label.endsWith("analysis") && !label.endsWith("analysis reason"));
     return html`
       <section class="analysis-panel" aria-labelledby="recording-analysis-title">
@@ -464,7 +484,7 @@ export class ResultView extends LitElement {
         </p>
         ${result ? html`<p class="analysis-outcome"><span>Result</span><strong>${this.analysisResult(result)}</strong></p>` : nothing}
         ${reason ? html`<p class="analysis-reason"><strong>Why:</strong> ${reason}</p>` : nothing}
-        ${this.isVacuumRecording() && this.hasMissingAwayEpisodes(reason) ? html`
+        ${missingAway ? html`
           <p class="analysis-reason">
             The analyser needs two separate periods of each listed activity with at least five usable samples each.
             If the meter reports 0 W while the robot is away, those readings are discarded; another run with the
@@ -472,41 +492,53 @@ export class ResultView extends LitElement {
             resistive dummy load, or a more sensitive meter. See the
             <a href=${LOW_POWER_URL} target="_blank" rel="noopener noreferrer">low-power measurement guide</a>.
           </p>` : nothing}
-        ${details.length ? html`<dl class="analysis-details" aria-label="Recording analysis details">
-          ${details.map(([label, value]) => {
-            const definition = ANALYSIS_DETAILS[label];
-            const displayLabel = definition?.label ?? label;
-            const help = definition?.help;
-            return html`
-              <div>
-                <dt>
-                  <span>${displayLabel}</span>
-                  ${help ? html`<span class="analysis-help" tabindex="0" data-help=${help} title=${help} aria-label=${`${displayLabel}: ${help}`}>?</span>` : nothing}
-                </dt>
-                <dd>${label === "Analysed feature" ? this.analysisFeature(value) : value}</dd>
-              </div>
-            `;
-          })}
-        </dl>` : nothing}
-        ${this.canAnalyse ? html`
-          <div class="analysis-retry">
-            <p class=${this.analysisComplete ? "complete" : ""} role=${this.analysisComplete ? "status" : nothing}>
-              ${this.analysisComplete
-                ? "✓ Recording analysed again. The result and generated files are now up to date."
-                : "Analyse all saved recordings again without recording new data."}
-            </p>
-            <button type="button" @click=${() => this.emit("analyse")} ?disabled=${this.busy}>
-              Analyse recording again
-            </button>
-          </div>
-          <div class="analysis-retry">
-            <p>${this.isVacuumRecording() && this.hasMissingAwayEpisodes(reason)
-              ? "Once the meter can reliably read the lowest-load activity, record enough separate activity periods. Previous recordings are kept and all runs are analysed together."
-              : "Record another run using the same entities and settings. Previous recordings are kept and all runs are analysed together."}</p>
-            <button type="button" @click=${() => this.emit("record-more")} ?disabled=${this.busy}>Record more</button>
-          </div>
-        ` : nothing}
+        ${this.renderAnalysisDetails(details)}
+        ${this.canAnalyse ? this.renderAnalysisActions(missingAway) : nothing}
       </section>
+    `;
+  }
+
+  private renderAnalysisDetails(details: [string, string][]) {
+    if (!details.length) return nothing;
+    return html`<dl class="analysis-details" aria-label="Recording analysis details">
+      ${details.map(([label, value]) => {
+        const definition = ANALYSIS_DETAILS[label];
+        const displayLabel = definition?.label ?? label;
+        const help = definition?.help;
+        const helpLabel = `${displayLabel}: ${help}`;
+        return html`
+          <div>
+            <dt>
+              <span>${displayLabel}</span>
+              ${help ? html`<span class="analysis-help" tabindex="0" data-help=${help} title=${help} aria-label=${helpLabel}>?</span>` : nothing}
+            </dt>
+            <dd>${label === "Analysed feature" ? this.analysisFeature(value) : value}</dd>
+          </div>
+        `;
+      })}
+    </dl>`;
+  }
+
+  private renderAnalysisActions(missingAway: boolean) {
+    const analysisMessage = this.analysisComplete
+      ? "✓ Recording analysed again. The result and generated files are now up to date."
+      : "Analyse all saved recordings again without recording new data.";
+    const recordingGuidance = missingAway
+      ? "Once the meter can reliably read the lowest-load activity, record enough separate activity periods. Previous recordings are kept and all runs are analysed together."
+      : "Record another run using the same entities and settings. Previous recordings are kept and all runs are analysed together.";
+    return html`
+      <div class="analysis-retry">
+        <p class=${this.analysisComplete ? "complete" : ""} role=${this.analysisComplete ? "status" : nothing}>
+          ${analysisMessage}
+        </p>
+        <button type="button" @click=${() => this.emit("analyse")} ?disabled=${this.busy}>
+          Analyse recording again
+        </button>
+      </div>
+      <div class="analysis-retry">
+        <p>${recordingGuidance}</p>
+        <button type="button" @click=${() => this.emit("record-more")} ?disabled=${this.busy}>Record more</button>
+      </div>
     `;
   }
 

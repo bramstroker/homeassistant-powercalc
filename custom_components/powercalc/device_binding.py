@@ -104,7 +104,6 @@ def resolve_device_discovery_source(hass: HomeAssistant, device: DeviceEntry) ->
 
 def _get_device_discovery_parent(hass: HomeAssistant, device: DeviceEntry) -> DeviceEntry | None:
     """Follow explicit scanner ownership or Shelly's channel identifier convention."""
-    device_reg = device_registry.async_get(hass)
     for entry_id in get_config_entry_ids(device):
         entry = hass.config_entries.async_get_entry(entry_id)
         if entry is None:
@@ -117,17 +116,23 @@ def _get_device_discovery_parent(hass: HomeAssistant, device: DeviceEntry) -> De
         ):
             return source_device
 
-        if entry.domain == "shelly" and device.via_device_id:
-            parent = device_reg.async_get(device.via_device_id)
-            if not isinstance(parent, DeviceEntry) or entry_id not in get_config_entry_ids(parent):
-                continue
-            for domain, identifier in parent.identifiers:
-                if domain == "shelly" and any(
-                    child_domain == domain and child_identifier.startswith(f"{identifier}-")
-                    for child_domain, child_identifier in device.identifiers
-                ):
-                    return parent
+        if entry.domain == "shelly" and (parent := _get_shelly_channel_parent(hass, device, entry_id)) is not None:
+            return parent
 
+    return None
+
+
+def _get_shelly_channel_parent(hass: HomeAssistant, device: DeviceEntry, entry_id: str) -> DeviceEntry | None:
+    if not device.via_device_id:
+        return None
+    parent = device_registry.async_get(hass).async_get(device.via_device_id)
+    if not isinstance(parent, DeviceEntry) or entry_id not in get_config_entry_ids(parent):
+        return None
+
+    prefixes = tuple(f"{identifier}-" for domain, identifier in parent.identifiers if domain == "shelly")
+    for domain, identifier in device.identifiers:
+        if domain == "shelly" and identifier.startswith(prefixes):
+            return parent
     return None
 
 

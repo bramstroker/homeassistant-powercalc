@@ -192,9 +192,7 @@ def draft_from_request(
     artifact_model = _artifact_model(artifact_root)
     voltage_range = _voltage_range(artifact_model)
     author = _first_author(artifact_model)
-    device_specs = _artifact_device_specs(artifact_model)
-    if default_connectivity is not None and "connectivity" not in (device_specs or {}):
-        device_specs = {**(device_specs or {}), "connectivity": [default_connectivity]}
+    device_specs = _artifact_device_specs(artifact_model, default_connectivity)
     content = _PreviewContent(
         manufacturer_name=manufacturer or "",
         manufacturer_directory="",
@@ -260,9 +258,12 @@ def _contribution_ineligibility_reason(
     return None if has_model else f"Contribution requires a generated {MODEL_FILENAME} artifact"
 
 
-def _artifact_device_specs(model: dict[str, Any]) -> dict[str, Any] | None:
+def _artifact_device_specs(model: dict[str, Any], default_connectivity: str | None) -> dict[str, Any] | None:
     value = model.get("device_specs")
-    return value if isinstance(value, dict) else None
+    specs = value if isinstance(value, dict) else None
+    if default_connectivity is not None and "connectivity" not in (specs or {}):
+        return {**(specs or {}), "connectivity": [default_connectivity]}
+    return specs
 
 
 def preview_from_job(

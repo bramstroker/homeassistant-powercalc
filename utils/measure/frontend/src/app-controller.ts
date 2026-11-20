@@ -194,7 +194,7 @@ export class MeasureAppController {
       await calibrationPromise;
       this.state.request = this.state.snapshot?.request;
       if (this.state.request) await this.loadTypeEntities(this.state.request.measure_type);
-      await this.routeSnapshot();
+      this.routeSnapshot();
     } catch (error) {
       this.setError(error);
     }
@@ -203,9 +203,10 @@ export class MeasureAppController {
 
   private async loadEntityCatalogWhenReady(api: MeasureAppApi) {
     let catalog = await api.getEntityCatalog();
+    // Polling is sequential: each response determines whether another request is needed.
     while (!catalog.home_assistant_ready) {
-      await this.waitForRetry(ENTITY_CATALOG_RETRY_DELAY_MS);
-      catalog = await api.getEntityCatalog();
+      await this.waitForRetry(ENTITY_CATALOG_RETRY_DELAY_MS); // NOSONAR
+      catalog = await api.getEntityCatalog(); // NOSONAR
     }
     return catalog;
   }
@@ -665,7 +666,7 @@ export class MeasureAppController {
     this.changed();
   }
 
-  private async routeSnapshot(): Promise<void> {
+  private routeSnapshot(): void {
     const state = this.state.snapshot?.state ?? "idle";
     if (isActive(state)) {
       this.state.view = "running";
