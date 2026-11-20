@@ -1,0 +1,26 @@
+{
+  "name": "EcoFlow Smart Plug SG3",
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "linked_profile": "shelly/S3PL-00112EU",
+  "only_self_usage": true,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "EcoFlow Smart Plug SG3 is an OEM rebrand of the Shelly Plug S Gen3 and reports itself to Home Assistant as a Shelly device. Uses linked_profile to shelly/S3PL-00112EU.",
+  "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
+  },
+  "created_at": "2026-03-25T14:20:22Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
