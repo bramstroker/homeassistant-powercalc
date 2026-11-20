@@ -14,7 +14,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from pytest_homeassistant_custom_component.common import MockToggleEntity
+
+from tests.ha_test import MockToggleEntity
 
 ENTITIES = []
 

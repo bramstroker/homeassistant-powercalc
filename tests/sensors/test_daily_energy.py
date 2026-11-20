@@ -19,9 +19,6 @@ from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.typing import ConfigType
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    mock_restore_cache,
-)
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
@@ -53,6 +50,9 @@ from tests.common import (
     set_states,
 )
 from tests.config_flow.test_global_configuration import create_mock_global_config_entry
+from tests.ha_test import (
+    mock_restore_cache,
+)
 
 
 def test_create_daily_energy_sensor_default_options(hass: HomeAssistant) -> None:

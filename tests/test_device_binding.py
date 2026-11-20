@@ -8,10 +8,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntryDisabler, DeviceRegistry
 import homeassistant.helpers.entity_registry as er
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    mock_device_registry,
-)
 
 from custom_components.powercalc import device_binding
 from custom_components.powercalc.common import SourceEntity, create_source_entity, get_main_device_entry
@@ -47,6 +43,10 @@ from tests.common import (
     mock_entities_in_registry,
     requires_child_devices,
     run_powercalc_setup,
+)
+from tests.ha_test import (
+    MockConfigEntry,
+    mock_device_registry,
 )
 
 

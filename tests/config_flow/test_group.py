@@ -16,7 +16,6 @@ from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.selector import SelectSelector
 from homeassistant.helpers.translation import async_get_translations
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 import voluptuous as vol
 
 from custom_components.powercalc import SensorType
@@ -76,6 +75,7 @@ from tests.config_flow.common import (
     set_virtual_power_configuration,
     submit_form_step,
 )
+from tests.ha_test import MockConfigEntry
 
 
 async def test_create_group_entry(hass: HomeAssistant) -> None:
