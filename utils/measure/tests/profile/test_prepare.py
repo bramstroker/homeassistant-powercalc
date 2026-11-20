@@ -570,6 +570,21 @@ def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts
         preparer.prepare(artifacts, profile_metadata)
 
 
+@pytest.mark.parametrize("evidence", ["analyser.json", "smart_switch_readings.json"])
+def test_preparer_accepts_measurement_evidence_beside_the_model(tmp_path: Path, evidence: str) -> None:
+    """Runners keep diagnostic evidence next to model.json. It is not a profile file and
+    must not block preparation: a smart switch run writes smart_switch_readings.json, so
+    every smart switch profile used to fail with "Unexpected artifact file(s)"."""
+    artifacts = tmp_path / "artifacts"
+    write_library(tmp_path)
+    write_profile_artifacts(artifacts)
+    (artifacts / evidence).write_text("{}", encoding="utf-8")
+
+    preview = make_preparer(tmp_path).prepare(artifacts, metadata())
+
+    assert evidence not in {Path(file.path).name for file in preview.files}
+
+
 @pytest.mark.parametrize("compressed", [False, True])
 @pytest.mark.parametrize(
     "raw_content",

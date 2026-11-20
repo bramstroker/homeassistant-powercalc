@@ -117,7 +117,7 @@ from .sensors.energy_related import create_energy_related_sensors
 from .sensors.group.config_entry_utils import add_to_associated_groups
 from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
-from .sensors.group.standby import StandbyPowerSensor
+from .sensors.group.standby import SumPowerSensor
 from .sensors.measure import MeasureSessionStatusSensor
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor
 
@@ -238,7 +238,7 @@ async def _async_setup_entities(
 
     entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
     for entity in entities_to_add:
-        if isinstance(entity, GroupedSensor | StandbyPowerSensor):
+        if isinstance(entity, GroupedSensor | SumPowerSensor):
             hass.data[DOMAIN][DATA_GROUP_ENTITIES][entity.entity_id] = entity
         else:
             hass.data[DOMAIN][DATA_ENTITIES][entity.entity_id] = entity
@@ -433,13 +433,13 @@ def register_entity_services() -> None:
     )
 
 
-def _resolve_group_sensor(entity: SensorEntity) -> GroupedSensor | StandbyPowerSensor:
+def _resolve_group_sensor(entity: SensorEntity) -> GroupedSensor | SumPowerSensor:
     """Resolve the group itself or the source power group of an integrated energy sensor."""
-    if isinstance(entity, GroupedSensor | StandbyPowerSensor):
+    if isinstance(entity, GroupedSensor | SumPowerSensor):
         return entity
     if isinstance(entity, VirtualEnergySensor):
         source = entity.platform.entities.get(entity.source_entity_id)
-        if isinstance(source, GroupedSensor | StandbyPowerSensor):
+        if isinstance(source, GroupedSensor | SumPowerSensor):
             return source
         raise ServiceValidationError(f"Entity {entity.entity_id} does not integrate a loaded Powercalc power group")
     raise ServiceValidationError(f"Entity {entity.entity_id} is not a Powercalc group sensor")
