@@ -10117,16 +10117,20 @@
               "name": "Jan Brinkmann"
             }
           ],
-          "calculation_strategy": "lut",
+          "calculation_strategy": "linear",
+          "allow_manual_power": true,
           "created_at": "2026-11-07T14:28:52Z",
           "device_specs": {
+            "form_factor": "led_driver",
+            "max_load_watts": 10,
+            "power_monitoring": false,
             "connectivity": [
               "zigbee"
             ]
           },
-          "device_type": "light",
+          "device_type": "smart_dimmer",
           "mains_voltage": 230,
-          "measure_description": "Measured with Powercalc Measure",
+          "measure_description": "Driver-only power is estimated at 0.1 W in both states, based on the previous standby estimate. The NORRFLY subprofile uses the measured curve for the complete setup.",
           "measure_device": "Shelly Plug S",
           "measure_device_firmware": "1.7.6",
           "measure_method": "script",
@@ -10139,6 +10143,7 @@
           },
           "name": "TRADFRI LED driver, 10 w (ICPSHC24-10EU-IL-1)",
           "standby_power": 0.1,
+          "standby_power_on": 0.1,
           "standby_power_estimated": true,
           "voltage_range": {
             "max": 235.9,
@@ -10150,7 +10155,7 @@
           ],
           "id": "ICPSHC24-10EU-IL-1",
           "manufacturer": "ikea",
-          "updated_at": "2026-11-18T20:25:03",
+          "updated_at": "2026-11-20T08:12:19",
           "max_power": 5.9,
           "sub_profile_count": 1,
           "measurement_updated_at": "2026-11-11T18:28:53",
@@ -10165,7 +10170,7 @@
             "score": 98.8,
             "brightness": 98.8
           },
-          "hash": "66be4f06a9f5201966fae3c4400a6919"
+          "hash": "8fb3d416c63ff04df62aa1afc5c1cf51"
         },
         {
           "aliases": [
