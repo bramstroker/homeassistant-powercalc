@@ -1,0 +1,45 @@
+{
+  "authors": [
+    {
+      "github": "Maxik933",
+      "name": "Maxik933"
+    }
+  ],
+  "calculation_strategy": "multi_switch",
+  "config_flow_sub_profile_remarks": "You need to select the profile depending on your device settings.\nThe profile only covers the strip's own consumption. The appliances plugged into the sockets are measured by the strip itself and are not part of this profile.\n\nSub-profile configurations (everything not named in the profile is turned off):\n\"+WLAN\": Only Wi-Fi enabled. ECO mode, Bluetooth and the LED indication are off.\n\"+BT\": Bluetooth additionally enabled.\n\"+ECO\": ECO mode additionally enabled.\n\"+LED\": LED indication additionally enabled, the ring lights up while the socket is switched on. It adds 0.08 to 0.11 W per switched-on socket; the standby difference is within the run-to-run noise and is not modelled separately.\nCombinations are named accordingly, for example \"+WLAN +ECO +LED\".\n\nActivating any setting that is not listed in the profile name changes the power draw.",
+  "created_at": "2026-11-20T01:01:00Z",
+  "description": "Smart Wi-Fi power strip with four individually switchable and metered sockets",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "bluetooth",
+      "zigbee",
+      "matter"
+    ],
+    "form_factor": "power_strip",
+    "max_load_watts": 3680,
+    "power_monitoring": true,
+    "rated_power": 1
+  },
+  "device_type": "smart_switch",
+  "discovery_by": "device",
+  "mains_voltage": 230,
+  "measure_description": "Setup: a Shelly Plug S Gen3 reference meter sits between the wall socket and the strip. A calibrated resistive dummy load (33.8 W, about 1578.8 Ohm) is connected in parallel to the same mains input and never to one of the strip's sockets, so the reference meter always reads the strip plus roughly 33 W and can resolve its sub-watt self consumption. The dummy load contribution is subtracted per sample as V^2/R instead of a fixed offset, because it follows the mains voltage.\n\nRecordings: eight runs, one per device configuration (WLAN, +BT, +LED, +ECO and their combinations). Each run measures six states - all sockets off, each of the four sockets on its own, and all four sockets on - in three cycles, with 12 samples per state at a 2 s interval. That is 144 state means (1728 samples) in total. The runs were recorded with measure app 0.14.3, extended locally so the four relay entities of one strip can be measured in a single run; the sampling and averaging logic is unchanged.\n\nCoverage:\n- All sockets off: 0.360 W (+WLAN +ECO +LED) up to 0.686 W (+WLAN +LED +BT), depending on the configuration.\n- One socket on: the standby value plus one increment of 0.471 W (+WLAN +ECO) up to 0.591 W (+WLAN +ECO +LED +BT) per socket.\n- All four sockets on: 2.227 W (+WLAN +ECO) up to 2.959 W (+WLAN +LED +BT).\n\nLimitations:\n- The multi_switch strategy models the four sockets linearly (standby + n x power). The measured all-on state is 0.03 to 0.10 W below that sum (1.1 to 3.9 %), because the internal 5 V supply is shared between the sockets. With all four sockets switched on the calculation therefore overestimates by that amount, while a single switched-on socket matches the measurement.\n- Two- and three-socket combinations were not measured separately.\n- The four sockets differ by at most 0.12 W within a run (standard deviation 0.03 W or less), so one increment per sub profile is used.\n- The LED indication adds 0.08 to 0.11 W per switched-on socket. The standby difference between LED on and off is within the run-to-run noise of about 0.03 W and is not modelled separately.\n- All values were recorded at a single mains voltage between 230.5 V and 231.7 V. The firmware version of the strip was not recorded.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 33.8,
+    "DUMMY_LOAD_RESISTANCE": 1578.78,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.3:app"
+  },
+  "name": "Power Strip 4 Gen4",
+  "only_self_usage": true,
+  "product_url": "https://www.shelly.com/products/shelly-power-strip-4-gen4",
+  "voltage_range": {
+    "max": 231.7,
+    "min": 230.5
+  }
+}
