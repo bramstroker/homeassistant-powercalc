@@ -1,0 +1,20 @@
+{
+  "name": "ATOM Echo",
+  "device_type": "smart_speaker",
+  "calculation_strategy": "fixed",
+  "discovery_by": "manual",
+  "fixed_config": {
+    "power": 0.48
+  },
+  "standby_power": 0.48,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "Measured via USB power meter running the ESPHome Bluetooth Proxy firmware, stable between 0.45 and 0.50 W. ESPHome does not report a specific model, so the profile has to be selected manually.",
+  "created_at": "2026-03-25T14:20:21Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
