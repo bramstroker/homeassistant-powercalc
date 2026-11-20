@@ -30,7 +30,8 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType, StateType
-from pytest_homeassistant_custom_component.common import MockEntity
+
+from tests.ha_test import MockEntity
 
 DEVICE_CLASSES.append("none")
 

@@ -6,7 +6,6 @@ from homeassistant.components.media_player import ATTR_MEDIA_VOLUME_LEVEL
 from homeassistant.const import CONF_ENTITY_ID, STATE_PAUSED, STATE_PLAYING
 from homeassistant.core import HomeAssistant
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -37,6 +36,7 @@ from custom_components.powercalc.power_profile.power_profile import (
     is_device_type_supported_for_entity,
 )
 from tests.common import assert_entity_state, get_test_profile_dir, run_powercalc_setup, set_states
+from tests.ha_test import MockConfigEntry, RegistryEntryWithDefaults
 
 
 @pytest.mark.parametrize(
