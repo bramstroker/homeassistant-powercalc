@@ -23,7 +23,7 @@
   },
   "measure_method": "script",
   "measure_device": "Shelly Plug S Gen3",
-  "measure_description": "Idle and printing measured with the Powercalc Measure app over 64 minutes (1857 samples; 1712 idle, 56 printing). Idle has two reachable levels (about 1.1 W deep sleep, about 3.7 W awake), so the energy-weighted average is used.",
+  "measure_description": "Profile created from a Powercalc Measure recording (measure app 0.14.3, Shelly Plug S Gen3, 230 V). One run over 64 minutes with 1857 samples: 1712 idle and 56 printing. Idle shows two reachable levels (about 1.1 W in deep sleep, about 3.7 W awake on WiFi), so the energy-weighted average is used. Printing averages 10.8 W (median 11.6 W, peak 19.2 W).",
   "mains_voltage": 230,
   "created_at": "2026-11-20T00:00:00Z",
   "authors": [
@@ -31,5 +31,10 @@
       "name": "Maximilian Kraus",
       "github": "Maxik933"
     }
-  ]
+  ],
+  "gtin": [
+    "4549292066517",
+    "4549292066654"
+  ],
+  "product_url": "https://www.canon.de/printers/pixma-ts5050-series/specifications/"
 }
