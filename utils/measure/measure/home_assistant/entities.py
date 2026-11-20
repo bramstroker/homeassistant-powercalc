@@ -11,10 +11,14 @@ from measure.controller.light.effects import filter_recordable_effects
 from measure.home_assistant.client import HomeAssistantManager
 from measure.home_assistant.connectivity import Connectivity, detect_connectivity
 from measure.home_assistant.const import (
+    HASS_DEVICE_REGISTRY_CONFIG_ENTRIES,
+    HASS_DEVICE_REGISTRY_CONFIG_ENTRY_ID,
     HASS_DEVICE_REGISTRY_ID,
     HASS_DEVICE_REGISTRY_MANUFACTURER,
     HASS_DEVICE_REGISTRY_MODEL,
     HASS_DEVICE_REGISTRY_MODEL_ID,
+    HASS_DEVICE_REGISTRY_PARENT_DEVICE_ID,
+    HASS_DEVICE_REGISTRY_VIA_DEVICE_ID,
     HASS_ENTITY_DEVICE_CLASS,
     HASS_ENTITY_GROUP_MEMBERS,
     HASS_ENTITY_UNIT_OF_MEASUREMENT,
@@ -64,11 +68,15 @@ class EntityDescriptor(BaseModel):
     device_class: str | None = None
     device_id: str | None = None
     device_name: str | None = None
+    #: Root device when this entity lives on a sub-device (e.g. one output of a power strip).
+    device_group_id: str | None = None
+    device_group_name: str | None = None
     #: Home Assistant integration providing the entity, as shown on the device page.
     integration: str | None = None
     connectivity: Connectivity | None = None
     translation_key: str | None = None
     unique_id: str | None = None
+    entity_category: str | None = None
     disabled_by: str | None = None
     has_live_state: bool = True
     manufacturer: str | None = None
@@ -122,7 +130,12 @@ class EntityCatalogSnapshot:
 
         if domain is not None:
             selected = [
-                entity for entity in self._entities if entity.domain == domain and self._is_domain_selectable(entity)
+                entity
+                for entity in self._entities
+                if entity.domain == domain
+                and self._is_domain_selectable(entity)
+                # Configuration/diagnostic switches (e.g. a Shelly BLE setting) are not relays.
+                and not (domain == EntityDomain.SWITCH and entity.entity_category in {"config", "diagnostic"})
             ]
         else:
             assert device_class is not None
@@ -241,8 +254,12 @@ class HomeAssistantEntityCatalog:
             if entity_id not in live_ids
         )
         by_id = {descriptor.entity_id: descriptor for descriptor in descriptors}
+        groups = _device_groups(devices)
         return EntityCatalogSnapshot(
-            [_enrich_group_device_metadata(descriptor, by_id) for descriptor in descriptors],
+            [
+                _with_device_group(_enrich_group_device_metadata(descriptor, by_id), devices, groups)
+                for descriptor in descriptors
+            ],
             map_profile_related_devices(data.device_registry),
         )
 
@@ -262,6 +279,7 @@ def _describe_registry_entity(entry: EntityRegistryEntry, devices: dict[str, dic
         connectivity=detect_connectivity(entry.platform, devices.get(entry.device_id or "", {})),
         translation_key=getattr(entry, "translation_key", None),
         unique_id=getattr(entry, "unique_id", None),
+        entity_category=getattr(entry, "entity_category", None),
         manufacturer=_optional_string(manufacturer),
         model_id=_optional_string(model_id),
         product_name=_optional_string(device.get(HASS_DEVICE_REGISTRY_MODEL)),
@@ -355,6 +373,7 @@ def _describe_entity(
         connectivity=(detect_connectivity(getattr(registry_entry, "platform", None), device) if not members else None),
         translation_key=getattr(registry_entry, "translation_key", None),
         unique_id=getattr(registry_entry, "unique_id", None),
+        entity_category=getattr(registry_entry, "entity_category", None),
         disabled_by=getattr(registry_entry, "disabled_by", None),
         manufacturer=_optional_string(manufacturer),
         model_id=_optional_string(model_id),
@@ -379,6 +398,86 @@ def _optional_string(value: object) -> str | None:
 def _device_name(device: dict[str, object]) -> str | None:
     name = device.get("name_by_user") or device.get("name")
     return str(name) if name else None
+
+
+def _device_groups(devices: dict[str, dict[str, object]]) -> dict[str, str]:
+    """Map every device to the root of its parent chain.
+
+    Home Assistant models a multi-channel device (a power strip, for example) as one
+    parent device plus one sub-device per channel. Relay selection and preflight must
+    treat those sub-devices as one physical device.
+    """
+
+    roots: dict[str, str] = {}
+    for device_id, device in devices.items():
+        current = device
+        seen = {device_id}
+        while (parent_id := _parent_device_id(current)) is not None:
+            parent = devices.get(parent_id)
+            if parent is None or parent_id in seen or not _is_channel_of_same_device(device, parent):
+                break
+            seen.add(parent_id)
+            current = parent
+        roots[device_id] = _device_id(current, device_id)
+    return roots
+
+
+def _parent_device_id(device: dict[str, object]) -> str | None:
+    for key in (HASS_DEVICE_REGISTRY_VIA_DEVICE_ID, HASS_DEVICE_REGISTRY_PARENT_DEVICE_ID):
+        value = device.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return None
+
+
+def _device_id(device: dict[str, object], fallback: str) -> str:
+    value = device.get(HASS_DEVICE_REGISTRY_ID)
+    return value if isinstance(value, str) and value else fallback
+
+
+def _is_channel_of_same_device(child: dict[str, object], parent: dict[str, object]) -> bool:
+    """Whether a child device is another channel of the parent's physical product.
+
+    ``via_device_id`` alone is not enough: a light connected through a bridge is also
+    linked to it, but is a separate product. A channel shares the parent's model.
+    """
+
+    child_model = child.get(HASS_DEVICE_REGISTRY_MODEL_ID) or child.get(HASS_DEVICE_REGISTRY_MODEL)
+    parent_model = parent.get(HASS_DEVICE_REGISTRY_MODEL_ID) or parent.get(HASS_DEVICE_REGISTRY_MODEL)
+    if not child_model or not parent_model or child_model != parent_model:
+        return False
+    child_entries = _config_entry_ids(child)
+    parent_entries = _config_entry_ids(parent)
+    return not child_entries or not parent_entries or bool(child_entries & parent_entries)
+
+
+def _config_entry_ids(device: dict[str, object]) -> set[str]:
+    ids: set[str] = set()
+    single = device.get(HASS_DEVICE_REGISTRY_CONFIG_ENTRY_ID)
+    if isinstance(single, str) and single:
+        ids.add(single)
+    entries = device.get(HASS_DEVICE_REGISTRY_CONFIG_ENTRIES)
+    if isinstance(entries, list):
+        ids.update(entry for entry in entries if isinstance(entry, str) and entry)
+    return ids
+
+
+def _with_device_group(
+    descriptor: EntityDescriptor,
+    devices: dict[str, dict[str, object]],
+    groups: dict[str, str],
+) -> EntityDescriptor:
+    """Name the physical device an entity belongs to, also for entities on a sub-device."""
+
+    group_id = groups.get(descriptor.device_id or "")
+    if group_id is None or group_id == descriptor.device_id:
+        return descriptor
+    return descriptor.model_copy(
+        update={
+            "device_group_id": group_id,
+            "device_group_name": _device_name(devices.get(group_id, {})) or descriptor.device_name,
+        }
+    )
 
 
 def _parse_device_class(value: object) -> str | None:

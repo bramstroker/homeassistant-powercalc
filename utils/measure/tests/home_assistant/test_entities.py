@@ -520,3 +520,87 @@ def test_catalog_preserves_valetudo_identity(live: bool) -> None:
     assert descriptor.manufacturer == "Valetudo"
     assert descriptor.integration == "mqtt"
     assert descriptor.has_live_state is live
+
+
+def test_catalog_groups_channels_of_one_physical_device() -> None:
+    """A power strip's outputs are sub-devices of one product, not separate devices."""
+
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = SimpleNamespace(
+        entities={},
+        entity_registry=[
+            SimpleNamespace(entity_id="switch.output_0", device_id="out-0", platform="shelly"),
+            SimpleNamespace(entity_id="switch.output_1", device_id="out-1", platform="shelly"),
+            SimpleNamespace(entity_id="light.bulb", device_id="bulb", platform="hue"),
+        ],
+        device_registry=[
+            {
+                "id": "strip",
+                "name": "Power Strip",
+                "model": "Shelly Power Strip 4 Gen4",
+                "model_id": "S4PL-00416EU",
+                "config_entry_id": "entry",
+            },
+            {
+                "id": "out-0",
+                "name": "Power Strip Output 0",
+                "model": "Shelly Power Strip 4 Gen4",
+                "model_id": "S4PL-00416EU",
+                "config_entry_id": "entry",
+                "via_device_id": "strip",
+            },
+            {
+                "id": "out-1",
+                "name": "Power Strip Output 1",
+                "model": "Shelly Power Strip 4 Gen4",
+                "model_id": "S4PL-00416EU",
+                "config_entry_id": "entry",
+                "via_device_id": "strip",
+            },
+            # A bulb linked through a bridge is a separate product, not a channel of it.
+            {"id": "bridge", "name": "Bridge", "model": "Bridge", "model_id": "BSB002", "config_entry_id": "hue"},
+            {
+                "id": "bulb",
+                "name": "Bulb",
+                "model": "Bulb",
+                "model_id": "LWA017",
+                "config_entry_id": "hue",
+                "via_device_id": "bridge",
+            },
+        ],
+    )
+
+    snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
+
+    assert snapshot.get("switch.output_0").device_group_id == "strip"
+    assert snapshot.get("switch.output_0").device_group_name == "Power Strip"
+    assert snapshot.get("switch.output_1").device_group_id == "strip"
+    assert snapshot.get("light.bulb").device_group_id is None
+
+
+def test_catalog_omits_configuration_switches_from_relay_choices() -> None:
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = HomeAssistantEntityData(
+        entities={
+            "switch": SimpleNamespace(
+                entities={
+                    "relay": _entity("switch.relay", "on", friendly_name="Relay"),
+                    "ble": _entity("switch.ble", "on", friendly_name="BLE"),
+                },
+            ),
+        },
+        entity_registry=[
+            SimpleNamespace(entity_id="switch.relay", device_id="device", platform="shelly"),
+            SimpleNamespace(
+                entity_id="switch.ble",
+                device_id="device",
+                platform="shelly",
+                entity_category="config",
+            ),
+        ],
+        device_registry=[{"id": "device", "name": "Shelly 2PM"}],
+    )
+
+    switches = HomeAssistantEntityCatalog(home_assistant).load_snapshot().select(domain=EntityDomain.SWITCH)
+
+    assert [entity.entity_id for entity in switches] == ["switch.relay"]
