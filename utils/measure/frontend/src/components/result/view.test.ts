@@ -5,6 +5,12 @@ import type { ResultView } from "./view";
 import "./view";
 
 describe("result view", () => {
+  // jsdom does not implement native modal behavior; keyboard/inert behavior is covered in e2e.
+  beforeAll(() => {
+    HTMLDialogElement.prototype.showModal = function () { this.open = true; };
+    HTMLDialogElement.prototype.close = function () { this.open = false; };
+  });
+
   it("shows file modification dates in local time and explains recording names", async () => {
     const element = document.createElement("measure-result-view") as ResultView;
     element.snapshot = { state: "completed" };
@@ -81,11 +87,6 @@ describe("result view", () => {
     element.busy = true;
     await element.updateComplete;
     expect(button.disabled).toBe(true);
-  });
-  // jsdom does not implement native modal behavior; keyboard/inert behavior is covered in e2e.
-  beforeAll(() => {
-    HTMLDialogElement.prototype.showModal = function () { this.open = true; };
-    HTMLDialogElement.prototype.close = function () { this.open = false; };
   });
   it.each(["completed", "failed", "cancelled", "resumable"] as const)("offers diagnostics for a %s session without generated files", async (state) => {
     const element = document.createElement("measure-result-view") as HTMLElement & {

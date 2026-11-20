@@ -107,15 +107,20 @@ export function renderRoutePicker(device: DeviceChoice, routes: MeasurementRoute
     <button type="button" @click=${onBack}>Change device</button>
     <div class="type-grid">
       ${routes.map((route) => html`<button type="button" class="type-card route-card ${route.recommended ? "recommended" : ""}" @click=${() => onSelect(route.id)}>
-        ${route.recommended || route.experimental ? html`<span class="route-badges">
-          ${route.recommended ? html`<span class="route-recommended">Recommended</span>` : ""}
-          ${route.experimental ? html`<span class="experimental-badge">Experimental</span>` : ""}
-        </span>` : ""}
+        ${renderRouteBadges(route)}
         <span class="type-label">${route.label}</span>
         <span class="type-desc">${route.description}</span>
       </button>`)}
     </div>
   `;
+}
+
+function renderRouteBadges(route: MeasurementRoute) {
+  if (!route.recommended && !route.experimental) return "";
+  return html`<span class="route-badges">
+    ${route.recommended ? html`<span class="route-recommended">Recommended</span>` : ""}
+    ${route.experimental ? html`<span class="experimental-badge">Experimental</span>` : ""}
+  </span>`;
 }
 
 /** Restate the chosen device and route while showing the measurement form. */

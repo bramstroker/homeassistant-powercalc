@@ -74,6 +74,26 @@ describe("device-first setup", () => {
     });
   });
 
+  it("shows a discovery failure when the device list cannot load", async () => {
+    const element = createSetup();
+    element.definitions = [{
+      ...lightDefinition,
+      fields: [
+        { name: "device_id", label: "Home Assistant device", control: "device", role: "attribute",
+          required: true, all_entities: true, options: [] },
+      ],
+    }];
+    element.deviceEntityErrors = { "*": "Home Assistant is unavailable" };
+    await element.updateComplete;
+    [...element.shadowRoot.querySelectorAll<HTMLButtonElement>(".device-card")]
+      .find((card) => card.querySelector(".type-label")?.textContent === "Light")!.click();
+    await element.updateComplete;
+
+    expect(element.shadowRoot.querySelector(".notice.error")?.textContent)
+      .toBe("Could not load Home Assistant devices: Home Assistant is unavailable");
+    expect(element.shadowRoot.querySelector('[name="device_id"]')).toBeNull();
+  });
+
   it("filters device types and opens the only light route directly", async () => {
     const element = createSetup();
     await element.updateComplete;

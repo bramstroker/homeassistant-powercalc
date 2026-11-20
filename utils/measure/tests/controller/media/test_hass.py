@@ -52,8 +52,9 @@ def test_turn_off_stops_playback_when_power_service_fails(hass_client: MagicMock
 def test_turn_off_propagates_connection_failure_without_fallback(hass_client: MagicMock) -> None:
     hass_client.trigger_service.side_effect = WebsocketError("Disconnected")
 
+    controller = _get_instance(hass_client)
     with pytest.raises(WebsocketError, match="Disconnected"):
-        _get_instance(hass_client).turn_off()
+        controller.turn_off()
 
     hass_client.trigger_service.assert_called_once_with("media_player", "turn_off", entity_id="media_player.test")
 
@@ -71,8 +72,9 @@ def test_turn_off_propagates_stop_playback_failure(hass_client: MagicMock, error
         error,
     ]
 
+    controller = _get_instance(hass_client)
     with pytest.raises(type(error), match="Cannot stop") as exc_info:
-        _get_instance(hass_client).turn_off()
+        controller.turn_off()
 
     assert exc_info.value is error
     assert hass_client.trigger_service.call_args_list == [

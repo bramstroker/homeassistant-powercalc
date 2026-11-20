@@ -323,7 +323,7 @@ class RemoteLoader(Loader):
             return None
         try:
             compress_installed_profile_csv_files(installed)
-        except (OSError, ValueError, KeyError, TypeError, JSONDecodeError) as err:
+        except (OSError, ValueError, KeyError, TypeError) as err:
             _LOGGER.warning("Could not compress cached CSV files for %s: %s", storage, err)
         return installed
 

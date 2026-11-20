@@ -150,7 +150,7 @@ class LibraryFlow:
                         self.flow.source_entity,
                     )
                 except LibraryError as error:
-                    _LOGGER.error("Problem loading model: %s", error)
+                    _LOGGER.exception("Problem loading model")
                     raise SchemaFlowError("unknown") from error
                 await self.flow.validate_strategy_config(power_profile=resolved_profile)
             return user_input

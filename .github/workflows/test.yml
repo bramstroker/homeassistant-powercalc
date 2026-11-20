@@ -125,6 +125,7 @@ jobs:
       - name: Install dependencies
         # Install only the plugin picked for this matrix entry. The two plugins
         # register overlapping fixtures and cannot be loaded together.
+        # The locked dependencies include pyric, which is published only as source.
         run: uv sync --locked --group dev --no-install-package pytest-homeassistant
       - name: Pin Home Assistant and its test plugin
         env:

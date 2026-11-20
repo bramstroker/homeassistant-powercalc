@@ -25,7 +25,7 @@ FIRST_OFFICIAL_MONTH = (2026, 11)
 CONST_FILE = "custom_components/powercalc/const.py"
 STABLE_VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 PYTHON_FLOOR = re.compile(r">=\s*(\d+)\.(\d+)")
-PLUGIN_HA_PIN = re.compile(r"^homeassistant\s*==\s*(\d+)\.(\d+)\.(\d+)([^\s;]*)\s*(?:;.*)?$")
+PLUGIN_HA_PIN = re.compile(r"^homeassistant\s*+==\s*+(\d++)\.(\d++)\.(\d++)([^\s;]*+)\s*+(?:;.*)?$")
 
 
 def read_min_version() -> tuple[int, int]:

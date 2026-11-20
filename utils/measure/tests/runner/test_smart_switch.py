@@ -118,8 +118,10 @@ def test_unusable_single_switch_measurement_preserves_readings(
 ) -> None:
     runner, _, controller, _ = make_runner(["switch.relay"], powers * 2)
 
+    request = make_request(["switch.relay"])
+    output_directory = str(tmp_path)
     with pytest.raises(ValueError, match=message):
-        runner.run(make_request(["switch.relay"]), str(tmp_path))
+        runner.run(request, output_directory)
 
     controller.restore_states.assert_called_once()
     assert (tmp_path / "smart_switch_readings.json").exists()
@@ -130,8 +132,10 @@ def test_multi_switch_rejects_inconsistent_all_on_power(tmp_path: Path) -> None:
     cycle = [0.4] * 5 + [0.6] * 5 + [0.6] * 5 + [1.3] * 5
     runner, _, controller, _ = make_runner(ids, cycle * 2)
 
+    request = make_request(ids)
+    output_directory = str(tmp_path)
     with pytest.raises(ValueError, match="All-on power"):
-        runner.run(make_request(ids), str(tmp_path))
+        runner.run(request, output_directory)
 
     controller.restore_states.assert_called_once()
 
@@ -140,8 +144,10 @@ def test_sampling_failure_still_restores_relay(tmp_path: Path) -> None:
     runner, sampler, controller, _ = make_runner(["switch.relay"], [])
     sampler.take_measurement.side_effect = RuntimeError("meter disconnected")
 
+    request = make_request(["switch.relay"])
+    output_directory = str(tmp_path)
     with pytest.raises(RuntimeError, match="meter disconnected"):
-        runner.run(make_request(["switch.relay"]), str(tmp_path))
+        runner.run(request, output_directory)
 
     controller.restore_states.assert_called_once()
 
