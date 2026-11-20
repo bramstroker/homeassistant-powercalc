@@ -1,0 +1,30 @@
+{
+  "name": "Smart Plug V3",
+  "aliases": [
+    "Smart_Plug_V3",
+    "Athom Plug V3"
+  ],
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "discovery_by": "device",
+  "only_self_usage": true,
+  "standby_power": 0.8,
+  "standby_power_on": 1.4,
+  "measure_method": "manual",
+  "measure_device": "Innovateking-EU AT35",
+  "measure_description": "Athom Smart Plug V3 EU, measured standby off and on without load",
+  "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "created_at": "2026-03-25T14:20:20Z",
+  "authors": [
+    {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    }
+  ]
+}
