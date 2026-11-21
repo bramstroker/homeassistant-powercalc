@@ -1,0 +1,17 @@
+effect,bri,watt
+off,5,0.27
+off,45,0.32
+off,85,0.5
+off,125,0.78
+off,165,1.2
+off,205,1.8
+off,245,2.55
+off,255,2.77
+colorloop,5,0.24
+colorloop,45,0.28
+colorloop,85,0.38
+colorloop,125,0.58
+colorloop,165,0.75
+colorloop,205,1.06
+colorloop,245,1.56
+colorloop,255,1.67
