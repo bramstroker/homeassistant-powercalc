@@ -28,12 +28,6 @@ from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntryD
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt as dt_util
 import pytest
-from pytest_homeassistant_custom_component.components.recorder.common import (
-    async_wait_purge_done,
-    async_wait_recording_done,
-    do_adhoc_statistics,
-    statistics_during_period,
-)
 from sqlalchemy import Connection, event, select
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Mapper, Session, object_session
@@ -63,6 +57,12 @@ from custom_components.powercalc.sensors.group.custom import PreviousStateStore
 from custom_components.powercalc.sensors.group.statistics import async_recreate_statistics, combine_statistics
 from tests.common import assert_entity_state, create_mock_group_entry
 from tests.config_flow.common import section_schema, select_menu_item, submit_form_step
+from tests.ha_test import (
+    async_wait_purge_done,
+    async_wait_recording_done,
+    do_adhoc_statistics,
+    statistics_during_period,
+)
 
 
 @pytest.fixture
