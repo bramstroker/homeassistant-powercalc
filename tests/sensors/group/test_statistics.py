@@ -423,7 +423,8 @@ async def test_import_reserves_entity_id_occupied_by_disabled_entity(
         blocking=True,
     )
     hass.states.async_set("sensor.a", "102", {ATTR_UNIT_OF_MEASUREMENT: "kWh"})
-    await hass.async_block_till_done()
+    # Let the group update propagate to its derived sensors before checking their states.
+    await async_wait_recording_done(hass)
     assert_entity_state(hass, "sensor.history_energy_2_daily", "2.0000")
     assert_entity_state(hass, "sensor.history_cost", "0.5000")
 
