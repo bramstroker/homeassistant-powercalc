@@ -59,6 +59,7 @@ class EntityRecord(Protocol):
     device_class: str | None
     unit: str | None
     device_id: str | None
+    device_group_id: str | None
     related_device_ids: list[str]
     state: str
     attribute_names: list[str]
@@ -439,14 +440,16 @@ class MeasurementPreflight:
         return PreflightResult()
 
     def _validate_smart_switch(self, request: SmartSwitchMeasurementRequest) -> PreflightResult:
-        """Require live relays on one device and an external measurement source."""
+        """Require live relays on one physical device and an external measurement source."""
 
         relays = [
             self._require_entity(entity_id, EntityDomain.SWITCH, "Selected switch is unavailable")
             for entity_id in request.controller.entity_ids
         ]
-        device_id = relays[0].device_id
-        if device_id is None or any(relay.device_id != device_id for relay in relays):
+        # A multi-channel device (power strip) is one parent device plus one sub-device per
+        # channel; its relays must be selectable together.
+        device_ids = {relay.device_group_id or relay.device_id for relay in relays}
+        if None in device_ids or len(device_ids) != 1:
             raise PreflightError("All selected relays must belong to the same Home Assistant device")
         if any(relay.state not in {"on", "off"} for relay in relays):
             raise PreflightError("Every selected relay must have an on or off state")
@@ -454,7 +457,8 @@ class MeasurementPreflight:
             meter = self._require_entity(
                 request.power_meter.entity_id, EntityDomain.SENSOR, "Power sensor is unavailable"
             )
-            if meter.device_id == device_id:
+            meter_device_id = meter.device_group_id or meter.device_id
+            if meter_device_id is not None and meter_device_id in device_ids:
                 raise PreflightError("Measure switch self consumption with an external power meter, not its own sensor")
         return PreflightResult(
             estimated_variations=request.repeat_cycles * (len(relays) + (2 if len(relays) > 1 else 1)),
