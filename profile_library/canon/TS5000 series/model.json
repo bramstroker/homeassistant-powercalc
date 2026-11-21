@@ -1,0 +1,39 @@
+{
+  "name": "Canon TS5000 series",
+  "device_type": "printer",
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "states_power": {
+      "idle": 2.15,
+      "printing": 10.8
+    }
+  },
+  "aliases": [
+    "TS5000 series"
+  ],
+  "discovery_by": "device",
+  "compatible_integrations": [
+    "ipp"
+  ],
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "usb"
+    ]
+  },
+  "measure_method": "script",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_description": "Profile created from a Powercalc Measure recording (measure app 0.14.3, Shelly Plug S Gen3, 230 V). One run over 64 minutes with 1857 samples: 1712 idle and 56 printing. Idle shows two reachable levels (about 1.1 W in deep sleep, about 3.7 W awake on WiFi), so the energy-weighted average is used. Printing averages 10.8 W (median 11.6 W, peak 19.2 W).",
+  "mains_voltage": 230,
+  "created_at": "2026-11-20T00:00:00Z",
+  "authors": [
+    {
+      "name": "Maximilian Kraus",
+      "github": "Maxik933"
+    }
+  ],
+  "gtin": [
+    "4549292066517"
+  ],
+  "product_url": "https://www.canon.de/printers/pixma-ts5050-series/specifications/"
+}
