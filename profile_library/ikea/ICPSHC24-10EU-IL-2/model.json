@@ -5,14 +5,18 @@
       "name": "Jan Brinkmann"
     }
   ],
-  "calculation_strategy": "lut",
+  "calculation_strategy": "linear",
+  "allow_manual_power": true,
   "created_at": "2026-11-18T18:43:36Z",
   "device_specs": {
+    "form_factor": "led_driver",
+    "max_load_watts": 10,
+    "power_monitoring": false,
     "connectivity": [
       "zigbee"
     ]
   },
-  "device_type": "light",
+  "device_type": "smart_dimmer",
   "mains_voltage": 230,
   "measure_description": "Measured with Powercalc Measure",
   "measure_device": "Shelly Plug S",
@@ -27,6 +31,8 @@
   },
   "name": "TRADFRI LED driver, 10 w (ICPSHC24-10EU-IL-2)",
   "standby_power": 0.1,
+  "standby_power_on": 0.1,
+  "standby_power_estimated": true,
   "voltage_range": {
     "max": 234.9,
     "min": 233.5
@@ -36,5 +42,5 @@
     "ICPSHC24-10EU-IL-1/ICPSHC24-10EU-IL-2"
   ],
   "config_flow_discovery_remarks": "Select this profile only if the printed driver type is ICPSHC24-10EU-IL-2. The shared Home Assistant identifier may also match IL-1. Select the driver revision and connected load you actually have.",
-  "config_flow_sub_profile_remarks": "Select only the YTBERG 1.5W load subprofile matching the actual number of connected lamps (1x, 2x, 3x or 4x, where available). Each subprofile estimates the complete ICPSHC24-10EU-IL-2 driver plus the connected lamps. The measurements do not represent individual lamps and must not be multiplied or divided by the number of lamps. Other connected loads are not supported."
+  "config_flow_sub_profile_remarks": "Choose the measured YTBERG 1.5W combination (1x, 2x, 3x or 4x) matching your connected lights. Each measurement includes the driver and all connected lamps. For other lights, select 'Virtual power (manual)' and enter their minimum and maximum power, excluding the driver's own consumption. Leave the fields empty to track only the driver."
 }
