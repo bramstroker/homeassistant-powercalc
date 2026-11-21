@@ -1,6 +1,7 @@
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
+    CONF_BATTERY_RATE,
     CONF_COMPOSITE,
     CONF_FIXED,
     CONF_LINEAR,
@@ -15,6 +16,7 @@ from custom_components.powercalc.errors import UnsupportedStrategyError
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 STRATEGY_CONFIG_MAP = {
+    CONF_BATTERY_RATE: CalculationStrategy.BATTERY_RATE,
     CONF_LINEAR: CalculationStrategy.LINEAR,
     CONF_FIXED: CalculationStrategy.FIXED,
     CONF_MULTI_SWITCH: CalculationStrategy.MULTI_SWITCH,

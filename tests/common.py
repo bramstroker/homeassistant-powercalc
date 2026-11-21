@@ -19,13 +19,6 @@ from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    RegistryEntryWithDefaults,
-    async_fire_time_changed,
-    mock_device_registry,
-    mock_registry,
-)
 
 from custom_components.powercalc import (
     CONF_ENERGY_UPDATE_INTERVAL,
@@ -46,6 +39,13 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.discovery import DISCOVERY_DELAY
+from tests.ha_test import (
+    MockConfigEntry,
+    RegistryEntryWithDefaults,
+    async_fire_time_changed,
+    mock_device_registry,
+    mock_registry,
+)
 
 type StateDefinition = (
     tuple[str, StateType] | tuple[str, StateType, Mapping[str, Any]] | tuple[str, StateType, Mapping[str, Any], bool]

@@ -23,7 +23,7 @@ export class ResultPlot extends LitElement {
   private resizeObserver?: ResizeObserver;
 
   @query("canvas")
-  private canvas!: HTMLCanvasElement | null;
+  private readonly canvas!: HTMLCanvasElement | null;
 
   static readonly styles = [sharedStyles, css`
     :host { display: block; min-width: 0; }

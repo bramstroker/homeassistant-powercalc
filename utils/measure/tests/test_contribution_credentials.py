@@ -29,8 +29,9 @@ def test_credential_store_rejects_invalid_kind(tmp_path: Path, kind: object) -> 
     path = tmp_path / "github.json"
     path.write_text(json.dumps({"kind": kind, "token": "test-token"}))
 
+    store = CredentialStore(path)
     with pytest.raises(ValueError, match="Credential file is invalid"):
-        CredentialStore(path).load()
+        store.load()
 
 
 def test_credential_store_clear_removes_credentials(tmp_path: Path) -> None:
@@ -48,8 +49,9 @@ def test_credential_store_rejects_non_object_file(tmp_path: Path, value: object)
     path = tmp_path / "github.json"
     path.write_text(json.dumps(value))
 
+    store = CredentialStore(path)
     with pytest.raises(ValueError, match="Credential file must contain an object"):
-        CredentialStore(path).load()
+        store.load()
 
 
 @pytest.mark.parametrize(
@@ -69,8 +71,9 @@ def test_credential_store_rejects_invalid_fields(tmp_path: Path, field: str, val
     path = tmp_path / "github.json"
     path.write_text(json.dumps({"kind": "pat", "token": "test-token", field: value}))
 
+    store = CredentialStore(path)
     with pytest.raises(ValueError, match=message):
-        CredentialStore(path).load()
+        store.load()
 
 
 def test_credential_store_preserves_verified_permissions_and_scopes(tmp_path: Path) -> None:

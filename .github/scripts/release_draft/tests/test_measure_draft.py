@@ -301,8 +301,9 @@ def test_release_verification_accepts_explicit_previous_tag() -> None:
     ],
 )
 def test_release_verification_rejects_malformed_changelog_boundaries(changelog: str, message: str) -> None:
+    client = FakeClient([], [])
     with pytest.raises(entry.ReleaseDraftDriftError, match=message):
-        entry.verify_release(FakeClient([], []), changelog, "0.1.0", head_ref="master")
+        entry.verify_release(client, changelog, "0.1.0", head_ref="master")
 
 
 def test_release_verification_reports_missing_previous_tag() -> None:

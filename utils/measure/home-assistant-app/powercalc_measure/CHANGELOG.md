@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.14.3 - 2026-11-18
+
+### 🐛 Bug Fixes
+
+- #5126 Normalize CSV line endings in measurement profile exports @bramstroker
+- #5152 Infer vacuum charging from docked state and battery level @bramstroker
+- #5177 fix(measure): accept smart switch readings as run evidence @Maxik933
+
 ## 0.14.2 - 2026-11-06
 
 - #5113 Addition of a KNX connection for Gen3/Gen4 and Matter certification for Shelly Gen3 devices @Maxik933

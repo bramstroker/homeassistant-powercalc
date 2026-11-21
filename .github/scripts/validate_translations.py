@@ -95,25 +95,27 @@ def validate_translations(translations_dir: Path) -> list[str]:
             errors.append(f"Error: {lang_code}.json is not a valid JSON file")
             continue
 
-        lang_placeholders = extract_all_placeholders(lang_data)
+        errors.extend(validate_placeholders(lang_code, lang_data, en_placeholders))
 
-        for path, en_path_placeholders in en_placeholders.items():
-            path_exists, current = get_path_value(lang_data, path)
-            if not path_exists:
-                errors.append(f"Missing path in {lang_code}.json: {path}")
-                continue
+    return errors
 
-            if path in lang_placeholders:
-                lang_path_placeholders = lang_placeholders[path]
-                missing_placeholders = en_path_placeholders - lang_path_placeholders
 
-                if missing_placeholders:
-                    placeholders_str = ", ".join([f"{{{p}}}" for p in missing_placeholders])
-                    errors.append(f"Missing placeholders in {lang_code}.json at path {path}: {placeholders_str}")
-            elif isinstance(current, str):
-                placeholders_str = ", ".join([f"{{{p}}}" for p in en_path_placeholders])
-                errors.append(f"Missing placeholders in {lang_code}.json at path {path}: {placeholders_str}")
+def validate_placeholders(lang_code: str, lang_data: dict[str, Any], en_placeholders: dict[str, set[str]]) -> list[str]:
+    lang_placeholders = extract_all_placeholders(lang_data)
+    errors = []
+    for path, expected in en_placeholders.items():
+        path_exists, current = get_path_value(lang_data, path)
+        if not path_exists:
+            errors.append(f"Missing path in {lang_code}.json: {path}")
+            continue
 
+        if path not in lang_placeholders and not isinstance(current, str):
+            continue
+
+        missing = expected - lang_placeholders.get(path, set())
+        if missing:
+            placeholders_str = ", ".join(f"{{{placeholder}}}" for placeholder in missing)
+            errors.append(f"Missing placeholders in {lang_code}.json at path {path}: {placeholders_str}")
     return errors
 
 

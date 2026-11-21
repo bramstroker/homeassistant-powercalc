@@ -3,6 +3,7 @@ from collections.abc import Sequence
 import json
 from pathlib import Path
 
+from measure.profile.prepare import MODEL_JSON
 from measure.visualization import (
     PlotSpec,
     build_composite_diagram_from_file,
@@ -79,12 +80,12 @@ def generate_directory_plots(directory: Path, *, force: bool = False) -> int:
 
 def _directory_plot_inputs(directory: Path) -> list[Path]:
     light_files = (path for path in directory.rglob("*.csv*") if path.name in _LIGHT_PLOT_FILES)
-    linear_models = (path for path in directory.rglob("model.json") if _has_linear_calibration(path))
+    linear_models = (path for path in directory.rglob(MODEL_JSON) if _has_linear_calibration(path))
     return sorted((*light_files, *linear_models))
 
 
 def _directory_composite_inputs(directory: Path) -> list[Path]:
-    return sorted(path for path in directory.rglob("model.json") if _has_composite_branches(path))
+    return sorted(path for path in directory.rglob(MODEL_JSON) if _has_composite_branches(path))
 
 
 def _has_linear_calibration(path: Path) -> bool:
@@ -104,10 +105,7 @@ def _has_composite_branches(path: Path) -> bool:
 
 
 def _directory_output_paths(input_path: Path) -> list[Path]:
-    if input_path.name == "model.json":
-        name = "calibration"
-    else:
-        name = input_path.name.removesuffix(".gz").removesuffix(".csv")
+    name = "calibration" if input_path.name == MODEL_JSON else input_path.name.removesuffix(".gz").removesuffix(".csv")
     return [input_path.with_name(f"{name}.{extension}") for extension in ("png", "svg")]
 
 

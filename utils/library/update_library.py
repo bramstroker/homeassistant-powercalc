@@ -376,7 +376,7 @@ def get_lut_quality(model_directory: str) -> dict[str, float]:
     """
     try:
         return score_profile_directory(Path(model_directory))
-    except (ValueError, OSError, EOFError, UnicodeDecodeError, csv.Error) as error:
+    except (ValueError, OSError, EOFError, csv.Error) as error:
         print(f"Error scoring LUT quality for {model_directory}: {error}")
         return {}
 
@@ -451,64 +451,63 @@ async def get_power_range(model_directory: str, model_data: dict[str, Any]) -> t
     """
     calculation_strategy = model_data.get("calculation_strategy", "lut")
     if calculation_strategy == "lut":
-        max_power = 0
-        paths = [
-            *glob.glob(f"{model_directory}/**/*.csv", recursive=True),
-            *glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True),
-        ]
-
-        # Process CSV files concurrently
-        if paths:
-            tasks = [process_csv_file(path) for path in paths]
-            csv_powers = await asyncio.gather(*tasks)
-            # Filter out None values and find the outer bounds
-            valid_powers = [power_range for power_range in csv_powers if power_range is not None]
-            if valid_powers:
-                return min(minimum for minimum, _maximum in valid_powers), max(
-                    maximum for _minimum, maximum in valid_powers
-                )
-            return None, max_power
-        return None, max_power
-
+        return await asyncio.to_thread(_get_lut_power_range, model_directory)
     if calculation_strategy == "linear":
-        linear_config = model_data.get("linear_config", {})
-        if "calibrate" in linear_config:
-            calibrate_powers = [
-                float(line.split("->")[1].strip()) for line in linear_config.get("calibrate", []) if "->" in line
-            ]
-            if calibrate_powers:
-                return min(calibrate_powers), max(calibrate_powers)
-            return None, 0
-        min_power = linear_config.get("min_power")
-        return (
-            float(min_power) if is_number(min_power) else None,
-            float(max(linear_config.get("max_power", 0), model_data.get("standby_power_on", 0))),
-        )
-
+        return _get_linear_power_range(model_data)
     if calculation_strategy == "fixed":
-        fixed_config = model_data.get("fixed_config", {})
-        candidates = [
-            fixed_config.get("power", 0),
-            model_data.get("standby_power_on", 0),
-            *fixed_config.get("states_power", {}).values(),
-        ]
-        fixed_powers = [float(value) for value in candidates if is_number(value)]
-        # The zeros above stand in for values the profile does not set. They cannot pull the
-        # maximum down, but they would happily claim to be the low end of the range.
-        declared_powers = [power for power in fixed_powers if power > 0]
-
-        if declared_powers:
-            standby_power = model_data.get("standby_power")
-            standby_power_value = float(standby_power) if standby_power is not None and is_number(standby_power) else 0
-            if standby_power_value > 0:
-                declared_powers.append(standby_power_value)
-            return min(declared_powers), max(fixed_powers)
-        return None, max(fixed_powers) if fixed_powers else 0
-
+        return _get_fixed_power_range(model_data)
     return None, None
 
 
-async def process_csv_file(path: str) -> tuple[float, float] | None:
+def _get_lut_power_range(model_directory: str) -> tuple[float | None, float]:
+    paths = [
+        *glob.glob(f"{model_directory}/**/*.csv", recursive=True),
+        *glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True),
+    ]
+    valid_powers = [power_range for path in paths if (power_range := process_csv_file(path)) is not None]
+    if not valid_powers:
+        return None, 0
+    return min(minimum for minimum, _ in valid_powers), max(maximum for _, maximum in valid_powers)
+
+
+def _get_linear_power_range(model_data: dict[str, Any]) -> tuple[float | None, float]:
+    linear_config = model_data.get("linear_config", {})
+    if "calibrate" in linear_config:
+        calibrate_powers = [
+            float(line.split("->")[1].strip()) for line in linear_config.get("calibrate", []) if "->" in line
+        ]
+        if calibrate_powers:
+            return min(calibrate_powers), max(calibrate_powers)
+        return None, 0
+    min_power = linear_config.get("min_power")
+    return (
+        float(min_power) if is_number(min_power) else None,
+        float(max(linear_config.get("max_power", 0), model_data.get("standby_power_on", 0))),
+    )
+
+
+def _get_fixed_power_range(model_data: dict[str, Any]) -> tuple[float | None, float]:
+    fixed_config = model_data.get("fixed_config", {})
+    candidates = [
+        fixed_config.get("power", 0),
+        model_data.get("standby_power_on", 0),
+        *fixed_config.get("states_power", {}).values(),
+    ]
+    fixed_powers = [float(value) for value in candidates if is_number(value)]
+    # The zeros above stand in for values the profile does not set. They cannot pull the
+    # maximum down, but they would happily claim to be the low end of the range.
+    declared_powers = [power for power in fixed_powers if power > 0]
+
+    if declared_powers:
+        standby_power = model_data.get("standby_power")
+        standby_power_value = float(standby_power) if standby_power is not None and is_number(standby_power) else 0
+        if standby_power_value > 0:
+            declared_powers.append(standby_power_value)
+        return min(declared_powers), max(fixed_powers)
+    return None, max(fixed_powers) if fixed_powers else 0
+
+
+def process_csv_file(path: str) -> tuple[float, float] | None:
     """Process a single CSV file to find the lowest and highest power value"""
     try:
         with open_lut_file(Path(path)) as f:

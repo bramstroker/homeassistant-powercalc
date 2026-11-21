@@ -58,7 +58,7 @@
     {
       "description": "HA test harness tracks upstream releases, no soak time",
       "matchPackageNames": [
-        "pytest-homeassistant-custom-component",
+        "pytest-homeassistant",
         "homeassistant-stubs"
       ],
       "minimumReleaseAge": "0"

@@ -305,6 +305,10 @@ class PowerProfile:
         """Get configuration to set up playbook strategy."""
         return self.get_strategy_config(CalculationStrategy.PLAYBOOK)
 
+    @property
+    def battery_rate_config(self) -> ConfigType | None:
+        return self.get_strategy_config(CalculationStrategy.BATTERY_RATE)
+
     def get_strategy_config(self, strategy: CalculationStrategy) -> ConfigType | None:
         """Get configuration for a certain strategy."""
         if not self.is_strategy_supported(strategy):
@@ -440,6 +444,15 @@ class PowerProfile:
             return False
 
         return not self.has_sub_profile_select_matchers
+
+    @property
+    def allows_manual_power(self) -> bool:
+        """Whether the main driver profile can be used without selecting a LUT."""
+        return (
+            self._base_json_data.get("allow_manual_power") is True
+            and self._base_json_data.get("device_type") == DeviceType.SMART_DIMMER
+            and self._base_json_data.get("calculation_strategy") == CalculationStrategy.LINEAR
+        )
 
     @property
     def sub_profile_select(self) -> SubProfileSelectConfig | None:

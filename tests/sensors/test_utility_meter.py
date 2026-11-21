@@ -6,14 +6,15 @@ from freezegun import freeze_time
 from homeassistant.components import utility_meter
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.const import DAILY, HOURLY, QUARTER_HOURLY
-from homeassistant.components.utility_meter.sensor import (
-    ATTR_STATUS,
-    ATTR_TARIFF,
-    COLLECTING,
+from homeassistant.components.utility_meter.sensor import COLLECTING, PAUSED
+from homeassistant.const import (
+    ATTR_UNIT_OF_MEASUREMENT,
+    CONF_ENTITY_ID,
+    CONF_NAME,
     CONF_UNIQUE_ID,
-    PAUSED,
+    STATE_OFF,
+    UnitOfEnergy,
 )
-from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_ENTITY_ID, CONF_NAME, STATE_OFF, UnitOfEnergy
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.setup import async_setup_component
@@ -69,13 +70,13 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     assert_entity_state(
         hass,
         "sensor.test_energy_daily_peak",
-        attributes={ATTR_TARIFF: "peak", ATTR_STATUS: COLLECTING},
+        attributes={"tariff": "peak", "status": COLLECTING},
     )
 
     assert_entity_state(
         hass,
         "sensor.test_energy_daily_offpeak",
-        attributes={ATTR_TARIFF: "offpeak", ATTR_STATUS: PAUSED},
+        attributes={"tariff": "offpeak", "status": PAUSED},
     )
 
     general_sensor_daily = hass.states.get("sensor.test_energy_daily")
@@ -87,9 +88,9 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     assert_entity_state(hass, "select.test_energy_daily", "peak")
 
     await set_states(hass, [("select.test_energy_daily", "offpeak")])
-    assert_entity_state(hass, "sensor.test_energy_daily_peak", attributes={ATTR_STATUS: PAUSED})
+    assert_entity_state(hass, "sensor.test_energy_daily_peak", attributes={"status": PAUSED})
 
-    assert_entity_state(hass, "sensor.test_energy_daily_offpeak", attributes={ATTR_STATUS: COLLECTING})
+    assert_entity_state(hass, "sensor.test_energy_daily_offpeak", attributes={"status": COLLECTING})
 
 
 async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:

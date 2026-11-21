@@ -8,7 +8,6 @@ from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_NAME, CONF_UN
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (
     CONF_CREATE_STANDBY_GROUP,
@@ -88,6 +87,7 @@ from tests.config_flow.common import (
     submit_form_step,
     submit_options_step,
 )
+from tests.ha_test import MockConfigEntry
 
 
 async def test_config_flow(hass: HomeAssistant) -> None:

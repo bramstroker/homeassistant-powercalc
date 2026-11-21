@@ -133,8 +133,9 @@ def test_get_battery_level_reports_disappeared_sensor(charging_hass_client: Magi
     charging_hass_client.get_entity_data.return_value = _battery_sensor_data()
     charging_hass_client.get_entity.return_value = None
 
+    controller = _get_instance(charging_hass_client)
     with pytest.raises(BatteryLevelRetrievalError, match=r"Battery level entity sensor\.test_battery_level not found"):
-        _get_instance(charging_hass_client).get_battery_level()
+        controller.get_battery_level()
 
     charging_hass_client.get_entity.assert_called_once_with(entity_id="sensor.test_battery_level")
 
@@ -142,8 +143,9 @@ def test_get_battery_level_reports_disappeared_sensor(charging_hass_client: Magi
 def test_charging_state_reports_disappeared_vacuum(charging_hass_client: MagicMock) -> None:
     charging_hass_client.get_entity.return_value = None
 
+    controller = _get_instance(charging_hass_client)
     with pytest.raises(ControllerError, match=r"Entity vacuum\.test not found"):
-        _get_instance(charging_hass_client).is_charging()
+        controller.is_charging()
 
 
 def test_is_charging(charging_hass_client: MagicMock) -> None:

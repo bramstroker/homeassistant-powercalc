@@ -16,8 +16,8 @@ export class SessionLog extends LitElement {
 
   private readonly container = createRef<HTMLDivElement>();
 
-  @query(".log-toggle") private toggleButton!: HTMLButtonElement | null;
-  @query(".log-head button") private closeButton!: HTMLButtonElement | null;
+  @query(".log-toggle") private readonly toggleButton!: HTMLButtonElement | null;
+  @query(".log-head button") private readonly closeButton!: HTMLButtonElement | null;
 
   static readonly styles = [sharedStyles, css`
     :host { display: inline-flex; }

@@ -123,22 +123,20 @@ jobs:
           # release does not get handed to a Home Assistant that predates it.
           python-version: ${{ matrix.target.python_version }}
       - name: Install dependencies
-        run: uv sync --locked --group dev
-      - name: Pin Home Assistant version
+        # Install only the plugin picked for this matrix entry. The two plugins
+        # register overlapping fixtures and cannot be loaded together.
+        # The locked dependencies include pyric, which is published only as source.
+        run: uv sync --locked --group dev --no-install-package pytest-homeassistant
+      - name: Pin Home Assistant and its test plugin
         env:
           HA_VERSION: ${{ matrix.target.ha_version }}
-        # pytest-homeassistant-custom-component pins an exact homeassistant version,
-        # so resolving it against the requested release picks the matching plugin.
-        # --no-config skips the override-dependencies from pyproject.toml, which are
-        # pinned against the locked release and conflict with older ones. --python is
-        # required because UV_PYTHON, set by setup-uv, otherwise wins over .venv here.
-        # The floors keep a release without a matching plugin an outright resolution
-        # error: without them the resolver walks back to a plugin old enough to pin no
-        # homeassistant at all, and silently swaps in a pytest that predates our Python.
+          TEST_PLUGIN: ${{ matrix.target.test_plugin }}
+        # --no-config skips overrides from the lockfile environment. The pytest
+        # floor prevents the legacy resolver from selecting an obsolete plugin.
         run: |
           uv pip install --no-config --python .venv \
             "homeassistant==${HA_VERSION}" \
-            "pytest-homeassistant-custom-component>=0.13" \
+            "${TEST_PLUGIN}" \
             "pytest>=9"
       - name: Prepare test env
         run: bash tests/setup.sh
