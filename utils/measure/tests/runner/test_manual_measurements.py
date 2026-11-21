@@ -102,8 +102,9 @@ def test_fixed_profile_rejects_unusable_power(device_type: ProfileDeviceType, po
         power_meter=DummyPowerMeterSpec(), device_id="ha-device", profile_device_type=device_type
     )
 
+    runner = AverageRunner(sampler)
     with pytest.raises(UnusableSelfConsumptionError, match=message):
-        AverageRunner(sampler).run(request, "")
+        runner.run(request, "")
 
 
 def test_recorder_treats_app_stop_as_successful_completion(tmp_path: Path) -> None:

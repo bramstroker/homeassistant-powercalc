@@ -78,6 +78,7 @@ from tests.config_flow.common import (
     set_virtual_power_configuration,
     submit_form_step,
 )
+from tests.ha_test import MockConfigEntry
 
 
 async def test_create_group_entry(hass: HomeAssistant) -> None:

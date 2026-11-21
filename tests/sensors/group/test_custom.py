@@ -36,11 +36,6 @@ from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.util import dt
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    async_fire_time_changed,
-    mock_restore_cache_with_extra_data,
-)
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
@@ -109,6 +104,11 @@ from tests.common import (
     mock_entities_in_registry,
     run_powercalc_setup,
     set_states,
+)
+from tests.ha_test import (
+    MockConfigEntry,
+    async_fire_time_changed,
+    mock_restore_cache_with_extra_data,
 )
 
 

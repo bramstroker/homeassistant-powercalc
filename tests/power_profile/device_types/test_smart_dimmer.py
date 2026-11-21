@@ -1,7 +1,11 @@
-from homeassistant.components.light import ATTR_BRIGHTNESS
+from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ATTR_SUPPORTED_COLOR_MODES, ColorMode
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.exceptions import ServiceValidationError
+from homeassistant.helpers.issue_registry import IssueRegistry
+from homeassistant.helpers.selector import SelectSelector
+import pytest
 
 from custom_components.powercalc import CONF_IGNORE_UNAVAILABLE_STATE, async_setup_entry
 from custom_components.powercalc.config_flow import Step
@@ -10,19 +14,191 @@ from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_GAMMA_CURVE,
     CONF_LINEAR,
+    CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_MODE,
+    CONF_MODEL,
     CONF_POWER_CURVE,
+    CONF_SUB_PROFILE,
     DOMAIN,
+    SERVICE_SWITCH_SUB_PROFILE,
+    CalculationStrategy,
 )
+from custom_components.powercalc.flow_helper.flows.library import CONF_CONFIRM_AUTODISCOVERED_MODEL
+from custom_components.powercalc.flow_helper.schema import MANUAL_POWER_OPTION
 from tests.common import (
     assert_entity_state,
+    create_mock_config_entry,
     get_test_profile_dir,
     mock_device_with_entities,
     run_powercalc_setup,
     set_states,
 )
-from tests.config_flow.common import confirm_auto_discovered_model, handle_options_flow_update
+from tests.config_flow.common import confirm_auto_discovered_model, handle_options_flow_update, initialize_options_flow
+
+TRADFRI_DRIVER = "ICPSHC24-10EU-IL-1"
+NORRFLY_SUB_PROFILE = "1x_norrfly_5w"
+LIGHT_AT_FULL_BRIGHTNESS = {
+    ATTR_BRIGHTNESS: 255,
+    ATTR_COLOR_MODE: ColorMode.BRIGHTNESS,
+    ATTR_SUPPORTED_COLOR_MODES: [ColorMode.BRIGHTNESS],
+}
+
+
+@pytest.mark.parametrize(
+    "choice, linear_input, expected_power",
+    [
+        (NORRFLY_SUB_PROFILE, None, "5.90"),
+        (MANUAL_POWER_OPTION, {CONF_MIN_POWER: 1, CONF_MAX_POWER: 4}, "4.10"),
+        (MANUAL_POWER_OPTION, {}, "0.10"),
+    ],
+)
+async def test_tradfri_driver_discovery(
+    hass: HomeAssistant,
+    issue_registry: IssueRegistry,
+    choice: str,
+    linear_input: dict[str, int] | None,
+    expected_power: str,
+) -> None:
+    mock_device_with_entities(hass, "light.test", "ikea", TRADFRI_DRIVER)
+    await set_states(hass, [("light.test", STATE_ON, LIGHT_AT_FULL_BRIGHTNESS)])
+    await run_powercalc_setup(hass)
+
+    (flow,) = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    result = await hass.config_entries.flow.async_configure(
+        flow["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+    )
+    assert result["step_id"] == Step.SUB_PROFILE
+    schema = result["data_schema"]
+    assert schema is not None
+    picker = schema.schema[CONF_SUB_PROFILE]
+    assert isinstance(picker, SelectSelector)
+    assert [option["value"] for option in picker.config["options"]] == [NORRFLY_SUB_PROFILE, MANUAL_POWER_OPTION]
+    assert picker.config["options"][1]["label"] == "Virtual power (manual)"
+    placeholders = result["description_placeholders"]
+    assert placeholders is not None
+    assert "Leave all fields blank" in placeholders["remarks"]
+
+    result = await hass.config_entries.flow.async_configure(flow["flow_id"], {CONF_SUB_PROFILE: choice})
+    if linear_input is not None:
+        assert result["step_id"] == Step.LINEAR
+        result = await hass.config_entries.flow.async_configure(flow["flow_id"], linear_input)
+
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    entry = result["result"]
+    if linear_input is None:
+        assert entry.data[CONF_MODEL] == f"{TRADFRI_DRIVER}/{NORRFLY_SUB_PROFILE}"
+        assert entry.data[CONF_MODE] == CalculationStrategy.LUT
+    else:
+        assert entry.data[CONF_MODEL] == TRADFRI_DRIVER
+        assert entry.data[CONF_MODE] == CalculationStrategy.LINEAR
+        assert entry.data[CONF_LINEAR] == linear_input
+
+    await hass.async_block_till_done()
+    assert await hass.config_entries.async_reload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert_entity_state(hass, "sensor.test_power", expected_power)
+    assert not issue_registry.async_get_issue(DOMAIN, f"sub_profile_{entry.entry_id}")
+
+    if linear_input == {}:
+        await set_states(hass, [("light.test", STATE_ON)])
+        assert_entity_state(hass, "sensor.test_power", "0.10")
+
+    await set_states(hass, [("light.test", STATE_OFF)])
+    assert_entity_state(hass, "sensor.test_power", "0.10")
+
+
+async def test_tradfri_driver_change_power_method(hass: HomeAssistant) -> None:
+    await set_states(hass, [("light.test", STATE_ON, LIGHT_AT_FULL_BRIGHTNESS)])
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "ikea",
+            CONF_MODEL: f"{TRADFRI_DRIVER}/{NORRFLY_SUB_PROFILE}",
+        },
+    )
+    assert_entity_state(hass, "sensor.test_power", "5.90")
+
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+    configure = hass.config_entries.options.async_configure
+    flow_id = result["flow_id"]
+    await configure(flow_id, {})
+    await configure(flow_id, {CONF_MANUFACTURER: "ikea"})
+    result = await configure(flow_id, {CONF_MODEL: TRADFRI_DRIVER})
+    assert result["step_id"] == Step.SUB_PROFILE
+
+    result = await configure(flow_id, {CONF_SUB_PROFILE: MANUAL_POWER_OPTION})
+    assert result["step_id"] == Step.LINEAR
+    result = await configure(flow_id, {CONF_MIN_POWER: 1})
+    assert result["errors"] == {"base": "linear_mandatory"}
+    assert entry.data[CONF_MODEL] == f"{TRADFRI_DRIVER}/{NORRFLY_SUB_PROFILE}"
+
+    result = await configure(flow_id, {CONF_MIN_POWER: 1, CONF_MAX_POWER: 4})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+    assert entry.data[CONF_MODEL] == TRADFRI_DRIVER
+    assert entry.data[CONF_MODE] == CalculationStrategy.LINEAR
+    assert_entity_state(hass, "sensor.test_power", "4.10")
+
+    with pytest.raises(ServiceValidationError):
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_SWITCH_SUB_PROFILE,
+            {CONF_ENTITY_ID: "sensor.test_power", "profile": NORRFLY_SUB_PROFILE},
+            blocking=True,
+        )
+    assert entry.data[CONF_MODEL] == TRADFRI_DRIVER
+
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+    flow_id = result["flow_id"]
+    await configure(flow_id, {})
+    await configure(flow_id, {CONF_MANUFACTURER: "ikea"})
+    result = await configure(flow_id, {CONF_MODEL: TRADFRI_DRIVER})
+    assert result["step_id"] == Step.SUB_PROFILE
+    schema = result["data_schema"]
+    assert schema is not None
+    choice = next(iter(schema.schema))
+    assert choice.default() == MANUAL_POWER_OPTION
+
+    result = await configure(flow_id, {CONF_SUB_PROFILE: NORRFLY_SUB_PROFILE})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+    assert entry.data[CONF_MODEL] == f"{TRADFRI_DRIVER}/{NORRFLY_SUB_PROFILE}"
+    assert entry.data[CONF_MODE] == CalculationStrategy.LUT
+    assert CONF_LINEAR not in entry.data
+    assert_entity_state(hass, "sensor.test_power", "5.90")
+
+
+async def test_tradfri_driver_change_library_model(hass: HomeAssistant) -> None:
+    await set_states(hass, [("light.test", STATE_OFF)])
+    entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "ikea",
+            CONF_MODEL: TRADFRI_DRIVER,
+            CONF_MODE: CalculationStrategy.LINEAR,
+            CONF_LINEAR: {CONF_MAX_POWER: 4},
+        },
+    )
+    assert_entity_state(hass, "sensor.test_power", "0.10")
+
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+    configure = hass.config_entries.options.async_configure
+    flow_id = result["flow_id"]
+    await configure(flow_id, {})
+    await configure(flow_id, {CONF_MANUFACTURER: "ikea"})
+    result = await configure(flow_id, {CONF_MODEL: "LED1739R5"})
+
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    await hass.async_block_till_done()
+    assert entry.data[CONF_MODEL] == "LED1739R5"
+    assert CONF_MODE not in entry.data
+    assert CONF_LINEAR not in entry.data
+    assert_entity_state(hass, "sensor.test_power", "0.26")
 
 
 async def test_smart_dimmer_power_input_yaml(

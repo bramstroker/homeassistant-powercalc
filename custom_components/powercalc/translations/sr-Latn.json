@@ -1,0 +1,1291 @@
+{
+  "common": {
+    "source_entity": "Izvorni entitet",
+    "source_device": "Izvorni uređaj",
+    "remarks_smart_switch": "Ovaj profil pruža samo vrednosti potrošnje u stanju pripravnosti. \n Kada imate uređaj koji troši fiksnu količinu energije dok je uključen, tu vrednost možete uneti u sledećem koraku konfiguracije",
+    "remarks_smart_dimmer": "Ovaj profil pruža samo vrednosti potrošnje u stanju pripravnosti. \n U sledećem koraku opciono možete uneti vrednosti povezanog svetla",
+    "view_measurement_details": "Prikaži detalje merenja"
+  },
+  "config": {
+    "abort": {
+      "already_configured": "Senzor je već konfigurisan, navedite unique_id"
+    },
+    "error": {
+      "cost_price_mandatory": "Morate navesti ili cenu energije ili senzor cene energije",
+      "daily_energy_mandatory": "Morate navesti bar jedno od polja: Vrednost ili Šablon vrednosti",
+      "entity_mandatory": "Izbor entiteta je obavezan za svaku strategiju osim za playbook",
+      "fixed_mandatory": "Morate navesti bar jedno od polja: Snaga, Šablon snage ili Snaga po stanjima",
+      "group_mandatory": "Morate definisati bar podgrupe ili entitete snage i energije",
+      "linear_mandatory": "Morate navesti bar jedno od polja: max_power ili calibrate",
+      "linear_min_higher_as_max": "Maksimalna snaga ne može biti manja od minimalne snage",
+      "linear_unsupported_domain": "Domen entiteta nije podržan za linearni režim. Mora biti jedan od: fan, light ili mediaplayer. Međutim, možete koristiti opciju calibrate",
+      "lut_unsupported_color_mode": "LUT profil ne podržava jedan od režima boja vašeg svetla. Pogledajte evidenciju (logs) za više informacija",
+      "lut_wrong_domain": "Samo entiteti svetla (light) mogu koristiti LUT režim",
+      "playbook_mandatory": "Potrebno je da navedete bar jedan playbook",
+      "unknown": "Došlo je do nepoznate greške, pogledajte evidenciju (logs) za dodatne informacije"
+    },
+    "flow_title": "{name} ({manufacturer} {model})",
+    "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Izaberite grupu(e)",
+          "new_group": "Nova grupa"
+        },
+        "data_description": {
+          "new_group": "Unesite prilagođeni naziv grupe da biste kreirali novu grupu"
+        },
+        "title": "Dodeli grupi"
+      },
+      "availability_entity": {
+        "data": {
+          "availability_entity": "Entitet dostupnosti"
+        },
+        "data_description": {
+          "availability_entity": "Kada je ovaj entitet nedostupan, i powercalc senzor će takođe biti nedostupan"
+        },
+        "title": "Entitet dostupnosti",
+        "description": "Ovaj profil je po uređaju. Izaberite entitet koji će se koristiti za određivanje dostupnosti powercalc senzora"
+      },
+      "daily_energy": {
+        "data": {
+          "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)",
+          "daily_energy_value": "Dnevna vrednost energije",
+          "name": "Naziv",
+          "on_time": "Vreme uključenosti",
+          "start_time": "Vreme početka",
+          "unit_of_measurement": "Merna jedinica",
+          "update_frequency": "Učestalost ažuriranja",
+          "value": "Vrednost",
+          "value_template": "Šablon vrednosti"
+        },
+        "data_description": {
+          "on_time": "Ako ostane prazno, podrazumevano je 1 dan (uvek uključeno)",
+          "update_frequency": "vreme u sekundama između ažuriranja stanja senzora"
+        },
+        "title": "Kreiraj dnevni fiksni senzor"
+      },
+      "energy_options": {
+        "title": "Opcije energije",
+        "data": {
+          "energy_integration_method": "Metoda integracije",
+          "energy_sensor_unit_prefix": "Prefiks jedinice",
+          "energy_filter_outlier_enabled": "Filtriraj odstupanja",
+          "energy_filter_outlier_max_step": "Maksimalni korak filtera odstupanja"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Omogući filtriranje vrednosti koje odstupaju u senzoru energije",
+          "energy_filter_outlier_max_step": "Maksimalni očekivani skok u vrednostima snage (u vatima) za filter odstupanja"
+        }
+      },
+      "group_domain": {
+        "data": {
+          "name": "Naziv",
+          "create_energy_sensor": "Kreiraj senzor energije",
+          "create_cost_sensor": "Kreiraj senzor troškova",
+          "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)",
+          "domain": "Domen entiteta",
+          "exclude_entities": "Izuzmi entitete"
+        },
+        "title": "Kreiraj grupni senzor zasnovan na domenu"
+      },
+      "fixed": {
+        "data": {
+          "fixed_value": "Vrednost snage"
+        },
+        "data_description": {
+          "fixed_value": "Vrednost snage u vatima kada je entitet uključen (ON)"
+        },
+        "description": "Definišite fiksnu vrednost snage za vaš entitet. Pogledajte [dokumentaciju]({docs_uri}) za više informacija",
+        "title": "Fiksna konfiguracija"
+      },
+      "global_configuration": {
+        "title": "Globalna konfiguracija",
+        "description": "Podesite globalnu konfiguraciju za Powercalc. Za više informacija pogledajte [dokumentaciju]({docs_uri}). Dodatne opcije za senzore energije i brojila potrošnje možete uneti u sledećim koracima.",
+        "sections": {
+          "power_options": {
+            "name": "Senzor snage",
+            "data": {
+              "power_sensor_naming": "Šablon naziva senzora snage",
+              "power_sensor_friendly_naming": "Šablon prikaznog naziva senzora snage",
+              "power_sensor_category": "Kategorija senzora snage",
+              "power_sensor_precision": "Preciznost senzora snage",
+              "follow_device_name": "Prati naziv uređaja"
+            },
+            "data_description": {
+              "follow_device_name": "Koristi dodeljeni naziv uređaja za generisane entitete podržanih virtuelnih senzora snage konfigurisanih u korisničkom interfejsu. ID-ovi entiteta i prilagođeni nazivi entiteta ostaju nepromenjeni. Isključivanje ove opcije vraća konfigurisane nazive. Prilagođeni šabloni prikaznog naziva, uključujući globalne šablone, imaju prednost: pogođene stavke zadržavaju svoje konfigurisane nazive."
+            }
+          },
+          "features": {
+            "name": "Kreiraj senzore",
+            "data": {
+              "create_energy_sensors": "Kreiraj senzore energije",
+              "create_cost_sensors": "Kreiraj senzore troškova",
+              "create_standby_group": "Kreiraj grupu stanja pripravnosti",
+              "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)"
+            },
+            "data_description": {
+              "create_energy_sensors": "Da li powercalc treba da kreira kWh senzore",
+              "create_cost_sensors": "Da li powercalc treba da kreira senzore troškova. Zahteva konfigurisanje cene energije u sledećim koracima",
+              "create_standby_group": "Kreira grupu koja sabira svu potrošnju u stanju pripravnosti i sopstvenu potrošnju IoT uređaja",
+              "create_utility_meters": "Dozvolite da powercalc kreira brojila potrošnje, koja se resetuju dnevno, na sat itd."
+            }
+          },
+          "advanced": {
+            "name": "Napredno",
+            "data": {
+              "enable_analytics": "Omogući anonimnu analitiku",
+              "ignore_unavailable_state": "Ignoriši stanje nedostupnosti",
+              "include_non_powercalc_sensors": "Uključi senzore koji nisu powercalc",
+              "disable_extended_attributes": "Onemogući proširene atribute",
+              "disable_library_download": "Onemogući preuzimanje udaljene biblioteke"
+            },
+            "data_description": {
+              "enable_analytics": "Dozvolite da Powercalc šalje anonimnu, objedinjenu statistiku korišćenja kako bi pomogao u poboljšanju integracije",
+              "ignore_unavailable_state": "Zadrži Powercalc senzore dostupnim, čak i kada je izvorni entitet nedostupan",
+              "include_non_powercalc_sensors": "Kontrolišite da li želite da uključite senzore koji nisu powercalc u grupe",
+              "disable_extended_attributes": "Onemogućite sve dodatne atribute koje powercalc dodaje stanjima entiteta snage, energije i grupe. Ovo će pomoći da veličina baze podataka ostane mala",
+              "disable_library_download": "Onemogućite funkciju preuzimanja Powercalc biblioteke"
+            }
+          }
+        }
+      },
+      "global_configuration_cost": {
+        "title": "Opcije troškova",
+        "description": "Konfigurišite cenu energije koja se koristi za izračunavanje senzora troškova. Unesite ili fiksnu cenu ili senzor koji daje trenutnu cenu po kWh. Pogledajte [dokumentaciju]({docs_uri}) za više informacija",
+        "sections": {
+          "cost_pricing": {
+            "name": "Određivanje cena",
+            "data": {
+              "energy_price": "Fiksna cena energije",
+              "energy_price_multiplier": "Množilac cene energije",
+              "energy_price_sensor": "Senzor cene energije",
+              "energy_price_surcharge": "Dodatak na cenu energije"
+            },
+            "data_description": {
+              "energy_price": "Fiksna cena po kWh u vašoj lokalnoj valuti",
+              "energy_price_multiplier": "Množilac koji se primenjuje nakon dodatka. Koristite ovo za procentualne poreze ili naknade, na primer 1.21 za 21%",
+              "energy_price_sensor": "Senzor koji daje trenutnu cenu energije po kWh (npr. iz integracije za dinamičke tarife). Ostavite fiksnu cenu praznom da biste koristili ovaj senzor",
+              "energy_price_surcharge": "Dodatni fiksni iznos po kWh koji se dodaje na fiksnu cenu ili vrednost senzora cene"
+            }
+          },
+          "cost_naming": {
+            "name": "Imenovanje",
+            "data": {
+              "cost_sensor_friendly_naming": "Šablon prikaznog naziva senzora troškova",
+              "cost_sensor_naming": "Šablon naziva senzora troškova"
+            },
+            "data_description": {
+              "cost_sensor_friendly_naming": "Šablon za prikazni naziv senzora troškova. Izvorni naziv se umeće na poziciju čuvara mesta (placeholder)",
+              "cost_sensor_naming": "Šablon koji se koristi za kreiranje naziva i ID-a entiteta senzora troškova. Izvorni naziv se umeće na poziciju čuvara mesta (placeholder)"
+            }
+          }
+        }
+      },
+      "global_configuration_cost_apply": {
+        "title": "Primeni senzore troškova",
+        "description": "Promenili ste globalnu postavku za senzore troškova. Da li želite da primenite ovu promenu na sve postojeće powercalc senzore koji su kreirani putem korisničkog interfejsa (GUI)?",
+        "data": {
+          "apply_to_all": "Primeni na postojeće senzore"
+        },
+        "data_description": {
+          "apply_to_all": "Ažuriraj svaki postojeći GUI powercalc senzor tako da odgovara novoj postavci senzora troškova"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Opcije otkrivanja",
+        "description": "Powercalc može da skenira vaš sistem u potrazi za uređajima i entitetima koji imaju profile potrošnje u ugrađenoj biblioteci. Opcije u nastavku vam omogućavaju da fino podesite ovo ponašanje.",
+        "data": {
+          "enabled": "Omogući otkrivanje",
+          "exclude_device_types": "Izuzeti tipovi uređaja",
+          "exclude_self_usage": "Izuzmi sopstvenu potrošnju"
+        },
+        "data_description": {
+          "exclude_device_types": "Izuzmite jedan ili više određenih tipova uređaja iz otkrivanja.",
+          "exclude_self_usage": "Izuzmite profile sopstvene potrošnje za pametne prekidače."
+        }
+      },
+      "global_configuration_energy": {
+        "title": "Opcije energije",
+        "data": {
+          "energy_integration_method": "Metoda integracije energije",
+          "energy_sensor_category": "Kategorija senzora energije",
+          "energy_sensor_friendly_naming": "Šablon prikaznog naziva senzora energije",
+          "energy_sensor_naming": "Šablon naziva senzora energije",
+          "energy_sensor_precision": "Preciznost senzora energije",
+          "energy_sensor_unit_prefix": "Prefiks jedinice senzora energije"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "Opcije ograničavanja učestalosti (throttling)",
+        "description": "Podesite intervale ažuriranja za različite tipove senzora. Pogledajte [dokumentaciju]({docs_uri}) za više informacija",
+        "data": {
+          "group_energy_update_interval": "Interval ažuriranja grupne energije",
+          "group_power_update_interval": "Interval ažuriranja grupne snage",
+          "energy_update_interval": "Interval ažuriranja energije",
+          "power_update_interval": "Interval ažuriranja snage"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interval u kojem se ažuriraju grupni senzori energije. U sekundama. Postavite na 0 da biste onemogućili",
+          "group_power_update_interval": "Interval u kojem se ažuriraju grupni senzori snage. U sekundama. Postavite na 0 da biste onemogućili",
+          "energy_update_interval": "Interval u kojem se ažuriraju senzori energije. U sekundama. Postavite na 0 da biste onemogućili",
+          "power_update_interval": "Interval u kojem se senzori energije prinudno ažuriraju. U sekundama. Postavite na 0 da biste onemogućili"
+        }
+      },
+      "global_configuration_utility_meter": {
+        "title": "Opcije brojila potrošnje",
+        "data": {
+          "utility_meter_net_consumption": "Neto potrošnja brojila",
+          "utility_meter_tariffs": "Tarife brojila potrošnje",
+          "utility_meter_types": "Tipovi brojila potrošnje"
+        }
+      },
+      "group_custom": {
+        "data": {
+          "name": "Naziv"
+        },
+        "sections": {
+          "members": {
+            "name": "Članovi",
+            "data": {
+              "group_member_sensors": "Članovi powercalc senzori",
+              "group_member_devices": "Uređaji članovi",
+              "group_power_entities": "Dodatni entiteti snage",
+              "group_energy_entities": "Dodatni entiteti energije",
+              "sub_groups": "Podgrupe",
+              "area": "Prostorija",
+              "floor": "Sprat"
+            },
+            "data_description": {
+              "group_member_sensors": "Powercalc senzori koje treba uključiti u grupu",
+              "group_member_devices": "Dodajte entitete snage i energije sa izabranih uređaja u grupu",
+              "group_power_entities": "Dodatni senzori snage (W) iz vaše HA instalacije koje treba uključiti",
+              "group_energy_entities": "Dodatni senzori energije (kWh) iz vaše HA instalacije koje treba uključiti",
+              "sub_groups": "Svi sadržani senzori iz izabranih podgrupa biće takođe dodati u ovu grupu",
+              "area": "Dodaje sve senzore snage iz navedene prostorije",
+              "floor": "Dodaje sve senzore snage sa navedenog sprata"
+            }
+          },
+          "options": {
+            "name": "Opcije",
+            "data": {
+              "device": "Uređaj",
+              "hide_members": "Sakrij članove",
+              "include_non_powercalc_sensors": "Uključi senzore koji nisu powercalc",
+              "force_calculate_group_energy": "Prinudno izračunaj energiju",
+              "group_energy_start_at_zero": "Počni od nule",
+              "create_energy_sensor": "Kreiraj senzor energije",
+              "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)"
+            },
+            "data_description": {
+              "device": "Dodajte grupne entitete koje powercalc kreira postojećem uređaju",
+              "include_non_powercalc_sensors": "Kontrolišite da li želite da uključite senzore koji nisu powercalc kada koristite opciju prostorije",
+              "force_calculate_group_energy": "Podrazumevano powercalc sabira senzore energije iz senzora članova. Uključite ovu opciju da biste prinudno kreirali senzor Rimanove sume (Riemann Sum)",
+              "group_energy_start_at_zero": "Kada je omogućeno, senzor energije će početi od nule prilikom kreiranja. U suprotnom će sabrati sva trenutna stanja senzora energije članova",
+              "create_energy_sensor": "Da li powercalc treba da kreira kWh senzor"
+            }
+          }
+        },
+        "title": "Kreiraj grupni senzor"
+      },
+      "group_subtract": {
+        "data": {
+          "create_energy_sensor": "Kreiraj senzor energije",
+          "create_cost_sensor": "Kreiraj senzor troškova",
+          "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)",
+          "entity_id": "Osnovni entitet",
+          "name": "Naziv",
+          "subtract_entities": "Entiteti za oduzimanje"
+        },
+        "data_description": {
+          "entity_id": "Osnovni entitet od kojeg se oduzima snaga",
+          "subtract_entities": "Izaberite sve entitete koje želite da oduzmete od osnovnog entiteta"
+        },
+        "title": "Grupni senzor oduzimanja"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "Glavni senzor snage (mreža)",
+          "group_tracked_auto": "Automatski dodati entiteti",
+          "create_energy_sensor": "Kreiraj senzor energije",
+          "create_cost_sensor": "Kreiraj senzor troškova",
+          "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)"
+        },
+        "data_description": {
+          "main_power_sensor": "Izaberite senzor snage koji sadrži vašu ukupnu potrošnju snage. Ako ostane prazno, biće kreiran samo senzor praćene snage",
+          "group_tracked_auto": "Powercalc će automatski dodati sve senzore snage u praćenu grupu, preskačući powercalc grupe. Onemogućite ovo ako želite ručno da definišete praćene entitete",
+          "create_energy_sensor": "Da li powercalc treba da kreira kWh senzor",
+          "create_utility_meters": "Dozvolite da powercalc kreira brojila potrošnje, koja se resetuju dnevno, na sat itd."
+        },
+        "description": "Kreirajte grupni senzor za svu praćenu i nepraćenu snagu",
+        "title": "Kreiraj senzor praćene snage"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Praćeni entiteti"
+        },
+        "description": "Izaberite sve senzore snage koji su deo praćene potrošnje. Lista je već automatski popunjena, ali je možete ručno prilagoditi",
+        "title": "Izaberite entitete snage"
+      },
+      "group_tracked_untracked_auto": {
+        "data": {
+          "exclude_entities": "Izuzmi entitete"
+        },
+        "description": "Izuzmite određene entitete iz automatski praćene grupe",
+        "title": "Konfiguracija automatskog praćenja"
+      },
+      "library": {
+        "data": {
+          "confirm_autodisovered_model": "Potvrdi model"
+        },
+        "data_description": {
+          "confirm_autodisovered_model": "Ako izaberete da ne potvrdite, možete sami uneti proizvođača i model"
+        },
+        "description": "{source}\n\nProizvođač \"{manufacturer}\" i model \"{model}\" su automatski prepoznati za vaš uređaj.{remarks}{profile_details}",
+        "title": "Biblioteka"
+      },
+      "library_custom_fields": {
+        "title": "Konfiguracija profila",
+        "data": {
+          "power_factor": "Faktor snage"
+        },
+        "data_description": {
+          "power_factor": "Odnos aktivne i prividne snage. Koristite 0.6 za računare/elektroniku, 0.7 za mešovita opterećenja, 1.0 za omska opterećenja poput grejalica."
+        }
+      },
+      "library_multi_profile": {
+        "data": {
+          "model": "Izaberite model"
+        },
+        "description": "Proizvođač \"{manufacturer}\" i model \"{model}\" su automatski prepoznati za vaš uređaj. Pronađeno je više profila za ovaj entitet koji se potencijalno mogu koristiti. Potražite tačan model vašeg uređaja u [Powercalc biblioteci]({library_link}) i izaberite odgovarajući",
+        "title": "Biblioteka"
+      },
+      "linear": {
+        "data": {
+          "attribute": "Atribut",
+          "calibrate": "Vrednosti kalibracije",
+          "gamma_curve": "Gama kriva",
+          "max_power": "Maksimalna snaga",
+          "min_power": "Minimalna snaga"
+        },
+        "data_description": {
+          "attribute": "Navedite atribut. Ako ostane prazno, biće osvetljenost za svetla, jačina zvuka za zvučnike i procenat za ventilatore",
+          "calibrate": "Unesite po jednu vrednost kalibracije u svaki red. Primer\n\n1: 20"
+        },
+        "description": "Definišite opcije linearnog izračunavanja snage. Pogledajte [dokumentaciju]({docs_uri}) za više informacija. Koristite ili min/maks snagu ili vrednosti kalibracije koje omogućavaju više kontrolnih tačaka.",
+        "title": "Linearna konfiguracija"
+      },
+      "manufacturer": {
+        "data": {
+          "manufacturer": "Proizvođač"
+        },
+        "description": "Izaberite proizvođača uređaja",
+        "title": "Konfiguracija proizvođača"
+      },
+      "model": {
+        "data": {
+          "model": "ID modela"
+        },
+        "description": "Izaberite model uređaja. Pogledajte [listu]({supported_models_link}) podržanih modela za više informacija",
+        "title": "Konfiguracija modela"
+      },
+      "select_device": {
+        "data": {
+          "device": "Uređaj"
+        },
+        "data_description": {
+          "device": "Uređaj sa kojim Powercalc entiteti treba da budu povezani"
+        },
+        "description": "Izaberite uređaj sa kojim Powercalc senzor treba da bude povezan.",
+        "title": "Izaberite uređaj"
+      },
+      "menu_group": {
+        "menu_options": {
+          "group_custom": "Standardna",
+          "group_domain": "Zasnovana na domenu",
+          "group_subtract": "Oduzimanje",
+          "group_tracked_untracked": "Praćena/nepraćena snaga"
+        },
+        "title": "Izaberite tip grupe",
+        "description": "Izaberite tip grupnog senzora koji želite da kreirate. Izaberite grupu zasnovanu na domenu ako želite da grupišete sve entitete određenog domena ili kreirate senzor koji sabira sve vaše senzore energije. U suprotnom izaberite standardnu grupu"
+      },
+      "multi_switch": {
+        "data": {
+          "entities": "Entiteti prekidača",
+          "power": "Snaga kada je uključeno (ON)",
+          "power_off": "Snaga kada je isključeno (OFF)"
+        },
+        "data_description": {
+          "entities": "Izaberite sve pojedinačne prekidače koji su deo višestrukog prekidača",
+          "power": "Snaga za jedan prekidač kada je uključen",
+          "power_off": "Snaga za jedan prekidač kada je isključen"
+        },
+        "description": "Definišite opcije izračunavanja snage za višestruki prekidač. Pogledajte [dokumentaciju]({docs_uri}) za više informacija.",
+        "title": "Konfiguracija višestrukog prekidača"
+      },
+      "playbook": {
+        "data": {
+          "autostart": "Automatsko pokretanje",
+          "playbooks": "Playbook-ovi",
+          "repeat": "Ponavljaj",
+          "states_trigger": "Okidač stanja"
+        },
+        "data_description": {
+          "autostart": "Navedite da se određeni playbook pokrene kada se HA pokrene, npr. 'program1'",
+          "repeat": "Uključite kada želite da se playbook neprekidno ponavlja nakon što se završi",
+          "states_trigger": "Pokrenite playbook na osnovu promene stanja. Primer\n\nplaying: program1"
+        },
+        "description": "Definišite opcije za playbook. Pogledajte [dokumentaciju]({docs_uri}) za više informacija.",
+        "title": "Konfiguracija playbook-a"
+      },
+      "power_advanced": {
+        "data": {
+          "calculation_enabled_condition": "Uslov za omogućeno izračunavanje",
+          "energy_integration_method": "Metoda integracije energije",
+          "energy_sensor_unit_prefix": "Prefiks jedinice senzora energije",
+          "energy_filter_outlier_enabled": "Filtriraj odstupanja energije",
+          "energy_filter_outlier_max_step": "Maksimalni korak filtera odstupanja",
+          "ignore_unavailable_state": "Ignoriši stanje nedostupnosti",
+          "multiply_factor": "Faktor množenja",
+          "multiply_factor_standby": "Faktor množenja u stanju pripravnosti",
+          "unavailable_power": "Snaga kada je nedostupno"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "Konfigurisana strategija izračunavanja snage će se izvršavati samo kada se ovaj šablon proceni kao tačan (true) ili 1, u suprotnom će senzor snage prikazivati 0",
+          "energy_filter_outlier_enabled": "Omogući filtriranje vrednosti koje odstupaju u senzoru energije",
+          "energy_filter_outlier_max_step": "Maksimalni očekivani skok u vrednostima snage (u vatima) za filter odstupanja",
+          "ignore_unavailable_state": "Uključite ovu postavku kada želite da senzor snage ostane dostupan čak i ako je izvorni entitet nedostupan",
+          "multiply_factor": "Množi izračunatu snagu ovim odnosom. Može biti korisno za grupe svetala",
+          "multiply_factor_standby": "Da li da se faktor množenja primeni i na snagu u stanju pripravnosti",
+          "unavailable_power": "Snaga u W koja se beleži kada izvorni entitet ima stanje nedostupnosti"
+        },
+        "description": "Opcije u nastavku su za naprednu powercalc konfiguraciju. Većina korisnika ovo neće koristiti, pa ih možete preskočiti",
+        "title": "Napredne opcije"
+      },
+      "real_power": {
+        "data": {
+          "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)",
+          "entity_id": "ID senzora snage",
+          "name": "Naziv",
+          "device": "Uređaj"
+        },
+        "data_description": {
+          "create_utility_meters": "Dozvolite da powercalc kreira brojila potrošnje, koja se resetuju dnevno, na sat itd.",
+          "name": "Osnovni naziv za senzor energije i brojilo potrošnje. Pun naziv entiteta biće postavljen u skladu sa postavkom energy_sensor_naming",
+          "device": "Dodajte kreirani senzor energije određenom uređaju"
+        },
+        "description": "Trenutno se specifične postavke mogu konfigurisati samo globalno",
+        "title": "Kreiraj senzor energije za postojeći senzor snage"
+      },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "Senzor energije",
+          "name": "Naziv"
+        },
+        "data_description": {
+          "energy_sensor_id": "Postojeći senzor energije (kWh) za koji se izračunava trošak. Ovo može biti senzor iz bilo koje integracije, ne samo Powercalc",
+          "name": "Osnovni naziv za senzor troškova. Pun naziv entiteta se postavlja u skladu sa postavkom cost_sensor_naming"
+        },
+        "description": "Kreirajte senzor troškova za postojeći senzor energije. Cena energije se preuzima iz globalne konfiguracije za Powercalc, osim ako je ne zamenite u nastavku.",
+        "sections": {
+          "cost_pricing": {
+            "name": "Zamena cene",
+            "data": {
+              "energy_price": "Fiksna cena energije",
+              "energy_price_multiplier": "Množilac cene energije",
+              "energy_price_sensor": "Senzor cene energije",
+              "energy_price_surcharge": "Dodatak na cenu energije"
+            },
+            "data_description": {
+              "energy_price": "Fiksna cena po kWh u vašoj lokalnoj valuti. Ostavite prazno da biste koristili globalnu cenu energije",
+              "energy_price_multiplier": "Množilac koji se primenjuje nakon dodatka. Koristite ovo za procentualne poreze ili naknade, na primer 1.21 za 21%. Ostavite prazno da biste koristili globalni množilac",
+              "energy_price_sensor": "Senzor koji daje trenutnu cenu energije po kWh (npr. iz integracije za dinamičke tarife). Ostavite fiksnu cenu praznom da biste koristili ovaj senzor",
+              "energy_price_surcharge": "Dodatni fiksni iznos po kWh koji se dodaje na fiksnu cenu ili vrednost senzora cene. Ostavite prazno da biste koristili globalni dodatak"
+            }
+          }
+        },
+        "title": "Kreiraj senzor troškova"
+      },
+      "sub_profile": {
+        "data": {
+          "sub_profile": "Podprofil"
+        },
+        "description": "Ovaj uređaj ima model sa više podprofila. Izaberite onaj koji odgovara sledećem entitetu ovog uređaja:\n\n\"{entity_id}\"{remarks}",
+        "title": "Konfiguracija podprofila"
+      },
+      "sub_profile_per_device": {
+        "data": {
+          "sub_profile": "Podprofil"
+        },
+        "description": "Ovaj uređaj ima model sa više podprofila. {remarks}",
+        "title": "Konfiguracija podprofila"
+      },
+      "smart_switch": {
+        "data": {
+          "power": "Snaga",
+          "self_usage_included": "Uključena sopstvena potrošnja"
+        },
+        "data_description": {
+          "power": "Fiksna vrednost snage u vatima za povezani uređaj",
+          "self_usage_included": "Da li vrednost snage uključuje snagu koju troši sam pametni prekidač. Ako je izostavite, Powercalc će dodati sopstvenu potrošnju pametnog prekidača na vrednost snage, koja iznosi {self_usage_power}W"
+        },
+        "description": "Definišite potrošnju energije povezanog uređaja. Kada ne troši fiksnu količinu energije, možete preskočiti ovaj korak. Powercalc će podesiti senzor snage za sopstvenu potrošnju samog pametnog prekidača",
+        "title": "Konfiguracija pametnog prekidača"
+      },
+      "user": {
+        "data": {
+          "sensor_type": "Tip senzora"
+        },
+        "menu_options": {
+          "cost": "Senzor troškova (iz postojećeg senzora energije)",
+          "daily_energy": "Dnevna energija",
+          "group": "grupa",
+          "global_configuration": "Globalna konfiguracija",
+          "menu_group": "Grupa",
+          "menu_library": "Virtuelna snaga (biblioteka)",
+          "real_power": "Energija iz stvarnog senzora snage",
+          "virtual_power": "Virtuelna snaga (ručno)"
+        },
+        "title": "Izaberite tip senzora"
+      },
+      "utility_meter_options": {
+        "title": "Opcije brojila potrošnje",
+        "description": "Ovde definišite postavke za kreiranje brojila potrošnje",
+        "data": {
+          "utility_meter_net_consumption": "Neto potrošnja",
+          "utility_meter_types": "Ciklusi",
+          "utility_meter_tariffs": "Tarife"
+        },
+        "data_description": {
+          "utility_meter_net_consumption": "Omogućite ovo ako želite da izvor tretirate kao neto brojilo. Ovo će omogućiti vašem brojaču da ide i u plus i u minus.",
+          "utility_meter_types": "Kreiraj brojila potrošnje za navedene cikluse",
+          "utility_meter_tariffs": "Lista podržanih tarifa, ostavite prazno ako je potrebna samo jedna tarifa."
+        }
+      },
+      "virtual_power": {
+        "data": {
+          "create_energy_sensor": "Kreiraj senzor energije",
+          "create_standby_energy_sensor": "Kreiraj senzor energije u stanju pripravnosti",
+          "create_cost_sensor": "Kreiraj senzor troškova",
+          "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)",
+          "entity_id": "Izvorni entitet",
+          "mode": "Strategija izračunavanja",
+          "name": "Naziv",
+          "standby_power": "Snaga u stanju pripravnosti"
+        },
+        "data_description": {
+          "create_energy_sensor": "Da li powercalc treba da kreira kWh senzor",
+          "create_standby_energy_sensor": "Da li Powercalc treba da kreira kWh senzor koji prati samo potrošnju u stanju pripravnosti",
+          "create_utility_meters": "Dozvolite da powercalc kreira brojila potrošnje, koja se resetuju dnevno, na sat itd.",
+          "entity_id": "Entitet na kojem se zasniva virtuelna snaga, senzor snage će pratiti promene stanja ovog entiteta radi ažuriranja",
+          "name": "Ako ostavite prazno, preuzeće naziv od izvornog entiteta",
+          "standby_power": "Definišite količinu snage koju uređaj troši kada je isključen (OFF)"
+        },
+        "description": "Pogledajte uputstvo (readme) za više informacija o mogućim strategijama i opcijama konfiguracije. Potreban je ili izvorni entitet ili naziv, ili oba.",
+        "title": "Kreiraj virtuelni senzor snage"
+      },
+      "wled": {
+        "data": {
+          "current_entity": "Entitet jačine struje",
+          "power_factor": "Faktor snage",
+          "voltage": "Napon"
+        },
+        "description": "Obavezno omogućite ograničavač osvetljenosti u WLED softveru. Takođe pogledajte {docs_uri}",
+        "title": "WLED konfiguracija",
+        "data_description": {
+          "current_entity": "Opciono izaberite senzor koji daje procenjenu jačinu struje u mA. Potrebno samo kada Powercalc ne može automatski da pronađe WLED senzor procenjene struje, na primer kada je ograničavač osvetljenosti konfigurisan po izlazu."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "invalid_integration_method": {
+      "message": "Nevažeća metoda integracije \"{method}\". Mora biti jedna od: {allowed_methods}."
+    },
+    "no_sub_profile_support": {
+      "message": "{entity_id} ne podržava promenu podprofila. Ova radnja je dostupna samo za senzore koji imaju podprofile i nemaju automatski izbor podprofila."
+    },
+    "not_a_playbook_sensor": {
+      "message": "{entity_id} nije senzor sa omogućenim playbook-om. Ova radnja je dostupna samo za senzore koji koriste playbook strategiju."
+    },
+    "unknown_sub_profile": {
+      "message": "\"{profile}\" nije poznat podprofil. Dostupni podprofili: {known_profiles}."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "measure_session_status": {
+        "name": "Status sesije merenja",
+        "state": {
+          "idle": "U mirovanju",
+          "validating": "Provera u toku",
+          "ready": "Spremno",
+          "awaiting_confirmation": "Čeka potvrdu",
+          "running": "U toku",
+          "cancelling": "Otkazivanje",
+          "cancelled": "Otkazano",
+          "completed": "Završeno",
+          "failed": "Neuspelo",
+          "resumable": "Može se nastaviti"
+        }
+      },
+      "power": {
+        "name": "Snaga"
+      },
+      "energy": {
+        "name": "Energija"
+      },
+      "standby_energy": {
+        "name": "Energija u stanju pripravnosti"
+      },
+      "cost": {
+        "name": "Trošak"
+      },
+      "utility_meter_cycle": {
+        "name": "Energija {period}"
+      },
+      "utility_meter_tariff": {
+        "name": "Energija {period} {tariff}"
+      },
+      "utility_meter_cycle_cost": {
+        "name": "Trošak energije {period}"
+      },
+      "utility_meter_tariff_cost": {
+        "name": "Trošak energije {period} {tariff}"
+      }
+    },
+    "select": {
+      "utility_meter_cycle": {
+        "name": "Energija {period}"
+      }
+    }
+  },
+  "issues": {
+    "composite_device_id": {
+      "fix_flow": {
+        "abort": {
+          "entry_removed": "Stavka Powercalc konfiguracije je uklonjena"
+        },
+        "error": {
+          "invalid_device": "Izaberite postojeći uređaj ili ostavite polje praznim"
+        },
+        "step": {
+          "select_device": {
+            "data": {
+              "device": "Uređaj"
+            },
+            "data_description": {
+              "device": "Uređaj sa kojim entiteti kreirani ovom Powercalc konfiguracijom treba da budu povezani"
+            },
+            "description": "Powercalc konfiguracija {name} je bila povezana sa uređajem koji je Home Assistant podelio na više uređaja. Njeni entiteti ne mogu biti povezani sa starim ID-om uređaja.\n\nIzaberite uređaj sa kojim ovi entiteti treba da budu povezani ili ostavite polje praznim da bi ostali bez uređaja.",
+            "title": "Izaberite uređaj za {name}"
+          }
+        }
+      },
+      "title": "Uređaj za Powercalc konfiguraciju {name} mora ponovo biti izabran"
+    },
+    "deprecated_platform_yaml": {
+      "description": "Konfigurisanje senzora pomoću `sensor->platform` je zastarelo. Potrebno je da promenite konfiguraciju u `powercalc->sensors`. Kliknite na 'Saznaj više' za dalja uputstva.",
+      "title": "Powercalc YAML konfiguracija je premeštena"
+    },
+    "legacy_config": {
+      "title": "YAML konfiguracija je promenjena",
+      "description": "Vašu YAML konfiguraciju za {type} je potrebno ažurirati na novu strukturu. Kliknite na 'Saznaj više' za dodatne informacije."
+    },
+    "sub_profile": {
+      "fix_flow": {
+        "step": {
+          "sub_profile": {
+            "description": "Ovaj uređaj ima model sa više podprofila. Izaberite onaj koji odgovara sledećem entitetu ovog uređaja:\n\n\"{entity_id}\"\n\nProizvođač: {manufacturer}\nModel: {model}{remarks}",
+            "title": "Izaberite odgovarajući podprofil",
+            "data": {
+              "sub_profile": "Podprofil"
+            }
+          }
+        }
+      },
+      "title": "Potreban je izbor podprofila za {entry}"
+    }
+  },
+  "options": {
+    "abort": {
+      "model_not_support": "Model nije podržan"
+    },
+    "error": {
+      "cost_price_mandatory": "Morate navesti ili cenu energije ili senzor cene energije",
+      "fixed_mandatory": "Morate navesti bar jedno od polja: Snaga, Šablon snage ili Snaga po stanjima",
+      "group_mandatory": "Morate definisati bar podgrupe ili entitete snage i energije",
+      "linear_mandatory": "Morate navesti bar jedno od polja: max_power ili calibrate",
+      "linear_min_higher_as_max": "Maksimalna snaga ne može biti manja od minimalne snage",
+      "linear_unsupported_domain": "Domen entiteta nije podržan za linearni režim. Mora biti jedan od: fan, light ili mediaplayer. Međutim, možete koristiti opciju calibrate",
+      "unknown": "Došlo je do nepoznate greške, pogledajte evidenciju (logs) za dodatne informacije"
+    },
+    "step": {
+      "advanced_options": {
+        "title": "Napredne opcije",
+        "data": {
+          "calculation_enabled_condition": "Uslov za omogućeno izračunavanje",
+          "energy_integration_method": "Metoda integracije energije",
+          "ignore_unavailable_state": "Ignoriši stanje nedostupnosti",
+          "multiply_factor": "Faktor množenja",
+          "multiply_factor_standby": "Faktor množenja u stanju pripravnosti",
+          "unavailable_power": "Snaga kada je nedostupno"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "Konfigurisana strategija izračunavanja snage će se izvršavati samo kada se ovaj šablon proceni kao tačan (true) ili 1, u suprotnom će senzor snage prikazivati 0",
+          "ignore_unavailable_state": "Uključite ovu postavku kada želite da senzor snage ostane dostupan čak i ako je izvorni entitet nedostupan",
+          "multiply_factor": "Množi izračunatu snagu ovim odnosom. Može biti korisno za grupe svetala",
+          "multiply_factor_standby": "Da li da se faktor množenja primeni i na snagu u stanju pripravnosti",
+          "unavailable_power": "Snaga u W koja se beleži kada izvorni entitet ima stanje nedostupnosti"
+        }
+      },
+      "basic_options": {
+        "title": "Osnovne opcije",
+        "data": {
+          "create_energy_sensor": "Kreiraj senzor energije",
+          "create_standby_energy_sensor": "Kreiraj senzor energije u stanju pripravnosti",
+          "create_cost_sensor": "Kreiraj senzor troškova",
+          "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)",
+          "entity_id": "Izvorni entitet",
+          "name": "Naziv",
+          "standby_power": "Snaga u stanju pripravnosti"
+        },
+        "data_description": {
+          "create_energy_sensor": "Da li powercalc treba da kreira kWh senzor",
+          "create_standby_energy_sensor": "Da li Powercalc treba da kreira kWh senzor koji prati samo potrošnju u stanju pripravnosti",
+          "create_utility_meters": "Dozvolite da powercalc kreira brojila potrošnje, koja se resetuju dnevno, na sat itd.",
+          "entity_id": "Entitet na kojem se zasniva virtuelna snaga, senzor snage će pratiti promene stanja ovog entiteta radi ažuriranja",
+          "name": "Ako ostavite prazno, preuzeće naziv od izvornog entiteta",
+          "standby_power": "Definišite količinu snage koju uređaj troši kada je isključen (OFF)"
+        }
+      },
+      "daily_energy": {
+        "title": "Opcije dnevne energije",
+        "data": {
+          "daily_energy_value": "Dnevna vrednost energije",
+          "name": "Naziv",
+          "on_time": "Vreme uključenosti",
+          "start_time": "Vreme početka",
+          "unit_of_measurement": "Merna jedinica",
+          "update_frequency": "Učestalost ažuriranja",
+          "value": "Vrednost",
+          "value_template": "Šablon vrednosti"
+        },
+        "data_description": {
+          "on_time": "Ako ostane prazno, podrazumevano je 1 dan (uvek uključeno)",
+          "update_frequency": "vreme u sekundama između ažuriranja stanja senzora"
+        }
+      },
+      "energy_options": {
+        "title": "Opcije energije",
+        "data": {
+          "energy_integration_method": "Metoda integracije",
+          "energy_sensor_unit_prefix": "Prefiks jedinice",
+          "energy_filter_outlier_enabled": "Filtriraj odstupanja",
+          "energy_filter_outlier_max_step": "Maksimalni korak filtera odstupanja"
+        },
+        "data_description": {
+          "energy_filter_outlier_enabled": "Omogući filtriranje vrednosti koje odstupaju u senzoru energije",
+          "energy_filter_outlier_max_step": "Maksimalni očekivani skok u vrednostima snage (u vatima) za filter odstupanja"
+        }
+      },
+      "fixed": {
+        "title": "Fiksne opcije",
+        "data": {
+          "fixed_value": "Fiksna vrednost",
+          "self_usage_included": "Uključena sopstvena potrošnja"
+        },
+        "data_description": {
+          "self_usage_included": "Da li vrednost snage uključuje snagu koju troši sam pametni prekidač."
+        }
+      },
+      "global_configuration": {
+        "title": "Osnovne opcije",
+        "sections": {
+          "power_options": {
+            "name": "Senzor snage",
+            "data": {
+              "power_sensor_naming": "Šablon naziva senzora snage",
+              "power_sensor_friendly_naming": "Šablon prikaznog naziva senzora snage",
+              "power_sensor_category": "Kategorija senzora snage",
+              "power_sensor_precision": "Preciznost senzora snage",
+              "follow_device_name": "Prati naziv uređaja"
+            },
+            "data_description": {
+              "follow_device_name": "Koristi dodeljeni naziv uređaja za generisane entitete podržanih virtuelnih senzora snage konfigurisanih u korisničkom interfejsu. ID-ovi entiteta i prilagođeni nazivi entiteta ostaju nepromenjeni. Isključivanje ove opcije vraća konfigurisane nazive. Prilagođeni šabloni prikaznog naziva, uključujući globalne šablone, imaju prednost: pogođene stavke zadržavaju svoje konfigurisane nazive."
+            }
+          },
+          "features": {
+            "name": "Kreiraj senzore",
+            "data": {
+              "create_energy_sensors": "Kreiraj senzore energije",
+              "create_cost_sensors": "Kreiraj senzore troškova",
+              "create_standby_group": "Kreiraj grupu stanja pripravnosti",
+              "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)"
+            },
+            "data_description": {
+              "create_energy_sensors": "Da li powercalc treba da kreira kWh senzore",
+              "create_cost_sensors": "Da li powercalc treba da kreira senzore troškova. Zahteva konfigurisanje cene energije u sledećim koracima",
+              "create_standby_group": "Kreira grupu koja sabira svu potrošnju u stanju pripravnosti i sopstvenu potrošnju IoT uređaja",
+              "create_utility_meters": "Dozvolite da powercalc kreira brojila potrošnje, koja se resetuju dnevno, na sat itd."
+            }
+          },
+          "advanced": {
+            "name": "Napredno",
+            "data": {
+              "enable_analytics": "Omogući anonimnu analitiku",
+              "ignore_unavailable_state": "Ignoriši stanje nedostupnosti",
+              "include_non_powercalc_sensors": "Uključi senzore koji nisu powercalc",
+              "disable_extended_attributes": "Onemogući proširene atribute",
+              "disable_library_download": "Onemogući preuzimanje udaljene biblioteke"
+            },
+            "data_description": {
+              "enable_analytics": "Dozvolite da Powercalc šalje anonimnu, objedinjenu statistiku korišćenja kako bi pomogao u poboljšanju integracije",
+              "ignore_unavailable_state": "Zadrži Powercalc senzore dostupnim, čak i kada je izvorni entitet nedostupan",
+              "include_non_powercalc_sensors": "Kontrolišite da li želite da uključite senzore koji nisu powercalc u grupe",
+              "disable_extended_attributes": "Onemogućite sve dodatne atribute koje powercalc dodaje stanjima entiteta snage, energije i grupe. Ovo će pomoći da veličina baze podataka ostane mala",
+              "disable_library_download": "Onemogućite funkciju preuzimanja Powercalc biblioteke"
+            }
+          }
+        }
+      },
+      "global_configuration_cost": {
+        "title": "Opcije troškova",
+        "description": "Konfigurišite cenu energije koja se koristi za izračunavanje senzora troškova. Unesite ili fiksnu cenu ili senzor koji daje trenutnu cenu po kWh. Pogledajte [dokumentaciju]({docs_uri}) za više informacija",
+        "sections": {
+          "cost_pricing": {
+            "name": "Određivanje cena",
+            "data": {
+              "energy_price": "Fiksna cena energije",
+              "energy_price_multiplier": "Množilac cene energije",
+              "energy_price_sensor": "Senzor cene energije",
+              "energy_price_surcharge": "Dodatak na cenu energije"
+            },
+            "data_description": {
+              "energy_price": "Fiksna cena po kWh u vašoj lokalnoj valuti",
+              "energy_price_multiplier": "Množilac koji se primenjuje nakon dodatka. Koristite ovo za procentualne poreze ili naknade, na primer 1.21 za 21%",
+              "energy_price_sensor": "Senzor koji daje trenutnu cenu energije po kWh (npr. iz integracije za dinamičke tarife). Ostavite fiksnu cenu praznom da biste koristili ovaj senzor",
+              "energy_price_surcharge": "Dodatni fiksni iznos po kWh koji se dodaje na fiksnu cenu ili vrednost senzora cene"
+            }
+          },
+          "cost_naming": {
+            "name": "Imenovanje",
+            "data": {
+              "cost_sensor_friendly_naming": "Šablon prikaznog naziva senzora troškova",
+              "cost_sensor_naming": "Šablon naziva senzora troškova"
+            },
+            "data_description": {
+              "cost_sensor_friendly_naming": "Šablon za prikazni naziv senzora troškova. Izvorni naziv se umeće na poziciju čuvara mesta (placeholder)",
+              "cost_sensor_naming": "Šablon koji se koristi za kreiranje naziva i ID-a entiteta senzora troškova. Izvorni naziv se umeće na poziciju čuvara mesta (placeholder)"
+            }
+          }
+        }
+      },
+      "global_configuration_cost_apply": {
+        "title": "Primeni senzore troškova",
+        "description": "Promenili ste globalnu postavku za senzore troškova. Da li želite da primenite ovu promenu na sve postojeće powercalc senzore koji su kreirani putem korisničkog interfejsa (GUI)?",
+        "data": {
+          "apply_to_all": "Primeni na postojeće senzore"
+        },
+        "data_description": {
+          "apply_to_all": "Ažuriraj svaki postojeći GUI powercalc senzor tako da odgovara novoj postavci senzora troškova"
+        }
+      },
+      "global_configuration_discovery": {
+        "title": "Opcije otkrivanja",
+        "description": "Upravljajte postavkama otkrivanja. Pogledajte [dokumentaciju]({docs_uri}) za više informacija",
+        "data": {
+          "enabled": "Omogući otkrivanje",
+          "exclude_device_types": "Izuzeti tipovi uređaja",
+          "exclude_self_usage": "Izuzmi sopstvenu potrošnju"
+        },
+        "data_description": {
+          "exclude_device_types": "Izuzmite jedan ili više određenih tipova uređaja iz otkrivanja.",
+          "exclude_self_usage": "Izuzmite profile sopstvene potrošnje za pametne prekidače."
+        }
+      },
+      "global_configuration_energy": {
+        "title": "Opcije energije",
+        "description": "Ovde definišite podrazumevane postavke za senzore energije. Pogledajte [dokumentaciju]({docs_uri}) za više informacija",
+        "data": {
+          "energy_integration_method": "Metoda integracije energije",
+          "energy_sensor_category": "Kategorija senzora energije",
+          "energy_sensor_friendly_naming": "Šablon prikaznog naziva senzora energije",
+          "energy_sensor_naming": "Šablon naziva senzora energije",
+          "energy_sensor_precision": "Preciznost senzora energije",
+          "energy_sensor_unit_prefix": "Prefiks jedinice senzora energije"
+        }
+      },
+      "global_configuration_throttling": {
+        "title": "Opcije ograničavanja učestalosti (throttling)",
+        "description": "Podesite intervale ažuriranja za različite tipove senzora. Pogledajte [dokumentaciju]({docs_uri}) za više informacija",
+        "data": {
+          "group_energy_update_interval": "Interval ažuriranja grupne energije",
+          "group_power_update_interval": "Interval ažuriranja grupne snage",
+          "energy_update_interval": "Interval ažuriranja energije",
+          "power_update_interval": "Interval ažuriranja snage"
+        },
+        "data_description": {
+          "group_energy_update_interval": "Interval u kojem se ažuriraju grupni senzori energije. U sekundama. Postavite na 0 da biste onemogućili",
+          "group_power_update_interval": "Interval u kojem se ažuriraju grupni senzori snage. U sekundama. Postavite na 0 da biste onemogućili",
+          "energy_update_interval": "Interval u kojem se ažuriraju senzori energije. U sekundama. Postavite na 0 da biste onemogućili",
+          "power_update_interval": "Interval u kojem se senzori snage prinudno ažuriraju. U sekundama. Postavite na 0 da biste onemogućili"
+        }
+      },
+      "global_configuration_utility_meter": {
+        "title": "Opcije brojila potrošnje",
+        "description": "Ovde definišite podrazumevane postavke za brojila potrošnje. Pogledajte [dokumentaciju]({docs_uri}) za više informacija",
+        "data": {
+          "utility_meter_net_consumption": "Neto potrošnja brojila",
+          "utility_meter_tariffs": "Tarife brojila potrošnje",
+          "utility_meter_types": "Tipovi brojila potrošnje"
+        }
+      },
+      "group_custom": {
+        "title": "Opcije grupe",
+        "sections": {
+          "members": {
+            "name": "Članovi",
+            "data": {
+              "group_member_sensors": "Članovi powercalc senzori",
+              "group_member_devices": "Uređaji članovi",
+              "group_power_entities": "Dodatni entiteti snage",
+              "group_energy_entities": "Dodatni entiteti energije",
+              "sub_groups": "Podgrupe",
+              "area": "Prostorija",
+              "floor": "Sprat"
+            },
+            "data_description": {
+              "group_member_sensors": "Powercalc senzori koje treba uključiti u grupu",
+              "group_member_devices": "Dodajte entitete snage i energije sa izabranih uređaja u grupu",
+              "group_power_entities": "Dodatni senzori snage (W) iz vaše HA instalacije koje treba uključiti",
+              "group_energy_entities": "Dodatni senzori energije (kWh) iz vaše HA instalacije koje treba uključiti",
+              "sub_groups": "Svi sadržani senzori iz izabranih podgrupa biće takođe dodati u ovu grupu",
+              "area": "Dodaje sve senzore snage iz navedene prostorije",
+              "floor": "Dodaje sve senzore snage sa navedenog sprata"
+            }
+          },
+          "options": {
+            "name": "Opcije",
+            "data": {
+              "device": "Uređaj",
+              "hide_members": "Sakrij članove",
+              "include_non_powercalc_sensors": "Uključi senzore koji nisu powercalc",
+              "force_calculate_group_energy": "Prinudno izračunaj energiju"
+            },
+            "data_description": {
+              "device": "Dodajte grupne entitete koje powercalc kreira postojećem uređaju",
+              "include_non_powercalc_sensors": "Kontrolišite da li želite da uključite senzore koji nisu powercalc kada koristite opciju prostorije",
+              "force_calculate_group_energy": "Podrazumevano powercalc sabira senzore energije iz senzora članova. Uključite ovu opciju da biste prinudno kreirali senzor Rimanove sume (Riemann Sum)"
+            }
+          }
+        }
+      },
+      "group_subtract": {
+        "data": {
+          "entity_id": "Osnovni entitet",
+          "subtract_entities": "Entiteti za oduzimanje"
+        },
+        "data_description": {
+          "entity_id": "Osnovni entitet od kojeg se oduzima snaga",
+          "subtract_entities": "Izaberite sve entitete koje želite da oduzmete od osnovnog entiteta"
+        },
+        "title": "Opcije grupe"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "Glavni senzor snage (mreža)",
+          "group_tracked_auto": "Automatski dodati entiteti",
+          "create_energy_sensor": "Kreiraj senzor energije",
+          "create_cost_sensor": "Kreiraj senzor troškova",
+          "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)"
+        },
+        "data_description": {
+          "main_power_sensor": "Izaberite senzor snage koji sadrži vašu ukupnu potrošnju snage. Ako ostane prazno, biće kreiran samo senzor praćene snage",
+          "group_tracked_auto": "Powercalc će automatski dodati sve senzore snage u praćenu grupu, preskačući powercalc grupe. Onemogućite ovo ako želite ručno da definišete praćene entitete",
+          "create_energy_sensor": "Da li powercalc treba da kreira kWh senzor",
+          "create_utility_meters": "Dozvolite da powercalc kreira brojila potrošnje, koja se resetuju dnevno, na sat itd."
+        },
+        "title": "Opcije praćene/nepraćene grupe"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Praćeni entiteti"
+        },
+        "title": "Izaberite entitete snage"
+      },
+      "init": {
+        "menu_options": {
+          "advanced_options": "Napredne opcije",
+          "basic_options": "Osnovne opcije",
+          "cost": "Opcije troškova",
+          "daily_energy": "Opcije dnevne energije",
+          "energy_options": "Opcije energije",
+          "fixed": "Fiksne opcije",
+          "group_custom": "Opcije grupe",
+          "group_domain": "Opcije grupe",
+          "group_subtract": "Opcije grupe",
+          "group_tracked_untracked": "Opcije grupe",
+          "group_tracked_untracked_manual": "Praćeni entiteti",
+          "library_options": "Opcije biblioteke",
+          "linear": "Linearne opcije",
+          "playbook": "Opcije playbook-a",
+          "multi_switch": "Opcije višestrukog prekidača",
+          "real_power": "Opcije stvarne snage",
+          "select_device": "Uređaj",
+          "utility_meter_options": "Opcije brojila potrošnje",
+          "wled": "WLED opcije",
+          "cost_options": "Opcije troškova"
+        }
+      },
+      "library_options": {
+        "title": "Opcije biblioteke",
+        "description": "Trenutno je izabran sledeći profil iz biblioteke: \n proizvođač: {manufacturer}\n model: {model}\n\nAko želite da promenite profil, kliknite na Dalje.{profile_details}"
+      },
+      "select_device": {
+        "data": {
+          "device": "Uređaj"
+        },
+        "data_description": {
+          "device": "Uređaj sa kojim Powercalc entiteti treba da budu povezani"
+        },
+        "description": "Izaberite uređaj sa kojim Powercalc senzor treba da bude povezan.",
+        "title": "Izaberite uređaj"
+      },
+      "linear": {
+        "title": "Linearne opcije",
+        "data": {
+          "attribute": "Atribut",
+          "calibrate": "Vrednosti kalibracije",
+          "gamma_curve": "Gama kriva",
+          "max_power": "Maksimalna snaga",
+          "min_power": "Minimalna snaga"
+        },
+        "data_description": {
+          "attribute": "Navedite atribut. Ako ostane prazno, biće osvetljenost za svetla i procenat za ventilatore",
+          "calibrate": "Unesite po jednu vrednost kalibracije u svaki red. Primer\n\n1: 20"
+        }
+      },
+      "multi_switch": {
+        "title": "Opcije višestrukog prekidača",
+        "data": {
+          "entities": "Entiteti prekidača",
+          "power": "Snaga kada je uključeno (ON)",
+          "power_off": "Snaga kada je isključeno (OFF)"
+        },
+        "data_description": {
+          "entities": "Izaberite sve pojedinačne prekidače koji su deo višestrukog prekidača",
+          "power": "Snaga za jedan prekidač kada je uključen",
+          "power_off": "Snaga za jedan prekidač kada je isključen"
+        }
+      },
+      "playbook": {
+        "title": "Opcije playbook-a",
+        "data": {
+          "autostart": "Automatsko pokretanje",
+          "playbooks": "Playbook-ovi",
+          "repeat": "Ponavljaj",
+          "states_trigger": "Okidač stanja"
+        },
+        "data_description": {
+          "autostart": "Navedite da se određeni playbook pokrene kada se HA pokrene, npr. 'program1'",
+          "repeat": "Uključite kada želite da se playbook neprekidno ponavlja nakon što se završi",
+          "states_trigger": "Pokrenite playbook na osnovu promene stanja. Primer\n\nplaying: program1"
+        }
+      },
+      "real_power": {
+        "title": "Opcije stvarne snage",
+        "data": {
+          "device": "Uređaj"
+        },
+        "data_description": {
+          "device": "Dodajte kreirani senzor energije određenom uređaju"
+        }
+      },
+      "cost": {
+        "data": {
+          "energy_sensor_id": "Senzor energije"
+        },
+        "data_description": {
+          "energy_sensor_id": "Postojeći senzor energije (kWh) za koji se izračunava trošak"
+        },
+        "sections": {
+          "cost_pricing": {
+            "name": "Zamena cene",
+            "data": {
+              "energy_price": "Fiksna cena energije",
+              "energy_price_multiplier": "Množilac cene energije",
+              "energy_price_sensor": "Senzor cene energije",
+              "energy_price_surcharge": "Dodatak na cenu energije"
+            },
+            "data_description": {
+              "energy_price": "Fiksna cena po kWh u vašoj lokalnoj valuti. Ostavite prazno da biste koristili globalnu cenu energije",
+              "energy_price_multiplier": "Množilac koji se primenjuje nakon dodatka. Koristite ovo za procentualne poreze ili naknade, na primer 1.21 za 21%. Ostavite prazno da biste koristili globalni množilac",
+              "energy_price_sensor": "Senzor koji daje trenutnu cenu energije po kWh (npr. iz integracije za dinamičke tarife). Ostavite fiksnu cenu praznom da biste koristili ovaj senzor",
+              "energy_price_surcharge": "Dodatni fiksni iznos po kWh koji se dodaje na fiksnu cenu ili vrednost senzora cene. Ostavite prazno da biste koristili globalni dodatak"
+            }
+          }
+        },
+        "title": "Opcije troškova"
+      },
+      "utility_meter_options": {
+        "title": "Opcije brojila potrošnje",
+        "data": {
+          "utility_meter_net_consumption": "Neto potrošnja",
+          "utility_meter_types": "Ciklusi",
+          "utility_meter_tariffs": "Tarife"
+        },
+        "data_description": {
+          "utility_meter_net_consumption": "Omogućite ovo ako želite da izvor tretirate kao neto brojilo. Ovo će omogućiti vašem brojaču da ide i u plus i u minus.",
+          "utility_meter_types": "Kreiraj brojila potrošnje za navedene cikluse",
+          "utility_meter_tariffs": "Lista podržanih tarifa, ostavite prazno ako je potrebna samo jedna tarifa."
+        }
+      },
+      "wled": {
+        "title": "WLED opcije",
+        "data": {
+          "current_entity": "Entitet jačine struje",
+          "power_factor": "Faktor snage",
+          "voltage": "Napon"
+        },
+        "data_description": {
+          "current_entity": "Opciono izaberite senzor koji daje procenjenu jačinu struje u mA. Potrebno samo kada Powercalc ne može automatski da pronađe WLED senzor procenjene struje, na primer kada je ograničavač osvetljenosti konfigurisan po izlazu."
+        }
+      },
+      "cost_options": {
+        "data": {
+          "energy_price": "Fiksna cena energije",
+          "energy_price_multiplier": "Množilac cene energije",
+          "energy_price_sensor": "Senzor cene energije",
+          "energy_price_surcharge": "Dodatak na cenu energije"
+        },
+        "data_description": {
+          "energy_price": "Fiksna cena po kWh u vašoj lokalnoj valuti. Ostavite prazno da biste koristili globalnu cenu energije",
+          "energy_price_multiplier": "Množilac koji se primenjuje nakon dodatka. Koristite ovo za procentualne poreze ili naknade, na primer 1.21 za 21%. Ostavite prazno da biste koristili globalni množilac",
+          "energy_price_sensor": "Senzor koji daje trenutnu cenu energije po kWh (npr. iz integracije za dinamičke tarife). Ostavite fiksnu cenu praznom da biste koristili ovaj senzor",
+          "energy_price_surcharge": "Dodatni fiksni iznos po kWh koji se dodaje na fiksnu cenu ili vrednost senzora cene. Ostavite prazno da biste koristili globalni dodatak"
+        },
+        "description": "Zamenite globalno konfigurisanu cenu energije samo za ovaj senzor. Ostavite sva polja prazna da biste nastavili da koristite globalnu cenu. Pogledajte [dokumentaciju]({docs_uri}) za više informacija",
+        "title": "Opcije troškova"
+      }
+    }
+  },
+  "selector": {
+    "daily_energy_value": {
+      "choices": {
+        "value": "Fiksna vrednost",
+        "value_template": "Šablon"
+      }
+    },
+    "fixed_value": {
+      "choices": {
+        "power": "Fiksna vrednost",
+        "power_template": "Šablon",
+        "states_power": "Mapiranje stanja"
+      }
+    }
+  },
+  "services": {
+    "activate_playbook": {
+      "description": "Pokreni izvršavanje playbook-a.",
+      "fields": {
+        "playbook_id": {
+          "description": "Identifikator playbook-a.",
+          "name": "Playbook"
+        }
+      },
+      "name": "Aktiviraj playbook"
+    },
+    "calibrate_energy": {
+      "description": "Postavlja senzor energije na zadatu vrednost u kWh.",
+      "fields": {
+        "value": {
+          "description": "Vrednost koju treba postaviti.",
+          "name": "Vrednost"
+        }
+      },
+      "name": "Kalibriši senzor energije"
+    },
+    "calibrate_cost": {
+      "description": "Postavlja senzor troškova na zadatu novčanu vrednost.",
+      "fields": {
+        "value": {
+          "description": "Vrednost koju treba postaviti.",
+          "name": "Vrednost"
+        }
+      },
+      "name": "Kalibriši senzor troškova"
+    },
+    "calibrate_utility_meter": {
+      "description": "Kalibriše senzor brojila potrošnje.",
+      "fields": {
+        "value": {
+          "description": "Vrednost koju treba postaviti.",
+          "name": "Vrednost"
+        }
+      },
+      "name": "Kalibriši brojilo potrošnje"
+    },
+    "change_gui_config": {
+      "description": "Grupna izmena konfiguracije svih Powercalc konfiguracionih unosa",
+      "fields": {
+        "field": {
+          "description": "Polje koje želite da izmenite",
+          "name": "Polje"
+        },
+        "value": {
+          "description": "Vrednost koju treba postaviti.",
+          "name": "Vrednost"
+        }
+      },
+      "name": "Izmeni GUI konfiguraciju"
+    },
+    "debug_group": {
+      "description": "Prikaži pregled za otklanjanje grešaka (debug) grupnog senzora snage ili energije uključujući trenutne vrednosti članova.",
+      "name": "Otklanjanje grešaka grupe"
+    },
+    "get_active_playbook": {
+      "description": "Preuzmi trenutno aktivni playbook",
+      "name": "Preuzmi aktivni playbook"
+    },
+    "get_group_entities": {
+      "description": "Preuzmi sve ID-ove entiteta grupnog senzora energije ili snage",
+      "name": "Preuzmi entitete grupe"
+    },
+    "increase_daily_energy": {
+      "description": "Uvećava senzor za zadati iznos.",
+      "fields": {
+        "value": {
+          "description": "Iznos koji se dodaje senzoru.",
+          "name": "Vrednost"
+        }
+      },
+      "name": "Uvećaj senzor dnevne energije"
+    },
+    "reload": {
+      "description": "Ponovo učitaj Powercalc konfiguraciju i entitete",
+      "name": "Ponovo učitaj"
+    },
+    "reset_energy": {
+      "description": "Resetuj senzor energije na nula kWh.",
+      "name": "Resetuj senzor energije"
+    },
+    "reset_cost": {
+      "description": "Resetuj senzor troškova na nulu.",
+      "name": "Resetuj senzor troškova"
+    },
+    "stop_playbook": {
+      "description": "Zaustavi trenutno aktivni playbook.",
+      "name": "Zaustavi playbook"
+    },
+    "switch_sub_profile": {
+      "description": "Neki profili u biblioteci imaju različite podprofile. Ova usluga vam omogućava da pređete na drugi.",
+      "fields": {
+        "profile": {
+          "name": "Podprofil",
+          "description": "Definišite jedan od mogućih podprofila"
+        }
+      },
+      "name": "Prebaci na drugi podprofil"
+    }
+  }
+}

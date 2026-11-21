@@ -111,11 +111,12 @@ def test_cli_smart_switch_answers_create_typed_request(
 
 
 def test_cli_smart_switch_requires_a_selected_relay(mock_config_factory: MockConfigFactory) -> None:
+    config = mock_config_factory()
     with pytest.raises(ValueError, match="Select at least one switch relay"):
         request_from_answers(
             MeasureType.SMART_SWITCH,
             {"switch_entity_ids": [], "power_monitoring": False},
-            mock_config_factory(),
+            config,
         )
 
 
@@ -162,9 +163,10 @@ def test_request_exposes_all_controlled_entities_for_multi_light_controller() ->
     [["light.one"], ["light.one", "light.one"], ["light.one", "switch.two"]],
 )
 def test_multi_light_controller_requires_multiple_unique_light_entities(entity_ids: list[str]) -> None:
+    payload = valid_request() | {"controller": {"type": "hass_multi", "entity_ids": entity_ids}}
     with pytest.raises(ValidationError):
         LightMeasurementRequest.model_validate(
-            valid_request() | {"controller": {"type": "hass_multi", "entity_ids": entity_ids}},
+            payload,
         )
 
 
@@ -198,8 +200,9 @@ def test_fixed_request_accepts_a_one_minute_average() -> None:
 
 
 def test_fixed_request_rejects_averages_shorter_than_a_minute() -> None:
+    payload = fixed_request(59)
     with pytest.raises(ValidationError, match="duration"):
-        FixedMeasurementRequest.model_validate(fixed_request(59))
+        FixedMeasurementRequest.model_validate(payload)
 
 
 def test_request_defers_unknown_product_details_until_preparation() -> None:
@@ -526,8 +529,9 @@ def test_reused_dummy_load_description_is_trimmed_and_required() -> None:
 
 
 def test_light_request_rejects_white_mode_as_an_unsupported_measurement_mode() -> None:
+    payload = valid_request() | {"modes": {LutMode.WHITE}}
     with pytest.raises(ValidationError, match="Unsupported measurement modes: white"):
-        LightMeasurementRequest.model_validate(valid_request() | {"modes": {LutMode.WHITE}})
+        LightMeasurementRequest.model_validate(payload)
 
 
 @pytest.mark.parametrize(

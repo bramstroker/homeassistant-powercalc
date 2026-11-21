@@ -3,7 +3,7 @@
     "source_entity": "源实体",
     "source_device": "源设备",
     "remarks_smart_switch": "此配置文件仅提供待机功率值。\n 如果设备开启时消耗固定功率，可以在配置流程的下一步提供该值",
-    "remarks_smart_dimmer": "此配置文件仅提供待机功率值。\n 下一步可以选择提供连接灯具的功率值",
+    "remarks_smart_dimmer": "输入所连接灯具在最低和最高亮度时的功率，不计入驱动器自身的功耗。将所有字段留空，即可仅跟踪驱动器自身的功耗。",
     "view_measurement_details": "查看测量详情"
   },
   "config": {

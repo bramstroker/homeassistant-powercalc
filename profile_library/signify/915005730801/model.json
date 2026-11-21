@@ -1,0 +1,30 @@
+{
+  "authors": [
+    {
+      "email": "118590236+gjsiiger@users.noreply.github.com",
+      "github": "gjsiiger",
+      "name": "Gorm J. Siiger"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-09T15:11:48Z",
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plus Plug S",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.2:app"
+  },
+  "name": "Hue Impress outdoor wall",
+  "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-impress-outdoor-wall-light/1743030P7",
+  "standby_power": 0.3,
+  "voltage_range": {
+    "max": 237.4,
+    "min": 225.4
+  }
+}

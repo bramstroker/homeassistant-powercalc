@@ -2,7 +2,6 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.const import (
     CONF_CREATE_COST_SENSOR,
@@ -38,6 +37,7 @@ from tests.common import (
     run_powercalc_setup,
     set_states,
 )
+from tests.ha_test import MockConfigEntry
 
 
 async def test_main_power_is_removed_from_tracked_entities(hass: HomeAssistant) -> None:

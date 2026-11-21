@@ -22,7 +22,7 @@ from measure.utils.version import measure_version
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
     context = cast(AppContext, app.state.context)
     status_publisher = MeasureStatusPublisher(context.home_assistant, context.coordinator)
-    await status_publisher.async_start()
+    status_publisher.start()
     try:
         yield
     finally:

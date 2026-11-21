@@ -1,0 +1,31 @@
+{
+  "authors": [
+    {
+      "email": "little.ink3931@joosten.co",
+      "github": "svache",
+      "name": "J. Joosten"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-17T21:34:58Z",
+  "device_type": "light",
+  "mains_voltage": 120,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Kasa EP25",
+  "measure_device_firmware": "1.4.1 Build 260924 Rel. 202741",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.2:app"
+  },
+  "name": "RGBIC Cube Wall Sconces",
+  "product_url": "https://us.govee.com/products/govee-rgbic-cube-wall-sconces",
+  "standby_power": 0.6,
+  "voltage_range": {
+    "max": 120.2,
+    "min": 117.5
+  }
+}

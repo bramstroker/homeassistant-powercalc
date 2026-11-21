@@ -3,7 +3,7 @@
     "source_entity": "Kildeentitet",
     "source_device": "Kildeenhed",
     "remarks_smart_switch": "Denne profil indeholder kun effektværdier for standby. \n Hvis du har et apparat, der bruger en fast mængde effekt, når det er tændt, kan du angive denne værdi i næste trin i konfigurationsforløbet",
-    "remarks_smart_dimmer": "Denne profil indeholder kun effektværdier for standby. \n I næste trin kan du valgfrit angive værdierne for det tilsluttede lys",
+    "remarks_smart_dimmer": "Indtast effekten for de tilsluttede lyskilder ved laveste og højeste lysstyrke uden driverens eget forbrug. Lad alle felter være tomme for kun at registrere driverens eget forbrug.",
     "view_measurement_details": "Se måledetaljer"
   },
   "config": {

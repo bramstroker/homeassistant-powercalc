@@ -109,10 +109,14 @@ def test_fixed_profile_requires_selected_device_and_external_meter() -> None:
     )
 
     assert preflight(entities).validate(request).estimated_duration_seconds == 90
+    validator = preflight(entities)
+    modified_request = request.model_copy(update={"device_id": "meter-device"})
     with pytest.raises(PreflightError, match="external power meter"):
-        preflight(entities).validate(request.model_copy(update={"device_id": "meter-device"}))
+        validator.validate(modified_request)
+    validator = preflight(entities)
+    modified_request = request.model_copy(update={"device_id": "missing-device"})
     with pytest.raises(PreflightError, match="no longer exists"):
-        preflight(entities).validate(request.model_copy(update={"device_id": "missing-device"}))
+        validator.validate(modified_request)
 
 
 def test_fixed_profile_requires_home_assistant_device_metadata() -> None:
@@ -177,8 +181,9 @@ def test_smart_switch_preflight_rejects_invalid_selection(
         power_monitoring=True,
     )
 
+    validator = preflight(entities)
     with pytest.raises(PreflightError, match=expected):
-        preflight(entities).validate(request)
+        validator.validate(request)
 
 
 def test_smart_switch_preflight_requires_registered_switch_device() -> None:
@@ -190,8 +195,9 @@ def test_smart_switch_preflight_requires_registered_switch_device() -> None:
         power_monitoring=False,
     )
 
+    validator = preflight(entities)
     with pytest.raises(PreflightError, match="same Home Assistant device"):
-        preflight(entities).validate(request)
+        validator.validate(request)
 
 
 def test_preflight_accepts_request_without_meter_diagnostics() -> None:
@@ -212,8 +218,9 @@ def test_preflight_rejects_dummy_controller_outside_developer_mode() -> None:
         power_meter=HassPowerMeterSpec(entity_id="sensor.power"), controller=DummyMediaControllerSpec()
     )
 
+    validator = preflight(base_entities(), developer_mode=False)
     with pytest.raises(PreflightError, match="Dummy controllers require developer mode"):
-        preflight(base_entities(), developer_mode=False).validate(request)
+        validator.validate(request)
 
 
 def test_preflight_accepts_dummy_charging_controller_in_developer_mode() -> None:
@@ -248,8 +255,9 @@ def test_developer_preflight_accepts_synthetic_controllers_without_home_assistan
     real_meter_request = measurement_request.model_copy(
         update={"power_meter": ShellyPowerMeterSpec(device_ip="192.0.2.1")}
     )
+    validator = preflight({}, developer_mode=False)
     with pytest.raises(PreflightError, match="Dummy controllers require developer mode"):
-        preflight({}, developer_mode=False).validate(real_meter_request)
+        validator.validate(real_meter_request)
 
 
 def test_dummy_load_requires_known_voltage_capability_even_after_successful_reading() -> None:
@@ -283,8 +291,9 @@ def test_preflight_rejects_unadvertised_light_mode() -> None:
         modes={LutMode.COLOR_TEMP},
     )
 
+    validator = preflight(base_entities())
     with pytest.raises(PreflightError, match="does not advertise every requested mode"):
-        preflight(base_entities()).validate(request)
+        validator.validate(request)
 
 
 def test_preflight_rejects_non_overlapping_color_temperature_ranges() -> None:
@@ -301,8 +310,9 @@ def test_preflight_rejects_non_overlapping_color_temperature_ranges() -> None:
         modes={LutMode.COLOR_TEMP},
     )
 
+    validator = preflight(entities)
     with pytest.raises(PreflightError, match="do not share a color temperature range"):
-        preflight(entities).validate(request)
+        validator.validate(request)
 
 
 def test_preflight_rejects_unavailable_voltage_sensor() -> None:
@@ -310,8 +320,9 @@ def test_preflight_rejects_unavailable_voltage_sensor() -> None:
         power_meter=HassPowerMeterSpec(entity_id="sensor.power", voltage_entity_id="sensor.missing"),
     )
 
+    validator = preflight(base_entities())
     with pytest.raises(PreflightError, match="voltage entity is unavailable"):
-        preflight(base_entities()).validate(request)
+        validator.validate(request)
 
 
 @pytest.mark.parametrize("message", [None, "Meter did not respond"])
@@ -490,8 +501,9 @@ def test_preflight_still_rejects_an_unusable_required_vacuum_entity(field_name: 
         battery_entity_id=battery.entity_id,
     )
 
+    validator = preflight(entities)
     with pytest.raises(PreflightError, match="Selected recorder entity is disabled"):
-        preflight(entities).validate(request)
+        validator.validate(request)
 
 
 def test_preflight_accepts_vacuum_recorder_with_same_device_battery() -> None:
@@ -588,8 +600,9 @@ def test_printer_recorder_requires_unitless_primary_sensor(unit: str | None, acc
     if accepted:
         assert preflight(entities).validate(request).warnings == []
     else:
+        validator = preflight(entities)
         with pytest.raises(PreflightError, match="without a unit of measurement"):
-            preflight(entities).validate(request)
+            validator.validate(request)
 
 
 @pytest.mark.parametrize(
@@ -612,8 +625,9 @@ def test_generic_recorder_signals_require_same_or_related_device(signal_device: 
     if accepted:
         assert preflight(entities).validate(request).warnings == []
     else:
+        validator = preflight(entities)
         with pytest.raises(PreflightError, match="primary device or its parent or child"):
-            preflight(entities).validate(request)
+            validator.validate(request)
 
 
 def test_generic_recorder_signals_require_primary_device_metadata() -> None:
@@ -630,8 +644,9 @@ def test_generic_recorder_signals_require_primary_device_metadata() -> None:
         tracked_entity_ids=("sensor.signal",),
     )
 
+    validator = preflight(entities)
     with pytest.raises(PreflightError, match="primary entity with a Home Assistant device"):
-        preflight(entities).validate(request)
+        validator.validate(request)
 
 
 def test_preflight_rejects_missing_complex_recorder_entity() -> None:
@@ -1067,15 +1082,17 @@ def test_multi_light_preflight_rejects_mixed_models_and_group_member_overlap() -
         **common,
         controller=HassMultiLightControllerSpec(entity_ids=["light.one", "light.two"]),
     )
+    validator = preflight(entities)
     with pytest.raises(PreflightError, match="same model ID"):
-        preflight(entities).validate(mixed)
+        validator.validate(mixed)
 
     overlap = LightMeasurementRequest(
         **common,
         controller=HassMultiLightControllerSpec(entity_ids=["light.group", "light.one"]),
     )
+    validator = preflight(entities)
     with pytest.raises(PreflightError, match="group and one of its members"):
-        preflight(entities).validate(overlap)
+        validator.validate(overlap)
 
 
 def test_multi_light_preflight_warns_for_unknown_models_and_validates_count() -> None:
@@ -1094,8 +1111,10 @@ def test_multi_light_preflight_warns_for_unknown_models_and_validates_count() ->
     )
 
     assert "Could not confirm" in preflight(entities).validate(request).warnings[0]
+    validator = preflight(entities)
+    modified_request = request.model_copy(update={"multiple_light_count": 1})
     with pytest.raises(PreflightError, match="Number of lights"):
-        preflight(entities).validate(request.model_copy(update={"multiple_light_count": 1}))
+        validator.validate(modified_request)
 
 
 def test_light_group_does_not_force_its_discovered_member_count() -> None:

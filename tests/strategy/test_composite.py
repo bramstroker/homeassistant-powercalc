@@ -34,7 +34,7 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CONF_STRATEGIES,
 )
-from custom_components.powercalc.strategy.composite import CONFIG_SCHEMA, CompositeMode
+from custom_components.powercalc.strategy.composite import CONDITION_SCHEMA, CONFIG_SCHEMA, CompositeMode
 from tests.common import (
     assert_entity_state,
     async_advance_time,
@@ -493,6 +493,73 @@ async def test_nested_condition_omit_entity_id(hass: HomeAssistant) -> None:
 
     await set_states(hass, [("media_player.test", STATE_PLAYING, {"source": "HDMI2"})])
     assert_entity_state(hass, "sensor.test_power", "2.00")
+
+
+@pytest.mark.parametrize("condition_type", ["and", "or", "not"])
+@pytest.mark.parametrize("use_list", [False, True])
+def test_compound_shorthand_preserves_source_defaults(condition_type: str, use_list: bool) -> None:
+    child = {"condition": "state", "state": STATE_ON}
+    conditions = [child] if use_list else child
+    metadata = {"alias": "Source state", "enabled": False}
+
+    assert CONDITION_SCHEMA({condition_type: conditions, **metadata}) == CONDITION_SCHEMA(
+        {"condition": condition_type, "conditions": [child], **metadata},
+    )
+
+
+async def test_nested_condition_shorthand_defaults_to_source_entity(hass: HomeAssistant) -> None:
+    await set_states(hass, [("media_player.test", STATE_PAUSED, {"source": "HDMI1", "volume_level": 0.5})])
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "media_player.test",
+            CONF_COMPOSITE: [
+                {
+                    CONF_CONDITION: {
+                        "condition": [
+                            {"or": [{"condition": "state", "state": STATE_PLAYING}]},
+                            {
+                                "and": [
+                                    {"condition": "numeric_state", "attribute": "volume_level", "above": 0.2},
+                                    {"not": {"condition": "state", "attribute": "source", "state": "HDMI2"}},
+                                ],
+                            },
+                        ],
+                    },
+                    CONF_FIXED: {CONF_POWER: 20},
+                },
+                {CONF_FIXED: {CONF_POWER: 2}},
+            ],
+        },
+        {},
+    )
+
+    assert_entity_state(hass, "sensor.test_power", "2.00")
+    await set_states(hass, [("media_player.test", STATE_PLAYING, {"source": "HDMI1", "volume_level": 0.5})])
+    assert_entity_state(hass, "sensor.test_power", "20.00")
+    await set_states(hass, [("media_player.test", STATE_PLAYING, {"source": "HDMI2", "volume_level": 0.5})])
+    assert_entity_state(hass, "sensor.test_power", "2.00")
+    await set_states(hass, [("media_player.test", STATE_PLAYING, {"source": "HDMI1", "volume_level": 0.1})])
+    assert_entity_state(hass, "sensor.test_power", "2.00")
+
+
+@pytest.mark.parametrize(
+    "condition",
+    [
+        {"or": [{"condition": "state"}]},
+        {"and": [{"condition": "numeric_state", "above": "invalid"}]},
+        {"not": 5},
+        {"or": [{"condition": "state", "state": STATE_ON}], "unexpected": True},
+        {"and": [], "or": []},
+        {"or": [], "condition": "and"},
+        {"or": [], "conditions": []},
+        {"condition": [], "conditions": []},
+        {},
+    ],
+)
+def test_invalid_condition_shorthand(condition: dict[str, object]) -> None:
+    with pytest.raises(vol.Invalid):
+        CONDITION_SCHEMA(condition)
 
 
 async def test_invalid_composite_config_in_profile(hass: HomeAssistant) -> None:

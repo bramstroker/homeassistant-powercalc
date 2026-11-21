@@ -166,7 +166,8 @@ export class SettingsGithubSection extends LitElement {
     try {
       scratch.select();
       scratch.setSelectionRange(0, code.length);
-      return document.execCommand("copy");
+      // Home Assistant ingress over HTTP does not expose the Clipboard API.
+      return document.execCommand("copy"); // NOSONAR
     } catch {
       return false;
     } finally {

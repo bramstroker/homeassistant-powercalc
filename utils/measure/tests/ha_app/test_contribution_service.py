@@ -265,9 +265,10 @@ def test_submission_requires_a_completed_job(session: ContributionSession, tmp_p
 
 
 def test_failed_archive_replacement_cleans_up_temporary_file(session: ContributionSession, tmp_path: Path) -> None:
+    files = [RenderedProfileFile("model.json", b"{}")]
     with (
         patch.object(Path, "replace", side_effect=OSError("No space")),
         pytest.raises(OSError, match="No space"),
     ):
-        session.service._save_prepared_archive("job", [RenderedProfileFile("model.json", b"{}")])  # noqa: SLF001
+        session.service._save_prepared_archive("job", files)  # noqa: SLF001
     assert list((tmp_path / "contribution/prepared").iterdir()) == []

@@ -29,12 +29,6 @@ from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    RegistryEntryWithDefaults,
-    mock_device_registry,
-    mock_registry,
-)
 
 from custom_components.powercalc import (
     CONF_DISCOVERY,
@@ -72,6 +66,12 @@ from custom_components.powercalc.discovery import (
     get_power_profile_by_source_entity,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo
+from tests.ha_test import (
+    MockConfigEntry,
+    RegistryEntryWithDefaults,
+    mock_device_registry,
+    mock_registry,
+)
 
 from .common import (
     assert_entity_state,
@@ -1465,6 +1465,33 @@ async def test_initial_discovery_logs_unexpected_failure(
         await scheduled_job.target(None)
 
     assert "Error during initial discovery" in caplog.text
+
+
+@pytest.mark.parametrize(
+    "error, expected_log",
+    [
+        (asyncio.CancelledError(), "Initial discovery cancelled, Home Assistant is stopping"),
+        (RuntimeError("boom"), "Initial discovery aborted, Home Assistant is stopping"),
+    ],
+)
+async def test_initial_discovery_handles_failure_during_shutdown(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+    error: BaseException,
+    expected_log: str,
+) -> None:
+    discovery_manager = DiscoveryManager(hass, {})
+
+    with (
+        patch.object(hass, "is_stopping", True),
+        patch.object(discovery_manager, "start_discovery", side_effect=error),
+        patch("custom_components.powercalc.discovery.async_call_later") as mock_call_later,
+    ):
+        discovery_manager._schedule_initial_discovery()  # noqa: SLF001
+        scheduled_job = mock_call_later.call_args.args[2]
+        await scheduled_job.target(None)
+
+    assert expected_log in caplog.text
 
 
 async def test_pending_initial_discovery_is_cancelled_when_disabled(

@@ -1511,14 +1511,22 @@
         {
           "aliases": [
             "6145",
+            "6147",
+            "6149",
             "LB01D",
-            "lumi.light.agl001"
+            "lumi.light.agl001",
+            "lumi.light.agl003",
+            "lumi.light.agl005"
           ],
           "calculation_strategy": "lut",
           "created_at": "2026-02-16T06:45:36Z",
           "device_type": "light",
           "device_specs": {
-            "socket": "E26",
+            "socket": [
+              "E26",
+              "E27",
+              "GU10"
+            ],
             "form_factor": "bulb",
             "lumens": 1100,
             "rated_power": 10.5,
@@ -1529,7 +1537,9 @@
             ]
           },
           "gtin": [
-            "6975833357055"
+            "6975833357055",
+            "6975833357079",
+            "6975833357093"
           ],
           "measure_description": "Measured with utils/measure script",
           "measure_device": "Shelly Plug US Gen4",
@@ -1543,7 +1553,7 @@
           "legacy_ids": [
             "LB01D"
           ],
-          "name": "LED Bulb T2 (E26, RGB CCT)",
+          "name": "LED Bulb T2 (various, RGB CCT)",
           "product_url": "https://us.aqara.com/products/led-bulb-t2-e26",
           "standby_power": 0.14,
           "authors": [
@@ -1555,7 +1565,7 @@
           ],
           "id": "LB-L01D",
           "manufacturer": "aqara",
-          "updated_at": "2026-09-24T18:09:05",
+          "updated_at": "2026-11-19T09:34:51",
           "max_power": 10.54,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-09-24T18:09:05",
@@ -1571,7 +1581,7 @@
             "score": 98.5,
             "color_temp": 98.5
           },
-          "hash": "4a438dcef904c19f9bbf1797fdf79588"
+          "hash": "1b55f218def2fcf978bd116766b72e51"
         },
         {
           "aliases": [
@@ -7721,6 +7731,60 @@
           "hash": "37f48e53c3846daeff5313d815cdc292"
         },
         {
+          "authors": [
+            {
+              "github": "CoregaTab",
+              "name": "Klaus"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-12T17:04:30Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly PM Mini Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 4,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "Zigbee 6W anti-glare downlight RGB+CCT (pro)",
+          "product_url": "https://www.gledopto.cn/product-detail/zigbee-rgb-down-light.html",
+          "standby_power": 0.35,
+          "voltage_range": {
+            "max": 230.5,
+            "min": 226.3
+          },
+          "id": "GL-D-006P",
+          "manufacturer": "gledopto",
+          "updated_at": "2026-11-17T12:54:55",
+          "max_power": 6.14,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-17T12:54:55",
+          "power_range": {
+            "min": 0.33,
+            "max": 6.14
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "cb4ac159e35345a0936b1a0dd138d156"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2022-08-21T08:18:17Z",
           "device_type": "light",
@@ -8381,6 +8445,42 @@
           "hash": "ef0554bdfe130ed4d9b82e9b584c83be"
         },
         {
+          "authors": [
+            {
+              "github": "Trilliard",
+              "name": "Trilliard"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-18T11:29:38Z",
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plug M Gen3",
+          "measure_device_firmware": "2.2.0",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "COB LED Strip Light 2 3m",
+          "product_url": "https://eu.govee.com/de-de/products/govee-cob-strip-light-2?variant=53625378799800",
+          "standby_power": 0.3,
+          "voltage_range": {
+            "max": 227.1,
+            "min": 223.2
+          },
+          "id": "H1AB1",
+          "manufacturer": "govee",
+          "updated_at": "2026-11-18T21:00:07",
+          "max_power": 0,
+          "sub_profile_count": 0,
+          "hash": "46f37b5be292cb15df527c1d2a2c3d75"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2025-12-20T22:56:04Z",
           "device_type": "light",
@@ -8718,6 +8818,57 @@
             "color_temp": 99.0
           },
           "hash": "7b740713dd58e87d6254bd274b743738"
+        },
+        {
+          "authors": [
+            {
+              "email": "little.ink3931@joosten.co",
+              "github": "svache",
+              "name": "J. Joosten"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-17T21:34:58Z",
+          "device_type": "light",
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Kasa EP25",
+          "measure_device_firmware": "1.4.1 Build 260924 Rel. 202741",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "RGBIC Cube Wall Sconces",
+          "product_url": "https://us.govee.com/products/govee-rgbic-cube-wall-sconces",
+          "standby_power": 0.6,
+          "voltage_range": {
+            "max": 120.2,
+            "min": 117.5
+          },
+          "id": "H6088",
+          "manufacturer": "govee",
+          "updated_at": "2026-11-18T20:24:29",
+          "max_power": 26.5,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-18T20:24:29",
+          "power_range": {
+            "min": 1.1,
+            "max": 26.5
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 32.2,
+            "color_temp": 32.2
+          },
+          "hash": "099ac5070760fbc33881d26d4a03f4d3"
         },
         {
           "calculation_strategy": "lut",
@@ -9880,6 +10031,44 @@
           "hash": "d7e6fcdf5ce51a546c082396eb5ed960"
         },
         {
+          "name": "ALPSTUGA air quality monitor",
+          "device_type": "generic_iot",
+          "discovery_by": "device",
+          "calculation_strategy": "fixed",
+          "measure_method": "manual",
+          "measure_device": "OWON OWH9811",
+          "created_at": "2026-10-14T17:46:12Z",
+          "authors": [
+            {
+              "name": "MartinJM",
+              "github": "MartinJM"
+            }
+          ],
+          "aliases": [
+            "ALPSTUGA air quality monitor",
+            "12289"
+          ],
+          "device_specs": {
+            "rated_power": 5.0,
+            "connectivity": [
+              "matter",
+              "thread"
+            ]
+          },
+          "measure_description": "Measured on the 5V USB port of the device (it does *not* come with a power adapter). This means the measurement *excludes* power adapter losses. The value is an average of a three day measurement session, where the device showed it has periods of higher and lower power usage. For more information see discussion #4750.\n\nMeasurement was taken with the display turned on.",
+          "product_url": "https://www.ikea.com/de/en/p/alpstuga-air-quality-sensor-smart-50604187/",
+          "id": "E2495",
+          "manufacturer": "ikea",
+          "updated_at": "2026-11-11T15:25:54",
+          "max_power": 0.415,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.415,
+            "max": 0.415
+          },
+          "hash": "74955d19d74bc02ff524515119cde416"
+        },
+        {
           "aliases": [
             "VARMBLIXT colour and white"
           ],
@@ -9920,6 +10109,68 @@
             "hs"
           ],
           "hash": "9c6d1466e4f765a541f24aef7994f206"
+        },
+        {
+          "authors": [
+            {
+              "github": "jan-brinkmann",
+              "name": "Jan Brinkmann"
+            }
+          ],
+          "calculation_strategy": "linear",
+          "allow_manual_power": true,
+          "created_at": "2026-11-07T14:28:52Z",
+          "device_specs": {
+            "form_factor": "led_driver",
+            "max_load_watts": 10,
+            "power_monitoring": false,
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "smart_dimmer",
+          "mains_voltage": 230,
+          "measure_description": "Driver-only power is estimated at 0.1 W in both states, based on the previous standby estimate. The NORRFLY subprofile uses the measured curve for the complete setup.",
+          "measure_device": "Shelly Plug S",
+          "measure_device_firmware": "1.7.6",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "TRADFRI LED driver, 10 w (ICPSHC24-10EU-IL-1)",
+          "standby_power": 0.1,
+          "standby_power_on": 0.1,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 235.9,
+            "min": 233.2
+          },
+          "aliases": [
+            "TRADFRI LED driver, 10 w",
+            "ICPSHC24-10EU-IL-1/ICPSHC24-10EU-IL-2"
+          ],
+          "id": "ICPSHC24-10EU-IL-1",
+          "manufacturer": "ikea",
+          "updated_at": "2026-11-20T08:12:19",
+          "max_power": 5.9,
+          "sub_profile_count": 1,
+          "measurement_updated_at": "2026-11-11T18:28:53",
+          "power_range": {
+            "min": 0.53,
+            "max": 5.9
+          },
+          "color_modes": [
+            "brightness"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "brightness": 98.8
+          },
+          "hash": "8fb3d416c63ff04df62aa1afc5c1cf51"
         },
         {
           "aliases": [
@@ -13413,6 +13664,7 @@
         "smart_switch",
         "network",
         "fan",
+        "generic_iot",
         "light",
         "smart_dimmer"
       ]
@@ -24800,6 +25052,43 @@
           "hash": "b3a3054e7ab79edb7ea642d897cbf103"
         },
         {
+          "name": "BLU Gateway",
+          "description": "USB-powered gateway that connects Shelly BLU sensors to Wi-Fi",
+          "aliases": [
+            "SNGW-BT01"
+          ],
+          "device_type": "generic_iot",
+          "calculation_strategy": "fixed",
+          "discovery_by": "device",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "bluetooth"
+            ]
+          },
+          "product_url": "https://www.shelly.com/products/shelly-blu-gateway",
+          "measure_method": "manual",
+          "measure_device": "Generic USB power meter",
+          "measure_description": "Measured by hand with an inline USB power meter on the 5 V DC supply: 80 mA at 4.98 V = 0.398 W, rounded to 0.4 W. The meter is unlabelled (its printed model has faded), so the reading is limited to its display resolution. Losses of the USB power supply are not included. Device firmware 1.7.6.",
+          "created_at": "2026-11-17T23:56:00Z",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "SNGW-BT01",
+          "manufacturer": "shelly",
+          "updated_at": "2026-11-19T03:39:34",
+          "max_power": 0.4,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.4,
+            "max": 0.4
+          },
+          "hash": "c48e1acb0fce2e23e8671badb0bd3825"
+        },
+        {
           "aliases": [
             "Shelly Plus Plug S",
             "Shelly Plus Plug S V2",
@@ -25265,6 +25554,55 @@
           "hash": "30619f9daca2fb78c857c32ccf4f0553"
         },
         {
+          "authors": [
+            {
+              "email": "118590236+gjsiiger@users.noreply.github.com",
+              "github": "gjsiiger",
+              "name": "Gorm J. Siiger"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-09T15:11:48Z",
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plus Plug S",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "Hue Impress outdoor wall",
+          "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-impress-outdoor-wall-light/1743030P7",
+          "standby_power": 0.3,
+          "voltage_range": {
+            "max": 237.4,
+            "min": 225.4
+          },
+          "id": "915005730801",
+          "manufacturer": "signify",
+          "updated_at": "2026-11-09T20:10:02",
+          "max_power": 18.2,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-09T19:28:49",
+          "power_range": {
+            "min": 0.2,
+            "max": 18.2
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "6a4387064f6d71fd962db14a77a6319d"
+        },
+        {
           "aliases": [
             "1743130P7",
             "1743430P7",
@@ -25508,6 +25846,75 @@
             "color_temp": 24.0
           },
           "hash": "d84f4d478ce0eecefdb95e17eead62ab"
+        },
+        {
+          "aliases": [
+            "1744030P7",
+            "915005732301"
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-17T12:24:43Z",
+          "device_type": "light",
+          "device_specs": {
+            "form_factor": "fixture",
+            "socket": "integrated",
+            "lumens": 1140,
+            "rated_power": 15,
+            "connectivity": [
+              "zigbee",
+              "bluetooth"
+            ]
+          },
+          "gtin": [
+            "8718696170588"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly 1PM Mini Gen4",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 59.65,
+            "DUMMY_LOAD_RESISTANCE": 857.91,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:cli"
+          },
+          "name": "Hue Econic Outdoor Wall Light (down lantern)",
+          "product_url": "https://www.philips-hue.com/en-gb/p/hue-white-and-colour-ambiance-econic-outdoor-wall-light/1744030P7",
+          "standby_power": 0.22,
+          "voltage_range": {
+            "max": 230.4,
+            "min": 223.6
+          },
+          "authors": [
+            {
+              "name": "Dani\u00ebl Schenk",
+              "github": "danielschenk",
+              "email": "danielschenk@gmail.com"
+            }
+          ],
+          "id": "915005732301",
+          "manufacturer": "signify",
+          "updated_at": "2026-11-20T08:37:01",
+          "max_power": 16.51,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-20T08:37:01",
+          "power_range": {
+            "min": 0.07,
+            "max": 16.51
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 96.6,
+            "color_temp": 96.6
+          },
+          "hash": "932a037d38ebf83615bf11d063222198"
         },
         {
           "aliases": [
@@ -29028,7 +29435,7 @@
           },
           "id": "929004610402",
           "manufacturer": "signify",
-          "updated_at": "2026-11-07T08:40:35",
+          "updated_at": "2026-11-07T08:44:59",
           "max_power": 14.3,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-11-07T08:40:35",
@@ -29045,7 +29452,7 @@
             "score": 98.7,
             "color_temp": 98.7
           },
-          "hash": "e7e5760d6cc9bcda5c81938ebb28ed6b"
+          "hash": "8647e0260b33af926b9aceac187cf561"
         },
         {
           "calculation_strategy": "fixed",
@@ -37729,6 +38136,60 @@
           "hash": "079773d12a5f55ece781f8a9faa1dbfd"
         },
         {
+          "name": "MINI Extreme",
+          "aliases": [
+            "2"
+          ],
+          "device_type": "smart_switch",
+          "calculation_strategy": "fixed",
+          "only_self_usage": false,
+          "device_specs": {
+            "form_factor": "in_wall",
+            "power_monitoring": false,
+            "max_load_watts": 2300,
+            "connectivity": [
+              "wifi",
+              "matter"
+            ]
+          },
+          "gtin": [
+            "6920075740516"
+          ],
+          "product_url": "https://sonoff.tech/products/sonoff-mini-extreme-wi-fi-smart-switch-matter-enabled",
+          "mains_voltage": 230,
+          "standby_power": 0.332,
+          "standby_power_on": 0.7,
+          "measure_method": "script",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_device_firmware": "2.0.1",
+          "measure_description": "Measured with the Powercalc Measure app (smart switch mode), 3 cycles of 12 samples per relay state on a Shelly Plug S Gen3. A 34.06 W dummy load (1591.7 Ohm) keeps the meter in range and is subtracted per sample by the measurement tool, so both values are the switch's own consumption. The device has no power monitoring, so no appliance load was connected.",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 34.06,
+            "DUMMY_LOAD_RESISTANCE": 1591.7,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "created_at": "2026-11-17T15:42:59Z",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "MINIR4M",
+          "manufacturer": "sonoff",
+          "updated_at": "2026-11-19T02:57:48",
+          "max_power": 0.7,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 0.332,
+            "max": 0.7
+          },
+          "hash": "942c3736751852e2e3f0e9b3d3ebcc80"
+        },
+        {
           "calculation_strategy": "composite",
           "created_at": "2026-09-29T00:00:00Z",
           "device_type": "light",
@@ -40034,6 +40495,60 @@
             "color_temp": 99.5
           },
           "hash": "630c8403640b8616f6dc4c7f4e499202"
+        },
+        {
+          "authors": [
+            {
+              "github": "akashihi",
+              "name": "akashihi"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-15T21:09:26Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee"
+            ]
+          },
+          "device_type": "light",
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Power Strip 4 Gen4",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.2:app"
+          },
+          "name": "Smart Color Bulb ZL4",
+          "standby_power": 0.33,
+          "standby_power_estimated": true,
+          "voltage_range": {
+            "max": 234.6,
+            "min": 227.9
+          },
+          "id": "3RCB02070Z",
+          "manufacturer": "third reality",
+          "updated_at": "2026-11-18T09:52:32",
+          "max_power": 10.5,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-18T09:43:01",
+          "power_range": {
+            "min": 1.9,
+            "max": 10.5
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.1,
+            "color_temp": 98.1
+          },
+          "hash": "34fb61e05204c399b21faff6baa17312"
         }
       ],
       "device_types": [

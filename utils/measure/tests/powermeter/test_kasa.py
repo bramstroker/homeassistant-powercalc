@@ -35,11 +35,12 @@ def test_rejects_missing_power_measurements() -> None:
     plug.config = DeviceConfig(host="192.0.2.1")
 
     meter = KasaPowerMeter("192.0.2.1")
+    reading = meter.async_read_power_meter()
     with (
         patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)),
         pytest.raises(PowerMeterError, match="did not return a power measurement"),
     ):
-        asyncio.run(meter.async_read_power_meter())
+        asyncio.run(reading)
 
     plug.disconnect.assert_awaited_once_with()
 
@@ -51,11 +52,12 @@ def test_disconnects_when_a_reading_fails() -> None:
     plug.config = DeviceConfig(host="192.0.2.1")
 
     meter = KasaPowerMeter("192.0.2.1")
+    reading = meter.async_read_power_meter()
     with (
         patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)),
         pytest.raises(OSError, match="device unreachable"),
     ):
-        asyncio.run(meter.async_read_power_meter())
+        asyncio.run(reading)
     plug.disconnect.assert_awaited_once_with()
 
 
@@ -66,11 +68,12 @@ def test_converts_transport_failures_to_retryable_power_meter_errors() -> None:
     plug.config = DeviceConfig(host="192.0.2.1")
 
     meter = KasaPowerMeter("192.0.2.1")
+    reading = meter.async_read_power_meter()
     with (
         patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)),
         pytest.raises(PowerMeterError, match="Unable to read power from Kasa or Tapo device: Invalid padding bytes"),
     ):
-        asyncio.run(meter.async_read_power_meter())
+        asyncio.run(reading)
 
     plug.disconnect.assert_awaited_once_with()
 
@@ -100,11 +103,12 @@ def test_passes_credentials_for_newer_tapo_devices() -> None:
     meter = KasaPowerMeter("192.0.2.1", credentials=account)
 
     discover = AsyncMock(return_value=None)
+    reading = meter.async_read_power_meter()
     with (
         patch("measure.powermeter.kasa.Discover.discover_single", discover),
         pytest.raises(PowerMeterError, match="No Kasa or Tapo device"),
     ):
-        asyncio.run(meter.async_read_power_meter())
+        asyncio.run(reading)
 
     credentials = discover.await_args.kwargs["credentials"]
     assert credentials.username == "user@example.com"
@@ -191,11 +195,12 @@ def test_explains_when_a_discovered_device_requires_credentials() -> None:
     plug.config = DeviceConfig(host="192.0.2.1")
     meter = KasaPowerMeter("192.0.2.1")
 
+    reading = meter.async_read_power_meter()
     with (
         patch("measure.powermeter.kasa.Discover.discover_single", AsyncMock(return_value=plug)),
         pytest.raises(PowerMeterError, match="requires TP-Link account credentials"),
     ):
-        asyncio.run(meter.async_read_power_meter())
+        asyncio.run(reading)
 
     plug.disconnect.assert_awaited_once_with()
 

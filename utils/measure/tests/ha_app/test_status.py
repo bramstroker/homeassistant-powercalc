@@ -98,7 +98,7 @@ def test_status_publisher_lifecycle_and_error_recovery(
         coordinator = MeasurementCoordinator(SessionStorage(tmp_path), MagicMock())
         publisher = MeasureStatusPublisher(home_assistant, coordinator, heartbeat_interval=3600)
 
-        await publisher.async_start()
+        publisher.start()
         for _ in range(100):
             if home_assistant.fire_event.call_count == 1:
                 break

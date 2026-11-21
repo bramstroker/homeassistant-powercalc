@@ -3,7 +3,7 @@
     "source_entity": "Quell-Entität",
     "source_device": "Quell-Gerät",
     "remarks_smart_switch": "Dieses Profil liefert nur Werte für die Standby-Leistung. \n Wenn Sie ein Gerät haben, das beim Einschalten eine bestimmte Menge an Strom verbraucht, können Sie diesen Wert im nächsten Schritt des Konfigurationsablaufs angeben",
-    "remarks_smart_dimmer": "Dieses Profil bietet nur Standby-Leistungswerte. \n Im nächsten Schritt können Sie optional die Werte der angeschlossenen Lampe angeben",
+    "remarks_smart_dimmer": "Gib die Leistung der angeschlossenen Leuchten bei minimaler und maximaler Helligkeit ohne den Eigenverbrauch des LED-Treibers ein. Lass alle Felder leer, um nur den Eigenverbrauch des LED-Treibers zu erfassen.",
     "view_measurement_details": "Messdetails anzeigen"
   },
   "config": {

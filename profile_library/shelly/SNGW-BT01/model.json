@@ -1,0 +1,30 @@
+{
+  "name": "BLU Gateway",
+  "description": "USB-powered gateway that connects Shelly BLU sensors to Wi-Fi",
+  "aliases": [
+    "SNGW-BT01"
+  ],
+  "device_type": "generic_iot",
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": 0.4
+  },
+  "discovery_by": "device",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
+  },
+  "product_url": "https://www.shelly.com/products/shelly-blu-gateway",
+  "measure_method": "manual",
+  "measure_device": "Generic USB power meter",
+  "measure_description": "Measured by hand with an inline USB power meter on the 5 V DC supply: 80 mA at 4.98 V = 0.398 W, rounded to 0.4 W. The meter is unlabelled (its printed model has faded), so the reading is limited to its display resolution. Losses of the USB power supply are not included. Device firmware 1.7.6.",
+  "created_at": "2026-11-17T23:56:00Z",
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
+  ]
+}
