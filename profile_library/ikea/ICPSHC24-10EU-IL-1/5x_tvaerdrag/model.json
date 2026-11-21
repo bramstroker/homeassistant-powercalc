@@ -1,0 +1,16 @@
+{
+  "name": "5x TVÄRDRAG 1.5W",
+  "measure_method": "manual",
+  "measure_device": "IKEA GRILLPLATS smart plug",
+  "measure_description": "Measured manually with an IKEA GRILLPLATS Matter plug read through a Home Assistant power sensor (0.1 W resolution). The driver was set to 1-100 % brightness in 10 % steps and the stable power draw was noted at each step. Values below 1 W are coarse because of the meter resolution; brightness.csv lists the measured points and is interpolated between them. The profile covers the complete assembly: the ICPSHC24-10EU-IL-1 driver plus five TVÄRDRAG 1.5 W lamps.",
+  "standby_power": 0.1,
+  "standby_power_estimated": true,
+  "mains_voltage": 230,
+  "created_at": "2026-11-19T12:00:00Z",
+  "authors": [
+    {
+      "name": "Timo Wiese",
+      "github": "herrniffler"
+    }
+  ]
+}
