@@ -57,9 +57,8 @@ adding the raw meter readings or adding successive cumulative readings together.
   current reading. Its earlier consumption cannot be reconstructed.
 
 The group energy sensor starts with the imported total plus changes since the
-last recorded member readings, then continues counting normally. Its total may
-therefore differ from the sum of the members' current meter readings, especially
-when meters have reset. The members' own statistics remain unchanged.
+last recorded member readings, then continues counting normally.
+The members' own statistics remain unchanged.
 
 This runs **once when the group is created**. Restarting Home Assistant, reloading
 the group, or changing members does not repeat the import. The option is absent
