@@ -1,6 +1,7 @@
 {
   "aliases": [
-    "9290042355"
+    "9290042355",
+    "046677592530"
   ],
   "authors": [
     {
@@ -24,7 +25,8 @@
   "device_type": "light",
   "gtin": [
     "046677607029",
-    "046677592530"
+    "046677592530",
+    "046677592561"
   ],
   "mains_voltage": 120,
   "measure_description": "Measured with Powercalc Measure. Used a sonoff s31 flashed with esphome set to 1 sec updates. Had to use a resistive load to get it to work.",
