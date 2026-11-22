@@ -15,19 +15,23 @@
       "zigbee"
     ]
   },
-  "measure_description": "Measured manually",
-  "measure_device": "PeakTech 4350",
+  "measure_description": "Measured manually. Re-measured with a Brennenstuhl PM 231 E (issue #5217): 0.1 W with the relay off, 0.5 W with the relay on. Discussion #3108 measured 0.2 W off and 0.5 W on.",
+  "measure_device": "Brennenstuhl PM 231 E",
   "measure_method": "manual",
   "mains_voltage": 230,
   "name": "Extreme Zigbee Smart Switch",
   "only_self_usage": false,
   "product_url": "https://sonoff.tech/en-uk/products/sonoff-zbmini-extreme-zigbee-smart-switch-zbminir2",
-  "standby_power": 0.8,
-  "standby_power_on": 1.56,
+  "standby_power": 0.1,
+  "standby_power_on": 0.5,
   "authors": [
     {
       "name": "LtKowalski",
       "github": "LtKowalski"
+    },
+    {
+      "name": "Pwnyrider",
+      "github": "Pwnyrider"
     }
   ]
 }
