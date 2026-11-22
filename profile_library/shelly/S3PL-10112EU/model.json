@@ -1,0 +1,32 @@
+{
+  "name": "AZ Plug",
+  "aliases": [
+    "Shelly AZ Plug"
+  ],
+  "calculation_strategy": "fixed",
+  "created_at": "2026-11-23T00:55:00Z",
+  "description": "Smart Wi-Fi plug with power monitoring, Amazon Alexa edition",
+  "device_type": "smart_switch",
+  "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
+    "rated_power": 1,
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ]
+  },
+  "discovery_by": "entity",
+  "linked_profile": "shelly/SNPL-00112EU",
+  "mains_voltage": 230,
+  "measure_description": "No separate measurements. This model reuses the values of `shelly/SNPL-00112EU` (Plus Plug S) and inherits that profile's sub-profiles. The AZ Plug is the Amazon/Alexa edition of the Plus Plug S: Shelly documents the same 12 A / 2500 W rating and the same set of meters (AC voltmeter, AC ammeter, power and energy meters), and the device has Wi-Fi and Bluetooth only, no Matter and no KNX. Sources: https://kb.shelly.cloud/knowledge-base/shelly-plug-s-mtr-gen3 and https://kb.shelly.cloud/knowledge-base/shelly-az-plug",
+  "measure_device": "GW Instek GPM-8310",
+  "measure_method": "manual",
+  "only_self_usage": true,
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
+  ]
+}
