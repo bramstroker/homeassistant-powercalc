@@ -18,7 +18,7 @@ boundaries, see [Recorder and analyser architecture](RECORDER_ANALYSER_ARCHITECT
 ## Development setup
 
 **Prerequisites:**
-- Python 3.14 or newer.
+- Python 3.14 or newer. The Docker images use Python 3.15.
 - Install uv. `curl -LsSf https://astral.sh/uv/install.sh | sh` or see https://github.com/astral-sh/uv
 
 uv manages the virtual environment and installs all dependencies declared by the project:
@@ -118,7 +118,7 @@ See the [measurement tool architecture](../../docs/source/contributing/measure/a
 
 **Prerequisites:**
 - A reachable Home Assistant instance and a long-lived access token (HA → profile → Security → *Long-lived access tokens*). The app proxies real HA entity data, so `/api/entities` needs a live instance.
-- Python/uv set up as described under [Development setup](#development-setup), and Node.js for the frontend.
+- Python and uv set up as described under [Development setup](#development-setup), and Node.js 26 LTS for the frontend.
 
 **Terminal 1 — backend** (from `utils/measure`):
 ```
@@ -138,8 +138,11 @@ GitHub device login requires a GitHub OAuth App with Device Flow enabled. Set it
 Automatic contributions target `bramstroker/homeassistant-powercalc` on `master` by default. For an isolated test repository, set `POWERCALC_GITHUB_REPOSITORY=owner/repository` and, when needed, `POWERCALC_GITHUB_BRANCH=main` before starting the backend. Both preview validation and pull-request submission use this target.
 
 **Terminal 2 — frontend** (from `utils/measure/frontend`):
+
+If you use nvm, run `nvm install` and `nvm use` in this directory to select the Node.js version used in CI.
+
 ```
-npm install
+npm ci
 npm run dev
 ```
 Open http://localhost:5173. The Vite dev server proxies `/api` (including the SSE event stream) to the backend on port 8099, mirroring the single-origin ingress deployment.

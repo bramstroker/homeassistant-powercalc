@@ -28,7 +28,15 @@ jobs:
   tests:
     runs-on: "ubuntu-latest"
     timeout-minutes: 30
-    name: Run tests
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Run tests
+            python-version: '3.14'
+          - name: Run tests (Python 3.15)
+            python-version: '3.15'
     steps:
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -38,7 +46,7 @@ jobs:
         with:
           version: '0.13.9'
           working-directory: './utils/measure'
-          python-version: '3.14'
+          python-version: ${{ matrix.python-version }}
           enable-cache: true
           cache-dependency-glob: |
             pyproject.toml
@@ -78,7 +86,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '26'
+          node-version-file: utils/measure/frontend/.nvmrc
           cache: 'npm'
           cache-dependency-path: utils/measure/frontend/package-lock.json
       - name: Install dependencies
@@ -100,7 +108,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '26'
+          node-version-file: utils/measure/frontend/.nvmrc
           cache: 'npm'
           cache-dependency-path: utils/measure/frontend/package-lock.json
         # The Playwright postinstall hook is skipped here; browsers are installed
