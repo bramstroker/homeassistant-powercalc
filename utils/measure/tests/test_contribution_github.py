@@ -131,8 +131,9 @@ def test_fork_polling_times_out_without_creating_another_fork() -> None:
 def test_authenticated_request_requires_token_before_sending() -> None:
     transport = FakeTransport([])
 
+    client = GitHubClient(transport=transport)
     with pytest.raises(GitHubApiError, match="token is required"):
-        GitHubClient(transport=transport).fetch_authenticated_user()
+        client.fetch_authenticated_user()
 
     assert transport.calls == []
 

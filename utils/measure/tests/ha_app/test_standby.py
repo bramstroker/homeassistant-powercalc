@@ -153,6 +153,7 @@ def test_calibration_cancellation_interrupts_sampling_wait() -> None:
     from measure.request import DummyLoadCalibrationRequest
 
     request = standby_request().model_copy(update={"dummy_load": DummyLoadCalibrationRequest(description="Heater")})
+    measurement = StandbyMeasurement(lambda: assembler)
     with pytest.raises(MeasurementCancelledError):
-        StandbyMeasurement(lambda: assembler).calibrate(request, cancelled)
+        measurement.calibrate(request, cancelled)
     assembler.create_power_meter.assert_not_called()

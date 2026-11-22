@@ -11,7 +11,10 @@ class PowerCalculationStrategyInterface:
         """Collect source readings, including while calculation is disabled or a composite branch is skipped."""
 
     def is_sample_entity(self, entity_id: str) -> bool:
-        """Return whether this entity supplies readings independently of the source state."""
+        """Return whether this entity supplies readings independently of the source state.
+
+        The default ignores entity_id because it has no independent sample entities.
+        """
         return False
 
     def get_update_interval(self) -> timedelta | None:

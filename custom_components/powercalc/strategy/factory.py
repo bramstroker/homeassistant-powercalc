@@ -125,8 +125,17 @@ class PowerCalculatorStrategyFactory:
         source_entity: SourceEntity,
         config: ConfigType,
         power_profile: PowerProfile | None,
-    ) -> LinearStrategy:
+    ) -> LinearStrategy | FixedStrategy:
         """Create the linear strategy."""
+        if (
+            power_profile
+            and power_profile.allows_manual_power
+            and power_profile.calculation_strategy == CalculationStrategy.LINEAR
+            and config.get(CalculationStrategy.LINEAR) == {}
+        ):
+            # No connected load was entered. Only the profile's driver power is added.
+            return FixedStrategy(source_entity, power=0, per_state_power=None)
+
         linear_config = self._get_linear_config(config, power_profile)
 
         return LinearStrategy(

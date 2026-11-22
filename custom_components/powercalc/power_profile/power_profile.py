@@ -446,6 +446,15 @@ class PowerProfile:
         return not self.has_sub_profile_select_matchers
 
     @property
+    def allows_manual_power(self) -> bool:
+        """Whether the main driver profile can be used without selecting a LUT."""
+        return (
+            self._base_json_data.get("allow_manual_power") is True
+            and self._base_json_data.get("device_type") == DeviceType.SMART_DIMMER
+            and self._base_json_data.get("calculation_strategy") == CalculationStrategy.LINEAR
+        )
+
+    @property
     def sub_profile_select(self) -> SubProfileSelectConfig | None:
         """Get the configuration for automatic sub profile switching."""
         select_dict = self._json_data.get("sub_profile_select")

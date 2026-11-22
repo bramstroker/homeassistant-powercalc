@@ -445,7 +445,8 @@ def _resolve_group_sensor(entity: SensorEntity) -> GroupedSensor | SumPowerSenso
     raise ServiceValidationError(f"Entity {entity.entity_id} is not a Powercalc group sensor")
 
 
-async def async_get_group_entities(entity: SensorEntity, _call: ServiceCall) -> dict[str, Any]:
+# Home Assistant needs a coroutine to return a service response on its event loop.
+async def async_get_group_entities(entity: SensorEntity, _call: ServiceCall) -> dict[str, Any]:  # NOSONAR
     """List members, identifying the source when an energy sensor integrates a power group."""
     group = _resolve_group_sensor(entity)
     response: dict[str, Any] = group.get_group_entities()
@@ -454,7 +455,8 @@ async def async_get_group_entities(entity: SensorEntity, _call: ServiceCall) -> 
     return response
 
 
-async def async_debug_group(entity: SensorEntity, _call: ServiceCall) -> dict[str, Any]:
+# Home Assistant needs a coroutine to return a service response on its event loop.
+async def async_debug_group(entity: SensorEntity, _call: ServiceCall) -> dict[str, Any]:  # NOSONAR
     """Keep an integrated energy total separate from its source group's power readings."""
     group = _resolve_group_sensor(entity)
     response = group.debug_group()

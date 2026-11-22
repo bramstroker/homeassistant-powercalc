@@ -27,8 +27,9 @@ def test_turn_off_reports_service_failure(hass_client: MagicMock) -> None:
     error = HomeassistantAPIError("Service unavailable")
     hass_client.trigger_service.side_effect = error
 
+    controller = _get_instance(hass_client)
     with pytest.raises(ControllerError, match="Failed to turn off fan") as raised:
-        _get_instance(hass_client).turn_off()
+        controller.turn_off()
 
     assert raised.value.__cause__ is error
     hass_client.trigger_service.assert_called_once_with("fan", "turn_off", entity_id="fan.test")

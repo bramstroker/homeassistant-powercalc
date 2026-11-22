@@ -228,19 +228,7 @@ def report(source: Path, window_minutes: int, hass: HomeAssistant) -> None:
             continue  # The first two traces have only 10 Wh counter resolution.
         for segment, errors in replay.power_errors().items():
             segments.setdefault(segment, []).extend(errors)
-        for level, aggregate in departures.items():
-            departure = next(
-                (r.timestamp for r in trace.readings if start <= r.timestamp < end and r.battery >= level), None
-            )
-            if departure is None or departure - start < timedelta(minutes=15):
-                continue
-            departure_plug = trace.interpolate_energy(departure) - trace.interpolate_energy(start)
-            departure_model = replay.energy(start, departure)
-            gained = trace.at(departure).battery - trace.at(start).battery
-            pending = float(gained * COEFFICIENT) - replay.energy(start, departure, charging_only=True)
-            aggregate.plug += departure_plug
-            aggregate.model += departure_model
-            aggregate.pending += max(0, pending)
+        _accumulate_departures(replay, trace, start, end, departures)
     print(f"| **Total** | | {plug_total:.1f} | {model_total:.2f} | {model_total / plug_total - 1:+.2%} | |")
     print(f"\nHoldout: {holdout_model:.2f} / {holdout_plug:.1f} Wh ({holdout_model / holdout_plug - 1:+.2%}).\n")
     print("| Power segment | Counter spans >=5 min | MAE W | Bias W |")
@@ -258,6 +246,24 @@ def report(source: Path, window_minutes: int, hass: HomeAssistant) -> None:
             f"| {level}% | {aggregate.plug:.2f} | {aggregate.model:.2f} | "
             f"{aggregate.model / aggregate.plug - 1:+.2%} | {aggregate.pending:.2f} |"
         )
+
+
+def _accumulate_departures(
+    replay: Replay, trace: Trace, start: datetime, end: datetime, departures: dict[int, EnergyTotals]
+) -> None:
+    for level, aggregate in departures.items():
+        departure = next(
+            (r.timestamp for r in trace.readings if start <= r.timestamp < end and r.battery >= level), None
+        )
+        if departure is None or departure - start < timedelta(minutes=15):
+            continue
+        departure_plug = trace.interpolate_energy(departure) - trace.interpolate_energy(start)
+        departure_model = replay.energy(start, departure)
+        gained = trace.at(departure).battery - trace.at(start).battery
+        pending = float(gained * COEFFICIENT) - replay.energy(start, departure, charging_only=True)
+        aggregate.plug += departure_plug
+        aggregate.model += departure_model
+        aggregate.pending += max(0, pending)
 
 
 def main() -> None:

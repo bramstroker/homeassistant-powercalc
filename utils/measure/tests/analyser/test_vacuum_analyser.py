@@ -1517,8 +1517,9 @@ def test_short_activity_validation_uses_unrounded_energy(tmp_path: Path, trainin
 
 @pytest.mark.parametrize("levels", [[], [20], [20, 20], [40, 20]])
 def test_charging_curve_rejects_insufficient_or_unordered_points(levels: list[int]) -> None:
+    calibration = [ChargingPoint(level, 30) for level in levels]
     with pytest.raises(ValueError, match="calibration"):
-        ChargingBranch([ChargingPoint(level, 30) for level in levels])
+        ChargingBranch(calibration)
 
 
 @pytest.mark.parametrize(

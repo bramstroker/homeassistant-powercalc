@@ -1,3 +1,8 @@
 {
-  "name": "1x NORRFLY 5W"
+  "name": "1x NORRFLY 5W",
+  "calculation_strategy": "lut",
+  "measure_description": "Measured the complete assembly of the driver and one NORRFLY 5W lamp with Powercalc Measure. Standby power is estimated.",
+  "standby_power": 0.1,
+  "standby_power_estimated": true,
+  "standby_power_on": 0
 }

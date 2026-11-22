@@ -2,34 +2,26 @@
 
 ## Installation
 
-You could either install with HACS (recommended) or manual.
+Install Powercalc from the Marketplace in Home Assistant 2026.11 or later.
 
-=== "HACS (recommended)"
+[![Open Powercalc in the Home Assistant Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=bramstroker&repository=homeassistant-powercalc&category=integration)
 
-    This integration is part of the default HACS_ repository. Just click `Explore and add repository` and search for `powercalc` to install, or use this link to go directly there:
+1. Open the link above or go to **Settings → Marketplace** and search for **Powercalc**.
+2. On the Powercalc page, select **Install**. Review the version and select **Install** again to confirm.
 
-    [![image](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=bramstroker&repository=homeassistant-powercalc&category=integration)
-
-=== "Manual"
-
-    Copy `custom_components/powercalc` into your Home Assistant `config` directory.
-
-**Post installation steps**
-
-After you have downloaded the integration you must enable it.
-Powercalc supports both GUI and YAML configuration. Depending on your preference, follow the steps below.
+## Set up the integration
 
 === "GUI (recommended)"
 
-    Add the integration via the Home Assistant GUI:
+    Follow the setup wizard when it opens. To start it later, use this button.
 
     [![image](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc)
 
     Choose `Global Configuration` and follow the wizard to define global options.
 
-!!! tip
+    !!! tip
 
-    Enabling [analytics](misc/analytics.md) helps the development team understand how Powercalc is being used and prioritize improvements. The data collected is anonymous and includes information like the number of sensors, types of configurations, and device models. You can opt in during the Global Configuration setup.
+        Enabling [analytics](misc/analytics.md) helps the development team understand how Powercalc is being used and prioritize improvements. The data collected is anonymous and includes information like the number of sensors, types of configurations, and device models. You can opt in during the Global Configuration setup.
 
 === "YAML"
 
@@ -48,7 +40,7 @@ Powercalc includes a built-in library with 600+ measured power profiles, mostly 
 These profiles are measured and created by Powercalc users. See the [library website](https://library.powercalc.nl) for the listing of supported devices.
 Is your device missing? You can [measure it yourself](contributing/measure/index.md) and contribute the profile.
 
-After installation and restart, Powercalc will automatically:
+After setup, Powercalc will automatically:
 
 - Scan your Home Assistant installation
 - Detect supported devices using their *manufacturer* and *model*
@@ -108,5 +100,3 @@ powercalc:
 
     New energy sensors may take some time to appear in the Energy Dashboard, sometimes up to an hour.
     This is normal; just give Home Assistant a bit of time.
-
-[hacs]: https://hacs.xyz/

@@ -3,7 +3,7 @@
     "source_entity": "Källentitet",
     "source_device": "Källenhet",
     "remarks_smart_switch": "Denna profil visar endast effekt i standby-läge. \n Har du apparater som förbrukar ett fast effekt-värde när de är påslagna, kan du ange detta värde i nästa steg",
-    "remarks_smart_dimmer": "Den här profilen ger endast standby-effektvärden. \n I nästa steg kan du ange värden för det anslutna ljuset som tillval",
+    "remarks_smart_dimmer": "Ange effekten för de anslutna ljuskällorna vid lägsta och högsta ljusstyrka, utan drivdonets egenförbrukning. Lämna alla fält tomma för att bara följa drivdonets egenförbrukning.",
     "view_measurement_details": "Visa mätdetaljer"
   },
   "config": {

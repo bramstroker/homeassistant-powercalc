@@ -1,4 +1,3 @@
-import type { LightMeasurementRequest } from "../../types";
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { cache } from "lit/directives/cache.js";
@@ -10,7 +9,7 @@ import type { AppView, MeasureAppState } from "../../app-controller";
 import { reviewMetrics, reviewSummary } from "../preflight/summary";
 import { isAddressed, specFromRequest } from "../../power-meter/registry";
 import type { MeterContext } from "../../power-meter/registry";
-import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionFormValues, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, DummyLoadCalibration, EntityDescriptor, ErrorHelp, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SessionPowerMeter, SettingsSection, ShellyDiscoveryDevice } from "../../types";
+import type { AppSettings, AppSettingsUpdate, Capabilities, ContributionAuthDeviceStatus, ContributionAuthState, ContributionDeviceFlow, ContributionFormValues, ContributionPreview, ContributionPreviewRequest, ContributionResult, ContributionSubmitRequest, DeviceSpecificationField, DummyLoadCalibration, EntityDescriptor, ErrorHelp, LightMeasurementRequest, MeasureDefinition, MeasureType, MeasurementRequest, PlotCollection, PowerMeterSpec, PowerMeterDiagnostic, PreflightResponse, SessionFile, SessionSnapshot, SessionSummary, SessionPowerMeter, SettingsSection, ShellyDiscoveryDevice } from "../../types";
 import { sharedStyles, themeStyles } from "../../styles";
 import { THEME_CHANGE_EVENT, applyDocumentTheme, nextThemePreference, readThemePreference, saveThemePreference } from "../../theme";
 import type { ThemePreference } from "../../theme";

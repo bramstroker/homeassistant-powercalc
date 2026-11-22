@@ -11,7 +11,6 @@ from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import RegistryEntryDisabler
 from homeassistant.helpers.template import Template
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import DUMMY_ENTITY_ID, PLACEHOLDER_ENTITY_BY_DEVICE_CLASS, CalculationStrategy
@@ -34,6 +33,7 @@ from tests.common import (
     mock_entities_in_registry,
     requires_child_devices,
 )
+from tests.ha_test import MockConfigEntry
 
 
 @pytest.mark.parametrize(

@@ -17,6 +17,7 @@ from custom_components.powercalc.power_profile.error import ProfileDownloadError
 _LOGGER = logging.getLogger(__name__)
 CACHE_DIRECTORY = ".powercalc"
 METADATA_FILE = ".installed.json"
+MODEL_JSON_FILENAME = "model.json"
 
 
 def _sync_directory(directory: Path) -> None:
@@ -99,8 +100,8 @@ def compress_installed_profile_csv_files(installed: InstalledProfile) -> None:
 def validate_profile(directory: Path, version: AwesomeVersion) -> dict[str, Any]:
     """Validate JSON and version requirements before accepting any downloaded files."""
     try:
-        model = json.loads((directory / "model.json").read_bytes())
-        for path in directory.rglob("model.json"):
+        model = json.loads((directory / MODEL_JSON_FILENAME).read_bytes())
+        for path in directory.rglob(MODEL_JSON_FILENAME):
             if CACHE_DIRECTORY in path.relative_to(directory).parts:
                 continue
             data = json.loads(path.read_bytes())
@@ -133,7 +134,7 @@ def read_installed_profile(
     recover_installation(storage)
     current = storage / CACHE_DIRECTORY / "current"
     directory = current if current.exists() else storage
-    if not (directory / "model.json").exists():
+    if not (directory / MODEL_JSON_FILENAME).exists():
         return None
     try:
         model = validate_profile(directory, version)

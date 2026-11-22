@@ -17,10 +17,6 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State
 from homeassistant.util import dt as dt_util
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    mock_restore_cache,
-)
 
 from custom_components.powercalc.const import (
     CONF_COST,
@@ -63,6 +59,10 @@ from tests.common import (
     mock_sensors_in_registry,
     run_powercalc_setup,
     set_states,
+)
+from tests.ha_test import (
+    MockConfigEntry,
+    mock_restore_cache,
 )
 
 _KWH = {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR}

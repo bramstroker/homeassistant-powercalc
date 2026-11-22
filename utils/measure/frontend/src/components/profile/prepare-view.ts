@@ -23,7 +23,6 @@ import { profileDeviceType } from "./device-specification-fields";
 import { formValue, type ProfileFormSection } from "./form-section";
 import "./contribution-details";
 import "./contributor-fields";
-import "./device-specification-fields";
 import "./measurement-fields";
 import "./prepared-preview";
 import "./product-fields";

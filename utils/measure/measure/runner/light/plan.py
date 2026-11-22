@@ -124,12 +124,13 @@ def low_load_probe_variations(plan: LightMeasurementPlan) -> list[Variation]:
             and variation.bri == minimum_brightness
             and variation.sat == maximum_saturation
         ]
-        probes.extend(
-            min(hs_candidates, key=lambda variation: abs(variation.hue - primary_hue))
-            for primary_hue in (0, 65535 // 3, 2 * 65535 // 3)
-        )
+        probes.extend(_nearest_hue(hs_candidates, hue) for hue in (0, 65535 // 3, 2 * 65535 // 3))
 
     return list(dict.fromkeys(probes))
+
+
+def _nearest_hue(candidates: Sequence[HsVariation], hue: int) -> HsVariation:
+    return min(candidates, key=lambda variation: abs(variation.hue - hue))
 
 
 def build_light_plan(

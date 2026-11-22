@@ -82,8 +82,9 @@ def test_every_measure_type_has_an_explicit_cli_builder() -> None:
 
 def test_cli_rejects_fixed_profile_without_device_selection(mock_config_factory: MockConfigFactory) -> None:
     environment = mock_config_factory({"selected_measure_type": MeasureType.FIXED}, set_question_defaults=False)
+    measure = Measure(environment)
     with pytest.raises(ValueError, match="Home Assistant measure app"):
-        Measure(environment)._select_measure_type()  # noqa: SLF001
+        measure._select_measure_type()  # noqa: SLF001
     with pytest.raises(ValueError, match="Home Assistant measure app"):
         request_from_answers(MeasureType.FIXED, {}, environment)
 

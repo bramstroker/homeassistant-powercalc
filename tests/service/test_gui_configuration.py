@@ -5,7 +5,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.typing import ConfigType
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.const import (
     CONF_CREATE_STANDBY_ENERGY_SENSOR,
@@ -23,6 +22,7 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from tests.common import run_powercalc_setup
+from tests.ha_test import MockConfigEntry
 
 
 async def test_change_gui_configuration(hass: HomeAssistant) -> None:

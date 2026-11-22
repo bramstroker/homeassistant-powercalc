@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from freezegun.api import FrozenDateTimeFactory
-from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
@@ -13,7 +12,6 @@ from homeassistant.const import (
     UnitOfEnergy,
 )
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
@@ -30,6 +28,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from tests.common import assert_entity_state, run_powercalc_setup, set_states
+from tests.ha_test import async_fire_time_changed
 
 
 async def test_standby_energy_sensor_tracks_only_standby_consumption(
@@ -53,7 +52,7 @@ async def test_standby_energy_sensor_tracks_only_standby_consumption(
     assert standby_energy
     assert standby_energy.attributes[ATTR_DEVICE_CLASS] == SensorDeviceClass.ENERGY
     assert standby_energy.attributes[ATTR_UNIT_OF_MEASUREMENT] == UnitOfEnergy.KILO_WATT_HOUR
-    assert standby_energy.attributes[ATTR_SOURCE_ID] == "sensor.test_power"
+    assert standby_energy.attributes["source"] == "sensor.test_power"
     assert standby_energy.attributes[ATTR_SOURCE_ENTITY] == "input_boolean.test"
     assert not hass.states.get("sensor.test_energy")
 

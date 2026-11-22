@@ -3,7 +3,6 @@ import logging
 from unittest.mock import MagicMock, patch
 
 from homeassistant.components import light, sensor
-from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
@@ -109,7 +108,7 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant) -> None:
         attributes={
             ATTR_DEVICE_CLASS: SensorDeviceClass.ENERGY,
             ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
-            ATTR_SOURCE_ID: "sensor.test_power",
+            "source": "sensor.test_power",
             ATTR_SOURCE_ENTITY: "input_boolean.test",
         },
     )

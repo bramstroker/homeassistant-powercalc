@@ -20,9 +20,6 @@ from homeassistant.helpers.entity_registry import RegistryEntryDisabler
 from homeassistant.helpers.label_registry import LabelRegistry
 from homeassistant.setup import async_setup_component
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-)
 
 from custom_components.powercalc import CONF_CREATE_UTILITY_METERS
 from custom_components.powercalc.common import create_source_entity
@@ -65,6 +62,9 @@ from tests.common import (
     set_states,
 )
 from tests.config_flow.common import initialize_discovery_flow
+from tests.ha_test import (
+    MockConfigEntry,
+)
 
 # State attributes a lidl HG06462A light reports; needed for the LUT profile to match on discovery.
 DISCOVERABLE_LIGHT_ATTRIBUTES = {

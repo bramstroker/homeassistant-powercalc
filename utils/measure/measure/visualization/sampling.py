@@ -1,7 +1,7 @@
 """Downsample plot series, preserving line endpoints and bucket extrema."""
 
 from collections.abc import Sequence
-from dataclasses import replace
+from copy import replace
 import math
 
 from measure.visualization.models import IndexedPoint, PlotKind, PlotPoint, PlotSpec
