@@ -84,17 +84,7 @@ export function deviceChoices(definitions: MeasureDefinition[]): DeviceChoice[] 
 export function routesForDevice(deviceId: string, definitions: MeasureDefinition[]): MeasurementRoute[] {
   const available = new Set(definitions.map((definition) => definition.measure_type));
   const routes: MeasurementRoute[] = [];
-  if (deviceId === FREE_MEASUREMENT) {
-    if (available.has("average")) routes.push({
-      id: "average", measureType: "average", label: "Measure average power",
-      description: "Get one average reading for a device state.", preset: {},
-    });
-    if (available.has("recorder")) routes.push({
-      id: "playbook", measureType: "recorder", label: "Record a Playbook cycle",
-      description: "Save power over time as a Playbook CSV.", preset: { recorder_purpose: "playbook" },
-    });
-    return routes;
-  }
+  if (deviceId === FREE_MEASUREMENT) return freeMeasurementRoutes(available);
   const fixed = definitions.find((item) => item.measure_type === "fixed");
   if (fieldOptions(fixed, "profile_device_type").some((option) => option.value === deviceId)) {
     return [{
@@ -103,29 +93,12 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
       preset: { profile_device_type: deviceId },
     }];
   }
-  if (deviceId === "light") {
-    return available.has("light") ? [{
-      id: "light", measureType: "light", label: "Automated light measurement",
-      description: "Measure brightness, color and effects for a light profile.", preset: {},
-    }] : [];
-  }
-  if (deviceId === "smart_speaker") {
-    return available.has("speaker") ? [{
-      id: "speaker", measureType: "speaker", label: "Measure volume levels",
-      description: "Automatically calibrate playback power across volume levels.", preset: {},
-    }] : [];
-  }
+  const specialized = specializedRoute(deviceId, available);
+  if (specialized !== undefined) return specialized;
   if (deviceId === "fan" && available.has("fan")) routes.push({
     id: "fan", measureType: "fan", label: "Measure fan speeds",
     description: "Automatically calibrate power across percentage levels.", preset: {},
   });
-  if (deviceId === "smart_switch") {
-    return available.has("smart_switch") ? [{
-      id: "smart_switch", measureType: "smart_switch", label: "Measure switch self consumption",
-      description: "Automatically measure one or more relay states with all output loads disconnected.",
-      preset: {},
-    }] : [];
-  }
   if (deviceId === "vacuum_robot" && available.has("recorder")) {
     routes.push({
       id: "vacuum_profile", measureType: "recorder", label: "Record vacuum and dock activity",
@@ -150,6 +123,42 @@ export function routesForDevice(deviceId: string, definitions: MeasureDefinition
     });
   }
   return routes;
+}
+
+function freeMeasurementRoutes(available: ReadonlySet<MeasureType>): MeasurementRoute[] {
+  const routes: MeasurementRoute[] = [];
+  if (available.has("average")) routes.push({
+    id: "average", measureType: "average", label: "Measure average power",
+    description: "Get one average reading for a device state.", preset: {},
+  });
+  if (available.has("recorder")) routes.push({
+    id: "playbook", measureType: "recorder", label: "Record a Playbook cycle",
+    description: "Save power over time as a Playbook CSV.", preset: { recorder_purpose: "playbook" },
+  });
+  return routes;
+}
+
+function specializedRoute(deviceId: string, available: ReadonlySet<MeasureType>): MeasurementRoute[] | undefined {
+  if (deviceId === "light") {
+    return available.has("light") ? [{
+      id: "light", measureType: "light", label: "Automated light measurement",
+      description: "Measure brightness, color and effects for a light profile.", preset: {},
+    }] : [];
+  }
+  if (deviceId === "smart_speaker") {
+    return available.has("speaker") ? [{
+      id: "speaker", measureType: "speaker", label: "Measure volume levels",
+      description: "Automatically calibrate playback power across volume levels.", preset: {},
+    }] : [];
+  }
+  if (deviceId === "smart_switch") {
+    return available.has("smart_switch") ? [{
+      id: "smart_switch", measureType: "smart_switch", label: "Measure switch self consumption",
+      description: "Automatically measure one or more relay states with all output loads disconnected.",
+      preset: {},
+    }] : [];
+  }
+  return undefined;
 }
 
 /** Map old saved requests to the new entry flow without changing their schema. */

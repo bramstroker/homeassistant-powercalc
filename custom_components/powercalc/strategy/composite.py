@@ -1,5 +1,7 @@
+import asyncio
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import StrEnum
 import logging
@@ -15,6 +17,7 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
+    CONF_BATTERY_RATE,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_LUT,
@@ -25,6 +28,7 @@ from custom_components.powercalc.const import (
     CONF_WLED,
     UNAVAILABLE_STATES,
 )
+from custom_components.powercalc.strategy.battery_rate import CONFIG_SCHEMA as BATTERY_RATE_SCHEMA
 from custom_components.powercalc.strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from custom_components.powercalc.strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 from custom_components.powercalc.strategy.multi_switch import CONFIG_SCHEMA as MULTI_SWITCH_SCHEMA
@@ -167,6 +171,7 @@ LUT_SCHEMA = vol.Schema({})
 
 ITEM_SCHEMA = vol.Schema(
     {
+        vol.Optional(CONF_BATTERY_RATE): BATTERY_RATE_SCHEMA,
         vol.Optional(CONF_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CONDITION): CONDITION_SCHEMA,
         vol.Optional(CONF_FIXED): FIXED_SCHEMA,
@@ -207,40 +212,88 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         self.playbook_strategies: list[PlaybookStrategy] = [
             strategy.strategy for strategy in self.strategies if isinstance(strategy.strategy, PlaybookStrategy)
         ]
+        self._selected_playbooks: set[PlaybookStrategy] = set()
+        self._calculation_lock = asyncio.Lock()
+
+    async def async_update_state(self) -> None:
+        for sub_strategy in self.strategies:
+            await sub_strategy.strategy.async_update_state()
+
+    def is_sample_entity(self, entity_id: str) -> bool:
+        return any(sub_strategy.strategy.is_sample_entity(entity_id) for sub_strategy in self.strategies)
+
+    def get_update_interval(self) -> timedelta | None:
+        intervals = [
+            interval
+            for sub_strategy in self.strategies
+            if (interval := sub_strategy.strategy.get_update_interval()) is not None
+        ]
+        return min(intervals) if intervals else None
+
+    def get_next_update_time(self) -> datetime | None:
+        update_times = [
+            update_time
+            for sub_strategy in self.strategies
+            if (update_time := sub_strategy.strategy.get_next_update_time()) is not None
+        ]
+        return min(update_times) if update_times else None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
-        """Calculate power consumption based on entity state."""
-        await self.stop_active_playbooks()
+        """Calculate power after a source state change."""
+        async with self._calculation_lock:
+            await self.stop_active_playbooks()
+            self._selected_playbooks.clear()
+            return await self._calculate_branches(entity_state)
 
+    async def calculate_on_refresh(self, entity_state: State) -> Decimal | None:
+        """Reevaluate which branches contribute while keeping selected playbooks running."""
+        async with self._calculation_lock:
+            return await self._calculate_branches(entity_state)
+
+    async def _calculate_branches(self, entity_state: State) -> Decimal | None:
+        selected_playbooks: set[PlaybookStrategy] = set()
         total = Decimal(0)
+        power: Decimal | None = None
         for sub_strategy in self.strategies:
             sub_state = entity_state
             if sub_strategy.entity_id is not None:
                 fetched_state = self.hass.states.get(sub_strategy.entity_id)
                 if fetched_state is None or fetched_state.state in UNAVAILABLE_STATES:
-                    return None
+                    break
                 sub_state = fetched_state
-            value = await self._calculate_sub_strategy(sub_strategy, sub_state)
+            value = await self._calculate_sub_strategy(sub_strategy, sub_state, selected_playbooks)
             if value is None:
                 continue
             if self.mode == CompositeMode.STOP_AT_FIRST:
-                return value
+                power = value
+                break
             total += value
+        else:
+            if self.mode == CompositeMode.SUM_ALL:
+                power = total
 
-        return total if self.mode == CompositeMode.SUM_ALL else None
+        for playbook in self._selected_playbooks - selected_playbooks:
+            await playbook.stop_playbook()
+        self._selected_playbooks = selected_playbooks
+        return power
 
-    async def _calculate_sub_strategy(self, sub_strategy: SubStrategy, entity_state: State) -> Decimal | None:
+    async def _calculate_sub_strategy(
+        self, sub_strategy: SubStrategy, entity_state: State, selected_playbooks: set[PlaybookStrategy]
+    ) -> Decimal | None:
         """Calculate the power for a single sub strategy. Returns None when the sub strategy must be skipped."""
         strategy = sub_strategy.strategy
 
         if sub_strategy.condition and not self._condition_matches(sub_strategy.condition, entity_state):
             return None
 
-        if isinstance(strategy, PlaybookStrategy):
-            await self.activate_playbook(strategy)
-
         if entity_state.state == STATE_OFF and not strategy.can_calculate_standby():
             return None
+
+        if isinstance(strategy, PlaybookStrategy):
+            selected_playbooks.add(strategy)
+            if strategy in self._selected_playbooks:
+                return strategy.current_power
+            await self.activate_playbook(strategy)
 
         return await strategy.calculate(entity_state)
 

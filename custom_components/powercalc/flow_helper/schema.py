@@ -230,9 +230,13 @@ SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
 )
 
 
+MANUAL_POWER_OPTION = "/manual_power"  # A directory name cannot contain a slash.
+
+
 async def build_sub_profile_schema(
     profile: PowerProfile,
     selected_sub_profile: str | None,
+    manual_power_label: str | None = None,
 ) -> vol.Schema:
     """Create sub profile schema."""
     sub_profiles = [
@@ -242,6 +246,8 @@ async def build_sub_profile_schema(
         )
         for sub_profile in await profile.get_sub_profiles()
     ]
+    if manual_power_label:
+        sub_profiles.append(selector.SelectOptionDict(value=MANUAL_POWER_OPTION, label=manual_power_label))
     return vol.Schema(
         {
             vol.Required(

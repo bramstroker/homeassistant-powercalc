@@ -1,4 +1,4 @@
-from dataclasses import replace
+from copy import replace
 from typing import cast
 
 from measure.ha_app.session import CalibrationSample, SessionEvent, SessionEventType, SessionSnapshot, SessionState

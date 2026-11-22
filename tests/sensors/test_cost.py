@@ -17,10 +17,6 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State
 from homeassistant.util import dt as dt_util
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    mock_restore_cache,
-)
 
 from custom_components.powercalc.const import (
     CONF_COST,
@@ -63,6 +59,10 @@ from tests.common import (
     mock_sensors_in_registry,
     run_powercalc_setup,
     set_states,
+)
+from tests.ha_test import (
+    MockConfigEntry,
+    mock_restore_cache,
 )
 
 _KWH = {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR}
@@ -480,6 +480,34 @@ async def test_yaml_standalone_cost_sensor(hass: HomeAssistant) -> None:
     _assert_cost(hass, 2.5, "sensor.fridge_cost")
 
 
+@pytest.mark.parametrize("lower_reading", ["527.23", "474.957"])
+async def test_standalone_cost_sensor_ignores_small_energy_drop(hass: HomeAssistant, lower_reading: str) -> None:
+    """A stale reading up to 10% below the baseline does not charge for energy twice."""
+    energy_id = "sensor.existing_energy"
+    price_id = "sensor.energy_price"
+    cost_id = "sensor.fridge_cost"
+    mock_sensors_in_registry(hass, energy_entities=[energy_id])
+    mock_restore_cache(hass, [State(cost_id, "55.1666", {"last_energy": "527.73"})])
+    await set_states(hass, [(price_id, "0.332621"), (energy_id, "527.73", _KWH)])
+    await run_powercalc_setup(
+        hass,
+        {CONF_NAME: "Fridge", CONF_COST: {CONF_ENERGY_SENSOR_ID: energy_id}},
+        {CONF_ENERGY_PRICE_SENSOR: price_id},
+    )
+
+    await set_states(hass, [(energy_id, lower_reading, _KWH)])
+    _assert_cost(hass, 55.1666, cost_id)
+
+    await set_states(hass, [(price_id, "0.40")])
+    _assert_cost(hass, 55.1666, cost_id)
+
+    await set_states(hass, [(energy_id, "527.73", _KWH)])
+    _assert_cost(hass, 55.1666, cost_id)
+
+    await set_states(hass, [(energy_id, "528.73", _KWH)])
+    _assert_cost(hass, 55.5666, cost_id)
+
+
 async def test_yaml_standalone_cost_sensor_name_derived_from_energy_sensor(hass: HomeAssistant) -> None:
     """When no name is given the cost sensor name is derived from the tracked energy sensor."""
     mock_entities_in_registry(
@@ -731,8 +759,11 @@ async def test_restore_state(hass: HomeAssistant) -> None:
     _assert_cost(hass, 7.5)
 
 
-async def test_cost_sensor_handles_energy_reset(hass: HomeAssistant) -> None:
-    """A decreasing energy value (reset) is treated as the new delta."""
+@pytest.mark.parametrize("reset_energy,cost_after_reset", [("0", 2.5), ("5", 3.75)])
+async def test_cost_sensor_handles_energy_reset(
+    hass: HomeAssistant, reset_energy: str, cost_after_reset: float
+) -> None:
+    """A meter reset starts a new energy baseline and charges any energy since the reset."""
     await _setup_cost_sensor(
         hass,
         {CONF_CREATE_COST_SENSOR: True},
@@ -743,8 +774,11 @@ async def test_cost_sensor_handles_energy_reset(hass: HomeAssistant) -> None:
     await set_states(hass, [("sensor.existing_energy", "20", _KWH)])  # +10 kWh * 0.25
     _assert_cost(hass, 2.5)
 
-    await set_states(hass, [("sensor.existing_energy", "5", _KWH)])  # reset -> 5 kWh * 0.25
-    _assert_cost(hass, 3.75)
+    await set_states(hass, [("sensor.existing_energy", reset_energy, _KWH)])
+    _assert_cost(hass, cost_after_reset)
+
+    await set_states(hass, [("sensor.existing_energy", "19", _KWH)])
+    _assert_cost(hass, 7.25)
 
 
 async def test_reset_cost_service(hass: HomeAssistant) -> None:

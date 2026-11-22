@@ -1,26 +1,22 @@
 # Install development version
 
-Install the latest development version of Powercalc by selecting the `dev` release in HACS.
+The `dev` release is the latest development build of Powercalc.
 
-## HACS
+[![Open Powercalc in the Home Assistant Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=bramstroker&repository=homeassistant-powercalc&category=integration)
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=bramstroker&repository=homeassistant-powercalc)
+1. If Powercalc is new to your Home Assistant instance, [install it from the Marketplace](../quick-start.md#installation) first.
+2. Go to **Settings → Devices & services → Marketplace** and select the Powercalc device. Enable the **Pre-release** entity, then turn on its switch.
+3. Open Powercalc in the Marketplace using the button above. From the three-dot menu, select **Install another version**.
+4. Select `dev` and confirm with **Install**.
+5. Restart Home Assistant to apply the change.
 
-1. Click the button above to open the Powercalc HACS repository.
-2. Click the three-dot menu in the top right corner and select **Redownload**.
-3. Select the `dev` release.
-4. Click **Install**.
-5. Restart Home Assistant.
-
-!!! note
-
-    When you install a later stable release, HACS replaces the `dev` version with that release.
+To return to stable releases, turn off **Pre-release** and install the latest stable version from the Marketplace.
 
 ## Developer tools action
 
 [![Open your Home Assistant instance and show your service developer tools with a specific action selected.](https://my.home-assistant.io/badges/developer_call_service.svg)](https://my.home-assistant.io/redirect/developer_call_service/?service=update.install)
 
-You can also install `dev` with the `update.install` action:
+You can also install `dev` with the `update.install` action once Powercalc is installed through the Marketplace.
 
 1. Click the button above to open the `update.install` action.
 2. Select the Powercalc update entity as the target.

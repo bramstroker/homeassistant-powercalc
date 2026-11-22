@@ -12,13 +12,6 @@ from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 import homeassistant.helpers.entity_registry as er
 from homeassistant.util import dt as dt_util
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry
-from pytest_homeassistant_custom_component.components.recorder.common import (
-    async_wait_recording_done,
-    do_adhoc_statistics,
-    get_start_time,
-    statistics_during_period,
-)
 from sqlalchemy.orm import Session
 
 from custom_components.powercalc.common import create_source_entity
@@ -57,6 +50,13 @@ from custom_components.powercalc.flow_helper.common import Step
 from tests.common import create_mock_config_entry, create_mock_group_entry, run_powercalc_setup
 from tests.config_flow.common import handle_options_flow_update, initialize_options_flow
 from tests.config_flow.test_global_configuration import create_mock_global_config_entry
+from tests.ha_test import (
+    MockConfigEntry,
+    async_wait_recording_done,
+    do_adhoc_statistics,
+    get_start_time,
+    statistics_during_period,
+)
 
 
 @pytest.fixture

@@ -7,7 +7,6 @@ from homeassistant.helpers import device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.issue_registry import IssueRegistry
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc import (
     CONF_DISCOVERY_EXCLUDE_SELF_USAGE_DEPRECATED,
@@ -47,6 +46,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.power_profile.library import ModelInfo
 from tests.common import migrate_legacy_entry, mock_devices, requires_composite_devices, run_powercalc_setup
+from tests.ha_test import MockConfigEntry
 
 COMPOSITE_ID = "composite00000000000000000000ab"
 

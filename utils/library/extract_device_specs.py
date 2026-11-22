@@ -74,7 +74,7 @@ INTEGRATED_FORM_FACTORS = frozenset({"fixture", "panel", "strip"})
 LUMENS_PATTERN = re.compile(r"\b(\d{2,5})\s?(?:lm|lumens?)\b", re.IGNORECASE)
 # Two figures for two variants of the same lamp, e.g. "(450/470 lm)". Which one belongs to
 # this profile is not something the name settles.
-DUAL_LUMENS_PATTERN = re.compile(r"\d+\s*/\s*\d+\s*(?:lm|lumens?)\b", re.IGNORECASE)
+DUAL_LUMENS_PATTERN = re.compile(r"(?<!\d)\d++\s*+/\s*+\d++\s*+(?:lm|lumens?)\b", re.IGNORECASE)
 WATTS_PATTERN = re.compile(r"\b(\d{1,3}(?:[.,]\d+)?)\s?W\b")
 
 LUMENS_RANGE = (50, 25_000)
@@ -246,7 +246,14 @@ def main() -> int:
             updated = add_device_specs(model_data, additions)
             model_path.write_text(json.dumps(updated, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
-    print(f"\n{changed} profiles {'updated' if args.write else 'would be updated'}")  # noqa: T201
+    print_summary(changed, args.write, counts, skipped_profiles)
+    return 0
+
+
+def print_summary(
+    changed: int, write: bool, counts: dict[str, int], skipped_profiles: list[tuple[str, list[str]]]
+) -> None:
+    print(f"\n{changed} profiles {'updated' if write else 'would be updated'}")  # noqa: T201
     for key, count in counts.items():
         print(f"  {key}: {count}")  # noqa: T201
 
@@ -254,8 +261,6 @@ def main() -> int:
         print(f"\n{len(skipped_profiles)} profiles left for a human to decide:")  # noqa: T201
         for profile, reasons in skipped_profiles:
             print(f"  {profile}: {'; '.join(reasons)}")  # noqa: T201
-
-    return 0
 
 
 if __name__ == "__main__":  # pragma: no cover

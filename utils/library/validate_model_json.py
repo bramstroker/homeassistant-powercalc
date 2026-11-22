@@ -69,8 +69,11 @@ def validate_files_with_glob(directory: str, pattern: str, schema_path: str) -> 
 
 def validate_files_with_schema(directory: str, pattern: str, schema: dict[str, Any]) -> bool:
     """Validate every JSON file matching the glob pattern against an already loaded schema."""
-    results = [validate_file(file_path, schema) for file_path in sorted(glob.glob(os.path.join(directory, pattern)))]
-    return all(results)
+    is_valid = True
+    for file_path in sorted(glob.glob(os.path.join(directory, pattern))):
+        if not validate_file(file_path, schema):
+            is_valid = False
+    return is_valid
 
 
 def validate_models_with_glob(directory: str, schema_path: str) -> bool:

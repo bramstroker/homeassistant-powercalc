@@ -17,7 +17,7 @@ from homeassistant.const import (
     EntityCategory,
 )
 
-MIN_HA_VERSION = "2026.4.0"
+MIN_HA_VERSION = "2026.6.0"
 
 BUILT_IN_LIBRARY_DIR = "powercalc_profiles"
 
@@ -65,6 +65,8 @@ CONF_ENABLE_ANALYTICS = "enable_analytics"
 CONF_AREA = "area"
 CONF_AUTOSTART = "autostart"
 CONF_AVAILABILITY_ENTITY = "availability_entity"
+CONF_BASE_POWER = "base_power"
+CONF_BATTERY_RATE = "battery_rate"
 CONF_CALCULATION_ENABLED_CONDITION = "calculation_enabled_condition"
 CONF_CALIBRATE = "calibrate"
 CONF_CATEGORY = "category"
@@ -101,6 +103,7 @@ CONF_GROUP_UPDATE_INTERVAL_DEPRECATED = "group_update_interval"
 CONF_FORCE_UPDATE_FREQUENCY_DEPRECATED = "force_update_frequency"
 
 CONF_ENERGY_INTEGRATION_METHOD = "energy_integration_method"
+CONF_ENERGY_PER_PERCENT = "energy_per_percent"
 CONF_ENERGY_PRICE = "energy_price"
 CONF_ENERGY_PRICE_MULTIPLIER = "energy_price_multiplier"
 CONF_ENERGY_PRICE_SENSOR = "energy_price_sensor"
@@ -200,6 +203,7 @@ CONF_PLAYBOOK_ID = "playbook_id"
 CONF_VARIABLES = "variables"
 CONF_VOLTAGE = "voltage"
 CONF_WILDCARD = "wildcard"
+CONF_WINDOW = "window"
 CONF_WLED = "wled"
 
 # Redefine constants from integration component.
@@ -300,6 +304,7 @@ class CalculationStrategy(StrEnum):
     """Possible virtual power calculation strategies."""
 
     COMPOSITE = "composite"
+    BATTERY_RATE = "battery_rate"
     LUT = "lut"
     LINEAR = "linear"
     MULTI_SWITCH = "multi_switch"

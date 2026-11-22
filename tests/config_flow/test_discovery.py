@@ -4,7 +4,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.selector import SelectSelector
 import pytest
-from pytest_homeassistant_custom_component.common import mock_device_registry
 import voluptuous as vol
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
@@ -41,6 +40,7 @@ from tests.config_flow.common import (
     handle_options_flow_update,
     initialize_discovery_flow,
 )
+from tests.ha_test import mock_device_registry
 
 
 async def test_discovery_flow(

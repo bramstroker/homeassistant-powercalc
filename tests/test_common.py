@@ -3,7 +3,6 @@ from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 import pytest
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults
 
 from custom_components.powercalc import (
     CONF_CREATE_ENERGY_SENSORS,
@@ -15,6 +14,7 @@ from custom_components.powercalc.common import (
 )
 from custom_components.powercalc.const import CONF_CREATE_COST_SENSOR, CONF_CREATE_ENERGY_SENSOR
 from tests.common import build_device_entry
+from tests.ha_test import RegistryEntryWithDefaults
 
 
 @pytest.mark.parametrize(

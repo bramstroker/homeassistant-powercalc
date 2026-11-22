@@ -2,7 +2,9 @@
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field, replace
+from enum import StrEnum
 import json
+import math
 
 from measure.analyser.entity_references import resolve_portable_entity
 from measure.analyser.models import Activity as Activity, FeatureReference, FeatureSource, ScalarStateValue
@@ -40,6 +42,22 @@ def _contains(values: Sequence[ScalarStateValue], value: ScalarStateValue) -> bo
     return any(type(item) is type(value) and item == value for item in values)
 
 
+class BatteryState(StrEnum):
+    BELOW_FULL = "below_full"
+    FULL = "full"
+
+    def matches(self, value: ScalarStateValue) -> bool | None:
+        if isinstance(value, bool):
+            return None
+        try:
+            level = float(value)
+        except ValueError:
+            return None
+        if not math.isfinite(level) or not 0 <= level <= 100:
+            return None
+        return level < 100 if self == BatteryState.BELOW_FULL else level == 100
+
+
 @dataclass(frozen=True)
 class ActivitySignal:
     activity: Activity
@@ -47,6 +65,7 @@ class ActivitySignal:
     active: list[ScalarStateValue]
     inactive: list[ScalarStateValue]
     requirements: list[ActivitySignal] = field(default_factory=list)
+    battery_state: BatteryState | None = None
 
     @property
     def features(self) -> list[FeatureReference]:
@@ -59,12 +78,20 @@ class ActivitySignal:
         value = self.feature.get_value(sample)
         if value is None:
             return None
-        if _contains(self.active, value):
-            matches = [requirement.matches(sample) for requirement in self.requirements]
-            if False in matches:
-                return False
-            return None if None in matches else True
-        return False if _contains(self.inactive, value) else None
+        if self.battery_state is not None:
+            matched = self.battery_state.matches(value)
+        elif _contains(self.active, value):
+            matched = True
+        elif _contains(self.inactive, value):
+            return False
+        else:
+            return None
+        if matched is not True:
+            return matched
+        matches = [requirement.matches(sample) for requirement in self.requirements]
+        if False in matches:
+            return False
+        return None if None in matches else True
 
     def build_condition(self, context: RecordingContext, *, active: bool = True) -> dict[str, object]:
         condition = self._build_value_condition(context, active=active)
@@ -99,6 +126,18 @@ class ActivitySignal:
     def _build_value_condition(self, context: RecordingContext, *, active: bool) -> dict[str, object]:
         entity = self.resolve_entity(context)
         assert entity is not None
+        if self.battery_state is not None:
+            expression = f"states({entity!r})"
+            below_full = self.battery_state == BatteryState.BELOW_FULL
+            if not active:
+                below_full = not below_full
+            comparison = (
+                f"0 <= ({expression} | float(-1)) < 100" if below_full else f"({expression} | float(-1)) == 100"
+            )
+            return {
+                "condition": "template",
+                "value_template": "{{ " + expression + " is not boolean and " + comparison + " }}",
+            }
         values = self.active if active else self.inactive
         if self.feature.source == FeatureSource.STATE:
             return {"condition": "state", "entity_id": entity, "state": list(values)}
@@ -108,6 +147,8 @@ class ActivitySignal:
         }
 
     def resolve_entity(self, context: RecordingContext) -> str | None:
+        if self.battery_state is not None:
+            return resolve_portable_entity(self.feature.entity_id, context)
         return _resolve_signal_entity(self.feature.entity_id, context)
 
     def _build_attribute_template(self, entity: str, values: Sequence[ScalarStateValue]) -> str:
@@ -250,8 +291,42 @@ def discover_signals(samples: Sequence[RecordingSample], context: RecordingConte
             continue
         chosen.setdefault(signal.activity, signal)
     _apply_dreame_docked_context(samples, entities, primary, status_feature, chosen)
+    _infer_docked_charging(samples, context, chosen)
     _split_drying_by_charging(samples, entities, chosen)
     return [chosen[activity] for activity in ACTIVITY_PRIORITY if activity in chosen]
+
+
+def _infer_docked_charging(
+    samples: Sequence[RecordingSample],
+    context: RecordingContext,
+    chosen: dict[Activity, ActivitySignal],
+) -> None:
+    """Use docked plus battery level only when no explicit charging source is available."""
+    docked = chosen.get(Activity.DOCKED)
+    if docked is None or Activity.CHARGING in chosen:
+        return
+    for entity in context.entities:
+        rule = get_entity_signal_rule(entity)
+        if (
+            entity.disabled_by is None
+            and entity.has_live_state is not False
+            and rule is not None
+            and rule.signal_type in {EntitySignalType.CHARGING_FLAG, EntitySignalType.CHARGING_STATUS}
+        ):
+            return
+    battery = find_battery_feature(samples, context)
+    # Restrict inference to a selected, portable battery sensor.
+    if battery is None or battery.source != FeatureSource.STATE:
+        return
+    entity = next(entity for entity in context.entities if entity.entity_id == battery.entity_id)
+    if entity.disabled_by is not None or entity.has_live_state is False or entity.integration == "powercalc":
+        return
+    below_full = ActivitySignal(Activity.CHARGING, battery, [], [], battery_state=BatteryState.BELOW_FULL)
+    if not any(docked.matches(sample) is True and below_full.matches(sample) is True for sample in samples):
+        return
+    chosen[Activity.CHARGING] = replace(below_full, requirements=[docked])
+    full = replace(below_full, activity=Activity.DOCKED, battery_state=BatteryState.FULL)
+    chosen[Activity.DOCKED] = replace(docked, requirements=[*docked.requirements, full])
 
 
 def _find_charging_flag(

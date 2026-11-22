@@ -101,18 +101,22 @@ def test_store_ignores_invalid_legacy_resistance(
 
 
 def test_store_requires_dummy_load_configuration_before_saving(tmp_path: Path) -> None:
+    store = CliDummyLoadCalibrationStore(tmp_path)
+    request = _request()
     with pytest.raises(ValueError, match="without dummy-load configuration"):
-        CliDummyLoadCalibrationStore(tmp_path).save(_request(), 1000)
+        store.save(request, 1000)
 
     assert list(tmp_path.iterdir()) == []
 
 
 def test_reuse_requires_available_matching_calibration(tmp_path: Path) -> None:
+    request = _request()
+    store = CliDummyLoadCalibrationStore(tmp_path)
     with pytest.raises(ValueError, match="no longer available for this power meter"):
         apply_dummy_load_answers(
-            _request(),
+            request,
             {QUESTION_DUMMY_LOAD: True, QUESTION_DUMMY_LOAD_MODE: "reuse"},
-            CliDummyLoadCalibrationStore(tmp_path),
+            store,
         )
 
 

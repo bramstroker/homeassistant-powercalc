@@ -706,8 +706,9 @@ async def test_read_capped_returns_a_body_within_the_limit() -> None:
     ],
 )
 async def test_read_capped_rejects_an_oversized_body(chunks: list[bytes], content_length: int | None) -> None:
+    response = _streamed_response(chunks, content_length)
     with pytest.raises(ProfileDownloadError, match="larger than the maximum"):
-        await _read_capped(_streamed_response(chunks, content_length), 16, "resource")
+        await _read_capped(response, 16, "resource")
 
 
 @pytest.mark.parametrize(

@@ -60,6 +60,7 @@ class SettlingBranch:
         return 2
 
     def estimate(self, sample: RecordingSample, battery: FeatureReference | None) -> float | None:
+        """Estimate power from time since charging ended, independently of battery level."""
         elapsed = self.timing.get_elapsed(sample)
         if elapsed is None:
             return None

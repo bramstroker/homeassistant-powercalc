@@ -126,10 +126,7 @@ export class RunningView extends LitElement {
   /** Warnings, diagnostics and the stop control shared by both screens. */
   private renderFooter(openEnded: boolean) {
     return html`
-      ${!this.connected ? html`<p class="notice" role="status">
-        Reconnecting to live updates. The measurement may still be running in Home Assistant.
-        ${this.lastEventReceivedAt ? html`Last update received: <time datetime=${this.lastEventReceivedAt}>${timestamp(this.lastEventReceivedAt)}</time>.` : "Waiting for a live update."}
-      </p>` : nothing}
+      ${this.connected ? nothing : this.renderConnectionNotice()}
       ${this.renderLatestWarning()}
       ${diagnosticsDownload(this.diagnosticsUrl)}
       <div class="actions">${this.renderStopButton(openEnded)}</div>
@@ -293,12 +290,29 @@ export class RunningView extends LitElement {
     return nothing;
   }
 
+  private renderConnectionNotice() {
+    const lastUpdate = this.lastEventReceivedAt;
+    const message = lastUpdate
+      ? html`Last update received: <time datetime=${lastUpdate}>${timestamp(lastUpdate)}</time>.`
+      : "Waiting for a live update.";
+    return html`<p class="notice" role="status">
+      Reconnecting to live updates. The measurement may still be running in Home Assistant.
+      ${message}
+    </p>`;
+  }
+
   private renderLatestWarning() {
     // The recording status replaces historical read errors; keep unrelated warnings visible.
     const hasRecordingStatus = this.snapshot.mode === "Recording"
       && this.snapshot.progress?.waiting_for_entities !== undefined;
-    const warning = this.snapshot.warnings?.filter((message) =>
-      !(hasRecordingStatus && message.startsWith("Skipping sample, could not read entity states:"))).at(-1);
+    const warnings = this.snapshot.warnings ?? [];
+    let warning: string | undefined;
+    for (let index = warnings.length - 1; index >= 0; index--) {
+      const message = warnings[index]!;
+      if (hasRecordingStatus && message.startsWith("Skipping sample, could not read entity states:")) continue;
+      warning = message;
+      break;
+    }
 
     if (!warning) return nothing;
     const request = this.snapshot.request;
