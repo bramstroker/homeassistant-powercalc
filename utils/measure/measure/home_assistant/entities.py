@@ -262,9 +262,9 @@ def _describe_registry_entity(entry: EntityRegistryEntry, devices: dict[str, dic
         connectivity=detect_connectivity(entry.platform, devices.get(entry.device_id or "", {})),
         translation_key=getattr(entry, "translation_key", None),
         unique_id=getattr(entry, "unique_id", None),
-        manufacturer=str(manufacturer) if manufacturer else None,
-        model_id=str(model_id) if model_id else None,
-        product_name=str(device[HASS_DEVICE_REGISTRY_MODEL]) if device.get(HASS_DEVICE_REGISTRY_MODEL) else None,
+        manufacturer=_optional_string(manufacturer),
+        model_id=_optional_string(model_id),
+        product_name=_optional_string(device.get(HASS_DEVICE_REGISTRY_MODEL)),
         disabled_by=getattr(entry, "disabled_by", None),
         has_live_state=False,
         state="unavailable",
@@ -333,7 +333,7 @@ def _describe_entity(
 
     attributes = entity.state.attributes
     detailed = domain in _MEASURABLE_DOMAINS
-    device_id = str(registry_entry.device_id) if registry_entry is not None and registry_entry.device_id else None
+    device_id = _optional_string(getattr(registry_entry, "device_id", None))
     device = device_registry.get(device_id, {}) if device_id is not None else {}
     manufacturer = device.get(HASS_DEVICE_REGISTRY_MANUFACTURER)
     model_id = device.get(HASS_DEVICE_REGISTRY_MODEL_ID) or device.get(HASS_DEVICE_REGISTRY_MODEL)
@@ -342,7 +342,7 @@ def _describe_entity(
     light_info = light_info_from_attributes(attributes) if domain == EntityDomain.LIGHT else None
     unit = attributes.get(HASS_ENTITY_UNIT_OF_MEASUREMENT)
     members = attributes.get(HASS_ENTITY_GROUP_MEMBERS)
-    integration = str(registry_entry.platform) if registry_entry is not None and registry_entry.platform else None
+    integration = _optional_string(getattr(registry_entry, "platform", None))
     effects = [str(effect) for effect in (attributes.get("effect_list") or [])]
     return EntityDescriptor(
         entity_id=entity.entity_id,
@@ -356,11 +356,11 @@ def _describe_entity(
         translation_key=getattr(registry_entry, "translation_key", None),
         unique_id=getattr(registry_entry, "unique_id", None),
         disabled_by=getattr(registry_entry, "disabled_by", None),
-        manufacturer=str(manufacturer) if manufacturer else None,
-        model_id=str(model_id) if model_id else None,
-        product_name=str(device[HASS_DEVICE_REGISTRY_MODEL]) if device.get(HASS_DEVICE_REGISTRY_MODEL) else None,
+        manufacturer=_optional_string(manufacturer),
+        model_id=_optional_string(model_id),
+        product_name=_optional_string(device.get(HASS_DEVICE_REGISTRY_MODEL)),
         state=str(entity.state.state),
-        unit=str(unit) if unit else None,
+        unit=_optional_string(unit),
         attribute_names=sorted(attributes) if detailed else [],
         supported_modes=supported_modes,
         effect_list=(
@@ -370,6 +370,10 @@ def _describe_entity(
         max_mired=light_info.get_max_mired() if light_info is not None else None,
         member_entity_ids=[str(member) for member in members] if detailed and isinstance(members, list) else [],
     )
+
+
+def _optional_string(value: object) -> str | None:
+    return str(value) if value else None
 
 
 def _device_name(device: dict[str, object]) -> str | None:

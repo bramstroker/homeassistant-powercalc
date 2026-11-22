@@ -3,7 +3,7 @@
     "source_entity": "Entidad de origen",
     "source_device": "Dispositivo de origen",
     "remarks_smart_switch": "Este perfil solo provee valores de potencia en espera. \nCuando tienes un aparato que encendido consume una cantidad fija de potencia, puedes proveer ese valor en el siguiente paso de la configuración",
-    "remarks_smart_dimmer": "Este perfil solo proporciona valores de energía en espera.\nEn el siguiente paso puedes proporcionar opcionalmente los valores de la luz conectada",
+    "remarks_smart_dimmer": "Introduce la potencia de las luces conectadas al brillo mínimo y máximo, sin incluir el consumo del controlador. Deja todos los campos en blanco para registrar solo el consumo del controlador.",
     "view_measurement_details": "Ver detalles de la medición"
   },
   "config": {

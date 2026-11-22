@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Only the **latest release** of PowerCalc receives security fixes. Please reproduce issues against the most recent version on [HACS](https://hacs.xyz/) or [GitHub Releases](https://github.com/bramstroker/homeassistant-powercalc/releases) before reporting.
+Only the **latest release** of PowerCalc receives security fixes. Before reporting, please reproduce the issue on that version. You can find it in the [Home Assistant Marketplace](https://my.home-assistant.io/redirect/marketplace_repository/?owner=bramstroker&repository=homeassistant-powercalc&category=integration) or on [GitHub Releases](https://github.com/bramstroker/homeassistant-powercalc/releases/latest).
 
 ## Reporting a Vulnerability
 

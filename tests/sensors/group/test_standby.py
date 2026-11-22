@@ -24,6 +24,8 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_GROUP,
     ATTR_STATE,
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+    CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -408,3 +410,23 @@ async def test_no_group_created_when_both_switches_disabled(hass: HomeAssistant)
 
     assert hass.states.get("sensor.all_standby_power") is None
     assert hass.states.get("sensor.all_self_usage_power") is None
+
+
+async def test_standby_energy_sensor_keeps_group_name(hass: HomeAssistant) -> None:
+    """A global energy naming pattern must not rename the standby group energy sensor."""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test1",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 20},
+        },
+        {
+            CONF_ENERGY_SENSOR_NAMING: "{} my energy",
+            CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} my energy",
+        },
+    )
+
+    assert hass.states.get("sensor.all_standby_energy")
+    assert hass.states.get("sensor.all_standby_energy").attributes["friendly_name"] == "All standby energy"

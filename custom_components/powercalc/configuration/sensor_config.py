@@ -12,6 +12,7 @@ from custom_components.powercalc.common import validate_name_pattern
 from custom_components.powercalc.const import (
     CONF_AND,
     CONF_AVAILABILITY_ENTITY,
+    CONF_BATTERY_RATE,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_COMPOSITE,
     CONF_COST,
@@ -78,6 +79,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.group_include.filter import FILTER_CONFIG
 from custom_components.powercalc.sensors.daily_energy import DAILY_FIXED_ENERGY_SCHEMA
+from custom_components.powercalc.strategy.battery_rate import CONFIG_SCHEMA as BATTERY_RATE_SCHEMA
 from custom_components.powercalc.strategy.composite import CONFIG_SCHEMA as COMPOSITE_SCHEMA
 from custom_components.powercalc.strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from custom_components.powercalc.strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -89,6 +91,7 @@ from custom_components.powercalc.validation import vol
 MAX_GROUP_NESTING_LEVEL = 5
 
 SENSOR_CONFIG = {
+    vol.Optional(CONF_BATTERY_RATE): BATTERY_RATE_SCHEMA,
     vol.Optional(CONF_NAME): cv.string,
     vol.Optional(CONF_ENTITY_ID): cv.entity_id,
     vol.Optional(CONF_AVAILABILITY_ENTITY): cv.entity_id,

@@ -33,3 +33,7 @@ Used for led strips controlled by WLED firmware. WLED integration provides estim
 ## :material-vector-combine: [Composite](composite.md)
 
 Combine different strategies.
+
+## [Battery rate](battery-rate.md)
+
+Estimate charging power from changes in battery percentage when the charger speed varies.

@@ -35,7 +35,8 @@ export abstract class ProfileFormSection extends LitElement {
   protected renderFieldError(name: string) {
     const error = this.fieldError(name);
     if (!error) return nothing;
-    return html`<small id=${`${name}-error`} class="field-hint error">${error}</small>`;
+    const errorId = `${name}-error`;
+    return html`<small id=${errorId} class="field-hint error">${error}</small>`;
   }
 
   protected renderInput(

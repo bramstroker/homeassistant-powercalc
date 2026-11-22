@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from homeassistant.core import HomeAssistant, State
@@ -6,11 +7,33 @@ from homeassistant.helpers.event import TrackTemplate
 
 
 class PowerCalculationStrategyInterface:
+    async def async_update_state(self) -> None:
+        """Collect source readings, including while calculation is disabled or a composite branch is skipped."""
+
+    def is_sample_entity(self, entity_id: str) -> bool:
+        """Return whether this entity supplies readings independently of the source state.
+
+        The default ignores entity_id because it has no independent sample entities.
+        """
+        return False
+
+    def get_update_interval(self) -> timedelta | None:
+        """Return the interval needed for time-dependent calculations, if any."""
+        return None
+
+    def get_next_update_time(self) -> datetime | None:
+        """Return the next time a held calculation changes without a source event."""
+        return None
+
     async def initialize(self) -> None:
         """Initialize the strategy, called once on creation."""
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate power consumption based on entity state."""
+
+    async def calculate_on_refresh(self, entity_state: State) -> Decimal | None:
+        """Refresh power after a timer or sample update."""
+        return await self.calculate(entity_state)
 
     async def validate_config(self) -> None:
         """Validate correct setup of the strategy."""

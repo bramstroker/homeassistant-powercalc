@@ -3,7 +3,7 @@
     "source_entity": "Entidade de origem",
     "source_device": "Dispositivo de origem",
     "remarks_smart_switch": "Este perfil fornece apenas valores de potência em standby. \n Quando tiver um aparelho que consome uma quantidade fixa de potência quando ligado, pode fornecer esse valor no próximo passo do fluxo de configuração",
-    "remarks_smart_dimmer": "Este perfil fornece apenas valores de potência em standby. \n No próximo passo pode fornecer opcionalmente os valores da luz ligada",
+    "remarks_smart_dimmer": "Introduza a potência das luzes ligadas com o brilho mínimo e máximo, sem incluir o consumo do controlador. Deixe todos os campos em branco para monitorizar apenas o consumo do controlador.",
     "view_measurement_details": "Ver detalhes da medição"
   },
   "config": {

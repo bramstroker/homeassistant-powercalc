@@ -93,21 +93,31 @@ export class StandbySetup extends LitElement {
   private renderProgress() {
     if (!this.busy && !this.measurementStarted) return nothing;
     const active = this.busy || this.measuring;
+    const progressLabel = this.busy ? "Calibrating dummy load" : "Measuring standby";
+    const title = active ? `${progressLabel}…` : "Standby result";
+    const result = html`<p class="result" role="status">${this.measurementMessage}</p>
+      <p>Elapsed: ${this.formatDuration(this.elapsedSeconds)}</p>`;
     return html`<section class="progress-panel" aria-label="Measurement progress" aria-busy=${active}>
-      <h3>${this.busy ? "Calibrating dummy load…" : this.measuring ? "Measuring standby…" : "Standby result"}</h3>
-      ${active ? html`
-        <progress aria-label=${this.busy ? "Calibrating dummy load" : "Measuring standby"}></progress>
-        <p>Elapsed: ${this.formatDuration(this.elapsedSeconds)}</p>
-        ${this.busy ? html`<p>${this.message || "You can close this dialog and reopen it to check progress."}</p>` : nothing}
-        <p>${this.busy
-          ? "Calibration uses 10-minute stability checks and may repeat until the load is stable. Keep only the warmed-up dummy load connected."
-          : `Allow about ${this.formatDuration(this.expectedSeconds)} for settling and sampling. Meter updates and retries can take longer.`}</p>
-        ${!this.busy && this.elapsedSeconds > this.expectedSeconds ? html`<p>Still waiting for the meter to finish. Your standby value will update when a reliable reading is returned.</p>` : nothing}
-      ` : html`
-        <p class="result" role="status">${this.measurementMessage}</p>
-        <p>Elapsed: ${this.formatDuration(this.elapsedSeconds)}</p>
-      `}
+      <h3>${title}</h3>
+      ${active ? this.renderActiveProgress(progressLabel) : result}
     </section>`;
+  }
+
+  private renderActiveProgress(label: string) {
+    const message = this.busy
+      ? html`<p>${this.message || "You can close this dialog and reopen it to check progress."}</p>`
+      : nothing;
+    const guidance = this.busy
+      ? "Calibration uses 10-minute stability checks and may repeat until the load is stable. Keep only the warmed-up dummy load connected."
+      : `Allow about ${this.formatDuration(this.expectedSeconds)} for settling and sampling. Meter updates and retries can take longer.`;
+    const waiting = !this.busy && this.elapsedSeconds > this.expectedSeconds;
+    return html`
+      <progress aria-label=${label}></progress>
+      <p>Elapsed: ${this.formatDuration(this.elapsedSeconds)}</p>
+      ${message}
+      <p>${guidance}</p>
+      ${waiting ? html`<p>Still waiting for the meter to finish. Your standby value will update when a reliable reading is returned.</p>` : nothing}
+    `;
   }
 
   private close(): void {
@@ -121,7 +131,13 @@ export class StandbySetup extends LitElement {
 
   render() {
     const controller = this.request.controller;
-    const entities = controller.type === "hass_multi" ? controller.entity_ids.join(", ") : controller.type === "hass" ? controller.entity_id : "";
+    const singleEntity = controller.type === "hass" ? controller.entity_id : "";
+    const entities = controller.type === "hass_multi" ? controller.entity_ids.join(", ") : singleEntity;
+    const controlsDisabled = this.busy || this.measuring || this.checkingCalibration;
+    const dummyLoad = this.request.dummy_load;
+    const keepDummyLoad = this.loadMode === "calibrate" || this.loadMode === "reuse" || (this.loadMode === "original" && dummyLoad);
+    const connectionInstructions = keepDummyLoad ? " in parallel with the same preheated dummy load, keeping it connected" : "";
+    const originalLoad = dummyLoad ? `: ${dummyLoad.description}` : " (no dummy load)";
     return html`<dialog aria-labelledby="standby-title" aria-describedby="standby-description"
       @close=${this.handleClose}
       @cancel=${(event: Event) => { if (this.measuring) event.preventDefault(); }}>
@@ -132,7 +148,7 @@ export class StandbySetup extends LitElement {
       <div class="body">
       ${this.request.power_meter.type === "dummy" || this.request.controller.type === "dummy" ? html`<p class="notice warning">Results are simulated for testing; do not submit them as real measurements.</p>` : nothing}
       ${this.renderProgress()}
-      <fieldset ?hidden=${this.measurementStarted} ?disabled=${this.busy || this.measuring || this.checkingCalibration} @input=${(event: Event) => event.stopPropagation()} @change=${(event: Event) => event.stopPropagation()}>
+      <fieldset ?hidden=${this.measurementStarted} ?disabled=${controlsDisabled} @input=${(event: Event) => event.stopPropagation()} @change=${(event: Event) => event.stopPropagation()}>
         <section aria-label="Devices and meter">
         <h3>Devices and meter</h3>
         <div class="fields">
@@ -154,7 +170,7 @@ export class StandbySetup extends LitElement {
         <section aria-label="Dummy load">
         <h3>Dummy load</h3>
         <label><span>Resistive dummy load</span><select name="load" .value=${this.loadMode} @change=${this.changeLoad}>
-          <option value="original">Keep original setup${this.request.dummy_load ? `: ${this.request.dummy_load.description}` : " (no dummy load)"}</option>
+          <option value="original">Keep original setup${originalLoad}</option>
           ${this.savedCalibration ? html`<option value="reuse">Reuse saved calibration: ${this.savedCalibration.description}</option>` : nothing}
           <option value="none">No dummy load</option>
           <option value="calibrate">Add or change dummy load</option>
@@ -166,22 +182,34 @@ export class StandbySetup extends LitElement {
         </div>` : nothing}
         </section>
         <div class="instructions">
-        <p>Before measuring, connect the selected bulbs${this.loadMode === "calibrate" || this.loadMode === "reuse" || (this.loadMode === "original" && this.request.dummy_load) ? " in parallel with the same preheated dummy load, keeping it connected" : ""}. Confirm there are no other changing loads.</p>
+        <p>Before measuring, connect the selected bulbs${connectionInstructions}. Confirm there are no other changing loads.</p>
         <p>The selected lights will turn off and stay off. Stale readings may trigger brief full-brightness on/off pulses. No LUT measurements will be rerun.</p>
         </div>
       </fieldset>
       <p class="status" role="status" ?hidden=${this.busy || this.measurementStarted || !this.message}>${this.message}</p>
       </div>
-      <footer>
-        ${this.busy ? html`<button type="button" @click=${this.close}>Close</button><button type="button" @click=${this.cancelCalibration}>Cancel calibration</button>` : this.measurementStarted && !this.measuring ? html`
-          <button type="button" @click=${this.showSetup}>Measure again</button>
-          <button type="button" class="primary" @click=${this.close}>Done</button>
-        ` : html`
-          <button type="button" ?disabled=${this.busy || this.measuring || this.checkingCalibration} @click=${this.close}>Cancel</button>
-          <button type="button" class="primary" ?disabled=${this.busy || this.measuring || this.checkingCalibration} @click=${this.measure}>${this.measuring ? "Measuring standby…" : "Confirm and measure standby"}</button>
-        `}
-      </footer>
+      <footer>${this.renderActions(controlsDisabled)}</footer>
     </dialog>`;
+  }
+
+  private renderActions(disabled: boolean) {
+    if (this.busy) {
+      return html`
+        <button type="button" @click=${this.close}>Close</button>
+        <button type="button" @click=${this.cancelCalibration}>Cancel calibration</button>
+      `;
+    }
+    if (this.measurementStarted && !this.measuring) {
+      return html`
+        <button type="button" @click=${this.showSetup}>Measure again</button>
+        <button type="button" class="primary" @click=${this.close}>Done</button>
+      `;
+    }
+    const submitLabel = this.measuring ? "Measuring standby…" : "Confirm and measure standby";
+    return html`
+      <button type="button" ?disabled=${disabled} @click=${this.close}>Cancel</button>
+      <button type="button" class="primary" ?disabled=${disabled} @click=${this.measure}>${submitLabel}</button>
+    `;
   }
 
   private timing(name: keyof MeasurementParameters, label: string, min: number, value = this.request.parameters[name]) {

@@ -3,7 +3,7 @@
     "source_entity": "Zdrojová entita",
     "source_device": "Zdrojové zařízení",
     "remarks_smart_switch": "Tento profil poskytuje pouze hodnoty napájení v pohotovostním režimu. \n Pokud máte spotřebič, který zapnutí spotřebovává pevně dané množství energie, můžete zadat tuto hodnotu v dalším kroku v nastavení",
-    "remarks_smart_dimmer": "Tento profil poskytuje pouze hodnoty spotřeby energie v pohotovostním režimu. \n V dalším kroku můžete volitelně zadat hodnoty připojeného světla",
+    "remarks_smart_dimmer": "Zadejte příkon připojených světel při minimálním a maximálním jasu bez vlastní spotřeby napájecího zdroje. Chcete-li sledovat pouze vlastní spotřebu napájecího zdroje, nechte všechna pole prázdná.",
     "view_measurement_details": "Zobrazit podrobnosti měření"
   },
   "config": {

@@ -414,8 +414,9 @@ def test_coordinator_serializes_recording_analysis_with_other_session_actions(tm
         thread.start()
         assert analysis_started.wait(1)
 
+        request = light_request()
         with pytest.raises(SessionConflictError, match="Recording analysis is already active"):
-            coordinator.start(light_request())
+            coordinator.start(request)
         with pytest.raises(SessionConflictError, match="Recording analysis is already active"):
             coordinator.resume(completed.id)
         with pytest.raises(SessionConflictError, match="Recording analysis is already active"):

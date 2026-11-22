@@ -3,7 +3,7 @@
     "source_entity": "Lähde-entiteetti",
     "source_device": "Lähdelaite",
     "remarks_smart_switch": "Tämä profiili sisältää vain valmiustilan tehoarvot. \n Jos laite kuluttaa käynnissä ollessaan kiinteän määrän tehoa, voit antaa arvon määrityksen seuraavassa vaiheessa",
-    "remarks_smart_dimmer": "Tämä profiili sisältää vain valmiustilan tehoarvot. \n Seuraavassa vaiheessa voit halutessasi antaa liitetyn valon arvot",
+    "remarks_smart_dimmer": "Syötä liitettyjen valojen teho pienimmällä ja suurimmalla kirkkaudella ilman liitäntälaitteen omaa kulutusta. Jätä kaikki kentät tyhjiksi, jos haluat seurata vain liitäntälaitteen omaa kulutusta.",
     "view_measurement_details": "Näytä mittaustiedot"
   },
   "config": {

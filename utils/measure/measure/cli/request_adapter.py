@@ -107,20 +107,21 @@ def request_from_answers(
             controller=_fan_controller_spec(environment, answers),
         )
     if measure_type == MeasureType.SMART_SWITCH:
-        entity_ids = list(answers.get("switch_entity_ids") or [])
-        if not entity_ids:
-            raise ValueError("Select at least one switch relay")
-        controller = (
-            HassMultiSwitchControllerSpec(entity_ids=entity_ids)
-            if len(entity_ids) > 1
-            else HassSwitchControllerSpec(entity_id=entity_ids[0])
-        )
         return SmartSwitchMeasurementRequest(
             **common,
-            controller=controller,
+            controller=_switch_controller_spec(answers),
             power_monitoring=answers["power_monitoring"],
         )
     assert_never(measure_type)  # pragma: no cover - all MeasureType members handled
+
+
+def _switch_controller_spec(answers: dict[str, Any]) -> HassMultiSwitchControllerSpec | HassSwitchControllerSpec:
+    entity_ids = list(answers.get("switch_entity_ids") or [])
+    if not entity_ids:
+        raise ValueError("Select at least one switch relay")
+    if len(entity_ids) > 1:
+        return HassMultiSwitchControllerSpec(entity_ids=entity_ids)
+    return HassSwitchControllerSpec(entity_id=entity_ids[0])
 
 
 def _parameters_from_environment(environment: CliEnvironment) -> MeasurementParameters:

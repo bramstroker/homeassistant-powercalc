@@ -355,6 +355,8 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
             return
 
         delta = new_energy - self._last_energy
+        if delta == 0:
+            return
         if delta < 0:
             if self._reset_on_source_reset:
                 # The source (utility meter) reset for a new cycle, start the cost cycle over.
@@ -363,10 +365,12 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
                 self._attr_last_reset = dt_util.utcnow()
                 self.async_write_ha_state()
                 return
+            # Match Home Assistant's total_increasing reset threshold. Keep the baseline
+            # through small dips so recovery does not charge for the same energy again.
+            if new_energy >= self._last_energy * Decimal("0.9"):
+                return
             # The energy sensor got reset (e.g. restart or calibrate), treat the new value as the delta.
             delta = new_energy
-        if delta == 0:
-            return
 
         self._state += delta * price
         self._last_energy = new_energy

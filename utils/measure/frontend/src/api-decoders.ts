@@ -80,7 +80,8 @@ function optionalNullable<T>(guard: Guard<T>): Guard<T | null | undefined> {
 }
 
 function oneOf<const T extends readonly (string | number | boolean)[]>(...values: T): Guard<T[number]> {
-  return (value): value is T[number] => values.some((candidate) => candidate === value);
+  const candidates: readonly unknown[] = values;
+  return (value): value is T[number] => candidates.includes(value);
 }
 
 function decoder<T>(description: string, guard: Guard<T>): Decoder<T> {
@@ -503,6 +504,42 @@ interface DecodedSessionEnvelope {
   snapshot?: SessionSnapshot;
 }
 
+type RegularEventType = Exclude<SessionEvent["type"], "operating_point">;
+type EventValidator = readonly [validate: Guard<unknown>, error: string];
+
+const messageEvent: EventValidator = [objectOf({ message: isString }), "Invalid message event"];
+const eventValidators: Record<RegularEventType, EventValidator> = {
+  phase: messageEvent,
+  warning: messageEvent,
+  log: messageEvent,
+  checkpoint: [
+    objectOf({ message: isString, action: optionalNullable(isString) }),
+    "Invalid checkpoint event",
+  ],
+  progress: [
+    objectOf({
+      completed: isInteger,
+      total: isInteger,
+      skipped: isInteger,
+      mode: isString,
+      estimated_remaining: isString,
+      waiting_for_entities: optional(isBoolean),
+    }),
+    "Invalid progress event",
+  ],
+  state: [
+    objectOf({ state: isSessionState, error: optionalNullable(isString) }),
+    "Invalid state event",
+  ],
+  sample: [objectOf({ power: isNumber }), "Invalid sample event"],
+  calibration_sample: [
+    objectOf({ power: isNumber, resistance: isNumber, voltage: isNumber }),
+    "Invalid calibration event",
+  ],
+  entity_states: [objectOf({ states: isStringRecord }), "Invalid entity-state event"],
+  heartbeat: [isRecord, "Invalid heartbeat event"],
+};
+
 export function decodeSessionEnvelope(value: unknown): DecodedSessionEnvelope {
   if (!isRecord(value) || !isInteger(value.sequence) || !isString(value.type) || !isRecord(value.data)) {
     throw new Error("Invalid event envelope");
@@ -520,46 +557,11 @@ export function decodeSessionEnvelope(value: unknown): DecodedSessionEnvelope {
       snapshot,
     };
   }
-  switch (value.type) {
-    case "phase":
-    case "warning":
-    case "log":
-      if (!isString(value.data.message)) throw new Error("Invalid message event");
-      break;
-    case "checkpoint":
-      if (!isString(value.data.message) || !optionalNullable(isString)(value.data.action)) {
-        throw new Error("Invalid checkpoint event");
-      }
-      break;
-    case "progress":
-      if (!(isInteger(value.data.completed) && isInteger(value.data.total) && isInteger(value.data.skipped)
-        && isString(value.data.mode) && isString(value.data.estimated_remaining)
-        && optional(isBoolean)(value.data.waiting_for_entities))) {
-        throw new Error("Invalid progress event");
-      }
-      break;
-    case "state":
-      if (!isSessionState(value.data.state) || !optionalNullable(isString)(value.data.error)) {
-        throw new Error("Invalid state event");
-      }
-      break;
-    case "sample":
-      if (!isNumber(value.data.power)) throw new Error("Invalid sample event");
-      break;
-    case "calibration_sample":
-      if (!(isNumber(value.data.power) && isNumber(value.data.resistance) && isNumber(value.data.voltage))) {
-        throw new Error("Invalid calibration event");
-      }
-      break;
-    case "entity_states":
-      if (!isStringRecord(value.data.states)) throw new Error("Invalid entity-state event");
-      break;
-    case "heartbeat":
-      break;
-  }
+  const [validate, error] = eventValidators[value.type];
+  if (!validate(value.data)) throw new Error(error);
   return { event: { sequence: value.sequence, type: value.type, data: value.data, snapshot }, snapshot };
 }
 
-function isRegularEventType(value: string): value is Exclude<SessionEvent["type"], "operating_point"> {
-  return ["phase", "progress", "state", "warning", "log", "checkpoint", "heartbeat", "sample", "calibration_sample", "entity_states"].includes(value);
+function isRegularEventType(value: string): value is RegularEventType {
+  return Object.hasOwn(eventValidators, value);
 }

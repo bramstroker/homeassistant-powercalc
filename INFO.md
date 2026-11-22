@@ -8,17 +8,13 @@ Also possibilities are available to easily put all your energy sensors in groups
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
 
-## Post installation steps
-- Restart HA
-- Add the following entry to `configuration.yaml`:
-```yaml
-powercalc:
-```
-- Restart HA final time
+## Installation and setup
+
+Install Powercalc from **Settings → Marketplace** in Home Assistant. Follow the [Quick Start guide](https://docs.powercalc.nl/quick-start/) to set up the integration.
 
 ## Setup power sensors
 
-After restarting power and energy sensors should appear for the lights found in your HA installation which are supported by powercalc.
+After setup, Powercalc can discover supported lights and offer to create power and energy sensors for them.
 Please see the list of [supported models](https://library.powercalc.nl).
 When no power sensor is appearing please check the logs for any errors.
 Powercalc also provides extensive configuration to setup your own power sensors using different strategies. Please see the main [Documentation](https://github.com/bramstroker/homeassistant-powercalc/blob/master/README.md) on github for all the options and examples.

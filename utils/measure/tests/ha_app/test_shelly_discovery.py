@@ -139,8 +139,9 @@ def test_manager_closes_discovery_connection_after_failure() -> None:
         "http://ha.lan:8123", "token", discovery_client_factory=MagicMock(return_value=client)
     )
 
+    discovery = manager.discover_zeroconf()
     with pytest.raises(HomeAssistantDiscoveryError, match="Subscription rejected"):
-        asyncio.run(manager.discover_zeroconf())
+        asyncio.run(discovery)
 
     client.__aexit__.assert_awaited_once()
     assert client.__aexit__.call_args.args[1] is error

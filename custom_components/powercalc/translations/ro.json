@@ -3,7 +3,7 @@
     "source_entity": "Entitatea sursă",
     "source_device": "Dispozitiv sursă",
     "remarks_smart_switch": "Acest profil furnizează doar valorile puterii de așteptare. \n Când aveți un aparat care consumă o cantitate fixă ​​de energie atunci când este pornit, puteți furniza acea valoare în următorul pas al fluxului de configurare",
-    "remarks_smart_dimmer": "Acest profil furnizează doar valorile puterii de așteptare. \n În pasul următor puteți furniza opțional valorile luminii conectate",
+    "remarks_smart_dimmer": "Introduceți puterea luminilor conectate la luminozitatea minimă și maximă, fără consumul propriu al driverului. Lăsați toate câmpurile necompletate pentru a monitoriza doar consumul propriu al driverului.",
     "view_measurement_details": "Vedeți detaliile măsurătorii"
   },
   "config": {

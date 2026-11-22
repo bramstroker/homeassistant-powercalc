@@ -21,6 +21,8 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ACTIVE_GROUP,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_STANDBY_GROUP,
+    CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+    CONF_ENERGY_SENSOR_NAMING,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_PRECISION,
     DATA_SELF_USAGE_POWER_SENSORS,
@@ -72,6 +74,9 @@ def _create_sensors(
     if config.get(CONF_CREATE_ENERGY_SENSORS):
         sensor_config = config.copy()
         sensor_config[CONF_NAME] = name
+        # The group totals keep their own name, the global energy naming pattern is meant for device sensors.
+        sensor_config.pop(CONF_ENERGY_SENSOR_NAMING, None)
+        sensor_config.pop(CONF_ENERGY_SENSOR_FRIENDLY_NAMING, None)
         source_entity = create_source_entity(DUMMY_ENTITY_ID, hass)
         energy_sensor = create_energy_sensor(
             hass,

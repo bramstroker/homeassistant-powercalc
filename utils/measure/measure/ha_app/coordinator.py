@@ -1,6 +1,7 @@
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
-from dataclasses import dataclass, replace
+from copy import replace
+from dataclasses import dataclass
 import logging
 from pathlib import Path
 from threading import Lock, Thread
@@ -27,6 +28,9 @@ from measure.utils.clock import utc_now
 
 _LOGGER = logging.getLogger("measure")
 _SNAPSHOT_PERSIST_INTERVAL = 5.0
+_MEASUREMENT_ACTIVE = "A measurement session is already active"
+_RECORDING_ANALYSIS_ACTIVE = "Recording analysis is already active"
+_SESSION_NOT_FOUND = "The requested session does not exist"
 _DEVICE_CHECK_ACTIVE = "A device check is already active"
 _ANALYSIS_WARNING_PREFIXES = (
     "Profile was not created:",
@@ -145,9 +149,9 @@ class MeasurementCoordinator:
             if self._probing:
                 raise SessionConflictError(_DEVICE_CHECK_ACTIVE)
             if self._snapshot and self._snapshot.state in ACTIVE_SESSION_STATES:
-                raise SessionConflictError("A measurement session is already active")
+                raise SessionConflictError(_MEASUREMENT_ACTIVE)
             if self._analysing:
-                raise SessionConflictError("Recording analysis is already active")
+                raise SessionConflictError(_RECORDING_ANALYSIS_ACTIVE)
             if request.resume_policy == ResumePolicy.RESUME:
                 raise SessionConflictError("Use the resume action for persisted output")
             now = utc_now()
@@ -173,13 +177,13 @@ class MeasurementCoordinator:
             if self._probing:
                 raise SessionConflictError(_DEVICE_CHECK_ACTIVE)
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
-                raise SessionConflictError("A measurement session is already active")
+                raise SessionConflictError(_MEASUREMENT_ACTIVE)
             if self._analysing:
-                raise SessionConflictError("Recording analysis is already active")
+                raise SessionConflictError(_RECORDING_ANALYSIS_ACTIVE)
             try:
                 snapshot = self._snapshot_locked(session_id)
             except SESSION_LOAD_ERRORS as error:
-                raise SessionConflictError("The requested session does not exist") from error
+                raise SessionConflictError(_SESSION_NOT_FOUND) from error
             if snapshot.state not in RESUMABLE_SESSION_STATES:
                 raise SessionConflictError("The requested session cannot be resumed")
             if not self.storage.can_resume(snapshot.id):
@@ -201,13 +205,13 @@ class MeasurementCoordinator:
             if self._probing:
                 raise SessionConflictError(_DEVICE_CHECK_ACTIVE)
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
-                raise SessionConflictError("A measurement session is already active")
+                raise SessionConflictError(_MEASUREMENT_ACTIVE)
             if self._analysing:
-                raise SessionConflictError("Recording analysis is already active")
+                raise SessionConflictError(_RECORDING_ANALYSIS_ACTIVE)
             try:
                 snapshot = self._snapshot_locked(session_id)
             except SESSION_LOAD_ERRORS as error:
-                raise SessionConflictError("The requested session does not exist") from error
+                raise SessionConflictError(_SESSION_NOT_FOUND) from error
             if snapshot.state in ACTIVE_SESSION_STATES or not self.storage.can_analyse(session_id):
                 raise SessionConflictError("The requested session has no profile recording to extend")
             request = self.storage.load_request(session_id)
@@ -295,7 +299,7 @@ class MeasurementCoordinator:
             try:
                 snapshot = self._snapshot_locked(session_id)
             except SESSION_LOAD_ERRORS as error:
-                raise SessionConflictError("The requested session does not exist") from error
+                raise SessionConflictError(_SESSION_NOT_FOUND) from error
             if snapshot.state in ACTIVE_SESSION_STATES:
                 raise SessionConflictError("An active measurement session cannot be deleted")
             if session_id in self._analysing:
@@ -311,11 +315,11 @@ class MeasurementCoordinator:
 
         with self._lock:
             if self._snapshot is not None and self._snapshot.state in ACTIVE_SESSION_STATES:
-                raise SessionConflictError("A measurement session is already active")
+                raise SessionConflictError(_MEASUREMENT_ACTIVE)
             try:
                 snapshot = self._snapshot_locked(session_id)
             except SESSION_LOAD_ERRORS as error:
-                raise SessionConflictError("The requested session does not exist") from error
+                raise SessionConflictError(_SESSION_NOT_FOUND) from error
             if session_id in self._analysing:
                 raise SessionConflictError("The requested recording is already being analysed")
             if snapshot.state in ACTIVE_SESSION_STATES or not self.storage.can_analyse(session_id):

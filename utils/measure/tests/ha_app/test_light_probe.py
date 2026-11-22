@@ -286,8 +286,9 @@ def test_active_probe_rejects_repeated_zero_on_saturated_green_and_cleans_up() -
     assembler = FakeAssembler(controller, meter)
     probe = LightLoadProbe(lambda: assembler, wait=lambda _: None, now=lambda: 10)
 
+    measurement_request = request()
     with pytest.raises(LightLoadProbeError, match="repeatedly returned 0 W") as error:
-        probe.evaluate(request())
+        probe.evaluate(measurement_request)
 
     assert error.value.help_url == "https://docs.powercalc.nl/contributing/measure/low-power-measurements/"
     assert error.value.help_label == "Low-power measurement guide"
@@ -330,8 +331,10 @@ def test_active_probe_handles_effect_only_plan_and_formats_static_variations() -
 def test_active_probe_wraps_controller_errors_and_cleanup_errors_do_not_mask_success() -> None:
     failing_assembler = MagicMock()
     failing_assembler.create_light_controller.side_effect = RuntimeError("controller unavailable")
+    probe = LightLoadProbe(lambda: failing_assembler)
+    measurement_request = request()
     with pytest.raises(LightLoadProbeError, match="controller unavailable") as error:
-        LightLoadProbe(lambda: failing_assembler).evaluate(request())
+        probe.evaluate(measurement_request)
 
     # An adapter failure is not evidence of an unmeasurably low load.
     assert error.value.help_url is None

@@ -87,6 +87,10 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
         return self._power
 
+    @property
+    def current_power(self) -> Decimal:
+        return self._power
+
     async def on_start(self, hass: HomeAssistant) -> None:
         if self._autostart:
             await self.activate_playbook(self._autostart)
