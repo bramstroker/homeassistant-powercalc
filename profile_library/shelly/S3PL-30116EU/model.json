@@ -1,0 +1,33 @@
+{
+  "name": "Plug PM Gen3",
+  "aliases": [
+    "Shelly Plug PM Gen3"
+  ],
+  "calculation_strategy": "fixed",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\nNote: The Wi-Fi repeater function was disabled during all measurements.\n\nLED status indicator variants (`PLUGPM_UI` `leds.mode`):\n- \"LED\": the LED is lit at rgb [0, 100, 0] with brightness 100, night mode disabled.\n- \"No LED\": `leds.mode = \"off\"`, LED indication disabled completely.\n\nThe `power` LED mode (the factory default) was not used for any measurement, so it is not modelled.\n\nSub-profile configurations:\n\"WLAN + BT + ECO\": All three turned on.\n\"WLAN + ECO\": Both turned on.\n\"WLAN + BT\": Both turned on, ECO turned off.\n\"WLAN\": Only WLAN turned on, ECO turned off.",
+  "created_at": "2026-11-23T00:30:00Z",
+  "description": "Smart Wi-Fi plug with power monitoring, without a switching function",
+  "device_type": "power_meter",
+  "device_specs": {
+    "rated_power": 1,
+    "connectivity": [
+      "wifi",
+      "bluetooth",
+      "matter"
+    ]
+  },
+  "discovery_by": "device",
+  "mains_voltage": 230,
+  "measure_description": "The Shelly Plug PM Gen3 has no switching function, so it has a single operating state and no standby_power_on.\n\nNo separate measurement was taken on this device. The values are adopted from shelly/S3PL-00112EU, which is built on the same Gen3 metering platform: both are documented with the same ESP-Shelly-C38F MCU, the same 44x44x70 mm housing and the same set of meters (AC voltmeter, AC ammeter, power and energy meters).\n\nThe parent profile stores a pair of values per configuration. This device has only one state, so the lower value of each pair is used. All values are therefore estimates for this model, not measurements on it.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "manual",
+  "only_self_usage": true,
+  "product_url": "https://www.shelly.com/products/shelly-plug-pm-gen3",
+  "standby_power_estimated": true,
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
+  ]
+}
