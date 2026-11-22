@@ -38,9 +38,6 @@ from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.template import Template
 from homeassistant.util import dt
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    async_fire_time_changed,
-)
 
 from custom_components.powercalc import CONF_IGNORE_UNAVAILABLE_STATE, CONF_POWER_UPDATE_INTERVAL
 from custom_components.powercalc.const import (
@@ -86,6 +83,9 @@ from tests.common import (
     mock_entities_in_registry,
     run_powercalc_setup,
     set_states,
+)
+from tests.ha_test import (
+    async_fire_time_changed,
 )
 
 

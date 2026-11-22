@@ -95,39 +95,48 @@ class GitHubClient:
                     "variables": {"owner": owner, "name": name},
                 },
             )
-            if not isinstance(response, dict):
-                raise RuntimeError("GitHub GraphQL commit lookup returned no data")
-            if response.get("errors"):
-                raise RuntimeError(f"GitHub GraphQL commit lookup failed: {response['errors']}")
-            data = response.get("data")
-            if not isinstance(data, dict) or not isinstance(repository := data.get("repository"), dict):
-                raise RuntimeError("GitHub GraphQL commit lookup returned no repository data")
-            for index in range(len(batch)):
-                git_object = repository.get(f"commit{index}")
-                if not isinstance(git_object, dict):
-                    continue
-                associated = git_object.get("associatedPullRequests")
-                if not isinstance(associated, dict) or not isinstance(nodes := associated.get("nodes"), list):
-                    continue
-                for node in nodes:
-                    if not isinstance(node, dict) or node.get("mergedAt") is None:
-                        continue
-                    labels = node.get("labels")
-                    label_nodes = labels.get("nodes", []) if isinstance(labels, dict) else []
-                    author = node.get("author")
-                    pull_request = {
-                        "number": int(node["number"]),
-                        "title": str(node["title"]),
-                        "merged_at": node["mergedAt"],
-                        "user": {"login": str(author.get("login", "ghost")) if isinstance(author, dict) else "ghost"},
-                        "labels": [
-                            {"name": str(label["name"])}
-                            for label in label_nodes
-                            if isinstance(label, dict) and "name" in label
-                        ],
-                    }
-                    pull_requests.setdefault(pull_request["number"], pull_request)
+            for pull_request in self._parse_commit_pull_requests(response, len(batch)):
+                pull_requests.setdefault(pull_request["number"], pull_request)
         return [pull_requests[number] for number in sorted(pull_requests)]
+
+    @staticmethod
+    def _parse_commit_pull_requests(response: JsonResponse, batch_size: int) -> list[JsonObject]:
+        if not isinstance(response, dict):
+            raise RuntimeError("GitHub GraphQL commit lookup returned no data")
+        if response.get("errors"):
+            raise RuntimeError(f"GitHub GraphQL commit lookup failed: {response['errors']}")
+        data = response.get("data")
+        if not isinstance(data, dict) or not isinstance(repository := data.get("repository"), dict):
+            raise RuntimeError("GitHub GraphQL commit lookup returned no repository data")
+        pull_requests: list[JsonObject] = []
+        for index in range(batch_size):
+            git_object = repository.get(f"commit{index}")
+            if not isinstance(git_object, dict):
+                continue
+            associated = git_object.get("associatedPullRequests")
+            if not isinstance(associated, dict) or not isinstance(nodes := associated.get("nodes"), list):
+                continue
+            pull_requests.extend(
+                GitHubClient._format_merged_pull_request(node)
+                for node in nodes
+                if isinstance(node, dict) and node.get("mergedAt") is not None
+            )
+        return pull_requests
+
+    @staticmethod
+    def _format_merged_pull_request(node: JsonObject) -> JsonObject:
+        labels = node.get("labels")
+        label_nodes = labels.get("nodes", []) if isinstance(labels, dict) else []
+        author = node.get("author")
+        return {
+            "number": int(node["number"]),
+            "title": str(node["title"]),
+            "merged_at": node["mergedAt"],
+            "user": {"login": str(author.get("login", "ghost")) if isinstance(author, dict) else "ghost"},
+            "labels": [
+                {"name": str(label["name"])} for label in label_nodes if isinstance(label, dict) and "name" in label
+            ],
+        }
 
     def pull_request_files(self, number: int) -> list[str]:
         files = self.pull_request_file_details(number)

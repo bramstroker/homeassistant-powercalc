@@ -394,3 +394,19 @@ def test_update_translations_uses_separate_field_keys(tmp_path: Path, monkeypatc
         "water_amount_entity": "Select the water amount entity.",
         "switch_entity": "Select the switch entity.",
     }
+
+
+@pytest.mark.parametrize(
+    "model_data, expected",
+    [
+        ({"calculation_strategy": "lut"}, (None, 0)),
+        ({"calculation_strategy": "linear", "linear_config": {"calibrate": []}}, (None, 0)),
+        ({"calculation_strategy": "unsupported"}, (None, None)),
+    ],
+)
+def test_empty_or_unsupported_profile_has_no_power_range(
+    tmp_path: Path,
+    model_data: dict[str, Any],
+    expected: tuple[float | None, float | None],
+) -> None:
+    assert asyncio.run(update_library.get_power_range(str(tmp_path), model_data)) == expected

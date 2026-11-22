@@ -3,7 +3,6 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import RegistryEntry
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry, RegistryEntryWithDefaults
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.errors import PowercalcSetupError
@@ -15,6 +14,7 @@ from custom_components.powercalc.power_profile.sub_profile_selector import (
     SubProfileSelector,
 )
 from tests.common import build_device_entry, get_test_profile_dir, requires_child_devices
+from tests.ha_test import MockConfigEntry, RegistryEntryWithDefaults
 
 
 async def test_matcher_attribute(hass: HomeAssistant) -> None:

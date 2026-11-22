@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 from typing import Any
 
+from measure.artifacts import MEASUREMENT_EVIDENCE_ARTIFACTS
 from measure.profile.model_json import mains_voltage_from_range
 from measure.profile.models import PreparedProfileFile, ProfileMetadata, ProfilePreview, RenderedProfileFile
 from measure.profile.standby import is_valid_standby_power
@@ -25,9 +26,6 @@ EMPTY_OPTIONAL_MODEL_FIELDS = (
     "measure_device_firmware",
     "measure_description",
 )
-# Recorder analysis keeps its evidence beside the generated model. These files are
-# useful for re-analysis and diagnostics, but are not part of a profile-library entry.
-RECORDER_SOURCE_ARTIFACTS = frozenset({"analyser.json"})
 
 
 class ProfilePreparationError(ValueError):
@@ -143,8 +141,8 @@ class ProfilePreparer:
         if MODEL_JSON not in names:
             raise ProfilePreparationError("model.json is required")
         csv_names = {name for name in names if name.endswith((".csv", ".csv.gz"))}
-        recorder_sources = RECORDER_SOURCE_ARTIFACTS | set(select_recording_filenames(names))
-        unexpected = sorted(names - csv_names - {MODEL_JSON, MANUFACTURER_JSON} - recorder_sources)
+        evidence_artifacts = MEASUREMENT_EVIDENCE_ARTIFACTS | set(select_recording_filenames(names))
+        unexpected = sorted(names - csv_names - {MODEL_JSON, MANUFACTURER_JSON} - evidence_artifacts)
         if unexpected:
             raise ProfilePreparationError(f"Unexpected artifact file(s): {', '.join(unexpected)}")
         return sorted({name.removesuffix(".gz") for name in csv_names})

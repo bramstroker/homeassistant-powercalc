@@ -30,7 +30,8 @@ export function nextThemePreference(preference: ThemePreference): ThemePreferenc
 }
 
 export function resolvedTheme(preference: ThemePreference, systemPrefersDark: boolean): "light" | "dark" {
-  return preference === "system" ? (systemPrefersDark ? "dark" : "light") : preference;
+  if (preference !== "system") return preference;
+  return systemPrefersDark ? "dark" : "light";
 }
 
 export function applyDocumentTheme(preference: ThemePreference, systemPrefersDark: boolean): void {

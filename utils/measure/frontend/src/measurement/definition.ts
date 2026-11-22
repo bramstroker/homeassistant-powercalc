@@ -61,7 +61,8 @@ function isFieldValue(value: unknown): value is FieldValue {
 export function fieldOptions(field: FormField, supportedModes?: LutMode[]): FormFieldOption[] {
   const supported = field.narrowed_by ? supportedModes : undefined;
   if (!supported?.length) return field.options;
-  return field.options.filter((option) => supported.some((mode) => mode === option.value));
+  const supportedValues: readonly string[] = supported;
+  return field.options.filter((option) => supportedValues.includes(option.value));
 }
 
 /** Name of the Home Assistant device an entity belongs to, falling back to its model and then the entity. */
@@ -112,7 +113,8 @@ export function entityDomainsForOption(definition: MeasureDefinition, field: For
   const source = narrowingField(definition, field);
   if (source) {
     const option = source.options.find((candidate) => candidate.value === selectedOption);
-    return option?.entity_domains?.length ? option.entity_domains : option?.entity_domain ? [option.entity_domain] : [];
+    if (option?.entity_domains?.length) return option.entity_domains;
+    return option?.entity_domain ? [option.entity_domain] : [];
   }
   return field.entity_domains ?? [];
 }

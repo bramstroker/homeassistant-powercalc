@@ -109,11 +109,12 @@ def test_device_flow_maps_oauth_errors_to_poll_status(
 def test_device_flow_requires_nonempty_token(tmp_path: Path, token: object) -> None:
     github = MagicMock(spec=GitHubClient)
     github.poll_device_flow.return_value = {"access_token": token}
+    service = SharedContributionService(tmp_path)
     with (
         patch("measure.ha_app.contribution.auth.GitHubClient", return_value=github),
         pytest.raises(ContributionApiError, match="did not return an access token"),
     ):
-        SharedContributionService(tmp_path).poll_device_flow("client", "device")
+        service.poll_device_flow("client", "device")
 
 
 def test_device_flow_uses_response_scopes_when_identity_does_not_report_them(tmp_path: Path) -> None:

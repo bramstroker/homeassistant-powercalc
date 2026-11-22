@@ -14,6 +14,7 @@ from measure.analyser.vacuum.signals import (
     ALIASES,
     Activity,
     ActivitySignal,
+    BatteryState,
     discover_signals,
     resolve_activity,
     suggest_recording_entities,
@@ -28,6 +29,7 @@ from measure.recording.models import (
 import pytest
 
 PRIMARY = "vacuum.robot"
+BATTERY = "sensor.battery"
 
 
 def context(*entities: RecordedEntity) -> RecordingContext:
@@ -57,6 +59,134 @@ def sample(state: str = "docked", **states: str) -> RecordingSample:
             **{key: RecordedEntityState(value, {}) for key, value in states.items()},
         },
     )
+
+
+def battery_context() -> RecordingContext:
+    return context(RecordedEntity(BATTERY, "sensor", "battery", device_id="robot", device_class="battery", unit="%"))
+
+
+def test_docked_battery_level_distinguishes_charging_and_standby() -> None:
+    ctx = battery_context()
+    items = [sample(**{BATTERY: "20"}), sample(**{BATTERY: "100"}), sample("cleaning", **{BATTERY: "50"})]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [Activity.CHARGING, Activity.DOCKED, Activity.AWAY]
+    # These levels need not have appeared in the recording's vocabulary.
+    assert resolve_activity(sample(**{BATTERY: "75.5"}), signals) == Activity.CHARGING
+    assert resolve_activity(sample(**{BATTERY: "0"}), signals) == Activity.CHARGING
+    assert resolve_activity(sample(**{BATTERY: "100.0"}), signals) == Activity.DOCKED
+    charging = next(signal for signal in signals if signal.activity == Activity.CHARGING)
+    docked = next(signal for signal in signals if signal.activity == Activity.DOCKED)
+    assert charging.features == [
+        FeatureReference(BATTERY, FeatureSource.STATE),
+        FeatureReference(PRIMARY, FeatureSource.STATE),
+    ]
+    assert docked.features == [
+        FeatureReference(PRIMARY, FeatureSource.STATE),
+        FeatureReference(BATTERY, FeatureSource.STATE),
+    ]
+    assert charging.build_condition(ctx) == {
+        "condition": "and",
+        "conditions": [
+            {
+                "condition": "template",
+                "value_template": "{{ states('[[entity_by_device_class:battery]]') is not boolean and "
+                "0 <= (states('[[entity_by_device_class:battery]]') | float(-1)) < 100 }}",
+            },
+            {"condition": "state", "entity_id": "[[entity]]", "state": ["docked"]},
+        ],
+    }
+    assert charging.build_condition(ctx, active=False)["conditions"][0] == {
+        "condition": "template",
+        "value_template": "{{ states('[[entity_by_device_class:battery]]') is not boolean and "
+        "(states('[[entity_by_device_class:battery]]') | float(-1)) == 100 }}",
+    }
+    full = docked.requirements[-1]
+    assert full.build_condition(ctx) == charging.build_condition(ctx, active=False)["conditions"][0]
+    assert full.build_condition(ctx, active=False) == charging.build_condition(ctx)["conditions"][0]
+
+
+@pytest.mark.parametrize("level", ["unknown", "unavailable", "", "True", "-1", "100.1", "nan", "inf"])
+def test_invalid_battery_never_falls_back_to_docked_power(level: str) -> None:
+    signals = discover_signals([sample(**{BATTERY: "50"}), sample(**{BATTERY: "100"})], battery_context())
+    assert resolve_activity(sample(**{BATTERY: level}), signals) is None
+    assert resolve_activity(sample(), signals) is None
+
+
+@pytest.mark.parametrize("level", ["50", "100", "unavailable"])
+def test_dock_operations_take_precedence_over_battery_inference(level: str) -> None:
+    ctx = replace(battery_context(), entities=[*battery_context().entities, entity("station_state")])
+    items = [
+        sample(**{BATTERY: "50", "sensor.station_state": "idle"}),
+        sample(**{BATTERY: "100", "sensor.station_state": "idle"}),
+    ]
+    signals = discover_signals(items, ctx)
+    for state, expected in [
+        ("washing", Activity.WASHING),
+        ("drying", Activity.DRYING),
+        ("emptying", Activity.AUTO_EMPTYING),
+    ]:
+        item = sample(**{BATTERY: level, "sensor.station_state": state})
+        # Discover each recognised dock activity even if it was not active during charging.
+        assert resolve_activity(item, discover_signals([*items, item], ctx)) == expected
+    assert resolve_activity(sample("error", **{BATTERY: "50", "sensor.station_state": "idle"}), signals) is None
+
+
+@pytest.mark.parametrize(
+    "source,state,expected",
+    [
+        ("charging_state", "off", Activity.DOCKED),
+        ("charging_state", "unknown", Activity.DOCKED),
+        ("charging_status", "not_charging", Activity.DOCKED),
+        ("charging_status", "off", None),
+        ("charging_status", "unknown", Activity.DOCKED),
+    ],
+)
+def test_explicit_charging_source_prevents_battery_inference(
+    source: str, state: str, expected: Activity | None
+) -> None:
+    charging = entity(source, "binary_sensor" if source == "charging_state" else "sensor")
+    ctx = replace(battery_context(), entities=[*battery_context().entities, charging])
+    items = [
+        sample(**{BATTERY: "50", charging.entity_id: state}),
+        sample(**{BATTERY: "100", charging.entity_id: state}),
+    ]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [expected, expected]
+
+
+@pytest.mark.parametrize("value", [True, False])
+def test_battery_state_rejects_boolean_percentages(value: bool) -> None:
+    assert BatteryState.BELOW_FULL.matches(value) is None
+    assert BatteryState.FULL.matches(value) is None
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"disabled_by": "user"},
+        {"has_live_state": False},
+        {"integration": "powercalc"},
+        {"device_id": "other"},
+        {"unit": None},
+    ],
+)
+def test_battery_inference_requires_a_live_portable_source(change: dict[str, object]) -> None:
+    ctx = battery_context()
+    ctx = replace(ctx, entities=[ctx.entities[0], replace(ctx.entities[1], **change)])
+    items = [sample(**{BATTERY: "50"}), sample(**{BATTERY: "100"})]
+    signals = discover_signals(items, ctx)
+    assert [resolve_activity(item, signals) for item in items] == [Activity.DOCKED, Activity.DOCKED]
+
+
+def test_duplicate_battery_and_unobserved_charging_do_not_enable_inference() -> None:
+    ctx = battery_context()
+    duplicate = replace(ctx.entities[1], entity_id="sensor.other_battery", role="available", disabled_by="user")
+    ambiguous = replace(ctx, device_entities=[*ctx.entities, duplicate])
+    items = [sample(**{BATTERY: "50"}), sample(**{BATTERY: "100"})]
+    assert resolve_activity(items[0], discover_signals(items, ambiguous)) == Activity.DOCKED
+    assert resolve_activity(items[1], discover_signals(items[1:], ctx)) == Activity.DOCKED
+    away = sample("cleaning", **{BATTERY: "50"})
+    assert resolve_activity(away, discover_signals([away], ctx)) == Activity.AWAY
 
 
 def test_suggest_roborock_activity_entities() -> None:

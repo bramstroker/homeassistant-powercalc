@@ -35,7 +35,7 @@ export class Combobox extends LitElement {
   private readonly internals = this.createInternals();
 
   @queryElement("#combobox-input")
-  private input!: HTMLInputElement | null;
+  private readonly input!: HTMLInputElement | null;
 
   static readonly styles = [sharedStyles, css`
     :host { display: grid; gap: 0.4rem; min-width: 0; }
@@ -130,6 +130,7 @@ export class Combobox extends LitElement {
     const describedBy = [description ? "selected-description" : "", this.hint ? "combobox-hint" : "", this.error ? "combobox-error" : ""]
       .filter(Boolean)
       .join(" ");
+    const hasActiveOption = activeOption && !activeOption.disabled;
     return html`
       <div class=${this.controlClass()} @focusout=${this.focusOut}>
         ${this.renderSelectedValues()}
@@ -144,12 +145,12 @@ export class Combobox extends LitElement {
           role="combobox"
           aria-autocomplete=${this.searchable ? "list" : "none"}
           aria-readonly=${this.searchable ? nothing : "true"}
-          aria-invalid=${this.error ? "true" : "false"}
-          aria-required=${this.required ? "true" : "false"}
+          aria-invalid=${String(Boolean(this.error))}
+          aria-required=${String(this.required)}
           aria-describedby=${describedBy || nothing}
           aria-controls=${this.open ? "combobox-options" : nothing}
-          aria-expanded=${this.open ? "true" : "false"}
-          aria-activedescendant=${activeOption && !activeOption.disabled ? `combobox-option-${this.active}` : nothing}
+          aria-expanded=${String(this.open)}
+          aria-activedescendant=${hasActiveOption ? `combobox-option-${this.active}` : nothing}
           @focus=${this.openOptions}
           @click=${this.inputClicked}
           @input=${this.inputChanged}
@@ -176,10 +177,12 @@ export class Combobox extends LitElement {
     return this.values().map((value) => {
       const label = this.displayValue(value);
       const option = this.options.find((candidate) => candidate.value === value);
+      const description = option?.description;
+      const ariaLabel = description ? `Remove ${label} · ${description}` : `Remove ${label}`;
       return html`
         <span class="tag">
           <span class="tag-label" title=${option?.description ?? label}>${option ? this.renderOptionContent(option) : label}</span>
-          <button type="button" ?disabled=${this.disabled} aria-label=${`Remove ${label}${option?.description ? ` · ${option.description}` : ""}`} @click=${() => this.removeValue(value)}>×</button>
+          <button type="button" ?disabled=${this.disabled} aria-label=${ariaLabel} @click=${() => this.removeValue(value)}>×</button>
         </span>
       `;
     });
@@ -193,7 +196,8 @@ export class Combobox extends LitElement {
     const content = options.length
       ? options.map((option, index) => this.renderOption(option, index))
       : html`<p class="empty">${this.emptyMessage()}</p>`;
-    return html`<div id="combobox-options" class="menu" role="listbox" aria-label=${`${this.label} options`} aria-multiselectable=${this.multiple ? "true" : nothing}>${content}</div>`;
+    const ariaLabel = `${this.label} options`;
+    return html`<div id="combobox-options" class="menu" role="listbox" aria-label=${ariaLabel} aria-multiselectable=${this.multiple ? "true" : nothing}>${content}</div>`;
   }
 
   private renderOption(option: ComboboxOption, index: number) {

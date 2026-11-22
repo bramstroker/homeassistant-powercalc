@@ -66,6 +66,7 @@ class FixedBranch:
         return 1
 
     def estimate(self, sample: RecordingSample, battery: FeatureReference | None) -> float:
+        """Return fixed power regardless of the sample or battery level."""
         return self.power
 
 
@@ -213,10 +214,7 @@ class VacuumCompositeStrategy(ProfileAnalysisStrategy):
     ) -> list[AnalysisCandidate] | StrategyNotApplicable:
         if context.recipe != RecorderProfileRecipe.VACUUM_ROBOT:
             return StrategyNotApplicable("The vacuum analyser requires the vacuum recipe")
-        grouped: dict[Activity, list[RecordingSample]] = defaultdict(list)
-        for sample in samples:
-            if (activity := resolve_activity(sample, signals)) is not None:
-                grouped[activity].append(sample)
+        grouped = _group_samples_by_activity(samples, signals)
         if len(grouped) < 2:
             return StrategyNotApplicable("Record at least two identifiable vacuum/dock activities")
         if any(sample.power < 0 for sample in samples):
@@ -240,6 +238,16 @@ class VacuumCompositeStrategy(ProfileAnalysisStrategy):
             branches.append(branch)
         candidate = VacuumCompositeCandidate(list(signals), branches, battery, context)
         return [candidate, *_fit_settling_candidates(candidate, grouped, original_samples)]
+
+
+def _group_samples_by_activity(
+    samples: Sequence[RecordingSample], signals: Sequence[ActivitySignal]
+) -> dict[Activity, list[RecordingSample]]:
+    grouped: dict[Activity, list[RecordingSample]] = defaultdict(list)
+    for sample in samples:
+        if (activity := resolve_activity(sample, signals)) is not None:
+            grouped[activity].append(sample)
+    return grouped
 
 
 def _fit_settling_candidates(
@@ -655,15 +663,7 @@ def _split_within_activities(
         if episode.activity not in activities or len(episode.samples) < MIN_EPISODE_SAMPLES:
             continue
         validation_ids.difference_update(id(sample) for sample in episode.samples)
-        blocks: dict[int | None, list[RecordingSample]] = defaultdict(list)
-        for sample in episode.samples:
-            level = get_battery_level(sample, battery) if episode.activity == Activity.CHARGING else None
-            key = level // CHARGING_BIN_WIDTH if level is not None else None
-            if timing is not None and episode.activity in IDLE_ACTIVITIES:
-                elapsed = timing.get_elapsed(sample)
-                key = int(elapsed >= SETTLING_SECONDS) if elapsed is not None else None
-            blocks[key].append(sample)
-        for block in blocks.values():
+        for block in _group_episode_samples(episode, battery, timing).values():
             count = max(2, len(block) // 3)
             start = (len(block) - count) // 2
             validation_ids.update(id(sample) for sample in block[max(0, start) : start + count])
@@ -673,6 +673,24 @@ def _split_within_activities(
         method=ValidationMethod.HELD_OUT_BLOCKS,
         signals=split.signals,
     )
+
+
+def _group_episode_samples(
+    episode: VacuumEpisode, battery: FeatureReference | None, timing: PostChargeTiming | None
+) -> dict[int | None, list[RecordingSample]]:
+    blocks: dict[int | None, list[RecordingSample]] = defaultdict(list)
+    for sample in episode.samples:
+        key = None
+        if episode.activity == Activity.CHARGING:
+            level = get_battery_level(sample, battery)
+            if level is not None:
+                key = level // CHARGING_BIN_WIDTH
+        elif timing is not None and episode.activity in IDLE_ACTIVITIES:
+            elapsed = timing.get_elapsed(sample)
+            if elapsed is not None:
+                key = int(elapsed >= SETTLING_SECONDS)
+        blocks[key].append(sample)
+    return blocks
 
 
 def _try_split_by_recording(

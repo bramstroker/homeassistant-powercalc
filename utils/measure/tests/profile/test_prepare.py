@@ -123,8 +123,10 @@ def test_manufacturer_without_usable_directory_characters_is_rejected(tmp_path: 
     artifacts = tmp_path / "artifacts"
     write_profile_artifacts(artifacts)
 
+    preparer = make_preparer(tmp_path)
+    profile_metadata = metadata(manufacturer="灯具")
     with pytest.raises(ProfilePreparationError, match="Manufacturer directory cannot be empty"):
-        make_preparer(tmp_path).prepare(artifacts, metadata(manufacturer="灯具"))
+        preparer.prepare(artifacts, profile_metadata)
 
 
 def test_preparer_canonicalizes_manufacturer_enriches_author_and_keeps_aliases_unchanged(tmp_path: Path) -> None:
@@ -280,8 +282,10 @@ def test_preparer_rejects_lut_without_measurements(tmp_path: Path) -> None:
     write_profile_artifacts(artifacts)
     (artifacts / "brightness.csv.gz").unlink()
 
+    preparer = make_preparer(tmp_path)
+    profile_metadata = metadata()
     with pytest.raises(ProfilePreparationError, match="artifact is required for LUT profiles"):
-        make_preparer(tmp_path).prepare(artifacts, metadata())
+        preparer.prepare(artifacts, profile_metadata)
 
 
 def test_preparer_reports_artifact_removed_after_preview(tmp_path: Path) -> None:
@@ -297,8 +301,10 @@ def test_preparer_reports_artifact_removed_after_preview(tmp_path: Path) -> None
 
 
 def test_preparer_reports_missing_artifact_directory(tmp_path: Path) -> None:
+    preparer = make_preparer(tmp_path)
+    profile_metadata = metadata()
     with pytest.raises(ProfilePreparationError, match="Artifact directory does not exist"):
-        make_preparer(tmp_path).prepare(tmp_path / "missing", metadata())
+        preparer.prepare(tmp_path / "missing", profile_metadata)
 
 
 @pytest.mark.parametrize(
@@ -505,8 +511,10 @@ def test_preparer_rejects_product_names_prefixed_with_manufacturer_or_alias(
     write_library(tmp_path)
     write_profile_artifacts(artifacts)
 
+    preparer = make_preparer(tmp_path)
+    profile_metadata = metadata(manufacturer, product_name=product_name)
     with pytest.raises(ProfilePreparationError, match="must not start with the manufacturer") as error:
-        make_preparer(tmp_path).prepare(artifacts, metadata(manufacturer, product_name=product_name))
+        preparer.prepare(artifacts, profile_metadata)
 
     assert error.value.field == "product_name"
 
@@ -532,8 +540,9 @@ def test_new_manufacturer_has_no_library_url_and_still_cannot_prefix_product_nam
     preview = preparer.prepare(artifacts, metadata("Acme", product_name="Smart Bulb A19"))
     assert preview.manufacturer_library_url is None
 
+    profile_metadata = metadata("Acme", product_name="Acme Smart Bulb A19")
     with pytest.raises(ProfilePreparationError, match="must not start with the manufacturer"):
-        preparer.prepare(artifacts, metadata("Acme", product_name="Acme Smart Bulb A19"))
+        preparer.prepare(artifacts, profile_metadata)
 
 
 def test_preparer_allows_product_names_starting_with_a_sub_brand_alias(tmp_path: Path) -> None:
@@ -568,6 +577,21 @@ def test_preparer_accepts_raw_csv_alongside_gzip_and_rejects_unrelated_artifacts
     profile_metadata = metadata()
     with pytest.raises(ProfilePreparationError, match="Unexpected artifact"):
         preparer.prepare(artifacts, profile_metadata)
+
+
+@pytest.mark.parametrize("evidence", ["analyser.json", "smart_switch_readings.json"])
+def test_preparer_accepts_measurement_evidence_beside_the_model(tmp_path: Path, evidence: str) -> None:
+    """Runners keep diagnostic evidence next to model.json. It is not a profile file and
+    must not block preparation: a smart switch run writes smart_switch_readings.json, so
+    every smart switch profile used to fail with "Unexpected artifact file(s)"."""
+    artifacts = tmp_path / "artifacts"
+    write_library(tmp_path)
+    write_profile_artifacts(artifacts)
+    (artifacts / evidence).write_text("{}", encoding="utf-8")
+
+    preview = make_preparer(tmp_path).prepare(artifacts, metadata())
+
+    assert evidence not in {Path(file.path).name for file in preview.files}
 
 
 @pytest.mark.parametrize("compressed", [False, True])
@@ -673,8 +697,10 @@ def test_preparer_rejects_non_object_model_artifact(tmp_path: Path, contents: st
     write_profile_artifacts(artifacts)
     (artifacts / "model.json").write_text(contents, encoding="utf-8")
 
+    preparer = make_preparer(tmp_path)
+    profile_metadata = metadata()
     with pytest.raises(ProfilePreparationError, match=r"model\.json must contain a JSON object"):
-        make_preparer(tmp_path).prepare(artifacts, metadata())
+        preparer.prepare(artifacts, profile_metadata)
 
 
 @pytest.mark.parametrize("symlink", [False, True])
@@ -687,8 +713,10 @@ def test_preparer_requires_regular_model_artifact(tmp_path: Path, symlink: bool)
     if symlink:
         model.symlink_to(target)
 
+    preparer = make_preparer(tmp_path)
+    profile_metadata = metadata()
     with pytest.raises(ProfilePreparationError, match=r"model\.json is required"):
-        make_preparer(tmp_path).prepare(artifacts, metadata())
+        preparer.prepare(artifacts, profile_metadata)
 
 
 @pytest.mark.parametrize(

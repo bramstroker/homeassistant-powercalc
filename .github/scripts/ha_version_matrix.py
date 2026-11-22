@@ -1,13 +1,15 @@
 """Build the Home Assistant version matrix for the test workflow.
 
-Emits every monthly Home Assistant release from `MIN_HA_VERSION` up to the newest stable one,
-using the highest patch release of each month, paired with the Python version to test it on.
-The result is written as a `versions=[...]` line, ready to be appended to `$GITHUB_OUTPUT`.
+Emits the highest stable patch of each supported month that has a matching test plugin,
+along with the Python version and plugin requirement. The result is a `versions=[...]`
+line for `$GITHUB_OUTPUT`.
 
 Each release is pinned to the lowest Python it declares support for. That is the interpreter
 the release was actually built against, so an older Home Assistant never gets handed a Python
 that did not exist yet when it was published.
 """
+
+from __future__ import annotations
 
 import json
 import re
@@ -17,11 +19,13 @@ import urllib.error
 import urllib.request
 
 PYPI_URL = "https://pypi.org/pypi/homeassistant/json"
-PLUGIN_URL = "https://pypi.org/pypi/pytest-homeassistant-custom-component/json"
+OFFICIAL_PLUGIN_URL = "https://pypi.org/pypi/pytest-homeassistant/json"
+LEGACY_PLUGIN_URL = "https://pypi.org/pypi/pytest-homeassistant-custom-component/json"
+FIRST_OFFICIAL_MONTH = (2026, 11)
 CONST_FILE = "custom_components/powercalc/const.py"
 STABLE_VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 PYTHON_FLOOR = re.compile(r">=\s*(\d+)\.(\d+)")
-PLUGIN_HA_PIN = re.compile(r"^homeassistant\s*==\s*(\d+)\.(\d+)\.(\d+)([^\s;]*)\s*(?:;.*)?$")
+PLUGIN_HA_PIN = re.compile(r"^homeassistant\s*+==\s*+(\d++)\.(\d++)\.(\d++)([^\s;]*+)\s*+(?:;.*)?$")
 
 
 def read_min_version() -> tuple[int, int]:
@@ -53,23 +57,18 @@ def fetch_pypi_json(url: str) -> dict[str, Any]:
     raise RuntimeError(f"Could not fetch {url} from PyPI: {last_error}")
 
 
-def fetch_releases() -> dict[str, str]:
-    """Fetch all published homeassistant versions from PyPI, mapped to their requires-python."""
+def fetch_releases(url: str) -> dict[str, str]:
+    """Fetch published versions from PyPI, mapped to their requires-python."""
     return {
         version: next((file["requires_python"] for file in files if file.get("requires_python")), "")
-        for version, files in fetch_pypi_json(PYPI_URL)["releases"].items()
+        for version, files in fetch_pypi_json(url)["releases"].items()
         if files
     }
 
 
-def fetch_max_supported_version() -> tuple[int, int, int]:
-    """Return the newest Home Assistant release the test plugin can be installed against.
-
-    pytest-homeassistant-custom-component pins one exact Home Assistant release. During a beta,
-    its newest release may pin a prerelease such as 2026.9.0b6. In that case, cap the matrix below
-    that patch so the stable release is not tested until a plugin that supports it is published.
-    """
-    info = fetch_pypi_json(PLUGIN_URL)["info"]
+def fetch_legacy_max_version() -> tuple[int, int, int]:
+    """Read the legacy plugin's newest Home Assistant pin, excluding a prerelease pin."""
+    info = fetch_pypi_json(LEGACY_PLUGIN_URL)["info"]
     for requirement in info.get("requires_dist") or []:
         pin = PLUGIN_HA_PIN.match(requirement)
         if pin:
@@ -93,10 +92,11 @@ def python_version_for(release: str, requires_python: str) -> str:
 def build_matrix(
     releases: dict[str, str],
     min_version: tuple[int, int],
-    max_version: tuple[int, int, int],
+    official_versions: set[str],
+    legacy_max_version: tuple[int, int, int] | None,
 ) -> list[dict[str, str]]:
-    """Pick the highest supported patch release of every month at or after the minimum version."""
-    latest_per_month: dict[tuple[int, int], tuple[int, str]] = {}
+    """Pick the highest stable patch with a test plugin for each supported month."""
+    latest_per_month: dict[tuple[int, int], tuple[int, dict[str, str]]] = {}
     for release in releases:
         version = STABLE_VERSION.match(release)
         if not version:
@@ -107,21 +107,35 @@ def build_matrix(
             continue
 
         patch = int(version.group(3))
-        if (*month, patch) > max_version:
+        known = latest_per_month.get(month)
+        if known is not None and patch <= known[0]:
             continue
 
-        known = latest_per_month.get(month)
-        if known is None or patch > known[0]:
-            latest_per_month[month] = (patch, release)
+        if release in official_versions:
+            test_plugin = f"pytest-homeassistant=={release}"
+        elif month < FIRST_OFFICIAL_MONTH and legacy_max_version is not None and (*month, patch) <= legacy_max_version:
+            test_plugin = "pytest-homeassistant-custom-component>=0.13"
+        else:
+            continue
 
-    return [
-        {"ha_version": release, "python_version": python_version_for(release, releases[release])}
-        for _, (_, release) in sorted(latest_per_month.items())
-    ]
+        latest_per_month[month] = (
+            patch,
+            {
+                "ha_version": release,
+                "python_version": python_version_for(release, releases[release]),
+                "test_plugin": test_plugin,
+            },
+        )
+
+    return [target for _, (_, target) in sorted(latest_per_month.items())]
 
 
 def main() -> None:
-    versions = build_matrix(fetch_releases(), read_min_version(), fetch_max_supported_version())
+    min_version = read_min_version()
+    legacy_max_version = fetch_legacy_max_version() if min_version < FIRST_OFFICIAL_MONTH else None
+    versions = build_matrix(
+        fetch_releases(PYPI_URL), min_version, set(fetch_releases(OFFICIAL_PLUGIN_URL)), legacy_max_version
+    )
     print(f"versions={json.dumps(versions)}")
 
 

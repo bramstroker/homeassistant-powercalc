@@ -1,0 +1,51 @@
+{
+  "aliases": [
+    "046677592530"
+  ],
+  "authors": [
+    {
+      "email": "peter.vk@gmail.com",
+      "github": "petervk",
+      "name": "Peter Vander Klippe"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-21T21:11:10Z",
+  "device_specs": {
+    "connectivity": [
+      "zigbee",
+      "bluetooth"
+    ],
+    "form_factor": "bulb",
+    "lumens": 800,
+    "rated_power": 8.8,
+    "socket": "E26"
+  },
+  "device_type": "light",
+  "gtin": [
+    "046677607029",
+    "046677592530",
+    "046677592561"
+  ],
+  "mains_voltage": 120,
+  "measure_description": "Measured with Powercalc Measure. Used a sonoff s31 flashed with esphome set to 1 sec updates. Had to use a resistive load to get it to work.",
+  "measure_device": "Sonoff S31",
+  "measure_device_firmware": "ESPHOME",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 6.25,
+    "DUMMY_LOAD_RESISTANCE": 2308.79,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.3:app"
+  },
+  "name": "Hue Essential white and colour",
+  "product_url": "https://www.philips-hue.com/en-ca/p/hue-white-and-color-ambiance-essential-a19-e26-smart-bulb-800-lm-88w/046677592530",
+  "standby_power": 0.17,
+  "voltage_range": {
+    "max": 121.32,
+    "min": 118.43
+  }
+}

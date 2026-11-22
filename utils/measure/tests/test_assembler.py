@@ -110,18 +110,21 @@ def test_assembler_passes_tapo_credentials() -> None:
 
 def test_assembler_requires_tuya_key_before_creating_device() -> None:
     spec = TuyaPowerMeterSpec(device_id="device-id", device_ip="192.0.2.10")
+    assembler = _assembler()
     with (
         patch("measure.powermeter.tuya.TuyaPowerMeter") as meter,
         pytest.raises(PowerMeterError, match="key is required"),
     ):
-        _assembler().create_power_meter(spec)
+        assembler.create_power_meter(spec)
 
     meter.assert_not_called()
 
 
 def test_assembler_requires_home_assistant_for_entity_meter() -> None:
+    assembler = _assembler()
+    spec = HassPowerMeterSpec(entity_id="sensor.power")
     with pytest.raises(ValueError, match="Home Assistant runtime connection is required"):
-        _assembler().create_power_meter(HassPowerMeterSpec(entity_id="sensor.power"))
+        assembler.create_power_meter(spec)
 
 
 @pytest.mark.parametrize(

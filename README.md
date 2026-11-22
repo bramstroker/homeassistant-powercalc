@@ -1,8 +1,6 @@
 ![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc?style=for-the-badge)
 ![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total?style=for-the-badge)
 ![Contributors](https://img.shields.io/github/contributors/bramstroker/homeassistant-powercalc?style=for-the-badge)
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
-![hacs installs](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Flauwbier.nl%2Fhacs%2Fpowercalc&style=for-the-badge)
 [![Coverage Status](https://img.shields.io/coveralls/github/bramstroker/homeassistant-powercalc/badge.svg?branch=master&style=for-the-badge)](https://coveralls.io/github/bramstroker/homeassistant-powercalc?branch=master)
 
 # <img src="https://docs.powercalc.nl/img/logo2_light.svg" width="300">
@@ -45,6 +43,8 @@ You get realistic energy data — without physically measuring every device.
 ---
 
 ## Get started
+
+[![Open PowerCalc in the Home Assistant Marketplace](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=bramstroker&repository=homeassistant-powercalc&category=integration)
 
 - 👉 **[Quick Start Guide](https://docs.powercalc.nl/quick-start/)**
 - 📚 [Full Documentation](https://docs.powercalc.nl)

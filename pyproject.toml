@@ -28,6 +28,8 @@ testpaths = [
     "utils/library/tests",
 ]
 norecursedirs = ".git"
+# Let Home Assistant load its httpx alias before the respx pytest plugin.
+addopts = "-p no:respx"
 asyncio_mode = "auto"
 markers = [
     "skip_remote_loader_mocking: Do not mock globally registered remote loader mock",
@@ -139,7 +141,9 @@ dev = [
     "voluptuous-stubs>=0.1",
     "probatio>=0.11.2",
     "homeassistant-stubs",
-    "pytest-homeassistant-custom-component==0.13.375",
+    "pytest-cov>=7.1.0",
+    "pytest-homeassistant==2026.11.2",
+    "pytest-timeout>=2.4.0",
     "types-pytz>=2024.1",
     "types-croniter>=2.0",
     "croniter>=6.0.0",

@@ -35,6 +35,7 @@ from custom_components.powercalc.errors import (
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.validation import vol
 
+from .battery_rate import BatteryRateStrategy
 from .composite import (
     COMPOUND_CONDITIONS,
     CONFIG_SCHEMA as COMPOSITE_SCHEMA,
@@ -90,6 +91,9 @@ class PowerCalculatorStrategyFactory:
     ) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration."""
         strategy_mapping: dict[str, Callable[[], PowerCalculationStrategyInterface]] = {
+            CalculationStrategy.BATTERY_RATE: lambda: BatteryRateStrategy(
+                self._hass, self._get_strategy_config(CalculationStrategy.BATTERY_RATE, config, power_profile)
+            ),
             CalculationStrategy.LINEAR: lambda: self._create_linear(source_entity, config, power_profile),
             CalculationStrategy.FIXED: lambda: self._create_fixed(source_entity, config, power_profile),
             CalculationStrategy.LUT: lambda: self._create_lut(source_entity, power_profile),
@@ -121,8 +125,17 @@ class PowerCalculatorStrategyFactory:
         source_entity: SourceEntity,
         config: ConfigType,
         power_profile: PowerProfile | None,
-    ) -> LinearStrategy:
+    ) -> LinearStrategy | FixedStrategy:
         """Create the linear strategy."""
+        if (
+            power_profile
+            and power_profile.allows_manual_power
+            and power_profile.calculation_strategy == CalculationStrategy.LINEAR
+            and config.get(CalculationStrategy.LINEAR) == {}
+        ):
+            # No connected load was entered. Only the profile's driver power is added.
+            return FixedStrategy(source_entity, power=0, per_state_power=None)
+
         linear_config = self._get_linear_config(config, power_profile)
 
         return LinearStrategy(

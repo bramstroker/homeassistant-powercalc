@@ -604,8 +604,9 @@ def test_execution_requires_output_directory_before_running(generate_model: bool
     preparation = MagicMock(spec=MeasurementPreparation)
     prepared = PreparedMeasurement(request=request, runner=runner, preparations=[preparation])
 
+    execution = MeasurementExecution(measurement=prepared, output_directory=None)
     with pytest.raises(ValueError, match="output directory is required"):
-        MeasurementExecution(measurement=prepared, output_directory=None).run()
+        execution.run()
 
     preparation.run.assert_not_called()
     runner.run.assert_not_called()
@@ -621,8 +622,9 @@ def test_execution_cleans_up_after_preparation_failure(tmp_path: Path) -> None:
     preparation.run.side_effect = failure
     prepared = PreparedMeasurement(request=request, runner=runner, preparations=[preparation])
 
+    execution = MeasurementExecution(measurement=prepared, output_directory=tmp_path)
     with pytest.raises(OSError, match="Calibration device disconnected") as error:
-        MeasurementExecution(measurement=prepared, output_directory=tmp_path).run()
+        execution.run()
 
     assert error.value is failure
     runner.run.assert_not_called()

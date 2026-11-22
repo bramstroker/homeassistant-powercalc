@@ -6,7 +6,6 @@ import { ProfileFormSection } from "./form-section";
 @customElement("measure-profile-contribution-details")
 export class ProfileContributionDetails extends ProfileFormSection {
   render() {
-    const context = Object.entries(this.draft.home_assistant).filter(([, value]) => value !== null && value !== "");
     return html`
       <details class="profile-details">
         <summary>Contribution notes (optional)</summary>
@@ -18,14 +17,20 @@ export class ProfileContributionDetails extends ProfileFormSection {
         </div>
       </fieldset>
       </details>
-      ${context.length ? html`
-        <details class="profile-details">
-          <summary>Measurement context</summary>
-          <div class="profile-details-body">
-            <dl class="info-list" aria-label="Home Assistant measurement context">
-              ${context.map(([label, value]) => html`<div><dt><span>Home Assistant ${words(label)}</span></dt><dd>${value}</dd></div>`)}
-            </dl>
-          </div>
-        </details>` : nothing}`;
+      ${this.renderMeasurementContext()}`;
+  }
+
+  private renderMeasurementContext() {
+    const context = Object.entries(this.draft.home_assistant).filter(([, value]) => value !== null && value !== "");
+    if (!context.length) return nothing;
+    return html`
+      <details class="profile-details">
+        <summary>Measurement context</summary>
+        <div class="profile-details-body">
+          <dl class="info-list" aria-label="Home Assistant measurement context">
+            ${context.map(([label, value]) => html`<div><dt><span>Home Assistant ${words(label)}</span></dt><dd>${value}</dd></div>`)}
+          </dl>
+        </div>
+      </details>`;
   }
 }

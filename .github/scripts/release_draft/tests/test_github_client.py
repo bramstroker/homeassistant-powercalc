@@ -77,3 +77,37 @@ def test_pull_request_file_details_preserve_status(monkeypatch: pytest.MonkeyPat
 
     assert client.pull_request_file_details(42) == changed_files
     assert client.pull_request_files(42) == ["profile_library/acme/model/model.json"]
+
+
+@pytest.mark.parametrize(
+    "response, message",
+    [
+        (None, "returned no data"),
+        ({"errors": [{"message": "Invalid query"}]}, "commit lookup failed"),
+        ({"data": {"repository": None}}, "returned no repository data"),
+    ],
+)
+def test_merged_pull_requests_reports_graphql_errors(
+    monkeypatch: pytest.MonkeyPatch, response: dict[str, Any] | None, message: str
+) -> None:
+    client = GitHubClient("token", "owner/repo")
+    monkeypatch.setattr(client, "_request", lambda *_args: response)
+
+    with pytest.raises(RuntimeError, match=message):
+        client.merged_pull_requests(["sha1"])
+
+
+def test_merged_pull_requests_ignores_missing_commits_and_associations(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = GitHubClient("token", "owner/repo")
+    response = {
+        "data": {
+            "repository": {
+                "commit0": None,
+                "commit1": {},
+                "commit2": {"associatedPullRequests": {"nodes": [{"mergedAt": None}]}},
+            },
+        },
+    }
+    monkeypatch.setattr(client, "_request", lambda *_args: response)
+
+    assert client.merged_pull_requests(["sha1", "sha2", "sha3"]) == []

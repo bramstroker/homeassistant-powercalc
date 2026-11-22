@@ -33,6 +33,7 @@ import {
   routesForDevice,
   selectionFromRequest,
   selectionFromType,
+  type DeviceChoice,
   type MeasurementRoute,
 } from "./device-routes";
 import { errorHelpLink } from "../shared/error-help-link";
@@ -198,15 +199,8 @@ export class SetupView extends LitElement {
   `];
 
   willUpdate(changed: PropertyValues<this>): void {
-    // Restore a saved route without changing the request's stable measure_type.
     if ((changed.has("initialType") || changed.has("initialRequest")) && this.selectedType === undefined) {
-      const restored = this.initialRequest ? selectionFromRequest(this.initialRequest) : this.initialType
-        ? selectionFromType(this.initialType) : undefined;
-      if (restored) {
-        this.selectedDeviceId = restored.deviceId;
-        this.selectedRouteId = restored.routeId;
-        this.selectedType = this.initialRequest?.measure_type ?? this.initialType;
-      }
+      this.restoreSelection();
     }
     if (changed.has("initialRequest")) {
       const controller = this.initialRequest && "controller" in this.initialRequest
@@ -222,6 +216,18 @@ export class SetupView extends LitElement {
     } else if (changed.has("dummyLoadCalibration") && !this.dummyLoadEnabled) {
       this.dummyLoadMode = defaultDummyLoadMode(this.dummyLoadCalibration);
     }
+  }
+
+  private restoreSelection(): void {
+    // Restore a saved route without changing the request's stable measure_type.
+    const initialRequest = this.initialRequest;
+    const initialType = this.initialType;
+    const defaultSelection = initialType && selectionFromType(initialType);
+    const restored = initialRequest ? selectionFromRequest(initialRequest) : defaultSelection;
+    if (!restored) return;
+    this.selectedDeviceId = restored.deviceId;
+    this.selectedRouteId = restored.routeId;
+    this.selectedType = initialRequest?.measure_type ?? initialType;
   }
 
   protected async getUpdateComplete(): Promise<boolean> {
@@ -250,34 +256,39 @@ export class SetupView extends LitElement {
   private renderSetupContent() {
     const devices = deviceChoices(this.definitions).filter((device) => routesForDevice(device.id, this.definitions).length);
     const freeRoutes = routesForDevice(FREE_MEASUREMENT, this.definitions);
-    const selectedDevice = this.selectedDeviceId === FREE_MEASUREMENT
-      ? { id: FREE_MEASUREMENT, label: "Free measurement" }
-      : devices.find((device) => device.id === this.selectedDeviceId)
-        ?? (this.selectedDeviceId && this.currentRun
-          ? { id: this.selectedDeviceId, label: this.selectedDeviceId.replaceAll("_", " ") }
-          : undefined);
+    const selectedDevice = this.findSelectedDevice(devices);
     const routes = selectedDevice ? routesForDevice(selectedDevice.id, this.definitions) : [];
     const selectedRoute = routes.find((route) => route.id === this.selectedRouteId) ?? this.restoredRoute();
     // Older callers may still set selectedType directly without choosing a route.
     const hasForm = Boolean(this.selectedType && (selectedRoute || !this.selectedDeviceId));
+    if (!hasForm) {
+      return selectedDevice
+        ? renderRoutePicker(selectedDevice, routes, this.selectRoute, this.changeDevice)
+        : renderDevicePicker(devices, this.deviceSearch, this.searchDevices, this.selectDevice, freeRoutes.length > 0);
+    }
     return html`
-      ${hasForm
-        ? html`<div class="setup-summary">
-            ${selectedDevice && selectedRoute ? renderSelectionChip(
-              selectedDevice, selectedRoute, this.changeDevice, this.changeRoute, routes.length > 1,
-            ) : nothing}
-            ${renderPowerMeterSummary({
-              meter: this.meter,
-              measureDevice: this.defaultMeasureDevice,
-              context: this.meterContext(),
-              onOpenSettings: this.openSettings,
-            })}
-          </div>`
-        : selectedDevice
-          ? renderRoutePicker(selectedDevice, routes, this.selectRoute, this.changeDevice)
-          : renderDevicePicker(devices, this.deviceSearch, this.searchDevices, this.selectDevice, freeRoutes.length > 0)}
-      ${hasForm && this.selectedType ? this.renderMeasurementForm(this.selectedType, selectedRoute) : nothing}
+      <div class="setup-summary">
+        ${selectedDevice && selectedRoute ? renderSelectionChip(
+          selectedDevice, selectedRoute, this.changeDevice, this.changeRoute, routes.length > 1,
+        ) : nothing}
+        ${renderPowerMeterSummary({
+          meter: this.meter,
+          measureDevice: this.defaultMeasureDevice,
+          context: this.meterContext(),
+          onOpenSettings: this.openSettings,
+        })}
+      </div>
+      ${this.selectedType ? this.renderMeasurementForm(this.selectedType, selectedRoute) : nothing}
     `;
+  }
+
+  private findSelectedDevice(devices: DeviceChoice[]): DeviceChoice | undefined {
+    const id = this.selectedDeviceId;
+    if (id === FREE_MEASUREMENT) return { id, label: "Free measurement" };
+    const device = devices.find((candidate) => candidate.id === id);
+    if (device) return device;
+    if (id && this.currentRun) return { id, label: id.replaceAll("_", " ") };
+    return undefined;
   }
 
   private renderMeasurementForm(type: MeasureType, route?: MeasurementRoute) {
@@ -285,6 +296,8 @@ export class SetupView extends LitElement {
     if (!definition || !this.capabilities) return html`<p class="muted">Loading measurement capabilities…</p>`;
     const run = this.currentRun;
     const activeLightCheck = type === "light" && !this.dummyController && !this.dummyLoadEnabled;
+    const idleLabel = activeLightCheck ? "Check light and setup" : "Check setup";
+    const busyLabel = activeLightCheck ? "Checking light and setup…" : "Checking setup…";
     return html`
       <form @submit=${this.submitMeasurement}>
         <measure-setup-fields-section
@@ -334,9 +347,7 @@ export class SetupView extends LitElement {
             <progress aria-label="Low-load light check in progress"></progress>
           </div>
         ` : nothing}
-        <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy
-          ? activeLightCheck ? "Checking light and setup…" : "Checking setup…"
-          : activeLightCheck ? "Check light and setup" : "Check setup"}</button></div>
+        <div class="actions"><button class="primary" type="submit" ?disabled=${this.busy}>${this.busy ? busyLabel : idleLabel}</button></div>
       </form>
     `;
   }
