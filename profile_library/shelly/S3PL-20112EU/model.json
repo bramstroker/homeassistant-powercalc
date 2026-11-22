@@ -1,0 +1,39 @@
+{
+  "name": "Outdoor Plug S Gen3",
+  "aliases": [
+    "Shelly Outdoor Plug S Gen3"
+  ],
+  "calculation_strategy": "fixed",
+  "created_at": "2026-11-22T18:20:00Z",
+  "description": "Smart outdoor Wi-Fi plug with power monitoring (IP44)",
+  "device_type": "smart_switch",
+  "device_specs": {
+    "form_factor": "plug",
+    "power_monitoring": true,
+    "rated_power": 1,
+    "connectivity": [
+      "wifi",
+      "bluetooth",
+      "matter"
+    ]
+  },
+  "discovery_by": "entity",
+  "gtin": [
+    "3800238070557",
+    "3800238072698",
+    "3800238072704"
+  ],
+  "linked_profile": "shelly/S3PL-00112EU",
+  "mains_voltage": 230,
+  "measure_description": "No separate measurements. This model reuses the values of `shelly/S3PL-00112EU` because Shelly documents both plugs with the same metering hardware and the same electrical ratings: 12 A / 2500 W, 44x44x70 mm, 60 g, ESP-Shelly-C38F with 8 MB flash, internal temperature sensor plus AC voltmeter, AC ammeter and power/energy meters, SPNO relay with 10000 switching cycles. Both knowledge base pages publish the identical `Simplified internal schematics` figure, and the two EU declarations of conformity (No. 224 and No. 244, both dated 2025-12-05) list the same harmonized standards. The only documented differences are the IP44 enclosure, a wider ambient range (-25 to 51 °C instead of -20 to 40 °C) and the device model string (S3PL-20112EU instead of S3PL-00112EU); the metering path is not part of any documented difference. Sources: https://kb.shelly.cloud/knowledge-base/shelly-plug-s-mtr-gen3 and https://kb.shelly.cloud/knowledge-base/outdoor-plug-s-gen3",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "manual",
+  "only_self_usage": true,
+  "product_url": "https://www.shelly.com/products/shelly-outdoor-plug-s-gen3",
+  "authors": [
+    {
+      "name": "Maxik933",
+      "github": "Maxik933"
+    }
+  ]
+}
