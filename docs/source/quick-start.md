@@ -8,7 +8,6 @@ Install Powercalc from the Marketplace in Home Assistant 2026.11 or later.
 
 1. Open the link above or go to **Settings → Marketplace** and search for **Powercalc**.
 2. On the Powercalc page, select **Install**. Review the version and select **Install** again to confirm.
-3. Restart Home Assistant if prompted.
 
 ## Set up the integration
 
