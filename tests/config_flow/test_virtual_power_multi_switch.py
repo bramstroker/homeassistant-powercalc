@@ -8,7 +8,6 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.helpers.selector import EntitySelector
 import pytest
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults, mock_registry
 import voluptuous as vol
 
 from custom_components.powercalc import DiscoveryManager
@@ -50,6 +49,7 @@ from tests.config_flow.common import (
     select_menu_item,
     set_virtual_power_configuration,
 )
+from tests.ha_test import RegistryEntryWithDefaults, mock_registry
 
 
 async def test_create_multi_switch_sensor_entry(hass: HomeAssistant, entity_registry: EntityRegistry) -> None:

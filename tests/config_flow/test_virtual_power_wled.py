@@ -4,7 +4,6 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_ON, UnitOfElectricCurrent
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import setup_test_component_platform
 
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
@@ -29,6 +28,7 @@ from tests.config_flow.common import (
     handle_options_flow_update,
     set_virtual_power_configuration,
 )
+from tests.ha_test import setup_test_component_platform
 
 
 def test_wled_current_entity_selector_is_limited_to_milliamperes() -> None:

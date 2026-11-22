@@ -63,6 +63,7 @@ from custom_components.powercalc.const import (
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_STANDBY_POWER,
     CONF_IGNORE_UNAVAILABLE_STATE,
+    CONF_LINEAR,
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
@@ -151,18 +152,15 @@ async def create_virtual_power_sensor(
             if CONF_CALCULATION_ENABLED_CONDITION not in sensor_config and power_profile.calculation_enabled_condition:
                 sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = power_profile.calculation_enabled_condition
 
-            if (
-                config_entry
-                and await power_profile.requires_manual_sub_profile_selection
-                and "/" not in sensor_config.get(CONF_MODEL, "")
-            ):
-                async_create_config_entry_issue(
-                    hass,
-                    config_entry,
-                    f"sub_profile_{config_entry.entry_id}",
-                    translation_key="sub_profile",
-                    translation_placeholders={"entry": config_entry.title},
-                )
+        strategy = detect_calculation_strategy(sensor_config, power_profile)
+        if power_profile and config_entry and await _needs_sub_profile_repair(power_profile, sensor_config, strategy):
+            async_create_config_entry_issue(
+                hass,
+                config_entry,
+                f"sub_profile_{config_entry.entry_id}",
+                translation_key="sub_profile",
+                translation_placeholders={"entry": config_entry.title},
+            )
 
         name = generate_power_sensor_name(
             sensor_config,
@@ -177,7 +175,6 @@ async def create_virtual_power_sensor(
             unique_id=unique_id,
         )
         entity_category: str | None = sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
-        strategy = detect_calculation_strategy(sensor_config, power_profile)
         calculation_strategy_factory = PowerCalculatorStrategyFactory.get_instance(hass)
 
         standby_power, standby_power_on = _get_standby_power(hass, sensor_config, power_profile)
@@ -228,6 +225,21 @@ async def create_virtual_power_sensor(
             err,
         )
         raise err
+
+
+async def _needs_sub_profile_repair(
+    power_profile: PowerProfile,
+    sensor_config: ConfigType,
+    strategy: CalculationStrategy,
+) -> bool:
+    """Check whether a config entry still needs a sub profile choice."""
+    if "/" in sensor_config.get(CONF_MODEL, ""):
+        return False
+
+    if strategy == CalculationStrategy.LINEAR and CONF_LINEAR in sensor_config and power_profile.allows_manual_power:
+        return False
+
+    return await power_profile.requires_manual_sub_profile_selection
 
 
 async def _get_power_profile(
@@ -920,20 +932,24 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             await self._strategy_instance.stop_playbook()
         await super().async_will_remove_from_hass()
 
+    async def _supports_sub_profile_switch(self, power_profile: PowerProfile) -> bool:
+        """Check whether the active strategy supports switching sub profiles through a service call."""
+        if self._calculation_strategy != CalculationStrategy.LUT and power_profile.allows_manual_power:
+            return False
+
+        return await power_profile.has_sub_profiles and not power_profile.sub_profile_select
+
     async def async_switch_sub_profile(self, profile: str) -> None:
         """Switches to a new sub profile"""
-        if (
-            not self._power_profile
-            or not await self._power_profile.has_sub_profiles
-            or self._power_profile.sub_profile_select
-        ):
+        power_profile = self._power_profile
+        if not power_profile or not await self._supports_sub_profile_switch(power_profile):
             raise ServiceValidationError(
                 translation_domain=DOMAIN,
                 translation_key="no_sub_profile_support",
                 translation_placeholders={"entity_id": self.entity_id},
             )
 
-        known_profiles = [profile[0] for profile in await self._power_profile.get_sub_profiles()]
+        known_profiles = [profile[0] for profile in await power_profile.get_sub_profiles()]
         if profile not in known_profiles:
             raise ServiceValidationError(
                 translation_domain=DOMAIN,
@@ -953,7 +969,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
 
         # Persist the newly selected sub profile on the config entry
         if self._config_entry:
-            new_model = f"{self._power_profile.model}/{profile}"
+            new_model = f"{power_profile.model}/{profile}"
             self.hass.config_entries.async_update_entry(
                 self._config_entry,
                 data={**self._config_entry.data, CONF_MODEL: new_model},

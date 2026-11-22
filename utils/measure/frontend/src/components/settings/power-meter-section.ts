@@ -79,11 +79,7 @@ export class SettingsPowerMeterSection extends LitElement {
           .value=${this.measureDeviceValue}
           .options=${this.measureDeviceOptions()}
           placeholder="e.g. Shelly Plug S"
-          .hint=${this.measureDevicesLoading
-            ? "Loading names used by existing Powercalc profiles…"
-            : this.sessionOnly
-              ? "Manufacturer and model of the meter used for this measurement."
-              : "Manufacturer and model of the meter used to take readings. This is prefilled in each profile and can still be changed there."}
+          .hint=${this.measureDeviceHint()}
           required
           allowCustom
           @combobox-change=${this.measureDeviceChanged}
@@ -141,6 +137,12 @@ export class SettingsPowerMeterSection extends LitElement {
     return fields[type]();
   }
 
+  private measureDeviceHint(): string {
+    if (this.measureDevicesLoading) return "Loading names used by existing Powercalc profiles…";
+    if (this.sessionOnly) return "Manufacturer and model of the meter used for this measurement.";
+    return "Manufacturer and model of the meter used to take readings. This is prefilled in each profile and can still be changed there.";
+  }
+
   private renderHassFields() {
     const options = this.powers.map((entity) => entityOption(entity));
     return html`
@@ -155,12 +157,15 @@ export class SettingsPowerMeterSection extends LitElement {
       >
         <input slot="value" type="hidden" name="default_power_entity_id" .value=${this.hassPowerEntity} />
       </measure-combobox>
-      ${this.sessionOnly ? html`
-        <measure-combobox name="voltage_entity_id" label="Voltage sensor (optional)"
-          .value=${this.voltageEntityId} .options=${this.voltages.map((entity) => entityOption(entity))}
-          placeholder="No voltage sensor" @combobox-change=${this.voltageEntityChanged}>
-          <input slot="value" type="hidden" name="voltage_entity_id" .value=${this.voltageEntityId} />
-        </measure-combobox>` : nothing}`;
+      ${this.sessionOnly ? this.renderVoltageField() : nothing}`;
+  }
+
+  private renderVoltageField() {
+    return html`<measure-combobox name="voltage_entity_id" label="Voltage sensor (optional)"
+      .value=${this.voltageEntityId} .options=${this.voltages.map((entity) => entityOption(entity))}
+      placeholder="No voltage sensor" @combobox-change=${this.voltageEntityChanged}>
+      <input slot="value" type="hidden" name="voltage_entity_id" .value=${this.voltageEntityId} />
+    </measure-combobox>`;
   }
 
   private readonly voltageEntityChanged = (event: CustomEvent<{ value: string }>): void => {
@@ -200,13 +205,22 @@ export class SettingsPowerMeterSection extends LitElement {
           <input name="shelly_username" .value=${this.shellyUsername ?? this.settings?.shelly_username ?? DEFAULT_SHELLY_USERNAME} required autocomplete="username" maxlength="50" @input=${this.shellyUsernameChanged} />
           <small class="field-hint">Gen1 devices may use a custom username. Gen2 and newer always use admin.</small>
         </label>
-        ${this.sessionOnly ? nothing : html`<label>
-          <span>Shelly password</span>
-          <input name="shelly_password" type="password" .value=${this.shellyPassword} autocomplete="new-password" maxlength="255" placeholder=${this.settings?.shelly_password_configured ? "Saved password (leave blank to keep)" : "Optional"} @input=${this.shellyPasswordChanged} />
-          <small class="field-hint">Stored privately in the app and never returned by the API.</small>
-        </label>`}
+        ${this.sessionOnly ? nothing : this.renderShellyPassword()}
       </div>
-      ${this.sessionOnly ? html`<small class="field-hint">Authentication uses the credentials saved in Settings.</small>` : this.renderClearShellyPassword()}`;
+      ${this.sessionOnly ? this.renderSavedCredentialsHint() : this.renderClearShellyPassword()}`;
+  }
+
+  private renderShellyPassword() {
+    const placeholder = this.settings?.shelly_password_configured ? "Saved password (leave blank to keep)" : "Optional";
+    return html`<label>
+      <span>Shelly password</span>
+      <input name="shelly_password" type="password" .value=${this.shellyPassword} autocomplete="new-password" maxlength="255" placeholder=${placeholder} @input=${this.shellyPasswordChanged} />
+      <small class="field-hint">Stored privately in the app and never returned by the API.</small>
+    </label>`;
+  }
+
+  private renderSavedCredentialsHint() {
+    return html`<small class="field-hint">Authentication uses the credentials saved in Settings.</small>`;
   }
 
   private renderShellyOutlet(address: string) {
@@ -265,18 +279,25 @@ export class SettingsPowerMeterSection extends LitElement {
         <input name="kasa_ip" .value=${address} required autocomplete="off" placeholder="192.168.1.50" @input=${this.kasaIpChanged} />
         <small class="field-hint">Enter the IP address of an energy-monitoring Kasa or Tapo plug. Give it a static lease in your router so it stays reachable.</small>
       </label>
-      ${this.sessionOnly ? html`<small class="field-hint">Authentication uses the credentials saved in Settings.</small>` : html`<div class="grid">
+      ${this.sessionOnly ? this.renderSavedCredentialsHint() : this.renderTapoCredentials()}`;
+  }
+
+  private renderTapoCredentials() {
+    const placeholder = this.settings?.tapo_credentials_configured ? "Saved credentials (enter both to replace)" : "Required";
+    return html`
+      <div class="grid">
         <label>
           <span>TP-Link account email</span>
           <input name="tapo_username" type="email" .value=${this.tapoUsername} autocomplete="username" maxlength="255" @input=${this.tapoUsernameChanged} />
         </label>
         <label>
           <span>TP-Link account password</span>
-          <input name="tapo_password" type="password" .value=${this.tapoPassword} autocomplete="new-password" maxlength="255" placeholder=${this.settings?.tapo_credentials_configured ? "Saved credentials (enter both to replace)" : "Required"} @input=${this.tapoPasswordChanged} />
+          <input name="tapo_password" type="password" .value=${this.tapoPassword} autocomplete="new-password" maxlength="255" placeholder=${placeholder} @input=${this.tapoPasswordChanged} />
           <small class="field-hint">Stored privately in the app and used only to authenticate local Tapo connections.</small>
         </label>
       </div>
-      ${this.renderClearTapoCredentials()}`}`;
+      ${this.renderClearTapoCredentials()}
+    `;
   }
 
   private renderClearTapoCredentials() {

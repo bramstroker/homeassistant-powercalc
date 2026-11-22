@@ -7,7 +7,6 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.label_registry import LabelRegistry
 import pytest
-from pytest_homeassistant_custom_component.common import RegistryEntryWithDefaults
 
 from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_OR, CONF_WILDCARD
 from custom_components.powercalc.errors import SensorConfigurationError
@@ -29,6 +28,7 @@ from custom_components.powercalc.group_include.filter import (
     create_filter,
 )
 from tests.common import mock_device, mock_entities_in_registry, set_states
+from tests.ha_test import RegistryEntryWithDefaults
 
 
 @pytest.mark.parametrize(

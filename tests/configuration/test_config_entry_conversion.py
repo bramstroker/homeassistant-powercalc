@@ -5,7 +5,6 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_ID, CONF_NAME, CONF_PATH, C
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.template import Template
 import pytest
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.configuration.config_entry_conversion import convert_config_entry_to_sensor_config
 from custom_components.powercalc.const import (
@@ -28,6 +27,7 @@ from custom_components.powercalc.const import (
     CONF_VALUE_TEMPLATE,
     SensorType,
 )
+from tests.ha_test import MockConfigEntry
 
 
 def test_nested_configuration_is_converted_without_mutating_entry_data(hass: HomeAssistant) -> None:

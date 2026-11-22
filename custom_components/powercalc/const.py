@@ -17,7 +17,7 @@ from homeassistant.const import (
     EntityCategory,
 )
 
-MIN_HA_VERSION = "2026.4.0"
+MIN_HA_VERSION = "2026.6.0"
 
 BUILT_IN_LIBRARY_DIR = "powercalc_profiles"
 

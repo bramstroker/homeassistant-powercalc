@@ -34,7 +34,7 @@ class MeasureStatusPublisher:
         self._unsubscribe: Callable[[], None] | None = None
         self._stopping = False
 
-    async def async_start(self) -> None:
+    def start(self) -> None:
         """Subscribe to session transitions and publish the initial app presence."""
         self._loop = asyncio.get_running_loop()
         self._unsubscribe = self._coordinator.subscribe(self._signal_changed)

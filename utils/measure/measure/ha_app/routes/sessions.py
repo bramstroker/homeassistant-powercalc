@@ -204,7 +204,7 @@ def standby_calibration_status(session_id: str, request: Request) -> Calibration
     return context.calibration_jobs.get(session_id)
 
 
-@router.post("/sessions/{session_id}/standby/calibrate/{job_id}/cancel")
+@router.post("/sessions/{session_id}/standby/calibrate/{job_id}/cancel", responses={404: ERROR_RESPONSE})
 def cancel_standby_calibration(session_id: str, job_id: str, request: Request) -> CalibrationJob:
     try:
         return get_app_context(request).calibration_jobs.cancel(session_id, job_id)

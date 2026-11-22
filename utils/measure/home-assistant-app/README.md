@@ -30,7 +30,7 @@ For development with a pre-built image, copy `powercalc_measure/` to `/addons/po
 
 ## Preparing a release
 
-Measure CLI and app releases share one version and are versioned from the main Powercalc repository with a plain `measure-v` git tag, for example `measure-v0.2.0`. The GitHub release itself is published in this app-store repository: HACS reads the published releases of the main repository to resolve Powercalc integration versions, so the main repository must never publish a `measure-v*` release (plain tags and draft releases are invisible to HACS).
+Measure CLI and app releases share one version and use a `measure-v` Git tag in the main Powercalc repository, for example `measure-v0.2.0`. Publish the GitHub release in this app-store repository. The Home Assistant Marketplace uses published releases from the main repository as Powercalc integration versions.
 
 Every pull request merged to master that touches `utils/measure` (or carries the `measure-tool` label) is appended to the rolling `measure-next` draft release in the main repository by the **Measure Release** workflow, and excluded from the main integration release notes. Keep the `## Unreleased` section in `powercalc_measure/CHANGELOG.md` empty; the draft is the single source of unreleased notes.
 

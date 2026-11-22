@@ -8,9 +8,6 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.setup import async_setup_component
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    setup_test_component_platform,
-)
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import Step
@@ -31,6 +28,9 @@ from tests.common import (
     mock_entities_in_registry,
     run_powercalc_setup,
     set_states,
+)
+from tests.ha_test import (
+    setup_test_component_platform,
 )
 
 

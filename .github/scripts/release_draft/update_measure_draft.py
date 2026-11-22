@@ -140,10 +140,12 @@ def _render_release_notes(pull_requests: list[dict[str, Any]]) -> str:
 
 def _changelog_release(changelog: str, target_version: str) -> tuple[str, str]:
     normalized = changelog.replace("\r\n", "\n")
-    headings = list(re.finditer(r"^## (?P<title>.+?)[ \t]*$", normalized, re.MULTILINE))
+    headings = list(re.finditer(r"^## (?P<title>.+)$", normalized, re.MULTILINE))
     target_pattern = re.compile(rf"{re.escape(target_version)}(?:\s+-\s+.+)?")
     target_indexes = [
-        index for index, heading in enumerate(headings) if target_pattern.fullmatch(heading.group("title"))
+        index
+        for index, heading in enumerate(headings)
+        if target_pattern.fullmatch(heading.group("title").rstrip(" \t"))
     ]
     if not target_indexes:
         raise ReleaseDraftDriftError(f"Changelog has no section for target version {target_version}")
@@ -155,10 +157,12 @@ def _changelog_release(changelog: str, target_version: str) -> tuple[str, str]:
         raise ReleaseDraftDriftError(f"Changelog has no previous Measure release after {target_version}")
     target = headings[target_index]
     previous = headings[target_index + 1]
-    previous_match = re.fullmatch(rf"(?P<version>{VERSION_PATTERN})(?:\s+-\s+.+)?", previous.group("title"))
+    previous_title = previous.group("title")
+    previous_title = previous_title.rstrip(" \t") or previous_title[0]
+    previous_match = re.fullmatch(rf"(?P<version>{VERSION_PATTERN})(?:\s+-\s+.+)?", previous_title)
     if previous_match is None:
         raise ReleaseDraftDriftError(
-            f"The next changelog section after {target_version} is not a Measure version: {previous.group('title')!r}",
+            f"The next changelog section after {target_version} is not a Measure version: {previous_title!r}",
         )
     notes = normalized[target.end() : previous.start()].strip("\r\n")
     return notes, f"measure-v{previous_match.group('version')}"

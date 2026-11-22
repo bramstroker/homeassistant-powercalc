@@ -48,11 +48,26 @@ export function entityChoices(
   const allowedDomains = source?.control === "select"
     ? entityDomainsForOption(state.definition, field, selectValue(source, state))
     : domains;
+  if (field.all_entities && source?.control === "select" && !allowedDomains.length) return [];
+  let entities = matchingEntities(field, state, allowedDomains, source);
+  const related = relatedEntity(field, state);
+  if (state.definition.measure_type === "recorder") {
+    entities = filterRecordingEntities(field, state, entities, related);
+  }
+  if (!related?.device_id) return field.same_device_only ? [] : entities;
+  if (field.same_device_only) return entities.filter((entity) => entity.device_id === related.device_id);
+  return entities.sort(
+    (left, right) => Number(right.device_id === related.device_id) - Number(left.device_id === related.device_id),
+  );
+}
+
+function matchingEntities(
+  field: FormField, state: FieldState, allowedDomains: string[], source?: FormField,
+): EntityDescriptor[] {
   let entities = field.all_entities
     ? [...(state.deviceEntities["*"] ?? [])]
     : allowedDomains.flatMap((domain) => (domain === "light" ? state.lights : state.deviceEntities[domain] ?? []));
   entities = entities.filter(hasEnabledLiveState);
-  if (field.all_entities && source?.control === "select" && !allowedDomains.length) return [];
   if (field.all_entities && allowedDomains.length) {
     entities = entities.filter((entity) => entity.domain && allowedDomains.includes(entity.domain));
   }
@@ -62,32 +77,30 @@ export function entityChoices(
   if (field.name === "primary_entity_id" && source && selectValue(source, state) === "printer") {
     entities = entities.filter((entity) => !entity.unit);
   }
-  const related = relatedEntity(field, state);
-  if (state.definition.measure_type === "recorder" && field.name === "tracked_entity_ids") {
-    if (!related?.device_id) return [];
-    const allowedDevices = new Set([related.device_id, ...(related.related_device_ids ?? [])]);
-    entities = entities.filter((entity) => entity.entity_id !== related.entity_id
-      && entity.integration !== "powercalc"
-      && allowedDevices.has(entity.device_id ?? ""));
-  }
-  if (state.definition.measure_type === "recorder" && field.name === "additional_entity_ids") {
-    if (!related?.device_id) return [];
-    const allowedDevices = new Set([related.device_id, ...(related.related_device_ids ?? [])]);
-    const batteryField = state.definition.fields.find((candidate) => candidate.name === "battery_entity_id");
-    let batteryId = batteryField ? selectedEntityId(batteryField, state) : "";
-    if (batteryField && !batteryId) {
-      const batteries = entityChoices(batteryField, state);
-      if (batteries.length === 1) batteryId = batteries[0]!.entity_id;
-    }
-    entities = entities.filter((entity) => entity.entity_id !== related.entity_id
-      && entity.entity_id !== batteryId
-      && allowedDevices.has(entity.device_id ?? ""));
-  }
-  if (!related?.device_id) return field.same_device_only ? [] : entities;
-  if (field.same_device_only) return entities.filter((entity) => entity.device_id === related.device_id);
-  return entities.sort(
-    (left, right) => Number(right.device_id === related.device_id) - Number(left.device_id === related.device_id),
-  );
+  return entities;
+}
+
+function filterRecordingEntities(
+  field: FormField, state: FieldState, entities: EntityDescriptor[], related?: EntityDescriptor,
+): EntityDescriptor[] {
+  const tracking = field.name === "tracked_entity_ids";
+  if (!tracking && field.name !== "additional_entity_ids") return entities;
+  if (!related?.device_id) return [];
+  const allowedDevices = new Set([related.device_id, ...(related.related_device_ids ?? [])]);
+  const relatedEntities = entities.filter((entity) => entity.entity_id !== related.entity_id
+    && allowedDevices.has(entity.device_id ?? ""));
+  if (tracking) return relatedEntities.filter((entity) => entity.integration !== "powercalc");
+  const batteryId = findRecordingBatteryId(state);
+  return relatedEntities.filter((entity) => entity.entity_id !== batteryId);
+}
+
+function findRecordingBatteryId(state: FieldState): string {
+  const batteryField = state.definition.fields.find((candidate) => candidate.name === "battery_entity_id");
+  if (!batteryField) return "";
+  const selected = selectedEntityId(batteryField, state);
+  if (selected) return selected;
+  const batteries = entityChoices(batteryField, state);
+  return batteries.length === 1 ? batteries[0]!.entity_id : "";
 }
 
 export function availableOptions(field: FormField, state: FieldState): FormFieldOption[] {

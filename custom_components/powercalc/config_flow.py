@@ -30,10 +30,13 @@ from custom_components.powercalc.validation import vol
 
 from .common import SourceEntity, create_source_entity
 from .const import (
+    CONF_CALIBRATE,
     CONF_CREATE_COST_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_PRICE_SENSOR,
+    CONF_LINEAR,
     CONF_MANUFACTURER,
+    CONF_MAX_POWER,
     CONF_MODE,
     CONF_MODEL,
     CONF_POWER,
@@ -211,11 +214,19 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         strategy_name = CalculationStrategy(
             self.sensor_config.get(CONF_MODE) or profile.calculation_strategy,  # type: ignore
         )
+        config = user_input or self.sensor_config
+        if profile and profile.allows_manual_power and strategy_name == CalculationStrategy.LINEAR:
+            linear_config = config.get(CONF_LINEAR)
+            if linear_config and not linear_config.get(CONF_CALIBRATE):
+                linear_config.pop(CONF_CALIBRATE, None)
+                if linear_config and CONF_MAX_POWER not in linear_config:
+                    raise SchemaFlowError("linear_mandatory")
+
         factory = PowerCalculatorStrategyFactory(self.hass)
         assert self.source_entity is not None
         try:
             await factory.create(
-                user_input or self.sensor_config,
+                config,
                 strategy_name,
                 profile,
                 self.source_entity,

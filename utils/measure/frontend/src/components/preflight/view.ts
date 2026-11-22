@@ -25,7 +25,7 @@ export class PreflightView extends LitElement {
   powerMeterDiagnostic?: PowerMeterDiagnostic | null;
 
   @property({ attribute: false })
-  lightLoadProbe?: PreflightResponse["light_load_probe"];
+  lightLoadProbe: PreflightResponse["light_load_probe"];
 
   @property({ type: String })
   confirmationAction = "";
@@ -65,6 +65,10 @@ export class PreflightView extends LitElement {
   `];
 
   render() {
+    const busyHeading = this.rechecking ? "Rechecking setup" : "Initializing measurement session";
+    const busyMessage = this.rechecking
+      ? "Powercalc is probing the configured devices again."
+      : "This can take a few seconds while Powercalc prepares the measurement devices.";
     return html`
       <section class="panel" aria-labelledby="review-title">
         <p class="eyebrow">02 / Setup check</p>
@@ -113,9 +117,7 @@ export class PreflightView extends LitElement {
         ${this.busy ? html`
           <div class="notice starting" role="status" aria-live="polite">
             <span class="starting-indicator" aria-hidden="true"></span>
-            ${this.rechecking
-              ? html`<span><strong>Rechecking setup</strong><span>Powercalc is probing the configured devices again.</span></span>`
-              : html`<span><strong>Initializing measurement session</strong><span>This can take a few seconds while Powercalc prepares the measurement devices.</span></span>`}
+            <span><strong>${busyHeading}</strong><span>${busyMessage}</span></span>
           </div>
         ` : nothing}
         <div class="actions">

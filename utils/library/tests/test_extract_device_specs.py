@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+import sys
+
 import pytest
 
+from utils.library import extract_device_specs
 from utils.library.extract_device_specs import add_device_specs, extract_specs, missing_specs
 
 
@@ -174,3 +179,21 @@ def test_only_the_gaps_are_proposed() -> None:
     model = {"device_specs": {"socket": "E27"}}
 
     assert missing_specs(model, {"socket": "E14", "lumens": 806}) == {"lumens": 806}
+
+
+def test_device_spec_cli_lists_candidates_without_writing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    profile = tmp_path / "acme" / "lamp" / "model.json"
+    profile.parent.mkdir(parents=True)
+    model = {"device_type": "light", "name": "Smart Bulb E27 (450/470 lm)"}
+    profile.write_text(json.dumps(model), encoding="utf-8")
+    monkeypatch.setattr(extract_device_specs, "DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(sys, "argv", ["extract_device_specs.py"])
+
+    assert extract_device_specs.main() == 0
+    output = capsys.readouterr().out
+    assert '"socket": "E27"' in output
+    assert "1 profiles would be updated" in output
+    assert "quotes two brightness figures" in output
+    assert json.loads(profile.read_text(encoding="utf-8")) == model

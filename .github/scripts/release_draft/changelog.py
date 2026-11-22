@@ -21,7 +21,7 @@ PATCH_LABELS = frozenset({"patch"})
 
 # A leading conventional-commit type, optionally scoped and optionally marked
 # breaking with a trailing "!": "feat:", "fix(core):", "refactor!:".
-CONVENTIONAL_TITLE = re.compile(r"^(?P<type>[a-z]+)(?:\([^)]*\))?(?P<breaking>!)?:")
+CONVENTIONAL_TITLE = re.compile(r"^(?P<type>[a-z]++)(?:\([^)]*+\))?(?P<breaking>!)?:")
 
 VERSION_CORE = re.compile(r"(\d+)\.(\d+)\.(\d+)")
 
@@ -134,9 +134,9 @@ def parse_sections(body: str) -> dict[str, list[str]]:
     sections: dict[str, list[str]] = {UNCATEGORIZED: []}
     current = UNCATEGORIZED
     for line in body.replace("\r\n", "\n").splitlines():
-        heading = re.fullmatch(r"### (.+?)\s*", line)
-        if heading is not None:
-            current = heading.group(1)
+        if line.startswith("### ") and len(line) > 4:
+            title = line[4:]
+            current = title.rstrip() or title[0]
             sections.setdefault(current, [])
         elif line.strip():
             sections[current].append(line.rstrip())

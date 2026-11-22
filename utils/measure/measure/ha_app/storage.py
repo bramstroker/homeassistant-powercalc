@@ -46,6 +46,7 @@ from measure.utils.files import write_json_atomic
 _LOGGER = logging.getLogger("measure")
 
 _CURRENT_SESSION_FILENAME = "current.json"
+_RECORDING_LABELS_FILENAME = "recording_labels.json"
 _DUMMY_LOAD_CALIBRATION_FILENAME = "dummy_load_calibration.json"
 _CONTRIBUTION_STATUS_FILENAME = "contribution_status.json"
 _SHELLY_CREDENTIALS_FILENAME = "shelly_credentials.json"
@@ -378,7 +379,7 @@ class SessionStorage:
             self.artifact_directory(session_id, request.model_id), request.export_filename
         )
         stored = self._load_model(
-            self.session_directory(session_id) / "recording_labels.json", RecordingLabels, "recording labels"
+            self.session_directory(session_id) / _RECORDING_LABELS_FILENAME, RecordingLabels, "recording labels"
         )
         labels = stored.labels if stored is not None else {}
         return {str(path.relative_to(output)): labels.get(str(path.relative_to(output)), "") for path in recordings}
@@ -388,7 +389,7 @@ class SessionStorage:
         if name not in labels:
             raise ValueError("Only saved recordings can be labelled")
         labels[name] = label.strip()
-        self._write_json(self.session_directory(session_id) / "recording_labels.json", {"labels": labels})
+        self._write_json(self.session_directory(session_id) / _RECORDING_LABELS_FILENAME, {"labels": labels})
 
     def archive_recording(self, session_id: str, request: RecorderMeasurementRequest) -> None:
         """Keep the previous run before the recorder opens its fixed output filename."""
@@ -409,7 +410,7 @@ class SessionStorage:
         current.rename(archived)
         if label:
             labels[str(archived.relative_to(self.output_directory(session_id)))] = label
-            self._write_json(self.session_directory(session_id) / "recording_labels.json", {"labels": labels})
+            self._write_json(self.session_directory(session_id) / _RECORDING_LABELS_FILENAME, {"labels": labels})
 
     def verify_writable(self) -> None:
         """Exercise the same create/fsync/remove operations used by session persistence."""

@@ -3,7 +3,7 @@
     "source_entity": "Encja źródłowa",
     "source_device": "Urządzenie źródłowe",
     "remarks_smart_switch": "Ten profil dostarcza tylko wartości poboru mocy w trybie czuwania. \n Gdy masz urządzenie, które zużywa stałą ilość energii po włączeniu, możesz podać tę wartość w następnym kroku przepływu konfiguracji",
-    "remarks_smart_dimmer": "Ten profil dostarcza tylko wartości poboru mocy w trybie czuwania. \n W następnym kroku możesz opcjonalnie podać wartości dla podłączonego światła",
+    "remarks_smart_dimmer": "Podaj moc podłączonego oświetlenia przy minimalnej i maksymalnej jasności, z pominięciem zużycia energii przez sam zasilacz. Pozostaw wszystkie pola puste, aby monitorować tylko zużycie energii przez zasilacz.",
     "view_measurement_details": "Zobacz szczegóły pomiaru"
   },
   "config": {

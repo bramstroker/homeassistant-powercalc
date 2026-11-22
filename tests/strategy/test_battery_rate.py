@@ -9,7 +9,6 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
 import pytest
-from pytest_homeassistant_custom_component.common import async_fire_time_changed
 import voluptuous as vol
 
 from custom_components.powercalc.common import create_source_entity
@@ -19,6 +18,7 @@ from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.strategy.battery_rate import CONFIG_SCHEMA, BatteryRateStrategy
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from tests.common import assert_entity_state, mock_devices, mock_entities_in_registry, run_powercalc_setup, set_states
+from tests.ha_test import async_fire_time_changed
 
 START = datetime(2026, 11, 1, tzinfo=UTC)
 BATTERY_CONFIG = {"entity_id": "sensor.battery", "energy_per_percent": 0.96, "base_power": 3.5}

@@ -15,14 +15,10 @@ from unittest.mock import AsyncMock, Mock, patch
 from _pytest.fixtures import SubRequest
 import aiohttp
 import aioresponses.core
-from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import STORAGE_DIR
 import pytest
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-)
 
 from custom_components.powercalc.const import (
     BUILT_IN_LIBRARY_DIR,
@@ -34,6 +30,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from tests.common import get_test_config_dir
+from tests.ha_test import USING_OFFICIAL_PLUGIN, MockConfigEntry
 
 # Remove this once aioresponses supports aiohttp 3.14+.
 # See https://github.com/pnuckowski/aioresponses/issues/289.
@@ -69,17 +66,13 @@ def set_logging_levels(request: SubRequest) -> None:
 
 
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(request: SubRequest) -> None:
-    if "hass" in request.fixturenames:
-        request.getfixturevalue("enable_custom_integrations")
-
-
-@pytest.fixture(autouse=True)
 def configure_hass_config_dir(request: SubRequest) -> None:
     if "hass" not in request.fixturenames:
         return
     hass = request.getfixturevalue("hass")
     hass.config.config_dir = get_test_config_dir()
+    if not USING_OFFICIAL_PLUGIN:
+        request.getfixturevalue("enable_custom_integrations")
 
     # The test .storage directory is scratch that survives between runs. The loader prefers a
     # cached library.json when there is one, so drop it to keep every test starting from the
@@ -92,12 +85,6 @@ def configure_hass_config_dir(request: SubRequest) -> None:
 async def enable_event_loop_debug() -> None:
     """Override the plugin default to keep asyncio debug disabled in normal test runs."""
     asyncio.get_running_loop().set_debug(False)
-
-
-@pytest.fixture
-def enable_custom_integrations(hass: HomeAssistant) -> None:
-    """Enable custom integrations defined in the test dir."""
-    hass.data.pop(loader.DATA_CUSTOM_COMPONENTS)
 
 
 @pytest.fixture(autouse=True)

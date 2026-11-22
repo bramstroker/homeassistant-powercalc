@@ -11,7 +11,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
 import pytest
-from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
 from custom_components.powercalc import (
     CONF_CREATE_STANDBY_GROUP,
@@ -40,6 +39,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.measure import MeasureAppCoordinator
 from tests.common import async_advance_time, create_mock_config_entry, get_simple_fixed_config, run_powercalc_setup
+from tests.ha_test import AiohttpClientMocker
 
 MOCK_PAYLOAD = {
     "test": "data",

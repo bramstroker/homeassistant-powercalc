@@ -5,7 +5,8 @@ from zipfile import ZipFile
 from homeassistant.core import HomeAssistant
 import pytest
 
-from utils.replay_battery_rate import Replay, Trace, read_trace
+from utils import replay_battery_rate
+from utils.replay_battery_rate import ChargeWindow, Replay, Trace, read_trace, report
 
 TRACE = """timestamp_local,battery_pct,status,mop_drying,plug_energy_kwh
 2026-10-24T00:00:00,95,charging,off,0
@@ -46,3 +47,35 @@ def test_replay_reads_same_trace_from_directory_and_zip(tmp_path: Path) -> None:
     with ZipFile(archive, "w") as bundle:
         bundle.writestr(filename, TRACE)
     assert read_trace(tmp_path, "example").readings == read_trace(archive, "example").readings
+
+
+def test_report_aggregates_departures_only_after_fifteen_minutes(
+    hass: HomeAssistant, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    (tmp_path / "jarvis_charge_already_full.csv").write_text(TRACE, encoding="utf-8")
+    rising_trace = """timestamp_local,battery_pct,status,mop_drying,plug_energy_kwh
+2026-10-24T00:00:00,20,charging,off,0
+2026-10-24T00:20:00,30,charging,off,0.004
+2026-10-24T00:25:00,50,charging,off,0.009
+2026-10-24T00:30:00,70,charging,off,0.014
+2026-10-24T00:35:00,90,charging,off,0.019
+2026-10-24T00:40:00,100,charging,off,0.024
+"""
+    (tmp_path / "jarvis_charge_rising.csv").write_text(rising_trace, encoding="utf-8")
+    start, end = START.isoformat(), (START + timedelta(minutes=40)).isoformat()
+    monkeypatch.setattr(
+        replay_battery_rate,
+        "WINDOWS",
+        [
+            ChargeWindow("Already full", "already_full", start, end, True),
+            ChargeWindow("Rising", "rising", start, end, False),
+        ],
+    )
+
+    report(tmp_path, 10, hass)
+
+    output = capsys.readouterr().out
+    assert "| 30% | 4.00 |" in output
+    assert "| 50% | 9.00 |" in output
+    assert "| 70% | 14.00 |" in output
+    assert "| 90% | 19.00 |" in output
