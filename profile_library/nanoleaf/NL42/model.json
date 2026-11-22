@@ -1,0 +1,32 @@
+{
+  "aliases": [
+    "Shapes"
+  ],
+  "authors": [
+    {
+      "github": "elmystico",
+      "name": "elmystico"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-22T19:35:08Z",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "device_type": "light",
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure on a setup of 8 large and 14 small Shapes panels plus the controller (firmware 12.4.1). Values are for the whole set, not per panel. At brightness 1 the controller sometimes drops into a low-power state (about 1.8 W instead of about 7.5 W), so that row alternates between the two levels.",
+  "measure_device": "IKEA INSPELNING smart plug",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 4.0,
+    "VERSION": "v0.14.3:app"
+  },
+  "name": "Shapes",
+  "standby_power": 1.4
+}
