@@ -32,6 +32,10 @@
   "product_url": "https://www.shelly.com/products/shelly-outdoor-plug-s-gen3",
   "authors": [
     {
+      "name": "simon42",
+      "github": "TheRealSimon42"
+    },
+    {
       "name": "Maxik933",
       "github": "Maxik933"
     }
