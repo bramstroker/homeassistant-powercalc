@@ -1,5 +1,6 @@
 {
   "name": "PIXMA TS5050",
+  "description": "Inkjet printer, measured on a PIXMA TS5050. Other units in the series report the same \"TS5000 series\" model over IPP.",
   "device_type": "printer",
   "calculation_strategy": "fixed",
   "fixed_config": {
