@@ -825,7 +825,13 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             return
 
         await self._power_profile.select_sub_profile(profile)
-        self._standby_power, self._standby_power_on = _get_standby_power_from_profile(self.hass, self._power_profile)
+        # Resolve through the sensor config as well, otherwise a configured standby power
+        # (e.g. standby_power_on) is replaced by the profile value on every sub profile switch.
+        self._standby_power, self._standby_power_on = _get_standby_power(
+            self.hass,
+            self._sensor_config,
+            self._power_profile,
+        )
         await self.ensure_strategy_instance(True)
 
     async def calculate_standby_power(self, state: State) -> Decimal:
