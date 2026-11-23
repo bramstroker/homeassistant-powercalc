@@ -21,13 +21,13 @@ powercalc:
   # Your Powercalc configuration here
 ```
 
-## 3. Remove sources
+## 3. Uninstall from the Marketplace
 
-If you installed Powercalc using HACS (recommended method):
+If you already confirmed uninstalling Powercalc when deleting its last configuration entry, continue to step 4.
 
-1. Navigate to **HACS**
-2. Find Powercalc and click three-dot menu (⋮)
-3. Click "Remove"
+1. Go to **Settings → Marketplace** and open the Powercalc page.
+2. In the three-dot menu, select **Uninstall**.
+3. Confirm the uninstall.
 
 ## 4. Remove Powercalc internal storage files
 

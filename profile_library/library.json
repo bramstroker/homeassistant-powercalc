@@ -25897,7 +25897,7 @@
           ],
           "id": "915005732301",
           "manufacturer": "signify",
-          "updated_at": "2026-11-20T08:37:01",
+          "updated_at": "2026-11-20T10:36:10",
           "max_power": 16.51,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-11-20T08:37:01",
@@ -25914,7 +25914,7 @@
             "score": 96.6,
             "color_temp": 96.6
           },
-          "hash": "932a037d38ebf83615bf11d063222198"
+          "hash": "8f1f0ae455abd2acc978a5a755470a9a"
         },
         {
           "aliases": [
@@ -30319,6 +30319,77 @@
             "color_temp": 97.6
           },
           "hash": "e2d72fee1562b94c9be6e48c7e5eedf8"
+        },
+        {
+          "aliases": [
+            "046677592530"
+          ],
+          "authors": [
+            {
+              "email": "peter.vk@gmail.com",
+              "github": "petervk",
+              "name": "Peter Vander Klippe"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-21T21:11:10Z",
+          "device_specs": {
+            "connectivity": [
+              "zigbee",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 800,
+            "rated_power": 8.8,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "gtin": [
+            "046677607029",
+            "046677592530",
+            "046677592561"
+          ],
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure. Used a sonoff s31 flashed with esphome set to 1 sec updates. Had to use a resistive load to get it to work.",
+          "measure_device": "Sonoff S31",
+          "measure_device_firmware": "ESPHOME",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 6.25,
+            "DUMMY_LOAD_RESISTANCE": 2308.79,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.3:app"
+          },
+          "name": "Hue Essential white and colour",
+          "product_url": "https://www.philips-hue.com/en-ca/p/hue-white-and-color-ambiance-essential-a19-e26-smart-bulb-800-lm-88w/046677592530",
+          "standby_power": 0.17,
+          "voltage_range": {
+            "max": 121.32,
+            "min": 118.43
+          },
+          "id": "LCA017",
+          "manufacturer": "signify",
+          "updated_at": "2026-11-22T16:20:58",
+          "max_power": 8.19,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-21T21:41:51",
+          "power_range": {
+            "min": 0.1,
+            "max": 8.19
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 97.3,
+            "color_temp": 97.3
+          },
+          "hash": "ffb95eb4e33700a1ee19d3b6e6e966d7"
         },
         {
           "aliases": [
@@ -38464,31 +38535,35 @@
               "zigbee"
             ]
           },
-          "measure_description": "Measured manually",
-          "measure_device": "PeakTech 4350",
+          "measure_description": "Measured manually. Re-measured with a Brennenstuhl PM 231 E (issue #5217): 0.5 W with the relay on; the 0.1 W off reading is below the meter's specified measurement range, so the off value follows discussion #3108 (0.2 W, same meter type).",
+          "measure_device": "Brennenstuhl PM 231 E",
           "measure_method": "manual",
           "mains_voltage": 230,
           "name": "Extreme Zigbee Smart Switch",
           "only_self_usage": false,
           "product_url": "https://sonoff.tech/en-uk/products/sonoff-zbmini-extreme-zigbee-smart-switch-zbminir2",
-          "standby_power": 0.8,
-          "standby_power_on": 1.56,
+          "standby_power": 0.2,
+          "standby_power_on": 0.5,
           "authors": [
             {
               "name": "LtKowalski",
               "github": "LtKowalski"
+            },
+            {
+              "name": "Pwnyrider",
+              "github": "Pwnyrider"
             }
           ],
           "id": "ZBMINIR2",
           "manufacturer": "sonoff",
-          "updated_at": "2026-09-13T09:41:49",
-          "max_power": 1.56,
+          "updated_at": "2026-11-22T18:50:47",
+          "max_power": 0.5,
           "sub_profile_count": 0,
           "power_range": {
-            "min": 0.8,
-            "max": 1.56
+            "min": 0.2,
+            "max": 0.5
           },
-          "hash": "82beed20ea1a5286fa8f7d12085d205c"
+          "hash": "c3234bf707b2090fd267339fe1cd7055"
         }
       ],
       "device_types": [
