@@ -1,5 +1,5 @@
 {
   "name": "+WLAN",
-  "standby_power": NaN,
-  "standby_power_on": NaN
+  "standby_power": 0.573,
+  "standby_power_on": 0.87
 }
