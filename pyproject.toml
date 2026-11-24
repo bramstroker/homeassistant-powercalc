@@ -142,7 +142,7 @@ dev = [
     "probatio>=0.11.2",
     "homeassistant-stubs",
     "pytest-cov>=7.1.0",
-    "pytest-homeassistant==2026.11.2",
+    "pytest-homeassistant==2026.11.3",
     "pytest-timeout>=2.4.0",
     "types-pytz>=2024.1",
     "types-croniter>=2.0",
