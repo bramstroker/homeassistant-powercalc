@@ -3828,6 +3828,66 @@
       ]
     },
     {
+      "aliases": [
+        "Canon Inc."
+      ],
+      "name": "canon",
+      "full_name": "Canon",
+      "dir_name": "canon",
+      "website": "https://www.canon.de",
+      "country": "JP",
+      "description": "Japanese manufacturer of printers, cameras and imaging products.",
+      "models": [
+        {
+          "name": "PIXMA TS5050",
+          "description": "Inkjet printer, measured on a PIXMA TS5050. Other units in the series report the same \"TS5000 series\" model over IPP.",
+          "device_type": "printer",
+          "calculation_strategy": "fixed",
+          "aliases": [
+            "TS5000 series"
+          ],
+          "discovery_by": "device",
+          "compatible_integrations": [
+            "ipp"
+          ],
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "usb"
+            ]
+          },
+          "measure_method": "script",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_description": "Measured on a PIXMA TS5050 (GTIN 4549292066517). IPP only reports \"TS5000 series\", so the profile lives under the measured model id and keeps \"TS5000 series\" as its discovery alias \u2014 other printers in the series therefore use this profile too. Created from a Powercalc Measure recording (measure app 0.14.3, Shelly Plug S Gen3, 230 V): one run over 64 minutes with 1857 samples, 1712 idle and 56 printing. Idle shows two reachable levels (about 1.1 W in deep sleep, about 3.7 W awake on WiFi), so the energy-weighted average is used. Printing averages 10.8 W (median 11.6 W, peak 19.2 W).",
+          "mains_voltage": 230,
+          "created_at": "2026-11-20T00:00:00Z",
+          "authors": [
+            {
+              "name": "Maximilian Kraus",
+              "github": "Maxik933"
+            }
+          ],
+          "gtin": [
+            "4549292066517"
+          ],
+          "product_url": "https://www.canon.de/printers/pixma-ts5050-series/specifications/",
+          "id": "TS5050",
+          "manufacturer": "canon",
+          "updated_at": "2026-11-23T11:09:08",
+          "max_power": 10.8,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 2.15,
+            "max": 10.8
+          },
+          "hash": "3091f967c1b6945a24b37aadfa136060"
+        }
+      ],
+      "device_types": [
+        "printer"
+      ]
+    },
+    {
       "aliases": [],
       "name": "casalux",
       "full_name": "Casalux",
@@ -16622,7 +16682,7 @@
           },
           "id": "AC73907",
           "manufacturer": "ledvance",
-          "updated_at": "2026-11-23T11:14:33",
+          "updated_at": "2026-11-24T08:00:35",
           "max_power": 15.0,
           "sub_profile_count": 0,
           "measurement_updated_at": "2026-11-23T11:14:33",
@@ -16637,7 +16697,7 @@
             "score": 98.8,
             "color_temp": 98.8
           },
-          "hash": "ad81e4dbc2e1b03473302d333c93849c"
+          "hash": "898d5fe9a94f2b5ac3011400e70a1d4a"
         },
         {
           "gtin": [
@@ -30452,6 +30512,64 @@
             "color_temp": 97.3
           },
           "hash": "ffb95eb4e33700a1ee19d3b6e6e966d7"
+        },
+        {
+          "aliases": [
+            "929003853601"
+          ],
+          "authors": [
+            {
+              "github": "buttonger",
+              "name": "buttonger"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-19T09:37:02Z",
+          "device_type": "light",
+          "gtin": [
+            "8720169364226"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plus Plug S Gen2",
+          "measure_device_firmware": "2.1.1",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 24.19,
+            "DUMMY_LOAD_RESISTANCE": 2210.66,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.3:app"
+          },
+          "name": "Hue White and Color Ambiance A67 E27 1600 lm",
+          "product_url": "https://www.philips-hue.com/de-de/p/hue-white-color-ambiance-a67-smarte-lampe-e27-1600/8720169364226",
+          "standby_power": 0.37,
+          "voltage_range": {
+            "max": 235.1,
+            "min": 225.5
+          },
+          "id": "LCA022",
+          "manufacturer": "signify",
+          "updated_at": "2026-11-24T08:01:53",
+          "max_power": 11.82,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-19T11:17:00",
+          "power_range": {
+            "min": 0.35,
+            "max": 11.82
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "7250b364c19c82d55b443bc49fbbccda"
         },
         {
           "aliases": [
