@@ -91,6 +91,29 @@ def get_related_device_ids(hass: HomeAssistant, device_id: str) -> set[str]:
     return related
 
 
+def get_child_device_ids(hass: HomeAssistant, device_id: str) -> set[str]:
+    """Return the IDs of the structural child devices of a device, at any depth.
+
+    Integrations split one physical device into a parent and per-channel children: older cores
+    link them with ``via_device_id``, newer ones with ``parent_device_id``. The entities of those
+    children belong to the same physical device, so an entity choice built for the parent has to
+    include them.
+    """
+    children: set[str] = set()
+    pending = [device_id]
+    devices = get_non_composite_devices(hass)
+    while pending:
+        parent_id = pending.pop()
+        for device in devices:
+            if device.id == device_id or device.id in children:
+                continue
+            device_parent = getattr(device, "parent_device_id", None) or device.via_device_id
+            if device_parent == parent_id:
+                children.add(device.id)
+                pending.append(device.id)
+    return children
+
+
 def resolve_device_discovery_source(hass: HomeAssistant, device: DeviceEntry) -> DeviceEntry:
     """Resolve channel and scanner representations to the physical device used for discovery."""
     visited = {device.id}

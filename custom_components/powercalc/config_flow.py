@@ -51,7 +51,7 @@ from .const import (
     CalculationStrategy,
     SensorType,
 )
-from .device_binding import resolve_source_device
+from .device_binding import get_child_device_ids, resolve_source_device
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .flow_helper.common import FlowType, PowercalcFormStep, Step, fill_schema_defaults, flatten_sections
 from .flow_helper.flows.cost import CostConfigFlow, CostOptionsFlow
@@ -249,14 +249,16 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         self, domains: list[str], multiple: bool = False
     ) -> selector.Selector[selector.EntitySelectorConfig]:
         entity_registry = er.async_get(self.hass)
+        entities: list[str] = []
         if self.source_entity and self.source_entity.device_entry:
-            entities = [
-                entity.entity_id
-                for entity in entity_registry.entities.get_entries_for_device_id(self.source_entity.device_entry.id)
-                if entity.domain in domains
-            ]
-        else:
-            entities = []
+            device_entry = self.source_entity.device_entry
+            device_ids = [device_entry.id, *sorted(get_child_device_ids(self.hass, device_entry.id))]
+            for device_id in device_ids:
+                entities.extend(
+                    entity.entity_id
+                    for entity in entity_registry.entities.get_entries_for_device_id(device_id)
+                    if entity.domain in domains
+                )
 
         return selector.EntitySelector(
             selector.EntitySelectorConfig(
