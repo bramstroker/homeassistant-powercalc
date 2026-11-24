@@ -131,9 +131,7 @@ def test_get_child_device_ids_follows_shelly_channels(hass: HomeAssistant, monke
     assert device_binding.get_child_device_ids(hass, "parent") == {"channel"}
 
 
-def test_get_child_device_ids_requires_same_config_entry(
-    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_get_child_device_ids_requires_same_config_entry(hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch) -> None:
     """A Shelly channel identifier alone is not enough; the child must belong to the parent's entry."""
     parent = SimpleNamespace(
         id="parent",
