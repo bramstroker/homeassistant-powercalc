@@ -1,0 +1,38 @@
+{
+  "aliases": [
+    "1746330P7"
+  ],
+  "authors": [
+    {
+      "github": "buttonger",
+      "name": "buttonger"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-22T21:26:46Z",
+  "device_type": "light",
+  "gtin": [
+    "8718696174371"
+  ],
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plus Plug S Gen2",
+  "measure_device_firmware": "2.1.1",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 24.24,
+    "DUMMY_LOAD_RESISTANCE": 2181.48,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 3,
+    "SLEEP_TIME": 3.0,
+    "VERSION": "v0.14.3:app"
+  },
+  "name": "Hue Appear outdoor wall",
+  "product_url": "https://www.philips-hue.com/de-de/p/hue-white-color-ambiance-appear-outdoor-wandleuchte-schwarz/1746330P7",
+  "standby_power": 0.28,
+  "voltage_range": {
+    "max": 235.2,
+    "min": 224.3
+  }
+}
