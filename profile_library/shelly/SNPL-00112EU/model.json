@@ -9,7 +9,7 @@
     "shelly plus plug s"
   ],
   "calculation_strategy": "fixed",
-  "config_flow_sub_profile_remarks": "TODO: values are not filled in yet (NaN placeholders), they are measured next.\n\nYou need to select a profile depending on your settings.\nThe ECO setting (`Sys` `device.eco_mode`, an experimental mode that throttles the CPU and uses the wireless low-power mode) only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\nLED status indicator variants (`PLUGS_UI` `leds.mode`):\n- \"LED\": `leds.mode = \"switch\"`, i.e. the LED follows the output state, not the measured power. `colors.switch:0.on` = rgb [0, 100, 0] at brightness 100, `colors.switch:0.off` = rgb [100, 0, 0] at brightness 100 (the stock colour of the off state; set the off brightness to 0 for a dark LED). Night mode disabled.\n- \"No LED\": `leds.mode = \"off\"`, LED indication disabled completely. The `power` mode, which is the factory default of the Plus Plug S, was not used for any measurement.\n\nSub-profile configurations:\n\"WLAN + BT + ECO\": All three turned on.\n\"WLAN + ECO\": Both turned on.\n\"WLAN + BT\": Both turned on, ECO turned off.\n\"WLAN\": Only WLAN turned on, ECO turned off.",
+  "config_flow_sub_profile_remarks": "You need to select a profile depending on your settings.\nThe ECO setting (`Sys` `device.eco_mode`, an experimental mode that throttles the CPU and uses the wireless low-power mode) only changes the power consumption in the listed configurations. Activating any other settings not listed in the profile name will change the power draw.\n\nLED status indicator variants (`PLUGS_UI` `leds.mode`):\n- \"LED\": `leds.mode = \"switch\"`, i.e. the LED follows the output state. `colors.switch:0.on` = rgb [0, 100, 0] at brightness 100, `colors.switch:0.off` = rgb [100, 0, 0] at brightness 100, so the LED is lit in both states. Night mode disabled.\n- \"No LED\": `leds.mode = \"off\"`, LED indication disabled completely.\n\nThe factory default is `leds.mode = \"power\"`, where the LED colour follows the measured power. That mode was not measured separately. Because it keeps the LED lit in both relay states, pick one of the `+LED` sub-profiles if you did not change the LED setting; pick a variant without LED if you switched the indication off.\n\nSub-profile configurations:\n\"WLAN + BT + ECO\": All three turned on.\n\"WLAN + ECO\": Both turned on.\n\"WLAN + BT\": Both turned on, ECO turned off.\n\"WLAN\": Only WLAN turned on, ECO turned off.",
   "created_at": "2024-12-01T18:36:00Z",
   "description": "Smart Wi-Fi Plug with Power Monitoring",
   "device_type": "smart_switch",
@@ -27,7 +27,7 @@
     "3800235265628"
   ],
   "mains_voltage": 230,
-  "measure_description": "Measured manually, using the same setup as `shelly/S3PL-00112EU`: the plug under test and a calibrated resistive dummy load are connected in parallel to the same mains input, and a Shelly Plug S Gen3 measures upstream of both. The dummy load is never connected to the relay output, so the reference meter always sees the plug plus the dummy load and can resolve the sub-watt self-consumption. The dummy load contribution is subtracted per sample as V^2/R instead of a fixed offset, because it follows the mains voltage.\n\nFirmware version 1.7.6.\n\nTBD after the measurement run: dummy load resistance, number of samples and sample interval, firmware version of the reference meter. All values are time averages over the measurement window of each state, not peak values.",
+  "measure_description": "Measured manually. The plug under test and a calibrated resistive dummy load are connected in parallel to the same mains input, and a Shelly Plug S Gen3 measures upstream of both. The dummy load is never connected to the relay output, so the reference meter always sees the plug plus the dummy load and can resolve the sub-watt self-consumption. Its contribution is subtracted per sample as V^2/R instead of a fixed offset, because it follows the mains voltage. All values are time averages over the measurement window of each state, not peak values. Firmware version 1.7.6.",
   "measure_device": "Shelly Plug S Gen3",
   "measure_method": "manual",
   "only_self_usage": true,
@@ -42,5 +42,7 @@
       "name": "Maxik933",
       "github": "Maxik933"
     }
-  ]
+  ],
+  "standby_power": 0.74,
+  "standby_power_on": 1.01
 }
