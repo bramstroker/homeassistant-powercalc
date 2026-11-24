@@ -114,6 +114,8 @@ def test_get_child_device_ids_follows_shelly_channels(hass: HomeAssistant, monke
         via_device_id=None,
         identifiers={("shelly", "48F6EECD97B4")},
         config_entry_id="entry",
+        config_entries={"entry"},
+        primary_config_entry="entry",
     )
     channel = SimpleNamespace(
         id="channel",
@@ -121,6 +123,8 @@ def test_get_child_device_ids_follows_shelly_channels(hass: HomeAssistant, monke
         via_device_id="parent",
         identifiers={("shelly", "48F6EECD97B4-switch:0")},
         config_entry_id="entry",
+        config_entries={"entry"},
+        primary_config_entry="entry",
     )
     monkeypatch.setattr(device_binding, "get_non_composite_devices", lambda _hass: [parent, channel])
 
@@ -137,6 +141,8 @@ def test_get_child_device_ids_ignores_devices_behind_a_hub(
         via_device_id=None,
         identifiers={("zwave_js", "hub")},
         config_entry_id="entry",
+        config_entries={"entry"},
+        primary_config_entry="entry",
     )
     node = SimpleNamespace(
         id="node",
@@ -144,6 +150,8 @@ def test_get_child_device_ids_ignores_devices_behind_a_hub(
         via_device_id="hub",
         identifiers={("zwave_js", "node5")},
         config_entry_id="entry",
+        config_entries={"entry"},
+        primary_config_entry="entry",
     )
     monkeypatch.setattr(device_binding, "get_non_composite_devices", lambda _hass: [hub, node])
 
