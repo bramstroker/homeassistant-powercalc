@@ -1,0 +1,38 @@
+{
+  "aliases": [
+    "929003853601"
+  ],
+  "authors": [
+    {
+      "github": "buttonger",
+      "name": "buttonger"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-19T09:37:02Z",
+  "device_type": "light",
+  "gtin": [
+    "8720169364226"
+  ],
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Shelly Plus Plug S Gen2",
+  "measure_device_firmware": "2.1.1",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 24.19,
+    "DUMMY_LOAD_RESISTANCE": 2210.66,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.3:app"
+  },
+  "name": "Hue White and Color Ambiance A67 E27 1600 lm",
+  "product_url": "https://www.philips-hue.com/de-de/p/hue-white-color-ambiance-a67-smarte-lampe-e27-1600/8720169364226",
+  "standby_power": 0.37,
+  "voltage_range": {
+    "max": 235.1,
+    "min": 225.5
+  }
+}
