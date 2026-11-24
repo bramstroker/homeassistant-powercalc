@@ -54,6 +54,7 @@ from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.spec import HassPowerMeterSpec
 from measure.request import SmartSwitchMeasurementRequest
 from measure.runner.errors import RunnerError
+from measure.smart_switch_validation import smart_switch_selection_error
 from measure.start import MEASUREMENT_STARTS
 from measure.utils.version import measure_version
 
@@ -280,13 +281,14 @@ class Measure:
         relays = [snapshot.get(entity_id) for entity_id in request.controller.entity_ids]
         if any(relay is None or relay.state not in {"on", "off"} for relay in relays):
             raise ValueError("Every selected switch relay must be available and report on or off")
-        device_ids = {relay.device_id for relay in relays if relay is not None}
-        if None in device_ids or len(device_ids) != 1:
-            raise ValueError("All selected relays must belong to the same Home Assistant device")
+        available_relays = [relay for relay in relays if relay is not None]
+        meter = None
         if isinstance(request.power_meter, HassPowerMeterSpec):
             meter = snapshot.get(request.power_meter.entity_id)
-            if meter is None or meter.device_id in device_ids:
-                raise ValueError("Measure switch self consumption with an external power meter")
+            if meter is None:
+                raise ValueError("Power sensor is unavailable")
+        if error := smart_switch_selection_error(available_relays, meter):
+            raise ValueError(error)
 
     def _home_assistant_manager(self) -> HomeAssistantManager:
         if self._home_assistant is None:

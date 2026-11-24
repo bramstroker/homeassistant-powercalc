@@ -179,6 +179,27 @@ def test_smart_switch_preflight_accepts_relays_on_sub_devices_of_one_device() ->
     assert result.estimated_variations == 12
 
 
+def test_smart_switch_preflight_rejects_a_meter_on_a_sibling_channel() -> None:
+    """A sibling channel's built-in power sensor is not an external meter."""
+
+    entities = base_entities()
+    entities[("switch", None)] = [
+        Entity("switch.output_0", state="on", device_id="output-0", device_group_id="strip"),
+        Entity("switch.output_1", state="off", device_id="output-1", device_group_id="strip"),
+    ]
+    power = Entity("sensor.output_1_power", state="0.5", device_id="output-1", device_group_id="strip")
+    entities[("sensor", None)].append(power)
+    entities[(None, "power")].append(power)
+    request = SmartSwitchMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.output_1_power"),
+        controller=HassMultiSwitchControllerSpec(entity_ids=["switch.output_0", "switch.output_1"]),
+        power_monitoring=True,
+    )
+
+    with pytest.raises(PreflightError, match="external power meter"):
+        preflight(entities).validate(request)
+
+
 def test_smart_switch_preflight_rejects_relays_from_two_physical_devices() -> None:
     entities = base_entities()
     entities[("switch", None)] = [

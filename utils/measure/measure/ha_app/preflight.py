@@ -43,6 +43,7 @@ from measure.request import (
 )
 from measure.runner.light.plan import build_light_plan, estimate_light_time_left
 from measure.runner.smart_switch import estimate_smart_switch_remaining_seconds
+from measure.smart_switch_validation import smart_switch_selection_error
 
 
 class PreflightError(Exception):
@@ -446,20 +447,18 @@ class MeasurementPreflight:
             self._require_entity(entity_id, EntityDomain.SWITCH, "Selected switch is unavailable")
             for entity_id in request.controller.entity_ids
         ]
-        # A multi-channel device (power strip) is one parent device plus one sub-device per
-        # channel; its relays must be selectable together.
-        device_ids = {relay.device_group_id or relay.device_id for relay in relays}
-        if None in device_ids or len(device_ids) != 1:
-            raise PreflightError("All selected relays must belong to the same Home Assistant device")
         if any(relay.state not in {"on", "off"} for relay in relays):
             raise PreflightError("Every selected relay must have an on or off state")
+        meter = None
         if isinstance(request.power_meter, HassPowerMeterSpec):
             meter = self._require_entity(
                 request.power_meter.entity_id, EntityDomain.SENSOR, "Power sensor is unavailable"
             )
-            meter_device_id = meter.device_group_id or meter.device_id
-            if meter_device_id is not None and meter_device_id in device_ids:
-                raise PreflightError("Measure switch self consumption with an external power meter, not its own sensor")
+        # A multi-channel device (power strip) is one parent device plus one sub-device per
+        # channel; relays on different channels are one physical device, their power
+        # sensors are not an external meter.
+        if error := smart_switch_selection_error(relays, meter):
+            raise PreflightError(error)
         return PreflightResult(
             estimated_variations=request.repeat_cycles * (len(relays) + (2 if len(relays) > 1 else 1)),
             estimated_duration_seconds=estimate_smart_switch_remaining_seconds(request, len(relays)),

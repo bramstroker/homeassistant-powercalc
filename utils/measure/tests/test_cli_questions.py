@@ -51,6 +51,7 @@ def _entity(
     name: str | None = None,
     device_class: DeviceClass | None = None,
     device_id: str | None = None,
+    device_group_id: str | None = None,
     model_id: str | None = None,
     state: str = "on",
     unit: str | None = None,
@@ -62,6 +63,7 @@ def _entity(
         domain=domain,
         device_class=device_class,
         device_id=device_id,
+        device_group_id=device_group_id,
         model_id=model_id,
         state=state,
         unit=unit,
@@ -139,6 +141,49 @@ def test_cli_rejects_an_unavailable_smart_switch_relay(mock_config_factory: Mock
     )
 
     with pytest.raises(ValueError, match="report on or off"):
+        measure._validate_smart_switch_selection(request)  # noqa: SLF001
+
+
+def test_cli_accepts_sibling_relays_with_an_external_meter(mock_config_factory: MockConfigFactory) -> None:
+    """Channels of one power strip are one device, so both relays can be measured together."""
+
+    catalog = _catalog(
+        _entity("switch.output_0", EntityDomain.SWITCH, device_id="out-0", device_group_id="strip"),
+        _entity("switch.output_1", EntityDomain.SWITCH, device_id="out-1", device_group_id="strip"),
+        _entity("sensor.meter", EntityDomain.SENSOR, device_id="meter", state="0.5"),
+    )
+    measure = Measure(mock_config_factory())
+    measure._entity_catalog = catalog  # noqa: SLF001
+    request = SmartSwitchMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.meter"),
+        controller=HassMultiSwitchControllerSpec(entity_ids=["switch.output_0", "switch.output_1"]),
+        power_monitoring=False,
+    )
+
+    measure._validate_smart_switch_selection(request)  # noqa: SLF001
+
+
+def test_cli_rejects_a_meter_on_a_sibling_channel(mock_config_factory: MockConfigFactory) -> None:
+    catalog = _catalog(
+        _entity("switch.output_0", EntityDomain.SWITCH, device_id="out-0", device_group_id="strip"),
+        _entity("switch.output_1", EntityDomain.SWITCH, device_id="out-1", device_group_id="strip"),
+        _entity(
+            "sensor.output_1_power",
+            EntityDomain.SENSOR,
+            device_id="out-1",
+            device_group_id="strip",
+            state="0.5",
+        ),
+    )
+    measure = Measure(mock_config_factory())
+    measure._entity_catalog = catalog  # noqa: SLF001
+    request = SmartSwitchMeasurementRequest(
+        power_meter=HassPowerMeterSpec(entity_id="sensor.output_1_power"),
+        controller=HassMultiSwitchControllerSpec(entity_ids=["switch.output_0", "switch.output_1"]),
+        power_monitoring=False,
+    )
+
+    with pytest.raises(ValueError, match="external power meter"):
         measure._validate_smart_switch_selection(request)  # noqa: SLF001
 
 
