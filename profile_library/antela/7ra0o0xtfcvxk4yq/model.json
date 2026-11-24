@@ -1,0 +1,42 @@
+{
+  "authors": [
+    {
+      "email": "roelss@gmail.com",
+      "github": "roelsroels",
+      "name": "Roels"
+    }
+  ],
+  "calculation_strategy": "fixed",
+  "created_at": "2026-11-17T18:36:15Z",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ],
+    "rated_power": 12
+  },
+  "device_type": "power_meter",
+  "discovery_by": "device",
+  "gtin": [
+    "8721022290980"
+  ],
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "TS011F",
+  "measure_device_firmware": "0122052017",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.2:app"
+  },
+  "name": "Hombli Smart Christmas Lights RGB - HBCL-0221",
+  "only_self_usage": true,
+  "product_url": "https://hombli.com/products/hombli-smart-christmas-light-rgb",
+  "standby_power": 0.2,
+  "standby_power_estimated": true,
+  "voltage_range": {
+    "max": 245.0,
+    "min": 225.0
+  }
+}
