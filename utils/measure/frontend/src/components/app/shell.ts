@@ -38,6 +38,11 @@ const MEASUREMENT_STEPS: readonly { view: AppView; label: string }[] = [
   { view: "submit", label: "Submit profile" },
 ];
 
+const APP_TITLE = "Powercalc Measure";
+
+/** Views that show an open session, which keep its name in the header and the browser tab. */
+const SESSION_VIEWS: readonly AppView[] = ["running", "result", "profile", "submit"];
+
 /**
  * Root element. It owns the application state as plain fields — the controller mutates them and
  * asks for a re-render, so none of it needs Lit's reactive property machinery.
@@ -134,6 +139,9 @@ export class AppShell extends LitElement implements MeasureAppState {
     .intro.compact { display: block; padding-top: 1rem; }
     .intro.compact h1, .intro.compact .subtitle { display: none; }
     .intro.compact .sequence { max-width: 620px; }
+    .session-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.6rem; margin: 0 0 1rem; }
+    .session-label { color: var(--muted); font: 700 0.68rem/1 ui-monospace, monospace; letter-spacing: 0.16em; text-transform: uppercase; }
+    .session-title { min-width: 0; color: var(--ink); font-size: 1.25rem; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
     .topbar-actions { display: flex; align-items: center; gap: 0.55rem; }
     .topbar-action { min-height: 36px; padding: 0.4rem 0.8rem; border-radius: 999px; font: 700 0.72rem/1 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.45rem; }
     .theme-toggle { width: 36px; padding: 0; justify-content: center; font-size: 1rem; letter-spacing: normal; }
@@ -173,6 +181,8 @@ export class AppShell extends LitElement implements MeasureAppState {
   }
 
   protected updated(): void {
+    const sessionName = this.sessionName();
+    document.title = sessionName ? `${sessionName} · ${APP_TITLE}` : APP_TITLE;
     const previousView = this.renderedView;
     this.renderedView = this.view;
     if (previousView !== undefined && previousView !== this.view) {
@@ -209,6 +219,7 @@ export class AppShell extends LitElement implements MeasureAppState {
             <div>
             <p class="subtitle">Configure, validate, and monitor a power measurement without leaving Home Assistant.</p>
             </div>
+            ${this.renderSessionName()}
             ${this.renderProgress()}
           </div>
         </header>
@@ -540,6 +551,19 @@ export class AppShell extends LitElement implements MeasureAppState {
       ? (detail as { section?: SettingsSection }).section
       : undefined;
     this.controller.openSettings(section);
+  }
+
+  /** The open session's name, falling back to its product name or model ID for sessions saved without one. */
+  private sessionName(): string {
+    if (!this.snapshot || !SESSION_VIEWS.includes(this.view)) return "";
+    const request = this.snapshot.request;
+    return request?.session_name?.trim() || request?.product_name?.trim() || request?.model_id?.trim() || "";
+  }
+
+  private renderSessionName() {
+    const name = this.sessionName();
+    if (!name) return nothing;
+    return html`<p class="session-name"><span class="session-label">Session</span> <span class="session-title">${name}</span></p>`;
   }
 
   private renderProgress() {

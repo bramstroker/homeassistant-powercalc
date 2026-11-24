@@ -596,4 +596,54 @@ describe("app shell", () => {
     expect(result.shadowRoot.querySelector(".contribution")).toBeNull();
     expect(result.shadowRoot.textContent).not.toContain("No model.json is available yet");
   });
+
+  describe("session name", () => {
+    const request = (fields: Partial<MeasurementRequest>) => ({
+      model_id: "LCT010",
+      product_name: "Hue White and Color Ambiance",
+      ...fields,
+    }) as MeasurementRequest;
+
+    async function shellAt(view: AppShell["view"], sessionRequest: MeasurementRequest) {
+      vi.spyOn(AppShell.prototype as unknown as { boot: () => Promise<void> }, "boot").mockResolvedValue();
+      const element = document.createElement("powercalc-measure-app") as AppShell;
+      element.view = view;
+      element.snapshot = { state: view === "running" ? "running" : "completed", session_id: "session-1", request: sessionRequest };
+      document.body.append(element);
+      await element.updateComplete;
+      return element;
+    }
+
+    afterEach(() => {
+      document.title = "";
+    });
+
+    it("keeps the session name above every screen of an open session and in the browser tab", async () => {
+      const element = await shellAt("running", request({ session_name: "Living room lamp, second run" }));
+      const shown = () => element.shadowRoot?.querySelector(".session-title")?.textContent;
+
+      expect(shown()).toBe("Living room lamp, second run");
+      expect(document.title).toBe("Living room lamp, second run · Powercalc Measure");
+
+      for (const view of ["result", "profile", "submit"] as const) {
+        element.view = view;
+        element.requestUpdate();
+        await element.updateComplete;
+        expect(shown()).toBe("Living room lamp, second run");
+      }
+
+      element.view = "sessions";
+      element.requestUpdate();
+      await element.updateComplete;
+      expect(element.shadowRoot?.querySelector(".session-name")).toBeNull();
+      expect(document.title).toBe("Powercalc Measure");
+    });
+
+    it("falls back to the product name for a session saved without a name", async () => {
+      const element = await shellAt("result", request({ session_name: " " }));
+
+      expect(element.shadowRoot?.querySelector(".session-title")?.textContent).toBe("Hue White and Color Ambiance");
+      expect(document.title).toBe("Hue White and Color Ambiance · Powercalc Measure");
+    });
+  });
 });
