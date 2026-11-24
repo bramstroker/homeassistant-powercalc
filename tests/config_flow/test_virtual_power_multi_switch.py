@@ -247,26 +247,41 @@ async def test_switch_entities_automatically_populated_from_device(hass: HomeAss
 
 
 async def test_switch_entities_from_child_devices(hass: HomeAssistant) -> None:
-    """Switches of structural child devices must be selectable for the parent device.
+    """Switches of Shelly channel devices must be selectable for the parent device.
 
-    Shelly (and other integrations) split one physical multi-channel device into a parent device
-    plus one child device per channel. Starting the flow from the parent must still offer the
-    switches that live on the children.
+    The Shelly integration splits one physical multi-channel device into a parent device plus one
+    child device per channel. Starting the flow from the parent must offer the switches that live
+    on the channel children, and must not offer a switch that only hangs behind the same parent
+    through ``via_device_id`` (a device behind a hub).
     """
     devices = mock_devices(
         hass,
         {
-            "parent": {"manufacturer": "test", "model": "multi_switch", "name": "Test"},
+            "parent": {
+                "manufacturer": "test",
+                "model": "multi_switch",
+                "name": "Test",
+                "identifiers": {("shelly", "48F6EECD97B4")},
+            },
             "channel0": {
                 "manufacturer": "test",
                 "model": "multi_switch",
                 "name": "Test Channel 1",
+                "identifiers": {("shelly", "48F6EECD97B4-switch:0")},
                 "via_device_id": "parent",
             },
             "channel1": {
                 "manufacturer": "test",
                 "model": "multi_switch",
                 "name": "Test Channel 2",
+                "identifiers": {("shelly", "48F6EECD97B4-switch:1")},
+                "via_device_id": "parent",
+            },
+            "hub-node": {
+                "manufacturer": "test",
+                "model": "multi_switch",
+                "name": "Switch behind the hub",
+                "identifiers": {("zwave_js", "node5")},
                 "via_device_id": "parent",
             },
         },
@@ -276,6 +291,7 @@ async def test_switch_entities_from_child_devices(hass: HomeAssistant) -> None:
     for entity_id, device_id in (
         ("switch.channel1", "channel0"),
         ("switch.channel2", "channel1"),
+        ("switch.hub_node", "hub-node"),
     ):
         entities[entity_id] = RegistryEntryWithDefaults(
             entity_id=entity_id,

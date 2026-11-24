@@ -83,6 +83,73 @@ def test_get_related_device_ids_for_unknown_device(hass: HomeAssistant) -> None:
     assert get_related_device_ids(hass, "missing-device") == {"missing-device"}
 
 
+def test_get_child_device_ids_follows_parent_device_id(hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch) -> None:
+    """A structural child is linked with parent_device_id, at any depth."""
+    parent = SimpleNamespace(
+        id="parent", parent_device_id=None, via_device_id=None, identifiers=set(), config_entry_id="entry"
+    )
+    child = SimpleNamespace(
+        id="child", parent_device_id="parent", via_device_id=None, identifiers=set(), config_entry_id="entry"
+    )
+    grandchild = SimpleNamespace(
+        id="grandchild", parent_device_id="child", via_device_id=None, identifiers=set(), config_entry_id="entry"
+    )
+    unrelated = SimpleNamespace(
+        id="unrelated", parent_device_id=None, via_device_id=None, identifiers=set(), config_entry_id="entry"
+    )
+    monkeypatch.setattr(
+        device_binding,
+        "get_non_composite_devices",
+        lambda _hass: [parent, child, grandchild, unrelated],
+    )
+
+    assert device_binding.get_child_device_ids(hass, "parent") == {"child", "grandchild"}
+
+
+def test_get_child_device_ids_follows_shelly_channels(hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Cores without parent_device_id link Shelly channels through via_device_id."""
+    parent = SimpleNamespace(
+        id="parent",
+        parent_device_id=None,
+        via_device_id=None,
+        identifiers={("shelly", "48F6EECD97B4")},
+        config_entry_id="entry",
+    )
+    channel = SimpleNamespace(
+        id="channel",
+        parent_device_id=None,
+        via_device_id="parent",
+        identifiers={("shelly", "48F6EECD97B4-switch:0")},
+        config_entry_id="entry",
+    )
+    monkeypatch.setattr(device_binding, "get_non_composite_devices", lambda _hass: [parent, channel])
+
+    assert device_binding.get_child_device_ids(hass, "parent") == {"channel"}
+
+
+def test_get_child_device_ids_ignores_devices_behind_a_hub(
+    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """via_device_id also links separate devices behind a hub, which must not count as children."""
+    hub = SimpleNamespace(
+        id="hub",
+        parent_device_id=None,
+        via_device_id=None,
+        identifiers={("zwave_js", "hub")},
+        config_entry_id="entry",
+    )
+    node = SimpleNamespace(
+        id="node",
+        parent_device_id=None,
+        via_device_id="hub",
+        identifiers={("zwave_js", "node5")},
+        config_entry_id="entry",
+    )
+    monkeypatch.setattr(device_binding, "get_non_composite_devices", lambda _hass: [hub, node])
+
+    assert device_binding.get_child_device_ids(hass, "hub") == set()
+
+
 @pytest.mark.parametrize(
     "source,source_device_id,valid_config_entry,expected_device_id",
     [
