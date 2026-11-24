@@ -1,0 +1,44 @@
+{
+  "aliases": [
+    "2711"
+  ],
+  "authors": [
+    {
+      "email": "me@akashihi.org",
+      "github": "akashihi",
+      "name": "akashihi"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-23T09:54:33Z",
+  "device_specs": {
+    "connectivity": [
+      "matter",
+      "wifi"
+    ],
+    "lumens": 1521,
+    "rated_power": 14,
+    "socket": "E27"
+  },
+  "device_type": "light",
+  "gtin": [
+    "4099854528835"
+  ],
+  "mains_voltage": 230,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "Power Strip 4 Gen4",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.3:app"
+  },
+  "name": "SMART+ Matter Classic A100 E27 TW",
+  "standby_power": 0.28,
+  "voltage_range": {
+    "max": 235.1,
+    "min": 229.5
+  }
+}
