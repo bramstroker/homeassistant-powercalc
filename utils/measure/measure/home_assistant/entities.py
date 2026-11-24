@@ -13,7 +13,9 @@ from measure.home_assistant.connectivity import Connectivity, detect_connectivit
 from measure.home_assistant.const import (
     HASS_DEVICE_REGISTRY_CONFIG_ENTRIES,
     HASS_DEVICE_REGISTRY_CONFIG_ENTRY_ID,
+    HASS_DEVICE_REGISTRY_CONNECTIONS,
     HASS_DEVICE_REGISTRY_ID,
+    HASS_DEVICE_REGISTRY_IDENTIFIERS,
     HASS_DEVICE_REGISTRY_MANUFACTURER,
     HASS_DEVICE_REGISTRY_MODEL,
     HASS_DEVICE_REGISTRY_MODEL_ID,
@@ -401,20 +403,21 @@ def _device_name(device: dict[str, object]) -> str | None:
 
 
 def _device_groups(devices: dict[str, dict[str, object]]) -> dict[str, str]:
-    """Map every device to the root of its parent chain.
+    """Map every device to the root of its structural parent chain.
 
-    Home Assistant models a multi-channel device (a power strip, for example) as one
-    parent device plus one sub-device per channel. Relay selection and preflight must
-    treat those sub-devices as one physical device.
+    Home Assistant models a multi-channel device (a power strip, for example) either
+    as native child devices linked through ``parent_device_id`` or, for Shelly, as
+    devices linked through ``via_device_id``. Relay selection and preflight must
+    treat the channels of one physical product as one device.
     """
 
     roots: dict[str, str] = {}
     for device_id, device in devices.items():
         current = device
         seen = {device_id}
-        while (parent_id := _parent_device_id(current)) is not None:
+        while (parent_id := _linked_device_id(current)) is not None:
             parent = devices.get(parent_id)
-            if parent is None or parent_id in seen or not _is_channel_of_same_device(device, parent):
+            if parent is None or parent_id in seen or not _is_channel_of_same_device(current, parent):
                 break
             seen.add(parent_id)
             current = parent
@@ -422,12 +425,23 @@ def _device_groups(devices: dict[str, dict[str, object]]) -> dict[str, str]:
     return roots
 
 
-def _parent_device_id(device: dict[str, object]) -> str | None:
-    for key in (HASS_DEVICE_REGISTRY_VIA_DEVICE_ID, HASS_DEVICE_REGISTRY_PARENT_DEVICE_ID):
-        value = device.get(key)
-        if isinstance(value, str) and value:
-            return value
-    return None
+def _linked_device_id(device: dict[str, object]) -> str | None:
+    """Return the parent candidate, preferring Home Assistant's structural parent.
+
+    ``parent_device_id`` is an explicit parent/child relation. The older
+    ``via_device_id`` also links devices that merely communicate (a bulb and its
+    bridge, two separate MQTT devices), so it only feeds the Shelly check below.
+    """
+
+    return _device_string(device, HASS_DEVICE_REGISTRY_PARENT_DEVICE_ID) or _device_string(
+        device,
+        HASS_DEVICE_REGISTRY_VIA_DEVICE_ID,
+    )
+
+
+def _device_string(device: dict[str, object], key: str) -> str | None:
+    value = device.get(key)
+    return value if isinstance(value, str) and value else None
 
 
 def _device_id(device: dict[str, object], fallback: str) -> str:
@@ -438,17 +452,65 @@ def _device_id(device: dict[str, object], fallback: str) -> str:
 def _is_channel_of_same_device(child: dict[str, object], parent: dict[str, object]) -> bool:
     """Whether a child device is another channel of the parent's physical product.
 
-    ``via_device_id`` alone is not enough: a light connected through a bridge is also
-    linked to it, but is a separate product. A channel shares the parent's model.
+    A native child device (``parent_device_id``) is a structural child by definition;
+    its registry entry carries no model metadata, so no model comparison is possible
+    or needed.
+
+    ``via_device_id`` alone is not enough: a light connected through a bridge and two
+    separate MQTT devices that talk to each other are also linked, but are different
+    products. Only a Shelly channel identifier proves that ``via_device_id`` points
+    at the channel's own hardware.
     """
 
-    child_model = child.get(HASS_DEVICE_REGISTRY_MODEL_ID) or child.get(HASS_DEVICE_REGISTRY_MODEL)
-    parent_model = parent.get(HASS_DEVICE_REGISTRY_MODEL_ID) or parent.get(HASS_DEVICE_REGISTRY_MODEL)
-    if not child_model or not parent_model or child_model != parent_model:
+    if _device_string(child, HASS_DEVICE_REGISTRY_PARENT_DEVICE_ID) is not None:
+        return True
+    return _is_shelly_channel(child, parent)
+
+
+def _is_shelly_channel(child: dict[str, object], parent: dict[str, object]) -> bool:
+    """Match a Shelly channel identifier against the parent's MAC address.
+
+    Shelly registers one device per channel as ``("shelly", f"{mac}-{key}")`` and
+    links it to the main device through ``via_device_id``.
+    https://github.com/home-assistant/core/blob/2026.11.2/homeassistant/components/shelly/utils.py
+    """
+
+    if not _shares_config_entry(child, parent):
         return False
-    child_entries = _config_entry_ids(child)
-    parent_entries = _config_entry_ids(parent)
-    return not child_entries or not parent_entries or bool(child_entries & parent_entries)
+    parent_macs = _device_macs(parent)
+    if not parent_macs:
+        return False
+    return any(
+        namespace == "shelly" and any(identifier.lower().startswith(f"{mac.lower()}-") for mac in parent_macs)
+        for namespace, identifier in _device_pairs(child, HASS_DEVICE_REGISTRY_IDENTIFIERS)
+    )
+
+
+def _device_macs(device: dict[str, object]) -> set[str]:
+    """Collect the MAC addresses a Shelly parent is registered under."""
+
+    macs = {identifier for kind, identifier in _device_pairs(device, HASS_DEVICE_REGISTRY_CONNECTIONS) if kind == "mac"}
+    macs.update(
+        identifier
+        for namespace, identifier in _device_pairs(device, HASS_DEVICE_REGISTRY_IDENTIFIERS)
+        if namespace == "shelly"
+    )
+    return macs
+
+
+def _device_pairs(device: dict[str, object], key: str) -> set[tuple[str, str]]:
+    items = device.get(key)
+    pairs: set[tuple[str, str]] = set()
+    for item in items if isinstance(items, list) else []:
+        if isinstance(item, list | tuple) and len(item) == 2 and all(isinstance(part, str) for part in item):
+            pairs.add((item[0], item[1]))
+    return pairs
+
+
+def _shares_config_entry(left: dict[str, object], right: dict[str, object]) -> bool:
+    left_entries = _config_entry_ids(left)
+    right_entries = _config_entry_ids(right)
+    return not left_entries or not right_entries or bool(left_entries & right_entries)
 
 
 def _config_entry_ids(device: dict[str, object]) -> set[str]:

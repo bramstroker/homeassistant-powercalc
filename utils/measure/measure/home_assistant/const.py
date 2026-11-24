@@ -7,6 +7,7 @@ HASS_DEVICE_REGISTRY_MANUFACTURER = "manufacturer"
 HASS_DEVICE_REGISTRY_MODEL = "model"
 HASS_DEVICE_REGISTRY_MODEL_ID = "model_id"
 HASS_DEVICE_REGISTRY_IDENTIFIERS = "identifiers"
+HASS_DEVICE_REGISTRY_CONNECTIONS = "connections"
 HASS_DEVICE_REGISTRY_CONFIG_ENTRY_ID = "config_entry_id"
 #: Deprecated in Home Assistant 2026.8, which gives each device a single config_entry_id.
 HASS_DEVICE_REGISTRY_CONFIG_ENTRIES = "config_entries"

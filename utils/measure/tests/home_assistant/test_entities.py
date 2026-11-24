@@ -523,7 +523,7 @@ def test_catalog_preserves_valetudo_identity(live: bool) -> None:
 
 
 def test_catalog_groups_channels_of_one_physical_device() -> None:
-    """A power strip's outputs are sub-devices of one product, not separate devices."""
+    """A power strip's outputs are channels of one product, not separate devices."""
 
     home_assistant = MagicMock(spec=HomeAssistantManager)
     home_assistant.get_entity_data.return_value = SimpleNamespace(
@@ -539,6 +539,7 @@ def test_catalog_groups_channels_of_one_physical_device() -> None:
                 "name": "Power Strip",
                 "model": "Shelly Power Strip 4 Gen4",
                 "model_id": "S4PL-00416EU",
+                "connections": [["mac", "A8032AB12345"]],
                 "config_entry_id": "entry",
             },
             {
@@ -546,6 +547,7 @@ def test_catalog_groups_channels_of_one_physical_device() -> None:
                 "name": "Power Strip Output 0",
                 "model": "Shelly Power Strip 4 Gen4",
                 "model_id": "S4PL-00416EU",
+                "identifiers": [["shelly", "A8032AB12345-switch:0"]],
                 "config_entry_id": "entry",
                 "via_device_id": "strip",
             },
@@ -554,6 +556,7 @@ def test_catalog_groups_channels_of_one_physical_device() -> None:
                 "name": "Power Strip Output 1",
                 "model": "Shelly Power Strip 4 Gen4",
                 "model_id": "S4PL-00416EU",
+                "identifiers": [["shelly", "A8032AB12345-switch:1"]],
                 "config_entry_id": "entry",
                 "via_device_id": "strip",
             },
@@ -576,6 +579,79 @@ def test_catalog_groups_channels_of_one_physical_device() -> None:
     assert snapshot.get("switch.output_0").device_group_name == "Power Strip"
     assert snapshot.get("switch.output_1").device_group_id == "strip"
     assert snapshot.get("light.bulb").device_group_id is None
+
+
+def test_catalog_groups_a_native_mqtt_child_device_through_parent_device_id() -> None:
+    """A native child entry has no model metadata; parent_device_id still groups it."""
+
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = SimpleNamespace(
+        entities={},
+        entity_registry=[
+            SimpleNamespace(entity_id="switch.strip_relay", device_id="strip", platform="mqtt"),
+            SimpleNamespace(entity_id="switch.channel_relay", device_id="strip-channel-1", platform="mqtt"),
+        ],
+        device_registry=[
+            {
+                "id": "strip",
+                "name": "MQTT Power Strip",
+                "model": "Smart Power Strip",
+                "model_id": "SPS-4",
+                "config_entry_id": "entry",
+            },
+            # Native child devices carry no model/model_id of their own.
+            {
+                "id": "strip-channel-1",
+                "name": "Power Strip Channel 1",
+                "config_entry_id": "entry",
+                "parent_device_id": "strip",
+            },
+        ],
+    )
+
+    snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
+
+    assert snapshot.get("switch.channel_relay").device_group_id == "strip"
+    assert snapshot.get("switch.channel_relay").device_group_name == "MQTT Power Strip"
+    # The parent itself stays its own group root.
+    assert snapshot.get("switch.strip_relay").device_group_id is None
+
+
+def test_catalog_keeps_separate_mqtt_devices_apart_despite_via_device_id() -> None:
+    """Two MQTT devices of the same model that communicate are not one power strip."""
+
+    home_assistant = MagicMock(spec=HomeAssistantManager)
+    home_assistant.get_entity_data.return_value = SimpleNamespace(
+        entities={},
+        entity_registry=[
+            SimpleNamespace(entity_id="switch.sender", device_id="sender", platform="mqtt"),
+            SimpleNamespace(entity_id="switch.receiver", device_id="receiver", platform="mqtt"),
+        ],
+        device_registry=[
+            {
+                "id": "sender",
+                "name": "MQTT Plug A",
+                "model": "Smart Plug",
+                "model_id": "SP-1",
+                "config_entry_id": "entry",
+                "connections": [["mac", "A8032AB00001"]],
+            },
+            {
+                "id": "receiver",
+                "name": "MQTT Plug B",
+                "model": "Smart Plug",
+                "model_id": "SP-1",
+                "config_entry_id": "entry",
+                "connections": [["mac", "A8032AB00002"]],
+                "via_device_id": "sender",
+            },
+        ],
+    )
+
+    snapshot = HomeAssistantEntityCatalog(home_assistant).load_snapshot()
+
+    assert snapshot.get("switch.sender").device_group_id is None
+    assert snapshot.get("switch.receiver").device_group_id is None
 
 
 def test_catalog_omits_configuration_switches_from_relay_choices() -> None:
