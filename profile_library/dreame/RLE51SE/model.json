@@ -1,0 +1,177 @@
+{
+  "aliases": [
+    "dreame.vacuum.r2427a"
+  ],
+  "authors": [
+    {
+      "github": "Maxik933",
+      "name": "Maxik933"
+    }
+  ],
+  "calculation_strategy": "composite",
+  "compatible_integrations": [
+    "dreame_vacuum"
+  ],
+  "composite_config": {
+    "mode": "stop_at_first",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:auto_empty_status]]",
+          "state": [
+            "active"
+          ]
+        },
+        "fixed": {
+          "power": 414.5
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+          "state": [
+            "washing"
+          ]
+        },
+        "fixed": {
+          "power": 19.4
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+              "state": [
+                "drying"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:charging_state]]",
+              "state": [
+                "on"
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 36.9
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:self_wash_base_status]]",
+              "state": [
+                "drying"
+              ]
+            },
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:charging_state]]",
+              "state": [
+                "off"
+              ]
+            }
+          ]
+        },
+        "fixed": {
+          "power": 6.3
+        }
+      },
+      {
+        "condition": {
+          "condition": "and",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity_id": "[[entity_by_translation_key:charging_state]]",
+              "state": [
+                "on"
+              ]
+            },
+            {
+              "below": 100,
+              "condition": "numeric_state",
+              "entity_id": "[[entity_by_translation_key:battery_level]]"
+            }
+          ]
+        },
+        "entity_id": "[[entity_by_translation_key:battery_level]]",
+        "linear": {
+          "calibrate": [
+            "0 -> 32.83",
+            "15 -> 32.83",
+            "17 -> 33.48",
+            "74 -> 33.29",
+            "80 -> 33.2",
+            "85 -> 33.27",
+            "90 -> 33.22",
+            "92 -> 33.17",
+            "94 -> 32.99",
+            "95 -> 32.7",
+            "96 -> 32.19",
+            "97 -> 31.2",
+            "98 -> 29.09",
+            "99 -> 24.03"
+          ]
+        }
+      },
+      {
+        "condition": {
+          "condition": "state",
+          "entity_id": "[[entity_by_translation_key:status]]",
+          "state": [
+            "idle"
+          ]
+        },
+        "fixed": {
+          "power": 14.6
+        }
+      },
+      {
+        "condition": {
+          "condition": "template",
+          "value_template": "{{ state_attr('[[entity]]', 'docked') is sameas true }}"
+        },
+        "fixed": {
+          "power": 2.8
+        }
+      },
+      {
+        "fixed": {
+          "power": 0.37
+        }
+      }
+    ]
+  },
+  "created_at": "2026-11-16T00:19:55Z",
+  "device_specs": {
+    "connectivity": [
+      "wifi"
+    ]
+  },
+  "device_type": "vacuum_robot",
+  "mains_voltage": 230,
+  "measure_description": "Measured on a Mova E30 Ultra (robot model RLE51SE, dock model RCEE0301; Home Assistant model dreame.vacuum.r2427a) through the dreame_vacuum integration with a Shelly Plug S Gen3 between the wall socket and the base station, so every value covers the whole station rather than the robot alone. All values are time averages over the window in which the matching condition holds, not peak values.\n\nRecordings:\n- 6.33 h run covering a full clean from 100 % down to 15 %, mop washing and drying cycles, and a charge from 15 % to 99 % (the 18–73 % part ran while mop drying was active).\n- 25.2 min run covering charge completion at 99–100 % and the first 13 minutes of the post-charge tail.\n- Two dock-only runs of 3.1 and 2.4 minutes at 100 %, used to confirm the settled docked level.\n\nCoverage:\n- Away from the dock (cleaning, returning, paused): 0.37 W, from 4,206 samples between 0.13 and 0.86 W.\n- Auto-empty: auto_empty_status is active for only about 6 to 17 s per cycle. The plateau inside that window is 540 to 576 W, but the average over the complete active interval (47 samples, 98 s) is 414.5 W, which is the interval the condition actually spans, so the ramp-up is included instead of being reported as a peak.\n- Washing: 19.4 W, from 966 samples. The base draws this while charging is also flagged on, so the charging branch is not added on top.\n- Drying while charging: 36.9 W, from 2,297 samples. This is the total outlet power, not charging plus drying added together.\n- Drying after charging finished: 6.3 W, from 98 samples.\n- Docked idle: 14.6 W for the roughly 10 minutes after a charge while status is idle (752 samples).\n- Docked and settled: 2.8 W. The two dock-only runs confirm it (2.83 W and 2.78 W).\n- Charging: one calibration point per battery level from 15 to 17 % and 74 to 99 % (2,150 samples). The 93 to 99 % taper is modelled per level. 18 to 73 % was only recorded while mop drying ran, so it is interpolated flat between the 17 % (33.48 W) and 74 % (33.29 W) points; 0 to 14 % is a flat estimate at the 15 % value (32.83 W).\n\nWhole-run energy: over all four recordings the measured consumption is 123.16 Wh, while the profile predicts 119.86 Wh, an underestimate of 2.68 %. Most of that difference comes from the unmodelled sleeping decay described below.\n\nLimitations:\n- The first 30 minutes after a charge are not modelled separately. Once status changes from idle to sleeping, the station still decays from about 17 W to 2.8 W over roughly 30 minutes (mean 9.2 W). The profile reports the settled 2.8 W there instead, so each completed charge is under-counted by about 3.2 Wh. Modelling the decay would require a time template on charging_state.last_changed, which restarts on every Home Assistant restart or unavailable-to-off transition and would then overstate power for a full window, so the settled value is used on purpose.\n- The transition at 100 % is therefore not distinguished either: the charging branch stops at 99 %, and the short period at 100 % falls into the idle or docked branch.\n- Charging below 15 % and between 18 and 73 % is a flat interpolation and not measured in isolation.\n- The auto-empty per-sample MAE is large because a 6 to 17 s ramp is represented by one average. Integrated over all episodes the branch matches almost exactly (11.28 Wh measured against 11.28 Wh modelled).\n- All values were recorded at a single mains voltage around 230 V.",
+  "measure_device": "Shelly Plug S Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.1:app"
+  },
+  "min_version": "v1.25.5",
+  "name": "E30 Ultra Robot Vacuum Cleaner",
+  "product_url": "https://mova.tech/products/mova-e30-ultra-robot-vacuum",
+  "standby_power": 2.8
+}

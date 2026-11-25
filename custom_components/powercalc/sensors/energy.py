@@ -466,7 +466,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         )
 
     @property
-    def icon(self) -> str:  # ty: ignore[invalid-property-type-override]
+    def icon(self) -> str:  # ty: ignore[incompatible-property-override]
         return ENERGY_ICON
 
     @callback
@@ -576,11 +576,11 @@ class RealEnergySensor(EnergySensor):
         return cls(entry.entity_id, entry.name or entry.original_name, entry.unique_id)
 
     @property
-    def name(self) -> str | None:  # ty: ignore[invalid-property-type-override]
+    def name(self) -> str | None:  # ty: ignore[incompatible-property-override]
         """Return the name of the sensor."""
         return self._name
 
     @property
-    def unique_id(self) -> str | None:  # ty: ignore[invalid-property-type-override]
+    def unique_id(self) -> str | None:  # ty: ignore[incompatible-property-override]
         """Return the unique_id of the sensor."""
         return self._unique_id
