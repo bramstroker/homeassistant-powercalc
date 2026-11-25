@@ -314,17 +314,17 @@ class VirtualUtilityMeter(BaseEntity, UtilityMeterSensor):
     _sensor_config: ConfigType
 
     @property
-    def unique_id(self) -> str | None:  # ty: ignore[invalid-property-type-override]
+    def unique_id(self) -> str | None:  # ty: ignore[incompatible-property-override]
         """Return the unique id."""
         return self._attr_unique_id
 
     @property
-    def suggested_display_precision(self) -> int | None:  # ty: ignore[invalid-property-type-override]
+    def suggested_display_precision(self) -> int | None:  # ty: ignore[incompatible-property-override]
         """Return the suggested number of decimal digits for display."""
         return self.rounding_digits
 
     @property
-    def native_value(self) -> StateType | Decimal:  # ty: ignore[invalid-property-type-override]
+    def native_value(self) -> StateType | Decimal:  # ty: ignore[incompatible-property-override]
         """Return the state of the sensor."""
         value = cast(Decimal | int | None, self._attr_native_value)
         if self.rounding_digits and value is not None:

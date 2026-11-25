@@ -398,12 +398,12 @@ class CostSensor(BaseEntity, RestoreEntity, SensorEntity):
             self._last_energy = current_energy
 
     @property
-    def native_value(self) -> Decimal:  # ty: ignore[invalid-property-type-override]
+    def native_value(self) -> Decimal:  # ty: ignore[incompatible-property-override]
         """Return the accumulated cost."""
         return Decimal(round(self._state, self._rounding_digits))
 
     @property
-    def extra_state_attributes(self) -> dict[str, str] | None:  # ty: ignore[invalid-property-type-override]
+    def extra_state_attributes(self) -> dict[str, str] | None:  # ty: ignore[incompatible-property-override]
         """Return the state attributes of the cost sensor."""
         if self._last_energy is None:
             return None

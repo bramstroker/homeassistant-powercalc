@@ -129,12 +129,12 @@ library = [
 profile-library = [
     "aiofiles>=25.1.0",
     "gitpython>=3.1.57",
-    "httpx>=0.28.1",
+    "httpx>=0.28.1,<1",
 ]
 dev = [
     "aiofiles>=25.1.0",
     "gitpython>=3.1.57",
-    "httpx>=0.28.1",
+    "httpx>=0.28.1,<1",
     "prek",
     "ruff>=0.15.0",
     "mypy==2.4.1",
@@ -149,7 +149,7 @@ dev = [
     "croniter>=6.0.0",
     "aioresponses>=0.7.6",
     "pyturbojpeg>=1.8.2",
-    "ty>=0.0.39",
+    "ty>=0.0.109",
     "types-jsonschema>=4.26.0.20260518",
     "types-aiofiles>=25.1.0.20260518",
 ]

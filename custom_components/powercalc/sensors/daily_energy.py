@@ -284,7 +284,7 @@ class DailyEnergySensor(EnergySensor, RestoreEntity, SensorEntity):
         return Decimal((energy_per_day / 86400) * elapsed_seconds)
 
     @property
-    def native_value(self) -> Decimal:  # ty: ignore[invalid-property-type-override]
+    def native_value(self) -> Decimal:  # ty: ignore[incompatible-property-override]
         """Return the state of the sensor."""
         return Decimal(round(self._state, self._rounding_digits))
 
