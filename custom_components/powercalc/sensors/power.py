@@ -876,7 +876,7 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         return self._source_entity.entity_id
 
     @property
-    def native_value(self) -> StateType:  # ty: ignore[invalid-property-type-override]
+    def native_value(self) -> StateType:  # ty: ignore[incompatible-property-override]
         """Return the state of the sensor."""
         return cast(StateType, self._power)
 
@@ -997,6 +997,6 @@ class RealPowerSensor(PowerSensor):
         return self._device_id
 
     @property
-    def unique_id(self) -> str | None:  # ty: ignore[invalid-property-type-override]
+    def unique_id(self) -> str | None:  # ty: ignore[incompatible-property-override]
         """Return the unique_id of the sensor."""
         return self._unique_id

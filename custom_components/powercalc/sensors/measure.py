@@ -22,17 +22,17 @@ class MeasureSessionStatusSensor(SensorEntity):
         self._attr_options = list(MEASURE_SESSION_STATES)
 
     @property
-    def native_value(self) -> str | None:  # ty: ignore[invalid-property-type-override]
+    def native_value(self) -> str | None:  # ty: ignore[incompatible-property-override]
         """Return the latest session state."""
         return self._coordinator.data.state if self._coordinator.data is not None else None
 
     @property
-    def available(self) -> bool:  # ty: ignore[invalid-property-type-override]
+    def available(self) -> bool:  # ty: ignore[incompatible-property-override]
         """Return whether the Measure app heartbeat is current."""
         return self._coordinator.available
 
     @property
-    def extra_state_attributes(self) -> dict[str, Any]:  # ty: ignore[invalid-property-type-override]
+    def extra_state_attributes(self) -> dict[str, Any]:  # ty: ignore[incompatible-property-override]
         """Return stable metadata useful in completion and failure automations."""
         status = self._coordinator.data
         if status is None:
