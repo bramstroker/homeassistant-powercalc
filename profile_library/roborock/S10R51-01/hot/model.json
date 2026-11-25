@@ -48,7 +48,7 @@
         },
         "battery_rate": {
           "entity_id": "[[entity_by_device_class:battery]]",
-          "energy_per_percent": 0.96,
+          "energy_per_percent": 1.00,
           "base_power": 59.7,
           "window": 600,
           "max_power": 130
@@ -76,7 +76,7 @@
         },
         "battery_rate": {
           "entity_id": "[[entity_by_device_class:battery]]",
-          "energy_per_percent": 0.96,
+          "energy_per_percent": 1.00,
           "base_power": 3.5,
           "window": 600,
           "max_power": 70

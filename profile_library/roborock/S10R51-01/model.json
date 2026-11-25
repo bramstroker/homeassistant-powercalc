@@ -11,7 +11,7 @@
   "standby_power": 0.3,
   "measure_method": "manual",
   "measure_device": "ThirdReality 3RSP02064Z",
-  "measure_description": "Dock and robot measured together at the wall. Charging uses battery_rate at 0.96 Wh per battery %, so it follows both slow and fast charging; over three days of runs, charging energy came within 2% of the plug's energy counter. Mop drying adds 56.2 W to the 3.5 W docked baseline. Robot: S91COP, 20 V 2.5 A. Dock: EWFD28LRR, 120 V 60 Hz.",
+  "measure_description": "Dock and robot measured together at the wall. Charging uses battery_rate at 1.00 Wh per battery %, so it follows both slow and fast charging; over eight, charging energy came within 1% of the plug's energy counter. Mop drying adds 56.2 W to the 3.5 W docked baseline. Robot: S91COP, 20 V 2.5 A. Dock: EWFD28LRR, 120 V 60 Hz.",
   "config_flow_sub_profile_remarks": "Pick the sub-profile that matches the mop wash water temperature set in the Roborock app. Home Assistant can't read this setting, so change the sub-profile here if you change it in the app.",
   "mains_voltage": 120,
   "min_version": "v1.27.1",
