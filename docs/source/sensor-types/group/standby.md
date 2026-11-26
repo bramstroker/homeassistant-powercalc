@@ -37,6 +37,28 @@ When enabled you get two additional sensors:
 A device only takes part while it is switched on. When it is turned off it leaves the group again.
 The standby group is not affected by this option.
 
+### The two totals can overlap
+
+The standby group and the active group answer different questions, and a device can contribute to
+both at the same time. Do not add the two totals together.
+
+- A smart plug, dimmer or similar device draws power for its own operation while the connected load
+  is running. That self-usage is part of the standby group (it is phantom consumption in the sense
+  of that group) and it is also part of the power the device exposes while it is switched on, so it
+  is counted in the active group as well.
+- A device that is configured with `standby_power_on` adds that value to its power while it is
+  switched on. The standby group tracks the same value, because it is the device's own draw and
+  not the load.
+
+Example: a smart switch with `standby_power: 0.3` and `standby_power_on: 0.7` is switched on and its
+load draws nothing. Then:
+
+- `sensor.all_standby_power` = `0.70 W` (the controller draw of the running switch)
+- `sensor.all_self_usage_power` = `0.70 W` (the same value, it is the whole consumption)
+
+Adding both would report `1.40 W`, counting the controller draw twice. Once the switch is turned
+off, the device leaves the active group and only contributes its `0.3 W` standby power.
+
 ## Configuration
 
 The standby group is created by default when you set up the Powercalc integration. No additional configuration is needed to start using it.

@@ -336,6 +336,8 @@ async def test_active_group_created_when_enabled(hass: HomeAssistant) -> None:
     )
 
     await set_states(hass, [("switch.test1", STATE_ON), ("switch.test2", STATE_ON)])
+    # The 0.7 W controller draw of test2 is its whole consumption here, so the same value shows up in
+    # both totals. They are not complementary: adding them would count that draw twice.
     assert_entity_state(hass, "sensor.all_self_usage_power", "20.70")
     assert_entity_state(hass, "sensor.all_standby_power", "0.70")
 
