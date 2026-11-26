@@ -22,7 +22,9 @@
     ]
   },
   "gtin": [
-    "3800238070717"
+    "3800238070717",
+    "3800238070724",
+    "3800238070731"
   ],
   "measure_description": "Measured with 33.7 W dummy load, averaged over 300 seconds. Multiple combinations of settings were tested. Firmware version 2.1.1.",
   "measure_device": "Shelly Plug S Gen3",
