@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "Profilul LUT nu acceptă unul dintre modurile de culoare ale luminii dumneavoastră. Consultați jurnalele pentru mai multe informații",
       "lut_wrong_domain": "Numai entitățile luminoase pot folosi modul LUT",
       "playbook_mandatory": "Trebuie să specificați cel puțin un playbook",
-      "unknown": "A apărut o eroare necunoscută, vă rugăm să consultați jurnalele pentru informații suplimentare"
+      "unknown": "A apărut o eroare necunoscută, vă rugăm să consultați jurnalele pentru informații suplimentare",
+      "group_statistics_start_at_zero": "Alegeți Începe de la zero sau Reconstituie statisticile, nu ambele.",
+      "group_statistics_energy_required": "Pentru reconstituire, activați crearea senzorului de energie și dezactivați calculul forțat al energiei.",
+      "group_statistics_recorder_required": "Recorder trebuie activat pentru reconstituirea statisticilor."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Include senzori non-powercalc",
               "force_calculate_group_energy": "Forțează calcularea energiei",
               "group_energy_start_at_zero": "Începe de la zero",
+              "group_energy_recreate_statistics": "Reconstituie statisticile",
               "create_energy_sensor": "Creați un senzor de energie",
               "create_utility_meters": "Creați contoare"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Controlați dacă includeți senzori non-powercalc atunci când utilizați opțiunea zonă",
               "force_calculate_group_energy": "În mod implicit, Powercalc însumează senzorii de energie ai senzorilor membri. Activați această opțiune pentru a forța crearea unui senzor Riemann Sum",
               "group_energy_start_at_zero": "Când este activat, senzorul de energie va porni la zero când senzorul este creat. În caz contrar, va însuma toate stările actuale ale senzorilor de energie membri",
+              "group_energy_recreate_statistics": "La creare, însumează o singură dată statisticile energetice orare și cele disponibile de cinci minute ale membrilor. Dezactivați Începe de la zero. Necesită Recorder și un senzor care însumează energia.",
               "create_energy_sensor": "Dacă Powercalc trebuie să creeze un senzor kWh"
             }
           }

@@ -25,6 +25,53 @@ Select `Group` -> `Custom` and follow the instructions.
 
     Currently sensors registering negative energy values are not supported in groups.
 
+### Recreate energy statistics when creating a group
+
+Enable **Recreate statistics** under **Options** to give a new group the energy
+history of its members. Disable **Start at zero** first: the form rejects using
+both options together. **Create energy sensor** must be enabled and **Force
+calculate energy** must be disabled. Recorder must be enabled and must record
+the group's energy sensor.
+
+Powercalc copies the hourly long-term statistics and the five-minute statistics
+that Recorder still retains. For each interval, it converts the members' recorded
+energy `sum` values to the group's unit and adds them:
+
+| Interval | Sensor A's sum | Sensor B's sum | Group's sum |
+| --- | ---: | ---: | ---: |
+| 10:00–11:00 | 10 kWh | 5 kWh | 15 kWh |
+| 11:00–12:00 | 12 kWh | 6 kWh | 18 kWh |
+
+The group consumed **18 − 15 = 3 kWh** between these readings. Powercalc uses the
+recorded `sum`, which includes consumption across meter resets, rather than
+adding the raw meter readings or adding successive cumulative readings together.
+
+- Each resolved member energy sensor is included once, including members of subgroups.
+- If a member has a gap, its last known sum is carried forward. Before its first
+  recorded statistic it contributes zero; missing consumption is not estimated.
+- Older hourly values provide the baseline for retained five-minute statistics.
+  An hourly value is only used after that hour has ended.
+- If five-minute history is missing at the latest historical reading, Powercalc
+  adds a single continuation checkpoint so Recorder retains the imported total.
+- A member with no usable statistics starts contributing from its first available
+  current reading. Its earlier consumption cannot be reconstructed.
+
+The group energy sensor starts with the imported total plus changes since the
+last recorded member readings, then continues counting normally.
+The members' own statistics remain unchanged.
+
+This runs **once when the group is created**. Restarting Home Assistant, reloading
+the group, or changing members does not repeat the import. The option is absent
+from the settings of an existing group. Existing statistics under the new group's
+entity ID are protected from being overwritten.
+
+To inspect the calculation, run [**Powercalc: debug group**](../../actions/debug-group.md)
+for the group's energy sensor. Its `statistics` section contains the import time,
+unit, number of imported records, each member's last imported `sum` and meter
+`state`, and members without usable history. The `end` timestamps identify the
+end of each member's last imported interval in Unix seconds. This overview is a
+snapshot of the import, not the group's current membership or live consumption.
+
 ## Create group with YAML
 
 You can combine the `entities` option and `create_group` to group individual power sensors into a group.

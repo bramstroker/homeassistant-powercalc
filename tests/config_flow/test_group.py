@@ -16,6 +16,7 @@ from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.floor_registry import FloorRegistry
 from homeassistant.helpers.selector import SelectSelector
 from homeassistant.helpers.translation import async_get_translations
+import pytest
 import voluptuous as vol
 
 from custom_components.powercalc import SensorType
@@ -31,6 +32,7 @@ from custom_components.powercalc.const import (
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_ENERGY_RECREATE_STATISTICS,
     CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
@@ -100,9 +102,45 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_GROUP_ENERGY_START_AT_ZERO: True,
+        CONF_GROUP_ENERGY_RECREATE_STATISTICS: False,
     }
 
     assert hass.states.get("sensor.my_group_sensor_power")
+
+
+@pytest.mark.parametrize(
+    "options, error",
+    [
+        ({CONF_GROUP_ENERGY_START_AT_ZERO: True}, "group_statistics_start_at_zero"),
+        (
+            {CONF_GROUP_ENERGY_START_AT_ZERO: False, CONF_CREATE_ENERGY_SENSOR: False},
+            "group_statistics_energy_required",
+        ),
+        (
+            {CONF_GROUP_ENERGY_START_AT_ZERO: False, CONF_FORCE_CALCULATE_GROUP_ENERGY: True},
+            "group_statistics_energy_required",
+        ),
+        ({CONF_GROUP_ENERGY_START_AT_ZERO: False}, "group_statistics_recorder_required"),
+    ],
+)
+async def test_recreate_statistics_rejects_incompatible_options(
+    hass: HomeAssistant,
+    options: dict[str, bool],
+    error: str,
+) -> None:
+    result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
+    result = await submit_form_step(
+        hass,
+        result,
+        {
+            CONF_NAME: "My group",
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.energy"],
+            CONF_GROUP_ENERGY_RECREATE_STATISTICS: True,
+            **options,
+        },
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["errors"] == {"base": error}
 
 
 async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None:
@@ -127,6 +165,7 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_GROUP_ENERGY_START_AT_ZERO: True,
+        CONF_GROUP_ENERGY_RECREATE_STATISTICS: False,
     }
 
     await hass.async_block_till_done()
@@ -189,6 +228,7 @@ async def test_add_device_members_to_group(hass: HomeAssistant) -> None:
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_GROUP_ENERGY_START_AT_ZERO: True,
+        CONF_GROUP_ENERGY_RECREATE_STATISTICS: False,
     }
 
     await set_states(hass, [("sensor.balcony_power", 5), ("sensor.balcony_energy", 5)])
@@ -252,6 +292,7 @@ async def test_group_include_area(
         CONF_UTILITY_METER_TARIFFS: [],
         CONF_UTILITY_METER_TYPES: [DAILY],
         CONF_GROUP_ENERGY_START_AT_ZERO: True,
+        CONF_GROUP_ENERGY_RECREATE_STATISTICS: False,
     }
 
     await set_states(hass, [("sensor.test_power", 5)])
@@ -420,6 +461,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_GROUP_ENERGY_START_AT_ZERO: True,
+        CONF_GROUP_ENERGY_RECREATE_STATISTICS: False,
     }
 
 

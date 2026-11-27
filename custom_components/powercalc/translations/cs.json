@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "Profil LUT nepodporuje jeden z barevných režimů vašeho světla. Další informace najdete v protokolech",
       "lut_wrong_domain": "Režim LUT mohou používat pouze entity světel",
       "playbook_mandatory": "Musíte zadat alespoň jeden playbook",
-      "unknown": "Došlo k neznámé chybě, další informace najdete v protokolech"
+      "unknown": "Došlo k neznámé chybě, další informace najdete v protokolech",
+      "group_statistics_start_at_zero": "Vyberte buď Začít na nule, nebo Znovu vytvořit statistiky, nikoli obojí.",
+      "group_statistics_energy_required": "Pro vytvoření statistik zapněte vytváření senzoru energie a vypněte vynucený výpočet energie.",
+      "group_statistics_recorder_required": "Pro vytvoření statistik musí být zapnutý Recorder."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Zahrnout ne-powercalc senzory",
               "force_calculate_group_energy": "Vynutit výpočet energie",
               "group_energy_start_at_zero": "Začít na nule",
+              "group_energy_recreate_statistics": "Znovu vytvořit statistiky",
               "create_energy_sensor": "Vytvořit senzor energie",
               "create_utility_meters": "Vytvořit měřiče spotřeby"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Určete, zda při použití možnosti oblasti zahrnout i senzory mimo Powercalc",
               "force_calculate_group_energy": "Ve výchozím nastavení Powercalc sčítá senzory energie z členských senzorů. Zapnutím této možnosti vynutíte vytvoření senzoru Riemannova součtu",
               "group_energy_start_at_zero": "Když je povoleno, senzor energie začne při vytvoření na nule. Jinak se sečtou všechny aktuální stavy členských senzorů energie",
+              "group_energy_recreate_statistics": "Při vytváření jednorázově sečíst hodinové a dostupné pětiminutové statistiky energie členů. Vypněte Začít na nule. Vyžaduje Recorder a senzor sčítající energii.",
               "create_energy_sensor": "Zda má Powercalc vytvořit senzor kWh"
             }
           }

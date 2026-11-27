@@ -18,6 +18,7 @@ if USING_OFFICIAL_PLUGIN:
         setup_test_component_platform,
     )
     from pytest_homeassistant.components.recorder.common import (
+        async_wait_purge_done,
         async_wait_recording_done,
         do_adhoc_statistics,
         get_start_time,
@@ -38,6 +39,7 @@ else:
         setup_test_component_platform,
     )
     from pytest_homeassistant_custom_component.components.recorder.common import (
+        async_wait_purge_done,
         async_wait_recording_done,
         do_adhoc_statistics,
         get_start_time,
@@ -53,6 +55,7 @@ __all__ = [
     "MockToggleEntity",
     "RegistryEntryWithDefaults",
     "async_fire_time_changed",
+    "async_wait_purge_done",
     "async_wait_recording_done",
     "do_adhoc_statistics",
     "get_start_time",

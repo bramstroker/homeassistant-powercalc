@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "LUT profil ne podržava jedan od režima boja vašeg svetla. Pogledajte evidenciju (logs) za više informacija",
       "lut_wrong_domain": "Samo entiteti svetla (light) mogu koristiti LUT režim",
       "playbook_mandatory": "Potrebno je da navedete bar jedan playbook",
-      "unknown": "Došlo je do nepoznate greške, pogledajte evidenciju (logs) za dodatne informacije"
+      "unknown": "Došlo je do nepoznate greške, pogledajte evidenciju (logs) za dodatne informacije",
+      "group_statistics_start_at_zero": "Izaberite samo jednu od opcija „Počni od nule“ i „Ponovo kreiraj statistiku“.",
+      "group_statistics_energy_required": "Za ponovno kreiranje statistike uključite „Kreiraj senzor energije“ i isključite „Prinudno izračunaj energiju“.",
+      "group_statistics_recorder_required": "Za ponovno kreiranje statistike potrebno je da integracija Recorder bude uključena."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Uključi senzore koji nisu powercalc",
               "force_calculate_group_energy": "Prinudno izračunaj energiju",
               "group_energy_start_at_zero": "Počni od nule",
+              "group_energy_recreate_statistics": "Ponovo kreiraj statistiku",
               "create_energy_sensor": "Kreiraj senzor energije",
               "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Kontrolišite da li želite da uključite senzore koji nisu powercalc kada koristite opciju prostorije",
               "force_calculate_group_energy": "Podrazumevano powercalc sabira senzore energije iz senzora članova. Uključite ovu opciju da biste prinudno kreirali senzor Rimanove sume (Riemann Sum)",
               "group_energy_start_at_zero": "Kada je omogućeno, senzor energije će početi od nule prilikom kreiranja. U suprotnom će sabrati sva trenutna stanja senzora energije članova",
+              "group_energy_recreate_statistics": "Pri kreiranju grupe jednokratno se sabiraju satni i dostupni petominutni statistički podaci o energiji članova. Isključite „Počni od nule“. Potrebno je da integracija Recorder bude uključena i da senzor energije sabira vrednosti članova grupe.",
               "create_energy_sensor": "Da li powercalc treba da kreira kWh senzor"
             }
           }

@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "Het LUT profiel ondersteund 1 van de kleur modes van je lamp niet. Bekijk de logs voor uitgebreide informatie",
       "lut_wrong_domain": "Alleen lamp entiteiten kunnen de LUT mode gebruiken",
       "playbook_mandatory": "Je moet minimaal één playbook definiëren",
-      "unknown": "Onbekende fout opgetreden, bekijk de logs voor extra informatie"
+      "unknown": "Onbekende fout opgetreden, bekijk de logs voor extra informatie",
+      "group_statistics_start_at_zero": "Kies Start op nul of Statistieken reconstrueren, niet beide.",
+      "group_statistics_energy_required": "Schakel Energiesensor aanmaken in en Geforceerde energieberekening uit om statistieken te reconstrueren.",
+      "group_statistics_recorder_required": "Recorder moet ingeschakeld zijn om statistieken te reconstrueren."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
               "force_calculate_group_energy": "Forceer berekenen energie",
               "group_energy_start_at_zero": "Start op nul",
+              "group_energy_recreate_statistics": "Statistieken reconstrueren",
               "create_energy_sensor": "Energiesensoren aanmaken",
               "create_utility_meters": "Utiliteit meters aanmaken"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
               "force_calculate_group_energy": "Standaard worden de energiesensoren van de individuele sensoren opgeteld. Schakel deze optie in om een Riemann Sum sensor te forceren",
               "group_energy_start_at_zero": "Wanneer ingeschakeld, start de energiesensor bij nul wanneer deze is aangemaakt. Anders worden alle huidige onderliggende energiesensorwaarden opgeteld",
+              "group_energy_recreate_statistics": "Tel bij het aanmaken eenmalig de uurstatistieken en beschikbare vijfminutenstatistieken van de energiesensoren op. Schakel Start op nul uit. Vereist Recorder en een energiesensor die optelt.",
               "create_energy_sensor": "Laat Powercalc een kWh meter aanmaken"
             }
           }

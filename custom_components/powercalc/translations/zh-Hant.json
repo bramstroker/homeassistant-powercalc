@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "LUT 設定檔不支援您燈具的其中一種色彩模式。詳細資訊請查看日誌",
       "lut_wrong_domain": "只有燈光實體可以使用 LUT 模式",
       "playbook_mandatory": "您至少需要指定一個劇本",
-      "unknown": "發生未知錯誤，詳細資訊請查看日誌"
+      "unknown": "發生未知錯誤，詳細資訊請查看日誌",
+      "group_statistics_start_at_zero": "「從零開始」與「重建統計資料」只能擇一啟用。",
+      "group_statistics_energy_required": "重建統計資料需要啟用「建立能源感測器」，並停用「強制計算能源」。",
+      "group_statistics_recorder_required": "重建統計資料需要啟用 Recorder 整合。"
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "包含非 powercalc 感測器",
               "force_calculate_group_energy": "強制計算能源",
               "group_energy_start_at_zero": "從零開始",
+              "group_energy_recreate_statistics": "重建統計資料",
               "create_energy_sensor": "建立能源感測器",
               "create_utility_meters": "建立功耗表"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "控制使用分區選項時是否包含非 powercalc 感測器",
               "force_calculate_group_energy": "powercalc 預設會加總成員感測器的能源感測器。切換此選項可強制建立黎曼和（Riemann Sum）感測器",
               "group_energy_start_at_zero": "啟用後，能源感測器建立時會從零開始；否則會加總所有成員能源感測器目前的狀態",
+              "group_energy_recreate_statistics": "建立群組時，會一次性加總各成員的每小時能源統計資料及可用的五分鐘能源統計資料。請停用「從零開始」。需要啟用 Recorder 整合，並使用加總成員能源的感測器。",
               "create_energy_sensor": "powercalc 是否需要建立 kWh 感測器"
             }
           }

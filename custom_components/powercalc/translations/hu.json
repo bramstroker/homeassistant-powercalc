@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "A LUT-profil nem támogatja a lámpa egyik színmódját. További információért tekintse meg a naplókat",
       "lut_wrong_domain": "LUT-módot csak light entitások használhatnak",
       "playbook_mandatory": "Adjon meg legalább egy playbookot",
-      "unknown": "Ismeretlen hiba történt. További információért tekintse meg a naplókat"
+      "unknown": "Ismeretlen hiba történt. További információért tekintse meg a naplókat",
+      "group_statistics_start_at_zero": "Válassza az Indítás nulláról vagy a Statisztikák újraépítése lehetőséget, de ne mindkettőt.",
+      "group_statistics_energy_required": "A statisztikák újraépítéséhez engedélyezze az energiaérzékelő létrehozását, és tiltsa le a kényszerített energiaszámítást.",
+      "group_statistics_recorder_required": "A statisztikák újraépítéséhez engedélyezni kell a Recordert."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Nem Powercalc-érzékelők bevonása",
               "force_calculate_group_energy": "Energia kiszámításának kényszerítése",
               "group_energy_start_at_zero": "Indítás nulláról",
+              "group_energy_recreate_statistics": "Statisztikák újraépítése",
               "create_energy_sensor": "Energiaérzékelő létrehozása",
               "create_utility_meters": "Közüzemi mérők létrehozása"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Szabályozza, hogy a terület opció használatakor szerepeljenek-e nem Powercalc-érzékelők",
               "force_calculate_group_energy": "A Powercalc alapértelmezés szerint a tagérzékelők energiaérzékelőit összegzi. Kapcsolja be ezt a beállítást egy Riemann-összeg érzékelő létrehozásának kikényszerítéséhez",
               "group_energy_start_at_zero": "Ha engedélyezve van, az energiaérzékelő nulláról indul az érzékelő létrehozásakor. Ellenkező esetben az összes jelenlegi tag energiaérzékelő állapotát összegzi",
+              "group_energy_recreate_statistics": "Létrehozáskor egyszer összeadja a tagok óránkénti és elérhető ötperces energiastatisztikáit. Kapcsolja ki az Indítás nulláról beállítást. Recorder és az energiaértékeket összegző érzékelő szükséges.",
               "create_energy_sensor": "Meghatározza, hogy a Powercalc létrehozzon-e kWh-érzékelőt"
             }
           }

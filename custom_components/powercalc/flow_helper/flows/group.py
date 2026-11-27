@@ -15,16 +15,19 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
+from homeassistant.helpers.recorder import DATA_INSTANCE
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.selector import TextSelector
 
 from custom_components.powercalc.const import (
     CONF_AREA,
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_EXCLUDE_ENTITIES,
     CONF_FLOOR,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_ENERGY_RECREATE_STATISTICS,
     CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
@@ -193,6 +196,12 @@ def validate_group_input(user_input: dict[str, Any] | None = None) -> None:
     if not any(key in (user_input or {}) for key in required_keys):
         raise SchemaFlowError("group_mandatory")
 
+    if user_input and user_input.get(CONF_GROUP_ENERGY_RECREATE_STATISTICS):
+        if user_input.get(CONF_GROUP_ENERGY_START_AT_ZERO, True):
+            raise SchemaFlowError("group_statistics_start_at_zero")
+        if not user_input.get(CONF_CREATE_ENERGY_SENSOR, True) or user_input.get(CONF_FORCE_CALCULATE_GROUP_ENERGY):
+            raise SchemaFlowError("group_statistics_energy_required")
+
 
 def create_schema_group_custom(
     hass: HomeAssistant,
@@ -263,6 +272,7 @@ def create_schema_group_custom(
         options_schema = options_schema.extend(
             {
                 vol.Optional(CONF_GROUP_ENERGY_START_AT_ZERO, default=True): selector.BooleanSelector(),
+                vol.Optional(CONF_GROUP_ENERGY_RECREATE_STATISTICS, default=False): selector.BooleanSelector(),
                 **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
                 **SCHEMA_UTILITY_METER_TOGGLE.schema,
             },
@@ -416,6 +426,8 @@ class GroupConfigFlow(GroupFlow):
             ui = flatten_sections(ui, resolved_schema)
             if group_type == GroupType.CUSTOM:
                 validate_group_input(ui)
+                if ui.get(CONF_GROUP_ENERGY_RECREATE_STATISTICS) and DATA_INSTANCE not in self.flow.hass.data:
+                    raise SchemaFlowError("group_statistics_recorder_required")
 
             self.flow.name = ui.get(CONF_NAME)
             self.flow.sensor_config.update(ui)

@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "LUT-profiili ei tue yhtä valosi väritiloista. Katso lisätietoja lokista",
       "lut_wrong_domain": "Vain light-entiteetit voivat käyttää LUT-tilaa",
       "playbook_mandatory": "Määritä vähintään yksi playbook",
-      "unknown": "Tuntematon virhe. Katso lisätietoja lokista"
+      "unknown": "Tuntematon virhe. Katso lisätietoja lokista",
+      "group_statistics_start_at_zero": "Valitse joko Aloita nollasta tai Muodosta tilastot uudelleen, ei molempia.",
+      "group_statistics_energy_required": "Tilastojen muodostaminen edellyttää energia-anturin luomista ja pakotetun energialaskennan poistamista käytöstä.",
+      "group_statistics_recorder_required": "Recorderin on oltava käytössä tilastojen muodostamista varten."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Sisällytä muut kuin Powercalc-anturit",
               "force_calculate_group_energy": "Pakota energian laskenta",
               "group_energy_start_at_zero": "Aloita nollasta",
+              "group_energy_recreate_statistics": "Muodosta tilastot uudelleen",
               "create_energy_sensor": "Luo energia-anturi",
               "create_utility_meters": "Luo kulutusmittarit"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Määritä, sisällytetäänkö muut kuin Powercalc-anturit aluevaihtoehtoa käytettäessä",
               "force_calculate_group_energy": "Oletuksena Powercalc summaa jäsenantureiden energia-anturit. Ota tämä asetus käyttöön, jos haluat pakottaa luomaan Riemannin summa-anturin",
               "group_energy_start_at_zero": "Kun tämä on käytössä, energia-anturi käynnistyy nollasta, kun anturi luodaan. Muussa tapauksessa se summaa kaikki nykyiset jäsenten energia-anturin tilat",
+              "group_energy_recreate_statistics": "Luonnin yhteydessä lasketaan kerran yhteen jäsenten tuntikohtaiset ja saatavilla olevat viiden minuutin energiatilastot. Poista Aloita nollasta käytöstä. Vaatii Recorderin ja energia-arvot yhteen laskevan anturin.",
               "create_energy_sensor": "Määrittää, luoko Powercalc kWh-anturin"
             }
           }

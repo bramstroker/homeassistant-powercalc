@@ -3,6 +3,7 @@
   "name": "Powercalc",
   "after_dependencies": [
     "integration",
+    "recorder",
     "utility_meter"
   ],
   "categories": [

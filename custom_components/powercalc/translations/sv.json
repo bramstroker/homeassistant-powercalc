@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "LUT profilen stöder inte ett av färglägena på din lampa. Se loggen för mer information",
       "lut_wrong_domain": "Enbart lampentiteter kan använda LUT läge",
       "playbook_mandatory": "Du måste speciifera minst en playbook",
-      "unknown": "Okänt fel inträffade, se loggen för mer information"
+      "unknown": "Okänt fel inträffade, se loggen för mer information",
+      "group_statistics_start_at_zero": "Välj antingen Börja på noll eller Återskapa statistik, inte båda.",
+      "group_statistics_energy_required": "Aktivera Skapa energisensor och inaktivera Tvingad energiberäkning för att återskapa statistik.",
+      "group_statistics_recorder_required": "Recorder måste vara aktiverat för att återskapa statistik."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Inkludera icke-powercalc sensorer",
               "force_calculate_group_energy": "Tvinga energiberäkning",
               "group_energy_start_at_zero": "Börja på noll",
+              "group_energy_recreate_statistics": "Återskapa statistik",
               "create_energy_sensor": "Skapa energisensor",
               "create_utility_meters": "Skapa bruksmätare"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Ange huruvida icke-powercalc-sensorer ska inkluderas när områdesalternativet används",
               "force_calculate_group_energy": "Som standard summerar powercalc energisensorerna från medlemssensorerna. Växla detta alternativ för att tvinga fram en Riemann Sum-sensor",
               "group_energy_start_at_zero": "När den är aktiverad startar energisensorn vid noll när sensorn skapas. Annars kommer den att summera alla aktuella medlemsenergisensortillstånd",
+              "group_energy_recreate_statistics": "Vid skapandet summeras medlemmarnas energistatistik per timme och tillgänglig femminutersstatistik en gång. Stäng av Börja på noll. Kräver Recorder och en energisensor som summerar.",
               "create_energy_sensor": "Om powercalc ska skapa en kWh sensor"
             }
           }

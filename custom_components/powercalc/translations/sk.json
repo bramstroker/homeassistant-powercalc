@@ -22,7 +22,10 @@
       "lut_unsupported_color_mode": "Profil LUT nepodporuje jeden z farebných režimov vášho svetla. Viac informácií nájdete v protokoloch",
       "lut_wrong_domain": "Režim LUT môžu používať iba svetelné entity",
       "playbook_mandatory": "Musíte zadať aspoň jeden playbook",
-      "unknown": "Vyskytla sa neznáma chyba. Ďalšie informácie nájdete v protokoloch"
+      "unknown": "Vyskytla sa neznáma chyba. Ďalšie informácie nájdete v protokoloch",
+      "group_statistics_start_at_zero": "Vyberte buď Začať v nule, alebo Znovu vytvoriť štatistiky, nie obe možnosti.",
+      "group_statistics_energy_required": "Na vytvorenie štatistík zapnite vytváranie snímača energie a vypnite vynútený výpočet energie.",
+      "group_statistics_recorder_required": "Na vytvorenie štatistík musí byť zapnutý Recorder."
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
@@ -273,6 +276,7 @@
               "include_non_powercalc_sensors": "Zahrnúť nie powercalc snímače",
               "force_calculate_group_energy": "Sila vypočítať energiu",
               "group_energy_start_at_zero": "Začať v nule",
+              "group_energy_recreate_statistics": "Znovu vytvoriť štatistiky",
               "create_energy_sensor": "Vytvoriť snímač energie",
               "create_utility_meters": "Vytvorte merače spotreby"
             },
@@ -281,6 +285,7 @@
               "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc",
               "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum",
               "group_energy_start_at_zero": "Keď je aktivovaný, senzor energie sa po vytvorení senzora spustí na nule. V opačnom prípade spočíta všetky aktuálne stavy snímača energie člena",
+              "group_energy_recreate_statistics": "Pri vytváraní jednorazovo sčítať hodinové a dostupné päťminútové štatistiky energie členov. Vypnite Začať v nule. Vyžaduje Recorder a snímač sčítavajúci energiu.",
               "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh snímač"
             }
           }

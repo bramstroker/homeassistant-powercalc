@@ -29,12 +29,13 @@ from homeassistant.const import (
 )
 from homeassistant.core import (
     CALLBACK_TYPE,
+    CoreState,
     Event,
     HomeAssistant,
     State,
     callback,
 )
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import HomeAssistantError, PlatformNotReady
 from homeassistant.helpers import entity_registry as er, start
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
@@ -66,6 +67,7 @@ from custom_components.powercalc.const import (
     CONF_FLOOR,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_ENERGY_RECREATE_STATISTICS,
     CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_ENERGY_UPDATE_INTERVAL,
     CONF_GROUP_MEMBER_DEVICES,
@@ -89,6 +91,7 @@ from custom_components.powercalc.const import (
     DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
+    ENTRY_DATA_GROUP_ENERGY_STATISTICS,
     ENTRY_DATA_POWER_ENTITY,
     SERVICE_RESET_ENERGY,
     UNAVAILABLE_STATES,
@@ -96,6 +99,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
+from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.group_include.filter import (
     AreaFilter,
     CompositeFilter,
@@ -115,6 +119,7 @@ from custom_components.powercalc.sensors.abstract import (
 )
 from custom_components.powercalc.sensors.energy import EnergySensor, VirtualEnergySensor, VirtualStandbyEnergySensor
 from custom_components.powercalc.sensors.energy_related import create_energy_related_sensors
+from custom_components.powercalc.sensors.group.statistics import StatisticsSummary, async_recreate_statistics
 from custom_components.powercalc.sensors.power import PowerSensor
 from custom_components.powercalc.unit import (
     ENERGY_UNIT_PREFIX_MAPPING,
@@ -132,6 +137,7 @@ EntityPredicate = Callable[[Entity], bool]
 StoredStates = dict[str, dict[str, Any]]
 STORAGE_KEY = "powercalc_group"
 STORAGE_VERSION = 2
+ATTR_STATISTICS_PENDING = "powercalc_statistics_pending"
 # How long between periodically saving the current states to disk
 STATE_DUMP_INTERVAL = timedelta(minutes=10)
 
@@ -174,7 +180,41 @@ async def create_group_sensors_gui(
 
     energy_sensor_ids = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY)
 
-    return create_group_sensors_custom(hass, group_name, sensor_config, power_sensor_ids, energy_sensor_ids)
+    sensors = create_group_sensors_custom(
+        hass,
+        group_name,
+        sensor_config,
+        power_sensor_ids,
+        energy_sensor_ids,
+        config_entry=entry,
+    )
+    if (
+        sensor_config.get(CONF_GROUP_ENERGY_RECREATE_STATISTICS)
+        and ENTRY_DATA_GROUP_ENERGY_STATISTICS not in entry.data
+    ):
+        energy_sensor = next((sensor for sensor in sensors if isinstance(sensor, GroupedEnergySensor)), None)
+        if energy_sensor is None or sensor_config.get(CONF_GROUP_ENERGY_START_AT_ZERO, True):
+            raise SensorConfigurationError(
+                "Recreating statistics requires a summed energy sensor without start at zero"
+            )
+        if hass.state != CoreState.running:
+            # Recorder processes its queue after startup. Let HA finish starting
+            # before retrying an import that was pending when it last stopped.
+            raise PlatformNotReady("Recreating group statistics requires Home Assistant to finish starting")
+        try:
+            summary = await async_recreate_statistics(
+                hass,
+                energy_sensor.entity_id,
+                energy_sensor_ids,
+                str(energy_sensor.native_unit_of_measurement),
+            )
+        except HomeAssistantError as err:
+            raise SensorConfigurationError(f"Could not recreate group statistics: {err}") from err
+        energy_sensor.new_statistics = summary
+        sensor_config[ENTRY_DATA_GROUP_ENERGY_STATISTICS] = summary
+        hass.config_entries.async_update_entry(entry, data={**entry.data, ENTRY_DATA_GROUP_ENERGY_STATISTICS: summary})
+        _LOGGER.info("%s: Recreated group energy statistics: %s", energy_sensor.entity_id, summary)
+    return sensors
 
 
 def create_group_sensors_custom(
@@ -184,6 +224,7 @@ def create_group_sensors_custom(
     power_sensor_ids: set[str],
     energy_sensor_ids: set[str],
     force_create: bool = False,
+    config_entry: ConfigEntry | None = None,
 ) -> list[Entity]:
     """Create grouped power and energy sensors."""
 
@@ -213,6 +254,7 @@ def create_group_sensors_custom(
             sensor_config,
             energy_sensor_ids,
             power_sensor,
+            config_entry,
         )
 
         group_sensors.append(energy_sensor)
@@ -402,6 +444,7 @@ def create_grouped_energy_sensor(
     sensor_config: ConfigType,
     energy_sensor_ids: set[str],
     power_sensor: GroupedPowerSensor | None,
+    config_entry: ConfigEntry | None = None,
 ) -> EnergySensor:
     name = generate_energy_sensor_name(sensor_config, group_name)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
@@ -433,6 +476,19 @@ def create_grouped_energy_sensor(
             entity_category=sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY),
             unit_prefix=sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX, UnitPrefix.NONE),
         )
+
+    if config_entry is not None and sensor_config.get(CONF_GROUP_ENERGY_RECREATE_STATISTICS):
+        # Reserve the final ID before importing statistics and creating dependent
+        # sensors. Disabled entities also occupy IDs in the registry.
+        registry_entry = er.async_get(hass).async_get_or_create(
+            SENSOR_DOMAIN,
+            DOMAIN,
+            energy_unique_id,
+            suggested_object_id=entity_id.split(".", 1)[1],
+            config_entry=config_entry,
+            original_name=name,
+        )
+        entity_id = registry_entry.entity_id
 
     return GroupedEnergySensor(
         hass=hass,
@@ -802,6 +858,7 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
             UnitOfEnergy.WATT_HOUR,
         )
         self._prev_state_store: PreviousStateStore = PreviousStateStore(hass)
+        self.new_statistics: StatisticsSummary | None = None
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -810,9 +867,46 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
         # Clean up any entities that are no longer part of the group
         self._prev_state_store.cleanup_entity_states(self.entity_id, self._entities)
 
-        await self.restore_last_state()
+        # A newly imported group can reuse an entity ID with stale restore data.
+        # Only later setups should restore the total accumulated since the import.
+        summary = self.new_statistics
+        if summary is None and not await self.restore_last_state():
+            summary = self._sensor_config.get(ENTRY_DATA_GROUP_ENERGY_STATISTICS)
+        if summary is not None:
+            self.initialize_recreated_statistics(summary)
+            self.new_statistics = None
 
         await super().async_added_to_hass()
+
+    def initialize_recreated_statistics(self, summary: StatisticsSummary) -> None:
+        """Continue from the imported sum, counting only subsequent member changes."""
+        self._prev_state_store.cleanup_entity_states(self.entity_id, set())
+        self._set_native_value(Decimal(str(sum(member["sum"] for member in summary["members"].values()))), False)
+        for entity_id in self._entities:
+            member = summary["members"].get(entity_id)
+            current = self.hass.states.get(entity_id)
+            if member is None:
+                # No recorded history: begin counting from the current reading.
+                if current and current.state not in UNAVAILABLE_STATES:
+                    self._prev_state_store.set_entity_state(self.entity_id, entity_id, current)
+                continue
+            previous = State(
+                entity_id,
+                str(member["state"]),
+                {
+                    ATTR_UNIT_OF_MEASUREMENT: summary["unit_of_measurement"],
+                    ATTR_STATISTICS_PENDING: True,
+                },
+            )
+            # Persist pending status with the checkpoint, independently of the
+            # group total. The first live reading replaces both in the store.
+            self._prev_state_store.set_entity_state(self.entity_id, entity_id, previous)
+
+    def debug_group(self) -> dict[str, Any]:
+        result = super().debug_group()
+        if summary := self._sensor_config.get(ENTRY_DATA_GROUP_ENERGY_STATISTICS):
+            result["statistics"] = summary
+        return result
 
     async def async_reset(self) -> None:
         """Reset the group sensor and underlying member sensor when supported."""
@@ -898,7 +992,13 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
         )
 
         start_at_zero = self._sensor_config.get(CONF_GROUP_ENERGY_START_AT_ZERO, True)
+        if summary := self._sensor_config.get(ENTRY_DATA_GROUP_ENERGY_STATISTICS):
+            start_at_zero = start_at_zero or state.entity_id not in summary["members"]
         delta = Decimal(0) if prev_state is None and start_at_zero else cur_value - prev_value
+        if delta < 0 and prev_state is not None and prev_state.attributes.get(ATTR_STATISTICS_PENDING):
+            # A reset since the imported reading contributes consumption since
+            # that reset. This also works when the member was unavailable at setup.
+            delta = cur_value
 
         if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
             _LOGGER.debug(
@@ -918,7 +1018,7 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
 
         return delta
 
-    async def restore_last_state(self) -> None:
+    async def restore_last_state(self) -> bool:
         """Restore the last known state of the group sensor."""
         last_state = await self.async_get_last_state()
         last_sensor_state = await self.async_get_last_sensor_data()
@@ -928,12 +1028,12 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
         restored = parse_decimal(last_sensor_state.native_value) if last_sensor_state else None
         if restored is None and last_state:
             if last_state.state in UNAVAILABLE_STATES:
-                return
+                return False
             restored = parse_decimal(last_state.state)
 
         if restored is None:
             _LOGGER.warning("%s: Could not restore last state", self.entity_id)
-            return
+            return False
 
         self._set_native_value(restored)
         _LOGGER.debug(
@@ -941,6 +1041,7 @@ class GroupedEnergySensor(GroupedSensor, RestoreSensor, EnergySensor):
             self.entity_id,
             self._attr_native_value,
         )
+        return True
 
 
 class PreviousStateStore:
