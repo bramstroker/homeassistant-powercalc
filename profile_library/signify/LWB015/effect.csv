@@ -1,0 +1,17 @@
+effect,bri,watt
+off,5,1.04
+off,45,1.39
+off,85,2.27
+off,125,3.73
+off,165,5.85
+off,205,8.69
+off,245,12.1
+off,255,13.33
+candle,5,1.1
+candle,45,1.37
+candle,85,1.96
+candle,125,2.79
+candle,165,3.95
+candle,205,5.28
+candle,245,7.09
+candle,255,7.25

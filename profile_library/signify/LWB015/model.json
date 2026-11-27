@@ -1,0 +1,32 @@
+{
+  "authors": [
+    {
+      "email": "nhudek298@gmail.com",
+      "github": "Fat-Knees",
+      "name": "Nathaniel"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-27T21:25:02Z",
+  "device_type": "light",
+  "mains_voltage": 120,
+  "measure_description": "Measured with Powercalc Measure",
+  "measure_device": "TP-Link Kasa KP125",
+  "measure_device_firmware": "1.0.14",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": true,
+    "DUMMY_LOAD_POWER": 24.63,
+    "DUMMY_LOAD_RESISTANCE": 566.45,
+    "NUM_LIGHTS": 1,
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 2.0,
+    "VERSION": "v0.14.3:app"
+  },
+  "name": "Hue White PAR38 Outdoor",
+  "standby_power": 0.21,
+  "voltage_range": {
+    "max": 119.07,
+    "min": 116.84
+  }
+}
