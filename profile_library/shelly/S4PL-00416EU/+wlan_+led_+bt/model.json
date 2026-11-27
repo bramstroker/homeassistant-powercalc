@@ -1,0 +1,7 @@
+{
+  "name": "+WLAN +LED +BT",
+  "standby_power": 0.686,
+  "multi_switch_config": {
+    "power": 0.582
+  }
+}
