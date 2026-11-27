@@ -32,6 +32,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
+    CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
     CONF_UTILITY_METER_TYPES,
@@ -39,8 +40,14 @@ from custom_components.powercalc.const import (
     SERVICE_DEBUG_GROUP,
     SERVICE_GET_GROUP_ENTITIES,
     CalculationStrategy,
+    SensorType,
 )
-from tests.common import assert_entity_state, run_powercalc_setup, set_states
+from tests.common import (
+    assert_entity_state,
+    create_mock_config_entry,
+    run_powercalc_setup,
+    set_states,
+)
 
 
 async def test_standby_group(hass: HomeAssistant) -> None:
@@ -391,6 +398,33 @@ async def test_active_group_created_without_standby_group(hass: HomeAssistant) -
     assert_entity_state(hass, "sensor.all_self_usage_power", "20.00")
 
     await set_states(hass, [("switch.test1", STATE_OFF)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", STATE_UNKNOWN)
+
+
+async def test_active_group_drops_sensor_when_its_config_entry_is_unloaded(hass: HomeAssistant) -> None:
+    """Unloading the only member must not leave its last power value behind in the active group."""
+    await run_powercalc_setup(
+        hass,
+        None,
+        {CONF_CREATE_ACTIVE_GROUP: True},
+    )
+    config_entry = await create_mock_config_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test1",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_STANDBY_POWER: 0.2,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 20},
+        },
+    )
+
+    await set_states(hass, [("switch.test1", STATE_ON)])
+    assert_entity_state(hass, "sensor.all_self_usage_power", "20.00")
+
+    assert await hass.config_entries.async_unload(config_entry.entry_id)
+    await hass.async_block_till_done()
+
     assert_entity_state(hass, "sensor.all_self_usage_power", STATE_UNKNOWN)
 
 

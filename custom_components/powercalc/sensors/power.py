@@ -876,6 +876,14 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
         """Forget the current power, the device is no longer known to be running."""
         self._self_usage_sensors.pop(self.entity_id, None)
 
+    def _forget_group_contributions(self) -> None:
+        """Drop this sensor from the group totals and let them recalculate without it."""
+        contributed = self.entity_id in self._standby_sensors or self.entity_id in self._self_usage_sensors
+        self._clear_standby_power()
+        self._clear_self_usage_power()
+        if contributed:
+            async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
+
     async def is_calculation_enabled(self, entity_state: State) -> bool:
         """Check if calculation is enabled based on the condition template."""
         template = self._calculation_enabled_condition
@@ -933,6 +941,8 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
 
     async def async_will_remove_from_hass(self) -> None:
         """Cancel outstanding timers when the entity is removed."""
+        # Unloading a config entry does not run a state update, so the group totals would keep the last value.
+        self._forget_group_contributions()
         if self._strategy_expiry_timer is not None:
             self._strategy_expiry_timer()
             self._strategy_expiry_timer = None
