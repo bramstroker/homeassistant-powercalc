@@ -8583,6 +8583,67 @@
           "hash": "46f37b5be292cb15df527c1d2a2c3d75"
         },
         {
+          "authors": [
+            {
+              "github": "turmacar",
+              "name": "turmacar"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-26T23:15:37Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 800,
+            "rated_power": 9,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "gtin": [
+            "850061998576"
+          ],
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure, two bulbs in parallel behind one meter",
+          "measure_device": "Zooz Z-Wave Plus Power Switch ZEN15",
+          "measure_device_firmware": "2.40.0",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 2,
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 6.0,
+            "VERSION": "master"
+          },
+          "name": "RGBWW Smart LED Bulb A19",
+          "standby_power": 0.46,
+          "voltage_range": {
+            "max": 125.93,
+            "min": 121.08
+          },
+          "id": "H6004",
+          "manufacturer": "govee",
+          "updated_at": "2026-11-27T18:00:26",
+          "max_power": 9.27,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-27T18:00:26",
+          "power_range": {
+            "min": 0.54,
+            "max": 9.27
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "721297fa952174cc3feed499bc3758b0"
+        },
+        {
           "calculation_strategy": "lut",
           "created_at": "2025-12-20T22:56:04Z",
           "device_type": "light",
