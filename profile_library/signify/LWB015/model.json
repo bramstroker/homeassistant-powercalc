@@ -8,7 +8,15 @@
   ],
   "calculation_strategy": "lut",
   "created_at": "2026-11-27T21:25:02Z",
+  "device_specs": {
+    "socket": "E26",
+    "rated_power": 14,
+    "lumens": 1300
+  },
   "device_type": "light",
+  "gtin": [
+    "046677476816"
+  ],
   "mains_voltage": 120,
   "measure_description": "Measured with Powercalc Measure",
   "measure_device": "TP-Link Kasa KP125",
@@ -24,6 +32,7 @@
     "VERSION": "v0.14.3:app"
   },
   "name": "Hue White PAR38 Outdoor",
+  "product_url": "https://www.philips-hue.com/en-us/p/hue-white-single-par38-outdoor/046677476816",
   "standby_power": 0.21,
   "voltage_range": {
     "max": 119.07,
