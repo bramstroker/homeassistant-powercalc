@@ -43,6 +43,7 @@ from measure.request import (
 )
 from measure.runner.light.plan import build_light_plan, estimate_light_time_left
 from measure.runner.smart_switch import estimate_smart_switch_remaining_seconds
+from measure.smart_switch_validation import smart_switch_selection_error
 
 
 class PreflightError(Exception):
@@ -59,6 +60,7 @@ class EntityRecord(Protocol):
     device_class: str | None
     unit: str | None
     device_id: str | None
+    device_group_id: str | None
     related_device_ids: list[str]
     state: str
     attribute_names: list[str]
@@ -439,23 +441,24 @@ class MeasurementPreflight:
         return PreflightResult()
 
     def _validate_smart_switch(self, request: SmartSwitchMeasurementRequest) -> PreflightResult:
-        """Require live relays on one device and an external measurement source."""
+        """Require live relays on one physical device and an external measurement source."""
 
         relays = [
             self._require_entity(entity_id, EntityDomain.SWITCH, "Selected switch is unavailable")
             for entity_id in request.controller.entity_ids
         ]
-        device_id = relays[0].device_id
-        if device_id is None or any(relay.device_id != device_id for relay in relays):
-            raise PreflightError("All selected relays must belong to the same Home Assistant device")
         if any(relay.state not in {"on", "off"} for relay in relays):
             raise PreflightError("Every selected relay must have an on or off state")
+        meter = None
         if isinstance(request.power_meter, HassPowerMeterSpec):
             meter = self._require_entity(
                 request.power_meter.entity_id, EntityDomain.SENSOR, "Power sensor is unavailable"
             )
-            if meter.device_id == device_id:
-                raise PreflightError("Measure switch self consumption with an external power meter, not its own sensor")
+        # A multi-channel device (power strip) is one parent device plus one sub-device per
+        # channel; relays on different channels are one physical device, their power
+        # sensors are not an external meter.
+        if error := smart_switch_selection_error(relays, meter):
+            raise PreflightError(error)
         return PreflightResult(
             estimated_variations=request.repeat_cycles * (len(relays) + (2 if len(relays) > 1 else 1)),
             estimated_duration_seconds=estimate_smart_switch_remaining_seconds(request, len(relays)),

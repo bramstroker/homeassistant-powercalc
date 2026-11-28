@@ -336,14 +336,19 @@ export class SetupFieldsSection extends LitElement {
   }
 
   private renderDeviceEntities(field: FormField, entities: EntityDescriptor[]) {
+    // A multi-channel device (power strip) is one parent device plus one sub-device per
+    // channel; select by the physical device so all of its relays are offered together.
+    const groupId = (entity: EntityDescriptor) => entity.device_group_id || entity.device_id;
     const devices = new Map<string, string>();
     for (const entity of entities) {
-      if (entity.device_id && !devices.has(entity.device_id)) {
-        devices.set(entity.device_id, entity.device_name || entity.product_name || entity.name);
+      const id = groupId(entity);
+      if (id && !devices.has(id)) {
+        devices.set(id, entity.device_group_name || entity.device_name || entity.product_name || entity.name);
       }
     }
     const selected = this.fieldState ? selectedEntityIds(field, this.fieldState) : [];
-    const savedDeviceId = entities.find((entity) => selected.includes(entity.entity_id))?.device_id ?? "";
+    const saved = entities.find((entity) => selected.includes(entity.entity_id));
+    const savedDeviceId = saved ? groupId(saved) ?? "" : "";
     const deviceId = this.selectedEntityDeviceIds[field.name] ?? savedDeviceId;
     const deviceOptions = [...devices].map(([value, label]) => ({ value, label }));
     deviceOptions.sort((left, right) => left.label.localeCompare(right.label));
@@ -355,7 +360,7 @@ export class SetupFieldsSection extends LitElement {
         onChange: (event) => this.changeEntityDevice(field.name, event),
       })}
       ${deviceId ? this.renderEntityCombobox(
-        field, entities.filter((entity) => entity.device_id === deviceId), `Select ${(field.plural_label || field.label).toLowerCase()}`,
+        field, entities.filter((entity) => groupId(entity) === deviceId), `Select ${(field.plural_label || field.label).toLowerCase()}`,
       ) : nothing}
       ${field.hint ? fieldHint(field.hint) : nothing}
       ${devices.size === 0 ? html`<p class="muted">No available switch entities are assigned to a Home Assistant device.</p>` : nothing}

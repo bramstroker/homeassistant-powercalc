@@ -68,6 +68,10 @@ function matchingEntities(
     ? [...(state.deviceEntities["*"] ?? [])]
     : allowedDomains.flatMap((domain) => (domain === "light" ? state.lights : state.deviceEntities[domain] ?? []));
   entities = entities.filter(hasEnabledLiveState);
+  if (field.role === "controller") {
+    // Configuration and diagnostic switches (e.g. a Shelly BLE setting) are not relays.
+    entities = entities.filter((entity) => entity.entity_category !== "config" && entity.entity_category !== "diagnostic");
+  }
   if (field.all_entities && allowedDomains.length) {
     entities = entities.filter((entity) => entity.domain && allowedDomains.includes(entity.domain));
   }

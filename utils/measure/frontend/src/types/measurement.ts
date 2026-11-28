@@ -18,10 +18,14 @@ export interface EntityDescriptor {
   device_class?: string | null;
   device_id?: string | null;
   device_name?: string | null;
+  /** Root device when this entity lives on a sub-device, e.g. one output of a power strip. */
+  device_group_id?: string | null;
+  device_group_name?: string | null;
   related_device_ids?: string[];
   integration?: string | null;
   connectivity?: "zigbee" | "zwave" | null;
   translation_key?: string | null;
+  entity_category?: string | null;
   disabled_by?: string | null;
   has_live_state?: boolean;
   manufacturer?: string | null;
