@@ -35,6 +35,7 @@ from tests.common import (
     create_mock_config_entry,
     mock_device,
     mock_device_with_entities,
+    mock_devices,
     mock_entities_in_registry,
     run_powercalc_setup,
     set_states,
@@ -243,6 +244,73 @@ async def test_switch_entities_automatically_populated_from_device(hass: HomeAss
 
     schema_keys = list(data_schema.schema.keys())
     assert schema_keys[schema_keys.index(CONF_ENTITIES)].default() == expected_entities
+
+
+async def test_switch_entities_from_child_devices(hass: HomeAssistant) -> None:
+    """Switches of Shelly channel devices must be selectable for the parent device.
+
+    The Shelly integration splits one physical multi-channel device into a parent device plus one
+    child device per channel. Starting the flow from the parent must offer the switches that live
+    on the channel children, and must not offer a switch that only hangs behind the same parent
+    through ``via_device_id`` (a device behind a hub).
+    """
+    devices = mock_devices(
+        hass,
+        {
+            "parent": {
+                "manufacturer": "test",
+                "model": "multi_switch",
+                "name": "Test",
+                "identifiers": {("shelly", "48F6EECD97B4")},
+            },
+            "channel0": {
+                "manufacturer": "test",
+                "model": "multi_switch",
+                "name": "Test Channel 1",
+                "identifiers": {("shelly", "48F6EECD97B4-switch:0")},
+                "via_device_id": "parent",
+            },
+            "channel1": {
+                "manufacturer": "test",
+                "model": "multi_switch",
+                "name": "Test Channel 2",
+                "identifiers": {("shelly", "48F6EECD97B4-switch:1")},
+                "via_device_id": "parent",
+            },
+            "hub-node": {
+                "manufacturer": "test",
+                "model": "multi_switch",
+                "name": "Switch behind the hub",
+                "identifiers": {("zwave_js", "node5")},
+                "via_device_id": "parent",
+            },
+        },
+    )
+
+    entities: dict[str, RegistryEntry] = {}
+    for entity_id, device_id in (
+        ("switch.channel1", "channel0"),
+        ("switch.channel2", "channel1"),
+        ("switch.hub_node", "hub-node"),
+    ):
+        entities[entity_id] = RegistryEntryWithDefaults(
+            entity_id=entity_id,
+            unique_id=entity_id,
+            device_id=device_id,
+            platform="switch",
+        )
+    mock_registry(hass, entities)
+
+    result = await initialize_device_discovery_flow(hass, devices["parent"])
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_AVAILABILITY_ENTITY: "switch.channel1"},
+    )
+
+    assert result["step_id"] == Step.MULTI_SWITCH
+    data_schema: vol.Schema = result["data_schema"]
+    select: EntitySelector = data_schema.schema[CONF_ENTITIES]
+    assert select.config["include_entities"] == ["switch.channel1", "switch.channel2"]
 
 
 async def test_discovery_flow_once_per_unique_device(

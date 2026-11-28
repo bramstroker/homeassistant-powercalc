@@ -91,6 +91,59 @@ def get_related_device_ids(hass: HomeAssistant, device_id: str) -> set[str]:
     return related
 
 
+def get_child_device_ids(hass: HomeAssistant, device_id: str) -> set[str]:
+    """Return the IDs of the structural child devices of a device, at any depth.
+
+    Home Assistant links a structural child to its parent with ``parent_device_id``. Older cores,
+    and integrations which predate that split, only set ``via_device_id``. That field is also used
+    for unrelated devices behind a hub (a switch paired to a gateway, a scanner behind a proxy), so
+    it is only followed for Shelly channel devices, whose identifier is derived from the parent's.
+    """
+    children: set[str] = set()
+    devices = get_non_composite_devices(hass)
+    devices_by_id = {device.id: device for device in devices}
+    pending = [device_id]
+    while pending:
+        parent_id = pending.pop()
+        parent = devices_by_id.get(parent_id)
+        for device in devices:
+            if device.id == device_id or device.id in children:
+                continue
+            if not _is_structural_child(device, parent_id, parent):
+                continue
+            children.add(device.id)
+            pending.append(device.id)
+    return children
+
+
+def _is_structural_child(
+    device: DeviceEntry,
+    parent_id: str,
+    parent: DeviceEntry | None,
+) -> bool:
+    """Return whether the device is a structural child of the given parent device."""
+    if getattr(device, "parent_device_id", None) == parent_id:
+        return True
+    if device.via_device_id != parent_id or parent is None:
+        return False
+
+    # via_device_id also links separate devices behind a hub, so only trust it when the child is a
+    # Shelly channel of that parent: same config entry and an identifier derived from the parent's.
+    if not get_config_entry_ids(device) & get_config_entry_ids(parent):
+        return False
+
+    return _is_shelly_channel(device, parent)
+
+
+def _is_shelly_channel(device: DeviceEntry, parent: DeviceEntry) -> bool:
+    """Return whether the device is a Shelly channel split off from the given parent device."""
+    prefixes = tuple(f"{identifier}-" for domain, identifier in parent.identifiers if domain == "shelly")
+    if not prefixes:
+        return False
+
+    return any(domain == "shelly" and identifier.startswith(prefixes) for domain, identifier in device.identifiers)
+
+
 def resolve_device_discovery_source(hass: HomeAssistant, device: DeviceEntry) -> DeviceEntry:
     """Resolve channel and scanner representations to the physical device used for discovery."""
     visited = {device.id}
@@ -129,11 +182,7 @@ def _get_shelly_channel_parent(hass: HomeAssistant, device: DeviceEntry, entry_i
     if not isinstance(parent, DeviceEntry) or entry_id not in get_config_entry_ids(parent):
         return None
 
-    prefixes = tuple(f"{identifier}-" for domain, identifier in parent.identifiers if domain == "shelly")
-    for domain, identifier in device.identifiers:
-        if domain == "shelly" and identifier.startswith(prefixes):
-            return parent
-    return None
+    return parent if _is_shelly_channel(device, parent) else None
 
 
 def _get_bluetooth_source_device(hass: HomeAssistant, entry: ConfigEntry) -> DeviceEntry | None:
