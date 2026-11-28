@@ -19,7 +19,7 @@
   },
   "measure_method": "manual",
   "measure_device": "NETGEAR GS728TPv2 PoE port power",
-  "measure_description": "PoE power delivered to the access point as reported per port by the PoE switch (802.3af, short patch cable), sampled about once a minute for 10.8 days of normal home use: time-weighted mean 4.48 W, median 4.4 W, 5th-95th percentile 4.2-5.6 W.",
+  "measure_description": "The 4.5 W is DC power measured at the PoE switch port (802.3af, short patch cable), as reported per port by the switch. It is not mains power and excludes the switch's own conversion loss. Sampled about once a minute for 10.8 days of normal home use: time-weighted mean 4.48 W, median 4.4 W, 5th-95th percentile 4.2-5.6 W.",
   "created_at": "2026-11-27T00:00:00Z",
   "product_url": "https://techspecs.ui.com/unifi/wifi/u6-lite",
   "authors": [
