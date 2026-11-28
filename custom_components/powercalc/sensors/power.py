@@ -75,6 +75,7 @@ from custom_components.powercalc.const import (
     CONF_SELF_USAGE_INCLUDED,
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
+    CONF_STANDBY_POWER_ON,
     CONF_UNAVAILABLE_POWER,
     DATA_POWER_PROFILE_SOURCES,
     DATA_POWER_PROFILES,
@@ -328,13 +329,20 @@ def _get_standby_power(
     if sensor_config.get(CONF_SELF_USAGE_INCLUDED, False) or sensor_config.get(CONF_DISABLE_STANDBY_POWER):
         return Decimal(0), Decimal(0)
 
+    configured_power_on = sensor_config.get(CONF_STANDBY_POWER_ON)
+    standby_power_on = Decimal(str(configured_power_on)) if configured_power_on is not None else None
+
     if sensor_config.get(CONF_STANDBY_POWER) is not None:
-        return _resolve_standby_power_value(hass, sensor_config.get(CONF_STANDBY_POWER)), Decimal(0)
+        return (
+            _resolve_standby_power_value(hass, sensor_config.get(CONF_STANDBY_POWER)),
+            standby_power_on if standby_power_on is not None else Decimal(0),
+        )
 
     if power_profile is not None:
-        return _get_standby_power_from_profile(hass, power_profile)
+        standby_power, profile_standby_power_on = _get_standby_power_from_profile(hass, power_profile)
+        return standby_power, standby_power_on if standby_power_on is not None else profile_standby_power_on
 
-    return Decimal(0), Decimal(0)
+    return Decimal(0), standby_power_on if standby_power_on is not None else Decimal(0)
 
 
 def create_real_power_sensor(
@@ -817,7 +825,13 @@ class VirtualPowerSensor(PowerSensor, SensorEntity):
             return
 
         await self._power_profile.select_sub_profile(profile)
-        self._standby_power, self._standby_power_on = _get_standby_power_from_profile(self.hass, self._power_profile)
+        # Resolve through the sensor config as well, otherwise a configured standby power
+        # (e.g. standby_power_on) is replaced by the profile value on every sub profile switch.
+        self._standby_power, self._standby_power_on = _get_standby_power(
+            self.hass,
+            self._sensor_config,
+            self._power_profile,
+        )
         await self.ensure_strategy_instance(True)
 
     async def calculate_standby_power(self, state: State) -> Decimal:
