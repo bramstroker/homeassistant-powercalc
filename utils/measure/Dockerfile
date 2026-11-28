@@ -17,7 +17,7 @@ RUN npm run typecheck && npm test -- --run && npm run build
 FROM python:3.15-slim AS python-runtime
 
 # Install uv
-COPY --from=astral/uv:0.13.9 /uv /uvx /bin/
+COPY --from=astral/uv:0.13.10 /uv /uvx /bin/
 
 WORKDIR /app
 
