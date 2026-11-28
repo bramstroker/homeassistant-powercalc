@@ -121,12 +121,14 @@
               "create_energy_sensors": "Opprett energisensorer",
               "create_cost_sensors": "Opprett kostnadssensorer",
               "create_standby_group": "Opprett standbygruppe",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Opprett forbruksmålere"
             },
             "data_description": {
               "create_energy_sensors": "Om Powercalc trenger å lage kWh-sensorer",
               "create_cost_sensors": "Om Powercalc trenger å lage kostnadssensorer. Krever en energipris som skal konfigureres i de neste trinnene",
               "create_standby_group": "Opprett en gruppe som summerer alt effektforbruk i standby og egenbruk av IoT-enheter",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser"
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Opprett energisensorer",
               "create_cost_sensors": "Opprett kostnadssensorer",
               "create_standby_group": "Opprett standby-gruppe",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Opprett forbruksmålere"
             },
             "data_description": {
               "create_energy_sensors": "Om Powercalc trenger å lage kWh-sensorer",
               "create_cost_sensors": "Om Powercalc trenger å lage kostnadssensorer. Krever en energipris som skal konfigureres i de neste trinnene",
               "create_standby_group": "Opprett en gruppe som summerer alt effektforbruk i standby og egenbruk av IoT-enheter",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "La Powercalc opprette forbruksmålere med daglige, timebaserte osv. sykluser"
             }
           },

@@ -121,12 +121,14 @@
               "create_energy_sensors": "Energiesensor erstellen",
               "create_cost_sensors": "Kostensensoren erstellen",
               "create_standby_group": "Standby-Gruppe erstellen",
+              "create_active_group": "Aktive Gruppe erstellen",
               "create_utility_meters": "Verbrauchszähler erstellen"
             },
             "data_description": {
               "create_energy_sensors": "Ob Powercalc kWh Sensoren erstellen soll",
               "create_cost_sensors": "Ob Powercalc Kostensensoren erstellen soll. Erfordert, dass in den nächsten Schritten ein Energiepreis konfiguriert wird",
               "create_standby_group": "Erstellen Sie eine Gruppe, die den gesamten Standby-Stromverbrauch und die Selbstnutzung von IoT-Geräten zusammenfasst",
+              "create_active_group": "Erstellt eine Gruppe, die die Leistung aller gerade eingeschalteten Geräte summiert",
               "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Energiesensor erstellen",
               "create_cost_sensors": "Kostensensoren erstellen",
               "create_standby_group": "Standby-Gruppe erstellen",
+              "create_active_group": "Aktive Gruppe erstellen",
               "create_utility_meters": "Verbrauchszähler erstellen"
             },
             "data_description": {
               "create_energy_sensors": "Ob Powercalc kWh Sensoren erstellen soll",
               "create_cost_sensors": "Ob Powercalc Kostensensoren erstellen soll. Erfordert, dass in den nächsten Schritten ein Energiepreis konfiguriert wird",
               "create_standby_group": "Erstellen Sie eine Gruppe, die den gesamten Standby-Stromverbrauch und die Selbstnutzung von IOT-Geräten zusammenfasst",
+              "create_active_group": "Erstellt eine Gruppe, die die Leistung aller gerade eingeschalteten Geräte summiert",
               "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die den Verbrauch täglich, stündlich usw. festhalten."
             }
           },

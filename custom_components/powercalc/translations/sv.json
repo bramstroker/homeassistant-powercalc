@@ -121,12 +121,14 @@
               "create_energy_sensors": "Skapa energisensorer",
               "create_cost_sensors": "Skapa kostnadssensorer",
               "create_standby_group": "Skapa väntelägesgrupp",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Skapa bruksmätare"
             },
             "data_description": {
               "create_energy_sensors": "Huruvida powercalc behöver skapa kWh sensorer",
               "create_cost_sensors": "Om powercalc behöver skapa kostnadssensorer. Kräver ett energipris som ska konfigureras i nästa steg",
               "create_standby_group": "Skapa en grupp som summerar all strömförbrukning i standbyläge och självanvändning av IOT-enheter",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykler dag, timme etc."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Skapa energisensor",
               "create_cost_sensors": "Skapa kostnadssensorer",
               "create_standby_group": "Skapa väntelägesgrupp",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Skapa verktygsmätare"
             },
             "data_description": {
               "create_energy_sensors": "Om powercalc behöver skapa kWh-sensorer",
               "create_cost_sensors": "Om powercalc behöver skapa kostnadssensorer. Kräver ett energipris som ska konfigureras i nästa steg",
               "create_standby_group": "Skapa en grupp som summerar all strömförbrukning i standbyläge och självanvändning av IOT-enheter",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Låt powercalc skapa verktygsmätare, som cyklar dagligen, varje timme etc."
             }
           },

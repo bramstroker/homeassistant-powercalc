@@ -121,12 +121,14 @@
               "create_energy_sensors": "Vytvořit senzory energie",
               "create_cost_sensors": "Vytvořit senzory nákladů",
               "create_standby_group": "Vytvořit skupinu pohotovostního režimu",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Vytvořit senzor spotřeby"
             },
             "data_description": {
               "create_energy_sensors": "Zda má Powercalc vytvářet senzory kWh",
               "create_cost_sensors": "Zda má Powercalc vytvářet senzory nákladů. Vyžaduje nastavení ceny energie v následujících krocích",
               "create_standby_group": "Vytvořit skupinu, která sčítá veškerou spotřebu v pohotovostním režimu a vlastní spotřebu zařízení IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Nechat Powercalc vytvořit měřiče spotřeby s denními, hodinovými apod. cykly"
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Vytvořit senzory energie",
               "create_cost_sensors": "Vytvořit senzory nákladů",
               "create_standby_group": "Vytvořit skupinu pohotovostního režimu",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Vytvořit měřiče spotřeby"
             },
             "data_description": {
               "create_energy_sensors": "Zda má Powercalc vytvářet senzory kWh",
               "create_cost_sensors": "Zda má Powercalc vytvářet senzory nákladů. Vyžaduje nastavení ceny energie v následujících krocích",
               "create_standby_group": "Vytvořit skupinu, která sčítá veškerou spotřebu v pohotovostním režimu a vlastní spotřebu zařízení IoT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Nechat Powercalc vytvořit měřiče spotřeby s denními, hodinovými apod. cykly"
             }
           },

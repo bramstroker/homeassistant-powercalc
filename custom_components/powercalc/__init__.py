@@ -43,6 +43,7 @@ from .configuration.sensor_config import SENSOR_CONFIG
 from .const import (
     CONF_COST_SENSOR_FRIENDLY_NAMING,
     CONF_COST_SENSOR_NAMING,
+    CONF_CREATE_ACTIVE_GROUP,
     CONF_CREATE_COST_SENSORS,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -93,6 +94,7 @@ from .const import (
     DATA_ENTITIES,
     DATA_GROUP_ENTITIES,
     DATA_MEASURE_APP_COORDINATOR,
+    DATA_SELF_USAGE_POWER_SENSORS,
     DATA_STANDBY_POWER_SENSORS,
     DATA_USED_UNIQUE_IDS,
     DISCOVERY_TYPE,
@@ -194,6 +196,7 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(CONF_SENSORS): vol.All(cv.ensure_list, [SENSOR_CONFIG]),
                     vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS): cv.boolean,
                     vol.Optional(CONF_CREATE_STANDBY_GROUP): cv.boolean,
+                    vol.Optional(CONF_CREATE_ACTIVE_GROUP): cv.boolean,
                 },
             ),
         ),
@@ -229,6 +232,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         DATA_ENTITIES: {},
         DATA_USED_UNIQUE_IDS: [],
         DATA_STANDBY_POWER_SENSORS: {},
+        DATA_SELF_USAGE_POWER_SENSORS: {},
         DATA_ANALYTICS: {},
     }
 
@@ -371,14 +375,20 @@ async def create_standby_group(
     domain_config: ConfigType,
     event: Event[Any] | None = None,
 ) -> None:
-    if not bool(domain_config.get(CONF_CREATE_STANDBY_GROUP, True)):
+    create_standby_group_enabled = bool(domain_config.get(CONF_CREATE_STANDBY_GROUP, True))
+    create_active_group_enabled = bool(domain_config.get(CONF_CREATE_ACTIVE_GROUP, False))
+    if not create_standby_group_enabled and not create_active_group_enabled:
         return
     hass.async_create_task(
         async_load_platform(
             hass,
             SENSOR_DOMAIN,
             DOMAIN,
-            {DISCOVERY_TYPE: PowercalcDiscoveryType.STANDBY_GROUP},
+            {
+                DISCOVERY_TYPE: PowercalcDiscoveryType.STANDBY_GROUP,
+                CONF_CREATE_STANDBY_GROUP: create_standby_group_enabled,
+                CONF_CREATE_ACTIVE_GROUP: create_active_group_enabled,
+            },
             domain_config,
         ),
     )

@@ -121,12 +121,14 @@
               "create_energy_sensors": "Utwórz sensory energii",
               "create_cost_sensors": "Utwórz czujniki kosztów",
               "create_standby_group": "Utwórz grupę rezerwową",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Utwórz liczniki mediów"
             },
             "data_description": {
               "create_energy_sensors": "Czy Powercalc musi utworzyć sensory kWh",
               "create_cost_sensors": "Czy powercalc musi tworzyć czujniki kosztów. Wymaga skonfigurowania ceny energii w kolejnych krokach",
               "create_standby_group": "Utwórz grupę sumującą cały pobór mocy w trybie gotowości i wykorzystanie własne urządzeń IOT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Pozwól, aby Powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Utwórz sensory energii",
               "create_cost_sensors": "Utwórz czujniki kosztów",
               "create_standby_group": "Utwórz grupę rezerwową",
+              "create_active_group": "Create active group",
               "create_utility_meters": "Utwórz liczniki mediów"
             },
             "data_description": {
               "create_energy_sensors": "Czy Powercalc musi utworzyć sensor kWh",
               "create_cost_sensors": "Czy powercalc musi tworzyć czujniki kosztów. Wymaga skonfigurowania ceny energii w kolejnych krokach",
               "create_standby_group": "Utwórz grupę sumującą cały pobór mocy w trybie gotowości i wykorzystanie własne urządzeń IOT",
+              "create_active_group": "Create group which sums the power of all devices that are currently switched on",
               "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp."
             }
           },

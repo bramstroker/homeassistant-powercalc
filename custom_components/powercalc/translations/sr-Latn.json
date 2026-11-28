@@ -121,12 +121,14 @@
               "create_energy_sensors": "Kreiraj senzore energije",
               "create_cost_sensors": "Kreiraj senzore troškova",
               "create_standby_group": "Kreiraj grupu stanja pripravnosti",
+              "create_active_group": "建立運作中群組",
               "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)"
             },
             "data_description": {
               "create_energy_sensors": "Da li powercalc treba da kreira kWh senzore",
               "create_cost_sensors": "Da li powercalc treba da kreira senzore troškova. Zahteva konfigurisanje cene energije u sledećim koracima",
               "create_standby_group": "Kreira grupu koja sabira svu potrošnju u stanju pripravnosti i sopstvenu potrošnju IoT uređaja",
+              "create_active_group": "建立一個群組，加總所有目前已開啟裝置的功率",
               "create_utility_meters": "Dozvolite da powercalc kreira brojila potrošnje, koja se resetuju dnevno, na sat itd."
             }
           },
@@ -820,12 +822,14 @@
               "create_energy_sensors": "Kreiraj senzore energije",
               "create_cost_sensors": "Kreiraj senzore troškova",
               "create_standby_group": "Kreiraj grupu stanja pripravnosti",
+              "create_active_group": "建立運作中群組",
               "create_utility_meters": "Kreiraj brojila potrošnje (utility meters)"
             },
             "data_description": {
               "create_energy_sensors": "Da li powercalc treba da kreira kWh senzore",
               "create_cost_sensors": "Da li powercalc treba da kreira senzore troškova. Zahteva konfigurisanje cene energije u sledećim koracima",
               "create_standby_group": "Kreira grupu koja sabira svu potrošnju u stanju pripravnosti i sopstvenu potrošnju IoT uređaja",
+              "create_active_group": "建立一個群組，加總所有目前已開啟裝置的功率",
               "create_utility_meters": "Dozvolite da powercalc kreira brojila potrošnje, koja se resetuju dnevno, na sat itd."
             }
           },
