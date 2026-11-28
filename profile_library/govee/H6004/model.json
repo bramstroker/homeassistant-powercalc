@@ -1,0 +1,42 @@
+{
+  "authors": [
+    {
+      "github": "turmacar",
+      "name": "turmacar"
+    }
+  ],
+  "calculation_strategy": "lut",
+  "created_at": "2026-11-26T23:15:37Z",
+  "device_specs": {
+    "connectivity": [
+      "wifi",
+      "bluetooth"
+    ],
+    "form_factor": "bulb",
+    "lumens": 800,
+    "rated_power": 9,
+    "socket": "E26"
+  },
+  "device_type": "light",
+  "gtin": [
+    "850061998576"
+  ],
+  "mains_voltage": 120,
+  "measure_description": "Measured with Powercalc Measure, two bulbs in parallel behind one meter",
+  "measure_device": "Zooz Z-Wave Plus Power Switch ZEN15",
+  "measure_device_firmware": "2.40.0",
+  "measure_method": "script",
+  "measure_settings": {
+    "DUMMY_LOAD": false,
+    "NUM_LIGHTS": 2,
+    "SAMPLE_COUNT": 3,
+    "SLEEP_TIME": 6.0,
+    "VERSION": "master"
+  },
+  "name": "RGBWW Smart LED Bulb A19",
+  "standby_power": 0.46,
+  "voltage_range": {
+    "max": 125.93,
+    "min": 121.08
+  }
+}
